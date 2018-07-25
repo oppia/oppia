@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
+import feconf
 
 (suggestion_models, feedback_models, email_models, user_models) = (
     models.Registry.import_models(
@@ -239,11 +240,10 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             email_models.GeneralFeedbackEmailReplyToIdModel(
                 id=new_id, reply_to_id=item.reply_to_id).put()
         elif isinstance(item, user_models.UserSubscriptionsModel):
-            for thread_id in item.feedback_thread_ids:
-                if len(thread_id.split('.')) == 2:
-                    new_thread_id = 'exploration.' + thread_id
-                    if new_thread_id not in item.feedback_thread_ids:
-                        item.feedback_thread_ids.append(new_thread_id)
+            new_thread_ids = (
+                ['%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
+                 for thread_id in item.feedback_thread_ids])
+            item.general_feedback_thread_ids = new_thread_ids
             item.put()
 
     @staticmethod

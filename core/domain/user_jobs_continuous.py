@@ -240,7 +240,10 @@ class RecentUpdatesMRJobManager(
 
         exploration_ids_list = item.activity_ids
         collection_ids_list = item.collection_ids
-        feedback_thread_ids_list = item.feedback_thread_ids
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            feedback_thread_ids_list = item.general_feedback_thread_ids
+        else:
+            feedback_thread_ids_list = item.feedback_thread_ids
 
         (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(

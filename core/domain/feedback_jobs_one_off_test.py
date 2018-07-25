@@ -399,10 +399,10 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(output[0][1], 10)
 
 
-class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
+class FeedbackThreadIdMigrationOneJobTest(test_utils.GenericTestBase):
     """Tests for FeedbackThreadIdMigrationOneOffJob class."""
     def setUp(self):
-        super(FeedbackThreadIdMigrationJobTest, self).setUp()
+        super(FeedbackThreadIdMigrationOneJobTest, self).setUp()
         feedback_models.FeedbackThreadModel(
             id='exp1.thread1', exploration_id='exp1', state_name='state1',
             original_author_id='author',
@@ -478,5 +478,8 @@ class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             new_user_subscription_model.feedback_thread_ids,
-            ['exp1.thread1', 'exp2.thread2', 'exploration.exp1.thread1',
-             'exploration.exp2.thread2'])
+            ['exp1.thread1', 'exp2.thread2'])
+        self.assertEqual(
+            new_user_subscription_model.general_feedback_thread_ids,
+            ['exploration.exp1.thread1', 'exploration.exp2.thread2'])
+

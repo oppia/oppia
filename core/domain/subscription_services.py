@@ -19,6 +19,7 @@
 import datetime
 
 from core.platform import models
+import feconf
 import utils
 
 (user_models,) = models.Registry.import_models([
@@ -41,11 +42,17 @@ def subscribe_to_thread(user_id, feedback_thread_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (feedback_thread_id not in
-            subscriptions_model.feedback_thread_ids):
-        subscriptions_model.feedback_thread_ids.append(
-            feedback_thread_id)
-        subscriptions_model.put()
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if (feedback_thread_id not in
+                subscriptions_model.general_feedback_thread_ids):
+            subscriptions_model.general_feedback_thread_ids.append(
+                feedback_thread_id)
+    else:
+        if (feedback_thread_id not in
+                subscriptions_model.feedback_thread_ids):
+            subscriptions_model.feedback_thread_ids.append(
+                feedback_thread_id)
+    subscriptions_model.put()
 
 
 def subscribe_to_exploration(user_id, exploration_id):
