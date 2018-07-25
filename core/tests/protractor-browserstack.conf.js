@@ -107,6 +107,10 @@ exports.config = {
       'protractor_mobile/navigation.js'
     ],
 
+    ratings: [
+      'protractor/ratings.js'
+    ],
+
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ]

@@ -99,6 +99,10 @@ exports.config = {
       'protractor/publicationAndLibrary.js'
     ],
 
+    ratings: [
+      'protractor/ratings.js'
+    ],
+
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ],
