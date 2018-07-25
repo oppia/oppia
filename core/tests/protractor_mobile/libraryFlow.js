@@ -82,6 +82,11 @@ describe('Library pages tour on mobile', function() {
   });
 
   afterEach(function() {
-    general.checkForConsoleErrors([]);
+    general.checkForConsoleErrors([
+      // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.
+      'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+      'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Mobile device testing"',
+      'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "'
+    ]);
   });
 });
