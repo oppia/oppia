@@ -19,7 +19,7 @@
 // Mapping from Issue type to corresponding directive.
 oppia.constant('ISSUE_DIRECTIVE_MAPPING', {});
 
-oppia.directive('IssuesDirective', [
+oppia.directive('issuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
