@@ -141,7 +141,7 @@ var LearnerDashboardPage = function() {
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
     waitFor.visibilityOf(
-      explorationTitle, 'Unable to find collection ' + title);
+      explorationTitle, 'Unable to find exploration ' + title);
     expect(explorationTitle.isDisplayed()).toBe(true);
   };
 
