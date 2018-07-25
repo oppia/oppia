@@ -991,3 +991,90 @@ RTE_CONTENT_SPEC = {
 
     }
 }
+
+# Validation criteria for customization arguments of rich text components
+# along with their default values.
+RICH_TEXT_COMPONENTS = [{
+    'name': 'oppia-noninteractive-link',
+    'customization_args': [{
+        'name': 'url-with-value',
+        'type': "SanitizedUrl",
+        'default_value': "https://www.example.com"
+    }, {
+        'name': 'text-with-value',
+        'type': "UnicodeString",
+        'default_value': ""
+    }]
+}, {
+    'name': 'oppia-noninteractive-math',
+    'customization_args': [{
+        'name': 'raw_latex-with-value',
+        'type': "MathLatexString",
+        'default_value': ""
+    }]
+}, {
+    'name': 'oppia-noninteractive-image',
+    'customization_args': [{
+        'name': 'filepath-with-value',
+        'type': "Filepath",
+        'default_value': ""
+    }, {
+        'name': 'caption-with-value',
+        'type': "UnicodeString",
+        'default_value': ""
+    }, {
+        'name': 'alt-with-value',
+        'type': "UnicodeString",
+        'default_value': ""
+    }]
+}, {
+    'name': 'oppia-noninteractive-video',
+    'customization_args': [{
+        'name': 'video_id-with-value',
+        'type': "UnicodeString",
+        'default_value': ""
+    }, {
+        'name': 'start-with-value',
+        'type': "Int",
+        'default_value': 0
+    }, {
+        'name': 'end-with-value',
+        'type': "Int",
+        'default_value': 0
+    }, {
+        'name': 'autoplay-with-value',
+        'type': "Boolean",
+        'default_value': False
+    }]
+}, {
+    'name': 'oppia-noninteractive-collapsible',
+    'customization_args': [{
+        'name': 'heading-with-value',
+        'type': "UnicodeString",
+        'default_value': "Sample Header"
+    }, {
+        'name': 'content-with-value',
+        'type': "Html",
+        'default_value': "You have opened the collapsible block."
+    }]
+}, {
+    'name': 'oppia-noninteractive-tabs',
+    'customization_args': [{
+        'name': 'tab_contents-with-value',
+        # This is given a special type custom because a separate test is needed
+        # to see that the arg type here is list of dictionaries.
+        'type': 'custom',
+        'title_type': "UnicodeString",
+        'content_type': "Html",
+        'default_value': [{
+            "title": "Hint introduction",
+            "content": (
+                "This set of tabs shows some hints. "
+                "Click on the other tabs to display the relevant hints."
+            )
+        }, {
+            "title": "Hint 1",
+            "content": "This is a first hint."
+        }]
+    }]
+}]

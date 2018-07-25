@@ -693,3 +693,44 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, values)
+
+
+class CustomizationArgsValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for validating all the customizations arguments of
+    Rich Text Components.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        err_dict = {}
+
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+        except Exception as e:
+            yield('Error %s in exploration' % str(e), [item.id])
+            return
+
+        html_list = exploration.get_all_html_content_strings()
+        try:
+            err_dict = html_cleaner.validate_customization_args(html_list)
+        except Exception as e:
+            yield(
+                'Error in exploration %s' % item.id,
+                [traceback.format_exc()])
+            return
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
