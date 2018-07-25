@@ -46,13 +46,13 @@ oppia.directive('questionsTab', [
           };
 
           $scope.showQuestionEditor = function(id) {
-            $scope.questionEditorIsShown = true;
             EditableQuestionBackendApiService.fetchQuestion(id).then(
               function(questionBackendDict) {
                 var question = QuestionObjectFactory.createFromBackendDict(
                   questionBackendDict);
                 $scope.questionId = question.getId();
                 $scope.questionStateData = question.getStateData();
+                $scope.questionEditorIsShown = true;
               });
           };
 
