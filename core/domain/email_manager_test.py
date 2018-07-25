@@ -1574,7 +1574,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
         expected_email_subject = 'Invitation to review suggestions'
         expected_email_html_body = (
             'Hi reviewer,<br>'
-            'You have been actively contributing quality suggestions for oppia '
+            'You have been actively contributing quality suggestions for Oppia '
             'content in category Algebra. In recognition of your contributions,'
             ' we would like to have you as one of our reviewers. As a reviewer,'
             ' you would be responsible for regularly reviewing the suggestions '

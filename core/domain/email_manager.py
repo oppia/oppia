@@ -953,7 +953,7 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
 
     email_body_template = (
         'Hi %s,<br>'
-        'You have been actively contributing quality suggestions for oppia '
+        'You have been actively contributing quality suggestions for Oppia '
         'content in category %s. In recognition of your contributions, we would'
         ' like to have you as one of our reviewers. As a reviewer, you would be'
         ' responsible for regularly reviewing the suggestions in the same '
