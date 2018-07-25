@@ -94,6 +94,14 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         latest_exp_version = exploration.version
         versions = range(1, latest_exp_version + 1)
 
+        # Retrieve all exploration instances.
+        exploration_instances = exp_models.ExplorationModel.get_multi_versions(
+            exploration.id, versions)
+
+        old_exp_stats_instances = (
+            stats_models.ExplorationStatsModel.get_multi_versions(
+                exploration.id, versions))
+
         # Get list of snapshot models for each version of the exploration.
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
@@ -101,13 +109,12 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not exploration_model.deleted:
             current_version = exploration_model.version
             for exp_version in xrange(1, current_version + 1):
-                exp_stats_model = (
-                    stats_models.ExplorationStatsModel.get_model(
-                        exploration.id, exp_version))
-                if not exp_stats_model:
+                exp_stats = old_exp_stats_instances[exp_version - 1]
+                if not exp_stats:
+                    curr_exploration = exploration_instances[exp_version - 1]
                     state_stats_mapping = {
                         state_name: stats_domain.StateStats.create_default()
-                        for state_name in exploration.states
+                        for state_name in curr_exploration.states
                     }
                     exp_stats_default = (
                         stats_domain.ExplorationStats.create_default(
@@ -158,10 +165,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_stats_instances.append(exp_stats_default)
                     stats_services.create_stats_model(exp_stats_default)
                 else:
-                    exp_stats_instance = (
-                        stats_services.get_exploration_stats_from_model(
-                            exp_stats_model))
-                    exp_stats_instances.append(exp_stats_instance)
+                    exp_stats_instances.append(exp_stats)
             yield(
                 exploration.id,
                 'ExplorationStatsModel for missing versions regenerated.')
