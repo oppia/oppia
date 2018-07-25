@@ -76,6 +76,9 @@ class ExplorationIssuesModelCreatorOneOffJob(
 class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to regenerate missing stats models for explorations with
     correct v1 stats from previous versions.
+
+    This job is meant to be run only before the RecomputeStatisticsOneOffJob,
+    the v2 stats will be inconsistent otherwise.
     """
 
     @classmethod
