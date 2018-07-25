@@ -170,7 +170,7 @@ describe('DragAndDropSortInputValidationService', function() {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched ' +
-          'because both the selected elements are not distinct.'
+          'because both the selected elements are same.'
     }]);
   });
 });

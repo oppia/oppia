@@ -25,16 +25,18 @@ oppia.directive('dragAndDropHtmlStringEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/drag_and_drop_html_string_editor_directive.html'),
       controller: ['$scope', function($scope) {
-        if (!$scope.value) {
-          $scope.value = '';
-        }
-        $scope.selectedItem = $scope.value;
         $scope.name = math.random().toString(36).substring(7);
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
+
+        if (!$scope.value || $scope.value === '') {
+          $scope.value = $scope.choices[0].id;
+        }
+        $scope.selectedItem = $scope.value;
         if ($scope.selectedItem === '' || !$scope.selectedItem) {
           $scope.selectedItem = $scope.choices[0].id;
         }
+
         $scope.selection = function(selectedItem) {
           $scope.value = selectedItem;
         };
