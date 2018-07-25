@@ -9,7 +9,7 @@
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
          style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
-  <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+  <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>" class="protractor-mobile-test-exploration">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%'}">
