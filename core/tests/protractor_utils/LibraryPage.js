@@ -181,10 +181,10 @@ var LibraryPage = function(){
     var mobileSearchInput = searchInput.get(1);
     if (browser.isMobile) {
       mobileSearchInput.clear();
-      mobileSearchInput.sendKeys(explorationTitle);
+      mobileSearchInput.sendKeys(collectionTitle);
     } else {
       desktopSearchInput.clear();
-      desktopSearchInput.sendKeys(explorationTitle);
+      desktopSearchInput.sendKeys(collectionTitle);
     }
   };
 };
