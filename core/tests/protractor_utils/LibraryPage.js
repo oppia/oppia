@@ -45,7 +45,7 @@ var LibraryPage = function(){
     element(by.css('.protractor-test-search-bar-language-selector'))
   );
   var searchInput = element.all(
-    by.css('.protractor-test-search-input')).first();
+    by.css('.protractor-test-search-input'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -150,14 +150,42 @@ var LibraryPage = function(){
 
   this.findExploration = function(explorationTitle) {
     waitFor.pageToFullyLoad();
-    searchInput.clear();
-    searchInput.sendKeys(explorationTitle);
+    // The library page has two search bar input elements.
+    // The first input element is visible only in a desktop
+    // browser and is invisible in case of a mobile browser.
+    // The second input element is visible when the library
+    // page is rendered for mobile device.
+
+    var desktopSearchInput = searchInput.first();
+    // get function is a zero-based index.
+    var mobileSearchInput = searchInput.get(1);
+    if (browser.isMobile) {
+      mobileSearchInput.clear();
+      mobileSearchInput.sendKeys(explorationTitle);
+    } else {
+      desktopSearchInput.clear();
+      desktopSearchInput.sendKeys(explorationTitle);
+    }
   };
 
   this.findCollection = function(collectionTitle) {
     waitFor.pageToFullyLoad();
-    searchInput.clear();
-    searchInput.sendKeys(collectionTitle);
+    // The library page has two search bar input elements.
+    // The first input element is visible only in a desktop
+    // browser and is invisible in case of a mobile browser.
+    // The second input element is visible when the library
+    // page is rendered for mobile device.
+
+    var desktopSearchInput = searchInput.first();
+    // get function is a zero-based index.
+    var mobileSearchInput = searchInput.get(1);
+    if (browser.isMobile) {
+      mobileSearchInput.clear();
+      mobileSearchInput.sendKeys(explorationTitle);
+    } else {
+      desktopSearchInput.clear();
+      desktopSearchInput.sendKeys(explorationTitle);
+    }
   };
 };
 
