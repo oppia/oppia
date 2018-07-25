@@ -50,6 +50,7 @@ oppia.factory('TrainingDataEditorPanelService', [
                 TrainingModalService, FocusManagerService) {
               var _explorationId = ContextService.getExplorationId();
               var _stateName = EditorStateService.getActiveStateName();
+              $scope.stateName = _stateName;
               var _state = ExplorationStatesService.getState(_stateName);
               var answerGroupIndex = (
                 ResponsesService.getActiveAnswerGroupIndex());

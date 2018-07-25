@@ -13,19 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Standalone services for the exploration editor page.
+ * @fileoverview Standalone services for the general state editor page.
  */
 
 oppia.factory('statePropertyService', [
-  '$log', 'AlertsService', 'ExplorationStatesService',
-  function($log, AlertsService, ExplorationStatesService) {
+  '$log', 'AlertsService',
+  function($log, AlertsService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
     // editor, and every time the state is loaded, so that proper behavior is
     // maintained if e.g. the state is renamed.
-    // TODO(sll): Remove this service and its descendants, in favour of using
-    // ExplorationStatesService directly.
     return {
       init: function(stateName, value) {
         if (this.setterMethodKey === null) {
@@ -60,8 +58,7 @@ oppia.factory('statePropertyService', [
       _isValid: function(value) {
         return true;
       },
-      // Creates a new entry in the change list, and updates the memento to the
-      // displayed value.
+      // Updates the memento to the displayed value.
       saveDisplayedValue: function() {
         if (this.setterMethodKey === null) {
           throw 'State property setter method key cannot be null.';
@@ -79,8 +76,6 @@ oppia.factory('statePropertyService', [
 
         AlertsService.clearWarnings();
 
-        var setterFunc = ExplorationStatesService[this.setterMethodKey];
-        setterFunc(this.stateName, angular.copy(this.displayed));
         this.savedMemento = angular.copy(this.displayed);
       },
       // Reverts the displayed value to the saved memento.

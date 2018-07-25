@@ -20,7 +20,10 @@ oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSaveSolution: '&',
+        onSaveContentIdsToAudioTranslations: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
         'state_solution_editor_directive.html'),
@@ -205,8 +208,16 @@ oppia.directive('stateSolutionEditor', [
                 stateContentIdsToAudioTranslationsService.displayed
                   .addContentId(explanationContentId);
                 stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+                $scope.onSaveContentIdsToAudioTranslations()(
+                  stateContentIdsToAudioTranslationsService.stateName,
+                  stateContentIdsToAudioTranslationsService.displayed
+                );
               }
               stateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution()(
+                stateSolutionService.stateName,
+                stateSolutionService.displayed
+              );
             });
           };
 
@@ -239,7 +250,15 @@ oppia.directive('stateSolutionEditor', [
                 .deleteContentId(explanationContentId);
               stateSolutionService.displayed = null;
               stateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution()(
+                stateSolutionService.stateName,
+                stateSolutionService.displayed
+              );
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations()(
+                stateContentIdsToAudioTranslationsService.stateName,
+                stateContentIdsToAudioTranslationsService.displayed
+              );
               ExplorationStatesService.deleteSolutionValidity(
                 EditorStateService.getActiveStateName());
             });

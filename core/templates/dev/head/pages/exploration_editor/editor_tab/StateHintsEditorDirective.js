@@ -20,7 +20,11 @@ oppia.directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSaveHints: '&',
+        onSaveSolution: '&',
+        onSaveContentIdsToAudioTranslations: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
         'state_hints_editor_directive.html'),
@@ -30,14 +34,14 @@ oppia.directive('stateHintsEditor', [
         'stateHintsService', 'ExplorationStatesService', 'COMPONENT_NAME_HINT',
         'stateContentIdsToAudioTranslationsService', 'EditabilityService',
         'stateInteractionIdService', 'UrlInterpolationService',
-        'HintObjectFactory', 'ExplorationPlayerService', 'stateSolutionService',
+        'HintObjectFactory', 'stateSolutionService',
         function(
             $scope, $rootScope, $uibModal, $filter, EditorStateService,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
             stateHintsService, ExplorationStatesService, COMPONENT_NAME_HINT,
             stateContentIdsToAudioTranslationsService, EditabilityService,
             stateInteractionIdService, UrlInterpolationService,
-            HintObjectFactory, ExplorationPlayerService, stateSolutionService) {
+            HintObjectFactory, stateSolutionService) {
           $scope.EditorStateService = EditorStateService;
           $scope.EditabilityService = EditabilityService;
           $scope.stateHintsService = stateHintsService;
@@ -83,6 +87,8 @@ oppia.directive('stateHintsEditor', [
                 AlertsService.addInfoMessage('Deleting empty hint.');
                 stateHintsService.displayed.splice(currentActiveIndex, 1);
                 stateHintsService.saveDisplayedValue();
+                $scope.onSaveHints()(
+                  stateHintsService.stateName, stateHintsService.displayed);
               }
             }
             // If the current hint is being clicked on again, close it.
@@ -147,7 +153,13 @@ oppia.directive('stateHintsEditor', [
               stateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.contentId);
               stateHintsService.saveDisplayedValue();
+              $scope.onSaveHints()(
+                stateHintsService.stateName, stateHintsService.displayed);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations()(
+                stateContentIdsToAudioTranslationsService.stateName,
+                stateContentIdsToAudioTranslationsService.displayed
+              );
             });
           };
 
@@ -169,6 +181,8 @@ oppia.directive('stateHintsEditor', [
             },
             stop: function() {
               stateHintsService.saveDisplayedValue();
+              $scope.onSaveHints()(
+                stateHintsService.stateName, stateHintsService.displayed);
             }
           };
 
@@ -198,17 +212,27 @@ oppia.directive('stateHintsEditor', [
                 .explanation.getContentId();
               stateSolutionService.displayed = null;
               stateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution()(
+                stateSolutionService.stateName,
+                stateSolutionService.displayed
+              );
 
               var hintContentId = stateHintsService.displayed[0]
                 .hintContent.getContentId();
               stateHintsService.displayed = [];
               stateHintsService.saveDisplayedValue();
+              $scope.onSaveHints()(
+                stateHintsService.stateName, stateHintsService.displayed);
 
               stateContentIdsToAudioTranslationsService.displayed
                 .deleteContentId(solutionContentId);
               stateContentIdsToAudioTranslationsService.displayed
                 .deleteContentId(hintContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations()(
+                stateContentIdsToAudioTranslationsService.stateName,
+                stateContentIdsToAudioTranslationsService.displayed
+              );
             });
           };
 
@@ -245,15 +269,23 @@ oppia.directive('stateHintsEditor', [
                   .hintContent.getContentId();
                 stateHintsService.displayed.splice(index, 1);
                 stateHintsService.saveDisplayedValue();
+                $scope.onSaveHints()(
+                  stateHintsService.stateName, stateHintsService.displayed);
                 stateContentIdsToAudioTranslationsService.displayed
                   .deleteContentId(hintContentId);
                 stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+                $scope.onSaveContentIdsToAudioTranslations()(
+                  stateContentIdsToAudioTranslationsService.stateName,
+                  stateContentIdsToAudioTranslationsService.displayed
+                );
               }
             });
           };
 
           $scope.onSaveInlineHint = function() {
             stateHintsService.saveDisplayedValue();
+            $scope.onSaveHints()(
+              stateHintsService.stateName, stateHintsService.displayed);
           };
         }
       ]

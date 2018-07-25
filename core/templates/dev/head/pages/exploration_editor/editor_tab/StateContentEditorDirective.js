@@ -29,8 +29,8 @@ oppia.directive('stateContentEditor', [
       },
       scope: {
         getOnSaveContentFn: '&onSaveContentFn',
-        stateService: '=',
-        isQuestion: '&',
+        onSaveStateContent: '&',
+        onSaveContentIdsToAudioTranslations: '&',
         isInitialState: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -60,11 +60,9 @@ oppia.directive('stateContentEditor', [
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
-            if (!$scope.isQuestion()) {
-              $scope.stateService.saveStateContent(
-                stateContentService.stateName,
-                angular.copy(stateContentService.displayed));
-            }
+            $scope.onSaveStateContent()(
+              stateContentService.stateName,
+              stateContentService.displayed);
             $scope.contentEditorIsOpen = false;
           };
 
@@ -81,12 +79,10 @@ oppia.directive('stateContentEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(contentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              if (!$scope.isQuestion()) {
-                $scope.stateService.saveContentIdsToAudioTranslations(
-                  stateContentIdsToAudioTranslationsService.stateName,
-                  angular.copy(
-                    stateContentIdsToAudioTranslationsService.displayed));
-              }
+              $scope.onSaveContentIdsToAudioTranslations()(
+                stateContentIdsToAudioTranslationsService.stateName,
+                stateContentIdsToAudioTranslationsService.displayed
+              );
             });
           };
 
@@ -133,12 +129,10 @@ oppia.directive('stateContentEditor', [
 
           $scope.onAudioTranslationsEdited = function() {
             stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-            if (!$scope.isQuestion()) {
-              $scope.stateService.saveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.stateName,
-                angular.copy(
-                  stateContentIdsToAudioTranslationsService.displayed));
-            }
+            $scope.onSaveContentIdsToAudioTranslations()(
+              stateContentIdsToAudioTranslationsService.stateName,
+              stateContentIdsToAudioTranslationsService.displayed
+            );
           };
         }
       ]

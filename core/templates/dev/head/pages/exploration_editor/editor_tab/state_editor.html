@@ -13,8 +13,8 @@
       <div id="tutorialStateContent" class="oppia-editor-card-section"
            style="padding-top: 36px; padding-bottom: 36px;">
         <state-content-editor on-save-content-fn="showInteraction"
-                              state-service="explorationStatesService"
-                              is-question="false"
+                              on-save-state-content="saveStateContent"
+                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
                               is-initial-state="isInitialState()">
         </state-content-editor>
       </div>
@@ -22,16 +22,29 @@
   </md-card>
 
   <div ng-show="interactionIsShown">
-    <state-interaction-editor></state-interaction-editor>
+    <state-interaction-editor state-name="stateName"
+                              on-save-state-content="saveStateContent"
+                              on-save-interaction-id="saveInteractionId"
+                              on-save-interaction-customization-args="saveInteractionCustomizationArgs"
+                              on-save-solution="saveSolution"
+                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
+                              recompute-graph="recomputeGraph">
+    </state-interaction-editor>
   </div>
 
   <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-    <state-responses></state-responses>
+    <state-responses on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
+    </state-responses>
     <div>
-      <state-hints-editor></state-hints-editor>
+      <state-hints-editor on-save-hints="saveHints"
+                          on-save-solution="saveSolution"
+                          on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
+      </state-hints-editor>
     </div>
     <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution-editor></state-solution-editor>
+      <state-solution-editor on-save-solution="saveSolution"
+                             on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
+      </state-solution-editor>
     </div>
   </div>
 </div>

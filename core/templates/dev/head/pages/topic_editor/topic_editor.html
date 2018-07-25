@@ -4,6 +4,16 @@
   {{ topic_name }} - Oppia
 {% endblock maintitle %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
+      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
+  </script>
+
+{% endblock header_js %}
+
 {% block navbar_breadcrumb %}
   <topic-editor-navbar-breadcrumb>
   </topic-editor-navbar-breadcrumb>
@@ -60,6 +70,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/GenerateContentIdService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/EditabilityService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/QuestionCreationService.js"></script>
@@ -107,8 +118,9 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateContentEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/EditabilityService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorFirstTimeEventsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateInteractionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/StoriesListDirective.js"></script>
@@ -119,5 +131,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorRoutingService.js"></script>
+
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
   {% include 'components/rich_text_components.html' %}
+  {{ interaction_templates }}
+  {{ visualizations_html }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

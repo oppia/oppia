@@ -27,26 +27,34 @@ oppia.directive('stateInteractionEditor', [
           return scope;
         };
       },
-      scope: {},
+      scope: {
+        getStateName: '&stateName',
+        onSaveStateContent: '&',
+        onSaveInteractionId: '&',
+        onSaveInteractionCustomizationArgs: '&',
+        onSaveSolution: '&',
+        onSaveContentIdsToAudioTranslations: '&',
+        recomputeGraph: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
         'state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
-        'AlertsService', 'EditorStateService', 'HtmlEscaperService',
+        'AlertsService', 'HtmlEscaperService',
         'INTERACTION_SPECS', 'stateInteractionIdService',
         'GenerateContentIdService', 'stateCustomizationArgsService',
-        'EditabilityService', 'ExplorationStatesService', 'GraphDataService',
+        'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'stateContentIdsToAudioTranslationsService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
         'stateSolutionService', 'stateHintsService',
         'stateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
-            AlertsService, EditorStateService, HtmlEscaperService,
+            AlertsService, HtmlEscaperService,
             INTERACTION_SPECS, stateInteractionIdService,
             GenerateContentIdService, stateCustomizationArgsService,
-            EditabilityService, ExplorationStatesService, GraphDataService,
+            EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             stateContentIdsToAudioTranslationsService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
@@ -97,19 +105,16 @@ oppia.directive('stateInteractionEditor', [
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
             $scope.hasLoaded = false;
-
             InteractionDetailsCacheService.reset();
 
-            $scope.stateName = EditorStateService.getActiveStateName();
-
+            $scope.stateName = stateData.name;
             stateInteractionIdService.init(
               $scope.stateName, stateData.interaction.id);
             stateCustomizationArgsService.init(
               $scope.stateName, stateData.interaction.customizationArgs);
 
             stateSolutionService.init(
-              EditorStateService.getActiveStateName(),
-              stateData.interaction.solution);
+              stateData.name, stateData.interaction.solution);
 
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
@@ -129,7 +134,7 @@ oppia.directive('stateInteractionEditor', [
           // current active state is a terminal one.
           var updateDefaultTerminalStateContentIfEmpty = function() {
             // Get current state.
-            var stateName = EditorStateService.getActiveStateName();
+            var stateName = $scope.getStateName();
 
             // Check if the content is currently empty, as expected.
             var previousContent = stateContentService.savedMemento;
@@ -140,6 +145,10 @@ oppia.directive('stateInteractionEditor', [
             stateContentService.displayed.setHtml(
               DEFAULT_TERMINAL_STATE_CONTENT);
             stateContentService.saveDisplayedValue();
+            $scope.onSaveStateContent()(
+              stateContentService.stateName,
+              stateContentService.displayed
+            );
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
@@ -152,9 +161,17 @@ oppia.directive('stateInteractionEditor', [
                 updateDefaultTerminalStateContentIfEmpty();
               }
               stateInteractionIdService.saveDisplayedValue();
+              $scope.onSaveInteractionId()(
+                stateInteractionIdService.stateName,
+                stateInteractionIdService.displayed
+              );
             }
 
             stateCustomizationArgsService.saveDisplayedValue();
+            $scope.onSaveInteractionCustomizationArgs()(
+              stateCustomizationArgsService.stateName,
+              stateCustomizationArgsService.displayed
+            );
 
             InteractionDetailsCacheService.set(
               stateInteractionIdService.savedMemento,
@@ -168,7 +185,7 @@ oppia.directive('stateInteractionEditor', [
                 stateInteractionIdService.savedMemento);
             }
 
-            GraphDataService.recompute();
+            $scope.recomputeGraph()();
             _updateInteractionPreviewAndAnswerChoices();
           };
 
@@ -394,13 +411,33 @@ oppia.directive('stateInteractionEditor', [
               InteractionDetailsCacheService.removeDetails(
                 stateInteractionIdService.savedMemento);
               stateInteractionIdService.saveDisplayedValue();
+              $scope.onSaveInteractionId()(
+                stateInteractionIdService.stateName,
+                stateInteractionIdService.displayed
+              );
+
               stateCustomizationArgsService.saveDisplayedValue();
+              $scope.onSaveInteractionCustomizationArgs()(
+                stateCustomizationArgsService.stateName,
+                stateCustomizationArgsService.displayed
+              );
+
               stateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution()(
+                stateSolutionService.stateName,
+                stateSolutionService.displayed
+              );
+
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations()(
+                stateContentIdsToAudioTranslationsService.stateName,
+                stateContentIdsToAudioTranslationsService.displayed
+              );
+
               $rootScope.$broadcast(
                 'onInteractionIdChanged',
                 stateInteractionIdService.savedMemento);
-              GraphDataService.recompute();
+              $scope.recomputeGraph()();
               _updateInteractionPreviewAndAnswerChoices();
             });
           };
@@ -463,19 +500,20 @@ oppia.directive('testInteractionPanel', [
       scope: {
         stateContent: '&',
         inputTemplate: '&',
-        onSubmitAnswer: '&'
+        onSubmitAnswer: '&',
+        getStateName: '&stateName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
+        '$scope', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
         'EVENT_PROGRESS_NAV_SUBMITTED',
-        function($scope, EditorStateService, ExplorationStatesService,
+        function($scope, ExplorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
             EVENT_PROGRESS_NAV_SUBMITTED) {
-          var _stateName = EditorStateService.getActiveStateName();
+          var _stateName = $scope.getStateName();
           var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
