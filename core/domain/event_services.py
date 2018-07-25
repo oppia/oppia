@@ -75,16 +75,16 @@ class StatsEventsHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_ALL_STATS
 
     @classmethod
-    def is_latest_version(cls, exp_id, exp_version):
+    def _is_latest_version(cls, exp_id, exp_version):
         """Verifies whether the exploration version for the stats to be stored
-        correspond to the latest version of the exploration.
+        corresponds to the latest version of the exploration.
         """
         exploration = exp_services.get_exploration_by_id(exp_id)
         return exploration.version == exp_version
 
     @classmethod
     def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
-        if cls.is_latest_version(exploration_id, exp_version):
+        if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
                 stats_services.update_stats,
                 taskqueue_services.QUEUE_NAME_STATS, exploration_id,
