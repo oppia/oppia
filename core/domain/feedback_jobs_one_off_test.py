@@ -482,4 +482,3 @@ class FeedbackThreadIdMigrationOneJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             new_user_subscription_model.general_feedback_thread_ids,
             ['exploration.exp1.thread1', 'exploration.exp2.thread2'])
-
