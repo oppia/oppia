@@ -43,6 +43,8 @@ oppia.directive('topicEditorNavbar', [
           $scope.selectMainTab = TopicEditorRoutingService.navigateToMainTab;
           $scope.selectSubtopicsTab =
             TopicEditorRoutingService.navigateToSubtopicsTab;
+          $scope.selectQuestionsTab =
+            TopicEditorRoutingService.navigateToQuestionsTab;
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();

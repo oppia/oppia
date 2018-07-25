@@ -22,6 +22,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
+from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -710,11 +711,12 @@ def can_subscribe_to_users(handler):
 def can_edit_exploration(handler):
     """Decorator to check whether the user can edit given exploration."""
 
-    def test_can_edit(self, exploration_id, **kwargs):
+    def test_can_edit(self, exploration_id, *args, **kwargs):
         """Checks if the user can edit the exploration.
 
         Args:
             exploration_id: str. The exploration id.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -736,7 +738,7 @@ def can_edit_exploration(handler):
 
         if rights_manager.check_can_edit_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, *args, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
@@ -1061,6 +1063,40 @@ def can_access_learner_dashboard(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def can_manage_question_skill_status(handler):
+    """Decorator to check whether the user can publish a question and link it
+    to a skill.
+    """
+
+    def test_can_manage_question_skill_status(self, **kwargs):
+        """Checks if the user can publish a question directly.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to publish a question.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+                role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS in
+                self.user.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish a question.')
+    test_can_manage_question_skill_status.__wrapped__ = True
+
+    return test_can_manage_question_skill_status
 
 
 def require_user_id_else_redirect_to_homepage(handler):
@@ -1744,3 +1780,45 @@ def can_change_topic_publication_status(handler):
     test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
+
+
+def get_decorator_for_accepting_suggestion(decorator):
+    """Function that takes a decorator as an argument and then applies some
+    common checks and then checks the permissions specified by the passed in
+    decorator.
+
+    Args:
+        decorator: function. The decorator to be used to verify permissions
+            for accepting/rejecting suggestions.
+
+    Returns:
+        function. The new decorator which includes all the permission checks for
+            accepting/rejecting suggestions. These permissions include:
+            - Admins can accept/reject any suggestion.
+            - Users with scores above threshold can accept/reject any suggestion
+            in that category.
+            - Any user with edit permissions to the target entity can
+            accept/reject suggestions for that entity.
+    """
+    def generate_decorator_for_handler(handler):
+        def test_can_accept_suggestion(
+                self, target_id, suggestion_id, **kwargs):
+            if not self.user_id:
+                raise base.UserFacingExceptions.NotLoggedInException
+            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            if (
+                    role_services.ACTION_ACCEPT_ANY_SUGGESTION in
+                    user_actions_info.actions):
+                return handler(self, target_id, suggestion_id, **kwargs)
+
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            if suggestion_services.check_user_can_review_in_category(
+                    self.user_id, suggestion.score_category):
+                return handler(self, target_id, suggestion_id, **kwargs)
+
+            return decorator(handler)(self, target_id, suggestion_id, **kwargs)
+
+        test_can_accept_suggestion.__wrapped__ = True
+        return test_can_accept_suggestion
+
+    return generate_decorator_for_handler

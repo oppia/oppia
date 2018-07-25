@@ -366,6 +366,9 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# No. of questions to be displayed on a page in the topic editor.
+NUM_QUESTIONS_PER_PAGE = 10
+
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
@@ -624,13 +627,15 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_QUESTION_URL = '/question_editor_handler/create_new'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
+TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_CREATION_URL = '/question_editor_handler/create_new'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
-QUESTION_MANAGER_URL = '/questionmanagerhandler'
+QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -715,16 +720,8 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = True
-# Threshold for early quit playthrough.
-EARLY_QUIT_THRESHOLD_IN_SECS = 45
-# Threshold for multiple incorrect answers playthrough.
-NUM_INCORRECT_ANSWERS_THRESHOLD = 5
-# Threshold for repeated cyclic state transitions playthrough.
-NUM_REPEATED_CYCLES_THRESHOLD = 3
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
-# Probability of recording a playthrough.
-RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False

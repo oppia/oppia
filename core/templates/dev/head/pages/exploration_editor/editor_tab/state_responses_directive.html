@@ -1,4 +1,4 @@
-<div ng-controller="StateResponses">
+<div>
   <div class="oppia-editor-header">
     <strong>Learner's Answers and Oppia's Responses</strong>
   </div>
@@ -24,8 +24,8 @@
             </div>
             <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <response-header index="$index"
-                               summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():false"
-                               short-summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():true"
+                               summary="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
+                               short-summary="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
@@ -66,8 +66,8 @@
             <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
               <response-header index="$index"
                                is-active="$index === activeAnswerGroupIndex"
-                               summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
-                               short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
+                               summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
+                               short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                outcome="defaultOutcome"
                                is-response="true">
               </response-header>
