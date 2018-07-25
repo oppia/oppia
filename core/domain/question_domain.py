@@ -34,6 +34,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
+CMD_ADD_QUESTION_FROM_SUGGESTION = 'add_question_from_suggestion'
 
 # The following commands are deprecated, as these functionalities will be
 # handled by a QuestionSkillLink class in the future.
@@ -59,6 +60,7 @@ class QuestionChange(object):
                 below, together with the other keys in the dict:
                 - 'update question property' (with property_name, new_value
                 and old_value)
+                - 'add_question_from_suggestion' (with question_dict, skill_id)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -76,12 +78,23 @@ class QuestionChange(object):
             else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
 
+        if self.cmd == CMD_ADD_QUESTION_FROM_SUGGESTION:
+            self.question_dict = change_dict['question_dict']
+            self.skill_id = change_dict['skill_id']
+
     def to_dict(self):
         """Returns a dict representing QuestionChange domain object.
 
         Returns:
             dict. A dict representing QuestionChange instance.
         """
+        if self.cmd == CMD_ADD_QUESTION_FROM_SUGGESTION:
+            return {
+                'cmd': self.cmd,
+                'question_dict': self.question_dict,
+                'skill_id': self.skill_id
+            }
+
         return {
             'cmd': self.cmd,
             'property_name': self.property_name,

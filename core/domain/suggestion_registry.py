@@ -337,7 +337,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
-        self.change_cmd = change_cmd
+        self.change_cmd = question_domain.QuestionChange(change_cmd)
         self.score_category = score_category
         self.last_updated = last_updated
 
@@ -356,35 +356,48 @@ class SuggestionAddQuestion(BaseSuggestion):
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
-
-        if 'question_dict' not in self.change_cmd:
+        if not isinstance(self.change_cmd, question_domain.QuestionChange):
             raise utils.ValidationError(
-                'Expected change_cmd to contain question dict')
+                'Expected change_cmd to be an instance of QuestionChange')
 
-        if 'question_state_data' not in self.change_cmd['question_dict']:
+        if not self.change_cmd.cmd:
+            raise utils.ValidationError('Expected change_cmd to contain cmd')
+
+        if (
+                self.change_cmd.cmd !=
+                question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION):
+            raise utils.ValidationError('Expected cmd to be %s, obtained %s' % (
+                question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION,
+                self.change_cmd.cmd))
+
+        if not self.change_cmd.question_dict:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain question_dict')
+
+        if 'question_state_data' not in self.change_cmd.question_dict:
             raise utils.ValidationError(
                 'Expected question dict to contain question_state_data')
 
-        if 'language_code' not in self.change_cmd['question_dict']:
+        if 'language_code' not in self.change_cmd.question_dict:
             raise utils.ValidationError(
                 'Expected question dict to contain language_code')
 
         if (
                 'question_state_schema_version' not in
-                self.change_cmd['question_dict']):
+                self.change_cmd.question_dict):
             raise utils.ValidationError(
                 'Expected question dict to contain'
                 ' question_state_schema_version')
 
-        if 'skill_id' not in self.change_cmd:
+        if not self.change_cmd.skill_id:
             raise utils.ValidationError(
-                'Expected change_cmd to contain skill id')
+                'Expected change_cmd to contain skill_id')
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
-        question_dict = self.change_cmd['question_dict']
+        question_dict = self.change_cmd.question_dict
         self.validate()
         if (
                 question_dict['question_state_schema_version'] !=
@@ -392,9 +405,9 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 
-        skill_domain.Skill.require_valid_skill_id(self.change_cmd['skill_id'])
+        skill_domain.Skill.require_valid_skill_id(self.change_cmd.skill_id)
         skill = skill_services.get_skill_by_id(
-            self.change_cmd['skill_id'], strict=False)
+            self.change_cmd.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
@@ -405,34 +418,14 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def accept(self, unused_commit_message):
         """Accepts the suggestion."""
-        question_dict = self.change_cmd['question_dict']
+        question_dict = self.change_cmd.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question(self.author_id, question)
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change_cmd['skill_id'])
-
-    def to_dict(self):
-        """Returns a dict representation of a suggestion object.
-
-        Returns:
-            dict. A dict representation of a suggestion object.
-        """
-        return {
-            'suggestion_id': self.suggestion_id,
-            'suggestion_type': self.suggestion_type,
-            'target_type': self.target_type,
-            'target_id': self.target_id,
-            'target_version_at_submission': self.target_version_at_submission,
-            'status': self.status,
-            'author_name': self.get_author_name(),
-            'final_reviewer_id': self.final_reviewer_id,
-            'change_cmd': self.change_cmd,
-            'score_category': self.score_category,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated)
-        }
+            question_dict['id'], self.change_cmd.skill_id)
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {

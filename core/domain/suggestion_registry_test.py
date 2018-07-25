@@ -17,6 +17,7 @@
 import datetime
 
 from core.domain import exp_domain
+from core.domain import question_domain
 from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
@@ -138,6 +139,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
             'change_cmd': {
+                'cmd': question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION,
                 'question_dict': {
                     'question_state_data': self._create_valid_question_data(
                         'default_state'),

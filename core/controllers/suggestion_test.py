@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
@@ -355,6 +356,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         'target_id': self.TOPIC_ID,
                         'target_version_at_submission': 1,
                         'change_cmd': {
+                            'cmd': (
+                                question_domain
+                                .CMD_ADD_QUESTION_FROM_SUGGESTION),
                             'question_dict': self.question_dict,
                             'skill_id': self.SKILL_ID
                         },
@@ -382,14 +386,15 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/topic/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token)
+            with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+                self.put_json('%s/topic/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token)
 
             suggestion_post_accept = self.get_json(
                 '%s?suggestion_type=%s' % (

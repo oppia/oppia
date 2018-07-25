@@ -172,10 +172,7 @@ def _update_suggestion(suggestion):
 
     suggestion_model.status = suggestion.status
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    if isinstance(suggestion.change_cmd, dict):
-        suggestion_model.change_cmd = suggestion.change_cmd
-    else:
-        suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
+    suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
