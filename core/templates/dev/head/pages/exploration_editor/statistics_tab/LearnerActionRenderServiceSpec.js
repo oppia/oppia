@@ -40,8 +40,18 @@ describe('Learner Action Render Service', function() {
         this.ps.recordExplorationQuitAction('stateName2', 120);
 
         var learnerActions = this.ps.getPlaythrough().actions;
-
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+        
+        expect(displayBlocks).toEqual([[
+          this.laof.createNew(
+            'ExplorationStart', {
+              state_name: {
+                value: 'stateName1'
+              }
+            }, 1
+          ),
+          this.laof.create
+        ]])
         expect(displayBlocks.length).toEqual(1);
         expect(displayBlocks[0].length).toEqual(4);
         expect(displayBlocks[0][0]).toEqual(this.laof.createNew(
@@ -87,8 +97,8 @@ describe('Learner Action Render Service', function() {
         this.ps.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.ps.getPlaythrough().actions;
-
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+
         expect(displayBlocks.length).toEqual(3);
         expect(displayBlocks[0].length).toEqual(4);
         expect(displayBlocks[1].length).toEqual(4);
@@ -221,8 +231,8 @@ describe('Learner Action Render Service', function() {
         this.ps.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.ps.getPlaythrough().actions;
-
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+
         expect(displayBlocks.length).toEqual(1);
         expect(displayBlocks[0].length).toEqual(8);
         expect(displayBlocks[0][0]).toEqual(this.laof.createNew(
@@ -260,7 +270,6 @@ describe('Learner Action Render Service', function() {
         this.ps.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.ps.getPlaythrough().actions;
-
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
 
         expect(displayBlocks.length).toEqual(1);
@@ -294,7 +303,6 @@ describe('Learner Action Render Service', function() {
       this.ps.recordExplorationQuitAction('stateName2', 120);
 
       var learnerActions = this.ps.getPlaythrough().actions;
-
       var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
 
       expect(displayBlocks.length).toEqual(1);

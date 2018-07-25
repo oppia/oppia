@@ -109,14 +109,17 @@ oppia.factory('LearnerActionRenderService', [
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,
             custArgs.time_spent_in_state_secs.value);
-        }
-        else if (custArgs.answer.value) {
+        } else if (custArgs.answer.value) {
           return renderAnswerSubmitActionHTML(
             custArgs.answer.value, custArgs.dest_state_name.value,
             custArgs.time_spent_in_state_secs.value, custArgs.state_name.value
           );
         }
       }
+    };
+
+    var withinBlockUpperBound = function(blockLength) {
+      return blockLength < 4;
     };
 
     return {
@@ -152,16 +155,20 @@ oppia.factory('LearnerActionRenderService', [
           var action = learnerActions[i];
           if (action.actionCustomizationArgs.state_name.value !== stateName) {
             stateName = action.actionCustomizationArgs.state_name.value;
-            if (localBlock.length < 4) {
+            if (withinBlockUpperBound(localBlock.length)) {
+              // Add action to block.
               localBlock.unshift(action);
               continue;
             }
+            // Push current block to list of blocks and and action into new
+            // block.
             displayBlocks.push(localBlock);
             localBlock = [action];
           } else {
             localBlock.unshift(action);
           }
         }
+        // If there is a local block with actions at the end, push it.
         if (localBlock) {
           displayBlocks.push(localBlock);
         }
