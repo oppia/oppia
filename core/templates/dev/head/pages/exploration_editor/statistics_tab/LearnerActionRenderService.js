@@ -127,7 +127,7 @@ oppia.factory('LearnerActionRenderService', [
       localBlock: [],
       latestStateName: null,
       handleChangeInState: function(action) {
-        stateName = action.actionCustomizationArgs.state_name.value;
+        this.latestStateName = action.actionCustomizationArgs.state_name.value;
         if (withinBlockUpperBound(this.localBlock.length)) {
           // Add action to block.
           this.localBlock.unshift(action);
