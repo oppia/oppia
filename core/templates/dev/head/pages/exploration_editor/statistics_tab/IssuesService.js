@@ -19,27 +19,50 @@
 oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 
+oppia.constant(
+  'FETCH_PLAYTHROUGH_URL',
+  '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
+
 oppia.factory('IssuesService', [
-  '$http', 'ExplorationIssueObjectFactory', 'UrlInterpolationService',
-  function($http, ExplorationIssueObjectFactory, UrlInterpolationService) {
+  '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
+  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
+  function(
+      $http, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
+      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
+    var currentPlaythrough = null;
 
     var fetchIssues = function() {
       $http.get(getFullIssuesUrl(), {
         exp_version: explorationVersion
-      }).then(function(response) {
-        var unresolvedIssuesDicts = response.unresolved_issues;
+      }).then(function(unresolvedIssuesDicts) {
         issues = unresolvedIssuesDicts.map(
           ExplorationIssueObjectFactory.createFromBackendDict);
       });
+    };
+
+    var fetchPlaythrough = function(playthroughId) {
+      $http.get(getFullPlaythroughUrl(playthroughId), {}).then(
+        function(playthroughDict) {
+          currentPlaythrough = PlaythroughObjectFactory.createFromBackendDict(
+            playthroughDict);
+        });
     };
 
     var getFullIssuesUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {
           exploration_id: explorationId
+        });
+    };
+
+    var getFullPlaythroughUrl = function(playthroughId) {
+      return UrlInterpolationService.interpolateUrl(
+        FETCH_PLAYTHROUGH_URL, {
+          exploration_id: explorationId,
+          playthrough_id: playthroughId
         });
     };
 
@@ -51,6 +74,9 @@ oppia.factory('IssuesService', [
       },
       getIssues: function() {
         return issues;
+      },
+      getPlaythrough: function(playthroughId) {
+        return fetchPlaythrough(playthroughId);
       }
     };
   }]);
