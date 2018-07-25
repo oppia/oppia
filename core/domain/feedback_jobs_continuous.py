@@ -162,8 +162,6 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         feedback_thread_analytics_models = (
             feedback_models.FeedbackAnalyticsModel.get_multi(
                 feedback_analytics_model_ids))
-        print feedback_analytics_model_ids
-        print feedback_thread_analytics_models
         return [feedback_domain.FeedbackAnalytics(
             entity_type, entity_ids[i],
             (realtime_models[i].num_open_threads

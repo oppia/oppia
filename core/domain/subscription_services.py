@@ -144,9 +144,14 @@ def get_all_threads_subscribed_to(user_id):
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
 
-    return (
-        subscriptions_model.feedback_thread_ids
-        if subscriptions_model else [])
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        return (
+            subscriptions_model.general_feedback_thread_ids
+            if subscriptions_model else [])
+    else:
+        return (
+            subscriptions_model.feedback_thread_ids
+            if subscriptions_model else [])
 
 
 def get_all_creators_subscribed_to(user_id):
