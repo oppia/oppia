@@ -34,6 +34,58 @@ var AdminPage = function(){
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="statusMessage"]'));
 
+  // The reload functions are used for mobile testing
+  // done via Browserstack. These functions may cause
+  // a problem when used to run tests directly on Travis.
+
+  var explorationElements = element.all(by.css(
+    '.protractor-test-reload-exploration-row'
+  ));
+
+  var reloadAllExplorationsButtons = element.all(by.css(
+    '.protractor-test-reload-all-explorations-button'
+  ));
+
+  var reloadCollectionButton = element.all(by.css(
+    '.protractor-test-reload-collection-button')).first();
+
+  var explorationTitleElement = function(explorationElement) {
+    return explorationElement.element(
+      by.css('.protractor-test-reload-exploration-title')
+    );
+  };
+
+  var explorationElementReloadButton = function(explorationElement) {
+    return explorationElement.element(
+      by.css('.protractor-test-reload-exploration-button')
+    );
+  };
+
+  this.reloadCollection = function() {
+    reloadCollectionButton.click();
+  };
+
+  // The name should be as given in the admin page (including '.yaml' if
+  // necessary).
+  this.reloadExploration = function(name) {
+    this.get();
+    explorationElements.map(function(explorationElement) {
+      explorationTitleElement(explorationElement)
+        .getText().then(function(title) {
+          // We use match here in case there is whitespace around the name
+          if (title.match(name)) {
+            explorationElementReloadButton(explorationElement).click();
+            general.acceptAlert();
+            // Time is needed for the reloading to complete.
+            waitFor.textToBePresentInElement(
+              statusMessage, 'Data reloaded successfully.',
+              'Exploration could not be reloaded');
+            return true;
+          }
+        });
+    });
+  };
+
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
       .getText()
