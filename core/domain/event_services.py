@@ -66,6 +66,11 @@ class BaseEventHandler(object):
         cls._notify_continuous_computation_listeners_async(*args, **kwargs)
         cls._handle_event(*args, **kwargs)
 
+    @classmethod
+    def _is_none(cls, value):
+        """Checks whether the arg is None."""
+        return value == None
+
 
 class StatsEventsHandler(BaseEventHandler):
     """Event handler for incremental update of analytics model using aggregated
@@ -84,6 +89,8 @@ class StatsEventsHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
+        if cls._is_none(exp_version):
+            return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
                 stats_services.update_stats,
@@ -113,6 +120,8 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         user.
         """
         # TODO(sll): Escape these args?
+        if cls._is_none(exploration_version):
+            return
         stats_services.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
@@ -137,6 +146,8 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id):
+        if cls._is_none(exp_version):
+            return
         stats_models.ExplorationActualStartEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id)
 
@@ -150,6 +161,8 @@ class SolutionHitEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
+        if cls._is_none(exp_version):
+            return
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
@@ -164,6 +177,8 @@ class StartExplorationEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id, params,
             play_type):
+        if cls._is_none(exp_version):
+            return
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
@@ -178,6 +193,8 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type):
+        if cls._is_none(exp_version):
+            return
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
@@ -192,6 +209,8 @@ class CompleteExplorationEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type):
+        if cls._is_none(exp_version):
+            return
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
@@ -218,6 +237,8 @@ class StateHitEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             params, play_type):
+        if cls._is_none(exp_version):
+            return
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
@@ -232,6 +253,8 @@ class StateCompleteEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
+        if cls._is_none(exp_version):
+            return
         stats_models.StateCompleteEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
@@ -246,6 +269,8 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, refresher_exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
+        if cls._is_none(exp_version):
+            return
         stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
             exp_id, refresher_exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
