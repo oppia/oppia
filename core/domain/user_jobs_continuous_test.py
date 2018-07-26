@@ -278,189 +278,192 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
         with self._get_test_context():
-            self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-            editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+                editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-            # User creates an exploration.
-            self.save_new_valid_exploration(
-                EXP_1_ID, editor_id, title=EXP_1_TITLE,
-                category='Category')
+                # User creates an exploration.
+                self.save_new_valid_exploration(
+                    EXP_1_ID, editor_id, title=EXP_1_TITLE,
+                    category='Category')
 
-            exp1_last_updated_ms = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_1_ID))
+                exp1_last_updated_ms = (
+                    self._get_most_recent_exp_snapshot_created_on_ms(EXP_1_ID))
 
-            # User gives feedback on it.
-            feedback_services.create_thread(
-                'exploration', EXP_1_ID, None, editor_id,
-                FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                'exploration', EXP_1_ID, False)[0].id
-            message = feedback_services.get_messages(thread_id)[0]
+                # User gives feedback on it.
+                feedback_services.create_thread(
+                    'exploration', EXP_1_ID, None, editor_id,
+                    FEEDBACK_THREAD_SUBJECT, 'text')
+                thread_id = feedback_services.get_all_threads(
+                    'exploration', EXP_1_ID, False)[0].id
+                message = feedback_services.get_messages(thread_id)[0]
 
-            # User creates another exploration.
-            self.save_new_valid_exploration(
-                EXP_2_ID, editor_id, title=EXP_2_TITLE,
-                category='Category')
-            exp2_last_updated_ms = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
+                # User creates another exploration.
+                self.save_new_valid_exploration(
+                    EXP_2_ID, editor_id, title=EXP_2_TITLE,
+                    category='Category')
+                exp2_last_updated_ms = (
+                    self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+                ModifiedRecentUpdatesAggregator.start_computation()
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+                self.process_and_flush_pending_tasks()
 
-            recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    editor_id)[1])
-            self.assertEqual([(
-                self._get_expected_activity_created_dict(
-                    editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp2_last_updated_ms)
-            ), {
-                'activity_id': EXP_1_ID,
-                'activity_title': EXP_1_TITLE,
-                'author_id': editor_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    message.created_on),
-                'subject': FEEDBACK_THREAD_SUBJECT,
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }, (
-                self._get_expected_activity_created_dict(
-                    editor_id, EXP_1_ID, EXP_1_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp1_last_updated_ms)
-            )], recent_notifications)
+                recent_notifications = (
+                    ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                        editor_id)[1])
+                self.assertEqual([(
+                    self._get_expected_activity_created_dict(
+                        editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp2_last_updated_ms)
+                ), {
+                    'activity_id': EXP_1_ID,
+                    'activity_title': EXP_1_TITLE,
+                    'author_id': editor_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        message.created_on),
+                    'subject': FEEDBACK_THREAD_SUBJECT,
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                }, (
+                    self._get_expected_activity_created_dict(
+                        editor_id, EXP_1_ID, EXP_1_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp1_last_updated_ms)
+                )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
         with self._get_test_context():
-            self.signup(USER_A_EMAIL, USER_A_USERNAME)
-            user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
-            self.signup(USER_B_EMAIL, USER_B_USERNAME)
-            user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.signup(USER_A_EMAIL, USER_A_USERNAME)
+                user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
+                self.signup(USER_B_EMAIL, USER_B_USERNAME)
+                user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
-            # User A creates an exploration.
-            self.save_new_valid_exploration(
-                EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
-            exp_last_updated_ms = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
+                # User A creates an exploration.
+                self.save_new_valid_exploration(
+                    EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
+                exp_last_updated_ms = (
+                    self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            # User B starts a feedback thread.
-            feedback_services.create_thread(
-                'exploration', EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT,
-                'text')
-            thread_id = feedback_services.get_all_threads(
-                'exploration', EXP_ID, False)[0].id
+                # User B starts a feedback thread.
+                feedback_services.create_thread(
+                    'exploration', EXP_ID, None, user_b_id,
+                    FEEDBACK_THREAD_SUBJECT, 'text')
+                thread_id = feedback_services.get_all_threads(
+                    'exploration', EXP_ID, False)[0].id
 
-            message = feedback_services.get_messages(thread_id)[0]
+                message = feedback_services.get_messages(thread_id)[0]
 
-            ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+                ModifiedRecentUpdatesAggregator.start_computation()
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+                self.process_and_flush_pending_tasks()
 
-            recent_notifications_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    user_a_id)[1])
-            recent_notifications_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    user_b_id)[1])
-            expected_thread_notification = {
-                'activity_id': EXP_ID,
-                'activity_title': EXP_TITLE,
-                'author_id': user_b_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    message.created_on),
-                'subject': FEEDBACK_THREAD_SUBJECT,
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }
-            expected_creation_notification = (
-                self._get_expected_activity_created_dict(
-                    user_a_id, EXP_ID, EXP_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp_last_updated_ms))
+                recent_notifications_for_user_a = (
+                    ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                        user_a_id)[1])
+                recent_notifications_for_user_b = (
+                    ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                        user_b_id)[1])
+                expected_thread_notification = {
+                    'activity_id': EXP_ID,
+                    'activity_title': EXP_TITLE,
+                    'author_id': user_b_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        message.created_on),
+                    'subject': FEEDBACK_THREAD_SUBJECT,
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                }
+                expected_creation_notification = (
+                    self._get_expected_activity_created_dict(
+                        user_a_id, EXP_ID, EXP_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp_last_updated_ms))
 
-            # User A sees A's commit and B's feedback thread.
-            self.assertEqual(
-                recent_notifications_for_user_a, [
-                    expected_thread_notification,
-                    expected_creation_notification
-                ])
-            # User B sees only her feedback thread, but no commits.
-            self.assertEqual(
-                recent_notifications_for_user_b, [
-                    expected_thread_notification,
-                ])
+                # User A sees A's commit and B's feedback thread.
+                self.assertEqual(
+                    recent_notifications_for_user_a, [
+                        expected_thread_notification,
+                        expected_creation_notification
+                    ])
+                # User B sees only her feedback thread, but no commits.
+                self.assertEqual(
+                    recent_notifications_for_user_b, [
+                        expected_thread_notification,
+                    ])
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
         with self._get_test_context():
-            self.signup(USER_A_EMAIL, USER_A_USERNAME)
-            user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
-            self.signup(USER_B_EMAIL, USER_B_USERNAME)
-            user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
-            user_a = user_services.UserActionsInfo(user_a_id)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.signup(USER_A_EMAIL, USER_A_USERNAME)
+                user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
+                self.signup(USER_B_EMAIL, USER_B_USERNAME)
+                user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
+                user_a = user_services.UserActionsInfo(user_a_id)
 
 
-            # User A creates an exploration.
-            self.save_new_valid_exploration(
-                EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
-            exp_last_updated_ms = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
+                # User A creates an exploration.
+                self.save_new_valid_exploration(
+                    EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
+                exp_last_updated_ms = (
+                    self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            # User B starts a feedback thread.
-            feedback_services.create_thread(
-                'exploration', EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT,
-                'text')
-            thread_id = feedback_services.get_all_threads(
-                'exploration', EXP_ID, False)[0].id
-            message = feedback_services.get_messages(thread_id)[0]
+                # User B starts a feedback thread.
+                feedback_services.create_thread(
+                    'exploration', EXP_ID, None, user_b_id,
+                    FEEDBACK_THREAD_SUBJECT, 'text')
+                thread_id = feedback_services.get_all_threads(
+                    'exploration', EXP_ID, False)[0].id
+                message = feedback_services.get_messages(thread_id)[0]
 
-            # User A adds user B as an editor of the exploration.
-            rights_manager.assign_role_for_exploration(
-                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                # User A adds user B as an editor of the exploration.
+                rights_manager.assign_role_for_exploration(
+                    user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
-            ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+                ModifiedRecentUpdatesAggregator.start_computation()
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+                self.process_and_flush_pending_tasks()
 
-            recent_notifications_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    user_a_id)[1])
-            recent_notifications_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    user_b_id)[1])
-            expected_thread_notification = {
-                'activity_id': EXP_ID,
-                'activity_title': EXP_TITLE,
-                'author_id': user_b_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    message.created_on),
-                'subject': FEEDBACK_THREAD_SUBJECT,
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }
-            expected_creation_notification = (
-                self._get_expected_activity_created_dict(
-                    user_a_id, EXP_ID, EXP_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp_last_updated_ms))
+                recent_notifications_for_user_a = (
+                    ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                        user_a_id)[1])
+                recent_notifications_for_user_b = (
+                    ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                        user_b_id)[1])
+                expected_thread_notification = {
+                    'activity_id': EXP_ID,
+                    'activity_title': EXP_TITLE,
+                    'author_id': user_b_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        message.created_on),
+                    'subject': FEEDBACK_THREAD_SUBJECT,
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                }
+                expected_creation_notification = (
+                    self._get_expected_activity_created_dict(
+                        user_a_id, EXP_ID, EXP_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp_last_updated_ms))
 
-            # User A sees A's commit and B's feedback thread.
-            self.assertEqual(
-                recent_notifications_for_user_a, [
-                    expected_thread_notification,
-                    expected_creation_notification
-                ])
-            # User B sees A's commit and B's feedback thread.
-            self.assertEqual(
-                recent_notifications_for_user_b, [
-                    expected_thread_notification,
-                    expected_creation_notification,
-                ])
+                # User A sees A's commit and B's feedback thread.
+                self.assertEqual(
+                    recent_notifications_for_user_a, [
+                        expected_thread_notification,
+                        expected_creation_notification
+                    ])
+                # User B sees A's commit and B's feedback thread.
+                self.assertEqual(
+                    recent_notifications_for_user_b, [
+                        expected_thread_notification,
+                        expected_creation_notification,
+                    ])
 
     def test_basic_computation_for_collections(self):
         with self._get_test_context():

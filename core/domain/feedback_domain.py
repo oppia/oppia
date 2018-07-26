@@ -185,8 +185,7 @@ class FeedbackMessage(object):
 
 
 class FeedbackAnalytics(object):
-    """Domain object representing feedback analytics for a specific
-    entity.
+    """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
         entity_type: str. The type of entity the feedback thread is linked to.

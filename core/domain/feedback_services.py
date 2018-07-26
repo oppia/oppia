@@ -171,12 +171,18 @@ def create_message(
             exploration_id = thread.exploration_id
         if message_id == 0:
             # New thread.
-            event_services.FeedbackThreadCreatedEventHandler.record(
-                exploration_id)
+            if not (
+                    feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS and
+                    thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION):
+                event_services.FeedbackThreadCreatedEventHandler.record(
+                    exploration_id)
         else:
             # Thread status changed.
-            event_services.FeedbackThreadStatusChangedEventHandler.record(
-                exploration_id, thread.status, updated_status)
+            if not (
+                    feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS and
+                    thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION):
+                event_services.FeedbackThreadStatusChangedEventHandler.record(
+                    exploration_id, thread.status, updated_status)
 
         msg.updated_status = updated_status
     if updated_subject:

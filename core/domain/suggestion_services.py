@@ -58,6 +58,9 @@ def create_suggestion(
         target_type, target_id, None, author_id, description,
         DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
 
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
+
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:

@@ -132,31 +132,31 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_thread_analytics_multi(cls, entity_ids):
-        """Gets the thread analytics for the entities specified by the
-        entity_ids.
+    def get_thread_analytics_multi(cls, exploration_ids):
+        """Gets the thread analytics for the explorations specified by the
+        exploration_ids.
 
         Args:
-            entity_ids: list(str). IDs of the entities to get analytics for.
+            exploration_ids: list(str). IDs of the explorations to get analytics
+                for.
 
         Returns:
             list(dict). Each dict in this list corresponds to an
-            entity ID in the input list, and has two keys:
+            exploration ID in the input list, and has two keys:
             - num_open_threads: int. The count of open feedback threads
-              for this entity.
+              for this exploration.
             - num_total_threads: int. The count of all feedback threads
-              for this entity.
+              for this exploration.
         """
-        entity_type = feconf.ENTITY_TYPE_EXPLORATION
         realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
-            entity_ids)
+            exploration_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
 
         feedback_thread_analytics_models = (
-            feedback_models.FeedbackAnalyticsModel.get_multi(entity_ids))
+            feedback_models.FeedbackAnalyticsModel.get_multi(exploration_ids))
         return [feedback_domain.FeedbackAnalytics(
-            entity_type, entity_ids[i],
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_ids[i],
             (realtime_models[i].num_open_threads
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_open_threads
@@ -165,14 +165,14 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-        ) for i in range(len(entity_ids))]
+        ) for i in range(len(exploration_ids))]
 
     @classmethod
-    def get_thread_analytics(cls, entity_id):
+    def get_thread_analytics(cls, exploration_id):
         """Retrieves the analytics for feedback threads.
 
         Args:
-            entity_id: str. ID of the entity to get analytics for.
+            exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
             dict with two keys:
@@ -182,7 +182,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
               threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
-            [entity_id])[0]
+            [exploration_id])[0]
 
 
 class FeedbackAnalyticsMRJobManager(
@@ -200,8 +200,10 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [feedback_models.FeedbackThreadModel,
-                feedback_models.GeneralFeedbackThreadModel]
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            return [feedback_models.GeneralFeedbackThreadModel]
+        else:
+            return [feedback_models.FeedbackThreadModel]
 
     @staticmethod
     def map(item):

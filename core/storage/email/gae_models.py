@@ -520,10 +520,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             str or None. The FeedbackEmailReplyToIdModel instance corresponding
                 to the given 'reply-to' id if it is fetched else None.
         """
-        model = cls.query(cls.reply_to_id == reply_to_id).fetch()
-        if not model:
-            return None
-        return model[0]
+        model = cls.query(cls.reply_to_id == reply_to_id).get()
+        return model
 
     @classmethod
     def get(cls, user_id, thread_id, strict=True):
@@ -603,4 +601,5 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The thread id.
         """
-        return self.id[self.id.find('.') + 1:]
+        return '.'.join(
+            [self.entity_type, self.entity_id, self.id.split('.')[3]])

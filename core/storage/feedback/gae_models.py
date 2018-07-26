@@ -428,9 +428,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
     # The type of entity the thread is linked to.
-    entity_type = ndb.StringProperty(required=False, indexed=True)
+    entity_type = ndb.StringProperty(required=True, indexed=True)
     # The ID of the entity the thread is linked to.
-    entity_id = ndb.StringProperty(required=False, indexed=True)
+    entity_id = ndb.StringProperty(required=True, indexed=True)
     # ID of the user who started the thread. This may be None if the feedback
     # was given anonymously by a learner.
     original_author_id = ndb.StringProperty(indexed=True)
@@ -442,11 +442,12 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         indexed=True,
     )
     # Latest subject of the thread.
-    subject = ndb.StringProperty(indexed=False)
+    subject = ndb.StringProperty(indexed=True, required=True)
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
-    # Specifies whether this thread has a related learner suggestion.
-    has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
+    # Specifies whether this thread has a related suggestion.
+    has_suggestion = ndb.BooleanProperty(
+        indexed=True, default=False, required=True)
     # The number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True)
     # When this thread was last updated. This overrides the field in
@@ -455,7 +456,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # on running the job for calculating the number of messages in a thread
     # and updating the message_count field we do not wish the last_updated field
     # to be updated.
-    last_updated = ndb.DateTimeProperty(indexed=True)
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
@@ -465,7 +466,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 last_updated_field of the thread.
 
         Returns:
-            thread. The thread entity.
+            GeneralFeedbackThreadModel. The thread entity.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
@@ -528,8 +529,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Args:
             entity_type: str. The type of the entity.
             entity_id: str. The ID of the entity.
-            limit: int. The maximum possible number of items
-                in the returned list.
+            limit: int. The maximum possible number of items in the returned
+                list.
 
         Returns:
             list(GeneralFeedbackThreadModel). List of threads associated with
@@ -611,15 +612,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, thread_id, message_id):
-        """Creates a new FeedbackMessageModel entry.
+        """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
             thread_id: str. ID of the thread.
             message_id: int. ID of the message.
 
         Returns:
-            FeedbackMessageModel. Instance of the new FeedbackMessageModel
-                entry.
+            GeneralFeedbackMessageModel. Instance of the new
+                GeneralFeedbackMessageModel entry.
 
         Raises:
             Exception: A message with the same ID already exists
@@ -632,8 +633,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, thread_id, message_id, strict=True):
-        """Gets the FeedbackMessageModel entry for the given ID. Raises an
-        error if no undeleted message with the given ID is found and
+        """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
+        an error if no undeleted message with the given ID is found and
         strict == True.
 
         Args:
@@ -650,9 +651,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 given ID.
 
         Raises:
-            EntityNotFoundError: If strict == True and message ID is not valid
-                or message is marked as deleted. No error will be raised if
-                strict == False.
+            EntityNotFoundError: strict == True and either
+                    (i) message ID is not valid
+                    (ii) message is marked as deleted.
+                No error will be raised if strict == False.
         """
         instance_id = cls._generate_id(thread_id, message_id)
         return super(GeneralFeedbackMessageModel, cls).get(
@@ -670,9 +672,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             list(GeneralFeedbackMessageModel). A list of messages in the
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
-
         """
-
         return cls.get_all().filter(
             cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 

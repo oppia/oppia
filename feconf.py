@@ -368,6 +368,8 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# Determines whether to use the new feedback framework or the old one. To be
+# flipped after migrating existing feedback thread data to the new framework.
 ENABLE_GENERALIZED_FEEDBACK_THREADS = False
 
 # No. of questions to be displayed on a page in the topic editor.

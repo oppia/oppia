@@ -165,8 +165,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # The viewer posts a message to the thread.
         message_text = 'text'
         feedback_services.create_thread(
-            'exploration', 'exp_id', 'state_name', self.viewer_id, 'subject',
-            message_text)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 'state_name',
+            self.viewer_id, 'subject', message_text)
 
         thread_ids_subscribed_to = self._get_thread_ids_subscribed_to(
             self.viewer_id)

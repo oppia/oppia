@@ -212,6 +212,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 message_count=item.message_count,
                 last_updated=item.last_updated, created_on=item.created_on,
                 deleted=item.deleted).put(update_last_updated_time=False)
+            yield('GeneralFeedbackThreadModel', 1)
         elif isinstance(item, feedback_models.FeedbackMessageModel):
             new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
             new_thread_id = '%s.%s' % (
@@ -224,6 +225,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 received_via_email=item.received_via_email,
                 last_updated=item.last_updated, created_on=item.created_on,
                 deleted=item.deleted).put()
+            yield('GeneralFeedbackMessageModel', 1)
         elif isinstance(item, feedback_models.FeedbackThreadUserModel):
             old_id_parts = item.id.split('.')
             new_id = '.'.join(
@@ -233,6 +235,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 id=new_id,
                 message_ids_read_by_user=item.message_ids_read_by_user
             ).put()
+            yield('GeneralFeedbackThreadUserModel', 1)
         elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
             old_id_parts = item.id.split('.')
             new_id = '.'.join(
@@ -240,13 +243,15 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                  old_id_parts[1], old_id_parts[2]])
             email_models.GeneralFeedbackEmailReplyToIdModel(
                 id=new_id, reply_to_id=item.reply_to_id).put()
+            yield('GeneralFeedbackEmailReplyToIdModel', 1)
         elif isinstance(item, user_models.UserSubscriptionsModel):
             new_thread_ids = (
                 ['%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
                  for thread_id in item.feedback_thread_ids])
             item.general_feedback_thread_ids = new_thread_ids
             item.put()
+            yield('UserSubscriptionsModel', 1)
 
     @staticmethod
     def reduce(key, value):
-        pass
+        yield(key, len(value))

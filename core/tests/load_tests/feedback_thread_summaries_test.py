@@ -22,6 +22,7 @@ import time
 
 from core.domain import feedback_services
 from core.tests import test_utils
+import feconf
 
 
 class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
@@ -59,12 +60,12 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(
-                'exploration', self.EXP_ID_1,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
                 self.EXPECTED_THREAD_DICT['state_name'],
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
         threadlist = feedback_services.get_all_threads(
-            'exploration', self.EXP_ID_1, False)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False)
 
         thread_ids = []
         for thread in threadlist:
