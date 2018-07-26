@@ -210,7 +210,7 @@ def create_message(
         if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             suggestion_id = thread_id
         else:
-            suggestion_id = 'exploration.' + thread_id
+            suggestion_id = '%s.%s' %(feconf.ENTITY_TYPE_EXPLORATION, thread_id)
 
         suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
             suggestion_id)

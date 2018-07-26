@@ -214,7 +214,8 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 deleted=item.deleted).put(update_last_updated_time=False)
         elif isinstance(item, feedback_models.FeedbackMessageModel):
             new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
-            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.thread_id)
+            new_thread_id = '%s.%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION, item.thread_id)
             feedback_models.GeneralFeedbackMessageModel(
                 id=new_id, thread_id=new_thread_id,
                 message_id=item.message_id, author_id=item.author_id,
