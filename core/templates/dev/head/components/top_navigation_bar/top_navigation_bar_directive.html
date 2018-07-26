@@ -170,11 +170,12 @@
       <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
           style="margin-right: 15px; padding: 0;">
         <li>
-          <a href="" style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
+          <a href="" style="padding: 0; width: 190px;" ng-click="onLoginButtonClicked()">
             <div class="oppia-signin-google">
-              <i class="oppia-signin-google-icon fa fa-google-plus"></i>
-              <div class="oppia-signin-google-separator"></div>
-              <b><span translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span></b>
+              <div class="oppia-signin-g-icon">
+                <img ng-src="<[googleSignInIconUrl]>">
+              </div>
+              <span class="oppia-signin-text" translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span>
             </div>
           </a>
         </li>
@@ -188,32 +189,32 @@
     outline: auto 5px -webkit-focus-ring-color;
   }
   top-navigation-bar .oppia-signin-google {
-    background: #dd4b39;
-    color: white;
-    font-family: Roboto, sans-serif;
-    font-size: 13px;
-    margin: 3px 3px 3px;
-    padding: 9px;
-  }
-  top-navigation-bar .oppia-signin-google i.oppia-signin-google-icon.fa.fa-google-plus {
-    font-size: 22px;
-    margin-right: 25.5px;
-    padding-right: 3px;
-    vertical-align: middle;
-  }
-  top-navigation-bar .oppia-signin-google-separator {
-    background: rgba(175, 10, 10, 0.72);
-    display: -webkit-inline-box;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    border-width: 0;
+    box-shadow: 1px 1px 0px 1px rgba(0,0,0,0.05);
+    color: #737373;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: bold;
     height: 40px;
-    left: 48px;
-    position: absolute;
-    top: 3px;
-    width: 1px;
+    padding-left: 8px;
+    padding-right: 8px;
+    vertical-align: middle;
+    white-space: nowrap;
   }
-  top-navigation-bar .oppia-signin-google b {
-    font-weight: normal;
-    position: absolute;
-    top: 13.7px;
+  top-navigation-bar .oppia-signin-google:focus,
+  top-navigation-bar .oppia-signin-google:hover {
+    box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
+  }
+  top-navigation-bar .oppia-signin-google:active {
+    background-color: #e5e5e5;
+    box-shadow: none;
+    transition-duration: 10ms;
+  }
+  top-navigation-bar .oppia-signin-g-icon {
+    float: left;
+    padding: 10px 24px 10px 0;
   }
   top-navigation-bar .oppia-navbar-menu-icon {
     color: #fff;
@@ -276,5 +277,12 @@
     color: #fff;
     margin-right: 4px;
     margin-top: -10px;
+  }
+  top-navigation-bar .oppia-signin-text {
+    font-family: Roboto, arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .21px;
+    line-height: 38px;
   }
 </style>

@@ -1565,7 +1565,7 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-state-graph-container, 
+.oppia-state-graph-container,
 .oppia-translation-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -2362,7 +2362,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection-form-container {
   margin-top: -5px;
-  max-height: 250px; 
+  max-height: 250px;
   overflow-y: scroll;
 }
 
