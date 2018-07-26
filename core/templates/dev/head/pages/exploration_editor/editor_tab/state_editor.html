@@ -33,16 +33,19 @@
   </div>
 
   <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-    <state-responses on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
+    <state-responses state-name="stateName"
+                     on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
     </state-responses>
     <div>
-      <state-hints-editor on-save-hints="saveHints"
+      <state-hints-editor state-name="stateName"
+                          on-save-hints="saveHints"
                           on-save-solution="saveSolution"
                           on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
       </state-hints-editor>
     </div>
     <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution-editor on-save-solution="saveSolution"
+      <state-solution-editor state-name="stateName"
+                             on-save-solution="saveSolution"
                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
       </state-solution-editor>
     </div>

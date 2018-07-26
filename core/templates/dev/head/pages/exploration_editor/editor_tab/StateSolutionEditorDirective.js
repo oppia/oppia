@@ -21,6 +21,7 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
+        getStateName: '&stateName',
         onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '='
       },
@@ -28,7 +29,7 @@ oppia.directive('stateSolutionEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_solution_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+        '$scope', '$rootScope', '$uibModal', '$filter',
         'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
         'ExplorationStatesService', 'SolutionVerificationService',
         'ExplorationHtmlFormatterService', 'stateInteractionIdService',
@@ -36,7 +37,7 @@ oppia.directive('stateSolutionEditor', [
         'ContextService', 'ExplorationWarningsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID', 'EditabilityService',
         'stateContentIdsToAudioTranslationsService', function(
-            $scope, $rootScope, $uibModal, $filter, EditorStateService,
+            $scope, $rootScope, $uibModal, $filter,
             AlertsService, INTERACTION_SPECS, stateSolutionService,
             ExplorationStatesService, SolutionVerificationService,
             ExplorationHtmlFormatterService, stateInteractionIdService,
@@ -59,14 +60,14 @@ oppia.directive('stateSolutionEditor', [
 
           $scope.isSolutionValid = function() {
             return ExplorationStatesService.isSolutionValid(
-              EditorStateService.getActiveStateName());
+              $scope.getStateName());
           };
 
           $scope.correctAnswerEditorHtml = (
             ExplorationHtmlFormatterService.getInteractionHtml(
               stateInteractionIdService.savedMemento,
               ExplorationStatesService.getInteractionCustomizationArgsMemento(
-                EditorStateService.getActiveStateName()),
+                $scope.getStateName()),
               false,
               $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 
@@ -97,7 +98,7 @@ oppia.directive('stateSolutionEditor', [
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
             $scope.inlineSolutionEditorIsActive = false;
-
+            var stateName = $scope.getStateName();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -115,8 +116,7 @@ oppia.directive('stateSolutionEditor', [
                     ExplorationHtmlFormatterService.getInteractionHtml(
                       stateInteractionIdService.savedMemento,
                       ExplorationStatesService
-                        .getInteractionCustomizationArgsMemento(
-                          EditorStateService.getActiveStateName()),
+                        .getInteractionCustomizationArgsMemento(stateName),
                       false,
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
@@ -187,7 +187,7 @@ oppia.directive('stateSolutionEditor', [
               ]
             }).result.then(function(result) {
               var correctAnswer = result.solution.correctAnswer;
-              var currentStateName = EditorStateService.getActiveStateName();
+              var currentStateName = $scope.getStateName();
               var state = ExplorationStatesService.getState(currentStateName);
               var solutionIsValid = SolutionVerificationService.verifySolution(
                 ContextService.getExplorationId(), state, correctAnswer);
@@ -252,7 +252,7 @@ oppia.directive('stateSolutionEditor', [
                 stateContentIdsToAudioTranslationsService.displayed
               );
               ExplorationStatesService.deleteSolutionValidity(
-                EditorStateService.getActiveStateName());
+                $scope.getStateName());
             });
           };
         }

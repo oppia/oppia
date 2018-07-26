@@ -29,20 +29,19 @@ oppia.directive('stateHintsEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_hints_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+        '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'stateHintsService', 'ExplorationStatesService', 'COMPONENT_NAME_HINT',
+        'stateHintsService', 'COMPONENT_NAME_HINT',
         'stateContentIdsToAudioTranslationsService', 'EditabilityService',
         'stateInteractionIdService', 'UrlInterpolationService',
         'HintObjectFactory', 'stateSolutionService',
         function(
-            $scope, $rootScope, $uibModal, $filter, EditorStateService,
+            $scope, $rootScope, $uibModal, $filter,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            stateHintsService, ExplorationStatesService, COMPONENT_NAME_HINT,
+            stateHintsService, COMPONENT_NAME_HINT,
             stateContentIdsToAudioTranslationsService, EditabilityService,
             stateInteractionIdService, UrlInterpolationService,
             HintObjectFactory, stateSolutionService) {
-          $scope.EditorStateService = EditorStateService;
           $scope.EditabilityService = EditabilityService;
           $scope.stateHintsService = stateHintsService;
           $scope.activeHintIndex = null;
@@ -52,9 +51,6 @@ oppia.directive('stateHintsEditor', [
             '/general/drag_dots.png');
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            stateHintsService.init(
-              EditorStateService.getActiveStateName(),
-              stateData.interaction.hints);
             $scope.activeHintIndex = null;
           });
 
@@ -117,8 +113,8 @@ oppia.directive('stateHintsEditor', [
                 'add_hint_modal_directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'EditorStateService',
-                function($scope, $uibModalInstance, EditorStateService) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.HINT_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}

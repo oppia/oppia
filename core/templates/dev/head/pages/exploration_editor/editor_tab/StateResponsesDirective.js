@@ -20,22 +20,23 @@ oppia.directive('stateResponses', [
     return {
       restrict: 'E',
       scope: {
+        getStateName: '&stateName',
         onSaveContentIdsToAudioTranslations: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
-        'stateInteractionIdService', 'EditorStateService', 'AlertsService',
-        'ResponsesService', 'RouterService', 'ContextService',
+        'stateInteractionIdService', 'AlertsService',
+        'ResponsesService', 'ContextService',
         'TrainingDataService', 'EditabilityService',
         'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT', function(
             $scope, $rootScope, $uibModal, $filter,
-            stateInteractionIdService, EditorStateService, AlertsService,
-            ResponsesService, RouterService, ContextService,
+            stateInteractionIdService, AlertsService,
+            ResponsesService, ContextService,
             TrainingDataService, EditabilityService,
             stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
@@ -43,14 +44,13 @@ oppia.directive('stateResponses', [
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-          $scope.EditorStateService = EditorStateService;
           $scope.EditabilityService = EditabilityService;
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
           var _initializeTrainingData = function() {
             var explorationId = ContextService.getExplorationId();
-            var currentStateName = EditorStateService.getActiveStateName();
+            var currentStateName = $scope.getStateName();
           };
 
           $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -136,14 +136,14 @@ oppia.directive('stateResponses', [
             if (!outcome) {
               return false;
             }
-            return outcome.isConfusing(EditorStateService.getActiveStateName());
+            return outcome.isConfusing($scope.getStateName());
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
             if (!outcome) {
               return false;
             }
-            var currentStateName = EditorStateService.getActiveStateName();
+            var currentStateName = $scope.getStateName();
             return (
               (outcome.dest === currentStateName) &&
               outcome.labelledAsCorrect);
@@ -253,7 +253,7 @@ oppia.directive('stateResponses', [
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
-
+            var stateName = $scope.getStateName();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -262,12 +262,12 @@ oppia.directive('stateResponses', [
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'ResponsesService',
-                'EditorStateService', 'EditorFirstTimeEventsService',
+                'EditorFirstTimeEventsService',
                 'RuleObjectFactory', 'OutcomeObjectFactory',
                 'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
                 function(
                     $scope, $uibModalInstance, ResponsesService,
-                    EditorStateService, EditorFirstTimeEventsService,
+                    EditorFirstTimeEventsService,
                     RuleObjectFactory, OutcomeObjectFactory,
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
                   $scope.feedbackEditorIsOpen = false;
@@ -280,14 +280,12 @@ oppia.directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK);
 
                   $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                    EditorStateService.getActiveStateName(),
-                    feedbackContentId, '', []);
+                    stateName, feedbackContentId, '', []);
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (
                       tmpOutcome.dest ===
-                      EditorStateService.getActiveStateName() &&
-                      !tmpOutcome.hasNonemptyFeedback());
+                      stateName && !tmpOutcome.hasNonemptyFeedback());
                   };
 
                   $scope.addAnswerGroupForm = {};
@@ -509,12 +507,8 @@ oppia.directive('stateResponses', [
           };
 
           $scope.isOutcomeLooping = function(outcome) {
-            var activeStateName = EditorStateService.getActiveStateName();
+            var activeStateName = $scope.getStateName();
             return outcome && (outcome.dest === activeStateName);
-          };
-
-          $scope.navigateToState = function(stateName) {
-            RouterService.navigateToMainTab(stateName);
           };
         }
       ]

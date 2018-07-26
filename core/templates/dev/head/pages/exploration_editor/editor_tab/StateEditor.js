@@ -65,10 +65,12 @@ oppia.controller('StateEditor', [
       var stateData = ExplorationStatesService.getState($scope.stateName);
       if ($scope.stateName && stateData) {
         stateContentService.init(
-          EditorStateService.getActiveStateName(), stateData.content);
+          $scope.stateName, stateData.content);
         stateContentIdsToAudioTranslationsService.init(
-          EditorStateService.getActiveStateName(),
+          $scope.stateName,
           stateData.contentIdsToAudioTranslations);
+        stateHintsService.init(
+          $scope.stateName, stateData.interaction.hints);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = ExplorationStatesService.getInteractionIdMemento(
