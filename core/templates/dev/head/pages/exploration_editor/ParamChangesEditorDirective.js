@@ -182,8 +182,8 @@ oppia.directive('paramChangesEditor', [
             ExplorationParamSpecsService.saveDisplayedValue();
             $scope.paramChangesService.saveDisplayedValue();
             ExplorationStatesService.saveStateParamChanges(
-                $scope.paramChangesService.stateName,
-                angular.copy($scope.paramChangesService.displayed));
+              $scope.paramChangesService.stateName,
+              angular.copy($scope.paramChangesService.displayed));
             if ($scope.postSaveHook) {
               $scope.postSaveHook();
             }
