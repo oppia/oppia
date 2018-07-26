@@ -55,15 +55,66 @@ oppia.directive('earlyQuitIssueDirective', [
                 resolve: {
                   playthrough: function() {
                     return playthrough;
+                  },
+                  playthroughIndex: function() {
+                    return $scope.playthroughIds.indexOf(playthroughId);
                   }
                 },
                 controller: [
-                  '$scope', '$uibModalInstance', 'playthrough',
-                  'LearnerActionRenderService',
+                  '$scope', '$uibModalInstance', 'playthroughIndex',
+                  'playthrough', 'AlertsService', 'LearnerActionRenderService',
                   function(
-                      $scope, $uibModalInstance, playthrough,
-                      LearnerActionRenderService) {
-                    
+                      $scope, $uibModalInstance, playthroughIndex, playthrough,
+                      AlertsService, LearnerActionRenderService) {
+                    $scope.playthrough = playthrough;
+                    $scope.playthroughIndex = playthroughIndex;
+
+                    $scope.displayBlocks =
+                      LearnerActionRenderService.getDisplayBlocks(
+                        playthrough.learnerActions);
+
+                    $scope.maxHidden = $scope.displayBlocks.length - 1;
+
+                    $scope.showRemainingActions = function(pIdx) {
+                      if (maxHidden === 1) {
+                        document.getElementById(
+                          'remainingActions' + pIdx.toString() +
+                          maxHidden.toString()).style.display = 'block';
+                        document.getElementById('arrowDiv').style.display =
+                          'none';
+                      } else {
+                        var currentShown = 0, i;
+                        for (i = maxHidden; i > 0; i--) {
+                          if (document.getElementById(
+                            'remainingActions' + pIdx.toString() +
+                            i.toString()).style.display === 'block') {
+                            currentShown = i;
+                            break;
+                          }
+                        }
+                        if (currentShown === 0) {
+                          document.getElementById(
+                            'remainingActions' + pIdx.toString() +
+                            maxHidden.toString()).style.display = 'block';
+                        } else if (currentShown === 2) {
+                          document.getElementById(
+                            'remainingActions' + pIdx.toString() +
+                            '1').style.display = 'block';
+                          document.getElementById(
+                            'arrowDiv').style.display = 'none';
+                        } else {
+                          document.getElementById(
+                            'remainingActions' + pIdx.toString() +
+                            (currentShown - 1).toString()).style.display =
+                              'block';
+                        }
+                      }
+                    };
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                      AlertsService.clearWarnings();
+                    };
                   }
                 ]
               });
