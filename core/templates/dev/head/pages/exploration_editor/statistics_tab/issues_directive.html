@@ -9,15 +9,14 @@
           Issue <[$index+1]>
         </div>
       </div>
-
-      <div ng-repeat="issue in issues track by $index" class="col-md-9 border_gray">
-        <div ng-if="<[$index]> == 0" style="display: block;" id="issue<[$index]>">
-          <[retrieveIssueDirective($index)]>
-        </div>
-        <div ng-if="<[$index]> !== 0" style="display: none;" id="issue<[$index]>">
-          <[retrieveIssueDirective($index)]>
-        </div>
-      </div>
+    </div>
+  </div>
+  <div ng-repeat="issue in issues track by $index" class="col-md-9 border_gray">
+    <div ng-if="<[$index]> == 0" style="display: block;" id="issue<[$index]>">
+      <[retrieveIssueDirective($index)]>
+    </div>
+    <div ng-if="<[$index]> !== 0" style="display: none;" id="issue<[$index]>">
+      <[retrieveIssueDirective($index)]>
     </div>
   </div>
 </div>
