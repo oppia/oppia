@@ -23,6 +23,7 @@ oppia.directive('audioTranslationsEditor', [
       scope: {
         componentName: '@',
         contentId: '=',
+        onSaveContentIdsToAudioTranslations: '=',
         // A function that must be called at the outset of every attempt to
         // edit, even if the action is not subsequently taken through to
         // completion.
@@ -92,6 +93,8 @@ oppia.directive('audioTranslationsEditor', [
             stateContentIdsToAudioTranslationsService.displayed
               .toggleNeedsUpdateAttribute($scope.contentId, languageCode);
             stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            $scope.onSaveContentIdsToAudioTranslations(
+              stateContentIdsToAudioTranslationsService.displayed);
           };
 
           $scope.openAddAudioTranslationModal = function() {
@@ -221,6 +224,8 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.contentId, result.languageCode, result.filename,
                   result.fileSizeBytes);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.displayed);
             });
           };
 
@@ -261,6 +266,8 @@ oppia.directive('audioTranslationsEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .deleteAudioTranslation($scope.contentId, languageCode);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.displayed);
             });
           };
         }

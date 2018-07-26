@@ -136,6 +136,9 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+      ExplorationStatesService.saveContentIdsToAudioTranslations(
+        stateContentIdsToAudioTranslationsService.stateName,
+        angular.copy(stateContentIdsToAudioTranslationsService.displayed));
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -217,6 +220,9 @@ oppia.factory('ResponsesService', [
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
           stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          ExplorationStatesService.saveContentIdsToAudioTranslations(
+            stateContentIdsToAudioTranslationsService.stateName,
+            angular.copy(stateContentIdsToAudioTranslationsService.displayed));
         }
 
         _confirmedUnclassifiedAnswers = [];

@@ -22,6 +22,7 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
+        onSaveContentIdsToAudioTranslations: '=',
         getIndexPlusOne: '&indexPlusOne',
         getOnSaveFn: '&onSave'
       },
@@ -102,6 +103,8 @@ oppia.directive('hintEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(hintContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.displayed);
             });
           };
         }

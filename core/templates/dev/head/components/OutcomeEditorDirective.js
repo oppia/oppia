@@ -27,6 +27,7 @@ oppia.directive('outcomeEditor', [
         getOnSaveFeedbackFn: '&onSaveFeedback',
         getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
+        onSaveContentIdsToAudioTranslations: '=',
         suppressWarnings: '&suppressWarnings'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -80,6 +81,8 @@ oppia.directive('outcomeEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(feedbackContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.displayed);
             });
           };
 

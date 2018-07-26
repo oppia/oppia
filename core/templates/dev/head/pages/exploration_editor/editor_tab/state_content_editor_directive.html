@@ -31,7 +31,8 @@
   <div ng-if="stateContentService.savedMemento && !stateContentService.savedMemento.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_CONTENT]>"
                                content-id="stateContentService.savedMemento.getContentId()"
-                               on-start-edit="onAudioTranslationsStartEditAction">
+                               on-start-edit="onAudioTranslationsStartEditAction"
+                               on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
     </audio-translations-editor>
   </div>
 </div>

@@ -46,7 +46,8 @@
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                       class="protractor-test-response-body">
+                                       class="protractor-test-response-body"
+                                       on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
               </div>
@@ -86,7 +87,8 @@
                                        is-editable="EditabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                       class="protractor-test-response-body">
+                                       class="protractor-test-response-body"
+                                       on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
               </div>

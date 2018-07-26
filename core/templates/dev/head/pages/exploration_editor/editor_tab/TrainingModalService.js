@@ -70,6 +70,9 @@ oppia.factory('TrainingModalService', [
                 translationService.displayed.addContentId(
                   newAnswerGroup.outcome.feedback.getContentId());
                 translationService.saveDisplayedValue();
+                ExplorationStatesService.saveContentIdsToAudioTranslations(
+                  translationService.stateName,
+                  angular.copy(translationService.displayed));
               };
 
               $scope.exitTrainer = function() {

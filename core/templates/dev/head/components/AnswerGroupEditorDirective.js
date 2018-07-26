@@ -28,6 +28,7 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
         suppressWarnings: '&',
         rules: '='

@@ -21,7 +21,10 @@ oppia.directive('solutionExplanationEditor', [
   function(UrlInterpolationService, stateSolutionService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSaveSolution: '=',
+        onSaveContentIdsToAudioTranslations: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
@@ -64,6 +67,7 @@ oppia.directive('solutionExplanationEditor', [
               openMarkAllAudioAsNeedingUpdateModal();
             }
             stateSolutionService.saveDisplayedValue();
+            $scope.onSaveSolution(stateSolutionService.displayed);
             $scope.explanationEditorIsOpen = false;
           };
 
@@ -81,6 +85,8 @@ oppia.directive('solutionExplanationEditor', [
 
           $scope.onAudioTranslationsEdited = function() {
             stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            $scope.onSaveContentIdsToAudioTranslations(
+              stateContentIdsToAudioTranslationsService.displayed);
           };
 
           $scope.$on('externalSave', function() {
@@ -104,6 +110,8 @@ oppia.directive('solutionExplanationEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(solutionContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.displayed);
             });
           };
         }
