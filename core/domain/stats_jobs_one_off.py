@@ -196,12 +196,11 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return RecomputeStatisticsOneOffJob.ENTITY_CLASSES_TO_MAP_OVER
 
-    @staticmethod
-    def map(item):
-        if item.event_schema_version != 2:
-            return
+    @classmethod
+    def prepare_map(cls, item):
+        # pylint: disable=too-many-return-statements
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
-            yield (
+            return (
                 item.exp_id,
                 {
                     'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
@@ -210,7 +209,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
-            yield (
+            return (
                 item.exp_id,
                 {
                     'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
@@ -219,7 +218,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            yield (
+            return (
                 item.exploration_id,
                 {
                     'event_type': feconf.EVENT_TYPE_STATE_HIT,
@@ -228,7 +227,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            yield (
+            return (
                 item.exp_id,
                 {
                     'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
@@ -238,7 +237,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 })
         elif isinstance(
                 item, stats_models.StartExplorationEventLogEntryModel):
-            yield (
+            return (
                 item.exploration_id,
                 {
                     'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
@@ -247,7 +246,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 })
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
-            yield (
+            return (
                 item.exp_id,
                 {
                     'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
@@ -256,13 +255,20 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 })
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
-            yield (
+            return (
                 item.exploration_id,
                 {
                     'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                     'version': item.exploration_version,
                     'state_name': item.state_name
                 })
+        # pylint: enable=too-many-return-statements
+
+    @staticmethod
+    def map(item):
+        if item.event_schema_version != 2:
+            return
+        yield RecomputeStatisticsOneOffJob.prepare_map(item)
 
     @staticmethod
     def reduce(exp_id, values):
@@ -275,7 +281,12 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def prepare_reduce(cls, exp_id, values):
         values = map(ast.literal_eval, values)
-        sorted_events_dicts = sorted(values, key=lambda x: x['version'])
+
+        filtered_values = [
+            value for value in values if value['version'] is not None]
+
+        sorted_events_dicts = sorted(
+            filtered_values, key=lambda x: x['version'])
 
         error_messages = []
 
@@ -462,7 +473,9 @@ class RecomputeStatisticsValidationCopyOneOffJob(
 
     @staticmethod
     def map(item):
-        RecomputeStatisticsOneOffJob.map(item)
+        if item.event_schema_version != 2:
+            return
+        yield RecomputeStatisticsOneOffJob.prepare_map(item)
 
     @staticmethod
     def reduce(exp_id, values):
@@ -479,6 +492,8 @@ class RecomputeStatisticsValidationCopyOneOffJob(
                     'ERROR in recomputation. exp_id: %s, exp_version: %s, '
                     'new_stats_dict: %s, old_stats_dict: %s' % (
                         exp_id, index + 1, exp_stats_dict, old_stats_dict))
+
+        yield ('Completed', exp_id)
 
 
 class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
