@@ -17,7 +17,9 @@
  */
 
 // Mapping from Issue type to corresponding directive.
-oppia.constant('ISSUE_DIRECTIVE_MAPPING', {});
+oppia.constant('ISSUE_DIRECTIVE_MAPPING', {
+  'EarlyQuit': '<early-quit-issue-directive>'
+});
 
 oppia.directive('issuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
