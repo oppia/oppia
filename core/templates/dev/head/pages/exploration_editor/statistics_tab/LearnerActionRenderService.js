@@ -122,7 +122,7 @@ oppia.factory('LearnerActionRenderService', [
       return blockLength < 4;
     };
 
-    var displayBlocksGrouped = {
+    var groupedDisplayBlocks = {
       displayBlocks: [],
       localBlock: [],
       latestStateName: null,
@@ -133,8 +133,7 @@ oppia.factory('LearnerActionRenderService', [
           this.localBlock.unshift(action);
           return;
         }
-        // Push current block to list of blocks and and action into new
-        // block.
+        // Push current block to list of blocks and action into new block.
         this.displayBlocks.push(this.localBlock);
         this.localBlock = [action];
       },
@@ -168,25 +167,25 @@ oppia.factory('LearnerActionRenderService', [
       },
       getDisplayBlocks: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
-        displayBlocksGrouped.localBlock = [learnerActions[lastIndex]];
-        displayBlocksGrouped.latestStateName =
+        groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
+        groupedDisplayBlocks.latestStateName =
           learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
         for (var i = lastIndex - 1; i >= 0; i--) {
           var action = learnerActions[i];
           var currentStateName =
             action.actionCustomizationArgs.state_name.value;
-          if (currentStateName !== displayBlocksGrouped.latestStateName) {
-            displayBlocksGrouped.handleChangeInState(action);
+          if (currentStateName !== groupedDisplayBlocks.latestStateName) {
+            groupedDisplayBlocks.handleChangeInState(action);
           } else {
-            displayBlocksGrouped.handleSameState(action);
+            groupedDisplayBlocks.handleSameState(action);
           }
         }
         // If there is a local block with actions at the end, push it.
-        if (displayBlocksGrouped.localBlock) {
-          displayBlocksGrouped.displayBlocks.push(
-            displayBlocksGrouped.localBlock);
+        if (groupedDisplayBlocks.localBlock) {
+          groupedDisplayBlocks.displayBlocks.push(
+            groupedDisplayBlocks.localBlock);
         }
-        return displayBlocksGrouped.displayBlocks;
+        return groupedDisplayBlocks.displayBlocks;
       }
     };
   }]);
