@@ -25,19 +25,16 @@ oppia.directive('storiesList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_viewer/stories_list_directive.html'),
-      controller: ['WindowDimensionsService', '$scope',
-        'TopicViewerBackendApiService', '$timeout',
-        function(WindowDimensionsService, $scope,
-            TopicViewerBackendApiService, $timeout) {
+      controller: ['WindowDimensionsService', '$scope', '$timeout',
+        function(WindowDimensionsService, $scope, $timeout) {
           var STORY_TILE_WIDTH_PX = 360;
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 3;
           $scope.tileDisplayCount = 0;
 
           var initCarousels = function() {
-            $scope.storyList = TopicViewerBackendApiService.fetchTopicData(
-              $scope.getTopicId()).canonical_story_dicts;
-            if (!$scope.storyList) {
+            $scope.canonicalStories = $scope.getCanonicalStories();
+            if (!$scope.canonicalStories) {
               return;
             }
 
@@ -74,7 +71,7 @@ oppia.directive('storiesList', [
             // Prevent scrolling if there more carousel pixed widths than
             // there are tile widths.
 
-            if ($scope.storyList.length <= $scope.tileDisplayCount) {
+            if ($scope.canonicalStories.length <= $scope.tileDisplayCount) {
               return;
             }
 
@@ -85,7 +82,7 @@ oppia.directive('storiesList', [
                 0, $scope.leftmostCardIndices - $scope.tileDisplayCount);
             } else {
               $scope.leftmostCardIndices = Math.min(
-                $scope.storyList.length - $scope.tileDisplayCount + 1,
+                $scope.canonicalStories.length - $scope.tileDisplayCount + 1,
                 $scope.leftmostCardIndices + $scope.tileDisplayCount);
             }
 

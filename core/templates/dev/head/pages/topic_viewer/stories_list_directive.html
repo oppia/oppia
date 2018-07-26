@@ -1,4 +1,4 @@
-<div ng-if="getCanonicalStories().length === 0">
+<div ng-if="canonicalStories.length === 0">
   <em>There are no stories to display.</em>
 </div>
 
@@ -15,7 +15,7 @@
        ng-swipe-right="scroll(true)"
        ng-swipe-left="scroll(false)">
     <div class="oppia-topic-viewer-carousel-tiles">
-      <md-card ng-repeat="canonicalStory in getCanonicalStories()" class="oppia-story-summary-tile">
+      <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
         <canonical-story-summary-tile story-id="canonicalStory.id"
                                       title="canonicalStory.title"
                                       description="canonicalStory.description">
@@ -36,7 +36,7 @@
 </div>
 
 <div ng-if="topicViewerWindowIsNarrow" class="oppia-topic-viewer-low-width">
-  <md-card ng-repeat="canonicalStory in getCanonicalStories()" class="oppia-story-summary-tile">
+  <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
     <canonical-story-summary-tile story-id="canonicalStory.id"
                                   title="canonicalStory.title"
                                   description="canonicalStory.description">
