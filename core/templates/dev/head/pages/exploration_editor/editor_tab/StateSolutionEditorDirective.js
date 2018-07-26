@@ -47,6 +47,7 @@ oppia.directive('stateSolutionEditor', [
             stateContentIdsToAudioTranslationsService) {
           $scope.EditabilityService = EditabilityService;
           $scope.correctAnswer = null;
+          $scope.stateName = $scope.getStateName();
           $scope.correctAnswerEditorHtml = '';
           $scope.inlineSolutionEditorIsActive = false;
           $scope.SOLUTION_EDITOR_FOCUS_LABEL = (

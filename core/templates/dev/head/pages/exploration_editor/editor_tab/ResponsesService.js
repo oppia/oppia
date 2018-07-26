@@ -19,7 +19,7 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
+  'AnswerGroupsCacheService', 'EditorStateService',
   'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'ExplorationWarningsService',
@@ -29,7 +29,7 @@ oppia.factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, EditorStateService, ChangeListService,
+      AnswerGroupsCacheService, EditorStateService,
       ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, ExplorationWarningsService,

@@ -29,6 +29,7 @@ oppia.directive('stateResponses', [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'stateInteractionIdService', 'AlertsService',
         'ResponsesService', 'ContextService',
+        'ExplorationCorrectnessFeedbackService',
         'TrainingDataService', 'EditabilityService',
         'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
@@ -37,6 +38,7 @@ oppia.directive('stateResponses', [
             $scope, $rootScope, $uibModal, $filter,
             stateInteractionIdService, AlertsService,
             ResponsesService, ContextService,
+            ExplorationCorrectnessFeedbackService,
             TrainingDataService, EditabilityService,
             stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
@@ -45,6 +47,9 @@ oppia.directive('stateResponses', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
+          $scope.ExplorationCorrectnessFeedbackService =
+            ExplorationCorrectnessFeedbackService;
+          $scope.stateName = $scope.getStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 

@@ -29,12 +29,13 @@
           <li ng-repeat="answerGroup in stateAnswerGroups track by $index" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-prevent-selection" style="margin-top: 0;">
             <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <response-header index="$index"
-                               summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():false"
-                               short-summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():true"
+                               summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), false)"
+                               short-summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), true)"
                                is-active="$index === activeAnswerGroupIndex"
                                outcome="answerGroup.outcome"
                                num-rules="answerGroup.rules.length"
-                               is-response="true">
+                               is-response="true"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === $index">
@@ -56,10 +57,11 @@
             <a ng-click="changeActiveAnswerGroupIndex(stateAnswerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}">
               <response-header index="$index"
                                is-active="$index === activeAnswerGroupIndex"
-                               summary="stateDefaultOutcome|summarizeDefaultOutcome:stateInteractionId:stateDefaultOutcome.length:false"
-                               short-summary="stateDefaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId:stateDefaultOutcome.length:true"
+                               summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
+                               short-summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
                                outcome="stateDefaultOutcome"
-                               is-response="true">
+                               is-response="true"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">

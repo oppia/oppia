@@ -195,11 +195,13 @@ describe('State content editor directive', function() {
     $rootScope.$digest();
 
     outerScope = $rootScope.$new();
-    outerScope.ess = ess;
     outerScope.onSaveContentFn = jasmine.createSpy('onSaveContentFn');
+    outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     var elem = angular.element(
       '<state-content-editor on-save-content-fn="onSaveContentFn" ' +
-      'is-question="false" state-service="ess">' +
+      'on-save-state-content="saveStateContent" ' +
+      'on-save-content-ids-to-audio-translations=' +
+      '"saveContentIdsToAudioTranslations">' +
       '</state-content-editor>');
     var compiledElem = $compile(elem)(outerScope);
     outerScope.$digest();
@@ -229,19 +231,13 @@ describe('State content editor directive', function() {
     ctrlScope.openStateContentEditor();
     scs.displayed = _getContent('content', 'babababa');
     ctrlScope.onSaveContentButtonClicked();
-    expect(cls.getChangeList().length).toBe(1);
-    expect(cls.getChangeList()[0].new_value.html).toEqual('babababa');
-    expect(cls.getChangeList()[0].old_value.html).toEqual(
-      'This is some content.');
+    expect(outerScope.saveStateContent).toHaveBeenCalled();
 
     ctrlScope.openStateContentEditor();
     scs.displayed = _getContent(
       'content', 'And now for something completely different.');
     ctrlScope.onSaveContentButtonClicked();
-    expect(cls.getChangeList().length).toBe(2);
-    expect(cls.getChangeList()[1].new_value.html)
-      .toEqual('And now for something completely different.');
-    expect(cls.getChangeList()[1].old_value.html).toEqual('babababa');
+    expect(outerScope.saveStateContent).toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {

@@ -168,8 +168,18 @@ describe('State Interaction controller', function() {
       $rootScope.$digest();
 
       outerScope = $rootScope.$new();
+      outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
+      outerScope.saveInteractionId = jasmine.createSpy('saveInteractionId');
+      outerScope.recomputeGraph = jasmine.createSpy('createGraph');
+      outerScope.saveInteractionCustomizationArgs =
+        jasmine.createSpy('saveInteractionCustomizationArgs');
       var elem = angular.element(
-        '<state-interaction-editor></state-interaction-editor>');
+        '<state-interaction-editor on-save-state-content="saveStateContent" ' +
+        'on-save-interaction-id="saveInteractionId" ' +
+        'on-save-interaction-customization-args=' +
+        '"saveInteractionCustomizationArgs" ' +
+        'recompute-graph="recomputeGraph">' +
+        '</state-interaction-editor>');
       var compiledElem = $compile(elem)(outerScope);
       outerScope.$digest();
       directiveScope = compiledElem[0].getControllerScope();
@@ -190,10 +200,9 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(ess.getState('First State').content.getHtml()).toEqual(
-          'First State Content');
-        expect(ess.getState('First State').interaction.id).toEqual(
-          'TerminalInteraction');
+        expect(outerScope.saveInteractionId).toHaveBeenCalled();
+        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
+        expect(outerScope.recomputeGraph).toHaveBeenCalled();
       }
     );
 
@@ -212,11 +221,9 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(state.content.getHtml()).toEqual('');
-        expect(ess.getState('End State').content.getHtml()).toEqual(
-          'Congratulations, you have finished!');
-        expect(ess.getState('End State').interaction.id).toEqual(
-          'TerminalInteraction');
+        expect(outerScope.saveInteractionId).toHaveBeenCalled();
+        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
+        expect(outerScope.recomputeGraph).toHaveBeenCalled();
       }
     );
 
@@ -235,9 +242,8 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TextInput';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(state.content.getHtml()).toEqual('');
-        expect(ess.getState('End State').content.getHtml()).toEqual('');
-        expect(ess.getState('End State').interaction.id).toEqual('TextInput');
+        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
+        expect(outerScope.recomputeGraph).toHaveBeenCalled();
       }
     );
   });

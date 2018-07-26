@@ -30,7 +30,8 @@
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
                                num-rules="answerGroup.rules.length"
-                               is-response="true">
+                               is-response="true"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
 
@@ -69,7 +70,8 @@
                                summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                outcome="defaultOutcome"
-                               is-response="true">
+                               is-response="true"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
 
