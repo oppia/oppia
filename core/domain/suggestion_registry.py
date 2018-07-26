@@ -417,7 +417,13 @@ class SuggestionAddQuestion(BaseSuggestion):
         pass
 
     def accept(self, unused_commit_message):
-        """Accepts the suggestion."""
+        """Accepts the suggestion.
+
+        Args:
+            unused_commit_message: str. This parameter is passed in for
+                consistency with the existing suggestions. As there is no model
+                being commited to, this arg is unused.
+        """
         question_dict = self.change_cmd.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
