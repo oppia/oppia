@@ -71,16 +71,16 @@ describe('Responses Service', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
     });
 
-    it('should be able to change answer group index', function() {
+    it('should be able to change the answer group index', function() {
       rs.changeActiveAnswerGroupIndex(5);
       expect(rs.getActiveAnswerGroupIndex()).toEqual(5);
     });
 
-    it('should return 0 for active rule index by default', function() {
+    it('should return 0 for the active rule index by default', function() {
       expect(rs.getActiveRuleIndex()).toEqual(0);
     });
 
-    it('should be able to change active rule index', function() {
+    it('should be able to change the active rule index', function() {
       rs.changeActiveRuleIndex(5);
       expect(rs.getActiveRuleIndex()).toEqual(5);
     });
@@ -89,58 +89,20 @@ describe('Responses Service', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
 
-    it('should update answer group', function() {
-/*
-      // Initialize exploration states service -
-      // required for answer groups to be set
-      let ess;
+    describe('Manipulate answer group', function() {
 
-      inject(function($injector) {
-        ess = $injector.get('ExplorationStatesService');
-      });
+      let updates;
 
-      ess.init({
-        Test: {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: 'Test initialization'
-          },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
-              dest: 'Test',
-              feedback: {content_id: "default_outcome", html: ""},
-              labelled_as_correct: false,
-              missing_prerequisite_skill_id: null,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            hints: []
-          },
-          param_changes: []
-        }
-      });
-*/
-
-      // Set new answer group object and update
-      let updates = {
+      beforeEach(function() {
+        updates = {
           rules: [{
-            0: {
-              inputs: {x: ['<p>Two</p>']},
-              type: 'Equals'
-            }
+            inputs: {x: ['<p>Two</p>']},
+            type: 'Equals'
           }],
           outcome: {
             dest: 'Test',
             feedback: {
-              _contentId: "feedback_2",
+              _contentId: "feedback_1",
               _html: "<p>Correct!</p>↵"
             },
             refresherExplorationId: null,
@@ -151,26 +113,19 @@ describe('Responses Service', function() {
           trainingData: [],
           taggedMisconceptionId: null
         };
-      rs.updateAnswerGroup(0, updates);
-      expect(rs.getAnswerGroup(0)).toEqual(updates);
-    });
+      });
 
-    it('should delete answer group', function() {
-      let initialLength = rs.getAnswerGroupCount();
-      let updates = {
-        rules: 'new rules',
-        outcome: {
-          feedback: 'new feedback',
-          dest: 'new dest',
-          refresherExplorationId: 2,
-          missingPrerequisiteSkillId: 3,
-          labelledAsCorrect: false
-        },
-        trainingData: 'new data'
-      };
-      rs.updateAnswerGroup(initialLength, updates);
-      rs.deleteAnswerGroup(initialLength);
-      expect(rs.AnswerGroupCount()).toEqual(initialLength);
+      it('should update the answer group', function() {
+        rs.updateAnswerGroup(0, updates);
+        expect(rs.getAnswerGroup(0)).toEqual(updates);
+      });
+
+      it('should delete the answer group', function() {
+        let initialLength = rs.getAnswerGroupCount();
+        rs.updateAnswerGroup(0, updates);
+        rs.deleteAnswerGroup(initialLength);
+        expect(rs.AnswerGroupCount()).toEqual(initialLength);
+     });
     });
 
     it('should be able to update answer choices', function() {
