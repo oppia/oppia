@@ -152,16 +152,9 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             entity_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            feedback_analytics_model_ids = (
-                ['%s.%s' % (entity_type, entity_id)
-                 for entity_id in entity_ids])
-        else:
-            feedback_analytics_model_ids = entity_ids
 
         feedback_thread_analytics_models = (
-            feedback_models.FeedbackAnalyticsModel.get_multi(
-                feedback_analytics_model_ids))
+            feedback_models.FeedbackAnalyticsModel.get_multi(entity_ids))
         return [feedback_domain.FeedbackAnalytics(
             entity_type, entity_ids[i],
             (realtime_models[i].num_open_threads
@@ -188,13 +181,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             - num_total_threads: int. The count of all feedback
               threads for this exploration.
         """
-        entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            feedback_analytics_model_id = '%s.%s' % (entity_type, entity_id)
-        else:
-            feedback_analytics_model_id = entity_id
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
-            [feedback_analytics_model_id])[0]
+            [entity_id])[0]
 
 
 class FeedbackAnalyticsMRJobManager(
@@ -228,7 +216,7 @@ class FeedbackAnalyticsMRJobManager(
               - str. The feedback thread's status.
         """
         if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
-            yield (item.entity_type + '.' + item.entity_id, item.status)
+            yield (item.entity_id, item.status)
         else:
             yield (item.exploration_id, item.status)
 

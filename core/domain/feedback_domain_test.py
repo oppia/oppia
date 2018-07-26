@@ -19,6 +19,7 @@ import datetime
 from core.domain import feedback_domain
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
 import utils
 
 
@@ -46,7 +47,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'last_updated': utils.get_time_in_millisecs(fake_date)
         }
         observed_thread = feedback_domain.FeedbackThread(
-            self.THREAD_ID, 'exploration', self.EXP_ID,
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 1, fake_date, fake_date)
@@ -56,9 +57,9 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     def test_get_last_two_message_ids(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name',
-            self.viewer_id, u'open', u'a subject', None, False, 5, fake_date,
-            fake_date)
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            5, fake_date, fake_date)
 
         last_two_message_ids = thread_1.get_last_two_message_ids()
         self.assertEqual(
@@ -67,9 +68,9 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
         # Check what happens in case the thread has only one message.
         thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name',
-            self.viewer_id, u'open', u'a subject', None, False, 1, fake_date,
-            fake_date)
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            1, fake_date, fake_date)
 
         last_two_message_ids = thread_1.get_last_two_message_ids()
         # The second last message should be given an id of -1 as it doesn't
@@ -95,7 +96,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         expected_message_dict = {
             'author_username': self.OWNER_USERNAME,
             'created_on': utils.get_time_in_millisecs(fake_date),
-            'entity_type': 'exploration',
+            'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.EXP_ID,
             'message_id': self.MESSAGE_ID,
             'text': 'a message text',
@@ -117,7 +118,7 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
-            'exploration', self.EXP_ID, 1, 2)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, 2)
         self.assertDictEqual(expected_thread_analytics.to_dict(), {
             'num_open_threads': 1,
             'num_total_threads': 2
@@ -163,7 +164,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_feedback_message_reference = {
-            'entity_type': 'exploration',
+            'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,
             'message_id': self.message_id
@@ -171,7 +172,8 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
         observed_feedback_message_reference = (
             feedback_domain.FeedbackMessageReference(
-                'exploration', self.exp_id, self.thread_id, self.message_id))
+                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.thread_id,
+                self.message_id))
 
         self.assertDictEqual(observed_feedback_message_reference.to_dict(),
                              expected_feedback_message_reference)

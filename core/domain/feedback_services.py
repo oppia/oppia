@@ -445,8 +445,8 @@ def create_suggestion(
             the value of "value" is the actual content of the suggestion.
     """
     thread_id = _create_models_for_thread_and_first_message(
-        'exploration', exploration_id, state_name, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id, state_name, author_id,
+        description, DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
         description, suggestion_content)

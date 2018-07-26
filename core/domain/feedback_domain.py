@@ -40,8 +40,6 @@ class FeedbackThread(object):
             was last updated.
     """
 
-    # TODO (nithesh): Generalise feedback threads so that it is applicable to
-    # entities other than explorations also.
     def __init__(
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
@@ -203,7 +201,7 @@ class FeedbackAnalytics(object):
             self, entity_type, entity_id, num_open_threads, num_total_threads):
         """Initializes a FeedbackAnalytics object."""
 
-        self.id = entity_type + '.' + entity_id
+        self.id = entity_id
         self.entity_type = entity_type
         self.num_open_threads = num_open_threads
         self.num_total_threads = num_total_threads

@@ -202,9 +202,9 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, feedback_models.FeedbackThreadModel):
-            new_id = 'exploration.' + item.id
+            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
             feedback_models.GeneralFeedbackThreadModel(
-                id=new_id, entity_type='exploration',
+                id=new_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 entity_id=item.exploration_id,
                 original_author_id=item.original_author_id,
                 status=item.status, subject=item.subject,
@@ -213,8 +213,8 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 last_updated=item.last_updated, created_on=item.created_on,
                 deleted=item.deleted).put(update_last_updated_time=False)
         elif isinstance(item, feedback_models.FeedbackMessageModel):
-            new_id = 'exploration.' + item.id
-            new_thread_id = 'exploration.' + item.thread_id
+            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
+            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.thread_id)
             feedback_models.GeneralFeedbackMessageModel(
                 id=new_id, thread_id=new_thread_id,
                 message_id=item.message_id, author_id=item.author_id,
@@ -226,8 +226,8 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(item, feedback_models.FeedbackThreadUserModel):
             old_id_parts = item.id.split('.')
             new_id = '.'.join(
-                [old_id_parts[0], 'exploration', old_id_parts[1],
-                 old_id_parts[2]])
+                [old_id_parts[0], feconf.ENTITY_TYPE_EXPLORATION,
+                 old_id_parts[1], old_id_parts[2]])
             feedback_models.GeneralFeedbackThreadUserModel(
                 id=new_id,
                 message_ids_read_by_user=item.message_ids_read_by_user
@@ -235,8 +235,8 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
             old_id_parts = item.id.split('.')
             new_id = '.'.join(
-                [old_id_parts[0], 'exploration', old_id_parts[1],
-                 old_id_parts[2]])
+                [old_id_parts[0], feconf.ENTITY_TYPE_EXPLORATION,
+                 old_id_parts[1], old_id_parts[2]])
             email_models.GeneralFeedbackEmailReplyToIdModel(
                 id=new_id, reply_to_id=item.reply_to_id).put()
         elif isinstance(item, user_models.UserSubscriptionsModel):
