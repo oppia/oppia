@@ -748,6 +748,17 @@ def get_thread(thread_id):
     return _get_thread_from_model(model)
 
 
+def get_thread_subject(thread_id):
+    """Returns the subject of the thread.
+
+    Args:
+        thread_id: str. The ID of the thread to get subject for.
+    Returns:
+        str. The subject of the thread.
+    """
+    return get_thread(thread_id).subject
+
+
 def get_open_threads(entity_type, entity_id, has_suggestion):
     """Fetches all open threads for the given entity id.
 

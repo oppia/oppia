@@ -563,7 +563,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     text = ndb.StringProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
-    received_via_email = ndb.BooleanProperty(default=False, indexed=True)
+    received_via_email = ndb.BooleanProperty(
+        default=False, indexed=True, required=True)
     # TODO (nithesh): Overriding last_updated of base model for migrating
     # instances from old model to the new one. To be removed after migration.
     last_updated = ndb.DateTimeProperty()
@@ -599,16 +600,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             str. The entity_type.
         """
         return self.id.split('.')[0]
-
-
-    def get_thread_subject(self):
-        """Returns the subject of the thread corresponding to this
-        GeneralFeedbackMessageModel instance.
-
-        Returns:
-            str. The subject of the thread.
-        """
-        return GeneralFeedbackThreadModel.get_by_id(self.thread_id).subject
 
     @classmethod
     def create(cls, thread_id, message_id):
