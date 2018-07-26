@@ -31,11 +31,11 @@ oppia.directive('paramChangesEditor', [
       controller: [
         '$scope', '$rootScope', 'EditabilityService',
         'ExplorationParamSpecsService', 'AlertsService',
-        'ParamChangeObjectFactory',
+        'ParamChangeObjectFactory', 'ExplorationStatesService',
         function(
             $scope, $rootScope, EditabilityService,
             ExplorationParamSpecsService, AlertsService,
-            ParamChangeObjectFactory) {
+            ParamChangeObjectFactory, ExplorationStatesService) {
           $scope.EditabilityService = EditabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
@@ -181,6 +181,9 @@ oppia.directive('paramChangesEditor', [
 
             ExplorationParamSpecsService.saveDisplayedValue();
             $scope.paramChangesService.saveDisplayedValue();
+            ExplorationStatesService.saveStateParamChanges(
+                $scope.paramChangesService.stateName,
+                angular.copy($scope.paramChangesService.displayed));
             if ($scope.postSaveHook) {
               $scope.postSaveHook();
             }
