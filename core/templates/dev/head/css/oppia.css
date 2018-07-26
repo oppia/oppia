@@ -3749,6 +3749,10 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 8px;
 }
 
+span.learner-action {
+  margin-bottom: 2em;
+}
+
 /* Values below were experimentally generated using 'http://csshexagon.com' */
 .hexagon {
   transform: scale(0.5);
