@@ -1,0 +1,22 @@
+<div>
+  <div class="row content pt-4">
+    <div class="col-md-2 border_gray ft-14">
+      <div ng-repeat="issue in issues track by $index" class="row">
+        <div ng-if="<[$index]> == 0" class="issueNav col-md bor-btm clr-green pt-2 pb-2 bg-clr text-white" onclick="makeVisible(<[$index]>)" id="issueNav<[$index]>">
+          Issue <[$index+1]>
+        </div>
+        <div ng-if="<[$index]> !== 0" class="issueNav col-md bor-btm clr-green pt-2 pb-2" onclick="makeVisible(<[$index]>)" id="issueNav<[$index]>">
+          Issue <[$index+1]>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-repeat="issue in issues track by $index" class="col-md-9 border_gray">
+    <div ng-if="<[$index]> == 0" style="display: block;" id="issue<[$index]>">
+      <[retrieveIssueDirective($index)]>
+    </div>
+    <div ng-if="<[$index]> !== 0" style="display: none;" id="issue<[$index]>">
+      <[retrieveIssueDirective($index)]>
+    </div>
+  </div>
+</div>
