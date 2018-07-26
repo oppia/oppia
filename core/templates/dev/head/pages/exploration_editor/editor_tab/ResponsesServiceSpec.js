@@ -32,20 +32,38 @@ describe('Responses Service', function() {
 
     beforeEach(function() {
       rs.init({
-        interactionId: 1,
         answerGroups: [{
-          rules: 'rules',
+          rules: [{
+            inputs: {x: ['<p>One</p>']},
+            type: 'Equals'
+          }],
           outcome: {
-            feedback: 'feedback',
-            dest: 'dest',
-            refresherExplorationId: 1,
-            missingPrerequisiteSkillId: 2,
-            labelledAsCorrect: true
+            dest: 'Test',
+            feedback: {
+              _contentId: "feedback_1",
+              _html: "<p>True!</p>↵"
+            },
+            refresherExplorationId: null,
+            missingPrerequisiteSkillId: null,
+            labelledAsCorrect: false,
+            paramChanges: []
           },
-          trainingData: 'data'
+          trainingData: [],
+          taggedMisconceptionId: null
         }],
-        defaultOutcome: 'some default outcome',
-        confirmedUnclassifiedAnswers: ['some value']
+        defaultOutcome: {
+          dest: 'Test',
+          feedback: {
+            _contentId: 'default_outcome',
+            _html: ''
+          },
+          refresherExplorationId: null,
+          missingPrerequisiteSkillId: null,
+          labelledAsCorrect: false,
+          paramChanges: []
+        },
+        confirmedUnclassifiedAnswers: [],
+        interactionId: "ItemSelectionInput"
       })
     });
 
@@ -72,17 +90,67 @@ describe('Responses Service', function() {
     });
 
     it('should update answer group', function() {
+/*
+      // Initialize exploration states service -
+      // required for answer groups to be set
+      let ess;
+
+      inject(function($injector) {
+        ess = $injector.get('ExplorationStatesService');
+      });
+
+      ess.init({
+        Test: {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: 'Test initialization'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {}
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: 'Test',
+              feedback: {content_id: "default_outcome", html: ""},
+              labelled_as_correct: false,
+              missing_prerequisite_skill_id: null,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            hints: []
+          },
+          param_changes: []
+        }
+      });
+*/
+
+      // Set new answer group object and update
       let updates = {
-        rules: 'new rules',
-        outcome: {
-          feedback: 'new feedback',
-          dest: 'new dest',
-          refresherExplorationId: 2,
-          missingPrerequisiteSkillId: 3,
-          labelledAsCorrect: false
-        },
-        trainingData: 'new data'
-      };
+          rules: [{
+            0: {
+              inputs: {x: ['<p>Two</p>']},
+              type: 'Equals'
+            }
+          }],
+          outcome: {
+            dest: 'Test',
+            feedback: {
+              _contentId: "feedback_2",
+              _html: "<p>Correct!</p>↵"
+            },
+            refresherExplorationId: null,
+            missingPrerequisiteSkillId: null,
+            labelledAsCorrect: false,
+            paramChanges: []
+          },
+          trainingData: [],
+          taggedMisconceptionId: null
+        };
       rs.updateAnswerGroup(0, updates);
       expect(rs.getAnswerGroup(0)).toEqual(updates);
     });
