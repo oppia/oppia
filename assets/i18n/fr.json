@@ -234,7 +234,7 @@
 	"I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION": "Il semble que vous n'ayez pas encore démarré d'exploration. Allez voir à la bibliothèque pour commencer une nouvelle exploration excitante !",
 	"I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "À jouer plus tard",
 	"I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE": "Faites glisser et réarrangez les activités dans l’ordre dans lequel vous voulez les jouer !",
-	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Êtes-vous sûr de vouloir supprimer '<[entityTitle]>' de votre liste '<[sectionNameI18nId | translate]>' ?",
+	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Êtes-vous sûr de vouloir supprimer '<[entityTitle]>' de votre liste '<[sectionNameI18nId | traduction]>' ?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER": "Supprimer de la liste '<[sectionNameI18nId | translate]>' ?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Supprimer",
 	"I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Revenir à la liste des messages",

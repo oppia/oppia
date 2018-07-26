@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Aselkem",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Tazmilt",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Isteqsiyen war tifrat",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Tafelwit n usenqed n isental d timusniwin",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Zuɣer tugna ar temnaḍt-agi",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Azen afaylu",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Sens asnirem",
@@ -194,6 +195,7 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "Sfeḍ",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Urar",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Urar agzum asaḍas",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Imasalen uzmiren n iferdisen",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Tebɣiḍ ad talseḍ awennez n tengalt-ik?",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Sefsex",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Asentem ilaq",
@@ -434,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Anmager",
 	"I18N_SIDEBAR_GET_STARTED": "Bdu",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Tanedlist",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Tasbeddit Oppia",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Selmed s Oppia",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "S rrcem n texxamt deg uzelmaḍ n uḍris-agi, ad tqebleḍ ad tettwaqqneḍ ar <[sitename]> tiwtilin n useqdec, yellan <a href=\"/terms\" target=\"_blank\">dagi</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Azen sakin bdu attekki",
@@ -520,5 +523,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Qqen s Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Selmed s Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Ɣur-k amḍan amatu n <[totalSubscribers]> n imeltaɣen.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ffeɣ seg ujerred"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ffeɣ seg ujerred",
+	"I18N_WORKED_EXAMPLE": "Amedya yettwasqedcen"
 }
