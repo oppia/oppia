@@ -33,9 +33,6 @@ oppia.directive('dragAndDropHtmlStringEditor', [
           $scope.value = $scope.choices[0].id;
         }
         $scope.selectedItem = $scope.value;
-        if ($scope.selectedItem === '' || !$scope.selectedItem) {
-          $scope.selectedItem = $scope.choices[0].id;
-        }
 
         $scope.selection = function(selectedItem) {
           $scope.value = selectedItem;
