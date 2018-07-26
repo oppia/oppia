@@ -20,7 +20,7 @@ oppia.directive('stateResponses', [
     return {
       restrict: 'E',
       scope: {
-        onSaveContentIdsToAudioTranslations: '&'
+        onSaveContentIdsToAudioTranslations: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
@@ -320,8 +320,7 @@ oppia.directive('stateResponses', [
               stateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.tmpOutcome.feedback.getContentId());
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations()(
-                stateContentIdsToAudioTranslationsService.stateName,
+              $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
               $scope.changeActiveAnswerGroupIndex(
@@ -389,8 +388,7 @@ oppia.directive('stateResponses', [
               stateContentIdsToAudioTranslationsService.
                 displayed.deleteContentId(deletedFeedbackContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations()(
-                stateContentIdsToAudioTranslationsService.stateName,
+              $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
             });

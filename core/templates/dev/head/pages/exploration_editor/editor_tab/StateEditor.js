@@ -61,9 +61,9 @@ oppia.controller('StateEditor', [
     });
 
     $scope.initStateEditor = function() {
-      var stateName = EditorStateService.getActiveStateName();
-      var stateData = ExplorationStatesService.getState(stateName);
-      if (stateName && stateData) {
+      $scope.stateName = EditorStateService.getActiveStateName();
+      var stateData = ExplorationStatesService.getState($scope.stateName);
+      if ($scope.stateName && stateData) {
         stateContentService.init(
           EditorStateService.getActiveStateName(), stateData.content);
         stateContentIdsToAudioTranslationsService.init(
@@ -72,7 +72,7 @@ oppia.controller('StateEditor', [
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = ExplorationStatesService.getInteractionIdMemento(
-          stateName);
+          $scope.stateName);
         $scope.interactionIdIsSet = Boolean(interactionId);
         $scope.currentInteractionCanHaveSolution = Boolean(
           $scope.interactionIdIsSet &&
@@ -82,7 +82,7 @@ oppia.controller('StateEditor', [
           INTERACTION_SPECS[interactionId].is_terminal);
 
         var content = ExplorationStatesService.getStateContentMemento(
-          stateName);
+          $scope.stateName);
         if (content.getHtml() || stateData.interaction.id) {
           $scope.interactionIsShown = true;
         }
@@ -95,42 +95,39 @@ oppia.controller('StateEditor', [
       GraphDataService.recompute();
     };
 
-    $scope.saveStateContent = function(stateName, displayedValue) {
+    $scope.saveStateContent = function(displayedValue) {
       ExplorationStatesService.saveStateContent(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
-    $scope.saveInteractionId = function(stateName, displayedValue) {
+    $scope.saveInteractionId = function(displayedValue) {
       ExplorationStatesService.saveInteractionId(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
-    $scope.saveInteractionCustomizationArgs = function(
-        stateName, displayedValue) {
+    $scope.saveInteractionCustomizationArgs = function(displayedValue) {
       ExplorationStatesService.saveInteractionCustomizationArgs(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
-    $scope.saveSolution = function(stateName, displayedValue) {
+    $scope.saveSolution = function(displayedValue) {
       ExplorationStatesService.saveSolution(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
-    $scope.saveHints = function(stateName, displayedValue) {
+    $scope.saveHints = function(displayedValue) {
       ExplorationStatesService.saveHints(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
-    $scope.saveContentIdsToAudioTranslations = function(
-        stateName, displayedValue) {
+    $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
       ExplorationStatesService.saveContentIdsToAudioTranslations(
-        stateName, angular.copy(displayedValue));
+        $scope.stateName, angular.copy(displayedValue));
     };
 
     $scope.showInteraction = function() {
       // Show the interaction when the text content is saved, even if no
       // content is entered.
-      $scope.stateName = EditorStateService.getActiveStateName();
       $scope.interactionIsShown = true;
     };
   }

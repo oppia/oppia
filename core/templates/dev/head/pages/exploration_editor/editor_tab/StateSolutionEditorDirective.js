@@ -21,8 +21,8 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSaveSolution: '&',
-        onSaveContentIdsToAudioTranslations: '&'
+        onSaveSolution: '=',
+        onSaveContentIdsToAudioTranslations: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
@@ -208,16 +208,12 @@ oppia.directive('stateSolutionEditor', [
                 stateContentIdsToAudioTranslationsService.displayed
                   .addContentId(explanationContentId);
                 stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-                $scope.onSaveContentIdsToAudioTranslations()(
-                  stateContentIdsToAudioTranslationsService.stateName,
+                $scope.onSaveContentIdsToAudioTranslations(
                   stateContentIdsToAudioTranslationsService.displayed
                 );
               }
               stateSolutionService.saveDisplayedValue();
-              $scope.onSaveSolution()(
-                stateSolutionService.stateName,
-                stateSolutionService.displayed
-              );
+              $scope.onSaveSolution(stateSolutionService.displayed);
             });
           };
 
@@ -250,13 +246,9 @@ oppia.directive('stateSolutionEditor', [
                 .deleteContentId(explanationContentId);
               stateSolutionService.displayed = null;
               stateSolutionService.saveDisplayedValue();
-              $scope.onSaveSolution()(
-                stateSolutionService.stateName,
-                stateSolutionService.displayed
-              );
+              $scope.onSaveSolution(stateSolutionService.displayed);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations()(
-                stateContentIdsToAudioTranslationsService.stateName,
+              $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
               ExplorationStatesService.deleteSolutionValidity(

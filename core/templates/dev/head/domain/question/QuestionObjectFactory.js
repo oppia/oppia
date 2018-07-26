@@ -48,7 +48,7 @@ oppia.factory('QuestionObjectFactory', ['StateObjectFactory',
       return this._version;
     };
 
-    Question.createDefaultQuestionData = function() {
+    Question.createDefaultQuestionState = function() {
       return StateObjectFactory.createDefaultState(null);
     };
 

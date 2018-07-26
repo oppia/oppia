@@ -40,7 +40,7 @@ oppia.directive('questionsTab', [
 
           $scope.createQuestion = function() {
             $scope.questionStateData =
-              QuestionObjectFactory.createDefaultQuestionData();
+              QuestionObjectFactory.createDefaultQuestionState();
             $scope.questionEditorIsShown = true;
             $scope.questionId = null;
           };

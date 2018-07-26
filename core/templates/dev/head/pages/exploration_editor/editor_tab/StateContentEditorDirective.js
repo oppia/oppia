@@ -29,8 +29,8 @@ oppia.directive('stateContentEditor', [
       },
       scope: {
         getOnSaveContentFn: '&onSaveContentFn',
-        onSaveStateContent: '&',
-        onSaveContentIdsToAudioTranslations: '&',
+        onSaveStateContent: '=',
+        onSaveContentIdsToAudioTranslations: '=',
         isInitialState: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -60,9 +60,7 @@ oppia.directive('stateContentEditor', [
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
-            $scope.onSaveStateContent()(
-              stateContentService.stateName,
-              stateContentService.displayed);
+            $scope.onSaveStateContent(stateContentService.displayed);
             $scope.contentEditorIsOpen = false;
           };
 
@@ -79,8 +77,7 @@ oppia.directive('stateContentEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(contentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations()(
-                stateContentIdsToAudioTranslationsService.stateName,
+              $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
             });
@@ -129,8 +126,7 @@ oppia.directive('stateContentEditor', [
 
           $scope.onAudioTranslationsEdited = function() {
             stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-            $scope.onSaveContentIdsToAudioTranslations()(
-              stateContentIdsToAudioTranslationsService.stateName,
+            $scope.onSaveContentIdsToAudioTranslations(
               stateContentIdsToAudioTranslationsService.displayed
             );
           };
