@@ -132,6 +132,7 @@ exports.config = {
     'browserstack.user': process.env.USERNAME,
     'browserstack.key': process.env.ACCESS_KEY,
     'browserstack.local': true,
+    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     'browserstack.debug': true,
     'browserstack.networkLogs': true,
     'browserstack.appium_version': '1.7.2',
