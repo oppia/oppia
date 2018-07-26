@@ -32,10 +32,18 @@ oppia.directive('issuesDirective', [
           $scope.issues = IssuesService.getIssues();
 
           $scope.currentIssueIndex = 0;
+          $scope.currentIssue = $scope.issues[0];
 
           $scope.retrieveIssueDirective = function(issueIndex) {
-            issueType = issues[issueIndex].issueType;
-            return ISSUE_DIRECTIVE_MAPPING[issueType];
+            var issueType = issues[issueIndex].issueType;
+            var issueDirective = ISSUE_DIRECTIVE_MAPPING[issueType];
+            issueDirectiveArgs =
+              ' index="currentIssueIndex" issue="currentIssue"';
+            var tempLength = issueDirective.length;
+            var issueDirectiveComplete = [
+              issueDirective.slice(0, tempLength - 1), issueDirectiveArgs,
+              issueDirective.slice(tempLength - 1)].join('');
+            return issueDirectiveComplete;
           };
 
           $scope.makeVisible = function(nextIssueIndex) {
@@ -52,6 +60,8 @@ oppia.directive('issuesDirective', [
               'issueNav' + nextIssueIndex).classList.add('text-white');
             document.getElementById(
               'issueNav' + nextIssueIndex).classList.add('bg-clr');
+            $scope.currentIssueIndex = nextIssueIndex;
+            $scope.currentIssue = $scope.issues[nextIssueIndex];
           };
         }
       ]
