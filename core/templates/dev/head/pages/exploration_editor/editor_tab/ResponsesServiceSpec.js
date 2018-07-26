@@ -125,7 +125,13 @@ describe('Responses Service', function() {
         rs.updateAnswerGroup(0, updates);
         rs.deleteAnswerGroup(initialLength);
         expect(rs.AnswerGroupCount()).toEqual(initialLength);
-     });
+      });
+
+      it('should update active answer group', function() {
+        rs.updateActiveAnswerGroup(updates);
+        let activeIndex = rs.getActiveAnswerGroupIndex();
+        expect(rs.getAnswerGroup(activeIndex)).toEqual(updates);
+      })
     });
 
     it('should be able to update answer choices', function() {
