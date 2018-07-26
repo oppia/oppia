@@ -200,6 +200,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.event_schema_version != 2:
             return
+        if isinstance(item.event_schema_version) != int:
+            yield "ERROR with event_schema_version for: %s" % item
+            return
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             yield (
                 item.exp_id,
@@ -290,6 +293,10 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # v1 fields.
         old_stats = stats_services.get_multiple_exploration_stats_by_version(
             exp_id, versions)
+        # Validate all old stats.
+        for stats_instance in old_stats:
+            if stats_instance:
+                stats_instance.validate()
         # Get list of snapshot models for each version of the exploration.
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
