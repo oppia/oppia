@@ -34,7 +34,8 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             exploration_id='exp_id_1')
         feedback_thread_model.put()
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1')
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
+            subject='dummy subject')
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
