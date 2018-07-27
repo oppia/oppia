@@ -490,13 +490,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_only_exploration_threads_trigger_events(self):
 
-        class MockEventHandler(object):
-
-            @classmethod
-            def mock_record_function(cls, unused_exp_id):
-                print "called mock"
-                return
-
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
