@@ -42,6 +42,7 @@ from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import subscriptions
+from core.controllers import subtopic_viewer
 from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topics_and_skills_dashboard
@@ -524,7 +525,8 @@ URLS = MAPREDUCE_HANDLERS + [
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>/<subtopic_id>' %
-        feconf.SUBTOPIC_VIEWER_URL_PREFIX),
+        feconf.SUBTOPIC_VIEWER_URL_PREFIX,
+        subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),

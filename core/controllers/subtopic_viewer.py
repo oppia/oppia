@@ -14,11 +14,13 @@
 
 """Controllers for the subtopic viewer page."""
 
+from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import topic_services
 from core.domain import subtopic_page_services
 import feconf
 
-class SubtopicPageDataHandler(base.Handler):
+class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to learner on the
     subtopic viewer page.
     """
@@ -34,8 +36,8 @@ class SubtopicPageDataHandler(base.Handler):
             topic_id, subtopic_id)
 
         self.values.update({
-            'subtopic_title': subtopic.title
-            'subtopic_html_data': subtopic_page.html_data
+            'subtopic_title': subtopic.title,
+            'subtopic_html_data': subtopic_page.html_data,
             'language_code': subtopic_page.language_code
         })
 
