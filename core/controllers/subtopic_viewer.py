@@ -45,3 +45,13 @@ class SubtopicPageDataHandler(base.Handler):
             'subtopic_html_data': subtopic_page.html_data
             'language_code': subtopic_page.language_code
         })
+
+class SubtopicViewerPage(base.BaseHandler):
+    """Manages to render subtopic viewer page."""
+
+    def get(self, topic_id, subtopic_id):
+        """Handles GET requests."""
+
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+        self.render_template('/pages/subtopic_viewer/subtopic_viewer.html')
