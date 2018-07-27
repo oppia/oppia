@@ -67,7 +67,7 @@ before_install:
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
 - wget --no-verbose -O /tmp/$(basename $CHROME_SOURCE_URL) $CHROME_SOURCE_URL
-- sudo dpkg -i /tmp/google-chrome*.deb
+- sudo dpkg -i /tmp/$(basename $CHROME_SOURCE_URL)
 
 install:
 - pushd $TRAVIS_BUILD_DIR
