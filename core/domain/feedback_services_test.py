@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 import json
 
+from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
 from core.domain import feedback_services
@@ -486,6 +487,44 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Check if the message is added to the read section of the viewer.
         self.assertEqual(self._get_all_messages_read(
             self.viewer_id, thread_id), message_ids)
+
+    def test_only_exploration_threads_trigger_events(self):
+
+        class MockEventHandler(object):
+
+            @classmethod
+            def mock_record_function(cls, unused_exp_id):
+                print "called mock"
+                return
+
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+
+            event_handler_call_counter_exploration = test_utils.CallCounter(
+                event_services.FeedbackThreadCreatedEventHandler.record)
+            with self.swap(
+                    event_services.FeedbackThreadCreatedEventHandler, 'record',
+                    event_handler_call_counter_exploration):
+                feedback_services.create_thread(
+                    feconf.ENTITY_TYPE_EXPLORATION, exp_id, 'a_state_name',
+                    None, 'a subject', 'some text')
+
+                self.assertEqual(
+                    event_handler_call_counter_exploration.times_called, 1)
+
+
+            event_handler_call_counter_non_exploration = (
+                test_utils.CallCounter(
+                    event_services.FeedbackThreadCreatedEventHandler.record))
+            with self.swap(
+                    event_services.FeedbackThreadCreatedEventHandler, 'record',
+                    event_handler_call_counter_non_exploration):
+                feedback_services.create_thread(
+                    'topic', 'topic_id', 'a_state_name', None, 'a subject',
+                    'some text')
+                self.assertEqual(
+                    event_handler_call_counter_non_exploration.times_called, 0)
 
 
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
