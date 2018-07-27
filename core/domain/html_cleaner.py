@@ -850,8 +850,8 @@ def validate_customization_args(html_list):
                             arg_type.normalize(arg_value)
                             # To ensure filepath is in valid format.
                             if arg_name == 'filepath-with-value':
-                                regex = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$' # pylint: disable=line-too-long
-                                if not re.match(regex, arg_value):
+                                filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$' # pylint: disable=line-too-long
+                                if not re.match(filename_re, arg_value):
                                     is_invalid = True
 
                             # To ensure video id has 11 chars.
