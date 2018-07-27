@@ -2,16 +2,24 @@
   <div class="tarnslation-nav md-tab">
     <ul class="oppia-translation-tabs">
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CONTENT)}">
-        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" class="oppia-translation-tabs-text">Content</a>
+        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="TabStatusColourStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" style="color: red">⚠</span>Content
+        </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}">
-        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text">Feedback</a>
+        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="TabStatusColourStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" style="color: red">⚠</span>Feedback
+        </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}">
-        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" class="oppia-translation-tabs-text">Hints</a>
+        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="TabStatusColourStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" style="color: red">⚠</span>Hints
+        </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}">
-        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" class="oppia-translation-tabs-text">Solution</a>
+        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" class="oppia-translation-tabs-text" ng-style="TabStatusColourStyle(TAB_ID_SOLUTION)">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" style="color: red">⚠</span>Solution
+        </a>
       </li>
     </ul>
   </div>
@@ -26,15 +34,22 @@
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li ng-repeat="answerGroup in stateAnswerGroups track by $index" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-prevent-selection" style="margin-top: 0;">
-            <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
+          <li class="oppia-rule-block oppia-prevent-selection"
+              ng-repeat="answerGroup in stateAnswerGroups track by $index"
+              ng-class="{'active': activeAnswerGroupIndex === $index}"
+              style="margin-top: 0;">
+            <a class="oppia-rule-tab"
+               ng-click="changeActiveAnswerGroupIndex($index)"
+               ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
+               ng-style="contentIdStatusColorStyle(answerGroup.outcome.feedback.getContentId())">
               <response-header index="$index"
                                summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():false"
                                short-summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():true"
                                is-active="$index === activeAnswerGroupIndex"
                                outcome="answerGroup.outcome"
                                num-rules="answerGroup.rules.length"
-                               is-response="true">
+                               is-response="true"
+                               show-warning="contentIdNeedUpdates(answerGroup.outcome.feedback.getContentId())">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === $index">
@@ -53,13 +68,17 @@
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}" class="oppia-rule-block">
-            <a ng-click="changeActiveAnswerGroupIndex(stateAnswerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}">
+            <a class="oppia-rule-tab oppia-default-rule-tab"
+               ng-click="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
+               ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
+               ng-style="contentIdStatusColorStyle(stateDefaultOutcome.feedback.getContentId())">
               <response-header index="$index"
                                is-active="$index === activeAnswerGroupIndex"
                                summary="stateDefaultOutcome|summarizeDefaultOutcome:stateInteractionId:stateDefaultOutcome.length:false"
                                short-summary="stateDefaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId:stateDefaultOutcome.length:true"
                                outcome="stateDefaultOutcome"
-                               is-response="true">
+                               is-response="true"
+                               show-warning="contentIdNeedUpdates(stateDefaultOutcome.feedback.getContentId())">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
@@ -76,17 +95,20 @@
     </div>
     <div ng-if="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li ng-repeat="hint in stateHints track by $index"
+        <li class="oppia-rule-block oppia-prevent-selection"
+            ng-repeat="hint in stateHints track by $index"
             ng-class="{'active': activeHintIndex === $index}"
-            class="oppia-rule-block oppia-prevent-selection"
+
             style="margin-top: 0;">
           <a ng-click="changeActiveHintIndex($index)"
              class="oppia-rule-tab"
-             ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}">
+             ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
+             ng-style="contentIdStatusColorStyle(hint.hintContent.getContentId())">
             <response-header index="$index"
                              summary="getHtmlSummary(hint.hintContent)"
                              short-summary="getHtmlSummary(hint.hintContent)"
-                             is-active="$index === activeHintIndex">
+                             is-active="$index === activeHintIndex"
+                             show-warning="contentIdNeedUpdates(hint.hintContent.getContentId())">
             </response-header>
           </a>
           <div ng-if="activeHintIndex === $index">
@@ -113,14 +135,15 @@
 
 <style>
   .oppia-state-translation-page {
-    padding: 10px 0px 10px 0px;
+    border-bottom: 2px solid #ccc;
+    padding: 0px;
     width: 80%;
     height: 500px;
   }
   .oppia-translation-tabs {
-    border-bottom: 2px solid #eee;
     display: -webkit-flex;
     display: flex;
+    height: 10%;
     margin-bottom: 0;
     padding-left: 0px;
     text-align: center;
@@ -128,7 +151,7 @@
   .oppia-translation-tabs li {
     display: -webkit-flex;
     display: flex;
-    margin-bottom: 0;
+    margin-bottom: 5px;
     width: -webkit-calc(100% / 4);
     width: -moz-calc(100% / 4);
     width: -o-calc(100% / 4);
@@ -136,7 +159,8 @@
   }
   .oppia-active-translation-tab a {
     color: #009688;
-    border-bottom: 2px solid #009688;
+    border-bottom: 0;
+    background-color: white;
     text-decoration: none;
   }
   .oppia-disabled-translation-tab a {
@@ -146,14 +170,17 @@
   }
   .oppia-translation-tabs-text {
     color: #009688;
-    border-bottom: none;
+    background: rgba(243,243,243,.75);
+    border: 1px solid #eee;
+    border-bottom-width: 2px;
+    border-top-width: 3px;
     padding: 10px;
     text-decoration: none;
     width: 100%;
   }
   .oppia-translation-tabs-text:hover {
     color: #009688;
-    border-bottom: 2px solid #009688;
+    text-decoration: none;
   }
   .translation-state-contents {
     display: block;

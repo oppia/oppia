@@ -1,22 +1,47 @@
 <div class="oppia-translator-overview">
-  <div class="col-lg-6 col-md-6 col-sm-6">
+  <div>
     <span style="font-size: 16px;">
       <strong>Translation in language:</strong>
     </span>
-  </div>
-  <div class="col-lg-4 col-md-4 col-sm-4">
     <select id="audioTranslationLanguageCodeField" class="oppia-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
             ng-options="language.id as language.description for language in languageCodesAndDescriptions">
     </select>
+  </div>
+  <div class="oppia-translation-progress">
+    <div class="oppia-progress-info">
+      <strong>Exploration translation progress:</strong>
+    </div>
+    <div class="progress oppia-translation-progess-bar">
+      <div class="progress-bar progress-bar-success" role="progressbar" ng-style="getTranslationProgressStyle()"></div>
+    </div>
   </div>
 </div>
 
 <style>
   .oppia-translator-overview {
-    width: 400px;
-    height: 35px;
+    width: 600px;
+    height: 45px;
     padding-top: 5px;
+    text-align: center;
     margin: 0 auto;
+  }
+  .oppia-progress-info {
+    display: -webkit-flex;
+    display: flex;
+    width: 250px;
+    font-size: 16px;
+  }
+  .oppia-translation-progress {
+    display: -webkit-flex;
+    display: flex;
+    margin-top: 5px;
+  }
+  .oppia-translation-progess-bar {
+    display: -webkit-flex;
+    display: flex;
+    margin-top: 5px;
+    width: 350px;
+    height: 10px;
   }
   .oppia-language-selector {
     padding: 2px;

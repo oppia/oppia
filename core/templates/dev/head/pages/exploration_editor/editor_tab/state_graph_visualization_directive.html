@@ -98,7 +98,7 @@ with the same id on the page. -->
                 <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                 <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
               </text>
-              <g ng-if="getNodeErrorMessage(node.label) && showWarningSign">
+              <g ng-if="getNodeErrorMessage(node.label) && (showWarningSign || showNeedsUpdateSign)">
                 <rect ng-click="onClickFunction(node.id)" class="clickable"
                       style="fill: yellow;" width="22" height="22"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0 - 8]>"

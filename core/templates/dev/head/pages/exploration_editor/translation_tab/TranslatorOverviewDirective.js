@@ -29,9 +29,11 @@ oppia.directive('translatorOverview', [
         'translator_overview_directive.html'),
       controller: [
         '$scope', '$window', 'SUPPORTED_AUDIO_LANGUAGES', 'LanguageUtilService',
-        'TranslationLanguageService', 'DEFAULT_AUDIO_LANGUAGE', function(
+        'TranslationLanguageService', 'TranslationStatusService',
+        'DEFAULT_AUDIO_LANGUAGE', function(
             $scope, $window, SUPPORTED_AUDIO_LANGUAGES, LanguageUtilService,
-            TranslationLanguageService, DEFAULT_AUDIO_LANGUAGE) {
+            TranslationLanguageService, TranslationStatusService,
+            DEFAULT_AUDIO_LANGUAGE) {
           var LAST_SELECTED_TRANSLATION_LANGUAGE = (
             'last_selected_translation_lang');
           var prevLanguageCode = $window.localStorage.getItem(
@@ -52,6 +54,14 @@ oppia.directive('translatorOverview', [
                     languageCode))
               };
             }));
+          $scope.getTranslationProgressStyle = function () {
+            required = TranslationStatusService
+              .getExplorationAudioRequiredCount();
+            notAvialable = TranslationStatusService
+              .getExplorationAudioNotAvailableCount();
+            progressPercent = 100 - (notAvialable / required) * 100;
+            return {width: progressPercent + '%;'};
+          };
 
           $scope.changeTranslationLanguage = function() {
             TranslationLanguageService.setActiveLanguageCode(
