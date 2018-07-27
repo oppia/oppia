@@ -887,6 +887,8 @@ def _validate_customization_args_in_soup(soup, err_dict, html_string):
         'Boolean': objects.Boolean,
         'Html': objects.Html
     }
+    filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
+
     for component in rich_text_components:
         # This flag is set to true if the html string is invalid.
         is_invalid = False
@@ -912,7 +914,6 @@ def _validate_customization_args_in_soup(soup, err_dict, html_string):
                         arg_type.normalize(arg_value)
                         # To ensure filepath is in valid format.
                         if arg_name == 'filepath-with-value':
-                            filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$' # pylint: disable=line-too-long
                             if not re.match(filename_re, arg_value):
                                 is_invalid = True
 
