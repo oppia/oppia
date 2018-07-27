@@ -47,7 +47,8 @@
       </state-hints-editor>
     </div>
     <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution-editor state-name="stateName"
+      <state-solution-editor is-solution-valid="isSolutionValid"
+                             delete-solution-validity="deleteSolutionValidity"
                              get-interaction-customization-args-memento="ExplorationStatesService.getInteractionCustomizationArgsMemento(stateName)"
                              on-save-solution="saveSolution"
                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">

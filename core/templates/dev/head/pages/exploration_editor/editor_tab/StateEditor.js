@@ -55,6 +55,16 @@ oppia.controller('StateEditor', [
       $scope.initStateEditor();
     });
 
+    $scope.isSolutionValid = function() {
+      return SolutionValidityService.isSolutionValid(
+        EditorStateService.getActiveStateName());
+    };
+
+    $scope.deleteSolutionValidity = function() {
+      SolutionValidityService.deleteSolutionValidity(
+        EditorStateService.getActiveStateName());
+    };
+
     $scope.isInitialState = function() {
       return (
         EditorStateService.getActiveStateName() ===

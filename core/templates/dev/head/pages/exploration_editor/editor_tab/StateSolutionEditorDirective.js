@@ -21,10 +21,11 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        getStateName: '&stateName',
         onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '=',
-        getInteractionCustomizationArgsMemento: '&'
+        getInteractionCustomizationArgsMemento: '&',
+        isSolutionValid: '=',
+        deleteSolutionValidity: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
@@ -47,7 +48,6 @@ oppia.directive('stateSolutionEditor', [
             EditabilityService, stateContentIdsToAudioTranslationsService) {
           $scope.EditabilityService = EditabilityService;
           $scope.correctAnswer = null;
-          $scope.stateName = $scope.getStateName();
           $scope.correctAnswerEditorHtml = '';
           $scope.inlineSolutionEditorIsActive = false;
           $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
@@ -58,11 +58,6 @@ oppia.directive('stateSolutionEditor', [
 
 
           ExplorationWarningsService.updateWarnings();
-
-          $scope.isSolutionValid = function() {
-            return SolutionValidityService.isSolutionValid(
-              $scope.getStateName());
-          };
 
           $scope.correctAnswerEditorHtml = (
             ExplorationHtmlFormatterService.getInteractionHtml(
@@ -238,8 +233,7 @@ oppia.directive('stateSolutionEditor', [
               $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
-              SolutionValidityService.deleteSolutionValidity(
-                $scope.getStateName());
+              $scope.deleteSolutionValidity();
             });
           };
         }
