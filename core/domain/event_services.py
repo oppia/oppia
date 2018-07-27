@@ -69,7 +69,7 @@ class BaseEventHandler(object):
     @classmethod
     def _is_none(cls, value):
         """Checks whether the arg is None."""
-        return value == None
+        return value is None
 
 
 class StatsEventsHandler(BaseEventHandler):
