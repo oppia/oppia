@@ -230,6 +230,19 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         )
         return question_ids, next_cursor_str
 
+    @classmethod
+    def get_question_skill_models_of_skill(cls, skill_id):
+        """Returns a list of QuestionSkillLink domains of a particular skill ID.
+
+        Args:
+            skill_id: str. ID of the skill
+
+        Returns:
+            list(QuestionSkillLinkModel)|None. The list of question skill link
+            domains that are linked to the skill ID. None if it doesnt exist.
+        """
+        return cls.query(cls.skill_id==skill_id)
+
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.

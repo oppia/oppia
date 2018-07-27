@@ -152,6 +152,49 @@ def get_question_by_id(question_id, strict=True):
     else:
         return None
 
+def get_question_skill_links_of_skill(skill_id):
+    """Returns a list of QuestionSkillLink domains of a particular skill ID.
+
+    Args:
+        skill_id: str. ID of the skill
+
+    Returns:
+        list(QuestionSkillLink)|None. The list of question skill link
+        domains that are linked to the skill ID. None if it doesnt exist.
+    """
+
+    question_skill_link_model_list = (
+        question_models.QuestionSkillLinkModel.get_question_skill_models_of_skill( #pylint: disable=line-too-long
+            skill_id)
+    )
+    question_skill_link_domains = [
+    question_domain.QuestionSkillLink(question_skill_link_model.question_id,
+    question_skill_link_model.skill_id) for question_skill_link_model in
+    question_skill_link_model_list
+    ]
+
+    return question_skill_link_domains
+
+def _save_question_skill_link(question_skill_link, question_skill_model_id):
+    question_skill_model = question_models.QuestionSkillLinkModel.get(question_skill_model_id)
+    question_skill_model.skill_id = question_skill_link.skill_id
+    question_skill_model.put()
+
+def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
+    """Updates the skill ID of QuestionSkillLinkModels to the superseding
+    skill ID.
+
+    Args:
+        curr_skill_id: str. ID of the current skill.
+        new_skill_id: str. ID of the superseding skill.
+    """
+    question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
+    for question_skill_link in question_skill_links:
+        question_skill_model_id = question_models.QuestionSkillLinkModel.get_model_id(
+        question_skill_link.question_id, question_skill_link.skill_id)
+        question_skill_link.skill_id = new_skill_id
+        _save_question_skill_link(question_skill_link, question_skill_model_id)
+
 
 def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by

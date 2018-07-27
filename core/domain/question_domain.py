@@ -336,6 +336,14 @@ class QuestionSkillLink(object):
             'skill_id': self.skill_id,
         }
 
+    def update_skill_id(self, skill_id):
+        """Updates the skill id of the domain object.
+
+        Args:
+            skill_id: str. The ID of the new skill.
+        """
+        self.skill_id = skill_id
+
 
 class QuestionRights(object):
     """Domain object for question rights."""
