@@ -23,6 +23,7 @@ import feconf
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
     """Test domain object for user global email preferences."""
+
     def setUp(self):
         super(UserGlobalPrefsTests, self).setUp()
         self.test_prefs_email = (user_domain.UserGlobalPrefs(
@@ -142,6 +143,7 @@ class UserExplorationPrefsTests(test_utils.GenericTestBase):
 
 class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
     """Testing domain object for an exploration last playthrough model."""
+
     def setUp(self):
         super(ExpUserLastPlaythroughTests, self).setUp()
         self.exp_last_playthrough = (user_domain.ExpUserLastPlaythrough(
@@ -173,6 +175,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
 class IncompleteActivitiesTests(test_utils.GenericTestBase):
     """Testing domain object for incomplete activities model."""
+
     def setUp(self):
         super(IncompleteActivitiesTests, self).setUp()
         self.incomplete_activities = (user_domain.IncompleteActivities(
@@ -217,6 +220,7 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
 class CompletedActivitiesTests(test_utils.GenericTestBase):
     """Testing domain object for the activities completed."""
+
     def setUp(self):
         super(CompletedActivitiesTests, self).setUp()
         self.completed_activities = (user_domain.CompletedActivities(
@@ -265,6 +269,7 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
 class LearnerPlaylistTests(test_utils.GenericTestBase):
     """Testing domain object for the learner playlist."""
+
     def setUp(self):
         super(LearnerPlaylistTests, self).setUp()
         self.learner_playlist = (user_domain.LearnerPlaylist(
@@ -343,6 +348,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
 class UserContributionScoringTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
+
     def setUp(self):
         super(UserContributionScoringTests, self).setUp()
         self.user_contribution_scoring = (user_domain.UserContributionScoring(
