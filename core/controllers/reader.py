@@ -525,6 +525,9 @@ class StatsEventsHandler(base.BaseHandler):
     def post(self, exploration_id):
         aggregated_stats = self.payload.get('aggregated_stats')
         exp_version = self.payload.get('exp_version')
+        if exp_version is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Stats aggregation")
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
@@ -553,6 +556,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         params = self.payload.get('params', {})
         # The version of the exploration.
         version = self.payload.get('version')
+        if version is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Answer Submit")
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
@@ -596,6 +602,9 @@ class StateHitEventHandler(base.BaseHandler):
         """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
+        if exploration_version is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: State hit")
         session_id = self.payload.get('session_id')
         # TODO(sll): why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
@@ -622,6 +631,9 @@ class StateCompleteEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exp_version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: State Complete")
         event_services.StateCompleteEventHandler.record(
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -637,6 +649,9 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exp_version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Leave for Refresher Exp")
         event_services.LeaveForRefresherExpEventHandler.record(
             exploration_id, self.payload.get('refresher_exp_id'),
             self.payload.get('exp_version'), self.payload.get('state_name'),
@@ -683,6 +698,9 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
+        if self.payload.get('version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Exploration start")
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
             self.payload.get('state_name'),
@@ -702,6 +720,9 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exploration_version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Actual Start")
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'))
@@ -716,6 +737,9 @@ class SolutionHitEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exploration_version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Solution hit")
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -744,6 +768,9 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         collection_id = self.payload.get('collection_id')
         user_id = self.user_id
 
+        if self.payload.get('version') is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Exploration complete")
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -790,6 +817,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.payload.get('version')
+        if version is None:
+            raise self.InvalidInputException(
+                "NONE EXP VERSION: Maybe quit")
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')
