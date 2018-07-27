@@ -28,7 +28,6 @@ oppia.directive('stateInteractionEditor', [
         };
       },
       scope: {
-        getStateName: '&stateName',
         onSaveStateContent: '=',
         onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
@@ -107,15 +106,6 @@ oppia.directive('stateInteractionEditor', [
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
 
-            $scope.stateName = stateData.name;
-            stateInteractionIdService.init(
-              $scope.stateName, stateData.interaction.id);
-            stateCustomizationArgsService.init(
-              $scope.stateName, stateData.interaction.customizationArgs);
-
-            stateSolutionService.init(
-              stateData.name, stateData.interaction.solution);
-
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
               answerGroups: stateData.interaction.answerGroups,
@@ -133,9 +123,6 @@ oppia.directive('stateInteractionEditor', [
           // NOTE TO DEVELOPERS: Callers of this function must ensure that the
           // current active state is a terminal one.
           var updateDefaultTerminalStateContentIfEmpty = function() {
-            // Get current state.
-            var stateName = $scope.getStateName();
-
             // Check if the content is currently empty, as expected.
             var previousContent = stateContentService.savedMemento;
             if (!previousContent.isEmpty()) {

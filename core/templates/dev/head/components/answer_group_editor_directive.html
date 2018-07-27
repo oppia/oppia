@@ -97,7 +97,7 @@
       + Add Another Possible Answer
     </button>
 
-    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled()">
+    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isQuestion()">
       <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
         <i class="material-icons md-24">playlist_add</i> Modify Training Data
       </button>

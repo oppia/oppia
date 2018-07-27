@@ -23,7 +23,8 @@ oppia.directive('stateResponses', [
         getStateName: '&stateName',
         onSaveContentIdsToAudioTranslations: '=',
         navigateToState: '=',
-        correctnessFeedbackEnabled: '='
+        correctnessFeedbackEnabled: '=',
+        isQuestion: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),

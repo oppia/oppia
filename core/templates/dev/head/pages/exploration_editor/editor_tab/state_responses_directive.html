@@ -49,6 +49,7 @@
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                        correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        class="protractor-test-response-body"
+                                       is-question="isQuestion()"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
@@ -91,6 +92,7 @@
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
                                        class="protractor-test-response-body"
+                                       is-question="isQuestion()"
                                        correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>

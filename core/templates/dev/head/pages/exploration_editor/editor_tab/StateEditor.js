@@ -128,6 +128,12 @@ oppia.controller('StateEditor', [
           stateData.contentIdsToAudioTranslations);
         stateHintsService.init(
           $scope.stateName, stateData.interaction.hints);
+        stateInteractionIdService.init(
+          $scope.stateName, stateData.interaction.id);
+        stateCustomizationArgsService.init(
+          $scope.stateName, stateData.interaction.customizationArgs);
+        stateSolutionService.init(
+          stateData.name, stateData.interaction.solution);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = ExplorationStatesService.getInteractionIdMemento(

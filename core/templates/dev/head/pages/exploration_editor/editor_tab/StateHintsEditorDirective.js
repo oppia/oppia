@@ -21,7 +21,6 @@ oppia.directive('stateHintsEditor', [
     return {
       restrict: 'E',
       scope: {
-        getStateName: '&stateName',
         onSaveHints: '=',
         onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '='
@@ -45,7 +44,6 @@ oppia.directive('stateHintsEditor', [
             HintObjectFactory, stateSolutionService) {
           $scope.EditabilityService = EditabilityService;
           $scope.stateHintsService = stateHintsService;
-          $scope.stateName = $scope.getStateName();
           $scope.activeHintIndex = null;
           $scope.canEdit = GLOBALS.can_edit;
 
