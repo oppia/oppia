@@ -143,10 +143,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_1'))
 
         self.assertEqual(len(question_skill_links), 2)
-        question_ids = [question_skill.question_id for question_skill 
-        in question_skill_links]
-        self.assertItemsEqual(question_ids,
-            [self.question_id, question_id_2])
+        question_ids = [question_skill.question_id for question_skill
+            in question_skill_links]
+        self.assertItemsEqual(
+            question_ids, [self.question_id, question_id_2])
 
     def test_get_question_summaries_by_ids(self):
         question_summaries = question_services.get_question_summaries_by_ids([
@@ -225,10 +225,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_1'))
 
         self.assertEqual(len(question_skill_links), 2)
-        question_ids = [question_skill.question_id for question_skill 
+        question_ids = [question_skill.question_id for question_skill
         in question_skill_links]
-        self.assertItemsEqual(question_ids,
-            [self.question_id, question_id_2])
+        self.assertItemsEqual(
+            question_ids, [self.question_id, question_id_2])
 
         question_services.update_skill_ids_of_questions(
             'skill_1', 'skill_3')
@@ -243,10 +243,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_3'))
 
         self.assertEqual(len(question_skill_links), 2)
-        question_ids = [question_skill.question_id for question_skill 
+        question_ids = [question_skill.question_id for question_skill
         in question_skill_links]
-        self.assertItemsEqual(question_ids,
-            [self.question_id, question_id_2])
+        self.assertItemsEqual(
+            question_ids, [self.question_id, question_id_2])
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(
