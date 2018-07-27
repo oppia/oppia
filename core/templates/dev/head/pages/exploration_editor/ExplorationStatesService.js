@@ -205,15 +205,6 @@ oppia.factory('ExplorationStatesService', [
         return (
           ValidatorsService.isValidStateName(newStateName, showWarnings));
       },
-      isSolutionValid: function(stateName) {
-        return SolutionValidityService.isSolutionValid(stateName);
-      },
-      updateSolutionValidity: function(stateName, solutionIsValid) {
-        SolutionValidityService.updateValidity(stateName, solutionIsValid);
-      },
-      deleteSolutionValidity: function(stateName) {
-        SolutionValidityService.deleteSolutionValidity(stateName);
-      },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
       },

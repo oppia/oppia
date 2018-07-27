@@ -21,7 +21,9 @@ oppia.directive('stateResponses', [
       restrict: 'E',
       scope: {
         getStateName: '&stateName',
-        onSaveContentIdsToAudioTranslations: '='
+        onSaveContentIdsToAudioTranslations: '=',
+        navigateToState: '=',
+        correctnessFeedbackEnabled: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
@@ -29,8 +31,7 @@ oppia.directive('stateResponses', [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'stateInteractionIdService', 'AlertsService',
         'ResponsesService', 'ContextService',
-        'ExplorationCorrectnessFeedbackService',
-        'TrainingDataService', 'EditabilityService',
+        'EditabilityService',
         'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
@@ -38,8 +39,7 @@ oppia.directive('stateResponses', [
             $scope, $rootScope, $uibModal, $filter,
             stateInteractionIdService, AlertsService,
             ResponsesService, ContextService,
-            ExplorationCorrectnessFeedbackService,
-            TrainingDataService, EditabilityService,
+            EditabilityService,
             stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
             UrlInterpolationService, AnswerGroupObjectFactory,
@@ -47,8 +47,6 @@ oppia.directive('stateResponses', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
-          $scope.ExplorationCorrectnessFeedbackService =
-            ExplorationCorrectnessFeedbackService;
           $scope.stateName = $scope.getStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
@@ -224,6 +222,9 @@ oppia.directive('stateResponses', [
             $rootScope.$broadcast('externalSave');
             ResponsesService.onInteractionIdChanged(
               newInteractionId, function() {
+                $scope.onSaveContentIdsToAudioTranslations(
+                  angular.copy(
+                    stateContentIdsToAudioTranslationsService.displayed));
                 $scope.answerGroups = ResponsesService.getAnswerGroups();
                 $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 

@@ -67,6 +67,9 @@ oppia.factory('TrainingModalService', [
                 answerGroups.push(newAnswerGroup);
                 ResponsesService.save(
                   answerGroups, ResponsesService.getDefaultOutcome());
+                ExplorationStatesService.saveInteractionAnswerGroups(
+                  EditorStateService.getActiveStateName(),
+                  angular.copy(answerGroups));
                 translationService.displayed.addContentId(
                   newAnswerGroup.outcome.feedback.getContentId());
                 translationService.saveDisplayedValue();

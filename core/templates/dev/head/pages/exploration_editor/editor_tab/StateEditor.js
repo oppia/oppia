@@ -21,15 +21,26 @@ oppia.controller('StateEditor', [
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService', 'stateHintsService',
   'stateContentIdsToAudioTranslationsService', 'stateInteractionIdService',
-  'ExplorationInitStateNameService', 'GraphDataService',
-  'stateCustomizationArgsService', 'stateSolutionService',
+  'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
+  'ExplorationCorrectnessFeedbackService', 'SolutionValidityService',
+  'stateCustomizationArgsService', 'stateSolutionService', 'AlertsService',
+  'SolutionVerificationService', 'ContextService', 'ExplorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $scope, $rootScope, EditorStateService, ExplorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService, stateHintsService,
       stateContentIdsToAudioTranslationsService, stateInteractionIdService,
-      ExplorationInitStateNameService, GraphDataService,
-      stateCustomizationArgsService, stateSolutionService) {
+      ExplorationInitStateNameService, GraphDataService, RouterService,
+      ExplorationCorrectnessFeedbackService, SolutionValidityService,
+      stateCustomizationArgsService, stateSolutionService, AlertsService,
+      SolutionVerificationService, ContextService, ExplorationWarningsService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+    $scope.ExplorationCorrectnessFeedbackService =
+      ExplorationCorrectnessFeedbackService;
+    $scope.ExplorationStatesService = ExplorationStatesService;
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 
@@ -58,6 +69,52 @@ oppia.controller('StateEditor', [
       $scope.currentStateIsTerminal = Boolean(
         $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
+    });
+
+    $scope.$on('saveDefaultOutcome', function(evt, newDefaultOutcome) {
+      ExplorationStatesService.saveInteractionDefaultOutcome(
+        EditorStateService.getActiveStateName(),
+        angular.copy(newDefaultOutcome));
+
+      GraphDataService.recompute();
+    });
+
+    $scope.$on('answerGroupChanged', function(evt, newAnswerGroups) {
+      ExplorationStatesService.saveInteractionAnswerGroups(
+        EditorStateService.getActiveStateName(),
+        angular.copy(newAnswerGroups));
+
+      GraphDataService.recompute();
+    });
+
+    $scope.$on('validateSolution', function(evt, responseIsEdited) {
+      var currentStateName = EditorStateService.getActiveStateName();
+      var state = ExplorationStatesService.getState(currentStateName);
+      var solutionIsValid = SolutionVerificationService.verifySolution(
+        ContextService.getExplorationId(), state,
+        stateSolutionService.savedMemento.correctAnswer);
+
+      SolutionValidityService.updateValidity(
+        currentStateName, solutionIsValid);
+      ExplorationWarningsService.updateWarnings();
+
+      if (responseIsEdited) {
+        var solutionWasPreviouslyValid = (
+          SolutionValidityService.isSolutionValid(currentStateName));
+        if (solutionIsValid && !solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+        } else if (!solutionIsValid && solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+        } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+        }
+      } else {
+        if (!solutionIsValid) {
+          AlertsService.addInfoMessage(
+            INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
+        }
+      }
     });
 
     $scope.initStateEditor = function() {
@@ -125,6 +182,10 @@ oppia.controller('StateEditor', [
     $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
       ExplorationStatesService.saveContentIdsToAudioTranslations(
         $scope.stateName, angular.copy(displayedValue));
+    };
+
+    $scope.navigateToState = function(stateName) {
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.showInteraction = function() {

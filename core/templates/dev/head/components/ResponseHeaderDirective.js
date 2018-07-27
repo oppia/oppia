@@ -29,16 +29,17 @@ oppia.directive('responseHeader', [
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
         getNumRules: '&numRules',
-        isResponse: '&isResponse'
+        isResponse: '&isResponse',
+        navigateToState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/response_header_directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'RouterService', 'EditorStateService',
+        '$scope', 'EditabilityService', 'EditorStateService',
         'PLACEHOLDER_OUTCOME_DEST',
         'stateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, EditabilityService, RouterService, EditorStateService,
+            $scope, EditabilityService, EditorStateService,
             PLACEHOLDER_OUTCOME_DEST,
             stateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
@@ -66,10 +67,6 @@ oppia.directive('responseHeader', [
           $scope.isCreatingNewState = function() {
             var outcome = $scope.getOutcome();
             return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-          };
-
-          $scope.navigateToState = function(stateName) {
-            RouterService.navigateToMainTab(stateName);
           };
 
           $scope.deleteResponse = function(evt) {

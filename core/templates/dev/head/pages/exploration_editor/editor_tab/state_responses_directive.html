@@ -29,9 +29,10 @@
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
+                               navigate-to-state="navigateToState"
                                num-rules="answerGroup.rules.length"
                                is-response="true"
-                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
+                               correctness-feedback-enabled="correctnessFeedbackEnabled">
               </response-header>
             </a>
 
@@ -46,6 +47,7 @@
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
+                                       correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        class="protractor-test-response-body"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
@@ -71,8 +73,9 @@
                                summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                outcome="defaultOutcome"
+                               navigate-to-state="navigateToState"
                                is-response="true"
-                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
+                               correctness-feedback-enabled="correctnessFeedbackEnabled">
               </response-header>
             </a>
 
@@ -88,6 +91,7 @@
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
                                        class="protractor-test-response-body"
+                                       correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>

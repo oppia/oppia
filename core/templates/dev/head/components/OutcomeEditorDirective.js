@@ -28,7 +28,8 @@ oppia.directive('outcomeEditor', [
         getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
         onSaveContentIdsToAudioTranslations: '=',
-        suppressWarnings: '&suppressWarnings'
+        suppressWarnings: '&suppressWarnings',
+        isCorrectnessFeedbackEnabled: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
@@ -36,12 +37,12 @@ oppia.directive('outcomeEditor', [
         '$scope', '$uibModal', 'EditorStateService',
         'stateContentIdsToAudioTranslationsService',
         'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
-        'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
+        'INTERACTION_SPECS',
         function(
             $scope, $uibModal, EditorStateService,
             stateContentIdsToAudioTranslationsService,
             stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
-            ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
+            INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
           $scope.feedbackEditorIsOpen = false;
@@ -62,10 +63,6 @@ oppia.directive('outcomeEditor', [
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-          };
-
-          $scope.isCorrectnessFeedbackEnabled = function() {
-            return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {

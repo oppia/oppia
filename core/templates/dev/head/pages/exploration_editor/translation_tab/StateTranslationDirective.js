@@ -28,12 +28,12 @@ oppia.directive('stateTranslation', [
         '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
         'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-        'ExplorationCorrectnessFeedbackService',
+        'ExplorationCorrectnessFeedbackService', 'RouterService',
         function(
             $scope, $filter, $timeout, $rootScope, EditorStateService,
             ExplorationStatesService, ExplorationInitStateNameService,
             INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
-            ExplorationCorrectnessFeedbackService) {
+            ExplorationCorrectnessFeedbackService, RouterService) {
           // Define tab constants.
           $scope.ExplorationCorrectnessFeedbackService =
             ExplorationCorrectnessFeedbackService;
@@ -57,6 +57,10 @@ oppia.directive('stateTranslation', [
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
+          };
+
+          $scope.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
           };
 
           $scope.onTabClick = function(tabId) {

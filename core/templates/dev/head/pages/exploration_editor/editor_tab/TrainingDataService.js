@@ -20,8 +20,10 @@
 
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
+  'ExplorationStatesService', 'EditorStateService',
   function(
-      $rootScope, $http, ResponsesService, RuleObjectFactory) {
+      $rootScope, $http, ResponsesService, RuleObjectFactory,
+      ExplorationStatesService, EditorStateService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -73,11 +75,17 @@ oppia.factory('TrainingDataService', [
       if (updatedAnswerGroups) {
         ResponsesService.save(
           answerGroups, ResponsesService.getDefaultOutcome());
+        ExplorationStatesService.saveInteractionAnswerGroups(
+          EditorStateService.getActiveStateName(),
+          angular.copy(answerGroups));
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
+        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
+          EditorStateService.getActiveStateName(),
+          angular.copy(confirmedUnclassifiedAnswers));
       }
     };
 
@@ -121,7 +129,8 @@ oppia.factory('TrainingDataService', [
         // confirmed unclassified answers.
         _removeAnswer(answer);
 
-        var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
+        var answerGroups = ResponsesService.getAnswerGroups();
+        var answerGroup = answerGroups[answerGroupIndex];
         var trainingData = answerGroup.trainingData;
 
         // Train the rule to include this answer.
@@ -129,6 +138,10 @@ oppia.factory('TrainingDataService', [
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
         });
+        answerGroup.trainingData = trainingData;
+        ExplorationStatesService.saveInteractionAnswerGroups(
+          EditorStateService.getActiveStateName(),
+          angular.copy(answerGroups));
       },
 
       associateWithDefaultResponse: function(answer) {
@@ -141,6 +154,9 @@ oppia.factory('TrainingDataService', [
         confirmedUnclassifiedAnswers.push(answer);
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
+        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
+          EditorStateService.getActiveStateName(),
+          angular.copy(confirmedUnclassifiedAnswers));
       },
 
       isConfirmedUnclassifiedAnswer: function(answer) {
@@ -153,9 +169,17 @@ oppia.factory('TrainingDataService', [
         var trainingData = ResponsesService.getAnswerGroup(
           answerGroupIndex).trainingData;
         _removeAnswerFromTrainingData(answer, trainingData);
+
+        var answerGroups = ResponsesService.getAnswerGroups();
+        answerGroups[answerGroupIndex].trainingData = trainingData;
+
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
         });
+
+        ExplorationStatesService.saveInteractionAnswerGroups(
+          EditorStateService.getActiveStateName(),
+          angular.copy(answerGroups));
       }
     };
   }

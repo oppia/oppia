@@ -20,23 +20,17 @@
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService',
-  'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
+  'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'ExplorationWarningsService',
-  'stateContentIdsToAudioTranslationsService',
-  'COMPONENT_NAME_DEFAULT_OUTCOME', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'stateContentIdsToAudioTranslationsService', 'SolutionValidityService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService,
-      ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
+      OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, ExplorationWarningsService,
-      stateContentIdsToAudioTranslationsService,
-      COMPONENT_NAME_DEFAULT_OUTCOME, INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      stateContentIdsToAudioTranslationsService, SolutionValidityService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -55,10 +49,7 @@ oppia.factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        $rootScope.$broadcast('answerGroupChanged');
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          EditorStateService.getActiveStateName(),
-          angular.copy(newAnswerGroups));
+        $rootScope.$broadcast('answerGroupChanged', newAnswerGroups);
 
         // To check if the solution is valid once a rule has been changed or
         // added.
@@ -71,31 +62,9 @@ oppia.factory('ResponsesService', [
           stateSolutionService.savedMemento.correctAnswer !== null);
 
         if (interactionCanHaveSolution && solutionExists) {
-          var currentStateName = EditorStateService.getActiveStateName();
-          var solutionWasPreviouslyValid = (
-            ExplorationStatesService.isSolutionValid(
-              EditorStateService.getActiveStateName()));
-          var solutionIsCurrentlyValid = (
-            SolutionVerificationService.verifySolution(
-              ContextService.getExplorationId(),
-              ExplorationStatesService.getState(currentStateName),
-              stateSolutionService.savedMemento.correctAnswer));
-
-          ExplorationStatesService.updateSolutionValidity(
-            currentStateName, solutionIsCurrentlyValid);
-          ExplorationWarningsService.updateWarnings();
-
-          if (solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
-            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-          } else if (!solutionIsCurrentlyValid && solutionWasPreviouslyValid) {
-            AlertsService.addInfoMessage(
-              INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-          } else if (!solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
-            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-          }
+          $rootScope.$broadcast('validateSolution', true);
         }
 
-        GraphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
     };
@@ -136,9 +105,6 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-      ExplorationStatesService.saveContentIdsToAudioTranslations(
-        stateContentIdsToAudioTranslationsService.stateName,
-        angular.copy(stateContentIdsToAudioTranslationsService.displayed));
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -146,11 +112,7 @@ oppia.factory('ResponsesService', [
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
         _defaultOutcome = newDefaultOutcome;
 
-        ExplorationStatesService.saveInteractionDefaultOutcome(
-          EditorStateService.getActiveStateName(),
-          angular.copy(newDefaultOutcome));
-
-        GraphDataService.recompute();
+        $rootScope.$broadcast('saveDefaultOutcome', newDefaultOutcome);
         _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
       }
     };
@@ -162,10 +124,6 @@ oppia.factory('ResponsesService', [
       if (!angular.equals(
         newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
-
-        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
-          EditorStateService.getActiveStateName(),
-          angular.copy(newConfirmedUnclassifiedAnswers));
 
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           newConfirmedUnclassifiedAnswers);
@@ -220,9 +178,6 @@ oppia.factory('ResponsesService', [
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
           stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-          ExplorationStatesService.saveContentIdsToAudioTranslations(
-            stateContentIdsToAudioTranslationsService.stateName,
-            angular.copy(stateContentIdsToAudioTranslationsService.displayed));
         }
 
         _confirmedUnclassifiedAnswers = [];
@@ -437,8 +392,7 @@ oppia.factory('ResponsesService', [
       getConfirmedUnclassifiedAnswers: function() {
         return angular.copy(_confirmedUnclassifiedAnswers);
       },
-      // This registers the change to the handlers in the list of changes, and
-      // also updates the states object in ExplorationStatesService.
+      // This registers the change to the handlers in the list of changes.
       save: function(newAnswerGroups, defaultOutcome) {
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);

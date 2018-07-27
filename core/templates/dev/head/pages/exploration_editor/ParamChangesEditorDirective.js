@@ -23,17 +23,18 @@ oppia.directive('paramChangesEditor', [
       restrict: 'E',
       scope: {
         paramChangesService: '=',
-        postSaveHook: '='
+        postSaveHook: '=',
+        inSettingsTab: '&settingsTab'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +
         'param_changes_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'EditabilityService',
+        '$scope', '$rootScope', 'EditabilityService', 'EditorStateService',
         'ExplorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory', 'ExplorationStatesService',
         function(
-            $scope, $rootScope, EditabilityService,
+            $scope, $rootScope, EditabilityService, EditorStateService,
             ExplorationParamSpecsService, AlertsService,
             ParamChangeObjectFactory, ExplorationStatesService) {
           $scope.EditabilityService = EditabilityService;
@@ -181,9 +182,11 @@ oppia.directive('paramChangesEditor', [
 
             ExplorationParamSpecsService.saveDisplayedValue();
             $scope.paramChangesService.saveDisplayedValue();
-            ExplorationStatesService.saveStateParamChanges(
-              $scope.paramChangesService.stateName,
-              angular.copy($scope.paramChangesService.displayed));
+            if (!$scope.inSettingsTab()) {
+              ExplorationStatesService.saveStateParamChanges(
+                $scope.paramChangesService.stateName,
+                angular.copy($scope.paramChangesService.displayed));
+            }
             if ($scope.postSaveHook) {
               $scope.postSaveHook();
             }
