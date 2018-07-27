@@ -79,7 +79,7 @@ describe('Subscriptions functionality on mobile', function() {
 
     // Verify there are 2 subscribers.
     users.login('creator1Id@subscriptions.com');
-    // Need to go exploration editor to activate /creator_dashboard
+    // Go to the creator_dashboard.
     creatorDashboardPage.get();
     // There is no 'Create' button for small
     // width devices. Therefore use the
@@ -99,7 +99,7 @@ describe('Subscriptions functionality on mobile', function() {
 
     // Verify there are 1 subscriber.
     users.login('creator2Id@subscriptions.com');
-    // Need to go exploration editor to activate /creator_dashboard
+    // Go to the creator_dashboard.
     creatorDashboardPage.get();
     // There is no 'Create' button for small
     // width devices. Therefore use the

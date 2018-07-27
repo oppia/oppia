@@ -128,7 +128,7 @@ var ExplorationPlayerPage = function() {
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
   // sent a handler (as given in forms.RichTextChecker) to which calls such as
-  // handler.readItalicText('slanted');
+  //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = function(richTextInstructions) {
     forms.expectRichText(
