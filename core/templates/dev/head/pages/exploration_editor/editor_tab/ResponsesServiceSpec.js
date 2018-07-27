@@ -22,14 +22,81 @@ describe('Responses Service', function() {
       module('oppia');
     });
 
+    let ess;
     let scope;
     let rs;
 
     beforeEach(inject(function($injector, $rootScope) {
       rs = $injector.get('ResponsesService');
+      ess = $injector.get('ExplorationStatesService');
       scope = $rootScope.$new();
     }));
 
+    // Since Exploration States Service required for Responses Service to work,
+    // it needs to be initialized prior
+    beforeEach(inject(function($injector) {
+      ess = $injector.get('ExplorationStatesService');
+    }));
+
+    beforeEach(function() {
+      ess.init({
+        Test: {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>Sample test</p>'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          param_changes: [],
+          interaction: {
+            answer_groups: [{
+              rule_specs: [{rule_type: 'Equals', inputs: {x: '<p>One</p>'}}],
+              outcome: {
+                dest: 'Test',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Correct</p>'
+                },
+                labelled_as_correct: false,
+                missing_prerequisite_skill_id: null,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              tagged_misconception_id: null,
+              training_data: []
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              choices: {
+                value: ['<p>One</p>', '<p>Two</p>']
+              },
+              maxAllowableSelectionCount: {value: 1},
+              minAllowableSelectionCount: {value: 1}
+            },
+            default_outcome: {
+              dest: 'Test',
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again</p>'
+              },
+              labelled_as_correct: false,
+              missing_prerequisite_skill_id: null,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            hints: [],
+            id: 'ItemSelectionInput',
+            solution: null
+          }
+        }
+      })
+    });
+
+    // Initialize Responses Service
     beforeEach(function() {
       rs.init({
         answerGroups: [{
@@ -114,8 +181,14 @@ describe('Responses Service', function() {
           dest: 'Test',
           refresherExplorationId: null,
           missingPrerequisiteSkillId: null
-        };
+        }
+      });
 
+      it('should update rules', function() {
+        rs.updateAnswerGroup(0, ruleUpdates);
+        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates.rules)
+      })
+/*
       it('should update the answer group', function() {
         rs.updateAnswerGroup(0, updates);
         expect(rs.getAnswerGroup(0)).toEqual(updates);
@@ -133,6 +206,7 @@ describe('Responses Service', function() {
         let activeIndex = rs.getActiveAnswerGroupIndex();
         expect(rs.getAnswerGroup(activeIndex)).toEqual(updates);
       })
+*/
     });
 
     it('should be able to update answer choices', function() {
