@@ -22,8 +22,7 @@
   </md-card>
 
   <div ng-show="interactionIsShown">
-    <state-interaction-editor state-name="stateName"
-                              on-save-state-content="saveStateContent"
+    <state-interaction-editor on-save-state-content="saveStateContent"
                               on-save-interaction-id="saveInteractionId"
                               on-save-interaction-customization-args="saveInteractionCustomizationArgs"
                               on-save-solution="saveSolution"
@@ -40,8 +39,7 @@
                      correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
     </state-responses>
     <div>
-      <state-hints-editor state-name="stateName"
-                          on-save-hints="saveHints"
+      <state-hints-editor on-save-hints="saveHints"
                           on-save-solution="saveSolution"
                           on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
       </state-hints-editor>
