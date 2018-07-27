@@ -41,7 +41,11 @@ oppia.directive('earlyQuitIssueDirective', [
 
           $scope.suggestions = IssuesService.renderIssueSuggestions(issue);
 
-          $scope.playthrougIds = issue.playthroughIds;
+          $scope.playthroughIds = issue.playthroughIds;
+
+          $scope.getPlaythroughIndex = function(playthroughId) {
+            return $scope.playthroughIds.indexOf(playthroughId);
+          };
 
           $scope.showPlaythrough = function(playthroughId) {
             IssuesService.getPlaythrough(
@@ -64,16 +68,33 @@ oppia.directive('earlyQuitIssueDirective', [
                   '$scope', '$uibModalInstance', 'playthroughIndex',
                   'playthrough', 'AlertsService', 'LearnerActionRenderService',
                   function(
-                      $scope, $uibModalInstance, playthroughIndex, playthrough,
-                      AlertsService, LearnerActionRenderService) {
+                      $scope, $uibModalInstance, playthroughIndex,
+                      playthrough, AlertsService, LearnerActionRenderService) {
                     $scope.playthrough = playthrough;
                     $scope.playthroughIndex = playthroughIndex;
 
                     $scope.displayBlocks =
                       LearnerActionRenderService.getDisplayBlocks(
-                        playthrough.learnerActions);
+                        playthrough.actions);
+
+                    var blockActionIndexMapping = {};
+                    var i = $scope.displayBlocks.length - 1, accumulator = 1;
+                    for (i; i >= 0; i--) {
+                      blockActionIndexMapping[i] = accumulator;
+                      accumulator += $scope.displayBlocks[i].length;
+                    }
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
+
+                    $scope.getDisplayBlockIndex = function(displayBlock) {
+                      return $scope.displayBlocks.indexOf(displayBlock);
+                    };
+
+                    $scope.renderBlockHtml = function(displayBlock) {
+                      var index = $scope.getDisplayBlockIndex(displayBlock);
+                      return LearnerActionRenderService.renderDisplayBlockHTML(
+                        displayBlock, blockActionIndexMapping[index]);
+                    };
 
                     $scope.showRemainingActions = function(pIdx) {
                       if (maxHidden === 1) {

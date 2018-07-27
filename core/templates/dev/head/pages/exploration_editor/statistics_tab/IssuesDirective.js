@@ -18,11 +18,7 @@
 
 // Mapping from Issue type to corresponding directive.
 oppia.constant('ISSUE_DIRECTIVE_MAPPING', {
-<<<<<<< HEAD
-  'EarlyQuit': '<early-quit-issue-directive>'
-=======
   EarlyQuit: '<early-quit-issue-directive>'
->>>>>>> container_directive
 });
 
 oppia.directive('issuesDirective', [

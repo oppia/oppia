@@ -1,29 +1,21 @@
-<div class="modal-dialog">
-  <div class="modal-content border-rad">
-    <div class="modal-header d-flex justify-content-center">
-      <h5 class="modal-title">Sample Playthrough</h5>
-    </div>
+<div class="modal-header d-flex justify-content-center">
+  <h5 class="modal-title">Sample Playthrough</h5>
+</div>
 
-    <div class="modal-body ft-500" style="padding-bottom: 8rem; margin-left:0.5rem; margin-right: 0.5rem;">
-      <div class="row pt-2">
-        <button type="button" name="button" onclick="showRemainingActions(playthroughIndex)" class="btn-arrow" id="arrowDiv" style="display: block;"><i class="arrow up"></i></button>
-      </div>
-      <div class="row pt-2" style="margin-top: 0.5rem;">
-        <div ng-repeat="displayBlock in displayBlocks track by $index" style="text-align: left; margin-left: 0.2rem;">
-          <div ng-if="<[$index]> == 0" class="highlight">
-            <[displayBlock]>
-          </div>
-          <div ng-if="<[$index]> != 0" id="remainingActions<[playthroughIndex]><[$index]>" style="display: none;">
-            <[displayBlock]>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="bg-clr text-white ft-14 btn btn_resolve" ng-click="cancel()">
-        Return to Playthroughs
-      </button>
+<div class="modal-body" style="padding-bottom: 8rem; margin-left:0.5rem; margin-right: 0.5rem;">
+  <div class="row pt-2">
+    <button type="button" name="button" onclick="showRemainingActions(playthroughIndex)" class="btn-arrow" id="arrowDiv" style="display: block;"><i class="arrow up"></i></button>
+  </div>
+  <div class="row pt-2" style="margin-top: 0.5rem;">
+    <div ng-repeat="displayBlock in displayBlocks" style="text-align: left; margin-left: 0.2rem;">
+      <div ng-if="getDisplayBlockIndex(displayBlock) == 0" ng-bind-html="renderBlockHtml(displayBlock)" class="highlight"></div>
+      <div ng-if="getDisplayBlockIndex(displayBlock) != 0" ng-bind-html="renderBlockHtml(displayBlock)" id="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" style="display: none;"></div>
     </div>
   </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="bg-clr text-white ft-14 btn btn_resolve" ng-click="cancel()">
+    Return to Playthroughs
+  </button>
 </div>

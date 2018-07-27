@@ -18,7 +18,9 @@
           </div>
         </div>
         <div ng-if="getIssueIndex(issue) !== 0" style="display: none;" id="issue<[getIssueIndex(issue)]>">
-          <[retrieveIssueDirective(getIssueIndex(issue))]>
+          <div ng-if="issue.issueType == 'EarlyQuit'">
+            <early-quit-issue-directive index="currentIssueIndex" issue="currentIssue"></early-quit-issue-directive>
+          </div>
         </div>
       </div>
     </div>

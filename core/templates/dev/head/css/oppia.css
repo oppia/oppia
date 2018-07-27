@@ -3750,6 +3750,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 span.learner-action {
+  display: block;
   margin-bottom: 2em;
 }
 
@@ -3853,8 +3854,6 @@ span.learner-action {
   padding: .35rem 1.2rem;
   border-radius: 10px !important;
 }
-<<<<<<< HEAD
-=======
 
 .ft-16 {
   font-size: 16px;
@@ -3876,4 +3875,8 @@ span.learner-action {
   font-weight: 500;
   font-size: .85rem;
 }
->>>>>>> container_directive
+
+.state_link {
+  text-decoration: underline;
+  color: blue;
+}
