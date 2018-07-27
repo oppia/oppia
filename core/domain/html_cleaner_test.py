@@ -799,6 +799,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'a link?&amp;quot;" url-with-value="&amp;quot;https://link.com&amp'
             ';quot;"></oppia-noninteractive-link></p>'
         ), (
+            '<oppia-noninteractive-collapsible content-with-value="'
+            '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+            'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+            'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+            '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;" heading-with-value="&amp;quot;Hello&amp;quot;">'
+            '</oppia-noninteractive-collapsible>'
+        ), (
             '<oppia-noninteractive-image caption-with-value="&amp;quot;'
             'abc&amp;quot;" filepath-with-value="&amp;quot;'
             'random.png&amp;quot;"></oppia-noninteractive-image>'
@@ -820,22 +828,22 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ), (
             '<oppia-noninteractive-collapsible content-with-value="'
             '&amp;quot;&amp;lt;oppia-noninteractive-tabs tab_contents'
-            '-with-value=\&amp;quot;[{&amp;amp;amp;quot;title&amp;amp;amp;'
+            '-with-value=\\&amp;quot;[{&amp;amp;amp;quot;title&amp;amp;amp;'
             'quot;:&amp;amp;amp;quot;Tab&amp;amp;amp;quot;,&amp;amp;amp;quot;'
             'content&amp;amp;amp;quot;:&amp;amp;amp;quot;&amp;amp;amp;lt;p&amp'
             ';amp;amp;gt;Hello&amp;amp;amp;lt;/p&amp;amp;amp;gt;&amp;amp;'
-            'amp;quot;}]\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-tabs'
+            'amp;quot;}]\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-tabs'
             '&amp;gt;&amp;lt;p&amp;gt;You have opened the collapsible block.'
             '&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;'
             'Hello&amp;quot;"></oppia-noninteractive-collapsible>'
         ), (
             '<oppia-noninteractive-collapsible content-with-value='
             '"&amp;quot;&amp;lt;oppia-noninteractive-collapsible '
-            'content-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;'
+            'content-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;'
             'amp;amp;lt;p&amp;amp;amp;gt;Hello&amp;amp;amp;lt;/p'
-            '&amp;amp;amp;gt;&amp;amp;amp;quot;\&amp;quot; '
-            'heading-with-value=\&amp;quot;&amp;amp;amp;quot;'
-            'SubCollapsible&amp;amp;amp;quot;\&amp;quot;&amp;'
+            '&amp;amp;amp;gt;&amp;amp;amp;quot;\\&amp;quot; '
+            'heading-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+            'SubCollapsible&amp;amp;amp;quot;\\&amp;quot;&amp;'
             'gt;&amp;lt;/oppia-noninteractive-collapsible&amp;'
             'gt;&amp;lt;p&amp;gt;&amp;amp;nbsp;&amp;lt;/p&amp;gt;'
             '&amp;quot;" heading-with-value="&amp;quot;Collapsible'
@@ -874,11 +882,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;'
             'title&amp;quot;:&amp;quot;Tab&amp;quot;,&amp;quot;content&amp;'
             'quot;:&amp;quot;&amp;lt;oppia-noninteractive-tabs '
-            'tab_contents-with-value=\&amp;quot;[{&amp;amp;amp;quot;title'
+            'tab_contents-with-value=\\&amp;quot;[{&amp;amp;amp;quot;title'
             '&amp;amp;amp;quot;:&amp;amp;amp;quot;Subtab&amp;amp;amp;quot;'
             ',&amp;amp;amp;quot;content&amp;amp;amp;quot;:&amp;amp;amp;quot;'
             '&amp;amp;amp;lt;p&amp;amp;amp;gt;Hello&amp;amp;amp;lt;/p&amp;'
-            'amp;amp;gt;&amp;amp;amp;quot;}]\&amp;quot;&amp;gt;&amp;lt;'
+            'amp;amp;gt;&amp;amp;amp;quot;}]\\&amp;quot;&amp;gt;&amp;lt;'
             '/oppia-noninteractive-tabs&amp;gt;&amp;lt;p&amp;gt;&amp;amp;'
             'nbsp;&amp;lt;/p&amp;gt;&amp;quot;}]">'
             '</oppia-noninteractive-tabs>'
@@ -970,6 +978,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<p><oppia-noninteractive-link text-with-value="3456" '
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
+            ), (
+                '<oppia-noninteractive-collapsible content-with-value="'
+                '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+                'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+                '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;Hello&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
             )],
             'oppia-noninteractive-video': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
@@ -998,11 +1014,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ), (
                 '<oppia-noninteractive-collapsible content-with-value="'
                 '&amp;quot;&amp;lt;oppia-noninteractive-tabs tab_contents'
-                '-with-value=\&amp;quot;[{&amp;amp;amp;quot;title&amp;amp;amp;'
+                '-with-value=\\&amp;quot;[{&amp;amp;amp;quot;title&amp;amp;amp;'
                 'quot;:&amp;amp;amp;quot;Tab&amp;amp;amp;quot;,&amp;amp;amp;'
                 'quot;content&amp;amp;amp;quot;:&amp;amp;amp;quot;&amp;amp;'
                 'amp;lt;p&amp;amp;amp;gt;Hello&amp;amp;amp;lt;/p&amp;amp;amp;'
-                'gt;&amp;amp;amp;quot;}]\&amp;quot;&amp;gt;&amp;lt;'
+                'gt;&amp;amp;amp;quot;}]\\&amp;quot;&amp;gt;&amp;lt;'
                 '/oppia-noninteractive-tabs&amp;gt;&amp;lt;p&amp;gt;'
                 'You have opened the collapsible block.&amp;lt;/p&amp;gt;'
                 '&amp;quot;" heading-with-value="&amp;quot;'
@@ -1010,11 +1026,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ), (
                 '<oppia-noninteractive-collapsible content-with-value='
                 '"&amp;quot;&amp;lt;oppia-noninteractive-collapsible '
-                'content-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;'
+                'content-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;'
                 'amp;amp;lt;p&amp;amp;amp;gt;Hello&amp;amp;amp;lt;/p'
-                '&amp;amp;amp;gt;&amp;amp;amp;quot;\&amp;quot; '
-                'heading-with-value=\&amp;quot;&amp;amp;amp;quot;'
-                'SubCollapsible&amp;amp;amp;quot;\&amp;quot;&amp;'
+                '&amp;amp;amp;gt;&amp;amp;amp;quot;\\&amp;quot; '
+                'heading-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'SubCollapsible&amp;amp;amp;quot;\\&amp;quot;&amp;'
                 'gt;&amp;lt;/oppia-noninteractive-collapsible&amp;'
                 'gt;&amp;lt;p&amp;gt;&amp;amp;nbsp;&amp;lt;/p&amp;gt;'
                 '&amp;quot;" heading-with-value="&amp;quot;Collapsible'
@@ -1046,11 +1062,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
                 'quot;title&amp;quot;:&amp;quot;Tab&amp;quot;,&amp;quot;'
                 'content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-tabs '
-                'tab_contents-with-value=\&amp;quot;[{&amp;amp;amp;quot;title'
+                'tab_contents-with-value=\\&amp;quot;[{&amp;amp;amp;quot;title'
                 '&amp;amp;amp;quot;:&amp;amp;amp;quot;Subtab&amp;amp;amp;quot;'
                 ',&amp;amp;amp;quot;content&amp;amp;amp;quot;:&amp;amp;amp;quot'
                 ';&amp;amp;amp;lt;p&amp;amp;amp;gt;Hello&amp;amp;amp;lt;/p&amp;'
-                'amp;amp;gt;&amp;amp;amp;quot;}]\&amp;quot;&amp;gt;&amp;lt;'
+                'amp;amp;gt;&amp;amp;amp;quot;}]\\&amp;quot;&amp;gt;&amp;lt;'
                 '/oppia-noninteractive-tabs&amp;gt;&amp;lt;p&amp;gt;&amp;amp;'
                 'nbsp;&amp;lt;/p&amp;gt;&amp;quot;}]">'
                 '</oppia-noninteractive-tabs>'
@@ -1058,3 +1074,41 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(actual_output, expected_output)
+
+
+def test_validate_customization_args(self):
+    test_cases = [(
+        '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+        'a link?&amp;quot;" url-with-value="&amp;quot;https://link.com&amp'
+        ';quot;"></oppia-noninteractive-link></p>'
+    ), (
+        '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+        'What is a link?&amp;quot;" url-with-value="&amp;quot;'
+        'htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'
+    ), (
+        '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+        'abc&amp;quot;" filepath-with-value="&amp;quot;'
+        'random.png&amp;quot;"></oppia-noninteractive-image>'
+    )]
+
+    actual_output = {}
+    for test_case in test_cases:
+        soup = bs4.BeautifulSoup(
+            test_case.encode(encoding='utf-8'), 'html.parser')
+        html_cleaner._validate_customization_args_in_soup( # pylint: disable=protected-access
+            soup, actual_output, test_case)
+
+    expected_output = {
+        'oppia-noninteractive-image': [(
+            '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+            'abc&amp;quot;" filepath-with-value="&amp;quot;random.png'
+            '&amp;quot;"></oppia-noninteractive-image>'
+        )],
+        'oppia-noninteractive-link': [(
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'What is a link?&amp;quot;" url-with-value="&amp;quot;'
+            'htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'
+        )]
+    }
+
+    self.assertEqual(actual_output, expected_output)
