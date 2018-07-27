@@ -16,6 +16,10 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
+oppia.constant(
+  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
+  '/skill_editor_handler/data/<skill_id>');
+
 oppia.factory('EditableSkillBackendApiService', [
   '$http', '$q', 'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function(
@@ -65,6 +69,23 @@ oppia.factory('EditableSkillBackendApiService', [
       });
     };
 
+    var _deleteSkill = function(skillId, successCallback, errorCallback) {
+      var skillDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+          skill_id: skillId
+        });
+
+      $http['delete'](skillDataUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.status);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
       fetchSkill: function(skillId) {
         return $q(function(resolve, reject) {
@@ -77,6 +98,11 @@ oppia.factory('EditableSkillBackendApiService', [
           _updateSkill(
             skillId, skillVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+      deleteSkill: function(skillId) {
+        return $q(function(resolve, reject) {
+          _deleteSkill(skillId, resolve, reject);
         });
       }
     };

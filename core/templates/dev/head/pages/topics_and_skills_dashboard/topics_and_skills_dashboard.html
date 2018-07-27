@@ -55,13 +55,15 @@
 
       <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
         <skills-list skill-summaries="untriagedSkillSummaries"
-                     editable-topic-summaries="editableTopicSummaries">
+                     editable-topic-summaries="editableTopicSummaries"
+                     user-can-delete-skill="userCanDeleteSkill">
         </skills-list>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
         <skills-list skill-summaries="unpublishedSkillSummaries"
-                     editable-topic-summaries="editableTopicSummaries">
+                     editable-topic-summaries="editableTopicSummaries"
+                     user-can-delete-skill="userCanDeleteSkill">
         </skills-list>
       </div>
     </div>
@@ -224,5 +226,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/EditableSkillBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
 {% endblock footer_js %}

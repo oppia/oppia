@@ -16,27 +16,67 @@
  * @fileoverview Controller for the skills list viewer.
  */
 oppia.directive('skillsList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'AlertsService', 'UrlInterpolationService',
+  function(
+      AlertsService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
         getSkillSummaries: '&skillSummaries',
-        getEditableTopicSummaries: '&editableTopicSummaries'
+        getEditableTopicSummaries: '&editableTopicSummaries',
+        canDeleteSkill: '&userCanDeleteSkill',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        'EditableSkillBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
+            EditableSkillBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
           ];
+
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
+
+          $scope.deleteSkill = function(skillId) {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'delete_skill_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.confirmDeletion = function() {
+                    $uibModalInstance.close();
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function() {
+              EditableSkillBackendApiService.deleteSkill(skillId).then(
+                function(status) {
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                },
+                function(error) {
+                  AlertsService.addWarning(
+                    error || 'There was an error deleting the skill.');
+                }
+              );
+            });
+          };
+
           $scope.assignSkillToTopic = function(skillId) {
             var topicSummaries = $scope.getEditableTopicSummaries();
             var modalInstance = $uibModal.open({

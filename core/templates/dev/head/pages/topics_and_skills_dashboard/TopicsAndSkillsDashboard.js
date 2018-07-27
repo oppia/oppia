@@ -66,6 +66,7 @@ oppia.controller('TopicsAndSkillsDashboard', [
           $rootScope.$broadcast(
             EVENT_TYPE_SKILL_CREATION_ENABLED, $scope.userCanCreateSkill);
           $scope.userCanDeleteTopic = response.data.can_delete_topic;
+          $scope.userCanDeleteSkill = response.data.can_delete_skill;
           if ($scope.topicSummaries.length === 0 &&
               $scope.untriagedSkillSummaries.length !== 0) {
             $scope.activeTab = $scope.TAB_NAME_UNTRIAGED_SKILLS;
