@@ -29,7 +29,9 @@ oppia.directive('outcomeEditor', [
         outcome: '=outcome',
         onSaveContentIdsToAudioTranslations: '=',
         suppressWarnings: '&suppressWarnings',
-        isCorrectnessFeedbackEnabled: '&'
+        isCorrectnessFeedbackEnabled: '&',
+        addState: '=',
+        getStateNames: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),

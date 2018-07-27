@@ -61,6 +61,10 @@ oppia.controller('StateEditor', [
         ExplorationInitStateNameService.savedMemento);
     };
 
+    $scope.addState = function(newStateName) {
+      ExplorationStatesService.addState(newStateName, null);
+    };
+
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.interactionIdIsSet = Boolean(newInteractionId);
       $scope.currentInteractionCanHaveSolution = Boolean(

@@ -24,7 +24,9 @@ oppia.directive('stateResponses', [
         onSaveContentIdsToAudioTranslations: '=',
         navigateToState: '=',
         correctnessFeedbackEnabled: '=',
-        isQuestion: '&'
+        isQuestion: '&',
+        addState: '=',
+        getStateNames: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
@@ -261,6 +263,8 @@ oppia.directive('stateResponses', [
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
             var stateName = $scope.getStateName();
+            var addState = $scope.addState;
+            var getStateNames = $scope.getStateNames;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -278,7 +282,8 @@ oppia.directive('stateResponses', [
                     RuleObjectFactory, OutcomeObjectFactory,
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
                   $scope.feedbackEditorIsOpen = false;
-
+                  $scope.addState = addState;
+                  $scope.getStateNames = getStateNames;
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
                   };

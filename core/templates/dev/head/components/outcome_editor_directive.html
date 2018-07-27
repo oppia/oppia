@@ -117,7 +117,10 @@
         class="form-inline protractor-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"
         ng-submit="saveThisDestination()">
-    <outcome-destination-editor outcome="outcome" outcome-has-feedback="displayFeedback">
+    <outcome-destination-editor outcome="outcome"
+                                outcome-has-feedback="displayFeedback"
+                                add-state="addState"
+                                get-state-names="getStateNames">
     </outcome-destination-editor>
   </form>
 

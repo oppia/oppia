@@ -33,7 +33,9 @@ oppia.directive('answerGroupEditor', [
         correctnessFeedbackEnabled: '=',
         suppressWarnings: '&',
         rules: '=',
-        isQuestion: '&'
+        isQuestion: '&',
+        addState: '=',
+        getStateNames: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
