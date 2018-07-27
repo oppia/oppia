@@ -59,9 +59,9 @@ function maybeInstallDependencies {
 
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
 
-    install_node_module jasmine-core 2.5.2
-    install_node_module karma 1.5.0
-    install_node_module karma-jasmine 1.1.0
+    # install_node_module jasmine-core 2.5.2
+    # install_node_module karma 1.5.0
+    # install_node_module karma-jasmine 1.1.0
     install_node_module karma-jasmine-jquery 0.1.1
     # install_node_module karma-json-fixtures-preprocessor 0.0.6
     # install_node_module karma-coverage 1.1.1
