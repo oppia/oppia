@@ -649,9 +649,6 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exp_version') is None:
-            raise self.InvalidInputException(
-                "NONE EXP VERSION: Leave for Refresher Exp")
         event_services.LeaveForRefresherExpEventHandler.record(
             exploration_id, self.payload.get('refresher_exp_id'),
             self.payload.get('exp_version'), self.payload.get('state_name'),
