@@ -660,7 +660,7 @@ class Topic(object):
         Raises:
             Exception. A subtopic with the given id doesn't exist.
         """
-        subtopic_index = get_subtopic_index(subtopic_id)
+        subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
             if strict:
                 raise Exception(

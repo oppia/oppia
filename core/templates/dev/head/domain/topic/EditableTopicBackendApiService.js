@@ -48,6 +48,7 @@ oppia.factory('EditableTopicBackendApiService', [
             skillIdToDescriptionDict: angular.copy(
               response.data.skill_id_to_description_dict)
           });
+          console.log(response.data.topic_dict);
         }
       }, function(errorResponse) {
         if (errorCallback) {

@@ -1846,8 +1846,7 @@ def can_access_subtopic_viewer_page(handler):
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException
-
-        subtopic = topic.get_subtopic_by_id(subtopic_id, strict=False)
+        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
         if subtopic is None:
             raise self.PageNotFoundException
 
