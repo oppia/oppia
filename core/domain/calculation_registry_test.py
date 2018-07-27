@@ -23,6 +23,7 @@ from core.domain import calculation_registry
 from core.tests import test_utils
 from extensions.answer_summarizers import models
 
+
 class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
