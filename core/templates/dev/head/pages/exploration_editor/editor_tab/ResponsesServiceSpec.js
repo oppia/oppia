@@ -91,29 +91,30 @@ describe('Responses Service', function() {
 
     describe('Manipulate answer group', function() {
 
-      let updates;
+      let ruleUpdates;
+      let feedbackUpdates;
+      let destUpdates;
 
       beforeEach(function() {
-        updates = {
+        ruleUpdates = {
           rules: [{
             inputs: {x: ['<p>Two</p>']},
             type: 'Equals'
           }],
-          outcome: {
-            dest: 'Test',
-            feedback: {
-              _contentId: "feedback_1",
-              _html: "<p>Correct!</p>↵"
-            },
-            refresherExplorationId: null,
-            missingPrerequisiteSkillId: null,
-            labelledAsCorrect: false,
-            paramChanges: []
-          },
-          trainingData: [],
-          taggedMisconceptionId: null
         };
-      });
+
+        feedbackUpdates = {
+          feedback: {
+            _contentId: "feedback_1",
+            _html: "<p>Correct!</p>↵"
+          }
+        };
+
+        destUpdates = {
+          dest: 'Test',
+          refresherExplorationId: null,
+          missingPrerequisiteSkillId: null
+        };
 
       it('should update the answer group', function() {
         rs.updateAnswerGroup(0, updates);
