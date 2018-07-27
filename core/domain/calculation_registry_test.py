@@ -32,20 +32,25 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
         calculation_registry.Registry._refresh_registry()
         for name, clazz in inspect.getmembers(models, inspect.isclass):
             if name.endswith('_test') or name == 'BaseCalculation':
-               self.assertNotIn(name, calculation_registry.Registry.calculations_dict)
-               continue
+                self.assertNotIn(
+                    name, calculation_registry.Registry.calculations_dict)
+                continue
             if 'BaseCalculation' not in [
-               base_class.__name__ for base_class in inspect.getmro(clazz)]:
-               self.assertNotIn(name, calculation_registry.Registry.calculations_dict)
-               continue
+                    base_class.__name__
+                    for base_class in inspect.getmro(clazz)]:
+                self.assertNotIn(
+                    name, calculation_registry.Registry.calculations_dict)
+                continue
             self.assertIn(name, calculation_registry.Registry.calculations_dict)
-            self.assertEqual(clazz, calculation_registry.Registry.calculations_dict[name])
+            self.assertEqual(
+                clazz, calculation_registry.Registry.calculations_dict[name])
 
     def test_get_calculation_by_id(self):
         if len(calculation_registry.Registry.calculations_dict) > 0:
-            calc_id = random.choice(calculation_registry.Registry.calculations_dict.keys())
+            calc_id = random.choice(
+                calculation_registry.Registry.calculations_dict.keys())
             self.assertEqual(
-                calculation_registry.Registry.calculations_dict[calc_id], 
+                calculation_registry.Registry.calculations_dict[calc_id],
                 calculation_registry.Registry.get_calculation_by_id(calc_id))
             with self.assertRaises(TypeError):
                 calculation_registry.Registry.get_calculation_by_id('a')
