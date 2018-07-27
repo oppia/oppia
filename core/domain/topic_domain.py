@@ -648,6 +648,24 @@ class Topic(object):
                 return ind
         return None
 
+    def get_subtopic_by_id(self, subtopic_id):
+        """Gets the subtopic that has the given id.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to be found.
+
+        Returns:
+            Subtopic. Returns the subtopic with the given id.
+
+        Raises:
+            Exception. A subtopic with the given id doesn't exist.
+        """
+        subtopic_index = get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'A subtopic with id %s doesn\'t exist. ' % subtopic_id)
+        return self.subtopics[subtopic_index]
+
     def add_subtopic(self, new_subtopic_id, title):
         """Adds a subtopic with the given id and title.
 
