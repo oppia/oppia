@@ -29,7 +29,6 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
     def test_refresh_registry(self):
-        calculation_registry.Registry._refresh_registry()
         for name, clazz in inspect.getmembers(models, inspect.isclass):
             if name.endswith('_test') or name == 'BaseCalculation':
                 self.assertNotIn(
