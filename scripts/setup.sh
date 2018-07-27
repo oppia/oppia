@@ -58,6 +58,7 @@ function maybeInstallDependencies {
     echo ""
 
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+    bash scripts/install_frontend_tests_dependencies.sh
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.40
   fi

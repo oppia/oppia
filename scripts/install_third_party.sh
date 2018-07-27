@@ -42,18 +42,6 @@ install_node_module through2 2.0.0
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
 
-install_node_module jasmine-core 2.5.2
-install_node_module karma 1.5.0
-install_node_module karma-jasmine 1.1.0
-install_node_module karma-jasmine-jquery 0.1.1
-install_node_module karma-json-fixtures-preprocessor 0.0.6
-install_node_module karma-coverage 1.1.1
-install_node_module karma-ng-html2js-preprocessor 1.0.0
-install_node_module karma-chrome-launcher 2.0.0
-install_node_module protractor 5.3.1
-install_node_module protractor-screenshot-reporter 0.0.5
-install_node_module jasmine-spec-reporter 3.2.0
-
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
 # GitPython, however the patches to it below (with the sed operations) lead to
