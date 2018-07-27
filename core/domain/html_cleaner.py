@@ -858,6 +858,19 @@ def validate_customization_args(html_list):
                             elif arg_name == 'video_id-with-value':
                                 if len(arg_value) != 11:
                                     is_invalid = True
+
+                            # To ensure that nested collapsible or tab
+                            # is not present in collapsible component.
+                            elif arg_name == 'content-with-value':
+                                inner_soup = bs4.BeautifulSoup(
+                                    arg_value.encode('utf-8'), 'html.parser')
+                                collapsible_count = len(inner_soup.findAll(
+                                    'oppia-noninteractive-collapsible'))
+                                tabs_count = len(inner_soup.findAll(
+                                    'oppia-noninteractive-tabs'))
+                                if collapsible_count or tabs_count:
+                                    is_invalid = True
+
                         except Exception:
                             is_invalid = True
                     else:
@@ -883,6 +896,17 @@ def validate_customization_args(html_list):
                                             customization_arg['content_type']]
                                         title_type.normalize(title)
                                         content_type.normalize(content)
+                                        inner_soup = bs4.BeautifulSoup(
+                                            content.encode('utf-8'),
+                                            'html.parser')
+                                        collapsible = inner_soup.findAll(
+                                            'oppia-noninteractive-collapsible')
+                                        collapsible_count = len(collapsible)
+                                        tabs = inner_soup.findAll(
+                                            'oppia-noninteractive-tabs')
+                                        tabs_count = len(tabs)
+                                        if collapsible_count or tabs_count:
+                                            is_invalid = True
                                     except Exception:
                                         is_invalid = True
 
