@@ -136,7 +136,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
-            in question_skill_links]
+                            in question_skill_links]
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 
@@ -218,7 +218,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
-        in question_skill_links]
+                            in question_skill_links]
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 
@@ -236,7 +236,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
-        in question_skill_links]
+                            in question_skill_links]
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 

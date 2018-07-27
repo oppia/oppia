@@ -152,6 +152,7 @@ def get_question_by_id(question_id, strict=True):
     else:
         return None
 
+
 def get_question_skill_links_of_skill(skill_id):
     """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
@@ -169,17 +170,20 @@ def get_question_skill_links_of_skill(skill_id):
     )
     question_skill_link_domains = [
         question_domain.QuestionSkillLink(
-            question_skill_link_model.question_id, question_skill_link_model.skill_id)
+            question_skill_link_model.question_id,
+            question_skill_link_model.skill_id)
         for question_skill_link_model in question_skill_link_model_list
     ]
 
     return question_skill_link_domains
+
 
 def _save_question_skill_link(question_skill_link, question_skill_model_id):
     question_skill_model = question_models.QuestionSkillLinkModel.get(
         question_skill_model_id)
     question_skill_model.skill_id = question_skill_link.skill_id
     question_skill_model.put()
+
 
 def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
