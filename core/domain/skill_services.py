@@ -751,7 +751,6 @@ def get_unpublished_skill_rights_by_creator(user_id):
     skill_rights_models = (
         skill_models.SkillRightsModel.get_unpublished_by_creator_id(
             user_id))
-    print [skill_rights_model for skill_rights_model in skill_rights_models]
     return [get_skill_rights_from_model(skill_rights_model)
             for skill_rights_model in skill_rights_models]
 
