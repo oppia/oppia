@@ -3749,6 +3749,10 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 8px;
 }
 
+span.learner-action {
+  margin-bottom: 2em;
+}
+
 /* Values below were experimentally generated using 'http://csshexagon.com' */
 .hexagon {
   transform: scale(0.5);
@@ -3788,8 +3792,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .content {
-  width: 76%;
-  margin: 0 auto;
+  width: 66%;
 }
 
 .border_gray {
@@ -3804,10 +3807,70 @@ md-card.preview-conversation-skin-supplemental-card {
   border-bottom: 2px solid #b2b2bb;
 }
 
+.bor-right {
+  border-right: 1px solid #b2b2bb;
+}
+
+.border-rad {
+  border-radius: 15px;
+}
+
 .clr-green {
   color: #66A79D;
 }
 
 .bg-clr {
   background: #469689;
+}
+
+.suggestion_header{
+  color: red;
+  margin-left: 10px;
+}
+
+.tips{
+  list-style-type: square;
+}
+
+.playthrough_content{
+  font-size: 25px;
+  color: white;
+}
+
+.btn-arrow{
+  margin: auto;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.highlight{
+  background-color: #cfffe1;
+  opacity: 0.5;
+}
+
+.btn_resolve {
+  padding: .35rem 1.2rem;
+  border-radius: 10px !important;
+}
+
+.ft-16 {
+  font-size: 16px;
+}
+
+.ft-15 {
+  font-size: 15px;
+}
+
+.ft-14 {
+  font-size: 14px;
+}
+
+.ft-18{
+  font-size: 18px;
+}
+
+.ft-500 {
+  font-weight: 500;
+  font-size: .85rem;
 }

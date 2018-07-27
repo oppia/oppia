@@ -17,7 +17,9 @@
  */
 
 // Mapping from Issue type to corresponding directive.
-oppia.constant('ISSUE_DIRECTIVE_MAPPING', {});
+oppia.constant('ISSUE_DIRECTIVE_MAPPING', {
+  EarlyQuit: '<early-quit-issue-directive>'
+});
 
 oppia.directive('issuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -31,18 +33,26 @@ oppia.directive('issuesDirective', [
         function($scope, IssuesService, ISSUE_DIRECTIVE_MAPPING) {
           $scope.issues = IssuesService.getIssues();
 
+          $scope.getIssueIndex = function(issue) {
+            return $scope.issues.indexOf(issue);
+          };
+
           $scope.currentIssueIndex = 0;
           $scope.currentIssue = $scope.issues[0];
 
           $scope.retrieveIssueDirective = function(issueIndex) {
-            var issueType = issues[issueIndex].issueType;
+            var issueType = $scope.issues[issueIndex].issueType;
             var issueDirective = ISSUE_DIRECTIVE_MAPPING[issueType];
+            var tempLength = issueDirective.length;
+            var issueDirectiveEnd = [
+              issueDirective.slice(0, 1), '/',
+              issueDirective.slice(1, tempLength - 1)].join('');
             issueDirectiveArgs =
               ' index="currentIssueIndex" issue="currentIssue"';
-            var tempLength = issueDirective.length;
             var issueDirectiveComplete = [
               issueDirective.slice(0, tempLength - 1), issueDirectiveArgs,
-              issueDirective.slice(tempLength - 1)].join('');
+              issueDirective.slice(tempLength - 1)].join('') +
+              issueDirectiveEnd;
             return issueDirectiveComplete;
           };
 
