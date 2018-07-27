@@ -51,26 +51,26 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
-echo ""
-echo "  View interactive frontend test coverage reports by navigating to"
-echo ""
-echo "    ../karma_coverage_reports"
-echo ""
-echo "  on your filesystem."
-echo ""
+# echo ""
+# echo "  View interactive frontend test coverage reports by navigating to"
+# echo ""
+# echo "    ../karma_coverage_reports"
+# echo ""
+# echo "  on your filesystem."
+# echo ""
 
-echo ""
-echo "  Running test in development environment"
-echo ""
-$PYTHON_CMD scripts/build.py
-$XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
+# echo ""
+# echo "  Running test in development environment"
+# echo ""
+# $PYTHON_CMD scripts/build.py
+# $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
-if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
-  echo ""
-  echo "  Running test in production environment"
-  echo ""
-  $PYTHON_CMD scripts/build.py --prod_env
-  $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --prod_env=True
-fi
+# if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
+#   echo ""
+#   echo "  Running test in production environment"
+#   echo ""
+#   $PYTHON_CMD scripts/build.py --prod_env
+#   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --prod_env=True
+# fi
 
 echo Done!
