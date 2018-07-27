@@ -241,7 +241,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(QuestionSkillLinkModel)|None. The list of question skill link
             domains that are linked to the skill ID. None if it doesnt exist.
         """
-        return cls.query(cls.skill_id==skill_id)
+        return cls.query(cls.skill_id == skill_id)
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
