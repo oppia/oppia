@@ -3792,8 +3792,7 @@ span.learner-action {
 }
 
 .content {
-  width: 76%;
-  margin: 0 auto;
+  width: 66%;
 }
 
 .border_gray {
@@ -3854,3 +3853,27 @@ span.learner-action {
   padding: .35rem 1.2rem;
   border-radius: 10px !important;
 }
+<<<<<<< HEAD
+=======
+
+.ft-16 {
+  font-size: 16px;
+}
+
+.ft-15 {
+  font-size: 15px;
+}
+
+.ft-14 {
+  font-size: 14px;
+}
+
+.ft-18{
+  font-size: 18px;
+}
+
+.ft-500 {
+  font-weight: 500;
+  font-size: .85rem;
+}
+>>>>>>> container_directive
