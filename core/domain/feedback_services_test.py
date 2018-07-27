@@ -504,8 +504,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             event_handler_call_counter_exploration = test_utils.CallCounter(
                 event_services.FeedbackThreadCreatedEventHandler.record)
             with self.swap(
-                    event_services.FeedbackThreadCreatedEventHandler, 'record',
-                    event_handler_call_counter_exploration):
+                event_services.FeedbackThreadCreatedEventHandler, 'record',
+                event_handler_call_counter_exploration):
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION, exp_id, 'a_state_name',
                     None, 'a subject', 'some text')
@@ -518,8 +518,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 test_utils.CallCounter(
                     event_services.FeedbackThreadCreatedEventHandler.record))
             with self.swap(
-                    event_services.FeedbackThreadCreatedEventHandler, 'record',
-                    event_handler_call_counter_non_exploration):
+                event_services.FeedbackThreadCreatedEventHandler, 'record',
+                event_handler_call_counter_non_exploration):
                 feedback_services.create_thread(
                     'topic', 'topic_id', 'a_state_name', None, 'a subject',
                     'some text')
