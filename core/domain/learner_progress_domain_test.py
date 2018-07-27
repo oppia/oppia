@@ -28,9 +28,9 @@ class LearnerProgressDomainUnitTests(test_utils.GenericTestBase):
         super(LearnerProgressDomainUnitTests, self).setUp()
         self.exploration_keys = []
         self.collection_keys = []
-        # Preparing Learner Progress exploration & collection ids.
-        # In case there are less DEMO dictionary members, than needed.
-        # Will need to reuse values to initiate Learner Progress.
+        # Preparing Learner Progress exploration & collection IDs.
+        # In case there are less DEMO dictionary members than needed,
+        # we need to reuse values to initiate Learner Progress.
         self.num_of_demo_explorations = len(feconf.DEMO_EXPLORATIONS)
         self.num_of_demo_collections = len(feconf.DEMO_COLLECTIONS)
         exploration_keys_iter = feconf.DEMO_EXPLORATIONS.iterkeys()
