@@ -519,6 +519,13 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.SUBTOPIC_VIEWER_DATA_URL_PREFIX,
+        subtopic_viewer.SubtopicPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.SUBTOPIC_VIEWER_URL_PREFIX),
+    get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),
     get_redirect_route(

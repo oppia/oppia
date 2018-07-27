@@ -1822,3 +1822,37 @@ def get_decorator_for_accepting_suggestion(decorator):
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_access_subtopic_viewer_page(handler):
+    """Decorator to check whether user can acces subtopic viewer page."""
+
+    def test_can_access_subtopic_viewer(self, topic_id, subtopic_id, **kwargs):
+        """Checks if the user can access subtopic viewer page.
+
+        Args:
+            topic_id: str. The topic id associated with the topic that the
+                subtopic is part of.
+            subtopic_id: str. The subtopic id associated with the subtopic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can access subtopic viewer page.
+
+        Raises:
+            PageNotFoundException. The subtopic does not exist.
+        """
+
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
+        subtopic = topic.get_subtopic_by_id(subtopic_id, strict=False)
+        if subtopic is None:
+            raise self.PageNotFoundException
+
+        return handler(self, topic_id, subtopic_id, **kwargs)
+
+    test_can_access_subtopic_viewer.__wrapped__ = True
+
+    return test_can_access_subtopic_viewer

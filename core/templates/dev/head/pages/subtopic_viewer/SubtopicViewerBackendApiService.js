@@ -17,8 +17,8 @@
   */
 
 oppia.constant(
-  'SUBTOPIC_DATA_URL_TEMPLATE',
-  '/subtopic_data_handler/<topic_id>/<subtopic_id>');
+  'SUBTOPIC_VIEWER_DATA_URL_TEMPLATE',
+  '/subtopic_viewer_handler/data/<topic_id>/<subtopic_id>');
 
 oppia.factory('SubtopicViewerBackendApiService', [
   '$http', '$q', 'SUBTOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',

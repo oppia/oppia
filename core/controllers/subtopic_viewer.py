@@ -23,19 +23,12 @@ class SubtopicPageDataHandler(base.Handler):
     subtopic viewer page.
     """
 
+    @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id)
-        if topic is None:
-            raise self.PageNotFoundException
-
-        subtopic = topic.get_subtopic_by_id(subtopic_id)
-        if subtopic is None:
-            raise. self.PageNotFoundException
 
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id)
@@ -49,6 +42,7 @@ class SubtopicPageDataHandler(base.Handler):
 class SubtopicViewerPage(base.BaseHandler):
     """Manages to render subtopic viewer page."""
 
+    @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
