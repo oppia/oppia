@@ -5,9 +5,6 @@ language: python
 python:
 - 2.7
 
-addons:
-  chrome: stable
-
 branches:
   only:
   - master
@@ -60,6 +57,7 @@ notifications:
     on_failure: always
 
 before_install:
+- wget --no-verbose -O /tmp/$(basename $CHROME_SOURCE_URL) $CHROME_SOURCE_URL
 # For the rationale behind the next two lines, see:
 #   https://github.com/travis-ci/travis-ci/issues/6928#issuecomment-264227708
 - source /opt/jdk_switcher/jdk_switcher.sh
