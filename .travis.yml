@@ -66,6 +66,9 @@ before_install:
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
+# The CHROME_SOURCE_URL is an environment variable set in the repository settings
+# of Travis. It can be found under 'Environment Variables' header here:
+# https://travis-ci.org/oppia/oppia/settings
 - wget --no-verbose -O /tmp/$(basename $CHROME_SOURCE_URL) $CHROME_SOURCE_URL
 - sudo dpkg -i /tmp/$(basename $CHROME_SOURCE_URL)
 
