@@ -82,6 +82,7 @@ exports.config = {
     full: [
       'protractor/accessibility.js',
       'protractor/learnerFlow.js',
+      'protractor/libraryFlow.js',
       'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
       'protractor_mobile/playerFlow.js',
