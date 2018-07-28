@@ -81,9 +81,10 @@ exports.config = {
   suites: {
     full: [
       'protractor/accessibility.js',
-      'protractor_mobile/learnerFlow.js',
+      'protractor/learnerFlow.js',
       'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
+      'protractor_mobile/playerFlow.js',
       'protractor/ratings.js',
       'protractor/subscriptionsFlow.js'
     ],
@@ -93,7 +94,7 @@ exports.config = {
     ],
 
     learner: [
-      'protractor_mobile/learnerFlow.js'
+      'protractor/learnerFlow.js'
     ],
 
     library: [
@@ -106,6 +107,10 @@ exports.config = {
 
     navigation: [
       'protractor_mobile/navigation.js'
+    ],
+
+    player: [
+      'protractor_mobile/playerFlow.js'
     ],
 
     ratings: [

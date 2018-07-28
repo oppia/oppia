@@ -88,6 +88,10 @@ exports.config = {
       'protractor_desktop/extensions.js'
     ],
 
+    learner: [
+      'protractor/learnerFlow.js'
+    ],
+
     learnerDashboard: [
       'protractor_desktop/learnerDashboard.js'
     ],
@@ -101,7 +105,7 @@ exports.config = {
     ],
 
     publication: [
-      'protractor/publicationAndLibrary.js'
+      'protractor_desktop/publicationAndLibrary.js'
     ],
 
     ratings: [
