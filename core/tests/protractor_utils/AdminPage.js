@@ -37,60 +37,61 @@ var AdminPage = function(){
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
+  if (general.checkForDevMode) {
+    var explorationElements = element.all(by.css(
+      '.protractor-test-reload-exploration-row'
+    ));
 
-  var explorationElements = element.all(by.css(
-    '.protractor-test-reload-exploration-row'
-  ));
+    var reloadAllExplorationsButtons = element.all(by.css(
+      '.protractor-test-reload-all-explorations-button'
+    ));
 
-  var reloadAllExplorationsButtons = element.all(by.css(
-    '.protractor-test-reload-all-explorations-button'
-  ));
+    var reloadCollectionButtons = element.all(by.css(
+      '.protractor-test-reload-collection-button'));
 
-  var reloadCollectionButtons = element.all(by.css(
-    '.protractor-test-reload-collection-button'));
+    var explorationTitleElement = function(explorationElement) {
+      return explorationElement.element(
+        by.css('.protractor-test-reload-exploration-title')
+      );
+    };
 
-  var explorationTitleElement = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-title')
-    );
-  };
+    var explorationElementReloadButton = function(explorationElement) {
+      return explorationElement.element(
+        by.css('.protractor-test-reload-exploration-button')
+      );
+    };
 
-  var explorationElementReloadButton = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-button')
-    );
-  };
+    this.reloadCollection = function(collectionId) {
+      reloadCollectionButtons.get(collectionId).click();
+      general.acceptAlert();
+      // Time is needed for the reloading to complete.
+      waitFor.textToBePresentInElement(
+        statusMessage, 'Data reloaded successfully.',
+        'Collection could not be reloaded');
+      return true;
+    };
 
-  this.reloadCollection = function(collectionId) {
-    reloadCollectionButtons.get(collectionId).click();
-    general.acceptAlert();
-    // Time is needed for the reloading to complete.
-    waitFor.textToBePresentInElement(
-      statusMessage, 'Data reloaded successfully.',
-      'Collection could not be reloaded');
-    return true;
-  };
-
-  // The name should be as given in the admin page (including '.yaml' if
-  // necessary).
-  this.reloadExploration = function(name) {
-    this.get();
-    explorationElements.map(function(explorationElement) {
-      explorationTitleElement(explorationElement)
-        .getText().then(function(title) {
+    // The name should be as given in the admin page (including '.yaml' if
+    // necessary).
+    this.reloadExploration = function(name) {
+      this.get();
+      explorationElements.map(function(explorationElement) {
+        explorationTitleElement(explorationElement)
+          .getText().then(function(title) {
           // We use match here in case there is whitespace around the name
-          if (title.match(name)) {
-            explorationElementReloadButton(explorationElement).click();
-            general.acceptAlert();
-            // Time is needed for the reloading to complete.
-            waitFor.textToBePresentInElement(
-              statusMessage, 'Data reloaded successfully.',
-              'Exploration could not be reloaded');
-            return true;
-          }
-        });
-    });
-  };
+            if (title.match(name)) {
+              explorationElementReloadButton(explorationElement).click();
+              general.acceptAlert();
+              // Time is needed for the reloading to complete.
+              waitFor.textToBePresentInElement(
+                statusMessage, 'Data reloaded successfully.',
+                'Exploration could not be reloaded');
+              return true;
+            }
+          });
+      });
+    };
+  }
 
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
