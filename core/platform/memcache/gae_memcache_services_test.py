@@ -43,7 +43,9 @@ class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(return_code_key_not_present, 1)
 
     def test_delete_multi(self):
-        return_value_keys_present = gae_memcache_services.delete_multi(self.keys)
-        return_value_keys_not_present = gae_memcache_services.delete_multi(['d', 'e', 'f'])
+        return_value_keys_present = gae_memcache_services.delete_multi(
+            self.keys)
+        return_value_keys_not_present = gae_memcache_services.delete_multi(
+            ['d', 'e', 'f'])
         self.assertEqual(return_value_keys_present, True)
         self.assertEqual(return_value_keys_not_present, True)
