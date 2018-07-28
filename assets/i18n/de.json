@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Gespielt",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Bewertung",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Unerledigte Antworten",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Verwaltungsseite für Themen und Fähigkeiten",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Ein Bild in diesem Bereich ablegen",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Eine Datei hochladen",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Deaktivierte Erforschung",
@@ -194,6 +195,7 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "Löschen",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Spielen",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Zielsequenz spielen",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Mögliche Einheitenformate",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Bist du sicher, dass du deinen Code zurücksetzen möchtest?",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Abbrechen",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Bestätigung erforderlich",
@@ -273,7 +275,7 @@
 	"I18N_LIBRARY_CATEGORIES_INTERACTIVE_FICTION": "Abenteuerspiele",
 	"I18N_LIBRARY_CATEGORIES_LANGUAGES": "Sprachen",
 	"I18N_LIBRARY_CATEGORIES_LAW": "Recht",
-	"I18N_LIBRARY_CATEGORIES_LIFE_SKILLS": "Lebensfertigkeiten",
+	"I18N_LIBRARY_CATEGORIES_LIFE_SKILLS": "Lebensfähigkeiten",
 	"I18N_LIBRARY_CATEGORIES_MATHEMATICS": "Mathematik",
 	"I18N_LIBRARY_CATEGORIES_MATHS": "Mathematik",
 	"I18N_LIBRARY_CATEGORIES_MEDICINE": "Medizin",
@@ -434,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Forum",
 	"I18N_SIDEBAR_GET_STARTED": "Anfangen",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Bibliothek",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Oppia Foundation",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Mit Oppia unterrichten",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "Durch das Anklicken des Kontrollkästchens auf der linken Seite dieses Textes akzeptierst du die Nutzungsbedingungen von <[sitename]>, die <a href=\"/terms\" target=\"_blank\">hier</a> gefunden werden können.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Registrieren und mit Beiträgen beginnen",
@@ -520,5 +523,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Mit Google anmelden",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Mit Oppia unterrichten",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du hast insgesamt <[totalSubscribers]> Abonnenten.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abmelden"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abmelden",
+	"I18N_WORKED_EXAMPLE": "Gelungenes Beispiel"
 }

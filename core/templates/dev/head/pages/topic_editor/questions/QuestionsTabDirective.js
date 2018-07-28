@@ -23,22 +23,34 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'UrlInterpolationService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED',
+        '$scope', 'AlertsService', 'TopicEditorStateService',
+        'QuestionCreationService', 'EditableQuestionBackendApiService',
+        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         function(
-            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, UrlInterpolationService,
-            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED) {
-          // TODO(aks681): Continue with the questions tab for topic editor here
-          // and create another questions editor directive to be used here.
+            $scope, AlertsService, TopicEditorStateService,
+            QuestionCreationService, EditableQuestionBackendApiService,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
+            $scope.questionEditorIsShown = false;
+            $scope.questionId = null;
+            $scope.topic = TopicEditorStateService.getTopic();
+            $scope.questionSummaries =
+              TopicEditorStateService.getQuestionSummaries();
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
+          $scope.createQuestion = function() {
+            // TODO (aks681): Add the necessary steps to be done when creating
+            // question here.
+            $scope.questionEditorIsShown = true;
+            $scope.questionId = null;
+          };
+
+          $scope.showQuestionEditor = function(id) {
+            $scope.questionEditorIsShown = true;
+            $scope.questionId = id;
+          };
+
+          $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);
 
           _initTab();
         }

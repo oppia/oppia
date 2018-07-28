@@ -204,9 +204,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(str), str. The question ids linked to given skills and the next
-                cursor value to be used for the next page. The returned next
-                cursor value is urlsafe.
+            list(str), str|None. The question ids linked to given skills and the
+                next cursor value to be used for the next page (or None if no
+                more pages are left). The returned next cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)

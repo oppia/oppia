@@ -54,26 +54,12 @@ def create_suggestion(
             accepted/rejected the suggestion.
     """
 
-    thread_id = None
-    # TODO(nithesh): Remove the check for target type once the feedback threads
-    # are generalised for all types of entities. As at the moment feedback
-    # threads can only be linked to explorations, we have this check.
-    # This will be completed as a part of milestone 2 of the generalised review
-    # system project.
-    if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        thread_id = feedback_services.create_thread(
-            target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
-        # This line and the if..else will be removed after the feedback thread
-        # migration is complete and the IDs for both models match.
-        thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
-    elif feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        # TODO (nithesh): Refactor the thread creation logic after #5235 is
-        # merged.
-        thread_id = feedback_services.create_thread(
-            target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
-        thread_id = suggestion_models.TARGET_TYPE_TOPIC + '.' + thread_id
+    thread_id = feedback_services.create_thread(
+        target_type, target_id, None, author_id, description,
+        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
+
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
 
     status = suggestion_models.STATUS_IN_REVIEW
 
@@ -197,23 +183,6 @@ def mark_review_completed(suggestion, status, reviewer_id):
     _update_suggestion(suggestion)
 
 
-# TODO (nithesh): This function is temporary. At the moment, the feedback
-# threads id is of the form exp_id.<random_str> while the suggestion ids are of
-# the form entity_type.entity_id.<random_str>. Once the feedback thread ID
-# migration is complete, these two IDs will be matched, and this function will
-# be removed.
-def get_thread_id_from_suggestion_id(suggestion_id):
-    """Gets the thread_id from the suggestion_id.
-
-    Args:
-        suggestion_id: str. The ID of the suggestion.
-
-    Returns:
-        str. The thread ID linked to the suggestion.
-    """
-    return suggestion_id[suggestion_id.find('.') + 1:]
-
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -260,12 +229,9 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
 
-    # TODO: Remove check for target being exploration after completing #5235.
-    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        feedback_services.create_message(
-            get_thread_id_from_suggestion_id(suggestion.suggestion_id),
-            reviewer_id, feedback_models.STATUS_CHOICES_FIXED, None,
-            review_message)
+    feedback_services.create_message(
+        suggestion.suggestion_id, reviewer_id,
+        feedback_models.STATUS_CHOICES_FIXED, None, review_message)
 
 
 def reject_suggestion(suggestion, reviewer_id, review_message):
@@ -286,12 +252,10 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         raise Exception('Review message cannot be empty.')
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
-    # TODO: Remove check for target being exploration after completing #5235.
-    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        feedback_services.create_message(
-            get_thread_id_from_suggestion_id(suggestion.suggestion_id),
-            reviewer_id, feedback_models.STATUS_CHOICES_IGNORED, None,
-            review_message)
+
+    feedback_services.create_message(
+        suggestion.suggestion_id, reviewer_id,
+        feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
