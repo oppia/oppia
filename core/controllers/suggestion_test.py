@@ -431,4 +431,3 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
                 last_message.text, 'Accepted')
-
