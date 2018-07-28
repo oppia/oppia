@@ -223,4 +223,4 @@ class CronMailReviewersInRotationHandler(base.BaseHandler):
                 reviewer_id = suggestion_services.get_next_user_in_rotation(
                     score_category)
                 print reviewer_id
-                # Email reviewer_id
+                # Email reviewer_id.
