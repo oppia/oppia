@@ -276,6 +276,15 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+    increment_score_for_user(
+        suggestion.author_id, suggestion.score_category,
+        suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+    if (
+            get_all_scores_of_user(
+                suggestion.author_id)[suggestion.score_category] >=
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+        # Send email if not sent already.
+        return
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
@@ -379,3 +388,67 @@ def create_new_user_contribution_scoring_model(user_id, score_category, score):
     """
     user_models.UserContributionScoringModel.create(
         user_id, score_category, score)
+
+
+def get_next_user_in_rotation(score_category):
+    """Gets the id of the next user in the reviewer rotation for the given
+    score_category. The order is alphabetical, and the next user in the
+    alphabetical order is returned.
+
+    Args:
+        score_category: str. The score category.
+
+    Returns:
+        str|None. The user id of the next user in the reviewer rotation, if
+            there are reviewers for the given category. Else None.
+    """
+    reviewer_ids = get_all_user_ids_who_are_allowed_to_review(score_category)
+    reviewer_names = user_services.get_usernames(reviewer_ids)
+    reviewer_names.sort()
+
+    if len(reviewer_names) == 0:
+        # No reviewers available for the given category.
+        return None
+
+    position_tracking_model = (
+        suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+            score_category))
+
+    next_user_id = None
+    if not position_tracking_model:
+        # No rotation has started yet, start rotation at index 0.
+        next_user_id = user_services.get_user_id_from_username(
+            reviewer_names[0])
+    else:
+        current_position_user_id = (
+            position_tracking_model.current_position_in_rotation)
+
+        current_position_user_name = user_services.get_username(
+            current_position_user_id)
+
+        for reviewer_name in reviewer_names:
+            if reviewer_name > current_position_user_name:
+                next_user_id = user_services.get_user_id_from_username(
+                    reviewer_name)
+                break
+
+        if not next_user_id:
+            # All names are lexicographically smaller than or equal to the
+            # current position username. Hence, Rotating back to the front.
+            next_user_id = user_services.get_user_id_from_username(
+                reviewer_names[0])
+
+    update_position_in_rotation(score_category, next_user_id)
+    return next_user_id
+
+
+def update_position_in_rotation(score_category, user_id):
+    """Updates the current position in the rotation to the given user_id.
+
+    Args:
+        score_category: str. The score category.
+        user_id: str. The ID of the user who completed their turn in the
+            rotation for the given category.
+    """
+    suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
+        score_category, user_id)

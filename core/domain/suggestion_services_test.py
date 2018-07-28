@@ -656,6 +656,13 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         suggestion_services.create_new_user_contribution_scoring_model(
             'user2', 'category1', 0)
 
+        self.signup('user_a@example.com', 'userA')
+        self.signup('user_b@example.com', 'userB')
+        self.signup('user_c@example.com', 'userC')
+        self.user_a_id = self.get_user_id_from_email('user_a@example.com')
+        self.user_b_id = self.get_user_id_from_email('user_b@example.com')
+        self.user_c_id = self.get_user_id_from_email('user_c@example.com')
+
     def test_update_score_for_user(self):
         suggestion_services.increment_score_for_user('user1', 'category1', 1)
         suggestion_services.increment_score_for_user('user2', 'category1', 5)
@@ -702,3 +709,39 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 suggestion_services.check_user_can_review_in_category(
                     'invalid_user', 'category1'))
+
+    def test_get_next_user_in_rotation(self):
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_a_id, 'category_a', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_b_id, 'category_a', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_c_id, 'category_a', 15)
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), self.user_a_id)
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, self.user_a_id)
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), self.user_b_id)
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, self.user_b_id)
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), self.user_c_id)
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, self.user_c_id)
+
+        # Rotates back.
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), self.user_a_id)
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, self.user_a_id)
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_invalid'), None)

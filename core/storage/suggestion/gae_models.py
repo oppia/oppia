@@ -87,6 +87,10 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
                                      ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
+# The amount to increase the score of the author by after successfuly getting an
+# accepted suggestion.
+INCREMENT_SCORE_OF_AUTHOR_BY = 1
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -196,3 +200,59 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.last_updated < threshold_time).fetch()
+
+    @classmethod
+    def get_all_score_categories(cls):
+        """Gets all the score categories for which suggestions have been
+        created.
+
+        Returns:
+            list(str). A list of all the score categories.
+        """
+        query_set = cls.query(projection=['score_category'], distinct=True)
+        return [data.score_category for data in query_set]
+
+
+class ReviewerRotationTrackingModel(base_models.BaseModel):
+    """Model to keep track of the position in the reviewer rotation. This model
+    is keyed by the score category.
+    """
+
+    # The ID of the user whose turn is just completed in the rotation.
+    current_position_in_rotation = ndb.StringProperty(
+        required=True, indexed=False)
+
+    @classmethod
+    def create(cls, score_category, user_id):
+        """Creates a new ReviewerRotationTrackingModel instance.
+
+        Args:
+            score_category: str. The score category.
+            user_id: str. The ID of the user who completed their turn in the
+                rotation for the given category.
+
+        Raises:
+            Exception: There is already an instance with the given id.
+        """
+        if cls.get_by_id(score_category):
+            raise Exception(
+                'There already exists an instance with the given id: %s' % (
+                    score_category))
+        cls(id=score_category, current_position_in_rotation=user_id).put()
+
+    @classmethod
+    def update_position_in_rotation(cls, score_category, user_id):
+        """Updates current position in rotation for the given score_category.
+
+        Args:
+            score_category: str. The score category.
+            user_id: str. The ID of the user who completed their turn in the
+                rotation for the given category.
+        """
+        instance = cls.get_by_id(score_category)
+
+        if not instance:
+            cls.create(score_category, user_id)
+        else:
+            instance.current_position_in_rotation = user_id
+            instance.put()
