@@ -380,7 +380,7 @@ oppia.factory('ExplorationStatesService', [
         // will raise an error because the new initial state name does not
         // exist.
         ChangeListService.renameState(newStateName, oldStateName);
-        SolutionValidityService.renameState(newStateName, oldStateName);
+        SolutionValidityService.onRenameState(newStateName, oldStateName);
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to
         // a complaint that the new name is not a valid state name.

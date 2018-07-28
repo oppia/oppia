@@ -131,14 +131,12 @@ oppia.factory('TrainingDataService', [
 
         var answerGroups = ResponsesService.getAnswerGroups();
         var answerGroup = answerGroups[answerGroupIndex];
-        var trainingData = answerGroup.trainingData;
 
         // Train the rule to include this answer.
-        trainingData.push(answer);
+        answerGroup.trainingData.push(answer);
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: trainingData
+          trainingData: answerGroup.trainingData
         });
-        answerGroup.trainingData = trainingData;
         ExplorationStatesService.saveInteractionAnswerGroups(
           EditorStateService.getActiveStateName(),
           angular.copy(answerGroups));

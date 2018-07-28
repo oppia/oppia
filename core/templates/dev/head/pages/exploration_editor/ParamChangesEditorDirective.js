@@ -24,7 +24,7 @@ oppia.directive('paramChangesEditor', [
       scope: {
         paramChangesService: '=',
         postSaveHook: '=',
-        inSettingsTab: '&settingsTab'
+        isCurrentlyInSettingsTab: '&currentlyInSettingsTab'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +
@@ -182,7 +182,7 @@ oppia.directive('paramChangesEditor', [
 
             ExplorationParamSpecsService.saveDisplayedValue();
             $scope.paramChangesService.saveDisplayedValue();
-            if (!$scope.inSettingsTab()) {
+            if (!$scope.isCurrentlyInSettingsTab()) {
               ExplorationStatesService.saveStateParamChanges(
                 $scope.paramChangesService.stateName,
                 angular.copy($scope.paramChangesService.displayed));

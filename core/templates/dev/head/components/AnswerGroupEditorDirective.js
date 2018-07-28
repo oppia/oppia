@@ -21,21 +21,21 @@ oppia.directive('answerGroupEditor', [
     return {
       restrict: 'E',
       scope: {
-        isEditable: '=',
+        addState: '=',
+        correctnessFeedbackEnabled: '=',
         displayFeedback: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        getStateNames: '=',
+        isEditable: '=',
+        isQuestion: '&',
         onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
-        correctnessFeedbackEnabled: '=',
-        suppressWarnings: '&',
         rules: '=',
-        isQuestion: '&',
-        addState: '=',
-        getStateNames: '='
+        suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),

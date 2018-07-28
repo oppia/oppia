@@ -28,7 +28,6 @@ oppia.directive('stateContentEditor', [
         };
       },
       scope: {
-        getOnSaveContentFn: '&onSaveContentFn',
         onSaveStateContent: '=',
         onSaveContentIdsToAudioTranslations: '=',
         isInitialState: '&'
@@ -108,7 +107,6 @@ oppia.directive('stateContentEditor', [
               openMarkAllAudioAsNeedingUpdateModal();
             }
             saveContent();
-            $scope.getOnSaveContentFn()();
           };
 
           $scope.cancelEdit = function() {

@@ -28,7 +28,7 @@ oppia.directive('outcomeEditor', [
         getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
         onSaveContentIdsToAudioTranslations: '=',
-        suppressWarnings: '&suppressWarnings',
+        areWarningsSuppressed: '&warningsAreSuppressed',
         isCorrectnessFeedbackEnabled: '&',
         addState: '=',
         getStateNames: '='

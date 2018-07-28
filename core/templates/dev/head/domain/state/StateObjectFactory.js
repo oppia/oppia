@@ -32,6 +32,10 @@ oppia.factory('StateObjectFactory', [
       this.contentIdsToAudioTranslations = contentIdsToAudioTranslations;
     };
 
+    State.prototype.setName = function(newName) {
+      this.name = newName;
+    };
+
     // Instance methods.
     State.prototype.toBackendDict = function() {
       return {

@@ -177,6 +177,9 @@ oppia.controller('StateEditor', [
     $scope.saveStateContent = function(displayedValue) {
       ExplorationStatesService.saveStateContent(
         $scope.stateName, angular.copy(displayedValue));
+      // Show the interaction when the text content is saved, even if no
+      // content is entered.
+      $scope.interactionIsShown = true;
     };
 
     $scope.saveInteractionId = function(displayedValue) {
@@ -206,12 +209,6 @@ oppia.controller('StateEditor', [
 
     $scope.navigateToState = function(stateName) {
       RouterService.navigateToMainTab(stateName);
-    };
-
-    $scope.showInteraction = function() {
-      // Show the interaction when the text content is saved, even if no
-      // content is entered.
-      $scope.interactionIsShown = true;
     };
   }
 ]);

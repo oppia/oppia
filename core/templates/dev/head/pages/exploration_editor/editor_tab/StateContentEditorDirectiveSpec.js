@@ -195,10 +195,9 @@ describe('State content editor directive', function() {
     $rootScope.$digest();
 
     outerScope = $rootScope.$new();
-    outerScope.onSaveContentFn = jasmine.createSpy('onSaveContentFn');
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     var elem = angular.element(
-      '<state-content-editor on-save-content-fn="onSaveContentFn" ' +
+      '<state-content-editor ' +
       'on-save-state-content="saveStateContent" ' +
       'on-save-content-ids-to-audio-translations=' +
       '"saveContentIdsToAudioTranslations">' +
@@ -252,6 +251,6 @@ describe('State content editor directive', function() {
 
   it('should call the callback function on-save', function() {
     ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.onSaveContentFn).toHaveBeenCalled();
+    expect(outerScope.saveStateContent).toHaveBeenCalled();
   });
 });

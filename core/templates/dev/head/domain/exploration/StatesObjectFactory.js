@@ -63,7 +63,7 @@ oppia.factory('StatesObjectFactory', [
     };
     States.prototype.renameState = function(oldStateName, newStateName) {
       this._states[newStateName] = angular.copy(this._states[oldStateName]);
-      this._states[newStateName].name = newStateName;
+      this._states[newStateName].setName(newStateName);
       delete this._states[oldStateName];
 
       for (var otherStateName in this._states) {
