@@ -3,7 +3,7 @@ blurb: ''
 category: Algorithms
 init_state_name: Start
 language_code: en
-objective: Testing mobile device functionality
+objective: To learn testing
 param_changes: []
 param_specs: {}
 schema_version: 17
@@ -26,4 +26,4 @@ states:
     param_changes: []
 states_schema_version: 13
 tags: []
-title: Mobile device testing
+title: Test Exploration
