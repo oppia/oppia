@@ -52,7 +52,7 @@ describe('Learner dashboard functionality', function() {
     waitFor.pageToFullyLoad();
   };
 
-  var createAboutOppiaExploration = function() {
+  var createAboutOppiaExplorationOnDesktop = function() {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     waitFor.pageToFullyLoad();
@@ -174,7 +174,7 @@ describe('Learner dashboard functionality', function() {
       users.createAndLoginUser('originalCreator@learnerDashboard.com',
         'originalCreator');
       // Create exploration 'About Oppia'
-      createAboutOppiaExploration();
+      createAboutOppiaExplorationOnDesktop();
       // Create a second exploration named 'Dummy Exploration'.
       workflow.createAndPublishExploration(
         'Dummy Exploration',
@@ -307,7 +307,7 @@ describe('Learner dashboard functionality', function() {
       users.createAndLoginUser('explorationCreator@learnerDashboard.com',
         'explorationCreator');
       // Create first exploration named 'Head of Collection'
-      createAboutOppiaExploration();
+      createAboutOppiaExplorationOnDesktop();
       // Create a second exploration named 'Collection Exploration'.
       workflow.createAndPublishExploration(
         'Collection Exploration',
