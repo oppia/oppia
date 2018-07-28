@@ -87,7 +87,7 @@ describe('Subscriptions functionality on mobile', function() {
     // dashboard intro button when the user is
     // on the creator dashboard page.
     if (browser.isMobile) {
-      creatorDashboardPage.clickCreateExplorationButtonOnMobile();
+      creatorDashboardPage.clickCreateNewExplorationButton();
     } else {
       creatorDashboardPage.clickCreateActivityButton();
     }
@@ -107,7 +107,7 @@ describe('Subscriptions functionality on mobile', function() {
     // dashboard intro button when the user is
     // on the creator dashboard page.
     if (browser.isMobile) {
-      creatorDashboardPage.clickCreateExplorationButtonOnMobile();
+      creatorDashboardPage.clickCreateNewExplorationButton();
     } else {
       creatorDashboardPage.clickCreateActivityButton();
     }
