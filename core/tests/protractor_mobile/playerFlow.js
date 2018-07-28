@@ -35,8 +35,9 @@ describe('player flow for mobile', function () {
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
 
-    var ADM_VISITOR = 'admVisitor';
-    users.createAndLoginAdminUserMobile('admVisitor@player.com', ADM_VISITOR);
+    var ADM_PLAYER_VISITOR = 'admPlayerVisitor';
+    users.createAndLoginAdminUserMobile(
+      'admPlayerVisitor@player.com', ADM_PLAYER_VISITOR);
     // Load /explore/24
     adminPage.reloadExploration('learner_flow_test.yaml');
     // Load /collection/1
