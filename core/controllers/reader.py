@@ -527,7 +527,7 @@ class StatsEventsHandler(base.BaseHandler):
         exp_version = self.payload.get('exp_version')
         if exp_version is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Stats aggregation")
+                'NONE EXP VERSION: Stats aggregation')
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
@@ -558,7 +558,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         version = self.payload.get('version')
         if version is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Answer Submit")
+                'NONE EXP VERSION: Answer Submit')
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
@@ -604,7 +604,7 @@ class StateHitEventHandler(base.BaseHandler):
         exploration_version = self.payload.get('exploration_version')
         if exploration_version is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: State hit")
+                'NONE EXP VERSION: State hit')
         session_id = self.payload.get('session_id')
         # TODO(sll): why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
@@ -633,7 +633,7 @@ class StateCompleteEventHandler(base.BaseHandler):
         """Handles POST requests."""
         if self.payload.get('exp_version') is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: State Complete")
+                'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -697,7 +697,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
         """
         if self.payload.get('version') is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Exploration start")
+                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
             self.payload.get('state_name'),
@@ -719,7 +719,7 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
         """Handles POST requests."""
         if self.payload.get('exploration_version') is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Actual Start")
+                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'))
@@ -736,7 +736,7 @@ class SolutionHitEventHandler(base.BaseHandler):
         """Handles POST requests."""
         if self.payload.get('exploration_version') is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Solution hit")
+                'NONE EXP VERSION: Solution hit')
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -767,7 +767,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
         if self.payload.get('version') is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Exploration complete")
+                'NONE EXP VERSION: Exploration complete')
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -816,7 +816,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         version = self.payload.get('version')
         if version is None:
             raise self.InvalidInputException(
-                "NONE EXP VERSION: Maybe quit")
+                'NONE EXP VERSION: Maybe quit')
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')
