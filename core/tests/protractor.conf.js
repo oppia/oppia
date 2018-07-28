@@ -108,10 +108,6 @@ exports.config = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
-    ratings: [
-      'protractor/ratings.js'
-    ],
-
     stateEditor: [
       'protractor_desktop/stateEditor.js',
     ],

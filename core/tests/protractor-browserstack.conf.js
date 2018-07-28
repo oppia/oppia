@@ -114,10 +114,6 @@ exports.config = {
       'protractor_mobile/playerFlow.js'
     ],
 
-    ratings: [
-      'protractor/ratings.js'
-    ],
-
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ]
