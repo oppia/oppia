@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -388,38 +389,46 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     def test_accept_question_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            suggestion_to_accept = self.get_json(
-                '%s?suggestion_type=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
-                )['suggestions'][0]
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                suggestion_to_accept = self.get_json(
+                    '%s?suggestion_type=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                    )['suggestions'][0]
 
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
-            with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-                self.put_json('%s/topic/%s/%s' % (
-                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                    suggestion_to_accept['target_id'],
-                    suggestion_to_accept['suggestion_id']), {
-                        'action': u'accept',
-                        'commit_message': u'commit message',
-                        'review_message': u'Accepted'
-                    }, csrf_token=csrf_token)
+                self.login(self.ADMIN_EMAIL)
+                response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+                csrf_token = self.get_csrf_token_from_response(response)
+                with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+                    self.put_json('%s/topic/%s/%s' % (
+                        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                        suggestion_to_accept['target_id'],
+                        suggestion_to_accept['suggestion_id']), {
+                            'action': u'accept',
+                            'commit_message': u'commit message',
+                            'review_message': u'Accepted'
+                        }, csrf_token=csrf_token)
 
-            suggestion_post_accept = self.get_json(
-                '%s?suggestion_type=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
-                )['suggestions'][0]
+                suggestion_post_accept = self.get_json(
+                    '%s?suggestion_type=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                    )['suggestions'][0]
+                self.assertEqual(
+                    suggestion_post_accept['status'],
+                    suggestion_models.STATUS_ACCEPTED)
+                questions, _ = (
+                    question_services.get_question_summaries_linked_to_skills(
+                        [self.SKILL_ID], ''))
+                self.assertEqual(len(questions), 1)
+                self.assertEqual(questions[0].creator_id, self.author_id)
+                self.assertEqual(
+                    questions[0].question_content,
+                    self.question_dict['question_state_data']['content']['html']
+                )
+                thread_messages = feedback_services.get_messages(
+                    suggestion_to_accept['suggestion_id'])
+            last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
-                suggestion_post_accept['status'],
-                suggestion_models.STATUS_ACCEPTED)
-            questions, _ = (
-                question_services.get_question_summaries_linked_to_skills(
-                    [self.SKILL_ID], ''))
-            self.assertEqual(len(questions), 1)
-            self.assertEqual(questions[0].creator_id, self.author_id)
-            self.assertEqual(
-                questions[0].question_content,
-                self.question_dict['question_state_data']['content']['html'])
+                last_message.text, 'Accepted')
+
