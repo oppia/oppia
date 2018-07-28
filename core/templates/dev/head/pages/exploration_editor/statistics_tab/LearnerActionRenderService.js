@@ -113,11 +113,11 @@ oppia.factory('LearnerActionRenderService', [
         if (interactionId === 'Continue') {
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,
-            custArgs.time_spent_state_in_msecs.value, actionIndex);
+            custArgs.time_spent_in_state_secs.value, actionIndex);
         } else {
           return renderAnswerSubmitActionHTML(
-            custArgs.submitted_answer.value, custArgs.dest_state_name.value,
-            custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
+            custArgs.answer.value, custArgs.dest_state_name.value,
+            custArgs.time_spent_in_state_secs.value, custArgs.state_name.value,
             actionIndex);
         }
       }
@@ -148,19 +148,22 @@ oppia.factory('LearnerActionRenderService', [
     };
 
     return {
-      renderFinalDisplayBlockForMISIssueHTML: function(block) {
+      renderFinalDisplayBlockForMISIssueHTML: function(
+          block, actionStartIndex) {
         var index = block.length - 1;
         var stateName = block[index].actionCustomizationArgs.state_name.value;
         var htmlString = '';
         for (
           var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          htmlString += renderLearnerActionHTML(block[i]);
+          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
         htmlString +=
-          '<span class="learner-action">Submitted the following answers in ' +
-          'card "' + stateName + '"</span>';
+          '<span class="learner-action">' + (actionStartIndex + i).toString() +
+          '. Submitted the following answers in card "' + stateName +
+          '"</span>';
         htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += renderLearnerActionHTML(block[index]);
+        htmlString += renderLearnerActionHTML(
+          block[index], actionStartIndex + i + 1);
         return $sce.trustAsHtml(htmlString);
       },
       renderDisplayBlockHTML: function(block, actionStartIndex) {

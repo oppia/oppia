@@ -28,6 +28,7 @@ describe('Learner Action Render Service', function() {
       spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(true);
       this.lars = $injector.get('LearnerActionRenderService');
       this.ps.initSession('expId1', 1);
+      this.sce = $injector.get('$sce');
     }));
 
     it('should split up EarlyQuit learner actions into display blocks.',
@@ -279,13 +280,13 @@ describe('Learner Action Render Service', function() {
         expect(displayBlocks.length).toEqual(1);
 
         var finalBlockHTML = this.lars.renderFinalDisplayBlockForMISIssueHTML(
-          displayBlocks[0]);
+          displayBlocks[0], 1);
 
-        expect(finalBlockHTML).toEqual(
-          '<span class="learner-action">Started exploration at card ' +
+        expect(this.sce.getTrustedHtml(finalBlockHTML)).toEqual(
+          '<span class="learner-action">1. Started exploration at card ' +
           '"stateName1".</span>' +
-          '<span class="learner-action">Submitted the following answers in ' +
-          'card "stateName1"</span>' +
+          '<span class="learner-action">2. Submitted the following answers in' +
+          ' card "stateName1"</span>' +
           '<table class="learner-actions-table"><tr><th>Answer</th>' +
           '<th>Feedback</th></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
@@ -293,8 +294,8 @@ describe('Learner Action Render Service', function() {
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr></table>' +
-          '<span class="learner-action">Left the exploration after spending ' +
-          'a total of 120 seconds on card "stateName1".</span>'
+          '<span class="learner-action">3. Left the exploration after ' +
+          'spending a total of 120 seconds on card "stateName1".</span>'
         );
       });
 
@@ -311,17 +312,17 @@ describe('Learner Action Render Service', function() {
 
       expect(displayBlocks.length).toEqual(1);
 
-      var blockHTML = this.lars.renderDisplayBlockHTML(displayBlocks[0]);
+      var blockHTML = this.lars.renderDisplayBlockHTML(displayBlocks[0], 1);
 
-      expect(blockHTML).toEqual(
-        '<span class="learner-action">Started exploration at card ' +
+      expect(this.sce.getTrustedHtml(blockHTML)).toEqual(
+        '<span class="learner-action">1. Started exploration at card ' +
         '"stateName1".</span>' +
-        '<span class="learner-action">Pressed "Continue" to move to card ' +
+        '<span class="learner-action">2. Pressed "Continue" to move to card ' +
         '"stateName2" after 30 seconds.</span>' +
-        '<span class="learner-action">Submitted answer "Hello" in card ' +
+        '<span class="learner-action">3. Submitted answer "Hello" in card ' +
         '"stateName2".</span>' +
-        '<span class="learner-action">Left the exploration after spending a ' +
-        'total of 120 seconds on card "stateName2".</span>'
+        '<span class="learner-action">4. Left the exploration after spending ' +
+        'a total of 120 seconds on card "stateName2".</span>'
       );
     });
   });
