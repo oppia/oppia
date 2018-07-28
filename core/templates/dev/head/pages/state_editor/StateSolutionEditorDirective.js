@@ -28,8 +28,7 @@ oppia.directive('stateSolutionEditor', [
         deleteSolutionValidity: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_solution_editor_directive.html'),
+        '/pages/state_editor/state_solution_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',

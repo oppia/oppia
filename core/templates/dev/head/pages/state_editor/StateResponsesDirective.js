@@ -29,7 +29,7 @@ oppia.directive('stateResponses', [
         getStateNames: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
+        '/pages/state_editor/state_responses_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'stateInteractionIdService', 'AlertsService',

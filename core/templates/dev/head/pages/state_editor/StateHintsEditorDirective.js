@@ -26,8 +26,7 @@ oppia.directive('stateHintsEditor', [
         onSaveContentIdsToAudioTranslations: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_hints_editor_directive.html'),
+        '/pages/state_editor/state_hints_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',

@@ -36,8 +36,7 @@ oppia.directive('stateInteractionEditor', [
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_interaction_editor_directive.html'),
+        '/pages/state_editor/state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService',

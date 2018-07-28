@@ -33,8 +33,7 @@ oppia.directive('stateContentEditor', [
         isInitialState: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_content_editor_directive.html'),
+        '/pages/state_editor/state_content_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService', 'COMPONENT_NAME_CONTENT',
