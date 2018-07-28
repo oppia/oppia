@@ -116,6 +116,7 @@ describe('Basic user journeys', function() {
 
     afterEach(function() {
       general.checkForConsoleErrors([]);
+      users.logout();
     });
   });
 });
