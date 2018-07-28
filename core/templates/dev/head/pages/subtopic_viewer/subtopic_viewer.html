@@ -1,1 +1,42 @@
-<h1>Subtopic Viewer</h1>
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Skill Page
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+
+{% block content %}
+  <div ng-controller="SubtopicViewer" style="position: relative;">
+    <div>
+      <div class="oppia-static-header">
+        <h1><[subtopicTitle]></h1>
+      </div>
+      <background-banner></background-banner>
+    </div>
+    <div class="oppia-static-content-below-banner">
+      <div class="oppia-page-card oppia-static-content" style="margin-top: 0; padding: 20px;">
+        <angular-html-bind html-data="subtopicPage.getHtmlData()">
+        </angular-html-bind>
+      </div>
+    </div>
+
+  </div>
+{% endblock content %}
+
+{% block footer_js %}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicViewer.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicViewerBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicPageObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  {% include 'components/rich_text_components.html' %}
+{% endblock footer_js %}

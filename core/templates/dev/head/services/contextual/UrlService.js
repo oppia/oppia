@@ -70,6 +70,16 @@ oppia.factory('UrlService', ['$window', function($window) {
       }
       return skillId;
     },
+    getTopicIdAndSubtopicIdFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/skill(\/(\w|-){12}\b){1}\/([0-9]+)/g)) {
+        return {
+          topicId: pathname.split('/')[2],
+          subtopicId: pathname.split('/')[3]
+        };
+      }
+      throw Error('Invalid subtopic page url');
+    },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
       if (this.getCurrentQueryString().indexOf('?') > -1) {

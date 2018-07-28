@@ -21,12 +21,12 @@ oppia.constant(
   '/subtopic_viewer_handler/data/<topic_id>/<subtopic_id>');
 
 oppia.factory('SubtopicViewerBackendApiService', [
-  '$http', '$q', 'SUBTOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, SUBTOPIC_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'SUBTOPIC_VIEWER_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  function($http, $q, SUBTOPIC_VIEWER_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchSubtopicData = function(
         topicId, subtopicId, successCallback, errorCallback) {
       var subtopicDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_DATA_URL_TEMPLATE, {
+        SUBTOPIC_VIEWER_DATA_URL_TEMPLATE, {
           topic_id: topicId,
           subtopic_id: subtopicId
         });
@@ -48,7 +48,7 @@ oppia.factory('SubtopicViewerBackendApiService', [
         return $q(function(resolve, reject) {
           _fetchSubtopicData(topicId, subtopicId, resolve, reject);
         });
-      };
-    }
+      }
+    };
   }
 ]);

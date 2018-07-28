@@ -20,6 +20,7 @@ from core.domain import topic_services
 from core.domain import subtopic_page_services
 import feconf
 
+
 class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to learner on the
     subtopic viewer page.
@@ -32,6 +33,8 @@ class SubtopicPageDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id)
 
@@ -40,6 +43,8 @@ class SubtopicPageDataHandler(base.BaseHandler):
             'subtopic_html_data': subtopic_page.html_data,
             'language_code': subtopic_page.language_code
         })
+        self.render_json(self.values)
+
 
 class SubtopicViewerPage(base.BaseHandler):
     """Manages to render subtopic viewer page."""
