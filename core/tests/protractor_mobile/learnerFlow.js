@@ -44,8 +44,7 @@ describe('learner flow for mobile', function () {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
 
     var ADM_VISITOR = 'admVisitor';
-    users.login('admVisitor@learner.com', true);
-    users.completeSignup(ADM_VISITOR);
+    users.createAndLoginAdminUserMobile('admVisitor@learner.com', ADM_VISITOR);
     // Load /explore/24
     adminPage.reloadExploration('learner_flow_test.yaml');
     // Load /explore/22
@@ -106,12 +105,12 @@ describe('learner flow for mobile', function () {
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       'Dummy Exploration');
 
-    // Learner Dashboard should display 'Mobile device testing'
+    // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
     learnerDashboardPage.navigateToCompletedSection();
     learnerDashboardPage.navigateToCompletedExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      'Mobile device testing');
+      'Test Exploration');
 
     // Now complete the 'Dummmy Exploration'.
     browser.get('/explore/24');
@@ -127,7 +126,7 @@ describe('learner flow for mobile', function () {
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       'Dummy Exploration');
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      'Mobile device testing');
+      'Test Exploration');
   });
 
   it('displays incomplete and completed collections', function () {
