@@ -72,10 +72,6 @@ exports.config = {
       'protractor_desktop/collections.js'
     ],
 
-    console: [
-      'protractor/consoleErrors.js'
-    ],
-
     editorAndPlayer: [
       'protractor_desktop/editorAndPlayer.js',
     ],

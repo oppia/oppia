@@ -81,7 +81,6 @@ exports.config = {
   suites: {
     full: [
       'protractor/accessibility.js',
-      'protractor/consoleErrors.js',
       'protractor_mobile/learnerFlow.js',
       'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
@@ -91,10 +90,6 @@ exports.config = {
 
     accessibility: [
       'protractor/accessibility.js'
-    ],
-
-    console: [
-      'protractor/consoleErrors.js'
     ],
 
     learner: [
