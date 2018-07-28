@@ -58,7 +58,8 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
+      'protractor/*.js',
+      'protractor_desktop/*.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in
@@ -68,34 +69,42 @@ exports.config = {
     ],
 
     collections: [
-      'protractor/collections.js'
+      'protractor_desktop/collections.js'
+    ],
+
+    console: [
+      'protractor/consoleErrors.js'
     ],
 
     editorAndPlayer: [
-      'protractor/editorAndPlayer.js',
-    ],
-
-    stateEditor: [
-      'protractor/stateEditor.js',
+      'protractor_desktop/editorAndPlayer.js',
     ],
 
     editorFeatures: [
-      'protractor/editorFeatures.js'
+      'protractor_desktop/editorFeatures.js'
     ],
 
     embedding: [
-      'protractor/embedding.js'
+      'protractor_desktop/embedding.js'
     ],
 
     extensions: [
-      'protractor/extensions.js'
+      'protractor_desktop/extensions.js'
     ],
 
     learnerDashboard: [
-      'protractor/learnerDashboard.js'
+      'protractor_desktop/learnerDashboard.js'
     ],
 
     library: [
+      'protractor/libraryFlow.js'
+    ],
+
+    login: [
+      'protractor/loginFlow.js'
+    ],
+
+    publication: [
       'protractor/publicationAndLibrary.js'
     ],
 
@@ -103,12 +112,16 @@ exports.config = {
       'protractor/ratings.js'
     ],
 
+    stateEditor: [
+      'protractor_desktop/stateEditor.js',
+    ],
+
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ],
 
     users: [
-      'protractor/userJourneys.js',
+      'protractor_desktop/userJourneys.js',
     ],
   },
 
