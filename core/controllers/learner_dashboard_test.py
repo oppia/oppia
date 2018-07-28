@@ -270,7 +270,7 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1))
 
         # Get the id of the thread.
-        thread_id = response_dict['threads'][0]['thread_id']
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
 
         # Get the message summary of the thread.
         thread_url = '%s/%s' % (

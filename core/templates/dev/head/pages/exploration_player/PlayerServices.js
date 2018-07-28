@@ -372,6 +372,12 @@ oppia.factory('ExplorationPlayerService', [
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
+        // Use angular.copy() to clone the object
+        // since classificationResult.outcome points
+        // at oldState.interaction.default_outcome
+        var outcome = angular.copy(classificationResult.outcome);
+        var newStateName = outcome.dest;
+
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
@@ -385,22 +391,17 @@ oppia.factory('ExplorationPlayerService', [
             classificationResult.ruleIndex,
             classificationResult.classificationCategorization,
             feedbackIsUseful);
+
+          if (ENABLE_PLAYTHROUGH_RECORDING) {
+            StatsReportingService.recordAnswerSubmitAction(
+              oldStateName, newStateName, oldState.interaction.id, answer,
+              outcome.feedback);
+          }
         }
 
-        // Use angular.copy() to clone the object
-        // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome
-        var outcome = angular.copy(classificationResult.outcome);
-        var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
         var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
-
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          StatsReportingService.recordAnswerSubmitAction(
-            oldStateName, newStateName, oldState.interaction.id, answer,
-            outcome.feedback);
-        }
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
