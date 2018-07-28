@@ -185,7 +185,7 @@ def _save_question_skill_link(new_skill_id, question_skill_model_id):
         new_skill_id: str. New ID for the questions that are merged.
         question_skill_model_id: str. ID of the model.
     """
-    
+
     question_skill_model = question_models.QuestionSkillLinkModel.get(
         question_skill_model_id)
     question_skill_model.skill_id = new_skill_id
@@ -206,7 +206,8 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
             question_models.QuestionSkillLinkModel.get_model_id(
                 question_skill_link.question_id, question_skill_link.skill_id))
         question_skill_link.skill_id = new_skill_id
-        _save_question_skill_link(question_skill_link.skill_id, question_skill_model_id)
+        _save_question_skill_link(question_skill_link.skill_id,
+            question_skill_model_id)
 
 
 def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
