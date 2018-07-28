@@ -80,21 +80,21 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor_mobile/accessibility.js',
-      'protractor_mobile/consoleErrors.js',
+      'protractor/accessibility.js',
+      'protractor/consoleErrors.js',
       'protractor_mobile/learnerFlow.js',
-      'protractor_mobile/loginFlow.js',
+      'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
       'protractor/ratings.js',
       'protractor/subscriptionsFlow.js'
     ],
 
     accessibility: [
-      'protractor_mobile/accessibility.js'
+      'protractor/accessibility.js'
     ],
 
     console: [
-      'protractor_mobile/consoleErrors.js'
+      'protractor/consoleErrors.js'
     ],
 
     learner: [
@@ -102,11 +102,11 @@ exports.config = {
     ],
 
     library: [
-      'protractor_mobile/libraryFlow.js'
+      'protractor/libraryFlow.js'
     ],
 
     login: [
-      'protractor_mobile/loginFlow.js'
+      'protractor/loginFlow.js'
     ],
 
     navigation: [
