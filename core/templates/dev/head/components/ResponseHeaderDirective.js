@@ -22,7 +22,6 @@ oppia.directive('responseHeader', [
       restrict: 'E',
       scope: {
         getIndex: '&index',
-        isCorrectnessFeedbackEnabled: '&correctnessFeedbackEnabled',
         getOutcome: '&outcome',
         getSummary: '&summary',
         getShortSummary: '&shortSummary',
@@ -48,6 +47,9 @@ oppia.directive('responseHeader', [
             return stateInteractionIdService.savedMemento;
           };
 
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return EditorStateService.getCorrectnessFeedbackEnabled();
+          };
           // This returns false if the current interaction ID is null.
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();

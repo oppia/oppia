@@ -23,14 +23,12 @@ oppia.directive('stateSolutionEditor', [
       scope: {
         onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '=',
-        getInteractionCustomizationArgsMemento: '&',
-        isSolutionValid: '=',
-        deleteSolutionValidity: '='
+        getInteractionCustomizationArgsMemento: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_solution_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter',
+        '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
         'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
         'SolutionVerificationService', 'SolutionValidityService',
         'ExplorationHtmlFormatterService', 'stateInteractionIdService',
@@ -38,7 +36,7 @@ oppia.directive('stateSolutionEditor', [
         'ContextService', 'ExplorationWarningsService',
         'EditabilityService', 'stateContentIdsToAudioTranslationsService',
         function(
-            $scope, $rootScope, $uibModal, $filter,
+            $scope, $rootScope, $uibModal, $filter, EditorStateService,
             AlertsService, INTERACTION_SPECS, stateSolutionService,
             SolutionVerificationService, SolutionValidityService,
             ExplorationHtmlFormatterService, stateInteractionIdService,
@@ -57,6 +55,10 @@ oppia.directive('stateSolutionEditor', [
 
 
           ExplorationWarningsService.updateWarnings();
+
+          $scope.isSolutionValid = function() {
+            return EditorStateService.isCurrentSolutionValid();
+          };
 
           $scope.correctAnswerEditorHtml = (
             ExplorationHtmlFormatterService.getInteractionHtml(
@@ -232,7 +234,7 @@ oppia.directive('stateSolutionEditor', [
               $scope.onSaveContentIdsToAudioTranslations(
                 stateContentIdsToAudioTranslationsService.displayed
               );
-              $scope.deleteSolutionValidity();
+              EditorStateService.deleteCurrentSolutionValidity();
             });
           };
         }

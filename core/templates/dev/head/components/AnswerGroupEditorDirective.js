@@ -22,16 +22,13 @@ oppia.directive('answerGroupEditor', [
       restrict: 'E',
       scope: {
         addState: '=',
-        correctnessFeedbackEnabled: '=',
         displayFeedback: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
-        getStateNames: '=',
         isEditable: '=',
-        isQuestion: '&',
         onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
         rules: '=',
@@ -41,17 +38,21 @@ oppia.directive('answerGroupEditor', [
         '/components/answer_group_editor_directive.html'),
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
-        'AlertsService', 'INTERACTION_SPECS',
+        'AlertsService', 'INTERACTION_SPECS', 'EditorStateService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
         'ENABLE_ML_CLASSIFIERS',
         function(
             $scope, stateInteractionIdService, ResponsesService,
-            AlertsService, INTERACTION_SPECS,
+            AlertsService, INTERACTION_SPECS, EditorStateService,
             RuleObjectFactory, TrainingDataEditorPanelService,
             ENABLE_ML_CLASSIFIERS) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
+
+          $scope.isInQuestionMode = function() {
+            return EditorStateService.getInQuestionMode();
+          };
 
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();

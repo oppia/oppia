@@ -38,9 +38,8 @@ oppia.controller('StateEditor', [
       SolutionVerificationService, ContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
-    $scope.ExplorationCorrectnessFeedbackService =
-      ExplorationCorrectnessFeedbackService;
-    $scope.ExplorationStatesService = ExplorationStatesService;
+    $scope.getInteractionCustomizationArgsMemento =
+      ExplorationStatesService.getInteractionCustomizationArgsMemento;
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 
@@ -55,15 +54,12 @@ oppia.controller('StateEditor', [
       $scope.initStateEditor();
     });
 
-    $scope.isSolutionValid = function() {
-      return SolutionValidityService.isSolutionValid(
-        EditorStateService.getActiveStateName());
-    };
-
-    $scope.deleteSolutionValidity = function() {
-      SolutionValidityService.deleteSolutionValidity(
-        EditorStateService.getActiveStateName());
-    };
+    $scope.$watch(ExplorationStatesService.getStates, function() {
+      if (ExplorationStatesService.getStates()) {
+        EditorStateService.setStateNames(
+          ExplorationStatesService.getStateNames());
+      }
+    }, true);
 
     $scope.isInitialState = function() {
       return (
@@ -133,6 +129,11 @@ oppia.controller('StateEditor', [
 
     $scope.initStateEditor = function() {
       $scope.stateName = EditorStateService.getActiveStateName();
+      EditorStateService.setStateNames(
+        ExplorationStatesService.getStateNames());
+      EditorStateService.setCorrectnessFeedbackEnabled(
+        ExplorationCorrectnessFeedbackService.isEnabled());
+      EditorStateService.setInQuestionMode(false);
       var stateData = ExplorationStatesService.getState($scope.stateName);
       if ($scope.stateName && stateData) {
         stateContentService.init(

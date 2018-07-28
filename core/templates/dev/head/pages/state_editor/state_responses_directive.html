@@ -31,8 +31,7 @@
                                outcome="answerGroup.outcome"
                                navigate-to-state="navigateToState"
                                num-rules="answerGroup.rules.length"
-                               is-response="true"
-                               correctness-feedback-enabled="correctnessFeedbackEnabled">
+                               is-response="true">
               </response-header>
             </a>
 
@@ -47,11 +46,8 @@
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                       correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        class="protractor-test-response-body"
-                                       is-question="isQuestion()"
                                        add-state="addState"
-                                       get-state-names="getStateNames"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
@@ -77,8 +73,7 @@
                                short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                outcome="defaultOutcome"
                                navigate-to-state="navigateToState"
-                               is-response="true"
-                               correctness-feedback-enabled="correctnessFeedbackEnabled">
+                               is-response="true">
               </response-header>
             </a>
 
@@ -94,10 +89,7 @@
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
                                        class="protractor-test-response-body"
-                                       is-question="isQuestion()"
                                        add-state="addState"
-                                       get-state-names="getStateNames"
-                                       correctness-feedback-enabled="correctnessFeedbackEnabled"
                                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>

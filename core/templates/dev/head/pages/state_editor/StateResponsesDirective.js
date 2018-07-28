@@ -23,10 +23,7 @@ oppia.directive('stateResponses', [
         getStateName: '&stateName',
         onSaveContentIdsToAudioTranslations: '=',
         navigateToState: '=',
-        correctnessFeedbackEnabled: '=',
-        isQuestion: '&',
-        addState: '=',
-        getStateNames: '='
+        addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_responses_directive.html'),
@@ -34,7 +31,7 @@ oppia.directive('stateResponses', [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'stateInteractionIdService', 'AlertsService',
         'ResponsesService', 'ContextService',
-        'EditabilityService',
+        'EditabilityService', 'EditorStateService',
         'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
@@ -42,7 +39,7 @@ oppia.directive('stateResponses', [
             $scope, $rootScope, $uibModal, $filter,
             stateInteractionIdService, AlertsService,
             ResponsesService, ContextService,
-            EditabilityService,
+            EditabilityService, EditorStateService,
             stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
             UrlInterpolationService, AnswerGroupObjectFactory,
@@ -146,7 +143,8 @@ oppia.directive('stateResponses', [
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
-            if (!outcome) {
+            if (!outcome ||
+                !EditorStateService.getCorrectnessFeedbackEnabled()) {
               return false;
             }
             var currentStateName = $scope.getStateName();
@@ -264,7 +262,6 @@ oppia.directive('stateResponses', [
             $rootScope.$broadcast('externalSave');
             var stateName = $scope.getStateName();
             var addState = $scope.addState;
-            var getStateNames = $scope.getStateNames;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -283,7 +280,6 @@ oppia.directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
-                  $scope.getStateNames = getStateNames;
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
                   };

@@ -29,9 +29,7 @@ oppia.directive('outcomeEditor', [
         outcome: '=outcome',
         onSaveContentIdsToAudioTranslations: '=',
         areWarningsSuppressed: '&warningsAreSuppressed',
-        isCorrectnessFeedbackEnabled: '&',
-        addState: '=',
-        getStateNames: '='
+        addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
@@ -59,6 +57,10 @@ oppia.directive('outcomeEditor', [
 
           $scope.getCurrentInteractionId = function() {
             return stateInteractionIdService.savedMemento;
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return EditorStateService.getCorrectnessFeedbackEnabled();
           };
 
           // This returns false if the current interaction ID is null.

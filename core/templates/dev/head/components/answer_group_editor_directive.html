@@ -97,7 +97,7 @@
       + Add Another Possible Answer
     </button>
 
-    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isQuestion()">
+    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isInQuestionMode()">
       <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
         <i class="material-icons md-24">playlist_add</i> Modify Training Data
       </button>
@@ -113,9 +113,7 @@
                   on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()"
                   outcome="outcome"
                   add-state="addState"
-                  get-state-names="getStateNames"
                   warnings-are-suppressed="suppressWarnings()"
-                  on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
-                  is-correctness-feedback-enabled="correctnessFeedbackEnabled">
+                  on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
   </outcome-editor>
 </div>

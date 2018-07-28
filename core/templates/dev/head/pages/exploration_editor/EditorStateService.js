@@ -17,19 +17,49 @@
  * in the exploration is currently active.
  */
 
-oppia.factory('EditorStateService', ['$log', function($log) {
-  var activeStateName = null;
+oppia.factory('EditorStateService', [
+  '$log', 'SolutionValidityService',
+  function(
+      $log, SolutionValidityService) {
+    var activeStateName = null;
+    var stateNames = [];
+    var correctnessFeedbackEnabled = null;
+    var inQuestionMode = null;
 
-  return {
-    getActiveStateName: function() {
-      return activeStateName;
-    },
-    setActiveStateName: function(newActiveStateName) {
-      if (newActiveStateName === '' || newActiveStateName === null) {
-        $log.error('Invalid active state name: ' + newActiveStateName);
-        return;
+    return {
+      getActiveStateName: function() {
+        return activeStateName;
+      },
+      setActiveStateName: function(newActiveStateName) {
+        if (newActiveStateName === '' || newActiveStateName === null) {
+          $log.error('Invalid active state name: ' + newActiveStateName);
+          return;
+        }
+        activeStateName = newActiveStateName;
+      },
+      setInQuestionMode: function(newModeValue) {
+        inQuestionMode = newModeValue;
+      },
+      getInQuestionMode: function() {
+        return isInQuestionMode;
+      },
+      setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {
+        correctnessFeedbackEnabled = newCorrectnessFeedbackEnabled;
+      },
+      getCorrectnessFeedbackEnabled: function() {
+        return correctnessFeedbackEnabled;
+      },
+      setStateNames: function(newStateNames) {
+        stateNames = newStateNames;
+      },
+      getStateNames: function() {
+        return stateNames;
+      },
+      isCurrentSolutionValid: function() {
+        return SolutionValidityService.isSolutionValid(activeStateName);
+      },
+      deleteCurrentSolutionValidity: function() {
+        SolutionValidityService.deleteSolutionValidity(activeStateName);
       }
-      activeStateName = newActiveStateName;
-    }
-  };
-}]);
+    };
+  }]);
