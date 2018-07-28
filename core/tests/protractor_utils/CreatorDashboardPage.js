@@ -36,7 +36,7 @@ var CreatorDashboardPage = function() {
   var createExplorationButton =
     element(by.css('.protractor-test-create-exploration'));
   var createExplorationButtonMobile =
-    element(by.css('.protractor-mobile-test-create-exploration'));
+    element(by.css('.protractor-test-create-new-exploration-button'));
 
     // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {

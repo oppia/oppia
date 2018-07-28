@@ -44,7 +44,7 @@ var LibraryPage = function(){
   var languageSelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-language-selector'))
   );
-  var searchInput = element.all(
+  var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
 
   // Returns a promise of all explorations with the given name.
@@ -156,9 +156,9 @@ var LibraryPage = function(){
     // The second input element is visible when the library
     // page is rendered for mobile device.
 
-    var desktopSearchInput = searchInput.first();
+    var desktopSearchInput = searchInputs.first();
     // get function is a zero-based index.
-    var mobileSearchInput = searchInput.get(1);
+    var mobileSearchInput = searchInputs.get(1);
     if (browser.isMobile) {
       mobileSearchInput.clear();
       mobileSearchInput.sendKeys(explorationTitle);
@@ -176,9 +176,9 @@ var LibraryPage = function(){
     // The second input element is visible when the library
     // page is rendered for mobile device.
 
-    var desktopSearchInput = searchInput.first();
+    var desktopSearchInput = searchInputs.first();
     // get function is a zero-based index.
-    var mobileSearchInput = searchInput.get(1);
+    var mobileSearchInput = searchInputs.get(1);
     if (browser.isMobile) {
       mobileSearchInput.clear();
       mobileSearchInput.sendKeys(collectionTitle);

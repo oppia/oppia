@@ -46,7 +46,7 @@ var AdminPage = function(){
     '.protractor-test-reload-all-explorations-button'
   ));
 
-  var reloadCollectionButton = element.all(by.css(
+  var reloadCollectionButtons = element.all(by.css(
     '.protractor-test-reload-collection-button'));
 
   var explorationTitleElement = function(explorationElement) {
@@ -62,7 +62,7 @@ var AdminPage = function(){
   };
 
   this.reloadCollection = function(collectionId) {
-    reloadCollectionButton.get(collectionId).click();
+    reloadCollectionButtons.get(collectionId).click();
     general.acceptAlert();
     // Time is needed for the reloading to complete.
     waitFor.textToBePresentInElement(
