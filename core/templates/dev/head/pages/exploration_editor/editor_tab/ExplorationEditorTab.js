@@ -155,7 +155,7 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveInteractionAnswerGroups(
         $scope.stateName, angular.copy(newAnswerGroups));
 
-        $scope.recomputeGraph();
+      $scope.recomputeGraph();
     };
 
     $scope.saveInteractionDefaultOutcome = function(newOutcome) {
