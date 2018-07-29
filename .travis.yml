@@ -77,11 +77,6 @@ before_install:
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
-# The CHROME_SOURCE_URL is an environment variable set in the repository settings
-# of Travis. It can be found under 'Environment Variables' header here:
-# https://travis-ci.org/oppia/oppia/settings
-- wget --no-verbose -O /tmp/$(basename $CHROME_SOURCE_URL) $CHROME_SOURCE_URL
-- sudo dpkg -i /tmp/$(basename $CHROME_SOURCE_URL)
 
 install:
 - pushd $TRAVIS_BUILD_DIR
@@ -89,35 +84,35 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 script:
-- if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
+- if [ "$RUN_LINT" == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [ $RUN_FRONTEND_TESTS == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh; fi
+- if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
+- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
+- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
+- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
+- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 # Run e2e tests in production mode.
-- if [ $RUN_E2E_TESTS_ACCESSIBILITY == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
-- if [ $RUN_E2E_TESTS_COLLECTIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EDITOR_AND_PLAYER == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorAndPlayer" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EDITOR_FEATURES == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorFeatures" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EMBEDDING == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
-- if [ $RUN_E2E_TESTS_FEEDBACK_THREADS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="feedbackThreads" --prod_env; fi
-- if [ $RUN_E2E_TESTS_LEARNER == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learner" --prod_env; fi
-- if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
-- if [ $RUN_E2E_TESTS_LOGIN == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="login" --prod_env; fi
-- if [ $RUN_E2E_TESTS_PUBLICATION == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
-- if [ $RUN_E2E_TESTS_STATE_EDITOR == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="stateEditor" --prod_env; fi
-- if [ $RUN_E2E_TESTS_SUBSCRIPTIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
-- if [ $RUN_E2E_TESTS_USERS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EDITOR_AND_PLAYER" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorAndPlayer" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EDITOR_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_FEEDBACK_THREADS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="feedbackThreads" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learner" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LOGIN" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="login" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_STATE_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="stateEditor" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
 # Run e2e tests for mobile in dev mode since the demo explorations and collections are only available in the dev mode and not in production mode.
 - if [ $RUN_E2E_TESTS_MOBILE == 'true' ] && [ $TRAVIS_BRANCH == 'develop' ] && [ $TRAVIS_EVENT_TYPE == 'push' ] && [ $TRAVIS_PULL_REQUEST == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
 
 after_success:
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
-- if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ]; then codecov; fi
+- if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
 cache:
   # Cache Oppia's dependencies.
@@ -126,7 +121,7 @@ cache:
     - ../oppia_tools/
     - third_party/
     - $HOME/.cache/pip
-
+    - $HOME/.cache/TravisChrome/
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
