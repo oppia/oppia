@@ -40,115 +40,127 @@ oppia.factory('TranslationStatusService', [
       stateWiseStatusColor = {};
       explorationAudioRequiredCount = 0;
       explorationAudioNotAvailableCount = 0;
-      ExplorationStatesService.getStateNames().forEach(function(stateName) {
-        var noTranslationCount = 0;
-        var contentIdsToAudioTranslations = ExplorationStatesService
-          .getContentIdsToAudioTranslationsMemento(stateName);
-        var allContentId = contentIdsToAudioTranslations.getAllContentId();
-        explorationAudioRequiredCount += allContentId.length;
-        allContentId.forEach(function(contentId) {
-          availableTranslationLanguageCode = contentIdsToAudioTranslations
-            .getAudioLanguageCodes(contentId);
-          if (availableTranslationLanguageCode.indexOf(langCode) > -1) {
-            var audioTranslation = contentIdsToAudioTranslations
-              .getAudioTranslation(contentId, langCode);
-            if (audioTranslation.needsUpdate) {
-              stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
+      if (ExplorationStatesService.isInitialized()) {
+        ExplorationStatesService.getStateNames().forEach(function(stateName) {
+          var noTranslationCount = 0;
+          var contentIdsToAudioTranslations = ExplorationStatesService
+            .getContentIdsToAudioTranslationsMemento(stateName);
+          var allContentId = contentIdsToAudioTranslations.getAllContentId();
+          explorationAudioRequiredCount += allContentId.length;
+          allContentId.forEach(function(contentId) {
+            availableTranslationLanguageCode = contentIdsToAudioTranslations
+              .getAudioLanguageCodes(contentId);
+            if (availableTranslationLanguageCode.indexOf(langCode) > -1) {
+              var audioTranslation = contentIdsToAudioTranslations
+                .getAudioTranslation(contentId, langCode);
+              if (audioTranslation.needsUpdate) {
+                stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
+              }
+            } else {
+              noTranslationCount++;
             }
+          });
+          explorationAudioNotAvailableCount += noTranslationCount;
+          if (noTranslationCount === 0) {
+            stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
+          } else if (noTranslationCount === allContentId.length) {
+            stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
           } else {
-            noTranslationCount++;
+            stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
           }
         });
-        explorationAudioNotAvailableCount += noTranslationCount;
-        if (noTranslationCount === 0) {
-          stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
-        } else if (noTranslationCount === allContentId.length) {
-          stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
-        } else {
-          stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
-        }
-      });
+      }
     };
 
     var _getContentIdListRelatedToComponent = function (componentName) {
-      var contentIdList = [];
-      if (componentName === 'solution' || componentName === 'content') {
-        contentIdList.push(componentName);
-      } else {
-        var searchKey = componentName + '_';
-        contentIdsToAudioTranslations.getAllContentId().forEach(
-          function(contentId) {
-            if (contentId.indexOf(searchKey) > -1) {
-              contentIdList.push(contentId);
+      contentIdsToAudioTranslations =
+        stateContentIdsToAudioTranslationsService.displayed;
+      if (contentIdsToAudioTranslations) {
+        var contentIdList = [];
+        if (componentName === 'solution' || componentName === 'content') {
+          contentIdList.push(componentName);
+        } else {
+          var searchKey = componentName + '_';
+          contentIdsToAudioTranslations.getAllContentId().forEach(
+            function(contentId) {
+              if (contentId.indexOf(searchKey) > -1) {
+                contentIdList.push(contentId);
+              }
             }
+          );
+          if (componentName === 'feedback') {
+            contentIdList.push('default_outcome');
           }
-        );
-        if (componentName === 'feedback') {
-          contentIdList.push('default_outcome');
         }
+        return contentIdList;
+      } else {
+        return null;
       }
-      return contentIdList;
     };
 
     var _getActiveStateComponentStatus = function(componentName) {
-      contentIdsToAudioTranslations =
-        stateContentIdsToAudioTranslationsService.displayed;
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
       var availableAudioCount = 0;
-      contentIdList.forEach(function(contentId) {
-        if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-          availableAudioCount++;
+      if (contentIdList) {
+        contentIdList.forEach(function(contentId) {
+          if (contentIdsToAudioTranslations
+            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+            availableAudioCount++;
+          }
+        });
+        if (contentIdList.length === availableAudioCount) {
+          return ALL_AUDIO_AVAILABLE_COLOR;
+        } else if (availableAudioCount === 0) {
+          return NO_AUDIO_AVAILABLE_COLOR;
+        } else {
+          return FEW_AUDIO_AVAILABLE_COLOR;
         }
-      });
-      if (contentIdList.length === availableAudioCount) {
-        return ALL_AUDIO_AVAILABLE_COLOR;
-      } else if (availableAudioCount === 0) {
-        return NO_AUDIO_AVAILABLE_COLOR;
-      } else {
-        return FEW_AUDIO_AVAILABLE_COLOR;
       }
     };
 
     var _getActiveStateComponentNeedsUpdateStatus = function(componentName) {
-      contentIdsToAudioTranslations =
-        stateContentIdsToAudioTranslationsService.displayed;
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
-      for (index in contentIdList) {
-        if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentIdList[index]).indexOf(langCode) > -1) {
-          var audioTranslation = contentIdsToAudioTranslations
-            .getAudioTranslation(contentIdList[index], langCode);
-          if (audioTranslation.needsUpdate) {
-            return true;
+      if (contentIdList) {
+        contentIdList.forEach(function(contentId) {
+          if (contentIdsToAudioTranslations
+            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+            var audioTranslation = contentIdsToAudioTranslations
+              .getAudioTranslation(contentId, langCode);
+            if (audioTranslation.needsUpdate) {
+              return true;
+            }
           }
-        }
+        });
       }
       return false;
     };
 
     var _getActiveStateContentIdStatusColor = function(contentId) {
-      var contentIdsToAudioTranslations =
+      contentIdsToAudioTranslations =
         stateContentIdsToAudioTranslationsService.displayed;
-      if (contentIdsToAudioTranslations
-        .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-        return ALL_AUDIO_AVAILABLE_COLOR;
-      } else {
-        return NO_AUDIO_AVAILABLE_COLOR;
+      if (contentIdsToAudioTranslations) {
+        if (contentIdsToAudioTranslations
+          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          return ALL_AUDIO_AVAILABLE_COLOR;
+        } else {
+          return NO_AUDIO_AVAILABLE_COLOR;
+        }
       }
     };
 
     var _getActiveStateContentIdNeedsUpdateStatus = function(contentId) {
-      var contentIdsToAudioTranslations =
+      contentIdsToAudioTranslations =
         stateContentIdsToAudioTranslationsService.displayed;
-      if (contentIdsToAudioTranslations
-        .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-        var audioTranslation = contentIdsToAudioTranslations
-          .getAudioTranslation(contentId, langCode);
-        if (audioTranslation.needsUpdate) {
-          return true;
-        } else {
-          return false;
+      if (contentIdsToAudioTranslations) {
+        if (contentIdsToAudioTranslations
+          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          var audioTranslation = contentIdsToAudioTranslations
+            .getAudioTranslation(contentId, langCode);
+          if (audioTranslation.needsUpdate) {
+            return true;
+          } else {
+            return false;
+          }
         }
       }
     };
