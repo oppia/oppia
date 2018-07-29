@@ -22,26 +22,29 @@ oppia.directive('stateResponses', [
       scope: {
         getStateName: '&stateName',
         onSaveContentIdsToAudioTranslations: '=',
+        onSaveInteractionDefaultOutcome: '=',
+        onSaveInteractionAnswerGroups: '=',
         navigateToState: '=',
-        addState: '='
+        addState: '=',
+        refreshWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_responses_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
-        'stateInteractionIdService', 'AlertsService',
+        'StateInteractionIdService', 'AlertsService',
         'ResponsesService', 'ContextService',
         'EditabilityService', 'EditorStateService',
-        'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
-        'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+        'StateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
+        'StateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT', function(
             $scope, $rootScope, $uibModal, $filter,
-            stateInteractionIdService, AlertsService,
+            StateInteractionIdService, AlertsService,
             ResponsesService, ContextService,
             EditabilityService, EditorStateService,
-            stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
-            stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+            StateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
+            StateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
             UrlInterpolationService, AnswerGroupObjectFactory,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
@@ -62,7 +65,7 @@ oppia.directive('stateResponses', [
             // This array contains the text of each of the possible answers
             // for the interaction.
             var answerChoices = [];
-            var customizationArgs = stateCustomizationArgsService.savedMemento;
+            var customizationArgs = StateCustomizationArgsService.savedMemento;
             var handledAnswersArray = [];
 
             if (interactionId === 'MultipleChoiceInput') {
@@ -161,7 +164,7 @@ oppia.directive('stateResponses', [
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isCreatingNewState = function(outcome) {
@@ -222,10 +225,13 @@ oppia.directive('stateResponses', [
               evt, newInteractionId) {
             $rootScope.$broadcast('externalSave');
             ResponsesService.onInteractionIdChanged(
-              newInteractionId, function() {
+              newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
                 $scope.onSaveContentIdsToAudioTranslations(
                   angular.copy(
-                    stateContentIdsToAudioTranslationsService.displayed));
+                    StateContentIdsToAudioTranslationsService.displayed));
+                $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                $scope.refreshWarnings()();
                 $scope.answerGroups = ResponsesService.getAnswerGroups();
                 $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
@@ -254,7 +260,11 @@ oppia.directive('stateResponses', [
           });
 
           $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-            ResponsesService.updateAnswerChoices(newAnswerChoices);
+            ResponsesService.updateAnswerChoices(
+              newAnswerChoices, function(newAnswerGroups) {
+                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                $scope.refreshWarnings()();
+              });
           });
 
           $scope.openAddAnswerGroupModal = function() {
@@ -322,12 +332,18 @@ oppia.directive('stateResponses', [
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
                 [result.tmpRule], result.tmpOutcome, [], null));
-              ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
-              stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              ResponsesService.save(
+                $scope.answerGroups, $scope.defaultOutcome,
+                function(newAnswerGroups, newDefaultOutcome) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                  $scope.refreshWarnings()();
+                });
+              StateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.tmpOutcome.feedback.getContentId());
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
               );
               $scope.changeActiveAnswerGroupIndex(
                 $scope.answerGroups.length - 1);
@@ -357,7 +373,13 @@ oppia.directive('stateResponses', [
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
-              ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
+              ResponsesService.save(
+                $scope.answerGroups, $scope.defaultOutcome,
+                function(newAnswerGroups, newDefaultOutcome) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                  $scope.refreshWarnings()();
+                });
             }
           };
 
@@ -388,14 +410,18 @@ oppia.directive('stateResponses', [
             }).result.then(function() {
               var deletedOutcome =
                 ResponsesService.getAnswerGroup(index).outcome;
-              ResponsesService.deleteAnswerGroup(index);
+              ResponsesService.deleteAnswerGroup(
+                index, function(newAnswerGroups) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.refreshWarnings()();
+                });
               var deletedFeedbackContentId =
                 deletedOutcome.feedback.getContentId();
-              stateContentIdsToAudioTranslationsService.
+              StateContentIdsToAudioTranslationsService.
                 displayed.deleteContentId(deletedFeedbackContentId);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
               );
             });
           };
@@ -403,6 +429,9 @@ oppia.directive('stateResponses', [
           $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               feedback: updatedOutcome.feedback
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
@@ -412,6 +441,9 @@ oppia.directive('stateResponses', [
               refresherExplorationId: updatedOutcome.refresherExplorationId,
               missingPrerequisiteSkillId:
                 updatedOutcome.missingPrerequisiteSkillId
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
@@ -419,18 +451,26 @@ oppia.directive('stateResponses', [
               updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
           $scope.saveActiveAnswerGroupRules = function(updatedRules) {
             ResponsesService.updateActiveAnswerGroup({
               rules: updatedRules
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
           $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
               feedback: updatedOutcome.feedback
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 
@@ -440,12 +480,16 @@ oppia.directive('stateResponses', [
               refresherExplorationId: updatedOutcome.refresherExplorationId,
               missingPrerequisiteSkillId:
                 updatedOutcome.missingPrerequisiteSkillId
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 
           $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 

@@ -20,10 +20,10 @@
 
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
-  'ExplorationStatesService', 'EditorStateService',
+  'ExplorationStatesService', 'EditorStateService', 'GraphDataService',
   function(
       $rootScope, $http, ResponsesService, RuleObjectFactory,
-      ExplorationStatesService, EditorStateService) {
+      ExplorationStatesService, EditorStateService, GraphDataService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -74,10 +74,18 @@ oppia.factory('TrainingDataService', [
 
       if (updatedAnswerGroups) {
         ResponsesService.save(
-          answerGroups, ResponsesService.getDefaultOutcome());
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          EditorStateService.getActiveStateName(),
-          angular.copy(answerGroups));
+          answerGroups, ResponsesService.getDefaultOutcome(),
+          function(newAnswerGroups, newDefaultOutcome) {
+            ExplorationStatesService.saveInteractionAnswerGroups(
+              EditorStateService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
+
+            ExplorationStatesService.saveInteractionDefaultOutcome(
+              EditorStateService.getActiveStateName(),
+              angular.copy(newDefaultOutcome));
+
+            GraphDataService.recompute();
+          });
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
@@ -136,10 +144,13 @@ oppia.factory('TrainingDataService', [
         answerGroup.trainingData.push(answer);
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: answerGroup.trainingData
+        }, function(newAnswerGroups) {
+          ExplorationStatesService.saveInteractionAnswerGroups(
+            EditorStateService.getActiveStateName(),
+            angular.copy(newAnswerGroups));
+
+          GraphDataService.recompute();
         });
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          EditorStateService.getActiveStateName(),
-          angular.copy(answerGroups));
       },
 
       associateWithDefaultResponse: function(answer) {
@@ -173,11 +184,13 @@ oppia.factory('TrainingDataService', [
 
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
-        });
+        }, function(newAnswerGroups) {
+          ExplorationStatesService.saveInteractionAnswerGroups(
+            EditorStateService.getActiveStateName(),
+            angular.copy(newAnswerGroups));
 
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          EditorStateService.getActiveStateName(),
-          angular.copy(answerGroups));
+          GraphDataService.recompute();
+        });
       }
     };
   }

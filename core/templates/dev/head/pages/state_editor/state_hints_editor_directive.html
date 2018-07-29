@@ -1,26 +1,26 @@
 <div>
   <div ng-if="!isCurrentInteractionLinear()">
     <div class="oppia-editor-header">
-      <strong ng-if="stateHintsService.displayed.length > 0 || canEdit">Hints</strong>
+      <strong ng-if="StateHintsService.displayed.length > 0 || canEdit">Hints</strong>
     </div>
 
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
-        <div ng-if="stateHintsService.displayed.length > 0">
+        <div ng-if="StateHintsService.displayed.length > 0">
           <!-- An HTML element marked ui-sortable should contain only one element,
           and this element should have an ng-repeat defined on it. See the
           ui-sortable documentation for more details. -->
           <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
               ui-sortable="HINT_LIST_SORTABLE_OPTIONS"
-              ng-model="stateHintsService.displayed">
+              ng-model="StateHintsService.displayed">
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
-            <li ng-repeat="hint in stateHintsService.displayed"
+            <li ng-repeat="hint in StateHintsService.displayed"
                 ng-class="{'active': activeHintIndex === $index}"
                 class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
                 style="margin-top: 0;">
               <span class="oppia-hint-sort-handle"
-                    ng-if="stateHintsService.displayed.length > 1"
+                    ng-if="StateHintsService.displayed.length > 1"
                     ng-mousedown="changeActiveHintIndex(null)">
                 <img ng-if="EditabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
               </span>
@@ -55,7 +55,7 @@
         <button type="button"
                 class="btn btn-primary btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
                 ng-click="openAddHintModal()"
-                ng-disabled="stateHintsService.displayed.length >= 5">
+                ng-disabled="StateHintsService.displayed.length >= 5">
           <[getHintButtonText()]>
         </button>
       </div>

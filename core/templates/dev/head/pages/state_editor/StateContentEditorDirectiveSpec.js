@@ -47,8 +47,8 @@ describe('State content editor directive', function() {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    scitat = $injector.get('stateContentIdsToAudioTranslationsService');
-    scs = $injector.get('stateContentService');
+    scitat = $injector.get('StateContentIdsToAudioTranslationsService');
+    scs = $injector.get('StateContentService');
     es = $injector.get('EditabilityService');
     ess = $injector.get('ExplorationStatesService');
 

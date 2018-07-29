@@ -25,6 +25,7 @@ oppia.factory('EditorStateService', [
     var stateNames = [];
     var correctnessFeedbackEnabled = null;
     var inQuestionMode = null;
+    var interaction = null;
 
     return {
       getActiveStateName: function() {
@@ -36,6 +37,12 @@ oppia.factory('EditorStateService', [
           return;
         }
         activeStateName = newActiveStateName;
+      },
+      setInteraction: function(newInteraction) {
+        interaction = newInteraction;
+      },
+      getInteraction: function() {
+        return interaction;
       },
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;

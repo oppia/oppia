@@ -36,15 +36,15 @@ oppia.directive('responseHeader', [
       controller: [
         '$scope', 'EditabilityService', 'EditorStateService',
         'PLACEHOLDER_OUTCOME_DEST',
-        'stateInteractionIdService', 'INTERACTION_SPECS',
+        'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
             $scope, EditabilityService, EditorStateService,
             PLACEHOLDER_OUTCOME_DEST,
-            stateInteractionIdService, INTERACTION_SPECS) {
+            StateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {

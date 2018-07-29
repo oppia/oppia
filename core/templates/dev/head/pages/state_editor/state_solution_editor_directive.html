@@ -1,12 +1,12 @@
 <div>
-  <div ng-if="stateHintsService.displayed.length > 0">
+  <div ng-if="StateHintsService.displayed.length > 0">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
-            ng-if="stateSolutionService.savedMemento">
+            ng-if="StateSolutionService.savedMemento">
           <li ng-class="!inlineSolutionEditorIsActive"
               class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
               style="margin-top: 0;">
@@ -29,7 +29,7 @@
 
             <div ng-if="inlineSolutionEditorIsActive">
               <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
-                <solution-editor interaction-id="stateInteractionIdService.savedMemento"
+                <solution-editor interaction-id="StateInteractionIdService.savedMemento"
                                  correct-answer-editor-html="correctAnswerEditorHtml"
                                  on-open-solution-editor="openAddOrUpdateSolutionModal()"
                                  on-save-solution="onSaveSolution"
@@ -44,7 +44,7 @@
 
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="EditabilityService.isEditableOutsideTutorialMode()">
-        <button ng-if="!stateSolutionService.savedMemento"
+        <button ng-if="!StateSolutionService.savedMemento"
                 type="button"
                 class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-solution-button"
                 ng-click="openAddOrUpdateSolutionModal()">

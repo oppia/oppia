@@ -32,31 +32,31 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$sce', 'stateContentService',
-        'stateContentIdsToAudioTranslationsService',
+        '$scope', '$rootScope', '$uibModal', '$sce', 'StateContentService',
+        'StateContentIdsToAudioTranslationsService',
         'EditabilityService', 'LanguageUtilService', 'AlertsService',
         'ContextService', 'AssetsBackendApiService',
         function(
-            $scope, $rootScope, $uibModal, $sce, stateContentService,
-            stateContentIdsToAudioTranslationsService,
+            $scope, $rootScope, $uibModal, $sce, StateContentService,
+            StateContentIdsToAudioTranslationsService,
             EditabilityService, LanguageUtilService, AlertsService,
             ContextService, AssetsBackendApiService) {
           $scope.isTranslatable = EditabilityService.isTranslatable;
 
-          $scope.stateContentIdsToAudioTranslationsService =
-              stateContentIdsToAudioTranslationsService;
+          $scope.StateContentIdsToAudioTranslationsService =
+              StateContentIdsToAudioTranslationsService;
           // The following if-condition is present because, sometimes,
           // Travis-CI throws an error of the form "Cannot read property
           // getBindableAudioTranslations of undefined". It looks like there is
           // a race condition that is causing this directive to get
           // initialized when it shouldn't. This is hard to reproduce
           // deterministically, hence this guard.
-          if (stateContentIdsToAudioTranslationsService.displayed) {
+          if (StateContentIdsToAudioTranslationsService.displayed) {
             $scope.audioTranslations = (
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .getBindableAudioTranslations($scope.contentId));
             $scope.hasAudioTranslations =
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .hasAudioTranslations($scope.contentId);
           }
 
@@ -72,7 +72,7 @@ oppia.directive('audioTranslationsEditor', [
           };
 
           $scope.isFullyTranslated = function() {
-            stateContentIdsToAudioTranslationsService.displayed
+            StateContentIdsToAudioTranslationsService.displayed
               .isFullyTranslated($scope.contentId);
           };
 
@@ -90,17 +90,17 @@ oppia.directive('audioTranslationsEditor', [
 
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {
             $scope.getOnStartEditFn()();
-            stateContentIdsToAudioTranslationsService.displayed
+            StateContentIdsToAudioTranslationsService.displayed
               .toggleNeedsUpdateAttribute($scope.contentId, languageCode);
-            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
             $scope.onSaveContentIdsToAudioTranslations(
-              stateContentIdsToAudioTranslationsService.displayed);
+              StateContentIdsToAudioTranslationsService.displayed);
           };
 
           $scope.openAddAudioTranslationModal = function() {
             var allowedAudioLanguageCodes = (
               LanguageUtilService.getComplementAudioLanguageCodes(
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
                   .getAudioLanguageCodes($scope.contentId)));
 
             if (allowedAudioLanguageCodes.length === 0) {
@@ -219,13 +219,13 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .addAudioTranslation(
                   $scope.contentId, result.languageCode, result.filename,
                   result.fileSizeBytes);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed);
+                StateContentIdsToAudioTranslationsService.displayed);
             });
           };
 
@@ -263,11 +263,11 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .deleteAudioTranslation($scope.contentId, languageCode);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed);
+                StateContentIdsToAudioTranslationsService.displayed);
             });
           };
         }

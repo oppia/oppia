@@ -18,19 +18,23 @@
  */
 
 oppia.factory('ResponsesService', [
-  '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
+  '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService',
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
-  'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
+  'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'ExplorationWarningsService',
-  'stateContentIdsToAudioTranslationsService', 'SolutionValidityService',
+  'StateContentIdsToAudioTranslationsService', 'SolutionValidityService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
-      $rootScope, stateInteractionIdService, INTERACTION_SPECS,
+      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService,
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
-      stateSolutionService, SolutionVerificationService, AlertsService,
+      StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, ExplorationWarningsService,
-      stateContentIdsToAudioTranslationsService, SolutionValidityService) {
+      StateContentIdsToAudioTranslationsService, SolutionValidityService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -44,32 +48,56 @@ oppia.factory('ResponsesService', [
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
 
+    var _verifySolution = function() {
+      // To check if the solution is valid once a rule has been changed or
+      // added.
+      var currentInteractionId = StateInteractionIdService.savedMemento;
+      var interactionCanHaveSolution = (
+        currentInteractionId &&
+        INTERACTION_SPECS[currentInteractionId].can_have_solution);
+      var solutionExists = (
+        StateSolutionService.savedMemento &&
+        StateSolutionService.savedMemento.correctAnswer !== null);
+
+      if (interactionCanHaveSolution && solutionExists) {
+        var interaction = EditorStateService.getInteraction();
+
+        interaction.answerGroups = angular.copy(_answerGroups);
+        interaction.defaultOutcome = angular.copy(_defaultOutcome);
+        var solutionIsValid = SolutionVerificationService.verifySolution(
+          EditorStateService.getActiveStateName(),
+          interaction,
+          StateSolutionService.savedMemento.correctAnswer
+        );
+
+        SolutionValidityService.updateValidity(
+          EditorStateService.getActiveStateName(), solutionIsValid);
+        var solutionWasPreviouslyValid = (
+          SolutionValidityService.isSolutionValid(
+            EditorStateService.getActiveStateName()));
+        if (solutionIsValid && !solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+        } else if (!solutionIsValid && solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+        } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+        }
+      }
+    };
+
     var _saveAnswerGroups = function(newAnswerGroups) {
       var oldAnswerGroups = _answerGroupsMemento;
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged', newAnswerGroups);
-
-        // To check if the solution is valid once a rule has been changed or
-        // added.
-        var currentInteractionId = stateInteractionIdService.savedMemento;
-        var interactionCanHaveSolution = (
-          currentInteractionId &&
-          INTERACTION_SPECS[currentInteractionId].can_have_solution);
-        var solutionExists = (
-          stateSolutionService.savedMemento &&
-          stateSolutionService.savedMemento.correctAnswer !== null);
-
-        if (interactionCanHaveSolution && solutionExists) {
-          $rootScope.$broadcast('validateSolution', true);
-        }
-
+        _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
     };
 
-    var _updateAnswerGroup = function(index, updates) {
+    var _updateAnswerGroup = function(index, updates, callback) {
       var answerGroup = _answerGroups[index];
       if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
@@ -95,24 +123,24 @@ oppia.factory('ResponsesService', [
         answerGroup.trainingData = updates.trainingData;
       }
       _saveAnswerGroups(_answerGroups);
+      callback(_answerGroupsMemento);
     };
 
     var _updateAnswerGroupsAudioTranslation = function () {
-      stateContentIdsToAudioTranslationsService.displayed.
+      StateContentIdsToAudioTranslationsService.displayed.
         deleteAllFeedbackContentId();
       for (var i = 0; i < _answerGroups.length; i++) {
-        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+        StateContentIdsToAudioTranslationsService.displayed.addContentId(
           _answerGroups[i].outcome.feedback.getContentId());
       }
-      stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+      StateContentIdsToAudioTranslationsService.saveDisplayedValue();
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
       var oldDefaultOutcome = _defaultOutcomeMemento;
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
         _defaultOutcome = newDefaultOutcome;
-
-        $rootScope.$broadcast('saveDefaultOutcome', newDefaultOutcome);
+        _verifySolution();
         _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
       }
     };
@@ -141,7 +169,7 @@ oppia.factory('ResponsesService', [
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
         AnswerGroupsCacheService.set(
-          stateInteractionIdService.savedMemento, _answerGroups);
+          StateInteractionIdService.savedMemento, _answerGroups);
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -168,16 +196,16 @@ oppia.factory('ResponsesService', [
         if (newInteractionId) {
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
-            stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+            StateContentIdsToAudioTranslationsService.displayed.deleteContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
               EditorStateService.getActiveStateName(),
               COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
-            stateContentIdsToAudioTranslationsService.displayed.addContentId(
+            StateContentIdsToAudioTranslationsService.displayed.addContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
-          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
 
         _confirmedUnclassifiedAnswers = [];
@@ -195,7 +223,7 @@ oppia.factory('ResponsesService', [
         _activeRuleIndex = 0;
 
         if (callback) {
-          callback();
+          callback(_answerGroupsMemento, _defaultOutcomeMemento);
         }
       },
       getActiveAnswerGroupIndex: function() {
@@ -220,19 +248,20 @@ oppia.factory('ResponsesService', [
       getAnswerChoices: function() {
         return angular.copy(_answerChoices);
       },
-      updateAnswerGroup: function(index, updates) {
-        _updateAnswerGroup(index, updates);
+      updateAnswerGroup: function(index, updates, callback) {
+        _updateAnswerGroup(index, updates, callback);
       },
-      deleteAnswerGroup: function(index) {
+      deleteAnswerGroup: function(index, callback) {
         _answerGroupsMemento = angular.copy(_answerGroups);
         _answerGroups.splice(index, 1);
         _activeAnswerGroupIndex = -1;
         _saveAnswerGroups(_answerGroups);
+        callback(_answerGroupsMemento);
       },
-      updateActiveAnswerGroup: function(updates) {
-        _updateAnswerGroup(_activeAnswerGroupIndex, updates);
+      updateActiveAnswerGroup: function(updates, callback) {
+        _updateAnswerGroup(_activeAnswerGroupIndex, updates, callback);
       },
-      updateDefaultOutcome: function(updates) {
+      updateDefaultOutcome: function(updates, callback) {
         var outcome = _defaultOutcome;
         if (updates.hasOwnProperty('feedback')) {
           outcome.feedback = updates.feedback;
@@ -251,6 +280,7 @@ oppia.factory('ResponsesService', [
           outcome.labelledAsCorrect = updates.labelledAsCorrect;
         }
         _saveDefaultOutcome(outcome);
+        callback(_defaultOutcomeMemento);
       },
       updateConfirmedUnclassifiedAnswers: function(
           confirmedUnclassifiedAnswers) {
@@ -259,13 +289,13 @@ oppia.factory('ResponsesService', [
       // Updates answer choices when the interaction requires it -- for
       // example, the rules for multiple choice need to refer to the multiple
       // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices) {
+      updateAnswerChoices: function(newAnswerChoices, callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
 
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+        if (StateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
             oldAnswerChoices) {
           // We use an approximate algorithm here. If the length of the answer
           // choices array remains the same, and no choice is replicated at
@@ -324,13 +354,13 @@ oppia.factory('ResponsesService', [
 
             _updateAnswerGroup(answerGroupIndex, {
               rules: newRules
-            });
+            }, callback);
           });
         }
 
         // If the interaction is DragAndDropSortInput, update the answer groups
         // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
+        if (StateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
             oldAnswerChoices) {
           // If the length of the answer choices array changes, then there is
           // surely any deletion or modification or addition in the array. We
@@ -372,7 +402,7 @@ oppia.factory('ResponsesService', [
 
               _updateAnswerGroup(answerGroupIndex, {
                 rules: newRules
-              });
+              }, callback);
             });
           }
         }
@@ -393,9 +423,10 @@ oppia.factory('ResponsesService', [
         return angular.copy(_confirmedUnclassifiedAnswers);
       },
       // This registers the change to the handlers in the list of changes.
-      save: function(newAnswerGroups, defaultOutcome) {
+      save: function(newAnswerGroups, defaultOutcome, callback) {
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);
+        callback(_answerGroupsMemento, _defaultOutcomeMemento);
       }
     };
   }

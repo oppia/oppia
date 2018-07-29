@@ -1,4 +1,4 @@
-<div ng-controller="StateEditor" class="oppia-editor-cards-container">
+<div ng-controller="ExplorationEditorTab" class="oppia-editor-cards-container">
   <div class="oppia-editor-header">
     <state-name-editor></state-name-editor>
   </div>
@@ -14,7 +14,7 @@
            style="padding-top: 36px; padding-bottom: 36px;">
         <state-content-editor on-save-state-content="saveStateContent"
                               on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
-                              is-initial-state="isInitialState()">
+                              state-content-placeholder="getStateContentPlaceholder()">
         </state-content-editor>
       </div>
     </div>
@@ -33,8 +33,11 @@
   <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
     <state-responses state-name="stateName"
                      on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
+                     on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
+                     on-save-interaction-answer-groups="saveInteractionAnswerGroups"
                      navigate-to-state="navigateToState"
-                     add-state="addState">
+                     add-state="addState"
+                     refresh-warnings="refreshWarnings">
     </state-responses>
     <div>
       <state-hints-editor on-save-hints="saveHints"
@@ -45,7 +48,8 @@
     <div ng-if="currentInteractionCanHaveSolution">
       <state-solution-editor interaction-customization-args-memento="getInteractionCustomizationArgsMemento(stateName)"
                              on-save-solution="saveSolution"
-                             on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
+                             on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
+                             refresh-warnings="refreshWarnings">
       </state-solution-editor>
     </div>
   </div>

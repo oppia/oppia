@@ -37,12 +37,12 @@ oppia.directive('answerGroupEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'stateInteractionIdService', 'ResponsesService',
+        '$scope', 'StateInteractionIdService', 'ResponsesService',
         'AlertsService', 'INTERACTION_SPECS', 'EditorStateService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
         'ENABLE_ML_CLASSIFIERS',
         function(
-            $scope, stateInteractionIdService, ResponsesService,
+            $scope, StateInteractionIdService, ResponsesService,
             AlertsService, INTERACTION_SPECS, EditorStateService,
             RuleObjectFactory, TrainingDataEditorPanelService,
             ENABLE_ML_CLASSIFIERS) {
@@ -69,7 +69,7 @@ oppia.directive('answerGroupEditor', [
           });
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.$on('externalSave', function() {

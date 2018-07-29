@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-describe('State Editor controller', function() {
-  describe('StateEditor', function() {
+describe('Exploration editor tab controller', function() {
+  describe('ExplorationEditorTab', function() {
     var scope, ecs, ess, scs;
 
     beforeEach(module('oppia'));
@@ -25,7 +25,7 @@ describe('State Editor controller', function() {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
-      scs = $injector.get('stateContentService');
+      scs = $injector.get('StateContentService');
 
       ess.init({
         'First State': {
@@ -154,7 +154,7 @@ describe('State Editor controller', function() {
         }
       });
 
-      $controller('StateEditor', {
+      $controller('ExplorationEditorTab', {
         $scope: scope,
         ExplorationStatesService: ess
       });

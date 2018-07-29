@@ -16,28 +16,24 @@
  * @fileoverview Controllers for the graphical state editor.
  */
 
-oppia.controller('StateEditor', [
+oppia.controller('ExplorationEditorTab', [
   '$scope', '$rootScope', 'EditorStateService', 'ExplorationStatesService',
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'stateContentService', 'stateHintsService',
-  'stateContentIdsToAudioTranslationsService', 'stateInteractionIdService',
+  'UrlInterpolationService', 'StateContentService', 'StateHintsService',
+  'StateContentIdsToAudioTranslationsService', 'StateInteractionIdService',
   'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
   'ExplorationCorrectnessFeedbackService', 'SolutionValidityService',
-  'stateCustomizationArgsService', 'stateSolutionService', 'AlertsService',
+  'StateCustomizationArgsService', 'StateSolutionService', 'AlertsService',
   'SolutionVerificationService', 'ContextService', 'ExplorationWarningsService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $scope, $rootScope, EditorStateService, ExplorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
-      UrlInterpolationService, stateContentService, stateHintsService,
-      stateContentIdsToAudioTranslationsService, stateInteractionIdService,
+      UrlInterpolationService, StateContentService, StateHintsService,
+      StateContentIdsToAudioTranslationsService, StateInteractionIdService,
       ExplorationInitStateNameService, GraphDataService, RouterService,
       ExplorationCorrectnessFeedbackService, SolutionValidityService,
-      stateCustomizationArgsService, stateSolutionService, AlertsService,
-      SolutionVerificationService, ContextService, ExplorationWarningsService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      StateCustomizationArgsService, StateSolutionService, AlertsService,
+      SolutionVerificationService, ContextService, ExplorationWarningsService) {
     $scope.getInteractionCustomizationArgsMemento =
       ExplorationStatesService.getInteractionCustomizationArgsMemento;
     $scope.areParametersEnabled = (
@@ -61,10 +57,18 @@ oppia.controller('StateEditor', [
       }
     }, true);
 
-    $scope.isInitialState = function() {
-      return (
+    $scope.getStateContentPlaceholder = function() {
+      if (
         EditorStateService.getActiveStateName() ===
-        ExplorationInitStateNameService.savedMemento);
+        ExplorationInitStateNameService.savedMemento) {
+        return (
+          'This is the first card of your exploration. Use this space to ' +
+          'introduce your topic and engage the learner, then ask them a ' +
+          'question.');
+      } else {
+        return (
+          'You can speak to the learner here, then ask them a question.');
+      }
     };
 
     $scope.addState = function(newStateName) {
@@ -81,51 +85,9 @@ oppia.controller('StateEditor', [
           newInteractionId].is_terminal);
     });
 
-    $scope.$on('saveDefaultOutcome', function(evt, newDefaultOutcome) {
-      ExplorationStatesService.saveInteractionDefaultOutcome(
-        EditorStateService.getActiveStateName(),
-        angular.copy(newDefaultOutcome));
-
-      GraphDataService.recompute();
-    });
-
-    $scope.$on('answerGroupChanged', function(evt, newAnswerGroups) {
-      ExplorationStatesService.saveInteractionAnswerGroups(
-        EditorStateService.getActiveStateName(),
-        angular.copy(newAnswerGroups));
-
-      GraphDataService.recompute();
-    });
-
-    $scope.$on('validateSolution', function(evt, responseIsEdited) {
-      var currentStateName = EditorStateService.getActiveStateName();
-      var state = ExplorationStatesService.getState(currentStateName);
-      var solutionIsValid = SolutionVerificationService.verifySolution(
-        ContextService.getExplorationId(), state,
-        stateSolutionService.savedMemento.correctAnswer);
-
-      SolutionValidityService.updateValidity(
-        currentStateName, solutionIsValid);
+    $scope.refreshWarnings = function() {
       ExplorationWarningsService.updateWarnings();
-
-      if (responseIsEdited) {
-        var solutionWasPreviouslyValid = (
-          SolutionValidityService.isSolutionValid(currentStateName));
-        if (solutionIsValid && !solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-        } else if (!solutionIsValid && solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-        } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-        }
-      } else {
-        if (!solutionIsValid) {
-          AlertsService.addInfoMessage(
-            INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
-        }
-      }
-    });
+    };
 
     $scope.initStateEditor = function() {
       $scope.stateName = EditorStateService.getActiveStateName();
@@ -136,18 +98,19 @@ oppia.controller('StateEditor', [
       EditorStateService.setInQuestionMode(false);
       var stateData = ExplorationStatesService.getState($scope.stateName);
       if ($scope.stateName && stateData) {
-        stateContentService.init(
+        EditorStateService.setInteraction(stateData.interaction);
+        StateContentService.init(
           $scope.stateName, stateData.content);
-        stateContentIdsToAudioTranslationsService.init(
+        StateContentIdsToAudioTranslationsService.init(
           $scope.stateName,
           stateData.contentIdsToAudioTranslations);
-        stateHintsService.init(
+        StateHintsService.init(
           $scope.stateName, stateData.interaction.hints);
-        stateInteractionIdService.init(
+        StateInteractionIdService.init(
           $scope.stateName, stateData.interaction.id);
-        stateCustomizationArgsService.init(
+        StateCustomizationArgsService.init(
           $scope.stateName, stateData.interaction.customizationArgs);
-        stateSolutionService.init(
+        StateSolutionService.init(
           stateData.name, stateData.interaction.solution);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
@@ -186,6 +149,20 @@ oppia.controller('StateEditor', [
     $scope.saveInteractionId = function(displayedValue) {
       ExplorationStatesService.saveInteractionId(
         $scope.stateName, angular.copy(displayedValue));
+    };
+
+    $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
+      ExplorationStatesService.saveInteractionAnswerGroups(
+        $scope.stateName, angular.copy(newAnswerGroups));
+
+        $scope.recomputeGraph();
+    };
+
+    $scope.saveInteractionDefaultOutcome = function(newOutcome) {
+      ExplorationStatesService.saveInteractionDefaultOutcome(
+        $scope.stateName, angular.copy(newOutcome));
+
+      $scope.recomputeGraph();
     };
 
     $scope.saveInteractionCustomizationArgs = function(displayedValue) {
@@ -241,19 +218,19 @@ oppia.directive('trainingPanel', [
       controller: [
         '$scope', 'ExplorationHtmlFormatterService',
         'EditorStateService', 'ExplorationStatesService',
-        'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
-        'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
+        'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
+        'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
         'COMPONENT_NAME_FEEDBACK',
-        'stateContentIdsToAudioTranslationsService',
+        'StateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
             EditorStateService, ExplorationStatesService,
-            TrainingDataService, ResponsesService, stateInteractionIdService,
-            stateCustomizationArgsService, AnswerGroupObjectFactory,
+            TrainingDataService, ResponsesService, StateInteractionIdService,
+            StateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
             COMPONENT_NAME_FEEDBACK,
-            stateContentIdsToAudioTranslationsService) {
+            StateContentIdsToAudioTranslationsService) {
           $scope.addingNewResponse = false;
 
           var _stateName = EditorStateService.getActiveStateName();
@@ -264,8 +241,8 @@ oppia.directive('trainingPanel', [
           var _updateAnswerTemplate = function() {
             $scope.answerTemplate = (
               ExplorationHtmlFormatterService.getAnswerHtml(
-                $scope.answer, stateInteractionIdService.savedMemento,
-                stateCustomizationArgsService.savedMemento));
+                $scope.answer, StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento));
           };
 
           $scope.$watch('answer', _updateAnswerTemplate);

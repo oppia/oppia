@@ -30,19 +30,19 @@ oppia.directive('stateHintsEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'stateHintsService', 'COMPONENT_NAME_HINT',
-        'stateContentIdsToAudioTranslationsService', 'EditabilityService',
-        'stateInteractionIdService', 'UrlInterpolationService',
-        'HintObjectFactory', 'stateSolutionService',
+        'StateHintsService', 'COMPONENT_NAME_HINT',
+        'StateContentIdsToAudioTranslationsService', 'EditabilityService',
+        'StateInteractionIdService', 'UrlInterpolationService',
+        'HintObjectFactory', 'StateSolutionService',
         function(
             $scope, $rootScope, $uibModal, $filter,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            stateHintsService, COMPONENT_NAME_HINT,
-            stateContentIdsToAudioTranslationsService, EditabilityService,
-            stateInteractionIdService, UrlInterpolationService,
-            HintObjectFactory, stateSolutionService) {
+            StateHintsService, COMPONENT_NAME_HINT,
+            StateContentIdsToAudioTranslationsService, EditabilityService,
+            StateInteractionIdService, UrlInterpolationService,
+            HintObjectFactory, StateSolutionService) {
           $scope.EditabilityService = EditabilityService;
-          $scope.stateHintsService = stateHintsService;
+          $scope.StateHintsService = StateHintsService;
           $scope.activeHintIndex = null;
           $scope.canEdit = GLOBALS.can_edit;
 
@@ -55,8 +55,8 @@ oppia.directive('stateHintsEditor', [
 
           $scope.getHintButtonText = function() {
             var hintButtonText = '+ Add Hint';
-            if ($scope.stateHintsService.displayed) {
-              if ($scope.stateHintsService.displayed.length >= 5) {
+            if ($scope.StateHintsService.displayed) {
+              if ($scope.StateHintsService.displayed.length >= 5) {
                 hintButtonText = 'Limit Reached';
               }
             }
@@ -72,17 +72,17 @@ oppia.directive('stateHintsEditor', [
           $scope.changeActiveHintIndex = function(newIndex) {
             var currentActiveIndex = $scope.activeHintIndex;
             if (currentActiveIndex !== null && (
-              !stateHintsService.displayed[currentActiveIndex]
+              !StateHintsService.displayed[currentActiveIndex]
                 .hintContent.getHtml())) {
-              if (stateSolutionService.savedMemento &&
-                stateHintsService.displayed.length === 1) {
+              if (StateSolutionService.savedMemento &&
+                StateHintsService.displayed.length === 1) {
                 openDeleteLastHintModal();
                 return;
               } else {
                 AlertsService.addInfoMessage('Deleting empty hint.');
-                stateHintsService.displayed.splice(currentActiveIndex, 1);
-                stateHintsService.saveDisplayedValue();
-                $scope.onSaveHints(stateHintsService.displayed);
+                StateHintsService.displayed.splice(currentActiveIndex, 1);
+                StateHintsService.saveDisplayedValue();
+                $scope.onSaveHints(StateHintsService.displayed);
               }
             }
             // If the current hint is being clicked on again, close it.
@@ -95,12 +95,12 @@ oppia.directive('stateHintsEditor', [
 
           // This returns false if the current interaction ID is null.
           $scope.isCurrentInteractionLinear = function() {
-            var interactionId = stateInteractionIdService.savedMemento;
+            var interactionId = StateInteractionIdService.savedMemento;
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
           };
 
           $scope.openAddHintModal = function() {
-            if ($scope.stateHintsService.displayed.length === 5) {
+            if ($scope.StateHintsService.displayed.length === 5) {
               return;
             }
             AlertsService.clearWarnings();
@@ -123,7 +123,7 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.addHintForm = {};
 
-                  $scope.hintIndex = stateHintsService.displayed.length + 1;
+                  $scope.hintIndex = StateHintsService.displayed.length + 1;
 
                   $scope.saveHint = function() {
                     var contentId = GenerateContentIdService.getNextId(
@@ -143,14 +143,14 @@ oppia.directive('stateHintsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              stateHintsService.displayed.push(result.hint);
-              stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              StateHintsService.displayed.push(result.hint);
+              StateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.contentId);
-              stateHintsService.saveDisplayedValue();
-              $scope.onSaveHints(stateHintsService.displayed);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateHintsService.saveDisplayedValue();
+              $scope.onSaveHints(StateHintsService.displayed);
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
               );
             });
           };
@@ -172,8 +172,8 @@ oppia.directive('stateHintsEditor', [
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
-              stateHintsService.saveDisplayedValue();
-              $scope.onSaveHints(stateHintsService.displayed);
+              StateHintsService.saveDisplayedValue();
+              $scope.onSaveHints(StateHintsService.displayed);
             }
           };
 
@@ -199,25 +199,25 @@ oppia.directive('stateHintsEditor', [
                 }
               ]
             }).result.then(function() {
-              var solutionContentId = stateSolutionService.displayed
+              var solutionContentId = StateSolutionService.displayed
                 .explanation.getContentId();
-              stateSolutionService.displayed = null;
-              stateSolutionService.saveDisplayedValue();
-              $scope.onSaveSolution(stateSolutionService.displayed);
+              StateSolutionService.displayed = null;
+              StateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution(StateSolutionService.displayed);
 
-              var hintContentId = stateHintsService.displayed[0]
+              var hintContentId = StateHintsService.displayed[0]
                 .hintContent.getContentId();
-              stateHintsService.displayed = [];
-              stateHintsService.saveDisplayedValue();
-              $scope.onSaveHints(stateHintsService.displayed);
+              StateHintsService.displayed = [];
+              StateHintsService.saveDisplayedValue();
+              $scope.onSaveHints(StateHintsService.displayed);
 
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .deleteContentId(solutionContentId);
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .deleteContentId(hintContentId);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.onSaveContentIdsToAudioTranslations(
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
               );
             });
           };
@@ -247,28 +247,28 @@ oppia.directive('stateHintsEditor', [
                 }
               ]
             }).result.then(function() {
-              if (stateSolutionService.savedMemento &&
-                stateHintsService.savedMemento.length === 1) {
+              if (StateSolutionService.savedMemento &&
+                StateHintsService.savedMemento.length === 1) {
                 openDeleteLastHintModal();
               } else {
-                var hintContentId = stateHintsService.displayed[index]
+                var hintContentId = StateHintsService.displayed[index]
                   .hintContent.getContentId();
-                stateHintsService.displayed.splice(index, 1);
-                stateHintsService.saveDisplayedValue();
-                $scope.onSaveHints(stateHintsService.displayed);
-                stateContentIdsToAudioTranslationsService.displayed
+                StateHintsService.displayed.splice(index, 1);
+                StateHintsService.saveDisplayedValue();
+                $scope.onSaveHints(StateHintsService.displayed);
+                StateContentIdsToAudioTranslationsService.displayed
                   .deleteContentId(hintContentId);
-                stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+                StateContentIdsToAudioTranslationsService.saveDisplayedValue();
                 $scope.onSaveContentIdsToAudioTranslations(
-                  stateContentIdsToAudioTranslationsService.displayed
+                  StateContentIdsToAudioTranslationsService.displayed
                 );
               }
             });
           };
 
           $scope.onSaveInlineHint = function() {
-            stateHintsService.saveDisplayedValue();
-            $scope.onSaveHints(stateHintsService.displayed);
+            StateHintsService.saveDisplayedValue();
+            $scope.onSaveHints(StateHintsService.displayed);
           };
         }
       ]

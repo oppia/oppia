@@ -39,20 +39,22 @@ oppia.factory('TrainingModalService', [
             '$scope', '$injector', '$uibModalInstance',
             'ExplorationStatesService', 'EditorStateService',
             'AnswerClassificationService', 'ContextService',
-            'stateInteractionIdService', 'AngularNameService',
+            'StateInteractionIdService', 'AngularNameService',
             'ResponsesService', 'TrainingDataService',
-            'stateContentIdsToAudioTranslationsService',
-            'AnswerGroupObjectFactory',
+            'StateContentIdsToAudioTranslationsService',
+            'AnswerGroupObjectFactory', 'GraphDataService',
+            'ExplorationWarningsService',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
                 AnswerClassificationService, ContextService,
-                stateInteractionIdService, AngularNameService,
+                StateInteractionIdService, AngularNameService,
                 ResponsesService, TrainingDataService,
-                stateContentIdsToAudioTranslationsService,
-                AnswerGroupObjectFactory) {
+                StateContentIdsToAudioTranslationsService,
+                AnswerGroupObjectFactory, GraphDataService,
+                ExplorationWarningsService) {
               $scope.trainingDataAnswer = '';
 
-              // See the training panel directive in StateEditor for an
+              // See the training panel directive in ExplorationEditorTab for an
               // explanation on the structure of this object.
               $scope.classification = {
                 answerGroupIndex: 0,
@@ -63,13 +65,22 @@ oppia.factory('TrainingModalService', [
               var _saveNewAnswerGroup = function(newAnswerGroup) {
                 var answerGroups = ResponsesService.getAnswerGroups();
                 var translationService = (
-                  stateContentIdsToAudioTranslationsService);
+                  StateContentIdsToAudioTranslationsService);
                 answerGroups.push(newAnswerGroup);
                 ResponsesService.save(
-                  answerGroups, ResponsesService.getDefaultOutcome());
-                ExplorationStatesService.saveInteractionAnswerGroups(
-                  EditorStateService.getActiveStateName(),
-                  angular.copy(answerGroups));
+                  answerGroups, ResponsesService.getDefaultOutcome(),
+                  function(newAnswerGroups, newDefaultOutcome) {
+                    ExplorationStatesService.saveInteractionAnswerGroups(
+                      EditorStateService.getActiveStateName(),
+                      angular.copy(newAnswerGroups));
+
+                    ExplorationStatesService.saveInteractionDefaultOutcome(
+                      EditorStateService.getActiveStateName(),
+                      angular.copy(newDefaultOutcome));
+
+                    GraphDataService.recompute();
+                    ExplorationWarningsService.updateWarnings();
+                  });
                 translationService.displayed.addContentId(
                   newAnswerGroup.outcome.feedback.getContentId());
                 translationService.saveDisplayedValue();
@@ -112,7 +123,7 @@ oppia.factory('TrainingModalService', [
                 var state = ExplorationStatesService.getState(currentStateName);
 
                 // Retrieve the interaction ID.
-                var interactionId = stateInteractionIdService.savedMemento;
+                var interactionId = StateInteractionIdService.savedMemento;
 
                 var rulesServiceName =
                   AngularNameService.getNameOfInteractionRulesService(
@@ -123,7 +134,7 @@ oppia.factory('TrainingModalService', [
 
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
-                    explorationId, currentStateName, state, unhandledAnswer,
+                    currentStateName, state.interaction, unhandledAnswer,
                     rulesService));
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;

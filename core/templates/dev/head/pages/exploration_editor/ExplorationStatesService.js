@@ -167,9 +167,8 @@ oppia.factory('ExplorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                ContextService.getExplorationId(),
                 stateName,
-                _states.getState(stateName),
+                _states.getState(stateName).interaction,
                 solution.correctAnswer,
                 $injector.get(
                   AngularNameService.getNameOfInteractionRulesService(
