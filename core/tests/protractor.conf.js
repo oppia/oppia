@@ -91,12 +91,12 @@ exports.config = {
       'protractor_desktop/extensions.js'
     ],
 
-    learner: [
-      'protractor/learnerFlow.js'
+    feedbackThreads: [
+      'protractor_desktop/learnerDashboardFeedbackThreads.js'
     ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
+    learner: [
+      'protractor/learnerFlow.js'
     ],
 
     library: [
