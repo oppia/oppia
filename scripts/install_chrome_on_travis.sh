@@ -14,7 +14,7 @@
 
 # This script should only be ran by Travis to install and provide a constant 
 # version of Chrome.
-# CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo settings
+# CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo settings.
 # It can be found under 'Environment Variables' header here: https://travis-ci.org/oppia/oppia/settings
 
 if [ ! -f $HOME/.cache/TravisChrome/$(basename $CHROME_SOURCE_URL) ]; then
