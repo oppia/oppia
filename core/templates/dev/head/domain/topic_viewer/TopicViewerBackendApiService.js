@@ -16,16 +16,16 @@
  * @fileoverview Service to get topic data.
  */
 oppia.constant(
-  'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_id>');
+  'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');
 
 oppia.factory('TopicViewerBackendApiService', [
   '$http', '$q', 'TOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, TOPIC_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var topicDataDict = null;
-    var _fetchTopicData = function(topicId, successCallback, errorCallback) {
+    var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
+          topic_name: topicName
         });
 
       $http.get(topicDataUrl).then(function(response) {
@@ -41,12 +41,12 @@ oppia.factory('TopicViewerBackendApiService', [
     };
 
     return {
-      fetchTopicData: function(topicId) {
+      fetchTopicData: function(topicName) {
         if (topicDataDict) {
           return topicDataDict;
         }
         return $q(function(resolve, reject) {
-          _fetchTopicData(topicId, resolve, reject);
+          _fetchTopicData(topicName, resolve, reject);
         });
       }
     };

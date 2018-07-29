@@ -18,10 +18,10 @@
 
 oppia.controller('TopicViewer', [
   '$scope', '$rootScope', '$window', 'UrlService', 'FATAL_ERROR_CODES',
-  'AlertsService', 'TopicViewerBackendApiService', 'UrlInterpolationService',
+  'AlertsService', 'TopicViewerBackendApiService',
   function(
       $scope, $rootScope, $window, UrlService, FATAL_ERROR_CODES,
-      AlertsService, TopicViewerBackendApiService, UrlInterpolationService) {
+      AlertsService, TopicViewerBackendApiService) {
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
@@ -30,13 +30,12 @@ oppia.controller('TopicViewer', [
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
     };
-    $scope.topicId = UrlService.getTopicIdFromLearnerUrl();
+    $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
 
     $rootScope.loadingMessage = 'Loading';
-    TopicViewerBackendApiService.fetchTopicData($scope.topicId).then(
+    TopicViewerBackendApiService.fetchTopicData($scope.topicName).then(
       function(response) {
         $scope.canonicalStoryList = response.canonical_story_dicts;
-        $scope.topicName = response.topic_name;
         $rootScope.loadingMessage = '';
       },
       function(errorResponse) {

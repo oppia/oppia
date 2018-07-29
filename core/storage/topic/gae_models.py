@@ -102,6 +102,18 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
 
+    @classmethod
+    def get_by_name(cls, topic_name):
+        """Gets TopicModel by topic_name.
+
+        Args:
+            topic_name: str. The name of the topic.
+
+        Returns:
+            TopicModel. The summary model of the question.
+        """
+        return TopicModel.query().filter(cls.name == topic_name).fetch()
+
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.

@@ -26,14 +26,14 @@ class TopicPageDataHandler(base.BaseHandler):
     viewer page.
     """
 
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_id):
+    # @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id)
+        topic = topic_services.get_topic_by_name(topic_name)
         canonical_stories = [
             story_services.get_story_by_id(
                 canonical_story_id) for canonical_story_id
@@ -66,13 +66,14 @@ class TopicPageDataHandler(base.BaseHandler):
 class TopicViewerPage(base.BaseHandler):
     """Manages to render topic viewer page."""
 
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_id):
+    # @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        topic = topic_services.get_topic_by_id(topic_id)
+
+        topic = topic_services.get_topic_by_name(topic_name)
 
         self.values.update({
             'topic_name': topic.name

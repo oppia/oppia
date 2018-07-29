@@ -55,12 +55,12 @@ oppia.factory('UrlService', ['$window', function($window) {
       }
       throw Error('Invalid topic id url');
     },
-    getTopicIdFromLearnerUrl: function() {
+    getTopicNameFromLearnerUrl: function() {
       var pathname = this.getPathname();
       if (pathname.match(/\/(story|topic)/g)) {
         return pathname.split('/')[2];
       }
-      throw Error('Invalid topic id url');
+      throw Error('Invalid topic name');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();

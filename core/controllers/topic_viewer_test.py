@@ -45,11 +45,11 @@ class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_name')
         self.topic.canonical_story_ids.append(self.story_id)
-        topic_services.save_new_topic(self.topic_id, self.topic)
+        topic_services.save_new_topic(self.admin, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'topic1_name')
-        topic_services.save_new_topic(self.topic_id_1, self.topic)
+        topic_services.save_new_topic(self.admin, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
