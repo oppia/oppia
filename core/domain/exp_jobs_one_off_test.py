@@ -24,6 +24,7 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -34,6 +35,10 @@ import utils
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
+
+
+def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+    return {'filename': filename, 'height': 490, 'width': 120}
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -621,7 +626,10 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
-        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+            updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
@@ -1060,19 +1068,22 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 updated_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+            exp_services.save_new_exploration(
+                self.albert_id, updated_exploration)
 
-        # Start validation job on updated exploration.
-        job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
+            # Start validation job on updated exploration.
+            job_id = (
+                exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
 
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
+            actual_output = (
+                exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                    job_id))
 
         # Test that validation passes after migration.
         self.assertEqual(actual_output, [])

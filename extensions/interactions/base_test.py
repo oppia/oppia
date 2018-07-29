@@ -23,6 +23,7 @@ import struct
 
 from core.domain import dependency_registry
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -479,9 +480,15 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
-        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
-        exploration = exp_services.get_exploration_by_id(
-            self._DEMO_EXPLORATION_ID)
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return {'filename': filename, 'height': 490, 'width': 120}
+
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+            exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+            exploration = exp_services.get_exploration_by_id(
+                self._DEMO_EXPLORATION_ID)
 
         all_interaction_ids = set(
             interaction_registry.Registry.get_all_interaction_ids())
