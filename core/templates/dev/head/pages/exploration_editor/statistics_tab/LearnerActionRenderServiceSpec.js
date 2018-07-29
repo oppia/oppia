@@ -58,7 +58,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName2'
               },
-              time_spent_in_state_secs: {
+              time_spent_state_in_msecs: {
                 value: 120
               }
             }, 1
@@ -105,13 +105,13 @@ describe('Learner Action Render Service', function() {
                 interaction_id: {
                   value: 'TextInput'
                 },
-                answer: {
+                submitted_answer: {
                   value: 'Hello'
                 },
                 feedback: {
                   value: 'Try again'
                 },
-                time_spent_in_state_secs: {
+                time_spent_state_in_msecs: {
                   value: 30
                 }
               }, 1
@@ -123,7 +123,7 @@ describe('Learner Action Render Service', function() {
                 state_name: {
                   value: 'stateName1'
                 },
-                time_spent_in_state_secs: {
+                time_spent_state_in_msecs: {
                   value: 120
                 }
               }, 1
@@ -141,13 +141,13 @@ describe('Learner Action Render Service', function() {
                 interaction_id: {
                   value: 'TextInput'
                 },
-                answer: {
+                submitted_answer: {
                   value: 'Hello'
                 },
                 feedback: {
                   value: 'Try again'
                 },
-                time_spent_in_state_secs: {
+                time_spent_state_in_msecs: {
                   value: 30
                 }
               }, 1
@@ -165,13 +165,13 @@ describe('Learner Action Render Service', function() {
                 interaction_id: {
                   value: 'TextInput'
                 },
-                answer: {
+                submitted_answer: {
                   value: 'Hello'
                 },
                 feedback: {
                   value: 'Try again'
                 },
-                time_spent_in_state_secs: {
+                time_spent_state_in_msecs: {
                   value: 30
                 }
               }, 1
@@ -197,13 +197,13 @@ describe('Learner Action Render Service', function() {
                 interaction_id: {
                   value: 'TextInput'
                 },
-                answer: {
+                submitted_answer: {
                   value: 'Hello'
                 },
                 feedback: {
                   value: 'Try again'
                 },
-                time_spent_in_state_secs: {
+                time_spent_state_in_msecs: {
                   value: 30
                 }
               }, 1
@@ -251,7 +251,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName1'
               },
-              time_spent_in_state_secs: {
+              time_spent_state_in_msecs: {
                 value: 120
               }
             }, 1

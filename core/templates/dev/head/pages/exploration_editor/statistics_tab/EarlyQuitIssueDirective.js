@@ -73,6 +73,7 @@ oppia.directive('earlyQuitIssueDirective', [
                     $scope.playthrough = playthrough;
                     $scope.playthroughIndex = playthroughIndex;
 
+                    console.log($scope.playthrough.actions);
                     $scope.displayBlocks =
                       LearnerActionRenderService.getDisplayBlocks(
                         playthrough.actions);
@@ -85,6 +86,7 @@ oppia.directive('earlyQuitIssueDirective', [
                     }
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
+                    console.log($scope.maxHidden);
 
                     $scope.getDisplayBlockIndex = function(displayBlock) {
                       return $scope.displayBlocks.indexOf(displayBlock);
@@ -97,15 +99,15 @@ oppia.directive('earlyQuitIssueDirective', [
                     };
 
                     $scope.showRemainingActions = function(pIdx) {
-                      if (maxHidden === 1) {
+                      if ($scope.maxHidden === 1) {
                         document.getElementById(
                           'remainingActions' + pIdx.toString() +
-                          maxHidden.toString()).style.display = 'block';
+                          $scope.maxHidden.toString()).style.display = 'block';
                         document.getElementById('arrowDiv').style.display =
                           'none';
                       } else {
                         var currentShown = 0, i;
-                        for (i = maxHidden; i > 0; i--) {
+                        for (i = $scope.maxHidden; i > 0; i--) {
                           if (document.getElementById(
                             'remainingActions' + pIdx.toString() +
                             i.toString()).style.display === 'block') {
@@ -116,7 +118,7 @@ oppia.directive('earlyQuitIssueDirective', [
                         if (currentShown === 0) {
                           document.getElementById(
                             'remainingActions' + pIdx.toString() +
-                            maxHidden.toString()).style.display = 'block';
+                            $scope.maxHidden.toString()).style.display = 'block';
                         } else if (currentShown === 2) {
                           document.getElementById(
                             'remainingActions' + pIdx.toString() +

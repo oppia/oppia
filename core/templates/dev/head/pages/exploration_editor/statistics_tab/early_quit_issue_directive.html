@@ -1,22 +1,22 @@
-<div class="row">
-  <div class="col-md-3 bor-btm bor-right text-center pt-2 pb-2 bg-clr text-white">
+<div class="row row-eq-height bor-left issue-dir">
+  <div class="col-md-3 bor-btm bor-right text-center pt2 pb2 bg-clr text-white">
     <div style="font-size: 1.3em;">
-      Issue <[currentIssueIndex]>
+      Issue <[currentIssueIndex + 1]>
     </div>
   </div>
-  <div class="col-md-9 bor-left text-center d-flex justify-content-center bor-btm pt-2 pb-2">
+  <div class="col-md-9 bor-left text-center d-flex justify-content-center bor-btm pt2 pb2">
     <[issueStatement]>
   </div>
 </div>
-<div class="row pt-4">
+<div class="row pt4">
   <p class="suggestion_header">To resolve this issue, the suggested approach is: </p>
-  <div class="pt-2">
+  <div class="pt2">
     <ul class="tips">
       <li ng-repeat="suggestion in suggestions" ng-bind-html="suggestion"></li>
     </ul>
   </div>
 </div>
-<div class="row pt-2">
+<div class="row pt2">
   <p class="suggestion_header">Sample Playthroughs: </p>
 </div>
 <div class="text-center">
@@ -24,8 +24,8 @@
     <div ng-repeat="playthroughId in playthroughIds" class="col-md-4" style="margin-left: -40px;">
       <div class="hexagon">
         <div class="text">
-          <button type="button" ng-click="showPlaythrough(playthroughId)" class="btn state_1 modal-btn ft-14 playthrough_content" style="padding-top: 20px; padding-right: 5px;">
-            View <br> Playthrough <[getPlaythroughIndex(playthroughId)]>
+          <button type="button" ng-click="showPlaythrough(playthroughId)" class="btn state_1 modal-btn playthrough_content" style="padding-top: 20px; padding-right: 5px;">
+            View <br> Playthrough <[getPlaythroughIndex(playthroughId) + 1]>
           </button>
         </div>
       </div>

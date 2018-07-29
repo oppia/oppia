@@ -3754,6 +3754,23 @@ span.learner-action {
   margin-bottom: 2em;
 }
 
+.text{
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    color: white;
+}
+
+.modal-btn {
+    background: transparent;
+}
+
+.btn {
+    border-radius: 0;
+}
+
 /* Values below were experimentally generated using 'http://csshexagon.com' */
 .hexagon {
   transform: scale(0.5);
@@ -3812,6 +3829,10 @@ span.learner-action {
   border-right: 1px solid #b2b2bb;
 }
 
+.bor-left {
+  border-left: 1px solid #b2b2bb;
+}
+
 .border-rad {
   border-radius: 15px;
 }
@@ -3834,7 +3855,7 @@ span.learner-action {
 }
 
 .playthrough_content{
-  font-size: 25px;
+  font-size: 1.3em;
   color: white;
 }
 
@@ -3879,4 +3900,36 @@ span.learner-action {
 .state_link {
   text-decoration: underline;
   color: blue;
+}
+
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+
+.text-white {
+  color: white;
+}
+
+.pt2 {
+  padding-top: .5rem;
+}
+
+.pt4 {
+  padding-top: 1.5rem;
+}
+
+.pb2 {
+  padding-bottom: .5rem;
+}
+
+.txt-center {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.issue-dir {
+  font-family: montserrat;
 }

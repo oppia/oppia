@@ -89,7 +89,8 @@ oppia.factory('LearnerActionRenderService', [
         if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
           continue;
         }
-        var answer = finalBlock[i].actionCustomizationArgs.answer.value;
+        var answer =
+          finalBlock[i].actionCustomizationArgs.submitted_answer.value;
         var feedback = finalBlock[i].actionCustomizationArgs.feedback.value;
         tableHTML +=
           '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
@@ -106,18 +107,18 @@ oppia.factory('LearnerActionRenderService', [
           custArgs.state_name.value, actionIndex);
       } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
         return renderExplorationQuitActionHTML(
-          custArgs.state_name.value, custArgs.time_spent_in_state_secs.value,
+          custArgs.state_name.value, custArgs.time_spent_state_in_msecs.value,
           actionIndex);
       } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
         interactionId = custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,
-            custArgs.time_spent_in_state_secs.value, actionIndex);
+            custArgs.time_spent_state_in_msecs.value, actionIndex);
         } else {
           return renderAnswerSubmitActionHTML(
-            custArgs.answer.value, custArgs.dest_state_name.value,
-            custArgs.time_spent_in_state_secs.value, custArgs.state_name.value,
+            custArgs.submitted_answer.value, custArgs.dest_state_name.value,
+            custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
             actionIndex);
         }
       }
@@ -128,8 +129,8 @@ oppia.factory('LearnerActionRenderService', [
     };
 
     var groupedDisplayBlocks = {
-      displayBlocks: [],
-      localBlock: [],
+      displayBlocks: null,
+      localBlock: null,
       latestStateName: null,
       handleChangeInState: function(action) {
         this.latestStateName = action.actionCustomizationArgs.state_name.value;
@@ -175,6 +176,7 @@ oppia.factory('LearnerActionRenderService', [
       },
       getDisplayBlocks: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
+        groupedDisplayBlocks.displayBlocks = [];
         groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
         groupedDisplayBlocks.latestStateName =
           learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
