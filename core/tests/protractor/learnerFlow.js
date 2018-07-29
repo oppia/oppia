@@ -90,6 +90,34 @@ describe('Learner dashboard functionality', function() {
     workflow.publishExploration();
   };
 
+  var checkIncompleteExplorationSection = function(explorationTitle) {
+    learnerDashboardPage.navigateToInCompleteSection();
+    learnerDashboardPage.navigateToIncompleteExplorationsSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  var checkCompleteExplorationSection = function(explorationTitle) {
+    learnerDashboardPage.navigateToCompletedSection();
+    learnerDashboardPage.navigateToCompletedExplorationsSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  var checkIncompleteCollectionSection = function(collectionTitle) {
+    learnerDashboardPage.navigateToInCompleteSection();
+    learnerDashboardPage.navigateToIncompleteCollectionsSection();
+    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
+  };
+
+  var checkCompleteCollectionSection = function(collectionTitle) {
+    learnerDashboardPage.navigateToCompletedSection();
+    learnerDashboardPage.navigateToCompletedCollectionsSection();
+    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
+  };
+
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -143,17 +171,11 @@ describe('Learner dashboard functionality', function() {
 
       // Learner Dashboard should display 'Dummy Exploration'
       // as incomplete.
-      learnerDashboardPage.navigateToInCompleteSection();
-      learnerDashboardPage.navigateToIncompleteExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Dummy Exploration');
+      checkIncompleteExplorationSection('Dummy Exploration');
 
       // Learner Dashboard should display 'Test Exploration'
       // exploration as complete.
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Test Exploration');
+      checkCompleteExplorationSection('Test Exploration');
 
       // Now complete the 'Dummmy Exploration'.
       browser.get('/explore/24');
@@ -164,12 +186,8 @@ describe('Learner dashboard functionality', function() {
 
       // Both should be added to the completed section.
       learnerDashboardPage.get();
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Dummy Exploration');
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Test Exploration');
+      checkCompleteExplorationSection('Dummy Exploration');
+      checkCompleteExplorationSection('Test Exploration');
     } else {
       users.createAndLoginUser('originalCreator@learnerDashboard.com',
         'originalCreator');
@@ -206,15 +224,11 @@ describe('Learner dashboard functionality', function() {
       // Wait for /learner_dashboard to load.
       waitFor.pageToFullyLoad();
 
-      learnerDashboardPage.navigateToInCompleteSection();
-      learnerDashboardPage.navigateToIncompleteExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'About Oppia');
+      // Learner Dashboard should display 'About Oppia'
+      // exploration as incomplete.
+      checkIncompleteExplorationSection('About Oppia');
       // Learner Dashboard should display 'Dummy Exploration' as complete.
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Dummy Exploration');
+      checkCompleteExplorationSection('Dummy Exploration');
 
       // Now play exploration 'About Oppia' completely.
       libraryPage.get();
@@ -228,12 +242,8 @@ describe('Learner dashboard functionality', function() {
 
       // Both should be added to the completed section.
       learnerDashboardPage.get();
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedExplorationsSection();
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'About Oppia');
-      learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Dummy Exploration');
+      checkCompleteExplorationSection('About Oppia');
+      checkCompleteExplorationSection('Dummy Exploration');
       users.logout();
 
       // Login as Admin and delete exploration 'About Oppia'.
@@ -279,11 +289,8 @@ describe('Learner dashboard functionality', function() {
       waitFor.pageToFullyLoad();
 
       // Learner Dashboard should display
-      // 'Introductions to Collections in Oppia' as incomplete.
-      learnerDashboardPage.navigateToInCompleteSection();
-      learnerDashboardPage.navigateToIncompleteCollectionsSection();
-      learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-        'Test Collection');
+      // 'Test Collection' as incomplete.
+      checkIncompleteCollectionSection('Test Collection');
 
       // Complete all remaining explorations of the collection.
       // The first exploration is already completed.
@@ -297,12 +304,9 @@ describe('Learner dashboard functionality', function() {
       clickContinueButton();
 
       // Learner Dashboard should display
-      // 'Introductions to Collections in Oppia' as complete.
+      // 'Test Collection' as complete.
       learnerDashboardPage.get();
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedCollectionsSection();
-      learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-        'Test Collection');
+      checkCompleteCollectionSection('Test Collection');
     } else {
       users.createAndLoginUser('explorationCreator@learnerDashboard.com',
         'explorationCreator');
@@ -357,10 +361,7 @@ describe('Learner dashboard functionality', function() {
       waitFor.pageToFullyLoad();
 
       // Learner Dashboard should display 'Test Collection' as incomplete.
-      learnerDashboardPage.navigateToInCompleteSection();
-      learnerDashboardPage.navigateToIncompleteCollectionsSection();
-      learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-        'Test Collection');
+      checkIncompleteCollectionSection('Test Collection');
 
       libraryPage.get();
       libraryPage.findCollection('Test Collection');
@@ -381,10 +382,7 @@ describe('Learner dashboard functionality', function() {
 
       // The collection should be found in the 'Completed' section.
       learnerDashboardPage.get();
-      learnerDashboardPage.navigateToCompletedSection();
-      learnerDashboardPage.navigateToCompletedCollectionsSection();
-      learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-        'Test Collection');
+      checkCompleteCollectionSection('Test Collection');
       users.logout();
 
       // Add exploration 'Collection Exploration' to 'Test Collection'
@@ -402,9 +400,7 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       users.login('learner4@learnerDashboard.com');
       learnerDashboardPage.get();
-      learnerDashboardPage.navigateToIncompleteCollectionsSection();
-      learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-        'Test Collection');
+      checkIncompleteCollectionSection('Test Collection');
     }
   });
 
