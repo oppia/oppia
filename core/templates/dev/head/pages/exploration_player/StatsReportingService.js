@@ -138,7 +138,7 @@ oppia.factory('StatsReportingService', [
       },
       // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {
-        if(explorationStarted) {
+        if (explorationStarted) {
           return;
         }
         aggregatedStats.num_starts += 1;
@@ -177,7 +177,7 @@ oppia.factory('StatsReportingService', [
         explorationStarted = true;
       },
       recordExplorationActuallyStarted: function(stateName) {
-        if(explorationActuallyStarted) {
+        if (explorationActuallyStarted) {
           return;
         }
         aggregatedStats.num_actual_starts += 1;

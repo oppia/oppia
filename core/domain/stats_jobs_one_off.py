@@ -410,20 +410,20 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         feconf.EVENT_TYPE_START_EXPLORATION):
                     if event_dict['session_id'] not in exp_started_session_ids:
                         exp_stats_dict['num_starts_v2'] += 1
-                    exp_started_session_ids.add(event_dict['session_id'])
+                        exp_started_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
                     if event_dict['session_id'] not in (
                             exp_actually_started_session_ids):
                         exp_stats_dict['num_actual_starts_v2'] += 1
-                    exp_actually_started_session_ids.add(
-                        event_dict['session_id'])
+                        exp_actually_started_session_ids.add(
+                            event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_COMPLETE_EXPLORATION):
                     if event_dict['session_id'] not in (
                             exp_completed_session_ids):
                         exp_stats_dict['num_completions_v2'] += 1
-                    exp_completed_session_ids.add(event_dict['session_id'])
+                        exp_completed_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ANSWER_SUBMITTED):
                     state_stats['total_answers_count_v2'] += 1
