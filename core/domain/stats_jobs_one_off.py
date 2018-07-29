@@ -92,6 +92,13 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_model.deleted:
             return
 
+        RELEVANT_COMMIT_CMDS = [
+            exp_domain.CMD_ADD_STATE,
+            exp_domain.CMD_RENAME_STATE,
+            exp_domain.CMD_DELETE_STATE,
+            exp_models.ExplorationModel.CMD_REVERT_COMMIT
+        ]
+
         # Find the latest version number.
         exploration = exp_services.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
@@ -101,9 +108,13 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_instances = exp_models.ExplorationModel.get_multi_versions(
             exploration.id, versions)
 
-        old_exp_stats_instances = (
+        old_exp_stats_models = (
             stats_models.ExplorationStatsModel.get_multi_versions(
                 exploration.id, versions))
+        old_exp_stats_instances = [(
+            stats_services.get_exploration_stats_from_model(exp_stats_model)
+            if exp_stats_model else None
+        ) for exp_stats_model in old_exp_stats_models]
 
         # Get list of snapshot models for each version of the exploration.
         snapshots_by_version = (
@@ -124,10 +135,15 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exp_version, state_stats_mapping))
                 if exp_version > 1:
                     prev_exp_stats = exp_stats_instances[exp_version - 2]
-                    change_list = snapshots_by_version[exp_version - 1][
+                    change_dicts = snapshots_by_version[exp_version - 1][
                         'commit_cmds']
-                    exp_versions_diff = (
-                        exp_domain.ExplorationVersionsDiff(change_list))
+                    change_list = [
+                        exp_domain.ExplorationChange(change_dict)
+                        for change_dict in change_dicts
+                        if change_dict['cmd'] in RELEVANT_COMMIT_CMDS]
+                    exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                        change_list)
+
                     # Copy v1 stats.
                     exp_stats_default.num_starts_v1 = (
                         prev_exp_stats.num_starts_v1)
@@ -169,12 +185,12 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exp_stats_instances.append(exp_stats)
         yield(
-            exploration.id,
-            'ExplorationStatsModel for missing versions regenerated.')
+            'ExplorationStatsModel for missing versions regenerated.',
+            exploration.id)
 
     @staticmethod
-    def reduce(exp_id, values):
-        yield "%s: %s" % (exp_id, values)
+    def reduce(message, values):
+        yield (message, values)
 
 
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
