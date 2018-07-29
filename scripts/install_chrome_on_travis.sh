@@ -14,12 +14,19 @@
 
 # This script should only be ran by Travis to install and provide a constant 
 # version of Chrome for Protractor.
+# The CHROME_SOURCE_URL is an environment variable set in the repository settings	
+# of Travis. It can be found under 'Environment Variables' header here:	
+# https://travis-ci.org/oppia/oppia/settings
 
-export CHROME_SOURCE_URL=https://raw.githubusercontent.com/webnicer/chrome-downloads/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
-# Download Chrome if not already cached.
-if [ ! -f $HOME/.cache/TravisChrome/google-chrome-stable_67.0.3396.99-1_amd64.deb ]; then
+if [ ! -f $HOME/.cache/TravisChrome/$(basename $CHROME_SOURCE_URL) ]; then
+  # Caching Chrome Debian package after download to prevent connection problem.
   mkdir -p $HOME/.cache/TravisChrome/
-  curl -o $HOME/.cache/TravisChrome/google-chrome-stable_67.0.3396.99-1_amd64.deb $CHROME_SOURCE_URL
+  cd $HOME/.cache/TravisChrome/
+  # --remote-name : Write output to a file named as the remote file.
+  # --location : Follow re-directs.
+  curl --remote-name --location $CHROME_SOURCE_URL
+  cd -
 fi
-echo Installing google-chrome-stable_67.0.3396.99-1_amd64
-sudo dpkg -i $HOME/.cache/TravisChrome/google-chrome-stable_67.0.3396.99-1_amd64.deb
+
+echo Installing $HOME/.cache/TravisChrome/$(basename $CHROME_SOURCE_URL)
+sudo dpkg -i $HOME/.cache/TravisChrome/$(basename $CHROME_SOURCE_URL)
