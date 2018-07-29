@@ -94,12 +94,21 @@ fi
 
 # Launch a browser window.
 if [ ${OS} == "Linux" ]; then
-  echo ""
-  echo "  INFORMATION"
-  echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  default browser window pointing to this server."
-  echo ""
-  (sleep 5; xdg-open http://localhost:8181/ )&
+  detect_virt="$(ls -1 /dev/disk/by-id/)"
+  if [[ $detect_virt = *"VBOX"* ]]; then
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server. You can access this server"
+    echo "  by navigating to localhost:8181 in a browser window."
+    echo ""
+  else
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server at localhost:8181. Opening a"
+    echo "  default browser window pointing to this server."
+    echo ""
+    (sleep 5; xdg-open http://localhost:8181/ )&
+  fi
 elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
