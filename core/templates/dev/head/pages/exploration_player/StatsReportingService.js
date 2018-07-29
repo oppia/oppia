@@ -112,6 +112,9 @@ oppia.factory('StatsReportingService', [
     // when a learner starts an exploration, when a learner completes an
     // exploration and also every five minutes.
     var postStatsToBackend = function() {
+      if (explorationIsComplete) {
+        return;
+      }
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         aggregated_stats: aggregatedStats,
         exp_version: explorationVersion
