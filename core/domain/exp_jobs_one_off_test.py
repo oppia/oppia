@@ -1077,7 +1077,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             # Start validation job on updated exploration.
             job_id = (
                 exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
                 job_id)
             self.process_and_flush_pending_tasks()
 
