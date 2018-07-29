@@ -34,26 +34,26 @@ oppia.factory('LearnerActionRenderService', [
       ACTION_TYPE_EXPLORATION_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
-        '<span class="learner-action">' + actionIndex + '. Started ' +
-        'exploration at card "' + stateName + '".</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Started exploration at card "' + stateName + '".</span>';
       return htmlString;
     };
 
     var renderExplorationQuitActionHTML = function(
         stateName, timeSpentInStateSecs, actionIndex) {
       var htmlString =
-        '<span class="learner-action">' + actionIndex + '. Left the ' +
-        'exploration after spending a ' + 'total of ' + timeSpentInStateSecs +
-        ' seconds on card "' + stateName + '".</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Left the exploration after spending a ' + 'total of ' +
+        timeSpentInStateSecs + ' seconds on card "' + stateName + '".</span>';
       return htmlString;
     };
 
     var renderContinueButtonSubmitActionHTML = function(
         stateName, timeSpentInStateSecs, actionIndex) {
       var htmlString =
-        '<span class="learner-action">' + actionIndex + '. Pressed "Continue"' +
-        ' to move to card "' + stateName + '" after ' + timeSpentInStateSecs +
-        ' seconds.</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Pressed "Continue" to move to card "' + stateName + '" after ' +
+        timeSpentInStateSecs + ' seconds.</span>';
       return htmlString;
     };
 
@@ -63,12 +63,12 @@ oppia.factory('LearnerActionRenderService', [
       var htmlString;
       if (currentStateName === destStateName) {
         htmlString =
-          '<span class="learner-action">' + actionIndex +
+          '<span class="oppia-issues-learner-action">' + actionIndex +
           '. Submitted answer "' + answer + '" in card "' + currentStateName +
           '".</span>';
       } else {
         htmlString =
-          '<span class="learner-action">' + actionIndex +
+          '<span class="oppia-issues-learner-action">' + actionIndex +
           '. Submitted answer "' + answer + '" and moved to card "' +
           destStateName + '" after spending ' + timeSpentInStateSecs +
           ' seconds on card "' + currentStateName + '".</span>';
@@ -83,7 +83,7 @@ oppia.factory('LearnerActionRenderService', [
         finalBlock[index].actionCustomizationArgs.state_name.value;
 
       var tableHTML =
-        '<table class="learner-actions-table"><tr><th>Answer</th>' +
+        '<table class="oppia-issues-learner-action-table"><tr><th>Answer</th>' +
         '<th>Feedback</th></tr>';
       for (var i = 0; i < index; i++) {
         if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
@@ -159,7 +159,8 @@ oppia.factory('LearnerActionRenderService', [
           htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
         htmlString +=
-          '<span class="learner-action">' + (actionStartIndex + i).toString() +
+          '<span class="oppia-issues-learner-action">' +
+          (actionStartIndex + i).toString() +
           '. Submitted the following answers in card "' + stateName +
           '"</span>';
         htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);

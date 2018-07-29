@@ -43,8 +43,9 @@ oppia.factory('IssuesService', [
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [
         $sce.trustAsHtml(
-          'Review the cards up to and including <span class="state_link">' +
-          '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
+          'Review the cards up to and including <span class=' +
+          '"oppia-issues-state-link">"' +
+          issue.issueCustomizationArgs.state_name.value + '"</span> for' +
           ' errors, ambiguities or insufficient motivation'
         )];
       return suggestions;

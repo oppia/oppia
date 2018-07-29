@@ -1,21 +1,21 @@
-<div class="modal-header d-flex text-center issue-dir">
+<div class="modal-header d-flex text-center oppia-issues-issue-dir">
   <h3 class="modal-title">Sample Playthrough</h3>
 </div>
 
 <div class="modal-body" style="padding-bottom: 8rem; margin-left:0.5rem; margin-right: 0.5rem;">
-  <div ng-if="maxHidden != 0" class="row pt2">
-    <button type="button" name="button" ng-click="showRemainingActions(playthroughIndex)" class="btn-arrow" id="arrowDiv" style="display: block;"><i class="fa fa-arrow-up"></i></button>
+  <div ng-if="maxHidden != 0" class="row oppia-pt2">
+    <button type="button" name="button" ng-click="showRemainingActions(playthroughIndex)" class="oppia-issues-btn-arrow" id="arrowDiv" style="display: block;"><i class="fa fa-arrow-up"></i></button>
   </div>
-  <div class="row pt2" style="margin-top: 0.5rem;">
+  <div class="row oppia-pt2" style="margin-top: 0.5rem;">
     <div ng-repeat="displayBlock in displayBlocks" style="text-align: left; margin-left: 0.2rem;">
       <div ng-if="getDisplayBlockIndex(displayBlock) != 0" ng-bind-html="renderBlockHtml(displayBlock, (getDisplayBlockIndex(displayBlock) + 1))" id="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" style="display: none;"></div>
     </div>
-    <div ng-if="getDisplayBlockIndex(displayBlocks[0]) == 0" ng-bind-html="renderBlockHtml(displayBlocks[0], 1)" class="highlight"></div>
+    <div ng-if="getDisplayBlockIndex(displayBlocks[0]) == 0" ng-bind-html="renderBlockHtml(displayBlocks[0], 1)" class="oppia-issues-highlight"></div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="bg-clr text-white ft-14 btn btn_resolve" ng-click="cancel()">
+  <button type="button" class="oppia-issues-bg-clr oppia-issues-text-white oppia-ft-14 btn oppia-issues-btn-resolve" ng-click="cancel()">
     Return to Playthroughs
   </button>
 </div>

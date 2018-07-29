@@ -283,19 +283,19 @@ describe('Learner Action Render Service', function() {
           displayBlocks[0], 1);
 
         expect(this.sce.getTrustedHtml(finalBlockHTML)).toEqual(
-          '<span class="learner-action">1. Started exploration at card ' +
-          '"stateName1".</span>' +
-          '<span class="learner-action">2. Submitted the following answers in' +
-          ' card "stateName1"</span>' +
-          '<table class="learner-actions-table"><tr><th>Answer</th>' +
-          '<th>Feedback</th></tr>' +
+          '<span class="oppia-issues-learner-action">1. Started exploration ' +
+          'at card "stateName1".</span>' +
+          '<span class="oppia-issues-learner-action">2. Submitted the ' +
+          'following answers in card "stateName1"</span>' +
+          '<table class="oppia-issues-learner-action-table"><tr><th>Answer' +
+          '</th><th>Feedback</th></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr></table>' +
-          '<span class="learner-action">3. Left the exploration after ' +
-          'spending a total of 120 seconds on card "stateName1".</span>'
+          '<span class="oppia-issues-learner-action">3. Left the exploration ' +
+          'after spending a total of 120 seconds on card "stateName1".</span>'
         );
       });
 
@@ -315,14 +315,14 @@ describe('Learner Action Render Service', function() {
       var blockHTML = this.lars.renderDisplayBlockHTML(displayBlocks[0], 1);
 
       expect(this.sce.getTrustedHtml(blockHTML)).toEqual(
-        '<span class="learner-action">1. Started exploration at card ' +
-        '"stateName1".</span>' +
-        '<span class="learner-action">2. Pressed "Continue" to move to card ' +
-        '"stateName2" after 30 seconds.</span>' +
-        '<span class="learner-action">3. Submitted answer "Hello" in card ' +
-        '"stateName2".</span>' +
-        '<span class="learner-action">4. Left the exploration after spending ' +
-        'a total of 120 seconds on card "stateName2".</span>'
+        '<span class="oppia-issues-learner-action">1. Started exploration at ' +
+        'card "stateName1".</span>' +
+        '<span class="oppia-issues-learner-action">2. Pressed "Continue" to ' +
+        'move to card "stateName2" after 30 seconds.</span>' +
+        '<span class="oppia-issues-learner-action">3. Submitted answer ' +
+        '"Hello" in card "stateName2".</span>' +
+        '<span class="oppia-issues-learner-action">4. Left the exploration ' +
+        'after spending a total of 120 seconds on card "stateName2".</span>'
       );
     });
   });
