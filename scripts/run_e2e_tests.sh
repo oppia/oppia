@@ -86,7 +86,7 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
-if [ "$TRAVIS" == true ]; then
+if [ "$TRAVIS" == 'true' ]; then
   source $(dirname $0)/install_chrome_on_travis.sh || exit 1
 fi
 
