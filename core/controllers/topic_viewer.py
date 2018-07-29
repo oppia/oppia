@@ -26,7 +26,7 @@ class TopicPageDataHandler(base.BaseHandler):
     viewer page.
     """
 
-    # @acl_decorators.can_access_topic_viewer_page
+    @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests."""
 
@@ -66,7 +66,7 @@ class TopicPageDataHandler(base.BaseHandler):
 class TopicViewerPage(base.BaseHandler):
     """Manages to render topic viewer page."""
 
-    # @acl_decorators.can_access_topic_viewer_page
+    @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests."""
 

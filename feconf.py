@@ -364,7 +364,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = True
+ENABLE_NEW_STRUCTURES = False
 
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
