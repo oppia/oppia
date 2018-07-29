@@ -79,6 +79,9 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
+    // When running the tests on browserstack, all suites should be added
+    // in 'full' individually. This is to parallelize the suites on
+    // browserstack.
     full: [
       'protractor/accessibility.js',
       'protractor/learnerFlow.js',

@@ -57,6 +57,9 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
+    // The tests on Travis are run individually to parallelize
+    // them. Therefore, we mention the complete directory
+    // in 'full'.
     full: [
       'protractor/*.js',
       'protractor_desktop/*.js'
