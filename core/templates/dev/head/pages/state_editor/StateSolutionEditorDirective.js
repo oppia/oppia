@@ -38,6 +38,7 @@ oppia.directive('stateSolutionEditor', [
         'ContextService', 'ExplorationWarningsService',
         'EditabilityService', 'StateContentIdsToAudioTranslationsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID',
+        'StateCustomizationArgsService',
         function(
             $scope, $rootScope, $uibModal, $filter, EditorStateService,
             AlertsService, INTERACTION_SPECS, StateSolutionService,
@@ -46,7 +47,8 @@ oppia.directive('stateSolutionEditor', [
             StateHintsService, UrlInterpolationService, SolutionObjectFactory,
             ContextService, ExplorationWarningsService,
             EditabilityService, StateContentIdsToAudioTranslationsService,
-            INFO_MESSAGE_SOLUTION_IS_INVALID) {
+            INFO_MESSAGE_SOLUTION_IS_INVALID,
+            StateCustomizationArgsService) {
           $scope.EditabilityService = EditabilityService;
           $scope.correctAnswer = null;
           $scope.correctAnswerEditorHtml = '';
@@ -67,7 +69,7 @@ oppia.directive('stateSolutionEditor', [
           $scope.correctAnswerEditorHtml = (
             ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
-              $scope.getInteractionCustomizationArgsMemento(),
+              StateCustomizationArgsService.savedMemento,
               false,
               $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 

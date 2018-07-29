@@ -41,6 +41,24 @@ oppia.factory('EditorStateService', [
       setInteraction: function(newInteraction) {
         interaction = newInteraction;
       },
+      setInteractionId: function(newId) {
+        interaction.setId(newId);
+      },
+      setInteractionAnswerGroups: function(newAnswerGroups) {
+        interaction.setAnswerGroups(newAnswerGroups);
+      },
+      setInteractionDefaultOutcome: function(newOutcome) {
+        interaction.setDefaultOutcome(newOutcome);
+      },
+      setInteractionCustomizationArgs: function(newArgs) {
+        interaction.setCustomizationArgs(newArgs);
+      },
+      setInteractionSolution: function(solution) {
+        interaction.setSolution(solution);
+      },
+      setInteractionHints: function(hints) {
+        interaction.setHints(hints);
+      },
       getInteraction: function() {
         return interaction;
       },

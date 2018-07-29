@@ -149,12 +149,15 @@ oppia.controller('ExplorationEditorTab', [
     $scope.saveInteractionId = function(displayedValue) {
       ExplorationStatesService.saveInteractionId(
         $scope.stateName, angular.copy(displayedValue));
+      EditorStateService.setInteractionId(angular.copy(displayedValue));
     };
 
     $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
       ExplorationStatesService.saveInteractionAnswerGroups(
         $scope.stateName, angular.copy(newAnswerGroups));
 
+      EditorStateService.setInteractionAnswerGroups(
+        angular.copy(newAnswerGroups));
       $scope.recomputeGraph();
     };
 
@@ -162,22 +165,33 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveInteractionDefaultOutcome(
         $scope.stateName, angular.copy(newOutcome));
 
+      EditorStateService.setInteractionDefaultOutcome(
+        angular.copy(newOutcome));
       $scope.recomputeGraph();
     };
 
     $scope.saveInteractionCustomizationArgs = function(displayedValue) {
       ExplorationStatesService.saveInteractionCustomizationArgs(
         $scope.stateName, angular.copy(displayedValue));
+
+      EditorStateService.setInteractionCustomizationArgs(
+        angular.copy(displayedValue));
     };
 
     $scope.saveSolution = function(displayedValue) {
       ExplorationStatesService.saveSolution(
         $scope.stateName, angular.copy(displayedValue));
+
+      EditorStateService.setInteractionSolution(
+        angular.copy(displayedValue));
     };
 
     $scope.saveHints = function(displayedValue) {
       ExplorationStatesService.saveHints(
         $scope.stateName, angular.copy(displayedValue));
+
+      EditorStateService.setInteractionHints(
+        angular.copy(displayedValue));
     };
 
     $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
