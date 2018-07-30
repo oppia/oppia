@@ -49,7 +49,7 @@ oppia.factory('ResponsesService', [
     var _answerChoices = null;
 
     var _verifySolution = function() {
-      // To check if the solution is valid once a rule has been changed or
+      // This checks if the solution is valid once a rule has been changed or
       // added.
       var currentInteractionId = StateInteractionIdService.savedMemento;
       var interactionCanHaveSolution = (

@@ -21,10 +21,8 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '=',
-        getInteractionCustomizationArgsMemento:
-          '&interactionCustomizationArgsMemento',
+        onSaveSolution: '=',
         refreshWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -100,8 +98,6 @@ oppia.directive('stateSolutionEditor', [
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
             $scope.inlineSolutionEditorIsActive = false;
-            var interactionCustomizationArgsMemento =
-              $scope.getInteractionCustomizationArgsMemento();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -109,16 +105,18 @@ oppia.directive('stateSolutionEditor', [
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
+                'StateCustomizationArgsService',
                 'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
                 'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
                     $scope, $uibModalInstance, StateSolutionService,
+                    StateCustomizationArgsService,
                     EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS,
                     COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
                     ExplorationHtmlFormatterService.getInteractionHtml(
                       StateInteractionIdService.savedMemento,
-                      interactionCustomizationArgsMemento,
+                      StateCustomizationArgsService.savedMemento,
                       false,
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {

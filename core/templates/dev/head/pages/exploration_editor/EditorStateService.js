@@ -25,6 +25,10 @@ oppia.factory('EditorStateService', [
     var stateNames = [];
     var correctnessFeedbackEnabled = null;
     var inQuestionMode = null;
+    // Currently, the only place where this is used in the state editor
+    // is in solution verification. So, once the interaction is set in this
+    // service, the given solutions would be automatically verified for the set
+    // interaction.
     var interaction = null;
 
     return {
@@ -66,7 +70,7 @@ oppia.factory('EditorStateService', [
         inQuestionMode = newModeValue;
       },
       getInQuestionMode: function() {
-        return isInQuestionMode;
+        return inQuestionMode;
       },
       setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {
         correctnessFeedbackEnabled = newCorrectnessFeedbackEnabled;

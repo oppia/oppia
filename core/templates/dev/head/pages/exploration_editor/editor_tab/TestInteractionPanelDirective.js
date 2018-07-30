@@ -20,10 +20,9 @@ oppia.directive('testInteractionPanel', [
     return {
       restrict: 'E',
       scope: {
-        stateContent: '&',
-        inputTemplate: '&',
-        onSubmitAnswer: '&',
-        getStateName: '&stateName'
+        getStateName: '&stateName',
+        getInputTemplate: '&inputTemplate',
+        onSubmitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +

@@ -59,6 +59,7 @@ describe('State Interaction controller', function() {
       cls = $injector.get('ChangeListService');
       ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('StateInteractionIdService');
+      scs = $injector.get('StateContentService');
       scas = $injector.get('StateCustomizationArgsService');
       idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
@@ -191,6 +192,7 @@ describe('State Interaction controller', function() {
         scope.initStateEditor();
 
         var state = ess.getState('First State');
+        scs.init('First State', state.content);
         siis.init(
           'First State', state.interaction.id, state.interaction, 'widget_id');
         scas.init(
@@ -212,6 +214,7 @@ describe('State Interaction controller', function() {
         scope.initStateEditor();
 
         var state = ess.getState('End State');
+        scs.init('End State', state.content);
         siis.init(
           'End State', state.interaction.id, state.interaction, 'widget_id');
         scas.init(

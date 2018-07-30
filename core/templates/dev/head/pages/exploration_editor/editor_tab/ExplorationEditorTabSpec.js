@@ -23,6 +23,8 @@ describe('Exploration editor tab controller', function() {
     beforeEach(module('oppia'));
     beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
+      rootScope = $injector.get('$rootScope');
+      spyOn(rootScope, '$broadcast');
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
       scs = $injector.get('StateContentService');
@@ -163,7 +165,11 @@ describe('Exploration editor tab controller', function() {
     it('should initialize the state name and related properties', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
-      expect(scs.savedMemento.getHtml()).toEqual('This is some content.');
+      expect(
+        rootScope.$broadcast
+      ).toHaveBeenCalledWith(
+        'stateEditorInitialized', ess.getState('Third State')
+      );
     });
   });
 });

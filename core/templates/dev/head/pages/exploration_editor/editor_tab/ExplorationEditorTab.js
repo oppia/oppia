@@ -13,38 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the graphical state editor.
+ * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
 oppia.controller('ExplorationEditorTab', [
   '$scope', '$rootScope', 'EditorStateService', 'ExplorationStatesService',
-  'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'StateContentService', 'StateHintsService',
-  'StateContentIdsToAudioTranslationsService', 'StateInteractionIdService',
+  'ExplorationAdvancedFeaturesService', 'UrlInterpolationService',
   'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
-  'ExplorationCorrectnessFeedbackService', 'SolutionValidityService',
-  'StateCustomizationArgsService', 'StateSolutionService', 'AlertsService',
-  'SolutionVerificationService', 'ContextService', 'ExplorationWarningsService',
+  'ExplorationCorrectnessFeedbackService', 'AlertsService',
+  'ContextService', 'ExplorationWarningsService',
   function(
       $scope, $rootScope, EditorStateService, ExplorationStatesService,
-      INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
-      UrlInterpolationService, StateContentService, StateHintsService,
-      StateContentIdsToAudioTranslationsService, StateInteractionIdService,
+      ExplorationAdvancedFeaturesService, UrlInterpolationService,
       ExplorationInitStateNameService, GraphDataService, RouterService,
-      ExplorationCorrectnessFeedbackService, SolutionValidityService,
-      StateCustomizationArgsService, StateSolutionService, AlertsService,
-      SolutionVerificationService, ContextService, ExplorationWarningsService) {
+      ExplorationCorrectnessFeedbackService, AlertsService,
+      ContextService, ExplorationWarningsService) {
     $scope.getInteractionCustomizationArgsMemento =
       ExplorationStatesService.getInteractionCustomizationArgsMemento;
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 
-    $scope.currentStateIsTerminal = false;
-    $scope.interactionIdIsSet = false;
     $scope.interactionIsShown = false;
-
-    $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg');
 
     $scope.$on('refreshStateEditor', function() {
       $scope.initStateEditor();
@@ -75,16 +64,6 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.addState(newStateName, null);
     };
 
-    $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-      $scope.interactionIdIsSet = Boolean(newInteractionId);
-      $scope.currentInteractionCanHaveSolution = Boolean(
-        $scope.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId].can_have_solution);
-      $scope.currentStateIsTerminal = Boolean(
-        $scope.interactionIdIsSet && INTERACTION_SPECS[
-          newInteractionId].is_terminal);
-    });
-
     $scope.refreshWarnings = function() {
       ExplorationWarningsService.updateWarnings();
     };
@@ -98,31 +77,7 @@ oppia.controller('ExplorationEditorTab', [
       EditorStateService.setInQuestionMode(false);
       var stateData = ExplorationStatesService.getState($scope.stateName);
       if ($scope.stateName && stateData) {
-        EditorStateService.setInteraction(stateData.interaction);
-        StateContentService.init(
-          $scope.stateName, stateData.content);
-        StateContentIdsToAudioTranslationsService.init(
-          $scope.stateName,
-          stateData.contentIdsToAudioTranslations);
-        StateHintsService.init(
-          $scope.stateName, stateData.interaction.hints);
-        StateInteractionIdService.init(
-          $scope.stateName, stateData.interaction.id);
-        StateCustomizationArgsService.init(
-          $scope.stateName, stateData.interaction.customizationArgs);
-        StateSolutionService.init(
-          stateData.name, stateData.interaction.solution);
-
         $rootScope.$broadcast('stateEditorInitialized', stateData);
-        var interactionId = ExplorationStatesService.getInteractionIdMemento(
-          $scope.stateName);
-        $scope.interactionIdIsSet = Boolean(interactionId);
-        $scope.currentInteractionCanHaveSolution = Boolean(
-          $scope.interactionIdIsSet &&
-          INTERACTION_SPECS[interactionId].can_have_solution);
-        $scope.currentStateIsTerminal = Boolean(
-          $scope.interactionIdIsSet &&
-          INTERACTION_SPECS[interactionId].is_terminal);
 
         var content = ExplorationStatesService.getStateContentMemento(
           $scope.stateName);

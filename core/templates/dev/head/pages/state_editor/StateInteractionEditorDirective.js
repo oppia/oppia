@@ -28,11 +28,11 @@ oppia.directive('stateInteractionEditor', [
         };
       },
       scope: {
-        onSaveStateContent: '=',
-        onSaveInteractionId: '=',
-        onSaveInteractionCustomizationArgs: '=',
-        onSaveSolution: '=',
         onSaveContentIdsToAudioTranslations: '=',
+        onSaveInteractionCustomizationArgs: '=',
+        onSaveInteractionId: '=',
+        onSaveSolution: '=',
+        onSaveStateContent: '=',
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

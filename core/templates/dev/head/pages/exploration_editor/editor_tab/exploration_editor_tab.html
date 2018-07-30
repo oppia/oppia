@@ -7,50 +7,19 @@
     <state-param-changes-editor></state-param-changes-editor>
   </div>
 
-  <md-card class="oppia-editor-card-with-avatar">
-    <div class="oppia-editor-card-body">
-      <img ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
-      <div id="tutorialStateContent" class="oppia-editor-card-section"
-           style="padding-top: 36px; padding-bottom: 36px;">
-        <state-content-editor on-save-state-content="saveStateContent"
-                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
-                              state-content-placeholder="getStateContentPlaceholder()">
-        </state-content-editor>
-      </div>
-    </div>
-  </md-card>
-
-  <div ng-show="interactionIsShown">
-    <state-interaction-editor on-save-state-content="saveStateContent"
-                              on-save-interaction-id="saveInteractionId"
-                              on-save-interaction-customization-args="saveInteractionCustomizationArgs"
-                              on-save-solution="saveSolution"
-                              on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
-                              recompute-graph="recomputeGraph">
-    </state-interaction-editor>
-  </div>
-
-  <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-    <state-responses state-name="stateName"
-                     on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
-                     on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
-                     on-save-interaction-answer-groups="saveInteractionAnswerGroups"
-                     navigate-to-state="navigateToState"
-                     add-state="addState"
-                     refresh-warnings="refreshWarnings">
-    </state-responses>
-    <div>
-      <state-hints-editor on-save-hints="saveHints"
-                          on-save-solution="saveSolution"
-                          on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations">
-      </state-hints-editor>
-    </div>
-    <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution-editor interaction-customization-args-memento="getInteractionCustomizationArgsMemento(stateName)"
-                             on-save-solution="saveSolution"
-                             on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
-                             refresh-warnings="refreshWarnings">
-      </state-solution-editor>
-    </div>
-  </div>
+  <state-editor on-save-state-content="saveStateContent"
+                on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
+                on-save-interaction-customization-args="saveInteractionCustomizationArgs"
+                on-save-interaction-id="saveInteractionId"
+                on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="saveInteractionAnswerGroups"
+                on-save-solution="saveSolution"
+                on-save-hints="saveHints"
+                recompute-graph="recomputeGraph"
+                state-content-placeholder="getStateContentPlaceholder()"
+                navigate-to-state="navigateToState"
+                add-state="addState"
+                refresh-warnings="refreshWarnings"
+                interaction-is-shown="interactionIsShown">
+  </state-editor>
 </div>

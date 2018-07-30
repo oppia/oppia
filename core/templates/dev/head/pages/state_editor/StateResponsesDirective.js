@@ -20,12 +20,11 @@ oppia.directive('stateResponses', [
     return {
       restrict: 'E',
       scope: {
-        getStateName: '&stateName',
-        onSaveContentIdsToAudioTranslations: '=',
-        onSaveInteractionDefaultOutcome: '=',
-        onSaveInteractionAnswerGroups: '=',
-        navigateToState: '=',
         addState: '=',
+        onSaveContentIdsToAudioTranslations: '=',
+        onSaveInteractionAnswerGroups: '=',
+        onSaveInteractionDefaultOutcome: '=',
+        navigateToState: '=',
         refreshWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -50,13 +49,13 @@ oppia.directive('stateResponses', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
-          $scope.stateName = $scope.getStateName();
+          $scope.stateName = EditorStateService.getActiveStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
           var _initializeTrainingData = function() {
             var explorationId = ContextService.getExplorationId();
-            var currentStateName = $scope.getStateName();
+            var currentStateName = $scope.stateName;
           };
 
           $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -142,7 +141,7 @@ oppia.directive('stateResponses', [
             if (!outcome) {
               return false;
             }
-            return outcome.isConfusing($scope.getStateName());
+            return outcome.isConfusing($scope.stateName);
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
@@ -150,7 +149,7 @@ oppia.directive('stateResponses', [
                 !EditorStateService.getCorrectnessFeedbackEnabled()) {
               return false;
             }
-            var currentStateName = $scope.getStateName();
+            var currentStateName = $scope.stateName;
             return (
               (outcome.dest === currentStateName) &&
               outcome.labelledAsCorrect);
@@ -270,7 +269,7 @@ oppia.directive('stateResponses', [
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
-            var stateName = $scope.getStateName();
+            var stateName = $scope.stateName;
             var addState = $scope.addState;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -559,7 +558,7 @@ oppia.directive('stateResponses', [
           };
 
           $scope.isOutcomeLooping = function(outcome) {
-            var activeStateName = $scope.getStateName();
+            var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
         }

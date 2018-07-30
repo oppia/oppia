@@ -21,9 +21,9 @@ oppia.directive('stateHintsEditor', [
     return {
       restrict: 'E',
       scope: {
+        onSaveContentIdsToAudioTranslations: '=',
         onSaveHints: '=',
-        onSaveSolution: '=',
-        onSaveContentIdsToAudioTranslations: '='
+        onSaveSolution: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_hints_editor_directive.html'),

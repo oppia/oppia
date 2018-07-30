@@ -28,9 +28,9 @@ oppia.directive('stateContentEditor', [
         };
       },
       scope: {
+        getStateContentPlaceholder: '&stateContentPlaceholder',
         onSaveStateContent: '=',
-        onSaveContentIdsToAudioTranslations: '=',
-        getStateContentPlaceholder: '&stateContentPlaceholder'
+        onSaveContentIdsToAudioTranslations: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_content_editor_directive.html'),
