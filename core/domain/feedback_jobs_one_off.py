@@ -25,9 +25,12 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
+import feconf
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, email_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.email,
+         models.NAMES.user]))
 
 
 class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -182,3 +185,73 @@ class SuggestionMigrationValdiationOneOffJob(
     @staticmethod
     def reduce(key, value):
         yield (key, len(value))
+
+
+class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating instances of feedback thread model and related
+    models to have thread ID of the form entity_type.entity_id.random_str.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackThreadModel,
+                feedback_models.FeedbackMessageModel,
+                feedback_models.FeedbackThreadUserModel,
+                email_models.FeedbackEmailReplyToIdModel,
+                user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, feedback_models.FeedbackThreadModel):
+            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
+            feedback_models.GeneralFeedbackThreadModel(
+                id=new_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id=item.exploration_id,
+                original_author_id=item.original_author_id,
+                status=item.status, subject=item.subject,
+                summary=item.summary, has_suggestion=item.has_suggestion,
+                message_count=item.message_count,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted).put(update_last_updated_time=False)
+            yield ('GeneralFeedbackThreadModel', 1)
+        elif isinstance(item, feedback_models.FeedbackMessageModel):
+            new_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, item.id)
+            new_thread_id = '%s.%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION, item.thread_id)
+            feedback_models.GeneralFeedbackMessageModel(
+                id=new_id, thread_id=new_thread_id,
+                message_id=item.message_id, author_id=item.author_id,
+                updated_status=item.updated_status,
+                updated_subject=item.updated_subject, text=item.text,
+                received_via_email=item.received_via_email,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted).put()
+            yield ('GeneralFeedbackMessageModel', 1)
+        elif isinstance(item, feedback_models.FeedbackThreadUserModel):
+            old_id_parts = item.id.split('.')
+            new_id = '.'.join(
+                [old_id_parts[0], feconf.ENTITY_TYPE_EXPLORATION,
+                 old_id_parts[1], old_id_parts[2]])
+            feedback_models.GeneralFeedbackThreadUserModel(
+                id=new_id,
+                message_ids_read_by_user=item.message_ids_read_by_user
+            ).put()
+            yield ('GeneralFeedbackThreadUserModel', 1)
+        elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
+            old_id_parts = item.id.split('.')
+            new_id = '.'.join(
+                [old_id_parts[0], feconf.ENTITY_TYPE_EXPLORATION,
+                 old_id_parts[1], old_id_parts[2]])
+            email_models.GeneralFeedbackEmailReplyToIdModel(
+                id=new_id, reply_to_id=item.reply_to_id).put()
+            yield ('GeneralFeedbackEmailReplyToIdModel', 1)
+        elif isinstance(item, user_models.UserSubscriptionsModel):
+            new_thread_ids = (
+                ['%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
+                 for thread_id in item.feedback_thread_ids])
+            item.general_feedback_thread_ids = new_thread_ids
+            item.put()
+            yield ('UserSubscriptionsModel', 1)
+
+    @staticmethod
+    def reduce(key, value):
+        yield(key, len(value))
