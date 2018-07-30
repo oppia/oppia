@@ -16,11 +16,6 @@
  * @fileoverview Directive for visualizing issues.
  */
 
-// Mapping from Issue type to corresponding directive.
-oppia.constant('ISSUE_DIRECTIVE_MAPPING', {
-  EarlyQuit: '<early-quit-issue-directive>'
-});
-
 oppia.directive('issuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -39,22 +34,6 @@ oppia.directive('issuesDirective', [
 
           $scope.currentIssueIndex = 0;
           $scope.currentIssue = $scope.issues[0];
-
-          $scope.retrieveIssueDirective = function(issueIndex) {
-            var issueType = $scope.issues[issueIndex].issueType;
-            var issueDirective = ISSUE_DIRECTIVE_MAPPING[issueType];
-            var tempLength = issueDirective.length;
-            var issueDirectiveEnd = [
-              issueDirective.slice(0, 1), '/',
-              issueDirective.slice(1, tempLength - 1)].join('');
-            issueDirectiveArgs =
-              ' index="currentIssueIndex" issue="currentIssue"';
-            var issueDirectiveComplete = [
-              issueDirective.slice(0, tempLength - 1), issueDirectiveArgs,
-              issueDirective.slice(tempLength - 1)].join('') +
-              issueDirectiveEnd;
-            return issueDirectiveComplete;
-          };
 
           $scope.makeVisible = function(nextIssueIndex) {
             document.getElementById(

@@ -16,21 +16,9 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
-oppia.constant(
-  'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
-
-oppia.constant(
-  'FETCH_PLAYTHROUGH_URL',
-  '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
-
 oppia.factory('IssuesService', [
-  '$http', '$sce', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
-  'ISSUE_TYPE_EARLY_QUIT',
-  function(
-      $http, $sce, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
-      ISSUE_TYPE_EARLY_QUIT) {
+  '$sce', 'ISSUE_TYPE_EARLY_QUIT',
+  function($sce, ISSUE_TYPE_EARLY_QUIT) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -51,53 +39,17 @@ oppia.factory('IssuesService', [
       return suggestions;
     };
 
-    var fetchIssues = function() {
-      $http.get(getFullIssuesUrl(), {
-        params: {
-          exp_version: explorationVersion
-        }
-      }).then(function(response) {
-        var unresolvedIssuesDicts = response.data;
-        issues = unresolvedIssuesDicts.map(
-          ExplorationIssueObjectFactory.createFromBackendDict);
-      });
-    };
-
-    var fetchPlaythrough = function(playthroughId) {
-      return $http.get(getFullPlaythroughUrl(playthroughId)).then(
-        function(response) {
-          var playthroughDict = response.data;
-          return PlaythroughObjectFactory.createFromBackendDict(
-            playthroughDict);
-        });
-    };
-
-    var getFullIssuesUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_ISSUES_URL, {
-          exploration_id: explorationId
-        });
-    };
-
-    var getFullPlaythroughUrl = function(playthroughId) {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_PLAYTHROUGH_URL, {
-          exploration_id: explorationId,
-          playthrough_id: playthroughId
-        });
-    };
-
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        fetchIssues();
+        issues = fetchIssues(explorationId, explorationVersion);
       },
       getIssues: function() {
         return issues;
       },
       getPlaythrough: function(playthroughId) {
-        return fetchPlaythrough(playthroughId);
+        return fetchPlaythrough(explorationId, playthroughId);
       },
       renderIssueStatement: function(issue) {
         if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
