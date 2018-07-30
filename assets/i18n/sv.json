@@ -455,5 +455,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Logga in med Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervisa med Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du har totalt <[totalSubscribers]> prenumeranter.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Avsluta prenumeration"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Avsluta prenumeration",
+	"I18N_WORKED_EXAMPLE": "Fungerande exempel"
 }
