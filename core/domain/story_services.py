@@ -29,7 +29,8 @@ from core.platform import models
 import feconf
 import utils
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(story_models, user_models) = models.Registry.import_models(
+    [models.NAMES.story, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -535,3 +536,107 @@ def save_story_summary(story_summary):
     )
 
     story_summary_model.put()
+
+
+def get_completed_node_ids(user_id, story_id):
+    """Returns the ids of the nodes completed in the story.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_id: str. ID of the story.
+
+    Returns:
+        list(str). List of the node ids completed in  story.
+    """
+    progress_model = user_models.StoryProgressModel.get(user_id, story_id)
+
+    return progress_model.completed_nodes if progress_model else []
+
+
+def get_nodes_completed_in_stories(user_id, story_ids):
+    """Returns the ids of the nodes completed in each of the stories.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_ids: list(str). IDs of the stories.
+
+    Returns:
+        list(list(str)). List of the node ids completed in each
+            story.
+    """
+    progress_models = user_models.StoryProgressModel.get_multi(
+        user_id, story_ids)
+
+    node_ids_completed_in_stories = []
+
+    for progress_model in progress_models:
+        if progress_model:
+            node_ids_completed_in_stories.append(
+                progress_model.completed_nodes)
+        else:
+            node_ids_completed_in_stories.append([])
+
+    return node_ids_completed_in_stories
+
+
+def get_valid_completed_node_ids(user_id, story):
+    """Returns a filtered version of the return value of
+    get_completed_node_ids, which only includes nodes found within
+    the current version of the story.
+
+    Args:
+        user_id: str. ID of the given user.
+        story: Story.
+
+    Returns:
+        A filtered version of the return value of get_completed_node_ids
+        which only includes nodes found within the current version of
+        the story.
+    """
+    completed_node_ids = get_completed_node_ids(
+        user_id, story.id)
+    return [
+        exploration_id for exploration_id in completed_node_ids
+        if story.story_contents.get_node(exploration_id)
+    ]
+
+
+def get_next_node_id_to_be_completed_by_user(user_id, story_id):
+    """Returns the first node ID in the specified story that the
+    given user has not yet attempted.
+
+    Args:
+        user_id: str. ID of the user.
+        story_id: str. ID of the story.
+
+    Returns:
+        str. The first node ID in the specified story that
+        the given user has not completed. Returns the story's initial
+        node if the user has yet to complete any nodes
+        within the story.
+    """
+    completed_node_ids = get_completed_node_ids(
+        user_id, story_id)
+
+    story = get_story_by_id(story_id)
+    if completed_node_ids:
+        return story.get_next_node_id(completed_node_ids)
+    else:
+        return story.first_node_id
+
+
+def record_played_node_in_story_context(user_id, story_id, node_id):
+    """Records a node by a given user in a given story
+    context as having been played.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_id: str. ID of the given story.
+        node_id: str. ID of the given node.
+    """
+    progress_model = user_models.StoryProgressModel.get_or_create(
+        user_id, story_id)
+
+    if node_id not in progress_model.completed_nodes:
+        progress_model.completed_nodes.append(node_id)
+        progress_model.put()

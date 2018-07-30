@@ -277,6 +277,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # IDs of feedback thread ids (new framework) that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
+    # IDs of feedback thread ids (new framework) that this user subscribes to.
+    general_feedback_thread_ids = ndb.StringProperty(
+        repeated=True, indexed=True)
     # IDs of the learners who have subscribed to this user.
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
@@ -563,6 +566,102 @@ class CollectionProgressModel(base_models.BaseModel):
             return instance_model
         else:
             return cls.create(user_id, collection_id)
+
+
+class StoryProgressModel(base_models.BaseModel):
+    """Stores progress a user has made within a story, including all
+    nodes which have been completed within the context of the story.
+
+    Please note instances of this progress model will persist even after a
+    story is deleted.
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The story id.
+    story_id = ndb.StringProperty(required=True, indexed=True)
+    # The list of nodes which have been completed within the context of
+    # the story represented by story_id.
+    completed_nodes = ndb.StringProperty(repeated=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, story_id):
+        return '%s.%s' % (user_id, story_id)
+
+    @classmethod
+    def create(cls, user_id, story_id):
+        """Creates a new StoryProgressModel instance and returns it.
+
+        Note: the client is responsible for actually saving this entity to the
+        datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            StoryProgressModel. The newly created StoryProgressModel
+            instance.
+        """
+        instance_id = cls._generate_id(user_id, story_id)
+        return cls(
+            id=instance_id, user_id=user_id, story_id=story_id)
+
+    @classmethod
+    def get(cls, user_id, story_id):
+        """Gets the StoryProgressModel for the given user and story
+        id.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            StoryProgressModel. The StoryProgressModel instance which
+            matches the given user_id and story_id.
+        """
+        instance_id = cls._generate_id(user_id, story_id)
+        return super(StoryProgressModel, cls).get(
+            instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_id, story_ids):
+        """Gets the StoryProgressModels for the given user and story
+        ids.
+
+        Args:
+            user_id: str. The id of the user.
+            story_ids: list(str). The ids of the stories.
+
+        Returns:
+            list(StoryProgressModel). The list of StoryProgressModel
+            instances which matches the given user_id and story_ids.
+        """
+        instance_ids = [cls._generate_id(user_id, story_id)
+                        for story_id in story_ids]
+
+        return super(StoryProgressModel, cls).get_multi(
+            instance_ids)
+
+    @classmethod
+    def get_or_create(cls, user_id, story_id):
+        """Gets the StoryProgressModel for the given user and story
+        ids, or creates a new instance with if no such instance yet exists
+        within the datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            StoryProgressModel. Either an existing one which
+            matches the given user_id and story_id, or the newly created
+            one if it does not already exist.
+        """
+        instance_model = cls.get(user_id, story_id)
+        if instance_model:
+            return instance_model
+        else:
+            return cls.create(user_id, story_id)
 
 
 class UserQueryModel(base_models.BaseModel):

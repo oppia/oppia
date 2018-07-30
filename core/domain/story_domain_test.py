@@ -408,3 +408,64 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
+
+    def test_next_nodes(self):
+        """Nodes should be suggested based on their index in the node
+           list.
+        """
+        story = story_domain.Story.create_default_story(
+            self.USER_ID, 'story_id')
+
+        # If a new node is added, the next node ID should be the
+        # same as the initial node.
+        story.add_node('node_2')
+        self.assertEqual(story.get_next_node_id([]), 'node_1')
+        self.assertEqual(
+            story.first_node_id,
+            story.get_next_node_id([]))
+
+        # If another node has been added, then the first node
+        # should be the next one to complete.
+        story.add_node('node_3')
+        self.assertEqual(story.get_next_node_id([]), 'node_1')
+
+        # If another node is added, then based on nodes
+        # completed, the correct node should be shown as the next one.
+        story.add_node('node_4')
+        self.assertEqual(
+            story.get_next_node_id([]), 'node_1')
+        self.assertEqual(
+            story.get_next_node_id(
+                ['node_1', 'node_2', 'node_3']), 'node_4')
+        self.assertEqual(
+            story.get_next_node_id(['node_1', 'node_2']),
+            'node_3')
+
+        # If all nodes have been completed, none should be suggested.
+        self.assertEqual(
+            story.get_next_node_id(
+                ['node_1', 'node_2', 'node_3', 'node_4']), None)
+
+    def test_next_nodes_in_sequence(self):
+        story = story_domain.Story.create_default_story(
+            self.USER_ID, 'story_id')
+
+        # Completing the only node of the story should lead to no
+        # available nodes thereafter.
+        self.assertEqual(
+            story.get_next_node_id_in_sequence('node_2'),
+            None)
+
+        story.add_node('node_2')
+        story.add_node('node_3')
+        story.add_node('node_4')
+
+        self.assertEqual(
+            story.get_next_node_id_in_sequence('node_1'),
+            'node_2')
+        self.assertEqual(
+            story.get_next_node_id_in_sequence('node_2'),
+            'node_3')
+        self.assertEqual(
+            story.get_next_node_id_in_sequence('node_3'),
+            'node_4')
