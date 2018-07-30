@@ -17,7 +17,6 @@
 """Tests for calculation registry."""
 
 import inspect
-import random
 
 from core.domain import calculation_registry
 from core.tests import test_utils
@@ -27,28 +26,20 @@ from extensions.answer_summarizers import models
 class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
-    def test_refresh_registry(self):
-        for name, clazz in inspect.getmembers(models, inspect.isclass):
-            if name.endswith('_test') or name == 'BaseCalculation':
-                self.assertNotIn(
-                    name, calculation_registry.Registry.calculations_dict)
-                continue
-            if 'BaseCalculation' not in [
-                    base_class.__name__
-                    for base_class in inspect.getmro(clazz)]:
-                self.assertNotIn(
-                    name, calculation_registry.Registry.calculations_dict)
-                continue
-            self.assertIn(name, calculation_registry.Registry.calculations_dict)
-            self.assertEqual(
-                clazz, calculation_registry.Registry.calculations_dict[name])
+    def test_calculation_registry(self):
+        """Do some sanity checks on the calculation registry."""
+        self.assertEqual(
+            len(calculation_registry.Registry.calculations_dict), 0)
+        calculation_registry.Registry.get_calculation_by_id('AnswerFrequencies')
+        self.assertEqual(
+            len(calculation_registry.Registry.calculations_dict), 6)
 
     def test_get_calculation_by_id(self):
-        if len(calculation_registry.Registry.calculations_dict) > 0:
-            calc_id = random.choice(
-                calculation_registry.Registry.calculations_dict.keys())
-            self.assertEqual(
-                calculation_registry.Registry.calculations_dict[calc_id],
-                calculation_registry.Registry.get_calculation_by_id(calc_id))
-            with self.assertRaises(TypeError):
-                calculation_registry.Registry.get_calculation_by_id('a')
+        self.assertTrue(
+            isinstance(
+                calculation_registry.Registry.get_calculation_by_id(
+                    'Top5AnswerFrequencies'),
+                calculation_registry.Registry.calculations_dict[
+                    'Top5AnswerFrequencies']))
+        with self.assertRaises(TypeError):
+            calculation_registry.Registry.get_calculation_by_id('a')
