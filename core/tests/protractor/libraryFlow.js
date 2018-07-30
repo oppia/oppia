@@ -47,36 +47,31 @@ describe('Library pages tour', function() {
     waitFor.pageToFullyLoad();
   };
 
-  var rateExplorationInDesktop = function() {
-    users.createUser('random@gmail.com', 'random');
-    users.login('random@gmail.com');
-    workflow.createAndPublishExploration(
-      EXPLORATION_TITLE,
-      EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE
-    );
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.rateExploration(EXPLORATION_RATING);
-    users.logout();
-  };
-
-  var rateExplorationInMobile = function() {
-    var adminPage = new AdminPage.AdminPage();
-    var LIB_ADM_VISITOR = 'libAdmVisitor';
-    // When logging-in on mobile devices, popups and suggestions
-    // might block the login button.
-    // See https://discuss.appium.io/t/how-to-disable-popups-on-android-chrome-browser-through-automation/5935
-    // At the moment, there does not exist a reliable way to
-    // disable them. Therefore the best
-    // way to deal with them is to use an
-    // entirely different email id.
-    users.createAndLoginAdminUserMobile(
-      'libAdmVisitor@library.com', LIB_ADM_VISITOR);
-    // Load /explore/22
-    adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
+  var rateExploration = function() {
+    if (browser.isMobile) {
+      var adminPage = new AdminPage.AdminPage();
+      var LIB_ADM_VISITOR = 'libAdmVisitor';
+      // When logging-in on mobile devices, popups and suggestions
+      // might block the login button.
+      // See https://discuss.appium.io/t/how-to-disable-popups-on-android-chrome-browser-through-automation/5935
+      // At the moment, there does not exist a reliable way to
+      // disable them. Therefore the best
+      // way to deal with them is to use an
+      // entirely different email id.
+      users.createAndLoginAdminUserMobile(
+        'libAdmVisitor@library.com', LIB_ADM_VISITOR);
+      // Load /explore/22
+      adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
+    } else {
+      users.createUser('random@gmail.com', 'random');
+      users.login('random@gmail.com');
+      workflow.createAndPublishExploration(
+        EXPLORATION_TITLE,
+        EXPLORATION_CATEGORY,
+        EXPLORATION_OBJECTIVE,
+        EXPLORATION_LANGUAGE
+      );
+    }
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -96,12 +91,8 @@ describe('Library pages tour', function() {
 
   it('visits the top rated page', function() {
     // To visit the top rated page, at least one
-    // exploration has to be rated by the user
-    if (browser.isMobile) {
-      rateExplorationInMobile();
-    } else {
-      rateExplorationInDesktop();
-    }
+    // exploration has to be rated by the user.
+    rateExploration();
     libraryPage.get();
     element(by.css('.protractor-test-library-top-rated')).click();
     waitFor.pageToFullyLoad();
