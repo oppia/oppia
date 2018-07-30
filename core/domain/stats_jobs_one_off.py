@@ -260,7 +260,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on)
+                    'created_on': str(item.created_on),
+                    'session_id': item.session_id
                 })
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
@@ -269,7 +270,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
                     'version': item.exp_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
                 })
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
@@ -278,7 +280,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                     'version': item.exploration_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
                 })
         else:
             raise Exception('Bad item: %s' % type(item))
@@ -397,19 +400,30 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_stats_dict = copy.deepcopy(prev_stats_dict)
 
             # Compute the statistics for events corresponding to this version.
+            exp_started_session_ids, exp_completed_session_ids = set(), set()
+            exp_actually_started_session_ids = set()
             state_hit_session_ids, solution_hit_session_ids = set(), set()
             while event_dict['version'] == version:
                 state_stats = (exp_stats_dict['state_stats_mapping'][
                     event_dict['state_name']])
                 if event_dict['event_type'] == (
                         feconf.EVENT_TYPE_START_EXPLORATION):
-                    exp_stats_dict['num_starts_v2'] += 1
+                    if event_dict['session_id'] not in exp_started_session_ids:
+                        exp_stats_dict['num_starts_v2'] += 1
+                        exp_started_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
-                    exp_stats_dict['num_actual_starts_v2'] += 1
+                    if event_dict['session_id'] not in (
+                            exp_actually_started_session_ids):
+                        exp_stats_dict['num_actual_starts_v2'] += 1
+                        exp_actually_started_session_ids.add(
+                            event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_COMPLETE_EXPLORATION):
-                    exp_stats_dict['num_completions_v2'] += 1
+                    if event_dict['session_id'] not in (
+                            exp_completed_session_ids):
+                        exp_stats_dict['num_completions_v2'] += 1
+                        exp_completed_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ANSWER_SUBMITTED):
                     state_stats['total_answers_count_v2'] += 1
