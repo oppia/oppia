@@ -94,8 +94,8 @@ fi
 
 # Launch a browser window.
 if [ ${OS} == "Linux" ]; then
-  detect_virt="$(ls -1 /dev/disk/by-id/)"
-  if [[ $detect_virt = *"VBOX"* ]]; then
+  detect_virtualbox="$(ls -1 /dev/disk/by-id/)"
+  if [[ $detect_virtualbox = *"VBOX"* ]]; then
     echo ""
     echo "  INFORMATION"
     echo "  Setting up a local development server. You can access this server"
