@@ -3754,7 +3754,7 @@ span.oppia-issues-learner-action {
   margin-bottom: 2em;
 }
 
-.oppia-issues-hexagon-text{
+.oppia-issues-hexagon-text {
     position: absolute;
     z-index: 1000;
     width: 100%;
@@ -3838,16 +3838,16 @@ span.oppia-issues-learner-action {
   background: #469689;
 }
 
-.oppia-issues-suggestion-header{
+.oppia-issues-suggestion-header {
   color: red;
   margin-left: 10px;
 }
 
-.oppia-issues-tips{
+.oppia-issues-tips {
   list-style-type: square;
 }
 
-.oppia-issues-playthrough-content{
+.oppia-issues-playthrough-content {
   font-size: 1.3em;
   color: white;
 }
@@ -3859,7 +3859,7 @@ span.oppia-issues-learner-action {
   cursor: pointer;
 }
 
-.oppia-issues-highlight{
+.oppia-issues-highlight {
   background-color: #cfffe1;
   opacity: 0.5;
 }
