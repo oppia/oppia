@@ -182,11 +182,11 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 exp_stats_instances.append(exp_stats_default)
                 stats_services.create_stats_model(exp_stats_default)
+                yield (
+                    'ExplorationStatsModel for missing versions regenerated: ',
+                    '%s v%s' % (exploration.id, exp_version))
             else:
                 exp_stats_instances.append(exp_stats)
-        yield(
-            'ExplorationStatsModel for missing versions regenerated.',
-            exploration.id)
 
     @staticmethod
     def reduce(message, values):
