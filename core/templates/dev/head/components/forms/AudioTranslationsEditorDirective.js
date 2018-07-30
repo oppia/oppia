@@ -42,6 +42,7 @@ oppia.directive('audioTranslationsEditor', [
             EditabilityService, LanguageUtilService, AlertsService,
             ContextService, AssetsBackendApiService) {
           $scope.isTranslatable = EditabilityService.isTranslatable;
+
           $scope.StateContentIdsToAudioTranslationsService =
               StateContentIdsToAudioTranslationsService;
           // The following if-condition is present because, sometimes,

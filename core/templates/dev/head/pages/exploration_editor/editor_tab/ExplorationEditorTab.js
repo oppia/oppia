@@ -28,8 +28,6 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationInitStateNameService, GraphDataService, RouterService,
       ExplorationCorrectnessFeedbackService, AlertsService,
       ContextService, ExplorationWarningsService) {
-    $scope.getInteractionCustomizationArgsMemento =
-      ExplorationStatesService.getInteractionCustomizationArgsMemento;
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 

@@ -1,1 +1,17 @@
-<!-- TODO(aks681): Write the question editor directive html here -->
+<div class="oppia-editor-cards-container">
+  <state-editor on-save-state-content="saveStateContent"
+                on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
+                on-save-interaction-customization-args="saveInteractionCustomizationArgs"
+                on-save-interaction-id="saveInteractionId"
+                on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="saveInteractionAnswerGroups"
+                on-save-solution="saveSolution"
+                on-save-hints="saveHints"
+                state-content-placeholder="getStateContentPlaceholder()"
+                interaction-is-shown="interactionIsShown"
+                recompute-graph="recomputeGraph"
+                navigate-to-state="navigateToState"
+                add-state="addState"
+                refresh-warnings="refreshWarnings">
+  </state-editor>
+</div>

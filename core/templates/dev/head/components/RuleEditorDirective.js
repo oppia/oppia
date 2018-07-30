@@ -108,6 +108,34 @@ oppia.directive('ruleEditor', [
                       type: 'dropdown',
                       varName: finalInputArray[i + 1]
                     });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropHtmlString') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropHtmlStringSelect',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropPositiveIntSelect',
+                      varName: finalInputArray[i + 1]
+                    });
                   } else {
                     $scope.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {

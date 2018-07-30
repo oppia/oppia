@@ -1,46 +1,44 @@
-<div ng-if="servicesInitialized">
-  <md-card class="oppia-editor-card-with-avatar">
-    <div class="oppia-editor-card-body">
-      <img ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
-      <div id="tutorialStateContent" class="oppia-editor-card-section"
-           style="padding-top: 36px; padding-bottom: 36px;">
-        <state-content-editor on-save-state-content="onSaveStateContent"
-                              on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
-                              state-content-placeholder="getStateContentPlaceholder()">
-        </state-content-editor>
-      </div>
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <img ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
+    <div id="tutorialStateContent" class="oppia-editor-card-section"
+         style="padding-top: 36px; padding-bottom: 36px;">
+      <state-content-editor on-save-state-content="onSaveStateContent"
+                            on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
+                            state-content-placeholder="getStateContentPlaceholder()">
+      </state-content-editor>
     </div>
-  </md-card>
-
-  <div ng-show="isInteractionShown()">
-    <state-interaction-editor on-save-state-content="onSaveStateContent"
-                              on-save-interaction-id="onSaveInteractionId"
-                              on-save-interaction-customization-args="onSaveInteractionCustomizationArgs"
-                              on-save-solution="onSaveSolution"
-                              on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
-                              recompute-graph="recomputeGraph">
-    </state-interaction-editor>
   </div>
+</md-card>
 
-  <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-    <state-responses on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
-                     on-save-interaction-default-outcome="onSaveInteractionDefaultOutcome"
-                     on-save-interaction-answer-groups="onSaveInteractionAnswerGroups"
-                     navigate-to-state="navigateToState"
-                     add-state="addState"
-                     refresh-warnings="refreshWarnings">
-    </state-responses>
-    <div>
-      <state-hints-editor on-save-hints="onSaveHints"
-                          on-save-solution="onSaveSolution"
-                          on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
-      </state-hints-editor>
-    </div>
-    <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution-editor on-save-solution="onSaveSolution"
-                             on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
-                             refresh-warnings="refreshWarnings">
-      </state-solution-editor>
-    </div>
+<div ng-show="isInteractionShown()">
+  <state-interaction-editor on-save-state-content="onSaveStateContent"
+                            on-save-interaction-id="onSaveInteractionId"
+                            on-save-interaction-customization-args="onSaveInteractionCustomizationArgs"
+                            on-save-solution="onSaveSolution"
+                            on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
+                            recompute-graph="recomputeGraph">
+  </state-interaction-editor>
+</div>
+
+<div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
+  <state-responses on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
+                   on-save-interaction-default-outcome="onSaveInteractionDefaultOutcome"
+                   on-save-interaction-answer-groups="onSaveInteractionAnswerGroups"
+                   navigate-to-state="navigateToState"
+                   add-state="addState"
+                   refresh-warnings="refreshWarnings">
+  </state-responses>
+  <div>
+    <state-hints-editor on-save-hints="onSaveHints"
+                        on-save-solution="onSaveSolution"
+                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
+    </state-hints-editor>
+  </div>
+  <div ng-if="currentInteractionCanHaveSolution">
+    <state-solution-editor on-save-solution="onSaveSolution"
+                           on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
+                           refresh-warnings="refreshWarnings">
+    </state-solution-editor>
   </div>
 </div>

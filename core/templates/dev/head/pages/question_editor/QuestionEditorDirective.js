@@ -33,46 +33,107 @@ oppia.directive('questionEditor', [
         'EditabilityService', 'EditableQuestionBackendApiService',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateContentService', 'StateContentIdsToAudioTranslationsService',
-        'INTERACTION_SPECS',
+        'INTERACTION_SPECS', 'EditorStateService', 'ResponsesService',
+        'SolutionValidityService',
         function(
             $scope, $rootScope, AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateContentService, StateContentIdsToAudioTranslationsService,
-            INTERACTION_SPECS) {
+            INTERACTION_SPECS, EditorStateService, ResponsesService,
+            SolutionValidityService) {
           EditabilityService.markEditable();
+          EditorStateService.setActiveStateName('question');
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 
-          var _init = function() {
-            StateContentService.init(
-              null, $scope.getQuestionStateData().content);
-            StateContentIdsToAudioTranslationsService.init(
-              null,
-              $scope.getQuestionStateData().contentIdsToAudioTranslations);
-            $scope.interactionIsShown = false;
-            $rootScope.$broadcast(
-              'stateEditorInitialized', $scope.getQuestionStateData());
+          $scope.interactionIsShown = false;
 
-            var interactionId = $scope.getQuestionStateData().interaction.id;
-            $scope.interactionIdIsSet = Boolean(interactionId);
-            $scope.currentInteractionCanHaveSolution = Boolean(
-              $scope.interactionIdIsSet &&
-              INTERACTION_SPECS[interactionId].can_have_solution);
-            $scope.currentStateIsTerminal = Boolean(
-              $scope.interactionIdIsSet &&
-              INTERACTION_SPECS[interactionId].is_terminal);
+          $scope.getStateContentPlaceholder = function() {
+            return (
+              'You can speak to the learner here, then ask them a question.');
           };
 
-          $scope.showInteraction = function() {
+          $scope.navigateToState = function() {
+            return;
+          };
+
+          $scope.addState = function() {
+            return;
+          };
+
+          $scope.recomputeGraph = function() {
+            return;
+          };
+
+          $scope.refreshWarnings = function() {
+            return;
+          };
+
+          var _init = function() {
+            EditorStateService.setStateNames([]);
+            EditorStateService.setCorrectnessFeedbackEnabled(true);
+            EditorStateService.setInQuestionMode(true);
+            SolutionValidityService.init(['question']);
+            var stateData = $scope.getQuestionStateData();
+            if (stateData) {
+              ResponsesService.save(
+                [], stateData.interaction.defaultOutcome,
+                function(newAnswerGroups, newDefaultOutcome) {}
+              );
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+
+              if (stateData.content.getHtml() || stateData.interaction.id) {
+                $scope.interactionIsShown = true;
+              }
+
+              $rootScope.loadingMessage = '';
+            }
+          };
+
+          $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
-            $rootScope.$broadcast(
-              'stateEditorInitialized', $scope.getQuestionStateData());
             $scope.interactionIsShown = true;
           };
 
-          _init();
+          $scope.saveInteractionId = function(displayedValue) {
+            EditorStateService.setInteractionId(angular.copy(displayedValue));
+          };
+
+          $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
+            EditorStateService.setInteractionAnswerGroups(
+              angular.copy(newAnswerGroups));
+            $scope.recomputeGraph();
+          };
+
+          $scope.saveInteractionDefaultOutcome = function(newOutcome) {
+            EditorStateService.setInteractionDefaultOutcome(
+              angular.copy(newOutcome));
+            $scope.recomputeGraph();
+          };
+
+          $scope.saveInteractionCustomizationArgs = function(displayedValue) {
+            EditorStateService.setInteractionCustomizationArgs(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveSolution = function(displayedValue) {
+            EditorStateService.setInteractionSolution(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveHints = function(displayedValue) {
+            EditorStateService.setInteractionHints(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
+          };
+
+          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            _init();
+          });
         }
       ]
     };

@@ -19,6 +19,7 @@
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs_one_off
+from core.domain import stats_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -114,6 +115,74 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(exp_issues2.exp_id, self.exp_id2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
+
+
+class RegenerateMissingStatsModelsOneOffJobTest(test_utils.GenericTestBase):
+    exp_id = 'exp_id1'
+
+    def setUp(self):
+        super(RegenerateMissingStatsModelsOneOffJobTest, self).setUp()
+
+        self.exp1 = self.save_new_valid_exploration(self.exp_id, 'owner')
+
+        state_stats_dict = {
+            'total_answers_count_v1': 3,
+            'total_answers_count_v2': 0,
+            'useful_feedback_count_v1': 3,
+            'useful_feedback_count_v2': 0,
+            'total_hit_count_v1': 3,
+            'total_hit_count_v2': 0,
+            'first_hit_count_v1': 3,
+            'first_hit_count_v2': 0,
+            'num_times_solution_viewed_v2': 0,
+            'num_completions_v1': 3,
+            'num_completions_v2': 0
+        }
+
+        stats_models.ExplorationStatsModel.create(
+            self.exp_id, 1, 7, 0, 5, 0, 2, 0,
+            {
+                self.exp1.init_state_name: state_stats_dict
+            })
+
+        self.exp1.add_states(['New state'])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state'
+        })]
+        # v2 version does not have ExplorationStatsModel.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
+
+    def test_stats_models_regeneration_works(self):
+        """Test that stats models are regenerated with correct v1 stats values.
+        """
+        job_id = (
+            stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob.create_new()) # pylint: disable=line-too-long
+        stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob.enqueue(
+            job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Verify exploration version 2 has a stats model and values are correct.
+        exp_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, 2)
+
+        self.assertEqual(exp_stats.num_starts_v1, 7)
+        self.assertEqual(exp_stats.num_actual_starts_v1, 5)
+        self.assertEqual(exp_stats.num_completions_v1, 2)
+
+        state_stats = exp_stats.state_stats_mapping[self.exp1.init_state_name]
+
+        self.assertEqual(state_stats.total_answers_count_v1, 3)
+        self.assertEqual(state_stats.useful_feedback_count_v1, 3)
+        self.assertEqual(state_stats.total_hit_count_v1, 3)
+        self.assertEqual(state_stats.first_hit_count_v1, 3)
+        self.assertEqual(state_stats.num_completions_v1, 3)
 
 
 class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
@@ -644,7 +713,6 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
-    session_id_1 = 'session_id_1'
 
     def setUp(self):
         super(RecomputeActualStartStatisticsTest, self).setUp()
@@ -662,28 +730,28 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_1',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id2',
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_2',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id3',
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_3',
             event_schema_version=1).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id4',
             exp_id=self.exp_id,
             exp_version=2,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_4',
             event_schema_version=2).put()
 
         state_stats_dict = {
@@ -749,7 +817,6 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
-    session_id_1 = 'session_id_1'
 
     def setUp(self):
         super(RecomputeCompleteEventStatisticsTest, self).setUp()
@@ -765,7 +832,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_1',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -776,7 +843,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_2',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -787,7 +854,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=2,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_3',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,

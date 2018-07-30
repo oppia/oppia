@@ -22,18 +22,18 @@ oppia.factory('ResponsesService', [
   'AnswerGroupsCacheService', 'EditorStateService',
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ContextService', 'ExplorationWarningsService',
-  'StateContentIdsToAudioTranslationsService', 'SolutionValidityService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'ContextService', 'StateContentIdsToAudioTranslationsService',
+  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService,
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, ExplorationWarningsService,
-      StateContentIdsToAudioTranslationsService, SolutionValidityService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      ContextService, StateContentIdsToAudioTranslationsService,
+      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -394,9 +394,24 @@ oppia.factory('ResponsesService', [
             _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
-                for (var key in rule.inputs) {
-                  var newInputValue = [];
-                  rule.inputs[key] = newInputValue;
+                if (rule.type === 'HasElementXAtPositionY') {
+                  for (var key in rule.inputs) {
+                    var newInputValue = '';
+                    if (key === 'y') {
+                      newInputValue = 1;
+                    }
+                    rule.inputs[key] = newInputValue;
+                  }
+                } else if (rule.type === 'HasElementXBeforeElementY') {
+                  for (var key in rule.inputs) {
+                    var newInputValue = '';
+                    rule.inputs[key] = newInputValue;
+                  }
+                } else {
+                  for (var key in rule.inputs) {
+                    var newInputValue = [];
+                    rule.inputs[key] = newInputValue;
+                  }
                 }
               });
 

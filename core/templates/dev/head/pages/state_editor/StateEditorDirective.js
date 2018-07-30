@@ -38,12 +38,12 @@ oppia.directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_editor_directive.html'),
       controller: [
-        '$scope', 'INTERACTION_SPECS', 'EditorStateService',
+        '$scope', '$rootScope', 'INTERACTION_SPECS', 'EditorStateService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
         'StateContentIdsToAudioTranslationsService',
         'StateInteractionIdService', 'StateCustomizationArgsService',
         function(
-            $scope, INTERACTION_SPECS, EditorStateService,
+            $scope, $rootScope, INTERACTION_SPECS, EditorStateService,
             StateContentService, StateHintsService, StateSolutionService,
             StateContentIdsToAudioTranslationsService,
             StateInteractionIdService, StateCustomizationArgsService) {
@@ -52,7 +52,7 @@ oppia.directive('stateEditor', [
           $scope.currentStateIsTerminal = false;
           $scope.interactionIdIsSet = false;
           $scope.servicesInitialized = false;
-
+          $scope.stateName = EditorStateService.getActiveStateName();
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
             $scope.currentInteractionCanHaveSolution = Boolean(
@@ -86,6 +86,8 @@ oppia.directive('stateEditor', [
             updateInteractionVisibility(stateData.interaction.id);
             $scope.servicesInitialized = true;
           });
+
+          $rootScope.$broadcast('stateEditorDirectiveInitialized');
         }
       ]
     };
