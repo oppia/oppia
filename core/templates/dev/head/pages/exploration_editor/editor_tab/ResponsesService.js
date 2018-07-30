@@ -403,9 +403,24 @@ oppia.factory('ResponsesService', [
             _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
-                for (var key in rule.inputs) {
-                  var newInputValue = [];
-                  rule.inputs[key] = newInputValue;
+                if (rule.type === 'HasElementXAtPositionY') {
+                  for (var key in rule.inputs) {
+                    var newInputValue = '';
+                    if (key === 'y') {
+                      newInputValue = 1;
+                    }
+                    rule.inputs[key] = newInputValue;
+                  }
+                } else if (rule.type === 'HasElementXBeforeElementY') {
+                  for (var key in rule.inputs) {
+                    var newInputValue = '';
+                    rule.inputs[key] = newInputValue;
+                  }
+                } else {
+                  for (var key in rule.inputs) {
+                    var newInputValue = [];
+                    rule.inputs[key] = newInputValue;
+                  }
                 }
               });
 
