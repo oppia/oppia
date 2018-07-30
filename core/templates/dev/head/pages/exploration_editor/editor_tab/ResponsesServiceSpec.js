@@ -37,6 +37,67 @@ describe('Responses Service', function() {
 
     beforeEach(function() {
       ess.init({
+        State: {
+          content: {
+            content_id: 'content',
+            html: 'State Content'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {
+                  x: 'Test'
+                }
+              }],
+              outcome: {
+                dest: 'State',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: 'Feedback'
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              training_data: [],
+              tagged_misconception_id: null
+            }],
+            default_outcome: {
+              dest: 'State',
+              feedback: {
+                content_id: 'default_outcome',
+                html: 'Default'
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            hints: [],
+            confirmed_unclassified_answers: []
+          },
+          param_changes: []
+        }
+      });
+
+      // Initialize Responses Service
+      let state = ess.getState('State');
+      rs.init({
+        answerGroups: state.interaction.answerGroups,
+        defaultOutcome: state.interaction.defaultOutcome,
+        confirmedUnclassifiedAnswers: (
+          state.interaction.confirmedUnclassifiedAnswers)
+      });
+    })
+ /*     ess.init({
         Test: {
           classifier_model_id: null,
           content: {
@@ -92,16 +153,8 @@ describe('Responses Service', function() {
         }
       })
     });
+*/
 
-    // Initialize Responses Service
-    beforeEach(function() {
-      let state = ess.getState('Test');
-      rs.init({
-        answerGroups: state.interaction.answerGroups,
-        defaultOutcome: state.interaction.defaultOutcome,
-        confirmedUnclassifiedAnswers: (
-          state.interaction.confirmedUnclassifiedAnswers)
-      });
 /*      rs.init({
         answerGroups: [{
           rules: [{
@@ -136,7 +189,6 @@ describe('Responses Service', function() {
         confirmedUnclassifiedAnswers: [],
         interactionId: "ItemSelectionInput"
       }) */
-    });
 
 
     it('should return -1 if no answer group is active', function() {
