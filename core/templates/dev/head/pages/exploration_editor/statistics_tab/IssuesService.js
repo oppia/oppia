@@ -24,15 +24,32 @@ oppia.constant(
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
 oppia.factory('IssuesService', [
-  '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
+  '$http', '$sce', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
+  'ISSUE_TYPE_EARLY_QUIT',
   function(
-      $http, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL) {
+      $http, $sce, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
+      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
+      ISSUE_TYPE_EARLY_QUIT) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
+
+    var renderEarlyQuitIssueStatement = function() {
+      return 'Several learners exited the exploration in less than a minute.';
+    };
+
+    var renderEarlyQuitIssueSuggestions = function(issue) {
+      var suggestions = [
+        $sce.trustAsHtml(
+          'Review the cards up to and including <span class=' +
+          '"oppia-issues-state-link">"' +
+          issue.issueCustomizationArgs.state_name.value + '"</span> for' +
+          ' errors, ambiguities or insufficient motivation'
+        )];
+      return suggestions;
+    };
 
     var fetchIssues = function() {
       $http.get(getFullIssuesUrl(), {
@@ -47,10 +64,10 @@ oppia.factory('IssuesService', [
     };
 
     var fetchPlaythrough = function(playthroughId) {
-      $http.get(getFullPlaythroughUrl(playthroughId)).then(
+      return $http.get(getFullPlaythroughUrl(playthroughId)).then(
         function(response) {
           var playthroughDict = response.data;
-          currentPlaythrough = PlaythroughObjectFactory.createFromBackendDict(
+          return PlaythroughObjectFactory.createFromBackendDict(
             playthroughDict);
         });
     };
@@ -81,6 +98,16 @@ oppia.factory('IssuesService', [
       },
       getPlaythrough: function(playthroughId) {
         return fetchPlaythrough(playthroughId);
+      },
+      renderIssueStatement: function(issue) {
+        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+          return renderEarlyQuitIssueStatement();
+        }
+      },
+      renderIssueSuggestions: function(issue) {
+        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+          return renderEarlyQuitIssueSuggestions(issue);
+        }
       }
     };
   }]);
