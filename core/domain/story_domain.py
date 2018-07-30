@@ -711,6 +711,7 @@ class Story(object):
             return self.story_contents.nodes[0].id
         else:
             return None
+
     def get_next_node_id(self, completed_node_ids):
         """Returns the first node id in the story that has not yet
            been completed by the learner, or if the story is completed,
