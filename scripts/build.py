@@ -25,6 +25,7 @@ import re
 import shutil
 import subprocess
 import threading
+import time
 
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -541,20 +542,20 @@ def _execute_tasks(tasks, batch_size=24):
 
     Runs no more than 'batch_size' tasks at a time.
     """
-    remaining_tasks = [] + tasks
-    currently_running_tasks = set([])
+    remaining_tasks = list(tasks)
+    currently_running_tasks = []
 
     while remaining_tasks or currently_running_tasks:
         if currently_running_tasks:
             for task in list(currently_running_tasks):
-                task.join(1)
-                if not task.isAlive():
+                if not task.is_alive():
                     currently_running_tasks.remove(task)
 
         while remaining_tasks and len(currently_running_tasks) < batch_size:
             task = remaining_tasks.pop()
-            currently_running_tasks.add(task)
+            currently_running_tasks.append(task)
             task.start()
+        time.sleep(1)
 
 
 def build_files(source, target, file_hashes):
@@ -574,8 +575,8 @@ def build_files(source, target, file_hashes):
     ensure_directory_exists(target)
     shutil.rmtree(target)
 
-    tasks = []
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
+        tasks = []
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
@@ -591,10 +592,10 @@ def build_files(source, target, file_hashes):
                 target=minify_func,
                 args=(source_path, target_path, file_hashes, filename))
             tasks.append(task)
-    try:
-        _execute_tasks(tasks)
-    except Exception:
-        print 'Minification Failed'
+        try:
+            _execute_tasks(tasks)
+        except Exception as e:
+            print e
 
 
 def generate_build_directory():
