@@ -39,7 +39,11 @@ import utils
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
+FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
+FILE_DELETED = 'File has been deleted'
 FOUND_DELETED_FILE = 'Error: found deleted file'
+NO_OF_FILES_DELETED = 'Number of files that got deleted'
+NO_OF_FILES_NOT_IN_GCS = 'Number of files that are not in GCS are'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
@@ -693,3 +697,61 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, values)
+
+
+class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for deleting the images in the exploration
+    from the GAE.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileSnapshotContentModel]
+
+    @staticmethod
+    def map(file_snapshot_content_model):
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if not feconf.DEV_MODE:
+            instance_id = (
+                file_snapshot_content_model.get_unversioned_instance_id())
+            filetype = instance_id[instance_id.rfind('.') + 1:]
+            # To separate the image entries from the audio entries we get from
+            # the FileSnapshotContentModel.
+            if filetype in ALLOWED_IMAGE_EXTENSIONS:
+                pattern = re.compile(
+                    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+                        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+                catched_groups = pattern.match(instance_id)
+                if not catched_groups:
+                    yield (WRONG_INSTANCE_ID, instance_id)
+                else:
+                    filename = catched_groups.group(2)
+                    filepath = 'assets/' + filename
+                    exploration_id = catched_groups.group(1)
+
+                    file_model = file_models.FileModel.get_model(
+                        exploration_id, filepath, False)
+                    filemetadata_model = (
+                        file_models.FileMetadataModel.get_model(
+                            exploration_id, filepath, False))
+
+                    if file_model:
+                        if not fs.isfile('image/%s' % filename):
+                            yield (FILE_IS_NOT_IN_GCS, file_model.id)
+                        else:
+                            file_model.delete(
+                                'ADMIN',
+                                'Deleting the file_model for the image from GAE',
+                                False)
+                            filemetadata_model.delete(
+                                'ADMIN',
+                                'Deleting the filemetamodel for the image from GAE',
+                                False)
+                            yield (FILE_DELETED, file_model.id)
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_IS_NOT_IN_GCS:
+            yield (NO_OF_FILES_NOT_IN_GCS, len(values))
+        else:
+            yield (NO_OF_FILES_DELETED, len(values))
