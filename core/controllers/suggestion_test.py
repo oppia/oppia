@@ -83,225 +83,236 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            self.login(self.AUTHOR_EMAIL)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.login(self.AUTHOR_EMAIL)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 1',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 1',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token=csrf_token)
-            self.logout()
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 1',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 1',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token=csrf_token)
+                self.logout()
 
-            self.login(self.AUTHOR_EMAIL_2)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+                self.login(self.AUTHOR_EMAIL_2)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 2',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 2',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token=csrf_token)
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 2',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 2',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token=csrf_token)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 3',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 3',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token=csrf_token)
-            self.logout()
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 3',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 3',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token=csrf_token)
+                self.logout()
 
     def test_create_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            self.login(self.AUTHOR_EMAIL_2)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.login(self.AUTHOR_EMAIL_2)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 3',
-                        'new_value': self.new_content
-                    },
-                    'description': 'change again to state 3',
-                }, csrf_token=csrf_token)
-            suggestions = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions']
-            self.assertEqual(len(suggestions), 3)
-            self.logout()
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 3',
+                            'new_value': self.new_content
+                        },
+                        'description': 'change again to state 3',
+                    }, csrf_token=csrf_token)
+                suggestions = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions']
+                self.assertEqual(len(suggestions), 3)
+                self.logout()
 
     def test_accept_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-            # Test editor can accept successfully.
-            self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+                # Test editor can accept successfully.
+                self.login(self.EDITOR_EMAIL)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
 
-            suggestion_to_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id))['suggestions'][0]
+                suggestion_to_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id))['suggestions'][0]
 
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/exploration/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token)
-            suggestion_post_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id))['suggestions'][0]
-            self.assertEqual(
-                suggestion_post_accept['status'],
-                suggestion_models.STATUS_ACCEPTED)
-            exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-            self.assertEqual(
-                exploration.states[suggestion_to_accept[
-                    'change_cmd']['state_name']].content.html,
-                suggestion_to_accept['change_cmd']['new_value']['html'])
-            self.logout()
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                self.put_json('%s/exploration/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token)
+                suggestion_post_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id))['suggestions'][0]
+                self.assertEqual(
+                    suggestion_post_accept['status'],
+                    suggestion_models.STATUS_ACCEPTED)
+                exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+                self.assertEqual(
+                    exploration.states[suggestion_to_accept[
+                        'change_cmd']['state_name']].content.html,
+                    suggestion_to_accept['change_cmd']['new_value']['html'])
+                self.logout()
 
-            # Testing user without permissions cannot accept.
-            self.login(self.NORMAL_USER_EMAIL)
-            suggestion_to_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions'][0]
+                # Testing user without permissions cannot accept.
+                self.login(self.NORMAL_USER_EMAIL)
+                suggestion_to_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions'][0]
 
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/exploration/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token, expect_errors=True,
-                          expected_status_int=401)
-            self.logout()
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                self.put_json('%s/exploration/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token, expect_errors=True,
+                              expected_status_int=401)
+                self.logout()
 
-            # Testing that author cannot accept own suggestion.
-            self.login(self.AUTHOR_EMAIL_2)
-            suggestion_to_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions'][0]
+                # Testing that author cannot accept own suggestion.
+                self.login(self.AUTHOR_EMAIL_2)
+                suggestion_to_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions'][0]
 
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/exploration/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token, expect_errors=True,
-                          expected_status_int=401)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                self.put_json('%s/exploration/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token, expect_errors=True,
+                              expected_status_int=401)
 
-            # Testing users with scores above threshold can accept.
-            self.login(self.AUTHOR_EMAIL)
-            suggestion_services.increment_score_for_user(
-                self.author_id, 'content.Algebra', 15)
+                # Testing users with scores above threshold can accept.
+                self.login(self.AUTHOR_EMAIL)
+                suggestion_services.increment_score_for_user(
+                    self.author_id, 'content.Algebra', 15)
 
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/exploration/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                self.put_json('%s/exploration/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token)
 
-            suggestion_post_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions'][0]
-            self.assertEqual(
-                suggestion_post_accept['status'],
-                suggestion_models.STATUS_ACCEPTED)
-            self.logout()
+                suggestion_post_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions'][0]
+                self.assertEqual(
+                    suggestion_post_accept['status'],
+                    suggestion_models.STATUS_ACCEPTED)
+                self.logout()
 
-            # Testing admins can accept suggestions.
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
-            suggestion_to_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions'][1]
-            self.put_json('%s/exploration/%s/%s' % (
-                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
-                }, csrf_token=csrf_token)
-            suggestion_post_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id_2))['suggestions'][1]
-            self.assertEqual(
-                suggestion_post_accept['status'],
-                suggestion_models.STATUS_ACCEPTED)
-            self.logout()
+                # Testing admins can accept suggestions.
+                self.login(self.ADMIN_EMAIL)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
+                suggestion_to_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions'][1]
+                self.put_json('%s/exploration/%s/%s' % (
+                    feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted'
+                    }, csrf_token=csrf_token)
+                suggestion_post_accept = self.get_json(
+                    '%s?author_id=%s' % (
+                        feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                        self.author_id_2))['suggestions'][1]
+                self.assertEqual(
+                    suggestion_post_accept['status'],
+                    suggestion_models.STATUS_ACCEPTED)
+                self.logout()
 
     def test_suggestion_list_handler(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
