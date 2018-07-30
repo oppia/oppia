@@ -819,7 +819,8 @@ def validate_customization_args(html_list):
                 name='oppia-noninteractive-collapsible'):
             # This is wrapped in try catch block since any invalid
             # content such as int will not be convertible in Beautiful
-            # Soup format.
+            # Soup format. Also missing attributes will result in error
+            # when we try to extract them here.
             try:
                 content_html = json.loads(
                     unescape_html(collapsible['content-with-value']))
@@ -836,26 +837,27 @@ def validate_customization_args(html_list):
                         html_string)
 
         for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-            tab_content_json = unescape_html(
-                tabs['tab_contents-with-value'])
-            tab_content_list = json.loads(tab_content_json)
-            for tab_content in tab_content_list:
-                # This is wrapped in try catch block since any invalid
-                # content such as int will not be convertible in Beautiful
-                # Soup format.
-                try:
+            # This is wrapped in try catch block since any invalid
+            # content such as int will not be convertible in Beautiful
+            # Soup format. Also missing attributes will result in error
+            # when we try to extract them here.
+            try:
+                tab_content_json = unescape_html(
+                    tabs['tab_contents-with-value'])
+                tab_content_list = json.loads(tab_content_json)
+                for tab_content in tab_content_list:
                     content_html = tab_content['content']
                     soup_for_tabs = bs4.BeautifulSoup(
                         content_html, 'html.parser')
                     _validate_customization_args_in_soup(
                         soup_for_tabs, err_dict, html_string)
-                except Exception:
-                    if 'oppia-noninteractive-tabs' not in err_dict:
-                        err_dict['oppia-noninteractive-tabs'] = html_string
-                    elif html_string not in err_dict[
-                            'oppia-noninteractive-tabs']:
-                        err_dict['oppia-noninteractive-tabs'].append(
-                            html_string)
+            except Exception:
+                if 'oppia-noninteractive-tabs' not in err_dict:
+                    err_dict['oppia-noninteractive-tabs'] = html_string
+                elif html_string not in err_dict[
+                        'oppia-noninteractive-tabs']:
+                    err_dict['oppia-noninteractive-tabs'].append(
+                        html_string)
 
     return err_dict
 
