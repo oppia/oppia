@@ -34,9 +34,6 @@ describe('Responses Service', function() {
 
     // Since Exploration States Service required for Responses Service to work,
     // it needs to be initialized prior
-    beforeEach(inject(function($injector) {
-      ess = $injector.get('ExplorationStatesService');
-    }));
 
     beforeEach(function() {
       ess.init({
@@ -98,7 +95,14 @@ describe('Responses Service', function() {
 
     // Initialize Responses Service
     beforeEach(function() {
+      let state = ess.getState('Test');
       rs.init({
+        answerGroups: state.interaction.answerGroups,
+        defaultOutcome: state.interaction.defaultOutcome,
+        confirmedUnclassifiedAnswers: (
+          state.interaction.confirmedUnclassifiedAnswers)
+      });
+/*      rs.init({
         answerGroups: [{
           rules: [{
             inputs: {x: ['<p>One</p>']},
@@ -131,8 +135,9 @@ describe('Responses Service', function() {
         },
         confirmedUnclassifiedAnswers: [],
         interactionId: "ItemSelectionInput"
-      })
+      }) */
     });
+
 
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
