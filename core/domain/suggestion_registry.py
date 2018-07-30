@@ -45,7 +45,7 @@ class BaseSuggestion(object):
         author_id: str. The ID of the user who submitted the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change_cmd: Change. The details of the suggestion. This should be an
+        change: Change. The details of the suggestion. This should be an
             object of type ExplorationChange, TopicChange, etc.
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
@@ -72,7 +72,7 @@ class BaseSuggestion(object):
             'status': self.status,
             'author_name': self.get_author_name(),
             'final_reviewer_id': self.final_reviewer_id,
-            'change_cmd': self.change_cmd.to_dict(),
+            'change': self.change.to_dict(),
             'score_category': self.score_category,
             'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
@@ -112,7 +112,7 @@ class BaseSuggestion(object):
         """Validates the BaseSuggestion object. Each subclass must implement
         this function.
 
-        The subclasses must validate the change_cmd and score_category fields.
+        The subclasses must validate the change and score_category fields.
 
         Raises:
             ValidationError: One or more attributes of the BaseSuggestion object
@@ -192,7 +192,7 @@ class BaseSuggestion(object):
 
     def get_change_list_for_accepting_suggestion(self):
         """Before accepting the suggestion, a change_list needs to be generated
-        from the change_cmd. Each subclass must implement this function.
+        from the change. Each subclass must implement this function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
@@ -224,7 +224,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change_cmd, score_category, last_updated):
+            change, score_category, last_updated):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -237,7 +237,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
-        self.change_cmd = exp_domain.ExplorationChange(change_cmd)
+        self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
 
@@ -250,10 +250,10 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super(SuggestionEditStateContent, self).validate()
 
-        if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
+        if not isinstance(self.change, exp_domain.ExplorationChange):
             raise utils.ValidationError(
-                'Expected change_cmd to be an ExplorationChange, received %s'
-                % type(self.change_cmd))
+                'Expected change to be an ExplorationChange, received %s'
+                % type(self.change))
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
@@ -267,17 +267,17 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected the second part of score_category to be a valid'
                 ' category, received %s' % self.get_score_sub_type())
 
-        if self.change_cmd.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+        if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd.cmd))
+                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change.cmd))
 
-        if (self.change_cmd.property_name !=
+        if (self.change.property_name !=
                 exp_domain.STATE_PROPERTY_CONTENT):
             raise utils.ValidationError(
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
-                    self.change_cmd.property_name))
+                    self.change.property_name))
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -285,27 +285,27 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         self.validate()
         states = exp_services.get_exploration_by_id(self.target_id).states
-        if self.change_cmd.state_name not in states:
+        if self.change.state_name not in states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
-                self.change_cmd.state_name)
+                self.change.state_name)
 
     def get_change_list_for_accepting_suggestion(self):
-        """Gets a complete change_cmd for the suggestion.
+        """Gets a complete change for the suggestion.
 
         Returns:
             list(ExplorationChange). The change_list corresponding to the
                 suggestion.
         """
-        change_cmd = self.change_cmd
+        change = self.change
         exploration = exp_services.get_exploration_by_id(self.target_id)
         old_content = (
-            exploration.states[self.change_cmd.state_name].content.to_dict())
+            exploration.states[self.change.state_name].content.to_dict())
 
-        change_cmd.old_value = old_content
-        change_cmd.new_value['content_id'] = old_content['content_id']
+        change.old_value = old_content
+        change.new_value['content_id'] = old_content['content_id']
 
-        return [change_cmd]
+        return [change]
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -325,7 +325,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change_cmd, score_category, last_updated):
+            change, score_category, last_updated):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -337,7 +337,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
-        self.change_cmd = question_domain.QuestionChange(change_cmd)
+        self.change = question_domain.QuestionChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
 
@@ -352,52 +352,73 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_QUESTION:
             raise utils.ValidationError(
-                'Expected the first part of score_category to be %s '
-                ', received %s' % (
+                'Expected the first part of score_category to be "%s" '
+                ', received "%s"' % (
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
-        if not isinstance(self.change_cmd, question_domain.QuestionChange):
+        if not isinstance(self.change, question_domain.QuestionChange):
             raise utils.ValidationError(
-                'Expected change_cmd to be an instance of QuestionChange')
+                'Expected change to be an instance of QuestionChange')
 
-        if not self.change_cmd.cmd:
-            raise utils.ValidationError('Expected change_cmd to contain cmd')
+        if not self.change.cmd:
+            raise utils.ValidationError('Expected change to contain cmd')
 
         if (
-                self.change_cmd.cmd !=
-                question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION):
+                self.change.cmd !=
+                question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
             raise utils.ValidationError('Expected cmd to be %s, obtained %s' % (
-                question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION,
-                self.change_cmd.cmd))
+                question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                self.change.cmd))
 
-        if not self.change_cmd.question_dict:
+        if not self.change.question_dict:
             raise utils.ValidationError(
-                'Expected change_cmd to contain question_dict')
+                'Expected change to contain question_dict')
 
-        if 'question_state_data' not in self.change_cmd.question_dict:
+        if 'question_state_data' not in self.change.question_dict:
             raise utils.ValidationError(
                 'Expected question dict to contain question_state_data')
 
-        if 'language_code' not in self.change_cmd.question_dict:
+        if 'language_code' not in self.change.question_dict:
             raise utils.ValidationError(
                 'Expected question dict to contain language_code')
 
+        if not isinstance(
+            self.change.question_dict['language_code'], basestring):
+            raise utils.ValidationError('Expected language code to be a string')
+
+        if not utils.is_valid_language_code(
+            self.change.question_dict['language_code']):
+            raise utils.ValidationError(
+                'Expected language code to be a valid language code')
+
         if (
                 'question_state_schema_version' not in
-                self.change_cmd.question_dict):
+                self.change.question_dict):
             raise utils.ValidationError(
                 'Expected question dict to contain'
                 ' question_state_schema_version')
 
-        if not self.change_cmd.skill_id:
+        if not isinstance(
+            self.change.question_dict['question_state_schema_version'], int):
             raise utils.ValidationError(
-                'Expected change_cmd to contain skill_id')
+                'Expected question state schema version to be int')
+
+        if not (
+            self.change.question_dict['question_state_schema_version'] >= 1 and
+            self.change.question_dict['question_state_schema_version'] <=
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected question state schema version to be between 1 and %s',
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+        if not self.change.skill_id:
+            raise utils.ValidationError('Expected change to contain skill_id')
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
-        question_dict = self.change_cmd.question_dict
+        question_dict = self.change.question_dict
         self.validate()
         if (
                 question_dict['question_state_schema_version'] !=
@@ -405,9 +426,9 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 
-        skill_domain.Skill.require_valid_skill_id(self.change_cmd.skill_id)
+        skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
         skill = skill_services.get_skill_by_id(
-            self.change_cmd.skill_id, strict=False)
+            self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
@@ -421,17 +442,17 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         Args:
             unused_commit_message: str. This parameter is passed in for
-                consistency with the existing suggestions. As there is no model
-                being commited to, this arg is unused.
+                consistency with the existing suggestions. As a default commit
+                message is used in the add_question function, the arg is unused.
         """
-        question_dict = self.change_cmd.question_dict
+        question_dict = self.change.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question(self.author_id, question)
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change_cmd.skill_id)
+            question_dict['id'], self.change.skill_id)
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {

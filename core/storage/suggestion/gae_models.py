@@ -91,6 +91,10 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
                                      ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
+# Action types for incoming requests to the suggestion action handlers.
+ACTION_TYPE_ACCEPT = 'accept'
+ACTION_TYPE_REJECT = 'reject'
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.

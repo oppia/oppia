@@ -132,7 +132,9 @@ class EditableQuestionDataHandler(base.BaseHandler):
         ]
 
         for change in change_list:
-            if change.cmd == question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION:
+            if (
+                    change.cmd ==
+                    question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
                 raise self.InvalidInputException
 
         question_services.update_question(

@@ -100,7 +100,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 1',
@@ -125,7 +125,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 2',
@@ -145,7 +145,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 3',
@@ -174,7 +174,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 3',
@@ -224,8 +224,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 exploration = exp_services.get_exploration_by_id(self.EXP_ID)
                 self.assertEqual(
                     exploration.states[suggestion_to_accept[
-                        'change_cmd']['state_name']].content.html,
-                    suggestion_to_accept['change_cmd']['new_value']['html'])
+                        'change']['state_name']].content.html,
+                    suggestion_to_accept['change']['new_value']['html'])
                 self.logout()
 
                 # Testing user without permissions cannot accept.
@@ -367,10 +367,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         'target_type': suggestion_models.TARGET_TYPE_TOPIC,
                         'target_id': self.TOPIC_ID,
                         'target_version_at_submission': 1,
-                        'change_cmd': {
+                        'change': {
                             'cmd': (
                                 question_domain
-                                .CMD_ADD_QUESTION_FROM_SUGGESTION),
+                                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                             'question_dict': self.question_dict,
                             'skill_id': self.SKILL_ID
                         },
@@ -386,6 +386,16 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
                 )['suggestions']
             self.assertEqual(len(suggestions), 1)
+            suggestion = suggestions[0]
+            self.assertEqual(
+                suggestion['suggestion_type'],
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            self.assertEqual(suggestion['target_id'], self.TOPIC_ID)
+            self.assertEqual(
+                suggestion['target_type'], suggestion_models.TARGET_TYPE_TOPIC)
+            self.assertEqual(
+                suggestion['change']['cmd'],
+                question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION)
 
     def test_accept_question_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
@@ -406,7 +416,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         suggestion_to_accept['suggestion_id']), {
                             'action': u'accept',
                             'commit_message': u'commit message',
-                            'review_message': u'Accepted'
+                            'review_message': u'This looks good!'
                         }, csrf_token=csrf_token)
 
                 suggestion_post_accept = self.get_json(
@@ -429,5 +439,4 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 thread_messages = feedback_services.get_messages(
                     suggestion_to_accept['suggestion_id'])
             last_message = thread_messages[len(thread_messages) - 1]
-            self.assertEqual(
-                last_message.text, 'Accepted')
+            self.assertEqual(last_message.text, 'This looks good!')

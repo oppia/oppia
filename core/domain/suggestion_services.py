@@ -34,7 +34,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change_cmd, description, final_reviewer_id):
+        author_id, change, description, final_reviewer_id):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -48,7 +48,7 @@ def create_suggestion(
         target_version_at_submission: int. The version number of the target
             entity at the time of creation of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
-        change_cmd: dict. The details of the suggestion.
+        change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
@@ -73,11 +73,13 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+    else:
+        raise Exception('Invalid suggestion type')
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        final_reviewer_id, change_cmd, score_category, thread_id)
+        final_reviewer_id, change, score_category, thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -158,7 +160,7 @@ def _update_suggestion(suggestion):
 
     suggestion_model.status = suggestion.status
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
+    suggestion_model.change = suggestion.change.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()

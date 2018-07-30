@@ -62,7 +62,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
-            'change_cmd': {
+            'change': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
@@ -81,7 +81,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertDictEqual(
@@ -95,7 +95,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         suggestion.validate()
@@ -108,7 +108,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'content')
@@ -138,8 +138,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
-            'change_cmd': {
-                'cmd': question_domain.CMD_ADD_QUESTION_FROM_SUGGESTION,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
                 'question_dict': {
                     'question_state_data': self._create_valid_question_data(
                         'default_state'),
@@ -161,7 +161,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertDictEqual(
@@ -175,7 +175,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         suggestion.validate()
@@ -188,7 +188,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'question')
