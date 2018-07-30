@@ -383,11 +383,11 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question dict to contain language_code')
 
         if not isinstance(
-            self.change.question_dict['language_code'], basestring):
+                self.change.question_dict['language_code'], basestring):
             raise utils.ValidationError('Expected language code to be a string')
 
         if not utils.is_valid_language_code(
-            self.change.question_dict['language_code']):
+                self.change.question_dict['language_code']):
             raise utils.ValidationError(
                 'Expected language code to be a valid language code')
 
@@ -398,18 +398,19 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question dict to contain'
                 ' question_state_schema_version')
 
-        if not isinstance(
-            self.change.question_dict['question_state_schema_version'], int):
+        question_state_schema_version = (
+            self.change.question_dict['question_state_schema_version'])
+        if not isinstance(question_state_schema_version, int):
             raise utils.ValidationError(
                 'Expected question state schema version to be int')
 
         if not (
-            self.change.question_dict['question_state_schema_version'] >= 1 and
-            self.change.question_dict['question_state_schema_version'] <=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+                question_state_schema_version >= 1 and
+                question_state_schema_version <=
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
-                'Expected question state schema version to be between 1 and %s',
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                'Expected question state schema version to be between 1 and '
+                '%s' % feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
         if not self.change.skill_id:
             raise utils.ValidationError('Expected change to contain skill_id')
