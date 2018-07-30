@@ -27,48 +27,51 @@
  */
 
 oppia.factory('LearnerActionRenderService', [
-  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
+  '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
   'ACTION_TYPE_EXPLORATION_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
+      $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
       ACTION_TYPE_EXPLORATION_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-    var renderExplorationStartActionHTML = function(stateName) {
+    var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
-        '<span class="learner-action">Started exploration at card "' +
-        stateName + '".</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Started exploration at card "' + stateName + '".</span>';
       return htmlString;
     };
 
     var renderExplorationQuitActionHTML = function(
-        stateName, timeSpentInStateSecs) {
+        stateName, timeSpentInStateSecs, actionIndex) {
       var htmlString =
-        '<span class="learner-action">Left the exploration after spending a ' +
-        'total of ' + timeSpentInStateSecs + ' seconds on card "' + stateName +
-        '".</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Left the exploration after spending a ' + 'total of ' +
+        timeSpentInStateSecs + ' seconds on card "' + stateName + '".</span>';
       return htmlString;
     };
 
     var renderContinueButtonSubmitActionHTML = function(
-        stateName, timeSpentInStateSecs) {
+        stateName, timeSpentInStateSecs, actionIndex) {
       var htmlString =
-        '<span class="learner-action">Pressed "Continue" to move to card "' +
-        stateName + '" after ' + timeSpentInStateSecs + ' seconds.</span>';
+        '<span class="oppia-issues-learner-action">' + actionIndex +
+        '. Pressed "Continue" to move to card "' + stateName + '" after ' +
+        timeSpentInStateSecs + ' seconds.</span>';
       return htmlString;
     };
 
     var renderAnswerSubmitActionHTML = function(
-        answer, destStateName, timeSpentInStateSecs, currentStateName) {
+        answer, destStateName, timeSpentInStateSecs, currentStateName,
+        actionIndex) {
       var htmlString;
       if (currentStateName === destStateName) {
         htmlString =
-          '<span class="learner-action">Submitted answer "' + answer +
-          '" in card "' + currentStateName + '".</span>';
+          '<span class="oppia-issues-learner-action">' + actionIndex +
+          '. Submitted answer "' + answer + '" in card "' + currentStateName +
+          '".</span>';
       } else {
         htmlString =
-          '<span class="learner-action">Submitted answer "' + answer +
-          '" and moved to card "' + destStateName + '" after spending ' +
-          timeSpentInStateSecs + ' seconds on card "' + currentStateName +
-          '".</span>';
+          '<span class="oppia-issues-learner-action">' + actionIndex +
+          '. Submitted answer "' + answer + '" and moved to card "' +
+          destStateName + '" after spending ' + timeSpentInStateSecs +
+          ' seconds on card "' + currentStateName + '".</span>';
       }
       return htmlString;
     };
@@ -80,13 +83,14 @@ oppia.factory('LearnerActionRenderService', [
         finalBlock[index].actionCustomizationArgs.state_name.value;
 
       var tableHTML =
-        '<table class="learner-actions-table"><tr><th>Answer</th>' +
+        '<table class="oppia-issues-learner-action-table"><tr><th>Answer</th>' +
         '<th>Feedback</th></tr>';
       for (var i = 0; i < index; i++) {
         if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
           continue;
         }
-        var answer = finalBlock[i].actionCustomizationArgs.answer.value;
+        var answer =
+          finalBlock[i].actionCustomizationArgs.submitted_answer.value;
         var feedback = finalBlock[i].actionCustomizationArgs.feedback.value;
         tableHTML +=
           '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
@@ -95,25 +99,27 @@ oppia.factory('LearnerActionRenderService', [
       return tableHTML;
     };
 
-    var renderLearnerActionHTML = function(learnerAction) {
+    var renderLearnerActionHTML = function(learnerAction, actionIndex) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
       if (actionType === ACTION_TYPE_EXPLORATION_START) {
-        return renderExplorationStartActionHTML(custArgs.state_name.value);
+        return renderExplorationStartActionHTML(
+          custArgs.state_name.value, actionIndex);
       } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
         return renderExplorationQuitActionHTML(
-          custArgs.state_name.value, custArgs.time_spent_in_state_secs.value);
+          custArgs.state_name.value, custArgs.time_spent_state_in_msecs.value,
+          actionIndex);
       } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
         interactionId = custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,
-            custArgs.time_spent_in_state_secs.value);
-        } else if (custArgs.answer.value) {
+            custArgs.time_spent_state_in_msecs.value, actionIndex);
+        } else {
           return renderAnswerSubmitActionHTML(
-            custArgs.answer.value, custArgs.dest_state_name.value,
-            custArgs.time_spent_in_state_secs.value, custArgs.state_name.value
-          );
+            custArgs.submitted_answer.value, custArgs.dest_state_name.value,
+            custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
+            actionIndex);
         }
       }
     };
@@ -123,8 +129,8 @@ oppia.factory('LearnerActionRenderService', [
     };
 
     var groupedDisplayBlocks = {
-      displayBlocks: [],
-      localBlock: [],
+      displayBlocks: null,
+      localBlock: null,
       latestStateName: null,
       handleChangeInState: function(action) {
         this.latestStateName = action.actionCustomizationArgs.state_name.value;
@@ -143,30 +149,35 @@ oppia.factory('LearnerActionRenderService', [
     };
 
     return {
-      renderFinalDisplayBlockForMISIssueHTML: function(block) {
+      renderFinalDisplayBlockForMISIssueHTML: function(
+          block, actionStartIndex) {
         var index = block.length - 1;
         var stateName = block[index].actionCustomizationArgs.state_name.value;
         var htmlString = '';
         for (
           var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          htmlString += renderLearnerActionHTML(block[i]);
+          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
         htmlString +=
-          '<span class="learner-action">Submitted the following answers in ' +
-          'card "' + stateName + '"</span>';
+          '<span class="oppia-issues-learner-action">' +
+          (actionStartIndex + i).toString() +
+          '. Submitted the following answers in card "' + stateName +
+          '"</span>';
         htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += renderLearnerActionHTML(block[index]);
-        return htmlString;
+        htmlString += renderLearnerActionHTML(
+          block[index], actionStartIndex + i + 1);
+        return $sce.trustAsHtml(htmlString);
       },
-      renderDisplayBlockHTML: function(block) {
+      renderDisplayBlockHTML: function(block, actionStartIndex) {
         var htmlString = '';
         for (var i = 0; i < block.length; i++) {
-          htmlString += renderLearnerActionHTML(block[i]);
+          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
-        return htmlString;
+        return $sce.trustAsHtml(htmlString);
       },
       getDisplayBlocks: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
+        groupedDisplayBlocks.displayBlocks = [];
         groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
         groupedDisplayBlocks.latestStateName =
           learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
