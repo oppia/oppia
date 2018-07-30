@@ -616,7 +616,7 @@ class ExplorationMigrationValidationJobForCKEditor(
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield ('Error %s when loadingn exploration' % str(e), [item.id])
+            yield ('Error %s when loading exploration' % str(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
