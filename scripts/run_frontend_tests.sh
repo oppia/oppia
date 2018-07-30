@@ -63,7 +63,7 @@ echo ""
 echo "  Running test in development environment"
 echo ""
 $PYTHON_CMD scripts/build.py
-$XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
+$XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --capture-timeout 600000
 
 if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   echo ""

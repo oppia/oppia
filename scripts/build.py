@@ -25,7 +25,7 @@ import re
 import shutil
 import subprocess
 
-ASSETS_SRC_DIR = os.path.join('assets', '')
+ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
@@ -198,7 +198,22 @@ def process_html(source_path, target_path, file_hashes):
         if filepath.endswith('.html'):
             continue
         filepath_with_hash = _insert_hash(filepath, file_hash)
-        content = content.replace(filepath, filepath_with_hash)
+        if 'templates/dev/head/%s' % filepath in content:
+            content = content.replace(
+                'templates/dev/head/%s' % filepath,
+                '%s%s' % (TEMPLATES_OUT_DIR, filepath_with_hash))
+        elif '%s%s' % (ASSETS_DEV_DIR, filepath) in content:
+            content = content.replace(
+                '%s%s' % (ASSETS_DEV_DIR, filepath),
+                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
+        elif '%s%s' % (EXTENSIONS_DEV_DIR, filepath) in content:
+            content = content.replace(
+                '%s%s' % (EXTENSIONS_DEV_DIR, filepath),
+                '%s%s' % (EXTENSIONS_OUT_DIR, filepath_with_hash))
+        elif '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath) in content:
+            content = content.replace(
+                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
+                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
     content = REMOVE_WS(' ', content)
     ensure_directory_exists(target_path)
     d = open(target_path, 'w+')
@@ -542,10 +557,9 @@ def save_hashes_as_json(target_filepath, file_hashes):
 
     file_hash = generate_md5_hash(target_filepath)
     relative_filepath = os.path.relpath(
-        target_filepath, os.path.join(os.path.curdir, 'build'))
+        target_filepath, os.path.join(os.path.curdir, 'build', 'assets'))
     filepath_with_hash = _insert_hash(target_filepath, file_hash)
     os.rename(target_filepath, filepath_with_hash)
-
     file_hashes[relative_filepath] = file_hash
 
 
@@ -598,8 +612,8 @@ def generate_build_directory():
     hashes = dict()
 
     # Create hashes for assets, copy directories and files to build/assets.
-    hashes.update(get_file_hashes(ASSETS_SRC_DIR))
-    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
+    hashes.update(get_file_hashes(ASSETS_DEV_DIR))
+    copy_files_source_to_target(ASSETS_DEV_DIR, ASSETS_OUT_DIR, hashes)
 
     # Process third_party resources, create hashes for them and copy them into
     # build/third_party/generated.

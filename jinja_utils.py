@@ -57,13 +57,6 @@ def get_jinja_env(dir_path):
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
 
-    def get_static_resource_url(resource_suffix):
-        """Returns the relative path for the resource, appending it to the
-        corresponding cache slug. resource_suffix should have a leading
-        slash.
-        """
-        return '%s%s' % (utils.get_asset_dir_prefix(), resource_suffix)
-
     def get_complete_static_resource_url(domain_url, resource_suffix):
         """Returns the relative path for the resource, appending it to the
         corresponding cache slug. resource_suffix should have a leading
@@ -72,7 +65,6 @@ def get_jinja_env(dir_path):
         return '%s%s%s' % (
             domain_url, utils.get_asset_dir_prefix(), resource_suffix)
 
-    env.globals['get_static_resource_url'] = get_static_resource_url
     env.globals['get_complete_static_resource_url'] = (
         get_complete_static_resource_url)
     env.filters.update(JINJA_FILTERS)

@@ -189,7 +189,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 in directive_filenames if filename.endswith('.js'))
 
         js_files_paths.sort()
-        prefix = '<script src="{{ASSET_DIR_PREFIX}}/'
+        prefix = '<script src="/'
         suffix = '"></script>'
         html_script_tags = [
             '%s%s%s' % (prefix, path, suffix) for path in js_files_paths]

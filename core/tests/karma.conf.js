@@ -117,7 +117,8 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      prependPrefix: '/'
+      prependPrefix: '/',
+      stripPrefix: 'core/'
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'
