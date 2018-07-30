@@ -519,7 +519,7 @@ class ExplorationContentValidationJobForTextAngular(
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -553,7 +553,7 @@ class ExplorationMigrationValidationJobForTextAngular(
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -587,7 +587,7 @@ class ExplorationContentValidationJobForCKEditor(
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -616,7 +616,7 @@ class ExplorationMigrationValidationJobForCKEditor(
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield('Error %s in exploration' % str(e), [item.id])
+            yield ('Error %s when loadingn exploration' % str(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
@@ -624,14 +624,14 @@ class ExplorationMigrationValidationJobForCKEditor(
             err_dict = html_cleaner.validate_rte_format(
                 html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
         except Exception as e:
-            yield(
-                'Error in exploration %s' % item.id,
+            yield (
+                'Error in validating rte format for exploration %s' % item.id,
                 [traceback.format_exc()])
             return
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -695,7 +695,8 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
-class CustomizationArgsValidationJob(jobs.BaseMapReduceOneOffJobManager):
+class InteractionCustomizationArgsValidationJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
     """
@@ -712,21 +713,22 @@ class CustomizationArgsValidationJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield('Error %s in exploration' % str(e), [item.id])
+            yield ('Error %s when loading exploration' % str(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
         try:
             err_dict = html_cleaner.validate_customization_args(html_list)
         except Exception as e:
-            yield(
-                'Error in exploration %s' % item.id,
+            yield (
+                'Error in validating customization args for exploration %s' % (
+                    item.id),
                 [traceback.format_exc()])
             return
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):

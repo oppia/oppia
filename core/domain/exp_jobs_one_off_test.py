@@ -1341,7 +1341,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class CustomizationArgsValidationJobTest(
+class InteractionCustomizationArgsValidationJobTest(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1353,7 +1353,7 @@ class CustomizationArgsValidationJobTest(
 
     def setUp(self):
         super(
-            CustomizationArgsValidationJobTest, self).setUp()
+            InteractionCustomizationArgsValidationJobTest, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1414,12 +1414,12 @@ class CustomizationArgsValidationJobTest(
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start CustomizationArgsValidation job on sample exploration.
-        job_id = exp_jobs_one_off.CustomizationArgsValidationJob.create_new()
-        exp_jobs_one_off.CustomizationArgsValidationJob.enqueue(job_id)
+        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = (
-            exp_jobs_one_off.CustomizationArgsValidationJob.get_output(job_id))
+        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
         expected_output = [(
             '[u\'oppia-noninteractive-image\', '
             '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '

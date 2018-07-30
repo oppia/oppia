@@ -24,6 +24,7 @@ import urlparse
 
 import bleach
 import bs4
+import constants
 from core.domain import rte_component_registry
 import feconf
 
@@ -833,29 +834,28 @@ def validate_customization_args(html_list):
                         'oppia-noninteractive-collapsible']:
                     err_dict['oppia-noninteractive-collapsible'].append(
                         html_string)
-                break
 
         for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-            # This is wrapped in try catch block since any invalid
-            # content such as int will not be convertible in Beautiful
-            # Soup format.
-            try:
-                tab_content_json = unescape_html(
-                    tabs['tab_contents-with-value'])
-                tab_content_list = json.loads(tab_content_json)
-                for tab_content in tab_content_list:
+            tab_content_json = unescape_html(
+                tabs['tab_contents-with-value'])
+            tab_content_list = json.loads(tab_content_json)
+            for tab_content in tab_content_list:
+                # This is wrapped in try catch block since any invalid
+                # content such as int will not be convertible in Beautiful
+                # Soup format.
+                try:
                     content_html = tab_content['content']
                     soup_for_tabs = bs4.BeautifulSoup(
                         content_html, 'html.parser')
                     _validate_customization_args_in_soup(
                         soup_for_tabs, err_dict, html_string)
-            except Exception:
-                if 'oppia-noninteractive-tabs' not in err_dict:
-                    err_dict['oppia-noninteractive-tabs'] = html_string
-                elif html_string not in err_dict[
-                        'oppia-noninteractive-tabs']:
-                    err_dict['oppia-noninteractive-tabs'].append(html_string)
-                break
+                except Exception:
+                    if 'oppia-noninteractive-tabs' not in err_dict:
+                        err_dict['oppia-noninteractive-tabs'] = html_string
+                    elif html_string not in err_dict[
+                            'oppia-noninteractive-tabs']:
+                        err_dict['oppia-noninteractive-tabs'].append(
+                            html_string)
 
     return err_dict
 
@@ -873,43 +873,51 @@ def _validate_customization_args_in_soup(soup, err_dict, html_string):
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     # Importing this at the top of the file causes a circular dependency.
-    # So this is needed here.
+    # This happens since objects import schema_utils which imports html_cleaner.
+    # So this import statement is needed here.
     from extensions.objects.models import objects # pylint: disable=relative-import
 
-    rich_text_components = feconf.RICH_TEXT_COMPONENTS
+    with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
+        rich_text_components = constants.parse_json_from_js(f)
+
     # Mapping of type to classes defined in objects.py.
-    class_dict = {
+    obj_types_to_obj_classes = {
         'SanitizedUrl': objects.SanitizedUrl,
-        'UnicodeString': objects.UnicodeString,
+        'unicode': objects.UnicodeString,
         'MathLatexString': objects.MathLatexString,
         'Filepath': objects.Filepath,
-        'Int': objects.Int,
-        'Boolean': objects.Boolean,
-        'Html': objects.Html
+        'int': objects.Int,
+        'bool': objects.Boolean,
+        'html': objects.Html
     }
     filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
 
-    for component in rich_text_components:
+    for component in rich_text_components.itervalues():
         # This flag is set to true if the html string is invalid.
         is_invalid = False
-        tag_name = component['name']
-        customization_args = component['customization_args']
-        required_attrs_names = [arg['name'] for arg in customization_args]
+        tag_name = 'oppia-noninteractive-' + component['frontend_id']
+        customization_args = component['customization_arg_specs']
+        required_attr_names = [
+            (arg['name'] + '-with-value') for arg in customization_args]
 
         for tag in soup.findAll(name=tag_name):
             attrs = tag.attrs
-            attrs_names = attrs.keys()
+            attr_names = attrs.keys()
             # Ensure that no tag attribute is missing and also check
             # there is no extra attribute.
-            if set(attrs_names) != set(required_attrs_names):
+            if set(attr_names) != set(required_attr_names):
                 is_invalid = True
                 break
 
             for customization_arg in customization_args:
-                arg_name = customization_arg['name']
+                arg_name = customization_arg['name'] + '-with-value'
                 arg_value = json.loads(unescape_html(attrs[arg_name]))
-                if customization_arg['type'] != 'custom':
-                    arg_type = class_dict[customization_arg['type']]
+                schema = customization_arg['schema']
+                if tag_name != 'oppia-noninteractive-tabs':
+                    if schema['type'] != 'custom':
+                        arg_type = obj_types_to_obj_classes[schema['type']]
+                    else:
+                        arg_type = obj_types_to_obj_classes[schema['obj_type']]
                     try:
                         arg_type.normalize(arg_value)
                         # To ensure filepath is in valid format.
@@ -924,7 +932,7 @@ def _validate_customization_args_in_soup(soup, err_dict, html_string):
 
                         # To ensure that nested collapsible or tab
                         # is not present in collapsible component.
-                        elif arg_name == 'content-with-value':
+                        if tag_name == 'oppia-noninteractive-collapsible':
                             inner_soup = bs4.BeautifulSoup(
                                 arg_value.encode(encoding='utf-8'),
                                 'html.parser')
@@ -953,13 +961,17 @@ def _validate_customization_args_in_soup(soup, err_dict, html_string):
                             else:
                                 content = value['content']
                                 title = value['title']
+                                title_dict = schema['items']['properties'][0]
+                                content_dict = schema['items']['properties'][1]
+                                title_type = obj_types_to_obj_classes[
+                                    title_dict['schema']['type']]
+                                content_type = obj_types_to_obj_classes[
+                                    content_dict['schema']['type']]
                                 try:
-                                    title_type = class_dict[
-                                        customization_arg['title_type']]
-                                    content_type = class_dict[
-                                        customization_arg['content_type']]
                                     title_type.normalize(title)
                                     content_type.normalize(content)
+                                    # To ensure that nested collapsible or tab
+                                    # is not present in tabs component.
                                     inner_soup = bs4.BeautifulSoup(
                                         content.encode(encoding='utf-8'),
                                         'html.parser')
