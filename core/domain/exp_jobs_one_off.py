@@ -741,11 +741,11 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
                         else:
                             file_model.delete(
                                 'ADMIN',
-                                'Deleting the file_model for the image from GAE',
+                                'Deleting file_model for image from GAE',
                                 False)
                             filemetadata_model.delete(
                                 'ADMIN',
-                                'Deleting the filemetamodel for the image from GAE',
+                                'Deleting filemetamodel for image from GAE',
                                 False)
                             yield (FILE_DELETED, file_model.id)
 
