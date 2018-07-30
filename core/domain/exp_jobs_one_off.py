@@ -736,6 +736,9 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
                             exploration_id, filepath, False))
 
                     if file_model:
+                        fs = fs_domain.AbstractFileSystem(
+                            fs_domain.GcsFileSystem(exploration_id))
+
                         if not fs.isfile('image/%s' % filename):
                             yield (FILE_IS_NOT_IN_GCS, file_model.id)
                         else:
