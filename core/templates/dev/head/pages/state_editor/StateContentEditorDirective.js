@@ -45,6 +45,7 @@ oppia.directive('stateContentEditor', [
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
+          $scope.contentId = null;
           $scope.StateContentService = StateContentService;
           if (StateContentService.displayed) {
             $scope.contentId = StateContentService.displayed.getContentId();

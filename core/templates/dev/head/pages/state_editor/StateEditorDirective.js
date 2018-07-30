@@ -51,7 +51,7 @@ oppia.directive('stateEditor', [
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
           $scope.interactionIdIsSet = false;
-          $scope.stateName = EditorStateService.getActiveStateName();
+          $scope.servicesInitialized = false;
 
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
@@ -68,6 +68,7 @@ oppia.directive('stateEditor', [
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            $scope.stateName = EditorStateService.getActiveStateName();
             EditorStateService.setInteraction(stateData.interaction);
             StateContentService.init(
               $scope.stateName, stateData.content);
@@ -81,8 +82,9 @@ oppia.directive('stateEditor', [
             StateCustomizationArgsService.init(
               $scope.stateName, stateData.interaction.customizationArgs);
             StateSolutionService.init(
-              stateData.name, stateData.interaction.solution);
+              $scope.stateName, stateData.interaction.solution);
             updateInteractionVisibility(stateData.interaction.id);
+            $scope.servicesInitialized = true;
           });
         }
       ]
