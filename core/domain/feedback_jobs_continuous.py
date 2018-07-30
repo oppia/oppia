@@ -137,8 +137,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         exploration_ids.
 
         Args:
-            exploration_ids: list(str). IDs of the explorations to get
-            analytics for.
+            exploration_ids: list(str). IDs of the explorations to get analytics
+                for.
 
         Returns:
             list(dict). Each dict in this list corresponds to an
@@ -152,12 +152,11 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
-        feedback_thread_analytics_models = (
-            feedback_models.FeedbackAnalyticsModel.get_multi(
-                exploration_ids))
 
+        feedback_thread_analytics_models = (
+            feedback_models.FeedbackAnalyticsModel.get_multi(exploration_ids))
         return [feedback_domain.FeedbackAnalytics(
-            exploration_ids[i],
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_ids[i],
             (realtime_models[i].num_open_threads
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_open_threads
@@ -173,7 +172,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """Retrieves the analytics for feedback threads.
 
         Args:
-            exploration_id: str. ID of exploration to get statistics for.
+            exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
             dict with two keys:
@@ -201,7 +200,10 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [feedback_models.FeedbackThreadModel]
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            return [feedback_models.GeneralFeedbackThreadModel]
+        else:
+            return [feedback_models.FeedbackThreadModel]
 
     @staticmethod
     def map(item):
@@ -214,8 +216,11 @@ class FeedbackAnalyticsMRJobManager(
             A tuple of two elements:
               - str. The exploration id associated to the feedback thread.
               - str. The feedback thread's status.
-      """
-        yield (item.exploration_id, item.status)
+        """
+        if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
+            yield (item.entity_id, item.status)
+        else:
+            yield (item.exploration_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):
