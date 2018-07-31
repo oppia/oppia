@@ -2,26 +2,27 @@
   <div class="row oppia-issues-content oppia-issues-row-eq-height">
     <div class="col-md-2 oppia-issues-border-gray oppia-ft-14">
       <div ng-repeat="issue in issues" class="row">
-        <div ng-if="getIssueIndex(issue) == 0" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
-          Issue <[getIssueIndex(issue) + 1]>
+        <div ng-if="isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
+          Issue <[createIssueNavId(issue)]>
         </div>
-        <div ng-if="getIssueIndex(issue) !== 0" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
-          Issue <[getIssueIndex(issue) + 1]>
+        <div ng-if="!isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
+          Issue <[createIssueNavId(issue)]>
         </div>
       </div>
     </div>
     <div class="col-md-9 oppia-issues-border-gray">
       <div ng-repeat="issue in issues">
-        <div ng-if="getIssueIndex(issue) == 0" style="display: block;" id="issue<[getIssueIndex(issue)]>">
+        <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
           <div ng-if="issue.issueType == 'EarlyQuit'">
             <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"></early-quit-issue-directive>
           </div>
         </div>
-        <div ng-if="getIssueIndex(issue) !== 0" style="display: none;" id="issue<[getIssueIndex(issue)]>">
+        <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
           <div ng-if="issue.issueType == 'EarlyQuit'">
             <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"></early-quit-issue-directive>
           </div>
         </div>
+        <!-- TODO(pranavsid98): Implement remaining issue types. -->
       </div>
     </div>
   </div>
