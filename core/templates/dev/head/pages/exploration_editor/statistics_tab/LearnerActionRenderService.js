@@ -146,14 +146,26 @@ oppia.factory('LearnerActionRenderService', [
       }
     };
 
+    /**
+     * Checks whether the block length is less than an explicit maximum value.
+     */
     var withinBlockUpperBound = function(blockLength) {
       return blockLength < 4;
     };
 
+    /**
+     * Helper object to maintain the status of different display blocks while
+     * splitting up learner actions. This object will be updated as and when
+     * learner actions are inserted.
+     */
     var groupedDisplayBlocks = {
       displayBlocks: null,
       localBlock: null,
       latestStateName: null,
+      /**
+       * Inserts new learner action into existing block or creates a new block
+       * correctly, following a change in state.
+       */
       handleChangeInState: function(action) {
         this.latestStateName = action.actionCustomizationArgs.state_name.value;
         if (withinBlockUpperBound(this.localBlock.length)) {
