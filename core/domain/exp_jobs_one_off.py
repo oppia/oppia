@@ -39,11 +39,7 @@ import utils
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
-FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
-FILE_DELETED = 'File has been deleted'
 FOUND_DELETED_FILE = 'Error: found deleted file'
-NO_OF_FILES_DELETED = 'Number of files that got deleted'
-NO_OF_FILES_NOT_IN_GCS = 'Number of files that are not in GCS are'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
