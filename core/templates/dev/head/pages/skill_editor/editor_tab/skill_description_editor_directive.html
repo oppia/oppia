@@ -3,7 +3,7 @@
     <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="canEditSkillDescription()">
       <strong style="font-size: 1.2em;"><[skill.getDescription()]></strong>
       <i ng-if="canEditSkillDescription()"
-         class="material-icons oppia-editor-edit-icon"
+         class="material-icons oppia-skill-description-edit-icon"
          title="Edit Skill Description">&#xE254;
       </i>
     </span>
@@ -19,5 +19,12 @@
 <style>
   skill-description-editor .oppia-editor-header {
     margin-left: 12vw;
+  }
+
+  skill-description-editor .oppia-skill-description-edit-icon {
+    font-size: 16px;
+    opacity: 0.2;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
   }
 </style>

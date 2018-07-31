@@ -576,7 +576,7 @@ def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
     model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
-def delete_skill(committer_id, skill_id, force_deletion=True):
+def delete_skill(committer_id, skill_id, force_deletion=False):
     """Deletes the skill with the given skill_id.
 
     Args:
