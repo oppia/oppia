@@ -1624,6 +1624,15 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+    def test_none_version_raises_exception(self):
+        """Test that error is raised on None exp_version."""
+        self.post_json(
+            '/explorehandler/stats_events/%s' % (
+                self.exp_id), {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': None},
+            expect_errors=True, expected_status_int=400)
+
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
         self.post_json('/explorehandler/stats_events/%s' % (

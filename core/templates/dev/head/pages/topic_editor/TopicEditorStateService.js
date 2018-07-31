@@ -23,6 +23,8 @@ oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 oppia.constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+oppia.constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
@@ -30,13 +32,15 @@ oppia.factory('TopicEditorStateService', [
   'TopicRightsBackendApiService', 'UndoRedoService',
   'EditableTopicBackendApiService', 'EditableStoryBackendApiService',
   'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_STORY_SUMMARIES_INITIALIZED', function(
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
       $rootScope, AlertsService, TopicObjectFactory,
       TopicRightsObjectFactory, SubtopicPageObjectFactory,
       TopicRightsBackendApiService, UndoRedoService,
       EditableTopicBackendApiService, EditableStoryBackendApiService,
       EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_STORY_SUMMARIES_INITIALIZED) {
+      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_STORY_SUMMARIES_INITIALIZED,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
@@ -51,6 +55,7 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
+    var _questionSummaries = [];
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -104,6 +109,10 @@ oppia.factory('TopicEditorStateService', [
       _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
+    var _setQuestionSummaries = function(questionSummaries) {
+      _questionSummaries = angular.copy(questionSummaries);
+      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
+    };
 
     return {
       /**
@@ -123,6 +132,10 @@ oppia.factory('TopicEditorStateService', [
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
+              });
+            EditableTopicBackendApiService.fetchQuestions(topicId).then(
+              function(questionSummaries) {
+                _setQuestionSummaries(questionSummaries);
               });
           },
           function(error) {
@@ -195,6 +208,10 @@ oppia.factory('TopicEditorStateService', [
 
       getCanonicalStorySummaries: function() {
         return _canonicalStorySummaries;
+      },
+
+      getQuestionSummaries: function() {
+        return _questionSummaries;
       },
 
       /**

@@ -116,6 +116,8 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+ENTITY_TYPE_EXPLORATION = 'exploration'
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -365,6 +367,10 @@ ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
+
+# Determines whether to use the new feedback framework or the old one. To be
+# flipped after migrating existing feedback thread data to the new framework.
+ENABLE_GENERALIZED_FEEDBACK_THREADS = False
 
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
@@ -720,16 +726,8 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = True
-# Threshold for early quit playthrough.
-EARLY_QUIT_THRESHOLD_IN_SECS = 45
-# Threshold for multiple incorrect answers playthrough.
-NUM_INCORRECT_ANSWERS_THRESHOLD = 5
-# Threshold for repeated cyclic state transitions playthrough.
-NUM_REPEATED_CYCLES_THRESHOLD = 3
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
-# Probability of recording a playthrough.
-RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
