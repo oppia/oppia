@@ -33,7 +33,14 @@ oppia.directive('issuesDirective', [
           };
 
           $scope.currentIssueIndex = 0;
-          $scope.currentIssue = $scope.issues[0];
+
+          $scope.isIssueOnInitDisplay = function(issue) {
+            return $scope.getIssueIndex(issue) === 0;
+          };
+
+          $scope.createIssueNavId = function(issue) {
+            return $scope.getIssueIndex(issue) + 1;
+          };
 
           $scope.makeVisible = function(nextIssueIndex) {
             document.getElementById(
@@ -50,7 +57,6 @@ oppia.directive('issuesDirective', [
             document.getElementById(
               'issueNav' + nextIssueIndex).classList.add('bg-clr');
             $scope.currentIssueIndex = nextIssueIndex;
-            $scope.currentIssue = $scope.issues[nextIssueIndex];
           };
         }
       ]
