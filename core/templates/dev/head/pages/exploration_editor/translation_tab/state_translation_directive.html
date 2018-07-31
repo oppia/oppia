@@ -43,13 +43,15 @@
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
                ng-style="contentIdStatusColorStyle(answerGroup.outcome.feedback.getContentId())">
               <response-header index="$index"
-                               summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():false"
-                               short-summary="answerGroup | summarizeAnswerGroup : stateInteractionId:getAnswerChoices():true"
+                               summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), false)"
+                               short-summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), true)"
                                is-active="$index === activeAnswerGroupIndex"
                                outcome="answerGroup.outcome"
                                num-rules="answerGroup.rules.length"
                                is-response="true"
-                               show-warning="contentIdNeedUpdates(answerGroup.outcome.feedback.getContentId())">
+                               show-warning="contentIdNeedUpdates(answerGroup.outcome.feedback.getContentId())"
+                               navigate-to-state="navigateToState"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === $index">
@@ -74,11 +76,13 @@
                ng-style="contentIdStatusColorStyle(stateDefaultOutcome.feedback.getContentId())">
               <response-header index="$index"
                                is-active="$index === activeAnswerGroupIndex"
-                               summary="stateDefaultOutcome|summarizeDefaultOutcome:stateInteractionId:stateDefaultOutcome.length:false"
-                               short-summary="stateDefaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId:stateDefaultOutcome.length:true"
+                               summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
+                               short-summary="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
                                outcome="stateDefaultOutcome"
                                is-response="true"
-                               show-warning="contentIdNeedUpdates(stateDefaultOutcome.feedback.getContentId())">
+                               show-warning="contentIdNeedUpdates(stateDefaultOutcome.feedback.getContentId())"
+                               navigate-to-state="navigateToState"
+                               correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
               </response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">

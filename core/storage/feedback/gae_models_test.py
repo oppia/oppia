@@ -16,6 +16,7 @@
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -31,6 +32,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_put_function(self):
         feedback_thread_model = feedback_models.FeedbackThreadModel(
             exploration_id='exp_id_1')
+        feedback_thread_model.put()
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
+            subject='dummy subject')
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated

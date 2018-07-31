@@ -32,6 +32,10 @@ oppia.factory('StateObjectFactory', [
       this.contentIdsToAudioTranslations = contentIdsToAudioTranslations;
     };
 
+    State.prototype.setName = function(newName) {
+      this.name = newName;
+    };
+
     // Instance methods.
     State.prototype.toBackendDict = function() {
       return {
@@ -44,6 +48,20 @@ oppia.factory('StateObjectFactory', [
         content_ids_to_audio_translations: (
           this.contentIdsToAudioTranslations.toBackendDict())
       };
+    };
+
+    State.createDefaultState = function(newStateName) {
+      var newStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
+      var newState = this.createFromBackendDict(newStateName, {
+        classifier_model_id: newStateTemplate.classifier_model_id,
+        content: newStateTemplate.content,
+        interaction: newStateTemplate.interaction,
+        param_changes: newStateTemplate.param_changes,
+        content_ids_to_audio_translations: (
+          newStateTemplate.content_ids_to_audio_translations)
+      });
+      newState.interaction.defaultOutcome.dest = newStateName;
+      return newState;
     };
 
     // Static class methods. Note that "this" is not available in

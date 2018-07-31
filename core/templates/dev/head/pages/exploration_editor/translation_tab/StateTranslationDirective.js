@@ -27,22 +27,28 @@ oppia.directive('stateTranslation', [
       controller: [
         '$scope', '$filter', '$rootScope', 'EditorStateService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
+        'ExplorationCorrectnessFeedbackService', 'RouterService',
         'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
-        'COMPONENT_NAME_SOLUTION',
+        'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $scope, $filter, $rootScope, EditorStateService,
             ExplorationStatesService, ExplorationInitStateNameService,
+            ExplorationCorrectnessFeedbackService, RouterService,
             TranslationStatusService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
-            COMPONENT_NAME_SOLUTION) {
+            COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
           $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
           $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
           $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
-
           $rootScope.loadingMessage = 'Loading';
+
+          $scope.ExplorationCorrectnessFeedbackService =
+            ExplorationCorrectnessFeedbackService;
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -59,6 +65,10 @@ oppia.directive('stateTranslation', [
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
+          };
+
+          $scope.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
           };
 
           $scope.onTabClick = function(tabId) {
@@ -82,6 +92,67 @@ oppia.directive('stateTranslation', [
               $scope.activeContentId = $scope.stateSolution.explanation
                 .getContentId();
             }
+          };
+
+          $scope.summarizeDefaultOutcome = function(
+              defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+            if (!defaultOutcome) {
+              return '';
+            }
+
+            var summary = '';
+            var hasFeedback = defaultOutcome.hasNonemptyFeedback();
+
+            if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+              summary =
+                INTERACTION_SPECS[interactionId].default_outcome_heading;
+            } else if (answerGroupCount > 0) {
+              summary = 'All other answers';
+            } else {
+              summary = 'All answers';
+            }
+
+            if (hasFeedback && shortenRule) {
+              summary = $filter('wrapTextWithEllipsis')(
+                summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+            }
+            summary = '[' + summary + '] ';
+
+            if (hasFeedback) {
+              summary +=
+                $filter(
+                  'convertToPlainText'
+                )(defaultOutcome.feedback.getHtml());
+            }
+            return summary;
+          };
+
+          $scope.summarizeAnswerGroup = function(
+              answerGroup, interactionId, answerChoices, shortenRule) {
+            var summary = '';
+            var outcome = answerGroup.outcome;
+            var hasFeedback = outcome.hasNonemptyFeedback();
+
+            if (answerGroup.rules) {
+              var firstRule = $filter('convertToPlainText')(
+                $filter('parameterizeRuleDescription')(
+                  answerGroup.rules[0], interactionId, answerChoices));
+              summary = 'Answer ' + firstRule;
+
+              if (hasFeedback && shortenRule) {
+                summary = $filter('wrapTextWithEllipsis')(
+                  summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+              }
+              summary = '[' + summary + '] ';
+            }
+
+            if (hasFeedback) {
+              summary += (
+                shortenRule ?
+                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
+                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            }
+            return summary;
           };
 
           $scope.isDisabled = function(tabId) {
