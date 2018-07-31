@@ -192,7 +192,32 @@ oppia.directive('ckEditorRte', [
         }, null, null, 20);
 
         ck.on('change', function() {
-          ngModel.$setViewValue(ck.getData());
+          var elt = document.createElement('div');
+          elt.innerHTML = ck.getData();
+          var textElt = elt.childNodes;
+          for (var i = textElt.length; i > 0; i--) {
+            for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+              if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+                (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                  textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+                textElt[i - 1].childNodes[j - 1].remove();
+              } else {
+                break;
+              }
+            }
+            if (textElt[i - 1].childNodes.length === 0) {
+              if (textElt[i - 1].nodeName === 'BR' ||
+                (textElt[i - 1].nodeName === '#text' &&
+                  textElt[i - 1].nodeValue.trim() === '') ||
+                  textElt[i - 1].nodeName === 'P') {
+                textElt[i - 1].remove();
+                continue;
+              }
+            } else {
+              break;
+            }
+          }
+          ngModel.$setViewValue(elt.innerHTML);
         });
 
         ngModel.$render = function() {
