@@ -54,7 +54,6 @@ describe('Learner Action Render Service', function() {
               }
             }, 1
           ),
-
           jasmine.any(Object),
           jasmine.any(Object),
           this.laof.createNew(
