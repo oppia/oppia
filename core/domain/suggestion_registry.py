@@ -434,7 +434,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
 
-
     def get_change_list_for_accepting_suggestion(self):
         pass
 
@@ -451,6 +450,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['id'] = (
             question_services.get_new_question_id())
         question = question_domain.Question.from_dict(question_dict)
+        question.validate()
         question_services.add_question(self.author_id, question)
         question_services.create_new_question_skill_link(
             question_dict['id'], self.change.skill_id)
