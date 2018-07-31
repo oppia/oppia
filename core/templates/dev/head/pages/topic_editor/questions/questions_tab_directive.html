@@ -34,16 +34,34 @@
     </h4>
   </div>
 </md-card>
-<question-editor ng-if="questionEditorIsShown"
-                 question-id="questionId"
-                 question-state-data="questionStateData">
-</question-editor>
+
+<div ng-if="questionEditorIsShown">
+  <div style="padding-left: 45%;">
+    <button type="button"
+            class="btn btn-success oppia-editor-publish-button"
+            ng-click="saveAndPublishQuestion()">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label">Save and Publish Question</span>
+    </button>
+  </div>
+  <question-editor question-id="questionId"
+                   misconceptions="misconceptions"
+                   question-state-data="questionStateData">
+  </question-editor>
+</div>
 
 <style>
   questions-tab .oppia-page-card {
     margin-top: 2%;
     margin-left: 10%;
     width: 80%;
+  }
+
+  questions-tab .oppia-editor-publish-button {
+    margin-top: 2%;
   }
 
   questions-tab .dashboard-table {

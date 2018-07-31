@@ -24,7 +24,8 @@ oppia.directive('questionEditor', [
       restrict: 'E',
       scope: {
         getQuestionId: '&questionId',
-        getQuestionStateData: '&questionStateData'
+        getMisconceptions: '&misconceptions',
+        questionStateData: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
@@ -44,6 +45,7 @@ oppia.directive('questionEditor', [
             SolutionValidityService) {
           EditabilityService.markEditable();
           StateEditorService.setActiveStateName('question');
+          StateEditorService.setMisconceptions($scope.getMisconceptions());
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 
@@ -75,7 +77,7 @@ oppia.directive('questionEditor', [
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            var stateData = $scope.getQuestionStateData();
+            var stateData = $scope.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
               $rootScope.$broadcast('stateEditorInitialized', stateData);
@@ -91,6 +93,7 @@ oppia.directive('questionEditor', [
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
+            $scope.questionStateData.content.setHtml(displayedValue);
             $scope.interactionIsShown = true;
           };
 

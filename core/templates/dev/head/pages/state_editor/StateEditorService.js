@@ -30,6 +30,7 @@ oppia.factory('StateEditorService', [
     // service, the given solutions would be automatically verified for the set
     // interaction.
     var interaction = null;
+    var misconceptions = null;
 
     return {
       getActiveStateName: function() {
@@ -41,6 +42,12 @@ oppia.factory('StateEditorService', [
           return;
         }
         activeStateName = newActiveStateName;
+      },
+      setMisconceptions: function(newMisconceptions) {
+        misconceptions = newMisconceptions;
+      },
+      getMisconceptions: function() {
+        return misconceptions;
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;

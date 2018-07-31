@@ -17,8 +17,9 @@
  * question domain objects.
  */
 
-oppia.factory('QuestionObjectFactory', ['StateObjectFactory',
-  function(StateObjectFactory) {
+oppia.factory('QuestionObjectFactory', [
+  'StateObjectFactory', 'INTERACTION_SPECS',
+  function(StateObjectFactory, INTERACTION_SPECS) {
     var Question = function(id, stateData, languageCode, version) {
       this._id = id;
       this._stateData = stateData;
@@ -48,8 +49,43 @@ oppia.factory('QuestionObjectFactory', ['StateObjectFactory',
       return this._version;
     };
 
-    Question.createDefaultQuestionState = function() {
-      return StateObjectFactory.createDefaultState(null);
+    Question.createDefaultQuestion = function() {
+      return new Question(
+        null, StateObjectFactory.createDefaultState(null),
+        constants.DEFAULT_LANGUAGE_CODE, 1);
+    };
+
+    Question.prototype.validate = function(misconceptions) {
+      var interaction = this._stateData.interaction;
+      if (interaction.hints.length === 0) {
+        return 'At least 1 hint should be specfied';
+      }
+      if (
+        !interaction.solution &&
+        INTERACTION_SPECS[interaction.id].can_have_solution) {
+          return 'A solution must be specified';
+      }
+      var answerGroups = this._stateData.interaction.answerGroups;
+      var taggedMisconceptionIds = {};
+      var atLeastOneAnswerCorrect = false;
+      for (var i = 0; i < answerGroups.length; i++) {
+        if (answerGroups[i].outcome.labelledAsCorrect) {
+          atLeastOneAnswerCorrect = true;
+          continue;
+        }
+        if (answerGroups[i].taggedMisconceptionId !== null) {
+          taggedMisconceptionIds[answerGroups[i].taggedMisconceptionId] = true;
+        }
+      }
+      if (!atLeastOneAnswerCorrect) {
+        return 'At least one answer should be marked correct';
+      }
+      for (var i = 0; i < misconceptions.length; i++) {
+        if (!taggedMisconceptionIds[misconceptions[i].getId()]) {
+          return 'All misconceptions of the linked skill are not tagged';
+        }
+      }
+      return false;
     };
 
     Question.createFromBackendDict = function(questionBackendDict) {

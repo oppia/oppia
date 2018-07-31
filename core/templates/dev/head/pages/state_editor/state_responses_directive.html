@@ -40,10 +40,12 @@
                 <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
                   <answer-group-editor rules="answerGroup.rules"
                                        outcome="answerGroup.outcome"
+                                       tagged-misconception-id="answerGroup.taggedMisconceptionId"
                                        on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"
                                        on-save-answer-group-dest="saveActiveAnswerGroupDest"
                                        on-save-answer-group-correctness-label="saveActiveAnswerGroupCorrectnessLabel"
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
+                                       on-save-tagged-misconception="saveTaggedMisconception"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                        class="protractor-test-response-body"

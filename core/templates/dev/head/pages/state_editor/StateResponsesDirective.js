@@ -428,6 +428,15 @@ oppia.directive('stateResponses', [
             });
           };
 
+          $scope.saveTaggedMisconception = function(misconceptionId) {
+            ResponsesService.updateActiveAnswerGroup({
+              taggedMisconceptionId: misconceptionId
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
+            });
+          };
+
           $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               feedback: updatedOutcome.feedback
