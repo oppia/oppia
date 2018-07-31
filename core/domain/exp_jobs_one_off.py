@@ -705,15 +705,14 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [file_models.FileSnapshotContentModel]
+        return [file_models.FileModel]
 
     @staticmethod
-    def map(file_snapshot_content_model):
+    def map(file_model):
         # This job is allowed to run only in Production environment since it
         # uses GcsFileSystem which can't be used in Development environment.
         if not feconf.DEV_MODE:
-            instance_id = (
-                file_snapshot_content_model.get_unversioned_instance_id())
+            instance_id = file_model.id
             filetype = instance_id[instance_id.rfind('.') + 1:]
             # To separate the image entries from the audio entries we get from
             # the FileSnapshotContentModel.
@@ -729,28 +728,25 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
                     filepath = 'assets/' + filename
                     exploration_id = catched_groups.group(1)
 
-                    file_model = file_models.FileModel.get_model(
-                        exploration_id, filepath, False)
                     filemetadata_model = (
                         file_models.FileMetadataModel.get_model(
                             exploration_id, filepath, False))
 
-                    if file_model:
-                        fs = fs_domain.AbstractFileSystem(
-                            fs_domain.GcsFileSystem(exploration_id))
+                    fs = fs_domain.AbstractFileSystem(
+                        fs_domain.GcsFileSystem(exploration_id))
 
-                        if not fs.isfile('image/%s' % filename):
-                            yield (FILE_IS_NOT_IN_GCS, file_model.id)
-                        else:
-                            file_model.delete(
-                                'ADMIN',
-                                'Deleting file_model for image from GAE',
-                                False)
-                            filemetadata_model.delete(
-                                'ADMIN',
-                                'Deleting filemetamodel for image from GAE',
-                                False)
-                            yield (FILE_DELETED, file_model.id)
+                    if not fs.isfile('image/%s' % filename):
+                        yield (FILE_IS_NOT_IN_GCS, file_model.id)
+                    else:
+                        file_model.delete(
+                            'ADMIN',
+                            'Deleting file_model for image from GAE',
+                            False)
+                        filemetadata_model.delete(
+                            'ADMIN',
+                            'Deleting filemetamodel for image from GAE',
+                            False)
+                        yield (FILE_DELETED, file_model.id)
 
     @staticmethod
     def reduce(status, values):
