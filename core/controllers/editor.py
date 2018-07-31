@@ -49,24 +49,6 @@ app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-# The frontend template for a new state. It is sent to the frontend when the
-# exploration editor page is first loaded, so that new states can be
-# added in a way that is completely client-side.
-# IMPORTANT: Before adding this state to an existing exploration, the
-# state name and the destination of the default rule should first be
-# changed to the desired new state name.
-NEW_STATE_TEMPLATE = {
-    'classifier_model_id': None,
-    'content': {
-        'html': '',
-        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
-    },
-    'interaction': exp_domain.State.NULL_INTERACTION_DICT,
-    'param_changes': [],
-    'content_ids_to_audio_translations': (
-        feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
-}
-
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     'default_twitter_share_message_editor', {
         'type': 'unicode',
@@ -214,7 +196,6 @@ class ExplorationPage(EditorHandler):
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
-            'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,

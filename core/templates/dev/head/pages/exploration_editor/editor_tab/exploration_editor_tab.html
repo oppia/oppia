@@ -1,4 +1,12 @@
-<div class="oppia-editor-cards-container">
+<div ng-controller="ExplorationEditorTab" class="oppia-editor-cards-container">
+  <div class="oppia-editor-header">
+    <state-name-editor></state-name-editor>
+  </div>
+
+  <div ng-if="areParametersEnabled()">
+    <state-param-changes-editor></state-param-changes-editor>
+  </div>
+
   <state-editor on-save-state-content="saveStateContent"
                 on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
                 on-save-interaction-customization-args="saveInteractionCustomizationArgs"
@@ -7,11 +15,11 @@
                 on-save-interaction-answer-groups="saveInteractionAnswerGroups"
                 on-save-solution="saveSolution"
                 on-save-hints="saveHints"
-                state-content-placeholder="getStateContentPlaceholder()"
-                interaction-is-shown="interactionIsShown"
                 recompute-graph="recomputeGraph"
+                state-content-placeholder="getStateContentPlaceholder()"
                 navigate-to-state="navigateToState"
                 add-state="addState"
-                refresh-warnings="refreshWarnings">
+                refresh-warnings="refreshWarnings"
+                interaction-is-shown="interactionIsShown">
   </state-editor>
 </div>

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service that maintains a record of which state
- * in the exploration is currently active.
+ * @fileoverview A service that maintains a record of the objects exclusive to
+ * a state.
  */
 
 oppia.factory('EditorStateService', [
