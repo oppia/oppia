@@ -23,12 +23,13 @@ import logging
 import urllib
 import urlparse
 
-from PIL import Image  # pylint: disable=import-error
 import bleach
 import bs4
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
+
+from PIL import Image
 
 app_identity_services = models.Registry.import_app_identity_services()
 
