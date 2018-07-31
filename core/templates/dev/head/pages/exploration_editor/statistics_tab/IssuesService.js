@@ -17,8 +17,8 @@
  */
 
 oppia.factory('IssuesService', [
-  '$sce', 'ISSUE_TYPE_EARLY_QUIT',
-  function($sce, ISSUE_TYPE_EARLY_QUIT) {
+  '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
+  function($sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -43,13 +43,18 @@ oppia.factory('IssuesService', [
       initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        issues = fetchIssues(explorationId, explorationVersion);
       },
       getIssues: function() {
-        return issues;
+        return IssuesBackendApiService.fetchIssues(
+          explorationId, explorationVersion).then(function(issues) {
+          return issues;
+        });
       },
       getPlaythrough: function(playthroughId) {
-        return fetchPlaythrough(explorationId, playthroughId);
+        return IssuesBackendApiService.fetchPlaythrough(
+          explorationId, playthroughId).then(function(playthrough) {
+          return playthrough;
+        });
       },
       renderIssueStatement: function(issue) {
         if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
