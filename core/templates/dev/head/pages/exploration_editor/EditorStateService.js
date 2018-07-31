@@ -17,7 +17,7 @@
  * in the exploration is currently active.
  */
 
-oppia.factory('EditorStateService', [
+oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
       $log, SolutionValidityService) {

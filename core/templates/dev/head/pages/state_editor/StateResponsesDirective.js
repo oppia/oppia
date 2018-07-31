@@ -33,7 +33,7 @@ oppia.directive('stateResponses', [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'StateInteractionIdService', 'AlertsService',
         'ResponsesService', 'ContextService',
-        'EditabilityService', 'EditorStateService',
+        'EditabilityService', 'StateEditorService',
         'StateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'StateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
@@ -41,7 +41,7 @@ oppia.directive('stateResponses', [
             $scope, $rootScope, $uibModal, $filter,
             StateInteractionIdService, AlertsService,
             ResponsesService, ContextService,
-            EditabilityService, EditorStateService,
+            EditabilityService, StateEditorService,
             StateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             StateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
             UrlInterpolationService, AnswerGroupObjectFactory,
@@ -49,12 +49,12 @@ oppia.directive('stateResponses', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
-          $scope.stateName = EditorStateService.getActiveStateName();
+          $scope.stateName = StateEditorService.getActiveStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
           var _initializeTrainingData = function() {
-            if (EditorStateService.getInQuestionMode()) {
+            if (StateEditorService.getInQuestionMode()) {
               return;
             }
             var explorationId = ContextService.getExplorationId();
@@ -149,7 +149,7 @@ oppia.directive('stateResponses', [
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
             if (!outcome ||
-                !EditorStateService.getCorrectnessFeedbackEnabled()) {
+                !StateEditorService.getCorrectnessFeedbackEnabled()) {
               return false;
             }
             var currentStateName = $scope.stateName;

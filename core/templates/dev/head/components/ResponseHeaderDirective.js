@@ -34,11 +34,11 @@ oppia.directive('responseHeader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/response_header_directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'EditorStateService',
+        '$scope', 'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',
         'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, EditabilityService, EditorStateService,
+            $scope, EditabilityService, StateEditorService,
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
@@ -48,7 +48,7 @@ oppia.directive('responseHeader', [
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return EditorStateService.getCorrectnessFeedbackEnabled();
+            return StateEditorService.getCorrectnessFeedbackEnabled();
           };
           // This returns false if the current interaction ID is null.
           $scope.isCurrentInteractionLinear = function() {
@@ -62,7 +62,7 @@ oppia.directive('responseHeader', [
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();
-            var activeStateName = EditorStateService.getActiveStateName();
+            var activeStateName = StateEditorService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
           };
 

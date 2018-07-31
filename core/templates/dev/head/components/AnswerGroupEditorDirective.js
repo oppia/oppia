@@ -38,12 +38,12 @@ oppia.directive('answerGroupEditor', [
         '/components/answer_group_editor_directive.html'),
       controller: [
         '$scope', 'StateInteractionIdService', 'ResponsesService',
-        'AlertsService', 'INTERACTION_SPECS', 'EditorStateService',
+        'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
         'ENABLE_ML_CLASSIFIERS',
         function(
             $scope, StateInteractionIdService, ResponsesService,
-            AlertsService, INTERACTION_SPECS, EditorStateService,
+            AlertsService, INTERACTION_SPECS, StateEditorService,
             RuleObjectFactory, TrainingDataEditorPanelService,
             ENABLE_ML_CLASSIFIERS) {
           $scope.rulesMemento = null;
@@ -51,7 +51,7 @@ oppia.directive('answerGroupEditor', [
           $scope.editAnswerGroupForm = {};
 
           $scope.isInQuestionMode = function() {
-            return EditorStateService.getInQuestionMode();
+            return StateEditorService.getInQuestionMode();
           };
 
           $scope.getAnswerChoices = function() {

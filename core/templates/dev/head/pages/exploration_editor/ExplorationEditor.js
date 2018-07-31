@@ -39,7 +39,7 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'ExplorationDataService', 'EditorStateService', 'ExplorationTitleService',
+  'ExplorationDataService', 'StateEditorService', 'ExplorationTitleService',
   'ExplorationCategoryService', 'ExplorationObjectiveService',
   'ExplorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationInitStateNameService', 'ExplorationTagsService',
@@ -56,7 +56,7 @@ oppia.controller('ExplorationEditor', [
   'ThreadDataService', 'StateClassifierMappingService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      ExplorationDataService, EditorStateService, ExplorationTitleService,
+      ExplorationDataService, StateEditorService, ExplorationTitleService,
       ExplorationCategoryService, ExplorationObjectiveService,
       ExplorationLanguageCodeService, ExplorationRightsService,
       ExplorationInitStateNameService, ExplorationTagsService,
@@ -72,7 +72,7 @@ oppia.controller('ExplorationEditor', [
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
       ThreadDataService, StateClassifierMappingService) {
     $scope.EditabilityService = EditabilityService;
-    $scope.EditorStateService = EditorStateService;
+    $scope.StateEditorService = StateEditorService;
 
     /** ********************************************************
      * Called on initial load of the exploration editor page.
@@ -165,10 +165,10 @@ oppia.controller('ExplorationEditor', [
 
         GraphDataService.recompute();
 
-        if (!EditorStateService.getActiveStateName() ||
+        if (!StateEditorService.getActiveStateName() ||
             !ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
-          EditorStateService.setActiveStateName(
+              StateEditorService.getActiveStateName())) {
+          StateEditorService.setActiveStateName(
             ExplorationInitStateNameService.displayed);
         }
 
@@ -205,7 +205,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (ExplorationStatesService.getState(
-          EditorStateService.getActiveStateName())) {
+          StateEditorService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
           $scope.$broadcast('refreshStateTranslation');
         }

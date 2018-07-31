@@ -19,7 +19,7 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'EditorStateService',
+  'AnswerGroupsCacheService', 'StateEditorService',
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
@@ -28,7 +28,7 @@ oppia.factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, EditorStateService,
+      AnswerGroupsCacheService, StateEditorService,
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
@@ -60,21 +60,21 @@ oppia.factory('ResponsesService', [
         StateSolutionService.savedMemento.correctAnswer !== null);
 
       if (interactionCanHaveSolution && solutionExists) {
-        var interaction = EditorStateService.getInteraction();
+        var interaction = StateEditorService.getInteraction();
 
         interaction.answerGroups = angular.copy(_answerGroups);
         interaction.defaultOutcome = angular.copy(_defaultOutcome);
         var solutionIsValid = SolutionVerificationService.verifySolution(
-          EditorStateService.getActiveStateName(),
+          StateEditorService.getActiveStateName(),
           interaction,
           StateSolutionService.savedMemento.correctAnswer
         );
 
         SolutionValidityService.updateValidity(
-          EditorStateService.getActiveStateName(), solutionIsValid);
+          StateEditorService.getActiveStateName(), solutionIsValid);
         var solutionWasPreviouslyValid = (
           SolutionValidityService.isSolutionValid(
-            EditorStateService.getActiveStateName()));
+            StateEditorService.getActiveStateName()));
         if (solutionIsValid && !solutionWasPreviouslyValid) {
           AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
         } else if (!solutionIsValid && solutionWasPreviouslyValid) {
@@ -200,7 +200,7 @@ oppia.factory('ResponsesService', [
               COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(),
+              StateEditorService.getActiveStateName(),
               COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
             StateContentIdsToAudioTranslationsService.displayed.addContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);

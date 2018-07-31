@@ -17,7 +17,7 @@
  * a state.
  */
 
-oppia.factory('EditorStateService', [
+oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
       $log, SolutionValidityService) {
