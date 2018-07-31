@@ -31,20 +31,20 @@ oppia.directive('earlyQuitIssueDirective', [
         'early_quit_issue_directive.html'),
       controller: [
         '$scope', '$uibModal', 'IssuesService',
-        function(
-            $scope, $uibModal, IssuesService) {
-          $scope.currentIssueIndex = $scope.index();
+        function($scope, $uibModal, IssuesService) {
+          $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();
-
           $scope.issueStatement = IssuesService.renderIssueStatement(issue);
-
           $scope.suggestions = IssuesService.renderIssueSuggestions(issue);
-
           $scope.playthroughIds = issue.playthroughIds;
 
-          $scope.getPlaythroughIndex = function(playthroughId) {
+          var getPlaythroughIndex = function(playthroughId) {
             return $scope.playthroughIds.indexOf(playthroughId);
+          };
+
+          $scope.createPlaythroughNavId = function(playthroughId) {
+            return getPlaythroughIndex(playthroughId) + 1;
           };
 
           $scope.showPlaythrough = function(playthroughId) {
@@ -70,10 +70,8 @@ oppia.directive('earlyQuitIssueDirective', [
                   function(
                       $scope, $uibModalInstance, playthroughIndex,
                       playthrough, AlertsService, LearnerActionRenderService) {
-                    $scope.playthrough = playthrough;
                     $scope.playthroughIndex = playthroughIndex;
 
-                    console.log($scope.playthrough.actions);
                     $scope.displayBlocks =
                       LearnerActionRenderService.getDisplayBlocks(
                         playthrough.actions);
@@ -86,10 +84,17 @@ oppia.directive('earlyQuitIssueDirective', [
                     }
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
-                    console.log($scope.maxHidden);
 
                     $scope.getDisplayBlockIndex = function(displayBlock) {
                       return $scope.displayBlocks.indexOf(displayBlock);
+                    };
+
+                    $scope.isDisplayBlockOnInitDisplay = function(block) {
+                      return $scope.getDisplayBlockIndex(block) === 0;
+                    };
+
+                    $scope.createDisplayBlockNavId = function(block) {
+                      return $scope.getDisplayBlockIndex(block) + 1;
                     };
 
                     $scope.renderBlockHtml = function(displayBlock) {
@@ -118,7 +123,8 @@ oppia.directive('earlyQuitIssueDirective', [
                         if (currentShown === 0) {
                           document.getElementById(
                             'remainingActions' + pIdx.toString() +
-                            $scope.maxHidden.toString()).style.display = 'block';
+                            $scope.maxHidden.toString()).style.display =
+                              'block';
                         } else if (currentShown === 2) {
                           document.getElementById(
                             'remainingActions' + pIdx.toString() +

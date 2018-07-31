@@ -1,7 +1,7 @@
 <div class="row oppia-issues-row-eq-height oppia-issues-bor-left oppia-issues-issue-dir">
   <div class="col-md-3 oppia-issues-bor-btm oppia-issues-bor-right text-center oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white">
     <div style="font-size: 1.3em;">
-      Issue <[currentIssueIndex + 1]>
+      Issue <[currentIssueIdentifier]>
     </div>
   </div>
   <div class="col-md-9 oppia-issues-bor-left text-center d-flex justify-content-center oppia-issues-bor-btm oppia-pt2 oppia-pb2">
@@ -25,7 +25,7 @@
       <div class="oppia-hexagon">
         <div class="oppia-issues-hexagon-text">
           <button type="button" ng-click="showPlaythrough(playthroughId)" class="oppia-issues-playthrough-modal-btn oppia-issues-playthrough-content" style="padding-top: 20px; padding-right: 5px;">
-            View <br> Playthrough <[getPlaythroughIndex(playthroughId) + 1]>
+            View <br> Playthrough <[createPlaythroughNavId(playthroughId)]>
           </button>
         </div>
       </div>
