@@ -47,6 +47,13 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
+      "Pillow": {
+        "version": "5.1.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/python-pillow/Pillow/archive/5.1.0.zip",
+        "rootDirPrefix": "Pillow-",
+        "targetDirPrefix": "Pillow-"
+      },
       "requests": {
         "version": "2.10.0",
         "downloadFormat": "tar",
