@@ -80,15 +80,13 @@ oppia.factory('ThreadDataService', [
             $log.error('Number of suggestion threads doesn\'t match number of' +
                        'suggestion objects');
           }
-          for (var i = 0; i < res[1].data.suggestions.length; i++) {
-            var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              res[1].data.suggestions[i]);
-            for (var j = 0; j < suggestionThreads.length; j++) {
-              if (suggestion.threadId() ===
-                  suggestionThreads[j].thread_id) {
+          for (var i = 0; i < suggestionThreads.length; i++) {
+            for (var j = 0; j < res[1].data.suggestions.length; j++) {
+              if (suggestionThreads[i].thread_id ===
+                  res[1].data.suggestions[j].threadId()) {
                 var suggestionThread = (
                   SuggestionThreadObjectFactory.createFromBackendDicts(
-                    suggestionThreads[j], res[1].data.suggestions[i]));
+                    suggestionThreads[i], res[1].data.suggestions[i]));
                 _data.suggestionThreads.push(suggestionThread);
                 break;
               }
