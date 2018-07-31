@@ -120,13 +120,3 @@ def evaluate_object(obj, params):
         return new_dict
     else:
         return copy.deepcopy(obj)
-
-
-def interpolate_cache_slug(string):
-    """Parses the cache slug in the input string.
-
-    Returns:
-      the parsed string, or None if the string could not be parsed.
-    """
-    cache_slug = utils.get_asset_dir_prefix()
-    return parse_string(string, {'cache_slug': cache_slug})

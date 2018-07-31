@@ -117,8 +117,14 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
+      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // the key that we use for that cache needs to be exactly the same as
+      // the templateUrl in directive JS. The stripPrefix and prependPrefix are
+      // used for modifying the $templateCache keys.
+      // If the key starts with core/ we need to get rid of that.
+      stripPrefix: 'core/',
+      // Every key must start with /.
       prependPrefix: '/',
-      stripPrefix: 'core/'
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'
