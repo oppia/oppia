@@ -39,11 +39,6 @@ import utils
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
-FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
-FILE_DELETED = 'File has been deleted'
-FOUND_DELETED_FILE = 'Error: found deleted file'
-NO_OF_FILES_DELETED = 'Number of files that got deleted'
-NO_OF_FILES_NOT_IN_GCS = 'Number of files that are not in GCS are'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
@@ -651,15 +646,14 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [file_models.FileSnapshotContentModel]
+        return [file_models.FileModel]
 
     @staticmethod
-    def map(file_snapshot_content_model):
+    def map(file_model):
         # This job is allowed to run only in Production environment since it
         # uses GcsFileSystem which can't be used in Development environment.
         if not feconf.DEV_MODE:
-            instance_id = (
-                file_snapshot_content_model.get_unversioned_instance_id())
+            instance_id = file_model.id
             filetype = instance_id[instance_id.rfind('.') + 1:]
             # To separate the image entries from the audio entries we get from
             # the FileSnapshotContentModel.
@@ -672,23 +666,17 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     yield (WRONG_INSTANCE_ID, instance_id)
                 else:
                     filename = catched_groups.group(2)
-                    filepath = 'assets/' + filename
                     exploration_id = catched_groups.group(1)
-                    file_model = file_models.FileModel.get_model(
-                        exploration_id, filepath, False)
-                    if file_model:
-                        content = file_model.content
-                        fs = fs_domain.AbstractFileSystem(
-                            fs_domain.GcsFileSystem(exploration_id))
-                        if fs.isfile('image/%s' % filename):
-                            yield (FILE_ALREADY_EXISTS, file_model.id)
-                        else:
-                            fs.commit(
-                                'ADMIN', 'image/%s' % filename,
-                                content, mimetype='image/%s' % filetype)
-                            yield (FILE_COPIED, 1)
+                    content = file_model.content
+                    fs = fs_domain.AbstractFileSystem(
+                        fs_domain.GcsFileSystem(exploration_id))
+                    if fs.isfile('image/%s' % filename):
+                        yield (FILE_ALREADY_EXISTS, file_model.id)
                     else:
-                        yield (FOUND_DELETED_FILE, file_model.id)
+                        fs.commit(
+                            'ADMIN', 'image/%s' % filename,
+                            content, mimetype='image/%s' % filetype)
+                        yield (FILE_COPIED, 1)
 
 
     @staticmethod
@@ -697,4 +685,3 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, values)
-
