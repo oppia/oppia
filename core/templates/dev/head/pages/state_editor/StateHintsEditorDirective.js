@@ -30,14 +30,14 @@ oppia.directive('stateHintsEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'StateHintsService', 'COMPONENT_NAME_HINT',
+        'StateHintsService', 'COMPONENT_NAME_HINT', 'StateEditorService',
         'StateContentIdsToAudioTranslationsService', 'EditabilityService',
         'StateInteractionIdService', 'UrlInterpolationService',
         'HintObjectFactory', 'StateSolutionService',
         function(
             $scope, $rootScope, $uibModal, $filter,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            StateHintsService, COMPONENT_NAME_HINT,
+            StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
             StateContentIdsToAudioTranslationsService, EditabilityService,
             StateInteractionIdService, UrlInterpolationService,
             HintObjectFactory, StateSolutionService) {
@@ -45,6 +45,9 @@ oppia.directive('stateHintsEditor', [
           $scope.StateHintsService = StateHintsService;
           $scope.activeHintIndex = null;
           $scope.canEdit = GLOBALS.can_edit;
+          if (StateEditorService.getInQuestionMode()) {
+            $scope.canEdit = true;
+          }
 
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');

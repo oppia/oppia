@@ -89,6 +89,10 @@ oppia.directive('outcomeDestinationEditor', [
               text: '(try again)'
             }];
 
+            if (StateEditorService.getInQuestionMode()) {
+              $scope.destChoices[0].id = null;
+            }
+
             // Arrange the remaining states based on their order in the state
             // graph.
             var lastComputedArrangement = (
@@ -142,10 +146,12 @@ oppia.directive('outcomeDestinationEditor', [
               }
             }
 
-            $scope.destChoices.push({
-              id: PLACEHOLDER_OUTCOME_DEST,
-              text: 'A New Card Called...'
-            });
+            if (!StateEditorService.getInQuestionMode()) {
+              $scope.destChoices.push({
+                id: PLACEHOLDER_OUTCOME_DEST,
+                text: 'A New Card Called...'
+              });
+            }
           }, true);
         }
       ]

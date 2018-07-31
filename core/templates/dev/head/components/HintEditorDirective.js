@@ -31,10 +31,13 @@ oppia.directive('hintEditor', [
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'StateHintsService',
         'StateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_HINT',
+        'StateEditorService',
         function($scope, $uibModal, EditabilityService, StateHintsService,
-            StateContentIdsToAudioTranslationsService, COMPONENT_NAME_HINT) {
+            StateContentIdsToAudioTranslationsService, COMPONENT_NAME_HINT,
+            StateEditorService) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.StateHintsService = StateHintsService;
+          $scope.getInQuestionMode = StateEditorService.getInQuestionMode;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
 

@@ -370,7 +370,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = True
+ENABLE_NEW_STRUCTURES = False
 
 # Determines whether to use the new feedback framework or the old one. To be
 # flipped after migrating existing feedback thread data to the new framework.

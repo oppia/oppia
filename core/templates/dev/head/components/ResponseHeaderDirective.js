@@ -42,6 +42,7 @@ oppia.directive('responseHeader', [
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
+          $scope.getInQuestionMode = StateEditorService.getInQuestionMode;
 
           $scope.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;

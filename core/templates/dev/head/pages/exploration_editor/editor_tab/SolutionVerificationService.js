@@ -18,8 +18,10 @@
 
 oppia.factory('SolutionVerificationService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
+  'StateEditorService',
   function(
-      $injector, AngularNameService, AnswerClassificationService) {
+      $injector, AngularNameService, AnswerClassificationService,
+      StateEditorService) {
     return {
       verifySolution: function(stateName, interaction, correctAnswer) {
         var interactionId = interaction.id;
@@ -30,6 +32,9 @@ oppia.factory('SolutionVerificationService', [
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, interaction, correctAnswer, rulesService
           ));
+        if (StateEditorService.getInQuestionMode()) {
+          return result.outcome.labelledAsCorrect;
+        }
         return stateName !== result.outcome.dest;
       }
     };

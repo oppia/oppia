@@ -76,12 +76,8 @@ oppia.directive('questionEditor', [
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
             var stateData = $scope.getQuestionStateData();
-            statedata.interaction.defaultOutcome.setDestination(null);
+            stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              ResponsesService.save(
-                [], stateData.interaction.defaultOutcome,
-                function(newAnswerGroups, newDefaultOutcome) {}
-              );
               $rootScope.$broadcast('stateEditorInitialized', stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
@@ -133,6 +129,10 @@ oppia.directive('questionEditor', [
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            _init();
+          });
+
+          $scope.$on('onInteractionIdChanged', function(evt) {
             _init();
           });
         }
