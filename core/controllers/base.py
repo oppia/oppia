@@ -152,7 +152,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
-        self.values['profile_picture_data_url'] = None
         self.preferred_site_language_code = None
 
         if self.user_id:
@@ -174,8 +173,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.preferred_site_language_code = (
                     user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
-                self.values['profile_picture_data_url'] = (
-                    user_settings.profile_picture_data_url)
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
@@ -217,7 +214,7 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect('https://oppiatestserver.appspot.com', True)
+            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
         # In DEV_MODE, clearing cookies does not log out the user, so we

@@ -18,7 +18,6 @@
 
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;
-  var sampleDataResults = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;

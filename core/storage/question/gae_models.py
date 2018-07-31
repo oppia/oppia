@@ -17,8 +17,10 @@
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import feconf
 import utils
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -152,23 +154,81 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
-    def create(
-            cls, question_id, skill_id):
-        """Creates a new QuestionSkillLinkModel entry.
+    def get_model_id(cls, question_id, skill_id):
+        """Returns the model id by combining the questions and skill id.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
 
         Returns:
+            str. The calculated model id.
+        """
+        return '%s:%s' % (question_id, skill_id)
+
+    @classmethod
+    def create(cls, question_id, skill_id):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+
+        Raises:
+            Exception. The given question is already linked to the given skill.
+
+        Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel
                 entry.
         """
+        question_skill_link_id = cls.get_model_id(question_id, skill_id)
+        if cls.get(question_skill_link_id, strict=False) is not None:
+            raise Exception(
+                'The given question is already linked to given skill')
 
         question_skill_link_model_instance = cls(
-            question_id=question_id, skill_id=skill_id)
-
+            id=question_skill_link_id,
+            question_id=question_id,
+            skill_id=skill_id
+        )
         return question_skill_link_model_instance
+
+    @classmethod
+    def get_question_ids_linked_to_skill_ids(cls, skill_ids, start_cursor):
+        """Fetches the list of question ids linked to the skill in batches.
+
+        Args:
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+            start_cursor: str. The starting point from which the batch of
+                questions are to be returned. This value should be urlsafe.
+
+        Returns:
+            list(str), str|None. The question ids linked to given skills and the
+                next cursor value to be used for the next page (or None if no
+                more pages are left). The returned next cursor value is urlsafe.
+        """
+        if not start_cursor == '':
+            cursor = datastore_query.Cursor(urlsafe=start_cursor)
+            question_skill_link_models, next_cursor, more = cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(cls.key).fetch_page(
+                feconf.NUM_QUESTIONS_PER_PAGE,
+                start_cursor=cursor
+            )
+        else:
+            question_skill_link_models, next_cursor, more = cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(cls.key).fetch_page(
+                feconf.NUM_QUESTIONS_PER_PAGE
+            )
+        question_ids = [
+            model.question_id for model in question_skill_link_models
+        ]
+        next_cursor_str = (
+            next_cursor.urlsafe() if (next_cursor and more) else None
+        )
+        return question_ids, next_cursor_str
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

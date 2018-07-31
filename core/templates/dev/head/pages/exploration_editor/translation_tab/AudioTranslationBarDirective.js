@@ -33,16 +33,18 @@ oppia.directive('audioTranslationBar', [
         'audio_translation_bar_directive.html'),
       controller: [
         '$scope', '$filter', '$timeout', '$uibModal', 'AlertsService',
-        'stateContentIdsToAudioTranslationsService', 'IdGenerationService',
+        'StateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService',
-        'EditabilityService', 'AssetsBackendApiService', 'recorderService',
-        'ContextService', 'RECORDING_TIME_LIMIT',
+        'EditorStateService', 'ExplorationStatesService', 'EditabilityService',
+        'AssetsBackendApiService', 'recorderService', 'ContextService',
+        'RECORDING_TIME_LIMIT',
         function(
             $scope, $filter, $timeout, $uibModal, AlertsService,
-            stateContentIdsToAudioTranslationsService, IdGenerationService,
+            StateContentIdsToAudioTranslationsService, IdGenerationService,
             AudioPlayerService, TranslationLanguageService,
-            EditabilityService, AssetsBackendApiService, recorderService,
-            ContextService, RECORDING_TIME_LIMIT) {
+            EditorStateService, ExplorationStatesService, EditabilityService,
+            AssetsBackendApiService, recorderService, ContextService,
+            RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
@@ -57,20 +59,40 @@ oppia.directive('audioTranslationBar', [
           $scope.AudioPlayerService = AudioPlayerService;
           $scope.canTranslate = false;
 
-          recorderService.showPermission({
-            onDenied: function() {
-              $scope.recordingPermissionDenied = true;
-            },
-            onAllowed: function() {
-              $scope.recordingPermissionDenied = false;
-              $scope.cannotRecord = false;
-            },
-            onClosed: function() {
-              $scope.recordingPermissionDenied = true;
-            },
-          });
+          var saveContentIdsToAudioTranslationChanges = function() {
+            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            var stateName = EditorStateService.getActiveStateName();
+            var value = StateContentIdsToAudioTranslationsService.displayed;
+            ExplorationStatesService.saveContentIdsToAudioTranslations(
+              stateName, value);
+          };
+
+          var getAvailableAudio = function(contentId, languageCode) {
+            if ($scope.contentId) {
+              return StateContentIdsToAudioTranslationsService
+                .displayed.getAudioTranslation(contentId, languageCode);
+            }
+          };
+
+          var generateNewFilename = function() {
+            return $scope.contentId + '-' +
+              $scope.languageCode + '-' +
+              IdGenerationService.generateNewId() + '.mp3';
+          };
 
           $scope.checkAndStartRecording = function() {
+            recorderService.showPermission({
+              onDenied: function() {
+                $scope.recordingPermissionDenied = true;
+              },
+              onAllowed: function() {
+                $scope.recordingPermissionDenied = false;
+                $scope.cannotRecord = false;
+              },
+              onClosed: function() {
+                $scope.recordingPermissionDenied = true;
+              },
+            });
             if (!$scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
@@ -84,28 +106,17 @@ oppia.directive('audioTranslationBar', [
               $scope.recorder.startRecord();
             }
           };
+
           $scope.toggleAudioNeedsUpdate = function() {
-            stateContentIdsToAudioTranslationsService.displayed
+            StateContentIdsToAudioTranslationsService.displayed
               .toggleNeedsUpdateAttribute(
                 $scope.contentId, $scope.languageCode);
-            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            saveContentIdsToAudioTranslationChanges();
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
           $scope.getRecorderController = function() {
             $scope.recorder = recorderService.controller($scope.RECORDER_ID);
-          };
-          var getAvailableAudio = function(contentId, languageCode) {
-            if ($scope.contentId) {
-              return stateContentIdsToAudioTranslationsService
-                .displayed.getAudioTranslation(contentId, languageCode);
-            }
-          };
-
-          var generateNewFilename = function() {
-            return $scope.contentId + '-' +
-              $scope.languageCode + '-' +
-              IdGenerationService.generateNewId() + '.mp3';
           };
 
           $scope.reRecord = function() {
@@ -136,15 +147,15 @@ oppia.directive('audioTranslationBar', [
               ContextService.getExplorationId(), filename,
               recordedAudioFile).then(function() {
               if ($scope.audioIsUpdating) {
-                stateContentIdsToAudioTranslationsService.displayed
+                StateContentIdsToAudioTranslationsService.displayed
                   .deleteAudioTranslation(
                     $scope.contentId, $scope.languageCode);
                 $scope.audioIsUpdating = false;
               }
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .addAudioTranslation($scope.contentId, $scope.languageCode,
                   filename, recordedAudioFile.size);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              saveContentIdsToAudioTranslationChanges();
               AlertsService.addSuccessMessage(
                 'Succesfuly uploaded recorded audio.');
               $scope.initAudioBar();
@@ -212,9 +223,9 @@ oppia.directive('audioTranslationBar', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .deleteAudioTranslation($scope.contentId, $scope.languageCode);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              saveContentIdsToAudioTranslationChanges();
               $scope.initAudioBar();
             });
           };
@@ -298,11 +309,11 @@ oppia.directive('audioTranslationBar', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .addAudioTranslation(
                   $scope.contentId, $scope.languageCode, result.filename,
                   result.fileSizeBytes);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              saveContentIdsToAudioTranslationChanges();
               $scope.initAudioBar();
             });
           };

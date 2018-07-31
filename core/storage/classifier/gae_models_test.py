@@ -209,7 +209,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
             mapping_id)
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
-            'utf-8')))
+            encoding='utf-8')))
 
         state_name2 = u'टेक्स्ट'
         mapping_id = (
@@ -220,7 +220,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
             mapping_id)
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
-            'utf-8')))
+            encoding='utf-8')))
 
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'

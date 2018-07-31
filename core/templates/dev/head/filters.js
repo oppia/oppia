@@ -239,8 +239,11 @@ oppia.filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
+          } else if (varType === 'DragAndDropPositiveInt') {
+            replacementText = inputs[varName] + '';
           } else {
-            // The following case is for MultipleChoiceInput
+            // The following case is for MultipleChoiceInput and
+            // DragAndDropHtmlString.
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =

@@ -1309,26 +1309,6 @@ class InteractionInstance(object):
 class State(object):
     """Domain object for a state."""
 
-    NULL_INTERACTION_DICT = {
-        'id': None,
-        'customization_args': {},
-        'answer_groups': [],
-        'default_outcome': {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': {
-                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
-                'html': ''
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        },
-        'confirmed_unclassified_answers': [],
-        'hints': [],
-        'solution': None,
-    }
-
     def __init__(
             self, content, param_changes, interaction,
             content_ids_to_audio_translations, classifier_model_id=None):
@@ -4365,7 +4345,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title, category)
+            yaml_content, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

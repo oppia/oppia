@@ -256,7 +256,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             '/adminhandler', {
                 'action': 'reload_exploration',
                 'exploration_id': '2'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
     def test_get_library_groups(self):

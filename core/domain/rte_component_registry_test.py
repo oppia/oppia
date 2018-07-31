@@ -37,8 +37,6 @@ _COMPONENT_CONFIG_SCHEMA = [
     ('backend_id', basestring), ('category', basestring),
     ('description', basestring), ('frontend_id', basestring),
     ('tooltip', basestring), ('icon_data_url', basestring),
-    ('preview_url_template_dev', basestring),
-    ('preview_url_template_prod', basestring), ('is_complex', bool),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
@@ -136,15 +134,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
             directives_dir = os.path.join(component_dir, 'directives')
             png_file = os.path.join(component_dir, '%s.png' % component_id)
-            preview_file = os.path.join(
-                component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isdir(directives_dir))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
-            if len(dir_contents) == 5:
-                self.assertTrue(os.path.isfile(preview_file))
 
             main_js_file = os.path.join(
                 directives_dir, '%sDirective.js' % component_id)

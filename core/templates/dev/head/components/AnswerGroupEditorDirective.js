@@ -21,30 +21,38 @@ oppia.directive('answerGroupEditor', [
     return {
       restrict: 'E',
       scope: {
-        isEditable: '=',
+        addState: '=',
         displayFeedback: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        isEditable: '=',
+        onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
-        suppressWarnings: '&',
-        rules: '='
+        rules: '=',
+        suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'stateInteractionIdService', 'ResponsesService',
-        'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
+        '$scope', 'StateInteractionIdService', 'ResponsesService',
+        'AlertsService', 'INTERACTION_SPECS', 'EditorStateService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
+        'ENABLE_ML_CLASSIFIERS',
         function(
-            $scope, stateInteractionIdService, ResponsesService,
-            EditorStateService, AlertsService, INTERACTION_SPECS,
-            RuleObjectFactory, TrainingDataEditorPanelService) {
+            $scope, StateInteractionIdService, ResponsesService,
+            AlertsService, INTERACTION_SPECS, EditorStateService,
+            RuleObjectFactory, TrainingDataEditorPanelService,
+            ENABLE_ML_CLASSIFIERS) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
+
+          $scope.isInQuestionMode = function() {
+            return EditorStateService.getInQuestionMode();
+          };
 
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
@@ -61,7 +69,7 @@ oppia.directive('answerGroupEditor', [
           });
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.$on('externalSave', function() {
@@ -243,6 +251,10 @@ oppia.directive('answerGroupEditor', [
 
           $scope.openTrainingDataEditor = function() {
             TrainingDataEditorPanelService.openTrainingDataEditor();
+          };
+
+          $scope.isMLEnabled = function() {
+            return ENABLE_ML_CLASSIFIERS;
           };
 
           $scope.$on('onInteractionIdChanged', function() {
