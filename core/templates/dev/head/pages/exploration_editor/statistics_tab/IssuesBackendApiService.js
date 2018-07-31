@@ -45,7 +45,7 @@ oppia.factory('IssuesBackendApiService', [
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        $http.get(getFullIssuesUrl(explorationId), {
+        return $http.get(getFullIssuesUrl(explorationId), {
           params: {
             exp_version: explorationVersion
           }

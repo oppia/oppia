@@ -3882,7 +3882,7 @@ span.oppia-issues-learner-action {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
-  display:         flex;
+  display: flex;
 }
 
 .oppia-issues-text-white {

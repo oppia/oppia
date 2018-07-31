@@ -24,9 +24,11 @@ oppia.directive('issuesDirective', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/statistics_tab/issues_directive.html'),
       controller: [
-        '$scope', 'IssuesService', 'ISSUE_DIRECTIVE_MAPPING',
-        function($scope, IssuesService, ISSUE_DIRECTIVE_MAPPING) {
-          $scope.issues = IssuesService.getIssues();
+        '$scope', 'IssuesService',
+        function($scope, IssuesService) {
+          IssuesService.getIssues().then(function(issues) {
+            $scope.issues = issues;
+          });
 
           $scope.getIssueIndex = function(issue) {
             return $scope.issues.indexOf(issue);
