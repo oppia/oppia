@@ -23,7 +23,7 @@ import logging
 import urllib
 import urlparse
 
-from PIL import Image
+from PIL import Image # pylint: disable=import-error
 import bleach
 import bs4
 from core.domain import rte_component_registry
