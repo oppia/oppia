@@ -205,7 +205,7 @@ class SkillRightsModel(base_models.VersionedModel):
         """
         return cls.query(
             cls.creator_id == user_id,
-            cls.skill_is_private == True,
+            cls.skill_is_private == True, #pylint: disable=singleton-comparison
             cls.deleted == False) #pylint: disable=singleton-comparison
 
     @classmethod
