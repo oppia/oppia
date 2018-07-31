@@ -48,6 +48,10 @@ oppia.factory('QuestionObjectFactory', ['StateObjectFactory',
       return this._version;
     };
 
+    Question.createDefaultQuestionState = function() {
+      return StateObjectFactory.createDefaultState(null);
+    };
+
     Question.createFromBackendDict = function(questionBackendDict) {
       return new Question(
         questionBackendDict.id,

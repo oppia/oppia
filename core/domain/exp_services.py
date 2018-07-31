@@ -877,12 +877,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
     # Trigger statistics model update.
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states, change_list)
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
@@ -899,7 +901,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     if feconf.ENABLE_PLAYTHROUGHS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff=exp_versions_diff,
             revert_to_version=None)
@@ -1425,6 +1426,10 @@ def revert_exploration(
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
+
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=None, revert_to_version=revert_to_version)
 
     if feconf.ENABLE_PLAYTHROUGHS:
         current_exploration = get_exploration_by_id(

@@ -19,36 +19,46 @@ oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        addState: '=',
+        onSaveContentIdsToAudioTranslations: '=',
+        onSaveInteractionAnswerGroups: '=',
+        onSaveInteractionDefaultOutcome: '=',
+        navigateToState: '=',
+        refreshWarnings: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
+        '/pages/state_editor/state_responses_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
-        'stateInteractionIdService', 'EditorStateService', 'AlertsService',
-        'ResponsesService', 'RouterService', 'ContextService',
-        'TrainingDataService', 'EditabilityService',
-        'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
-        'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+        'StateInteractionIdService', 'AlertsService',
+        'ResponsesService', 'ContextService',
+        'EditabilityService', 'EditorStateService',
+        'StateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
+        'StateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
         'UrlInterpolationService', 'AnswerGroupObjectFactory',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT', function(
             $scope, $rootScope, $uibModal, $filter,
-            stateInteractionIdService, EditorStateService, AlertsService,
-            ResponsesService, RouterService, ContextService,
-            TrainingDataService, EditabilityService,
-            stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
-            stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+            StateInteractionIdService, AlertsService,
+            ResponsesService, ContextService,
+            EditabilityService, EditorStateService,
+            StateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
+            StateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
             UrlInterpolationService, AnswerGroupObjectFactory,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-          $scope.EditorStateService = EditorStateService;
           $scope.EditabilityService = EditabilityService;
+          $scope.stateName = EditorStateService.getActiveStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
           var _initializeTrainingData = function() {
+            if (EditorStateService.getInQuestionMode()) {
+              return;
+            }
             var explorationId = ContextService.getExplorationId();
-            var currentStateName = EditorStateService.getActiveStateName();
+            var currentStateName = $scope.stateName;
           };
 
           $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -57,7 +67,7 @@ oppia.directive('stateResponses', [
             // This array contains the text of each of the possible answers
             // for the interaction.
             var answerChoices = [];
-            var customizationArgs = stateCustomizationArgsService.savedMemento;
+            var customizationArgs = StateCustomizationArgsService.savedMemento;
             var handledAnswersArray = [];
 
             if (interactionId === 'MultipleChoiceInput') {
@@ -134,14 +144,15 @@ oppia.directive('stateResponses', [
             if (!outcome) {
               return false;
             }
-            return outcome.isConfusing(EditorStateService.getActiveStateName());
+            return outcome.isConfusing($scope.stateName);
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
-            if (!outcome) {
+            if (!outcome ||
+                !EditorStateService.getCorrectnessFeedbackEnabled()) {
               return false;
             }
-            var currentStateName = EditorStateService.getActiveStateName();
+            var currentStateName = $scope.stateName;
             return (
               (outcome.dest === currentStateName) &&
               outcome.labelledAsCorrect);
@@ -155,7 +166,7 @@ oppia.directive('stateResponses', [
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isCreatingNewState = function(outcome) {
@@ -216,7 +227,13 @@ oppia.directive('stateResponses', [
               evt, newInteractionId) {
             $rootScope.$broadcast('externalSave');
             ResponsesService.onInteractionIdChanged(
-              newInteractionId, function() {
+              newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
+                $scope.onSaveContentIdsToAudioTranslations(
+                  angular.copy(
+                    StateContentIdsToAudioTranslationsService.displayed));
+                $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                $scope.refreshWarnings()();
                 $scope.answerGroups = ResponsesService.getAnswerGroups();
                 $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
@@ -245,13 +262,18 @@ oppia.directive('stateResponses', [
           });
 
           $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-            ResponsesService.updateAnswerChoices(newAnswerChoices);
+            ResponsesService.updateAnswerChoices(
+              newAnswerChoices, function(newAnswerGroups) {
+                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                $scope.refreshWarnings()();
+              });
           });
 
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
-
+            var stateName = $scope.stateName;
+            var addState = $scope.addState;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -260,16 +282,16 @@ oppia.directive('stateResponses', [
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'ResponsesService',
-                'EditorStateService', 'EditorFirstTimeEventsService',
+                'EditorFirstTimeEventsService',
                 'RuleObjectFactory', 'OutcomeObjectFactory',
                 'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
                 function(
                     $scope, $uibModalInstance, ResponsesService,
-                    EditorStateService, EditorFirstTimeEventsService,
+                    EditorFirstTimeEventsService,
                     RuleObjectFactory, OutcomeObjectFactory,
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
                   $scope.feedbackEditorIsOpen = false;
-
+                  $scope.addState = addState;
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
                   };
@@ -278,14 +300,12 @@ oppia.directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK);
 
                   $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                    EditorStateService.getActiveStateName(),
-                    feedbackContentId, '', []);
+                    stateName, feedbackContentId, '', []);
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (
                       tmpOutcome.dest ===
-                      EditorStateService.getActiveStateName() &&
-                      !tmpOutcome.hasNonemptyFeedback());
+                      stateName && !tmpOutcome.hasNonemptyFeedback());
                   };
 
                   $scope.addAnswerGroupForm = {};
@@ -314,10 +334,19 @@ oppia.directive('stateResponses', [
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
                 [result.tmpRule], result.tmpOutcome, [], null));
-              ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
-              stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              ResponsesService.save(
+                $scope.answerGroups, $scope.defaultOutcome,
+                function(newAnswerGroups, newDefaultOutcome) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                  $scope.refreshWarnings()();
+                });
+              StateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.tmpOutcome.feedback.getContentId());
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                StateContentIdsToAudioTranslationsService.displayed
+              );
               $scope.changeActiveAnswerGroupIndex(
                 $scope.answerGroups.length - 1);
 
@@ -346,7 +375,13 @@ oppia.directive('stateResponses', [
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
-              ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
+              ResponsesService.save(
+                $scope.answerGroups, $scope.defaultOutcome,
+                function(newAnswerGroups, newDefaultOutcome) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                  $scope.refreshWarnings()();
+                });
             }
           };
 
@@ -377,18 +412,28 @@ oppia.directive('stateResponses', [
             }).result.then(function() {
               var deletedOutcome =
                 ResponsesService.getAnswerGroup(index).outcome;
-              ResponsesService.deleteAnswerGroup(index);
+              ResponsesService.deleteAnswerGroup(
+                index, function(newAnswerGroups) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.refreshWarnings()();
+                });
               var deletedFeedbackContentId =
                 deletedOutcome.feedback.getContentId();
-              stateContentIdsToAudioTranslationsService.
+              StateContentIdsToAudioTranslationsService.
                 displayed.deleteContentId(deletedFeedbackContentId);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                StateContentIdsToAudioTranslationsService.displayed
+              );
             });
           };
 
           $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               feedback: updatedOutcome.feedback
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
@@ -398,6 +443,9 @@ oppia.directive('stateResponses', [
               refresherExplorationId: updatedOutcome.refresherExplorationId,
               missingPrerequisiteSkillId:
                 updatedOutcome.missingPrerequisiteSkillId
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
@@ -405,18 +453,26 @@ oppia.directive('stateResponses', [
               updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
           $scope.saveActiveAnswerGroupRules = function(updatedRules) {
             ResponsesService.updateActiveAnswerGroup({
               rules: updatedRules
+            }, function(newAnswerGroups) {
+              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+              $scope.refreshWarnings()();
             });
           };
 
           $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
               feedback: updatedOutcome.feedback
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 
@@ -426,12 +482,16 @@ oppia.directive('stateResponses', [
               refresherExplorationId: updatedOutcome.refresherExplorationId,
               missingPrerequisiteSkillId:
                 updatedOutcome.missingPrerequisiteSkillId
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 
           $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
+            }, function(newDefaultOutcome) {
+              $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
 
@@ -501,12 +561,8 @@ oppia.directive('stateResponses', [
           };
 
           $scope.isOutcomeLooping = function(outcome) {
-            var activeStateName = EditorStateService.getActiveStateName();
+            var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
-          };
-
-          $scope.navigateToState = function(stateName) {
-            RouterService.navigateToMainTab(stateName);
           };
         }
       ]

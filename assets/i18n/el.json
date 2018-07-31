@@ -120,6 +120,7 @@
 	"I18N_INTERACTIONS_LOGIC_PROOF_POSSIBLE_LINES": "Πιθανές γραμμές",
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "Εκκαθάριση",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Αναπαραγωγή",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Πιθανές μορφές μονάδας",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Ακύρωση",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Απαιτείται επιβεβαίωση",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Επαναφορά κωδικού",
@@ -321,5 +322,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Σύνδεση με τη Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Διδάξτε με την Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Έχετε ένα σύνολο <[totalSubscribers]> συνδρομητών.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Κατάργηση συνδρομής"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Κατάργηση συνδρομής",
+	"I18N_WORKED_EXAMPLE": "Δουλεμένο παράδειγμα"
 }
