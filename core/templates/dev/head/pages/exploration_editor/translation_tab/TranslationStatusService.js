@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview A service that provides the translation status of state and
- * it's components.
+ * its components.
  */
 
 oppia.factory('TranslationStatusService', [
@@ -22,7 +22,7 @@ oppia.factory('TranslationStatusService', [
   'TranslationLanguageService', function(
       StateContentIdsToAudioTranslationsService, ExplorationStatesService,
       TranslationLanguageService) {
-    var NEEDS_UPDATE_MESSAGE = ['Audio needs updates!'];
+    var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
     var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
@@ -48,9 +48,9 @@ oppia.factory('TranslationStatusService', [
           var allContentId = contentIdsToAudioTranslations.getAllContentId();
           explorationAudioRequiredCount += allContentId.length;
           allContentId.forEach(function(contentId) {
-            availableTranslationLanguageCode = contentIdsToAudioTranslations
+            availableTranslationLanguageCodes = contentIdsToAudioTranslations
               .getAudioLanguageCodes(contentId);
-            if (availableTranslationLanguageCode.indexOf(langCode) > -1) {
+            if (availableTranslationLanguageCodes.indexOf(langCode) > -1) {
               var audioTranslation = contentIdsToAudioTranslations
                 .getAudioTranslation(contentId, langCode);
               if (audioTranslation.needsUpdate) {
@@ -132,7 +132,7 @@ oppia.factory('TranslationStatusService', [
               return true;
             }
           }
-        };
+        }
       }
       return false;
     };
@@ -177,7 +177,7 @@ oppia.factory('TranslationStatusService', [
       getExplorationAudioNotAvailableCount: function() {
         return explorationAudioNotAvailableCount;
       },
-      getAllStateStatusColour: function() {
+      getAllStateStatusColors: function() {
         _computeAllStatesStatus();
         return stateWiseStatusColor;
       },

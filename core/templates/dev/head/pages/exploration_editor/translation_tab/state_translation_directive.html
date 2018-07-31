@@ -1,23 +1,23 @@
 <div class="oppia-page-card oppia-state-translation-page">
-  <div class="tarnslation-nav md-tab">
+  <div class="translation-nav md-tab">
     <ul class="oppia-translation-tabs">
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CONTENT)}">
-        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="TabStatusColourStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="tabStatusColourStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" style="color: red">⚠</span>Content
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}">
-        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="TabStatusColourStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColourStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" style="color: red">⚠</span>Feedback
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}">
-        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="TabStatusColourStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="tabStatusColourStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" style="color: red">⚠</span>Hints
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}">
-        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" class="oppia-translation-tabs-text" ng-style="TabStatusColourStyle(TAB_ID_SOLUTION)">
+        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" class="oppia-translation-tabs-text" ng-style="tabStatusColourStyle(TAB_ID_SOLUTION)">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" style="color: red">⚠</span>Solution
         </a>
       </li>
@@ -140,9 +140,9 @@
 <style>
   .oppia-state-translation-page {
     border-bottom: 2px solid #ccc;
+    height: 500px;
     padding: 0px;
     width: 80%;
-    height: 500px;
   }
   .oppia-translation-tabs {
     display: -webkit-flex;
@@ -162,22 +162,22 @@
     width: calc(100% / 4);
   }
   .oppia-active-translation-tab a {
-    color: #009688;
     border-bottom: 0;
     background-color: white;
+    color: #009688;
     text-decoration: none;
   }
   .oppia-disabled-translation-tab a {
     cursor: not-allowed;
-    pointer-events: none;
     color: #ccc;
+    pointer-events: none;
   }
   .oppia-translation-tabs-text {
-    color: #009688;
     background: rgba(243,243,243,.75);
     border: 1px solid #eee;
     border-bottom-width: 2px;
     border-top-width: 3px;
+    color: #009688;
     padding: 10px;
     text-decoration: none;
     width: 100%;
@@ -187,14 +187,14 @@
     text-decoration: none;
   }
   .translation-state-contents {
-    display: block;
-    margin: auto;
-    height: 80%;
-    overflow: auto;
     border-bottom: 2px solid #eee;
+    display: block;
+    height: 80%;
+    margin: auto;
+    overflow: auto;
     }
   .translation-state-content {
-    padding: 20px 30px 20px 30px;
     margin: auto;
+    padding: 20px 30px 20px 30px;
   }
 </style>

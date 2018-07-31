@@ -23,8 +23,8 @@ oppia.factory('ResponsesService', [
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'SolutionValidityService', 'ExplorationStatesService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
@@ -32,8 +32,8 @@ oppia.factory('ResponsesService', [
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID,
+      SolutionValidityService, ExplorationStatesService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -134,6 +134,9 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+      ExplorationStatesService.saveContentIdsToAudioTranslations(
+        EditorStateService.getActiveStateName(),
+        StateContentIdsToAudioTranslationsService.displayed);
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -205,7 +208,7 @@ oppia.factory('ResponsesService', [
             StateContentIdsToAudioTranslationsService.displayed.addContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
-          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          _updateAnswerGroupsAudioTranslation();
         }
 
         _confirmedUnclassifiedAnswers = [];

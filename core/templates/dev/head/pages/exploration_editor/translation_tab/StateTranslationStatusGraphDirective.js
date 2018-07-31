@@ -33,7 +33,7 @@ oppia.directive('stateTranslationStatusGraph', [
             EditorStateService, StateContentIdsToAudioTranslationsService,
             TranslationStatusService) {
           $scope.getGraphData = GraphDataService.getGraphData;
-          $scope.nodeColors = TranslationStatusService.getAllStateStatusColour;
+          $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
           $scope.getActiveStateName = function() {
             return EditorStateService.getActiveStateName();
           };

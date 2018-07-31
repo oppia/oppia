@@ -78,7 +78,7 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'translation'">
+      <div ng-if="getTabStatuses().active === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->

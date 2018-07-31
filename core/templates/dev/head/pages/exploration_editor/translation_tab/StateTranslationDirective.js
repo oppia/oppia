@@ -45,7 +45,6 @@ oppia.directive('stateTranslation', [
           $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
           $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
           $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
-          $rootScope.loadingMessage = 'Loading';
 
           $scope.ExplorationCorrectnessFeedbackService =
             ExplorationCorrectnessFeedbackService;
@@ -196,7 +195,7 @@ oppia.directive('stateTranslation', [
             }
           };
 
-          $scope.TabStatusColourStyle = function (tabId) {
+          $scope.tabStatusColourStyle = function (tabId) {
             if (!$scope.isDisabled(tabId)) {
               var color = TranslationStatusService
                 .getActiveStateComponentStatusColor(tabId);
@@ -260,6 +259,7 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
+          $rootScope.loadingMessage = '';
         }
       ]
     };
