@@ -14,12 +14,12 @@
       <div ng-repeat="issue in issues">
         <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
           <div ng-if="issue.issueType == 'EarlyQuit'">
-            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"></early-quit-issue-directive>
+            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
           </div>
         </div>
         <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
           <div ng-if="issue.issueType == 'EarlyQuit'">
-            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"></early-quit-issue-directive>
+            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
           </div>
         </div>
         <!-- TODO(pranavsid98): Implement remaining issue types. -->
