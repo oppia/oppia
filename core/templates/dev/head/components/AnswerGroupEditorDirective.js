@@ -58,7 +58,7 @@ oppia.directive('answerGroupEditor', [
             for (var i = 0; i < $scope.misconceptions.length; i++) {
               if (
                 $scope.misconceptions[i].getId() === misconceptionId) {
-                  $scope.misconceptionName = $scope.misconceptions[i].getName();
+                $scope.misconceptionName = $scope.misconceptions[i].getName();
               }
             }
           };

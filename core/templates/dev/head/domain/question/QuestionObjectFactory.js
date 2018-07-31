@@ -63,7 +63,7 @@ oppia.factory('QuestionObjectFactory', [
       if (
         !interaction.solution &&
         INTERACTION_SPECS[interaction.id].can_have_solution) {
-          return 'A solution must be specified';
+        return 'A solution must be specified';
       }
       var answerGroups = this._stateData.interaction.answerGroups;
       var taggedMisconceptionIds = {};
