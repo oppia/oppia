@@ -206,6 +206,10 @@ DEFAULT_EXPLORATION_CATEGORY = ''
 # Default objective for a newly-minted exploration.
 DEFAULT_EXPLORATION_OBJECTIVE = ''
 
+# NOTE TO DEVELOPERS: If any of the 5 constants below are modified, the
+# corresponding field in NEW_STATE_TEMPLATE in constants.js also has to be
+# modified.
+
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
 # Default content id for the state's content.

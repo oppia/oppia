@@ -79,9 +79,10 @@ oppia.factory('AnswerClassificationService', [
        * Classifies the answer according to the answer groups. and returns the
        * corresponding answer classification result.
        *
-       * @param {string} explorationId - The exploration ID.
-       * @param {object} oldState - The state where the user submitted the
-       *   answer.
+       * @param {string} stateName - The name of the state where the user
+       *   submitted the answer.
+       * @param {object} interactionInOldState - The interaction present in the
+       *   state where the user submitted the answer.
        * @param {*} answer - The answer that the user has submitted.
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
@@ -90,11 +91,11 @@ oppia.factory('AnswerClassificationService', [
        *   AnswerClassificationResult domain object.
        */
       getMatchingClassificationResult: function(
-          explorationId, stateName, oldState, answer, interactionRulesService) {
+          stateName, interactionInOldState, answer, interactionRulesService) {
         var answerClassificationResult = null;
 
-        var answerGroups = oldState.interaction.answerGroups;
-        var defaultOutcome = oldState.interaction.defaultOutcome;
+        var answerGroups = interactionInOldState.answerGroups;
+        var defaultOutcome = interactionInOldState.defaultOutcome;
         if (interactionRulesService) {
           answerClassificationResult = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
@@ -109,7 +110,7 @@ oppia.factory('AnswerClassificationService', [
         var ruleBasedOutcomeIsDefault = (
           answerClassificationResult.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
-          oldState.interaction.id].is_trainable;
+          interactionInOldState.id].is_trainable;
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
           for (var i = 0; i < answerGroups.length; i++) {
@@ -149,9 +150,9 @@ oppia.factory('AnswerClassificationService', [
         return answerClassificationResult;
       },
       isClassifiedExplicitlyOrGoesToNewState: function(
-          explorationId, stateName, state, answer, interactionRulesService) {
+          stateName, state, answer, interactionRulesService) {
         var result = this.getMatchingClassificationResult(
-          explorationId, stateName, state, answer, interactionRulesService);
+          stateName, state.interaction, answer, interactionRulesService);
         return (
           result.outcome.dest !== state.name ||
           result.classificationCategorization !==
