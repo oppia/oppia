@@ -22,111 +22,113 @@ describe('Responses Service', function() {
     let scope, siis, ecs, rs, ess
     let mockExplorationData;
 
-    beforeEach(function() {
-      beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-      beforeEach(function() {
-        module('oppia');
-        // Set a global value for INTERACTION_SPECS that will be used by all the
-        // descendant dependencies.
-        module(function($provide) {
-          $provide.constant('INTERACTION_SPECS', {
-            TextInput: {
-              display_mode: 'inline',
-              is_terminal: false
-            }
-          });
+    beforeEach(function() {
+      module('oppia');
+      // Set a global value for INTERACTION_SPECS that will be used by all the
+      // descendant dependencies.
+      module(function($provide) {
+        $provide.constant('INTERACTION_SPECS', {
+          TextInput: {
+            display_mode: 'inline',
+            is_terminal: false
+          }
         });
-        mockExplorationData = {
-          explorationId: 0,
-          autosaveChangeList: function() {}
-        };
-        module(function($provide) {
-          $provide.value('ExplorationDataService', [mockExplorationData][0]);
-        });
-        spyOn(mockExplorationData, 'autosaveChangeList');
+      });
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+
+      module(function($provide) {
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
 
-      beforeEach(inject(function($injector, $rootScope) {
-        scope = $rootScope.$new();
-        $httpBackend = $injector.get('$httpBackend');
-        siis = $injector.get('stateInteractionIdService');
-        ecs = $injector.get('EditorStateService');
-        ess = $injector.get('ExplorationStatesService');
-        rs = $injector.get('ResponsesService');
+      spyOn(mockExplorationData, 'autosaveChangeList');
+    });
 
-        // Set the currently loaded interaction ID.
-        siis.savedMemento = 'TextInput';
 
-        ess.init({
-          Test: {
-            content: {
-              content_id: 'content',
-              html: 'Sample'
-            },
-            content_ids_to_audio_translations: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            },
-            interaction: {
-              id: 'TextInput',
-              answer_groups: [{
-                rule_specs: [{
-                  rule_type: 'Contains',
-                  inputs: {
-                    x: 'Answer'
-                  }
-                }],
-                outcome: {
-                  dest: 'Test',
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: 'Feedback'
-                  },
-                  labelled_as_correct: false,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                  missing_prerequisite_skill_id: null
-                },
-                training_data: [],
-                tagged_misconception_id: null
+    beforeEach(inject(function($injector, $rootScope) {
+      scope = $rootScope.$new();
+      $httpBackend = $injector.get('$httpBackend');
+      siis = $injector.get('stateInteractionIdService');
+      ecs = $injector.get('EditorStateService');
+      ess = $injector.get('ExplorationStatesService');
+      rs = $injector.get('ResponsesService');
+
+      // Set the currently loaded interaction ID.
+      siis.savedMemento = 'TextInput';
+
+      ess.init({
+        Test: {
+          content: {
+            content_id: 'content',
+            html: 'Sample'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {
+                  x: 'Answer'
+                }
               }],
-              default_outcome: {
+              outcome: {
                 dest: 'Test',
                 feedback: {
-                  content_id: 'default_outcome',
-                  html: 'Default outcome'
+                  content_id: 'feedback_1',
+                  html: 'Feedback'
                 },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null
               },
-              hints: [],
-              confirmed_unclassified_answers: []
+              training_data: [],
+              tagged_misconception_id: null
+            }],
+            default_outcome: {
+              dest: 'Test',
+              feedback: {
+                content_id: 'default_outcome',
+                html: 'Default outcome'
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
-            param_changes: []
-          }
-        });
+            hints: [],
+            confirmed_unclassified_answers: []
+          },
+          param_changes: []
+        }
+      });
 
-        let state = ess.getState('Test');
-        rs.init({
-          answerGroups: state.interaction.answerGroups,
-          defaultOutcome: state.interaction.defaultOutcome,
-          confirmedUnclassifiedAnswers: (
-            state.interaction.confirmedUnclassifiedAnswers)
-        });
+      let state = ess.getState('Test');
 
-        ecs.setActiveStateName('Test');
-      }));
-    })
+      rs.init({
+        answerGroups: state.interaction.answerGroups,
+        defaultOutcome: state.interaction.defaultOutcome,
+        confirmedUnclassifiedAnswers: (
+          state.interaction.confirmedUnclassifiedAnswers)
+      });
+
+      ecs.setActiveStateName('Test');
+    }));
 
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
     });
 
-    it('should be able to change the answer group index', function() {
+    it('should change the answer group index', function() {
       rs.changeActiveAnswerGroupIndex(5);
       expect(rs.getActiveAnswerGroupIndex()).toEqual(5);
     });
@@ -135,7 +137,7 @@ describe('Responses Service', function() {
       expect(rs.getActiveRuleIndex()).toEqual(0);
     });
 
-    it('should be able to change the active rule index', function() {
+    it('should change the active rule index', function() {
       rs.changeActiveRuleIndex(5);
       expect(rs.getActiveRuleIndex()).toEqual(5);
     });
@@ -160,8 +162,8 @@ describe('Responses Service', function() {
 
         feedbackUpdates = {
           feedback: {
-            _contentId: "feedback_1",
-            _html: 'New feedback'
+            contentId: "feedback_1",
+            html: 'New feedback'
           }
         };
 
@@ -174,13 +176,14 @@ describe('Responses Service', function() {
 
       it('should update the rules', function() {
         rs.updateAnswerGroup(0, ruleUpdates);
-        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates.rules)
-      })
-/*
-      it('should update the answer group', function() {
-        rs.updateAnswerGroup(0, updates);
-        expect(rs.getAnswerGroup(0)).toEqual(updates);
+        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates.rules);
       });
+
+      it('should update the feedback', function() {
+        rs.updateAnswerGroup(0, feedbackUpdates);
+        expect(rs.getAnswerGroup(0).feedback).toEqual(feedbackUpdates.feedback);
+      });
+/*
 
       it('should delete the answer group', function() {
         let initialLength = rs.getAnswerGroupCount();
@@ -197,7 +200,7 @@ describe('Responses Service', function() {
 */
     });
 
-    it('should be able to update answer choices', function() {
+    it('should update answer choices', function() {
       rs.updateAnswerChoices('some answer');
       expect(rs.getAnswerChoices()).toEqual('some answer');
     });
