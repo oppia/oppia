@@ -320,7 +320,25 @@ class SuggestionEditStateContent(BaseSuggestion):
 
 
 class SuggestionAddQuestion(BaseSuggestion):
-    """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION."""
+    """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
+
+    Attributes:
+        suggestion_id: str. The ID of the suggestion.
+        suggestion_type: str. The type of the suggestion.
+        target_type: str. The type of target entity being edited, for this
+            subclass, target type is 'topic'.
+        target_id: str. The ID of the topic the question was submitted to.
+        target_version_at_submission: int. The version number of the target
+            topic at the time of creation of the suggestion.
+        status: str. The status of the suggestion.
+        author_id: str. The ID of the user who submitted the suggestion.
+        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
+            the suggestion.
+        change_cmd: QuestionChange. The change associated with the suggestion.
+        score_category: str. The scoring category for the suggestion.
+        last_updated: datetime.datetime. Date and time when the suggestion
+            was last updated.
+    """
 
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
