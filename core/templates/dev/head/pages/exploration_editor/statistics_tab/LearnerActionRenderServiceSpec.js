@@ -14,6 +14,9 @@
 
 /**
  * @fileoverview Unit tests for the learner action render service.
+ *
+ * NOTE: To make tests shorter, we skip some elements and simply check
+ * jasmine.any(Object).
  */
 
 describe('Learner Action Render Service', function() {
@@ -51,6 +54,7 @@ describe('Learner Action Render Service', function() {
               }
             }, 1
           ),
+
           jasmine.any(Object),
           jasmine.any(Object),
           this.laof.createNew(

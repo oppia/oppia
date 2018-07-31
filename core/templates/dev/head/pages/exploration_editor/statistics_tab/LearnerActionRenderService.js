@@ -57,6 +57,16 @@ oppia.factory('LearnerActionRenderService', [
       return htmlString;
     };
 
+    /**
+     * Renders the correct HTML for AnswerSubmit action after checking for a
+     * change in state.
+     * @param {string} answer.
+     * @param {string} destStateName.
+     * @param {int} timeSpentInStateSecs.
+     * @param {string} currentStateName.
+     * @param {int} actionIndex.
+     * @returns {string}
+     */
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateSecs, currentStateName,
         actionIndex) {
@@ -76,6 +86,12 @@ oppia.factory('LearnerActionRenderService', [
       return htmlString;
     };
 
+    /**
+     * Renders the correct HTML for the table display for MultipleIncorrect
+     * issue.
+     * @param {list(LearnerAction)} finalBlock.
+     * @returns {string}
+     */
     var renderLearnerActionsTableForMultipleIncorrectIssue = function(
         finalBlock) {
       var index = finalBlock.length - 1;
@@ -99,6 +115,12 @@ oppia.factory('LearnerActionRenderService', [
       return tableHTML;
     };
 
+    /**
+     * Renders the correct HTML for the learner action.
+     * @param {LearnerAction} learnerAction.
+     * @param {int} actionIndex.
+     * @returns {string}
+     */
     var renderLearnerActionHTML = function(learnerAction, actionIndex) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
@@ -149,6 +171,13 @@ oppia.factory('LearnerActionRenderService', [
     };
 
     return {
+      /**
+       * Returns the HTML for the final display block in a MultipleIncorrect
+       * issue. This accounts for the table to be displayed.
+       * @param {list(LearnerAction)} block.
+       * @param {int} actionStartIndex.
+       * @returns {string}
+       */
       renderFinalDisplayBlockForMISIssueHTML: function(
           block, actionStartIndex) {
         var index = block.length - 1;
@@ -175,6 +204,12 @@ oppia.factory('LearnerActionRenderService', [
         }
         return $sce.trustAsHtml(htmlString);
       },
+      /**
+       * Splits up the entire set of learner actions into correct display blocks
+       * to be displayed in sequence in the playthroughs modal.
+       * @param {list(learnerActions)} learnerActions.
+       * @returns {list(list(learnerActions))}
+       */
       getDisplayBlocks: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
         groupedDisplayBlocks.displayBlocks = [];
