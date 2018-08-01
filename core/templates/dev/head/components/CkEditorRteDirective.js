@@ -192,9 +192,8 @@ oppia.directive('ckEditorRte', [
         }, null, null, 20);
 
         ck.on('change', function() {
-          var elt = document.createElement('div');
-          elt.innerHTML = ck.getData();
-          var textElt = elt.childNodes;
+          var elt = $('<div>' + ck.getData() + '</div>');
+          var textElt = elt[0].childNodes;
           for (var i = textElt.length; i > 0; i--) {
             for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
               if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
@@ -217,7 +216,7 @@ oppia.directive('ckEditorRte', [
               break;
             }
           }
-          ngModel.$setViewValue(elt.innerHTML);
+          ngModel.$setViewValue(elt.html());
         });
 
         ngModel.$render = function() {
