@@ -69,7 +69,7 @@ oppia.factory('StateEditorService', [
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
       },
-      getInQuestionMode: function() {
+      isInQuestionMode: function() {
         return inQuestionMode;
       },
       setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {

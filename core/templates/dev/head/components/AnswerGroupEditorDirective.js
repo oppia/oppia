@@ -55,6 +55,9 @@ oppia.directive('answerGroupEditor', [
           $scope.misconceptions = StateEditorService.getMisconceptions();
 
           var _getTaggedMisconceptionName = function(misconceptionId) {
+            if ($scope.misconceptions === null) {
+              return;
+            }
             for (var i = 0; i < $scope.misconceptions.length; i++) {
               if (
                 $scope.misconceptions[i].getId() === misconceptionId) {
@@ -66,10 +69,10 @@ oppia.directive('answerGroupEditor', [
           _getTaggedMisconceptionName($scope.getTaggedMisconceptionId());
 
           $scope.isInQuestionMode = function() {
-            return StateEditorService.getInQuestionMode();
+            return StateEditorService.isInQuestionMode();
           };
 
-          $scope.tagMisconception = function() {
+          $scope.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
@@ -95,7 +98,7 @@ oppia.directive('answerGroupEditor', [
                   $scope.done = function() {
                     $uibModalInstance.close({
                       misconception: $scope.selectedMisconception,
-                      feedbackIsUSed: $scope.misconceptionFeedbackIsUsed
+                      feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
                     });
                   };
 
@@ -108,7 +111,7 @@ oppia.directive('answerGroupEditor', [
 
             modalInstance.result.then(function(returnObject) {
               var misconception = returnObject.misconception;
-              var feedbackIsUsed = returnObject.feedbackIsUSed;
+              var feedbackIsUsed = returnObject.feedbackIsUsed;
               var outcome = angular.copy($scope.outcome);
               if (feedbackIsUsed) {
                 outcome.feedback.setHtml(misconception.getFeedback());

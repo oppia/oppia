@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <div ng-if="!getInQuestionMode() && StateContentService.savedMemento && !StateContentService.savedMemento.isEmpty()">
+  <div ng-if="!isInQuestionMode() && StateContentService.savedMemento && !StateContentService.savedMemento.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_CONTENT]>"
                                content-id="StateContentService.savedMemento.getContentId()"
                                on-start-edit="onAudioTranslationsStartEditAction"

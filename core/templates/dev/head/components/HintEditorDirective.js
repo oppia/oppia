@@ -37,7 +37,7 @@ oppia.directive('hintEditor', [
             StateEditorService) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.StateHintsService = StateHintsService;
-          $scope.getInQuestionMode = StateEditorService.getInQuestionMode;
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
 

@@ -81,17 +81,14 @@ oppia.directive('outcomeDestinationEditor', [
           $scope.$watch(StateEditorService.getStateNames, function() {
             currentStateName = StateEditorService.getActiveStateName();
 
+            var questionModeEnabled = StateEditorService.isInQuestionMode();
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a
             // new state.
             $scope.destChoices = [{
-              id: currentStateName,
+              id: (questionModeEnabled ? null : currentStateName),
               text: '(try again)'
             }];
-
-            if (StateEditorService.getInQuestionMode()) {
-              $scope.destChoices[0].id = null;
-            }
 
             // Arrange the remaining states based on their order in the state
             // graph.
@@ -146,7 +143,7 @@ oppia.directive('outcomeDestinationEditor', [
               }
             }
 
-            if (!StateEditorService.getInQuestionMode()) {
+            if (!questionModeEnabled) {
               $scope.destChoices.push({
                 id: PLACEHOLDER_OUTCOME_DEST,
                 text: 'A New Card Called...'

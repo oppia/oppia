@@ -32,7 +32,7 @@ oppia.factory('SolutionVerificationService', [
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, interaction, correctAnswer, rulesService
           ));
-        if (StateEditorService.getInQuestionMode()) {
+        if (StateEditorService.isInQuestionMode()) {
           return result.outcome.labelledAsCorrect;
         }
         return stateName !== result.outcome.dest;

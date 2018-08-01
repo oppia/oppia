@@ -82,7 +82,9 @@ oppia.factory('QuestionObjectFactory', [
       }
       for (var i = 0; i < misconceptions.length; i++) {
         if (!taggedMisconceptionIds[misconceptions[i].getId()]) {
-          return 'All misconceptions of the linked skill are not tagged';
+          return (
+            'The following misconception should also be caught: ' +
+            misconceptions[i].getName());
         }
       }
       return false;

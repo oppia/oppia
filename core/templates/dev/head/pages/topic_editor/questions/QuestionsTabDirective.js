@@ -37,6 +37,8 @@ oppia.directive('questionsTab', [
             $scope.questionEditorIsShown = false;
             $scope.question = null;
             $scope.topic = TopicEditorStateService.getTopic();
+            $scope.topicRights = TopicEditorStateService.getTopicRights();
+            $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
           };

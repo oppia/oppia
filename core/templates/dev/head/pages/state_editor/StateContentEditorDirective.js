@@ -45,7 +45,7 @@ oppia.directive('stateContentEditor', [
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
-          $scope.getInQuestionMode = StateEditorService.getInQuestionMode;
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.contentId = null;
           $scope.StateContentService = StateContentService;
           if (StateContentService.displayed) {

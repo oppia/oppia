@@ -54,7 +54,7 @@ oppia.directive('stateResponses', [
             '/general/drag_dots.png');
 
           var _initializeTrainingData = function() {
-            if (StateEditorService.getInQuestionMode()) {
+            if (StateEditorService.isInQuestionMode()) {
               return;
             }
             var explorationId = ContextService.getExplorationId();

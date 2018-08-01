@@ -44,7 +44,7 @@ oppia.directive('outcomeEditor', [
             StateInteractionIdService, COMPONENT_NAME_FEEDBACK,
             INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
-          $scope.getInQuestionMode = StateEditorService.getInQuestionMode;
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
