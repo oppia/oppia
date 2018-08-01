@@ -22,6 +22,8 @@ describe('IssuesBackendApiService', function() {
   beforeEach(inject(function($injector) {
     this.IssuesBackendApiService = $injector.get('IssuesBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');
+    this.eif = $injector.get('ExplorationIssueObjectFactory');
+    this.pof = $injector.get('PlaythroughObjectFactory');
   }));
 
   afterEach(function() {
@@ -69,6 +71,8 @@ describe('IssuesBackendApiService', function() {
         successHandler, failureHandler);
       this.$httpBackend.flush();
 
+      expect(successHandler).toHaveBeenCalledWith(
+        backendIssues.map(this.eif.createFromBackendDict));
       expect(failureHandler).not.toHaveBeenCalled();
     });
 
@@ -106,6 +110,8 @@ describe('IssuesBackendApiService', function() {
         successHandler, failureHandler);
       this.$httpBackend.flush();
 
+      expect(successHandler).toHaveBeenCalledWith(
+        this.pof.createFromBackendDict(backendPlaythrough));
       expect(failureHandler).not.toHaveBeenCalled();
     });
   });

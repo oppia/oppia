@@ -21,16 +21,16 @@ oppia.factory('SolutionVerificationService', [
   function(
       $injector, AngularNameService, AnswerClassificationService) {
     return {
-      verifySolution: function(explorationId, state, correctAnswer) {
-        var interactionId = state.interaction.id;
+      verifySolution: function(stateName, interaction, correctAnswer) {
+        var interactionId = interaction.id;
         var rulesServiceName = (
           AngularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
         var result = (
           AnswerClassificationService.getMatchingClassificationResult(
-            explorationId, state.name, state, correctAnswer, rulesService
+            stateName, interaction, correctAnswer, rulesService
           ));
-        return state.name !== result.outcome.dest;
+        return stateName !== result.outcome.dest;
       }
     };
   }]);

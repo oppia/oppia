@@ -53,7 +53,11 @@ oppia.factory('UrlInterpolationService', [
      * depending on dev/prod mode.
      */
     var getCompleteUrl = function(prefix, path) {
-      return GLOBALS.ASSET_DIR_PREFIX + prefix + getUrlWithSlug(path);
+      if (GLOBALS.DEV_MODE) {
+        return prefix + getUrlWithSlug(path);
+      } else {
+        return '/build' + prefix + getUrlWithSlug(path);
+      }
     };
 
     /**
@@ -194,7 +198,11 @@ oppia.factory('UrlInterpolationService', [
        */
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
-        return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
+        if (GLOBALS.DEV_MODE) {
+          return '/templates/dev/head' + getUrlWithSlug(path);
+        } else {
+          return '/build/templates/head' + getUrlWithSlug(path);
+        }
       },
 
       getExtensionResourceUrl: getExtensionResourceUrl,
