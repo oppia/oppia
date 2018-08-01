@@ -1,10 +1,13 @@
-<div class="oppia-audio-recording-bar" ng-show="!isAudioAvailable && !selectedRecording">
+<div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <button class="btn oppia-audio-button" disabled>
     <i class="material-icons">&#xE039;</i>
   </button>
   <div class="oppia-audio-bar-info">
-    <div ng-if="!cannotRecord">
+    <div ng-if="!cannotRecord && !checkingMicrophonePermission">
       No audio recorded.<span ng-if="canTranslate"> Press <i class="material-icons">mic</i>  to start recording.</span>
+    </div>
+    <div ng-if="checkingMicrophonePermission">
+      Checking microphone permission.<loading-dots></loading-dots>
     </div>
     <div ng-if="recordingPermissionDenied && cannotRecord">
       You need to grant permission for this application to use your microphone.
@@ -27,13 +30,13 @@
   </button>
 </div>
 
-<div class="oppia-audio-recording-bar" ng-show="selectedRecording || audioIsUpdating">
+<div class="oppia-audio-recording-bar" ng-show="selectedRecording">
   <ng-audio-recorder id="<[RECORDER_ID]>" audio-model="audioBlob" time-limit="recordingTimeLimit">
     <button class="btn oppia-audio-button"
             ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
             ng-disabled="recorder.status.isRecording || !recorder.audioModel">
       <i class="material-icons">
-        {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;'}}
+        {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;']>
       </i>
     </button>
     <div class="oppia-audio-visulaizer">
@@ -42,7 +45,7 @@
       </div>
       <canvas-sizer id="analyser" >
         <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording">
-          <ng-audio-recorder-analyzer height="120" wave-color="black" ></ng-audio-recorder-analyzer>
+          <ng-audio-recorder-analyzer height="110" wave-color="black" ></ng-audio-recorder-analyzer>
         </div>
 
         <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel" >
@@ -53,7 +56,7 @@
 
     <div class="oppia-recording-timer"
          ng-if="recorder.status.isRecording">
-      {{recorder.elapsedTime | formatTimer}} / {{recorder.timeLimit | formatTimer}}
+      <[recorder.elapsedTime | formatTimer]> / <[recorder.timeLimit | formatTimer]>
     </div>
     <button class="btn oppia-audio-button"
             uib-tooltip="Stop" tooltip-placement="bottom"
@@ -92,9 +95,12 @@
       <md-progress-linear md-mode="indeterminate"></md-progress-linear>
     </div>
     <div>
-      <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
+      <md-slider ng-model="track.progress" ng-model-options="{getterSetter: true}" aria-label="audio-slider">
       </md-slider>
     </div>
+  </div>
+  <div class="oppia-recording-timer" ng-if="!isAudioLoading">
+      <[AudioPlayerService.getCurrentTime() | formatTimer]> / <[AudioPlayerService.getAudioDuration() | formatTimer]>
   </div>
   <div class="oppia-audio-extra-buttons">
     <button class="btn oppia-audio-button"
@@ -171,7 +177,7 @@
     background: red;
   }
   .oppia-slider-section {
-    width: 72%;
+    width: 58%;
     float: left;
     border-left: 1px solid #ccc;
     border-right: 2px solid #ccc;

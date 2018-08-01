@@ -41,7 +41,6 @@ oppia.directive('stateTranslation', [
           $scope.TAB_ID_FEEDBACK = 'feedback';
           $scope.TAB_ID_HINTS = 'hints';
           $scope.TAB_ID_SOLUTION = 'solution';
-          $rootScope.loadingMessage = 'Loading';
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -85,6 +84,7 @@ oppia.directive('stateTranslation', [
               $scope.activeContentId = $scope.stateSolution.explanation
                 .getContentId();
             }
+            $scope.$broadcast('refreshAudioTranslationBar');
           };
 
           $scope.summarizeDefaultOutcome = function(
@@ -229,6 +229,7 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
+          $rootScope.loadingMessage = '';
         }
       ]
     };

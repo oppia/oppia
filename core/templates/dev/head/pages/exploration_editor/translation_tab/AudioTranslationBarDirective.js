@@ -59,6 +59,7 @@ oppia.directive('audioTranslationBar', [
           $scope.AudioPlayerService = AudioPlayerService;
           $scope.canTranslate = false;
 
+          $scope.checkingMicrophonePermission = false;
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
             var stateName = EditorStateService.getActiveStateName();
@@ -80,30 +81,36 @@ oppia.directive('audioTranslationBar', [
               IdGenerationService.generateNewId() + '.mp3';
           };
 
-          $scope.checkAndStartRecording = function() {
+          var showPermissionAndStartRecording = function() {
+            $scope.checkingMicrophonePermission = true;
             recorderService.showPermission({
               onDenied: function() {
                 $scope.recordingPermissionDenied = true;
+                $scope.cannotRecord = true;
+                $scope.checkingMicrophonePermission = false;
               },
               onAllowed: function() {
                 $scope.recordingPermissionDenied = false;
                 $scope.cannotRecord = false;
+                $scope.recorder.startRecord();
+                $scope.selectedRecording = true;
+                $scope.checkingMicrophonePermission = false;
               },
               onClosed: function() {
                 $scope.recordingPermissionDenied = true;
+                $scope.cannotRecord = true;
+                $scope.checkingMicrophonePermission = false;
               },
             });
+          };
+
+          $scope.checkAndStartRecording = function() {
             if (!$scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
-            } else if ($scope.recordingPermissionDenied){
-              $scope.cannotRecord = true;
-            } else if ($scope.recorder.isAvailable) {
+            } else {
               $scope.unsupportedBrowser = false;
-              $scope.cannotRecord = false;
-              $scope.recordingPermissionDenied = false;
-              $scope.selectedRecording = true;
-              $scope.recorder.startRecord();
+              showPermissionAndStartRecording();
             }
           };
 
@@ -121,8 +128,8 @@ oppia.directive('audioTranslationBar', [
 
           $scope.reRecord = function() {
             $scope.initAudioBar();
-            $scope.selectedRecording = true;
-            $scope.recorder.startRecord();
+            $scope.selectedRecording = false;
+            showPermissionAndStartRecording();
           };
 
           $scope.cancelRecording = function() {
@@ -135,7 +142,8 @@ oppia.directive('audioTranslationBar', [
           $scope.updateAudio = function() {
             $scope.audioBlob = null;
             $scope.audioIsUpdating = true;
-            $scope.recorder.startRecord();
+            $scope.selectedRecording = false;
+            showPermissionAndStartRecording();
           };
 
           $scope.saveRecordedAudio = function() {
@@ -204,7 +212,7 @@ oppia.directive('audioTranslationBar', [
             }
           };
 
-          $scope.openDeleteAudioTranslationModal = function(languageCode) {
+          $scope.openDeleteAudioTranslationModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
@@ -242,14 +250,17 @@ oppia.directive('audioTranslationBar', [
                 },
                 languageCode: function() {
                   return $scope.languageCode;
+                },
+                isUpdatingAudio: function() {
+                  return $scope.isAudioAvailable;
                 }
               },
               controller: [
                 '$scope', '$uibModalInstance', 'AlertsService', 'languageCode',
-                'ContextService', 'generatedFilename',
+                'ContextService', 'generatedFilename', 'isUpdatingAudio',
                 function(
                     $scope, $uibModalInstance, AlertsService, languageCode,
-                    ContextService, generatedFilename) {
+                    ContextService, generatedFilename, isUpdatingAudio) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -259,6 +270,7 @@ oppia.directive('audioTranslationBar', [
                   $scope.errorMessage = null;
                   $scope.saveButtonText = BUTTON_TEXT_SAVE;
                   $scope.saveInProgress = false;
+                  $scope.isUpdatingAudio = isUpdatingAudio;
                   var uploadedFile = null;
 
                   $scope.isAudioTranslationValid = function() {
@@ -309,6 +321,11 @@ oppia.directive('audioTranslationBar', [
                 }
               ]
             }).result.then(function(result) {
+              if ($scope.isAudioAvailable) {
+                StateContentIdsToAudioTranslationsService.displayed
+                  .deleteAudioTranslation(
+                    $scope.contentId, $scope.languageCode);
+              }
               StateContentIdsToAudioTranslationsService.displayed
                 .addAudioTranslation(
                   $scope.contentId, $scope.languageCode, result.filename,

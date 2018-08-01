@@ -13,6 +13,10 @@
                                  on-file-changed="updateUploadedFile"
                                  on-file-cleared="clearUploadedFile">
             </audio-file-uploader>
+            <div ng-if="isUpdatingAudio"
+                 class="oppia-updated-audio-file-upload-message">
+              <strong>Note:</strong> You're going to update the audio translation and this will delete the already available audio.
+            </div>
             <div ng-if="errorMessage"
                  class="oppia-audio-file-upload-field-error-message">
               <i class="material-icons">&#xE002;</i>
@@ -31,7 +35,8 @@
 </div>
 
 <style>
-  .oppia-audio-file-upload-field-error-message {
+  .oppia-audio-file-upload-field-error-message,
+  .oppia-updated-audio-file-upload-message {
     color: red;
     display: inline-block;
     font-size: 14px;
