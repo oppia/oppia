@@ -598,13 +598,29 @@ class StateIdMappingModel(base_models.BaseModel):
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
 
-
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
         instance = cls.get(instance_id)
         return instance
+
+    @classmethod
+    def get_multi_state_id_mapping_models(cls, exp_id, exp_versions):
+        """Retrieve multiple state id mapping models from the datastore.
+
+        Args:
+            exp_id: str. The exploration id.
+            exp_versions: list(int). The list of exploration versions.
+
+        Returns:
+            list(StateIdMappingModel). The models retrieved from the datastore.
+        """
+        instance_ids = [
+            cls._generate_instance_id(exp_id, exp_version)
+            for exp_version in exp_versions]
+        instances = cls.get_multi(instance_ids)
+        return instances
 
     @classmethod
     def delete_state_id_mapping_models(cls, exp_id, exp_versions):
