@@ -78,11 +78,8 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: '',
+  DEV_MODE: true,
   GCS_RESOURCE_BUCKET_NAME: null,
-  // This prefix is needed to correctly interpolate directive template URLs in
-  // Karma tests. It is referenced by UrlInterpolationService.
-  TEMPLATE_DIR_PREFIX: '/core/templates/dev/head',
   userIsLoggedIn: true
 };
 

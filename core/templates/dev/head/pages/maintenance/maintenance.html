@@ -9,7 +9,6 @@
     <script>
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: [],
-        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       };
     </script>
@@ -50,24 +49,24 @@
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
-    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ContextService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/maintenance/Maintenance.js"></script>
+    <script src="/templates/dev/head/app.js"></script>
+    <script src="/templates/dev/head/i18n.js"></script>
+    <script src="/templates/dev/head/services/AlertsService.js"></script>
+    <script src="/templates/dev/head/services/UtilsService.js"></script>
+    <script src="/templates/dev/head/services/ContextService.js"></script>
+    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+    <script src="/templates/dev/head/services/DebouncerService.js"></script>
+    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+    <script src="/templates/dev/head/services/RteHelperService.js"></script>
+    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
+    <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
+    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
+    <script src="/templates/dev/head/pages/maintenance/Maintenance.js"></script>
 
     <!-- These three files need to be loaded here only because they are dependencies for $provide, and Angular will not load without them. -->
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
+    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
+    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
+    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
   </body>
 </html>

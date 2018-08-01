@@ -29,6 +29,7 @@
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
+                               navigate-to-state="navigateToState"
                                num-rules="answerGroup.rules.length"
                                is-response="true">
               </response-header>
@@ -45,7 +46,9 @@
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                       class="protractor-test-response-body">
+                                       class="protractor-test-response-body"
+                                       add-state="addState"
+                                       on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
               </div>
@@ -69,6 +72,7 @@
                                summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                outcome="defaultOutcome"
+                               navigate-to-state="navigateToState"
                                is-response="true">
               </response-header>
             </a>
@@ -84,7 +88,9 @@
                                        is-editable="EditabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                       class="protractor-test-response-body">
+                                       class="protractor-test-response-body"
+                                       add-state="addState"
+                                       on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
                   </answer-group-editor>
                 </div>
               </div>

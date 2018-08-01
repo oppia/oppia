@@ -368,7 +368,7 @@ oppia.factory('ExplorationPlayerService', [
           oldState.contentIdsToAudioTranslations;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            _explorationId, oldStateName, oldState, answer,
+            oldStateName, oldState.interaction, answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
@@ -381,7 +381,7 @@ oppia.factory('ExplorationPlayerService', [
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-              _explorationId, oldStateName, oldState, answer,
+              oldStateName, oldState, answer,
               interactionRulesService));
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,

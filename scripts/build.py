@@ -24,8 +24,10 @@ import os
 import re
 import shutil
 import subprocess
+import threading
+import time
 
-ASSETS_SRC_DIR = os.path.join('assets', '')
+ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
@@ -40,7 +42,8 @@ EXTENSIONS_STAGING_DIR = (
     os.path.join('backend_prod_files', 'extensions', ''))
 EXTENSIONS_OUT_DIR = os.path.join('build', 'extensions', '')
 
-TEMPLATES_DEV_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR_CORE = os.path.join('core', 'templates', 'dev', 'head', '')
 TEMPLATES_STAGING_DIR = (
     os.path.join('backend_prod_files', 'templates', 'head', ''))
 TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
@@ -198,35 +201,21 @@ def process_html(source_path, target_path, file_hashes):
         if filepath.endswith('.html'):
             continue
         filepath_with_hash = _insert_hash(filepath, file_hash)
-        content = content.replace(filepath, filepath_with_hash)
+        content = content.replace(
+            '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+            '%s%s' % (TEMPLATES_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (ASSETS_DEV_DIR, filepath),
+            '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (EXTENSIONS_DEV_DIR, filepath),
+            '%s%s' % (EXTENSIONS_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
+            '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
     content = REMOVE_WS(' ', content)
-    ensure_directory_exists(target_path)
     d = open(target_path, 'w+')
     d.write(content)
-
-
-def process_css(source_path, target_path):
-    """Runs the given CSS file through a minifier and outputs it to target_path.
-
-    Args:
-        source_path: str. Absolute path to file to be minified.
-        target_path: str. Absolute path to location where to copy
-            the minified file.
-    """
-    ensure_directory_exists(target_path)
-    _minify(source_path, target_path)
-
-
-def process_js(source_path, target_path):
-    """Runs the given JS file through a minifier and outputs it to target_path.
-
-    Args:
-        source_path: str. Absolute path to file to be minified.
-        target_path: str. Absolute path to location where to copy
-            the minified file.
-    """
-    ensure_directory_exists(target_path)
-    _minify(source_path, target_path)
 
 
 def get_dependency_directory(dependency):
@@ -542,11 +531,42 @@ def save_hashes_as_json(target_filepath, file_hashes):
 
     file_hash = generate_md5_hash(target_filepath)
     relative_filepath = os.path.relpath(
-        target_filepath, os.path.join(os.path.curdir, 'build'))
+        target_filepath, os.path.join(os.path.curdir, 'build', 'assets'))
     filepath_with_hash = _insert_hash(target_filepath, file_hash)
     os.rename(target_filepath, filepath_with_hash)
-
     file_hashes[relative_filepath] = file_hash
+
+
+def minify_func(source_path, target_path, file_hashes, filename):
+    if filename.endswith('.html'):
+        process_html(source_path, target_path, file_hashes)
+    elif filename.endswith('.css'):
+        _minify(source_path, target_path)
+    elif filename.endswith('.js'):
+        _minify(source_path, target_path)
+    else:
+        shutil.copyfile(source_path, target_path)
+
+
+def _execute_tasks(tasks, batch_size=24):
+    """Starts all tasks and checks the results.
+
+    Runs no more than 'batch_size' tasks at a time.
+    """
+    remaining_tasks = list(tasks)
+    currently_running_tasks = []
+
+    while remaining_tasks or currently_running_tasks:
+        if currently_running_tasks:
+            for task in list(currently_running_tasks):
+                if not task.is_alive():
+                    currently_running_tasks.remove(task)
+
+        while remaining_tasks and len(currently_running_tasks) < batch_size:
+            task = remaining_tasks.pop()
+            currently_running_tasks.append(task)
+            task.start()
+        time.sleep(1)
 
 
 def build_files(source, target, file_hashes):
@@ -567,6 +587,7 @@ def build_files(source, target, file_hashes):
     shutil.rmtree(target)
 
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
+        tasks = []
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
@@ -576,16 +597,16 @@ def build_files(source, target, file_hashes):
             if source not in source_path:
                 continue
             target_path = source_path.replace(source, target)
+            ensure_directory_exists(target_path)
 
-            if filename.endswith('.html'):
-                process_html(source_path, target_path, file_hashes)
-            elif filename.endswith('.css'):
-                process_css(source_path, target_path)
-            elif filename.endswith('.js'):
-                process_js(source_path, target_path)
-            else:
-                ensure_directory_exists(target_path)
-                shutil.copyfile(source_path, target_path)
+            task = threading.Thread(
+                target=minify_func,
+                args=(source_path, target_path, file_hashes, filename))
+            tasks.append(task)
+        try:
+            _execute_tasks(tasks)
+        except Exception as e:
+            print e
 
 
 def generate_build_directory():
@@ -595,11 +616,14 @@ def generate_build_directory():
     """
     print 'Building Oppia in production mode...'
 
+    # The keys for hashes are filepaths relative to the subfolders of the future
+    # /build folder. This is so that the replacing inside the HTML files works
+    # correctly.
     hashes = dict()
 
     # Create hashes for assets, copy directories and files to build/assets.
-    hashes.update(get_file_hashes(ASSETS_SRC_DIR))
-    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
+    hashes.update(get_file_hashes(ASSETS_DEV_DIR))
+    copy_files_source_to_target(ASSETS_DEV_DIR, ASSETS_OUT_DIR, hashes)
 
     # Process third_party resources, create hashes for them and copy them into
     # build/third_party/generated.
@@ -617,14 +641,14 @@ def generate_build_directory():
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
     # Create hashes for all template files.
-    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
+    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR_CORE))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
     save_hashes_as_json(HASHES_JSON, hashes)
 
     # Minify all template files copy them into build/templates/head.
-    build_files(TEMPLATES_DEV_DIR, TEMPLATES_STAGING_DIR, hashes)
+    build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
