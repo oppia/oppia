@@ -37,7 +37,7 @@ var AdminPage = function(){
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
-  if (general.checkForDevMode) {
+  if (general.isInDevMode()) {
     var explorationElements = element.all(by.css(
       '.protractor-test-reload-exploration-row'
     ));

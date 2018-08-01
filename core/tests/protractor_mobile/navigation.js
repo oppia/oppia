@@ -153,12 +153,22 @@ describe('Navigation features on mobile', function() {
         signInButton, 'Could not click sign in button');
       // For the rationale behind this statement, see
       // https://github.com/angular/protractor/issues/2643#issuecomment-213257116
+      // Here, we are transitioning from an angular page (Library page) to a
+      // non-angular page (Login page) using the 'Sign In' button. Protractor,
+      // by default, waits for angular to load completely. Since there is no
+      // angular on the login page, the test times out saying,
+      // "Could not find Angular on this page...". The
+      // browser.ignoreSynchronization = true asks Protractor
+      // not to wait for the Angular page.
       browser.ignoreSynchronization = true;
       signInButton.click();
       // We should not wait for angular here since
       // the login page is non-angular.
       expect(browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/_ah/login?continue=http%3A//localhost%3A9001/signup%3Freturn_url%3Dhttp%253A%252F%252Flocalhost%253A9001%252Flibrary');
+      // As soon as this page loads up, we are again
+      // setting browser.ignoreSynchronization = false
+      // to prevent any flakiness.
       browser.ignoreSynchronization = false;
     });
 

@@ -28,7 +28,7 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Subscriptions functionality on mobile', function() {
+describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
   var preferencesPage = null;
   var subscriptionDashboardPage = null;
@@ -81,16 +81,7 @@ describe('Subscriptions functionality on mobile', function() {
     users.login('creator1Id@subscriptions.com');
     // Go to the creator_dashboard.
     creatorDashboardPage.get();
-    // There is no 'Create' button for small
-    // width devices. Therefore use the
-    // 'Create Exploration' button, which is the
-    // dashboard intro button when the user is
-    // on the creator dashboard page.
-    if (browser.isMobile) {
-      creatorDashboardPage.clickCreateNewExplorationButton();
-    } else {
-      creatorDashboardPage.clickCreateActivityButton();
-    }
+    creatorDashboardPage.clickCreateNewExplorationButton();
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToSubscriptionDashboard();
     subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
@@ -101,16 +92,7 @@ describe('Subscriptions functionality on mobile', function() {
     users.login('creator2Id@subscriptions.com');
     // Go to the creator_dashboard.
     creatorDashboardPage.get();
-    // There is no 'Create' button for small
-    // width devices. Therefore use the
-    // 'Create Exploration' button, which is the
-    // dashboard intro button when the user is
-    // on the creator dashboard page.
-    if (browser.isMobile) {
-      creatorDashboardPage.clickCreateNewExplorationButton();
-    } else {
-      creatorDashboardPage.clickCreateActivityButton();
-    }
+    creatorDashboardPage.clickCreateNewExplorationButton();
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToSubscriptionDashboard();
     subscriptionDashboardPage.expectSubscriptionCountToEqual(1);

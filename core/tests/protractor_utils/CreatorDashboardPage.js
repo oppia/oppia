@@ -96,7 +96,8 @@ var CreatorDashboardPage = function() {
   this.clickCreateNewExplorationButton = function() {
     waitFor.elementToBeClickable(
       createNewExplorationButton,
-      'Create Exploration button on mobile takes too long to be clickable');
+      'Create Exploration button on the creator' +
+      'dashboard page takes too long to be clickable');
     createNewExplorationButton.click();
     waitFor.pageToFullyLoad();
   };

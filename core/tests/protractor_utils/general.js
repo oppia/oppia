@@ -50,7 +50,9 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   });
 };
 
-var checkForDevMode = function() {
+var isInDevMode = function() {
+  browser.get('/library');
+  waitFor.pageToFullyLoad();
   var devModeElement = element(by.css('.oppia-dev-mode'));
   return devModeElement.isPresent();
 };
@@ -179,7 +181,7 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
-exports.checkForDevMode = checkForDevMode;
+exports.isInDevMode = isInDevMode;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;

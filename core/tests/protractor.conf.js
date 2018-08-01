@@ -91,8 +91,8 @@ exports.config = {
       'protractor_desktop/extensions.js'
     ],
 
-    feedbackThreads: [
-      'protractor_desktop/learnerDashboardFeedbackThreads.js'
+    learnerDashboardSubscriptionsAndFeedbackThreads: [
+      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
     ],
 
     learner: [

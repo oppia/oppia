@@ -108,11 +108,6 @@ describe('Login flow', function() {
         waitFor.pageToFullyLoad();
         expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
       });
-
-    afterEach(function() {
-      general.checkForConsoleErrors([]);
-      users.logout();
-    });
   });
 
   afterEach(function() {

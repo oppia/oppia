@@ -18,6 +18,10 @@
  */
 
 var until = protractor.ExpectedConditions;
+// When running tests on mobile via browserstack, the localhost
+// might take some time to establish a connection with the
+// server since the mobile tests are run on a real
+// mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
 var alertToBePresent = function() {

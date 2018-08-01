@@ -88,8 +88,6 @@ exports.config = {
       'protractor/libraryFlow.js',
       'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
-      'protractor_mobile/playerFlow.js',
-      'protractor/ratings.js',
       'protractor/subscriptionsFlow.js'
     ],
 
@@ -111,10 +109,6 @@ exports.config = {
 
     navigation: [
       'protractor_mobile/navigation.js'
-    ],
-
-    player: [
-      'protractor_mobile/playerFlow.js'
     ],
 
     subscriptions: [
@@ -144,6 +138,36 @@ exports.config = {
 
   // Code to start browserstack local before start of test
   beforeLaunch: function() {
+    var checkSuites = function() {
+      // eslint-disable-next-line no-console
+      console.log(
+        'Checking whether the suites in "full" match the actual suites...');
+      var suitesInFull = exports.config.suites.full;
+      var allSuiteGroups = Object.keys(exports.config.suites);
+      var numOfSuitesInFull = suitesInFull.length;
+      var actualNumOfSuites = allSuiteGroups.length - 1;
+      if (numOfSuitesInFull !== actualNumOfSuites) {
+        // eslint-disable-next-line no-console
+        console.log(
+          'The number of suites in "full" do not match ' +
+          'the actual number of suites');
+        process.exit(1);
+      }
+      for (var suiteIndex in allSuiteGroups) {
+        if (allSuiteGroups[suiteIndex] === 'full') {
+          continue;
+        }
+        suiteGroup = allSuiteGroups[suiteIndex];
+        // The suiteFile is the first element of each suiteGroup array.
+        suiteFile = exports.config.suites[suiteGroup][0];
+        if (!suitesInFull.includes(suiteFile)) {
+          // eslint-disable-next-line no-console
+          console.log('The suites in "full" do not match the actual suites');
+          process.exit(1);
+        }
+      }
+    };
+    checkSuites();
     // eslint-disable-next-line no-console
     console.log('Connecting browserstack local');
     return new Promise(function(resolve, reject) {

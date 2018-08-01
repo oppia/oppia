@@ -151,18 +151,19 @@ var LibraryPage = function(){
   this.findExploration = function(explorationTitle) {
     waitFor.pageToFullyLoad();
     // The library page has two search bar input elements.
-    // The first input element is visible only in a desktop
-    // browser and is invisible in case of a mobile browser.
-    // The second input element is visible when the library
-    // page is rendered for mobile device.
 
-    var desktopSearchInput = searchInputs.first();
-    // get function is a zero-based index.
-    var mobileSearchInput = searchInputs.get(1);
     if (browser.isMobile) {
+      // The second search bar input element is visible when the library
+      // page is rendered for mobile device.
+
+      // get function is a zero-based index.
+      var mobileSearchInput = searchInputs.get(1);
       mobileSearchInput.clear();
       mobileSearchInput.sendKeys(explorationTitle);
     } else {
+      // The first search bar input element is visible only in a desktop
+      // browser and is invisible in case of a mobile browser.
+      var desktopSearchInput = searchInputs.first();
       desktopSearchInput.clear();
       desktopSearchInput.sendKeys(explorationTitle);
     }
@@ -171,18 +172,18 @@ var LibraryPage = function(){
   this.findCollection = function(collectionTitle) {
     waitFor.pageToFullyLoad();
     // The library page has two search bar input elements.
-    // The first input element is visible only in a desktop
-    // browser and is invisible in case of a mobile browser.
-    // The second input element is visible when the library
-    // page is rendered for mobile device.
-
-    var desktopSearchInput = searchInputs.first();
-    // get function is a zero-based index.
-    var mobileSearchInput = searchInputs.get(1);
     if (browser.isMobile) {
+      // The second search bar input element is visible when the library
+      // page is rendered for mobile device.
+
+      // get function is a zero-based index.
+      var mobileSearchInput = searchInputs.get(1);
       mobileSearchInput.clear();
       mobileSearchInput.sendKeys(collectionTitle);
     } else {
+      // The first search bar input element is visible only in a desktop
+      // browser and is invisible in case of a mobile browser.
+      var desktopSearchInput = searchInputs.first();
       desktopSearchInput.clear();
       desktopSearchInput.sendKeys(collectionTitle);
     }
