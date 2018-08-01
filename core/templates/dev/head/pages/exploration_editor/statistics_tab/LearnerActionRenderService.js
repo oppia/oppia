@@ -148,6 +148,9 @@ oppia.factory('LearnerActionRenderService', [
 
     /**
      * Checks whether the block length is less than an explicit maximum value.
+     * The block is limitied to a maximum number of learner actions so that the
+     * display modal is cleaner. When this bound is exceeded, actions are added
+     * to the next block which can be accessed by an 'extend' button.
      */
     var withinBlockUpperBound = function(blockLength) {
       return blockLength < 4;
@@ -155,8 +158,8 @@ oppia.factory('LearnerActionRenderService', [
 
     /**
      * Helper object to maintain the status of different display blocks while
-     * splitting up learner actions. This object will be updated as and when
-     * learner actions are inserted.
+     * splitting up learner actions. This object will be updated as learner
+     * actions are inserted.
      */
     var groupedDisplayBlocks = {
       displayBlocks: null,
