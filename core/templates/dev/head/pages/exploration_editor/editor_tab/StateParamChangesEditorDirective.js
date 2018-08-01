@@ -25,12 +25,12 @@ oppia.directive('stateParamChangesEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_param_changes_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'stateParamChangesService',
-        function($scope, EditorStateService, stateParamChangesService) {
-          $scope.stateParamChangesService = stateParamChangesService;
+        '$scope', 'EditorStateService', 'StateParamChangesService',
+        function($scope, EditorStateService, StateParamChangesService) {
+          $scope.StateParamChangesService = StateParamChangesService;
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            stateParamChangesService.init(
+            StateParamChangesService.init(
               EditorStateService.getActiveStateName(), stateData.paramChanges);
           });
         }

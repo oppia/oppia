@@ -27,31 +27,37 @@ oppia.directive('stateInteractionEditor', [
           return scope;
         };
       },
-      scope: {},
+      scope: {
+        onSaveContentIdsToAudioTranslations: '=',
+        onSaveInteractionCustomizationArgs: '=',
+        onSaveInteractionId: '=',
+        onSaveSolution: '=',
+        onSaveStateContent: '=',
+        recomputeGraph: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_interaction_editor_directive.html'),
+        '/pages/state_editor/state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
-        'AlertsService', 'EditorStateService', 'HtmlEscaperService',
-        'INTERACTION_SPECS', 'stateInteractionIdService',
-        'GenerateContentIdService', 'stateCustomizationArgsService',
-        'EditabilityService', 'ExplorationStatesService', 'GraphDataService',
+        'AlertsService', 'HtmlEscaperService',
+        'INTERACTION_SPECS', 'StateInteractionIdService',
+        'GenerateContentIdService', 'StateCustomizationArgsService',
+        'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'stateContentIdsToAudioTranslationsService',
+        'StateContentIdsToAudioTranslationsService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
-        'stateSolutionService', 'stateHintsService',
-        'stateContentService', function(
+        'StateSolutionService', 'StateHintsService',
+        'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
-            AlertsService, EditorStateService, HtmlEscaperService,
-            INTERACTION_SPECS, stateInteractionIdService,
-            GenerateContentIdService, stateCustomizationArgsService,
-            EditabilityService, ExplorationStatesService, GraphDataService,
+            AlertsService, HtmlEscaperService,
+            INTERACTION_SPECS, StateInteractionIdService,
+            GenerateContentIdService, StateCustomizationArgsService,
+            EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
-            stateContentIdsToAudioTranslationsService,
+            StateContentIdsToAudioTranslationsService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
-            stateSolutionService, stateHintsService,
-            stateContentService) {
+            StateSolutionService, StateHintsService,
+            StateContentService) {
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
 
@@ -61,7 +67,7 @@ oppia.directive('stateInteractionEditor', [
           $scope.adjustPageHeight = function() {};
           $scope.EditabilityService = EditabilityService;
 
-          $scope.stateInteractionIdService = stateInteractionIdService;
+          $scope.StateInteractionIdService = StateInteractionIdService;
           $scope.hasLoaded = false;
           $scope.customizationModalReopened = false;
 
@@ -72,14 +78,14 @@ oppia.directive('stateInteractionEditor', [
 
           $scope.getCurrentInteractionName = function() {
             return (
-              stateInteractionIdService.savedMemento ?
-                INTERACTION_SPECS[stateInteractionIdService.savedMemento].name :
+              StateInteractionIdService.savedMemento ?
+                INTERACTION_SPECS[StateInteractionIdService.savedMemento].name :
                 '');
           };
 
           $scope.doesCurrentInteractionHaveCustomizations = function() {
             var interactionSpec = INTERACTION_SPECS[
-              stateInteractionIdService.savedMemento];
+              StateInteractionIdService.savedMemento];
             return (
               interactionSpec &&
               interactionSpec.customization_arg_specs.length > 0);
@@ -87,29 +93,17 @@ oppia.directive('stateInteractionEditor', [
 
           var _getInteractionPreviewTag = function(
               interactionCustomizationArgs) {
-            if (!stateInteractionIdService.savedMemento) {
+            if (!StateInteractionIdService.savedMemento) {
               return '';
             }
             return ExplorationHtmlFormatterService.getInteractionHtml(
-              stateInteractionIdService.savedMemento,
+              StateInteractionIdService.savedMemento,
               interactionCustomizationArgs, false);
           };
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
             $scope.hasLoaded = false;
-
             InteractionDetailsCacheService.reset();
-
-            $scope.stateName = EditorStateService.getActiveStateName();
-
-            stateInteractionIdService.init(
-              $scope.stateName, stateData.interaction.id);
-            stateCustomizationArgsService.init(
-              $scope.stateName, stateData.interaction.customizationArgs);
-
-            stateSolutionService.init(
-              EditorStateService.getActiveStateName(),
-              stateData.interaction.solution);
 
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
@@ -128,47 +122,49 @@ oppia.directive('stateInteractionEditor', [
           // NOTE TO DEVELOPERS: Callers of this function must ensure that the
           // current active state is a terminal one.
           var updateDefaultTerminalStateContentIfEmpty = function() {
-            // Get current state.
-            var stateName = EditorStateService.getActiveStateName();
-
             // Check if the content is currently empty, as expected.
-            var previousContent = stateContentService.savedMemento;
+            var previousContent = StateContentService.savedMemento;
             if (!previousContent.isEmpty()) {
               return;
             }
             // Update the state's content.
-            stateContentService.displayed.setHtml(
+            StateContentService.displayed.setHtml(
               DEFAULT_TERMINAL_STATE_CONTENT);
-            stateContentService.saveDisplayedValue();
+            StateContentService.saveDisplayedValue();
+            $scope.onSaveStateContent(StateContentService.displayed);
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
             var hasInteractionIdChanged = (
-              stateInteractionIdService.displayed !==
-              stateInteractionIdService.savedMemento);
+              StateInteractionIdService.displayed !==
+              StateInteractionIdService.savedMemento);
             if (hasInteractionIdChanged) {
-              if (INTERACTION_SPECS[stateInteractionIdService.displayed]
+              if (INTERACTION_SPECS[StateInteractionIdService.displayed]
                 .is_terminal) {
                 updateDefaultTerminalStateContentIfEmpty();
               }
-              stateInteractionIdService.saveDisplayedValue();
+              StateInteractionIdService.saveDisplayedValue();
+              $scope.onSaveInteractionId(StateInteractionIdService.displayed);
             }
 
-            stateCustomizationArgsService.saveDisplayedValue();
+            StateCustomizationArgsService.saveDisplayedValue();
+            $scope.onSaveInteractionCustomizationArgs(
+              StateCustomizationArgsService.displayed
+            );
 
             InteractionDetailsCacheService.set(
-              stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento);
+              StateInteractionIdService.savedMemento,
+              StateCustomizationArgsService.savedMemento);
 
             // This must be called here so that the rules are updated before the
             // state graph is recomputed.
             if (hasInteractionIdChanged) {
               $rootScope.$broadcast(
                 'onInteractionIdChanged',
-                stateInteractionIdService.savedMemento);
+                StateInteractionIdService.savedMemento);
             }
 
-            GraphDataService.recompute();
+            $scope.recomputeGraph();
             _updateInteractionPreviewAndAnswerChoices();
           };
 
@@ -184,14 +180,14 @@ oppia.directive('stateInteractionEditor', [
                 resolve: {},
                 controller: [
                   '$scope', '$uibModalInstance', '$injector',
-                  'stateSolutionService', 'stateInteractionIdService',
-                  'stateCustomizationArgsService',
+                  'StateSolutionService', 'StateInteractionIdService',
+                  'StateCustomizationArgsService',
                   'InteractionDetailsCacheService', 'INTERACTION_SPECS',
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
                   function(
                       $scope, $uibModalInstance, $injector,
-                      stateSolutionService, stateInteractionIdService,
-                      stateCustomizationArgsService,
+                      StateSolutionService, StateInteractionIdService,
+                      StateCustomizationArgsService,
                       InteractionDetailsCacheService, INTERACTION_SPECS,
                       UrlInterpolationService, EditorFirstTimeEventsService) {
                     EditorFirstTimeEventsService
@@ -199,10 +195,10 @@ oppia.directive('stateInteractionEditor', [
 
                     // This binds the services to the HTML template, so that
                     // their displayed values can be used in the HTML.
-                    $scope.stateInteractionIdService =
-                      stateInteractionIdService;
-                    $scope.stateCustomizationArgsService = (
-                      stateCustomizationArgsService);
+                    $scope.StateInteractionIdService =
+                      StateInteractionIdService;
+                    $scope.StateCustomizationArgsService = (
+                      StateCustomizationArgsService);
 
                     $scope.getInteractionThumbnailImageUrl = (
                       UrlInterpolationService.getInteractionThumbnailImageUrl);
@@ -211,28 +207,28 @@ oppia.directive('stateInteractionEditor', [
                     $scope.ALLOWED_INTERACTION_CATEGORIES = (
                       GLOBALS.ALLOWED_INTERACTION_CATEGORIES);
 
-                    if (stateInteractionIdService.savedMemento) {
+                    if (StateInteractionIdService.savedMemento) {
                       $scope.customizationModalReopened = true;
                       var interactionSpec = INTERACTION_SPECS[
-                        stateInteractionIdService.savedMemento];
+                        StateInteractionIdService.savedMemento];
                       $scope.customizationArgSpecs = (
                         interactionSpec.customization_arg_specs);
 
-                      stateInteractionIdService.displayed = angular.copy(
-                        stateInteractionIdService.savedMemento);
-                      stateCustomizationArgsService.displayed = {};
-                      // Ensure that stateCustomizationArgsService.displayed is
+                      StateInteractionIdService.displayed = angular.copy(
+                        StateInteractionIdService.savedMemento);
+                      StateCustomizationArgsService.displayed = {};
+                      // Ensure that StateCustomizationArgsService.displayed is
                       // fully populated.
                       for (
                         var i = 0; i < $scope.customizationArgSpecs.length;
                         i++) {
                         var argName = $scope.customizationArgSpecs[i].name;
-                        stateCustomizationArgsService.displayed[argName] = {
+                        StateCustomizationArgsService.displayed[argName] = {
                           value: (
-                            stateCustomizationArgsService.savedMemento
+                            StateCustomizationArgsService.savedMemento
                               .hasOwnProperty(argName) ?
                               angular.copy(
-                                stateCustomizationArgsService.savedMemento[
+                                StateCustomizationArgsService.savedMemento[
                                   argName].value) :
                               angular.copy(
                                 $scope.customizationArgSpecs[i].default_value)
@@ -243,19 +239,19 @@ oppia.directive('stateInteractionEditor', [
                       $scope.$broadcast('schemaBasedFormsShown');
                       $scope.form = {};
                       $scope.hasCustomizationArgs = (Object.keys(
-                        stateCustomizationArgsService.displayed).length > 0);
+                        StateCustomizationArgsService.displayed).length > 0);
                     }
 
                     $scope.getCustomizationArgsWarningsList = function() {
                       var validationServiceName =
                         INTERACTION_SPECS[
-                          $scope.stateInteractionIdService.displayed].id +
+                          $scope.StateInteractionIdService.displayed].id +
                         'ValidationService';
                       var validationService = $injector.get(
                         validationServiceName);
                       var warningsList =
                         validationService.getCustomizationArgsWarnings(
-                          stateCustomizationArgsService.displayed);
+                          StateCustomizationArgsService.displayed);
                       return warningsList;
                     };
 
@@ -267,17 +263,17 @@ oppia.directive('stateInteractionEditor', [
                       $scope.customizationArgSpecs = (
                         interactionSpec.customization_arg_specs);
 
-                      stateInteractionIdService.displayed = newInteractionId;
-                      stateCustomizationArgsService.displayed = {};
+                      StateInteractionIdService.displayed = newInteractionId;
+                      StateCustomizationArgsService.displayed = {};
                       if (
                         InteractionDetailsCacheService.contains(
                           newInteractionId)) {
-                        stateCustomizationArgsService.displayed = (
+                        StateCustomizationArgsService.displayed = (
                           InteractionDetailsCacheService.get(
                             newInteractionId).customization);
                       } else {
                         $scope.customizationArgSpecs.forEach(function(caSpec) {
-                          stateCustomizationArgsService.displayed[caSpec.name] =
+                          StateCustomizationArgsService.displayed[caSpec.name] =
                             {
                               value: angular.copy(caSpec.default_value)
                             };
@@ -285,7 +281,7 @@ oppia.directive('stateInteractionEditor', [
                       }
 
                       if (Object.keys(
-                        stateCustomizationArgsService.displayed).length === 0) {
+                        StateCustomizationArgsService.displayed).length === 0) {
                         $scope.save();
                         $scope.hasCustomizationArgs = false;
                       } else {
@@ -298,16 +294,16 @@ oppia.directive('stateInteractionEditor', [
 
                     $scope.returnToInteractionSelector = function() {
                       InteractionDetailsCacheService.set(
-                        stateInteractionIdService.displayed,
-                        stateCustomizationArgsService.displayed);
+                        StateInteractionIdService.displayed,
+                        StateCustomizationArgsService.displayed);
 
-                      stateInteractionIdService.displayed = null;
-                      stateCustomizationArgsService.displayed = {};
+                      StateInteractionIdService.displayed = null;
+                      StateCustomizationArgsService.displayed = {};
                     };
 
                     $scope.isSaveInteractionButtonEnabled = function() {
                       return $scope.hasCustomizationArgs &&
-                        $scope.stateInteractionIdService.displayed &&
+                        $scope.StateInteractionIdService.displayed &&
                         $scope.form.schemaForm.$valid &&
                         $scope.getCustomizationArgsWarningsList().length === 0;
                     };
@@ -316,7 +312,7 @@ oppia.directive('stateInteractionEditor', [
                       if (!$scope.hasCustomizationArgs) {
                         return 'No customization arguments';
                       }
-                      if (!$scope.stateInteractionIdService.displayed) {
+                      if (!$scope.StateInteractionIdService.displayed) {
                         return 'No interaction being displayed';
                       }
 
@@ -354,9 +350,9 @@ oppia.directive('stateInteractionEditor', [
                 ]
               }).result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
-                  stateInteractionIdService.restoreFromMemento();
-                  stateCustomizationArgsService.restoreFromMemento();
-                  stateContentIdsToAudioTranslationsService
+                  StateInteractionIdService.restoreFromMemento();
+                  StateCustomizationArgsService.restoreFromMemento();
+                  StateContentIdsToAudioTranslationsService
                     .restoreFromMemento();
                 });
             }
@@ -382,34 +378,46 @@ oppia.directive('stateInteractionEditor', [
                 }
               ]
             }).result.then(function() {
-              stateInteractionIdService.displayed = null;
-              stateCustomizationArgsService.displayed = {};
-              if (stateSolutionService.displayed) {
+              StateInteractionIdService.displayed = null;
+              StateCustomizationArgsService.displayed = {};
+              if (StateSolutionService.displayed) {
                 var solutionContentId =
-                  stateSolutionService.displayed.explanation.getContentId();
-                stateContentIdsToAudioTranslationsService.displayed
+                  StateSolutionService.displayed.explanation.getContentId();
+                StateContentIdsToAudioTranslationsService.displayed
                   .deleteContentId(solutionContentId);
               }
-              stateSolutionService.displayed = null;
+              StateSolutionService.displayed = null;
               InteractionDetailsCacheService.removeDetails(
-                stateInteractionIdService.savedMemento);
-              stateInteractionIdService.saveDisplayedValue();
-              stateCustomizationArgsService.saveDisplayedValue();
-              stateSolutionService.saveDisplayedValue();
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.saveDisplayedValue();
+              $scope.onSaveInteractionId(StateInteractionIdService.displayed);
+
+              StateCustomizationArgsService.saveDisplayedValue();
+              $scope.onSaveInteractionCustomizationArgs(
+                StateCustomizationArgsService.displayed
+              );
+
+              StateSolutionService.saveDisplayedValue();
+              $scope.onSaveSolution(StateSolutionService.displayed);
+
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                StateContentIdsToAudioTranslationsService.displayed
+              );
+
               $rootScope.$broadcast(
                 'onInteractionIdChanged',
-                stateInteractionIdService.savedMemento);
-              GraphDataService.recompute();
+                StateInteractionIdService.savedMemento);
+              $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             });
           };
 
           var _updateInteractionPreviewAndAnswerChoices = function() {
-            $scope.interactionId = stateInteractionIdService.savedMemento;
+            $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
-              stateCustomizationArgsService.savedMemento;
+              StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
 
@@ -455,47 +463,3 @@ oppia.directive('stateInteractionEditor', [
       ]
     };
   }]);
-
-oppia.directive('testInteractionPanel', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        stateContent: '&',
-        inputTemplate: '&',
-        onSubmitAnswer: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'test_interaction_modal_directive.html'),
-      controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
-        function($scope, EditorStateService, ExplorationStatesService,
-            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
-          var _stateName = EditorStateService.getActiveStateName();
-          var _state = ExplorationStatesService.getState(_stateName);
-          $scope.interactionIsInline = (
-            INTERACTION_SPECS[_state.interaction.id].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-          $scope.interactionAnswerIsValid = true;
-          $scope.submitAnswer = function(answer) {
-            $scope.onSubmitAnswer({
-              answer: answer
-            });
-          };
-
-          $scope.onSubmitAnswerFromButton = function() {
-            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
-          };
-
-          $scope.setInteractionAnswerValidity = function(answerValidity) {
-            $scope.interactionAnswerIsValid = answerValidity;
-          };
-        }
-      ]
-    };
-  }
-]);
