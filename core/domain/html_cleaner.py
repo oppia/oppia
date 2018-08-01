@@ -23,13 +23,12 @@ import logging
 import urllib
 import urlparse
 
+from PIL import Image
 import bleach
 import bs4
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
-
-from PIL import Image
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -845,3 +844,13 @@ def get_filepath_of_object_image(filename, exp_id):
     width, height = img.size
     img.close()
     return {'filename': filename, 'height': height, 'width': width}
+
+
+def create_image():
+    """This is for testing that PIL works or not. If the backend tests
+        fail, it means that PIL is not there.
+
+    Returns:
+        null. It returns nothing.
+    """
+    Image.new('RGB', (60, 30), color='red')
