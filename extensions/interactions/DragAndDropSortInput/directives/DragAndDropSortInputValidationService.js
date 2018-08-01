@@ -103,35 +103,52 @@ oppia.factory('DragAndDropSortInputValidationService', [
             areAnyItemsEmpty = false;
             areAnyItemsDuplicated = false;
 
-            for (var k = 0; k < inputs.x.length; k++) {
-              if (inputs.x[k].length === 0) {
-                areAnyItemsEmpty = true;
-              } else {
-                for (var l = 0; l < inputs.x[k].length; l++) {
-                  var item = inputs.x[k][l];
-                  if (item.trim().length === 0) {
-                    areAnyItemsEmpty = true;
-                  }
-                  if (seenItems.indexOf(item) !== -1) {
-                    areAnyItemsDuplicated = true;
-                  }
-                  seenItems.push(item);
+            switch (rule.type) {
+              case 'HasElementXBeforeElementY':
+                if (inputs.x === inputs.y) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' will never be matched because both the ' +
+                      'selected elements are same.')
+                  });
                 }
-              }
-            }
+                break;
+              case 'IsEqualToOrdering':
+              case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
+                for (var k = 0; k < inputs.x.length; k++) {
+                  if (inputs.x[k].length === 0) {
+                    areAnyItemsEmpty = true;
+                  } else {
+                    for (var l = 0; l < inputs.x[k].length; l++) {
+                      var item = inputs.x[k][l];
+                      if (item.trim().length === 0) {
+                        areAnyItemsEmpty = true;
+                      }
+                      if (seenItems.indexOf(item) !== -1) {
+                        areAnyItemsDuplicated = true;
+                      }
+                      seenItems.push(item);
+                    }
+                  }
+                }
 
-            if (areAnyItemsEmpty) {
-              warningsList.push({
-                type: WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
-              });
-            }
+                if (areAnyItemsEmpty) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: 'Please ensure the items are nonempty.'
+                  });
+                }
 
-            if (areAnyItemsDuplicated) {
-              warningsList.push({
-                type: WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are unique.'
-              });
+                if (areAnyItemsDuplicated) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: 'Please ensure the items are unique.'
+                  });
+                }
+                break;
+              default:
             }
 
             for (var k = 0; k < ranges.length; k++) {
