@@ -553,7 +553,7 @@ def get_completed_node_ids(user_id, story_id):
     return progress_model.completed_nodes if progress_model else []
 
 
-def get_nodes_completed_in_stories(user_id, story_ids):
+def get_node_ids_completed_in_stories(user_id, story_ids):
     """Returns the ids of the nodes completed in each of the stories.
 
     Args:
@@ -578,54 +578,29 @@ def get_nodes_completed_in_stories(user_id, story_ids):
 
     return node_ids_completed_in_stories
 
-
-def get_valid_completed_node_ids(user_id, story):
-    """Returns a filtered version of the return value of
-    get_completed_node_ids, which only includes nodes found within
-    the current version of the story.
+def get_completed_nodes_in_story(user_id, story_id):
+    """Returns nodes that are completed in a story
 
     Args:
-        user_id: str. ID of the given user.
-        story: Story.
+        user_id: str. The user id of the user.
+        story_id: str. The id of the story.
 
     Returns:
-        A filtered version of the return value of get_completed_node_ids
-        which only includes nodes found within the current version of
-        the story.
+        list(StoryNode): The list of the story nodes that the user has
+        completed.
     """
-    completed_node_ids = get_completed_node_ids(
-        user_id, story.id)
-    return [
-        exploration_id for exploration_id in completed_node_ids
-        if story.story_contents.get_node(exploration_id)
-    ]
-
-
-def get_next_node_id_to_be_completed_by_user(user_id, story_id):
-    """Returns the first node ID in the specified story that the
-    given user has not yet attempted.
-
-    Args:
-        user_id: str. ID of the user.
-        story_id: str. ID of the story.
-
-    Returns:
-        str. The first node ID in the specified story that
-        the given user has not completed. Returns the story's initial
-        node if the user has yet to complete any nodes
-        within the story.
-    """
-    completed_node_ids = get_completed_node_ids(
-        user_id, story_id)
-
     story = get_story_by_id(story_id)
-    if completed_node_ids:
-        return story.get_next_node_id(completed_node_ids)
-    else:
-        return story.first_node_id
+    completed_nodes = []
+
+    completed_node_ids = get_completed_node_ids(user_id, story_id)
+    for node in story.story_contents.nodes:
+        if node.id in completed_node_ids:
+            completed_nodes = [node.to_dict()]
+
+    return completed_nodes
 
 
-def record_played_node_in_story_context(user_id, story_id, node_id):
+def record_completed_node_in_story_context(user_id, story_id, node_id):
     """Records a node by a given user in a given story
     context as having been played.
 

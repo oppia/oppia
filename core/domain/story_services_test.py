@@ -191,14 +191,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 class StoryProgressUnitTests(StoryServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a
     story, including query and recording methods related to nodes
-    which are played in the context of the story.
+    which are completed in the context of the story.
     """
 
     def _get_progress_model(self, user_id, STORY_ID):
         return user_models.StoryProgressModel.get(user_id, STORY_ID)
 
     def _record_completion(self, user_id, STORY_ID, node_id):
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             user_id, STORY_ID, node_id)
 
     def setUp(self):
@@ -212,7 +212,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         story = story_domain.Story.create_default_story(
             self.STORY_1_ID, 'Title')
         story.description = ('Description')
-        node_1 = {
+        self.node_1 = {
             'id': self.NODE_ID_1,
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': [],
@@ -221,7 +221,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             'outline_is_finalized': False,
             'exploration_id': None
         }
-        node_2 = {
+        self.node_2 = {
             'id': self.NODE_ID_2,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -231,8 +231,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             'exploration_id': None
         }
         story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2)
+            story_domain.StoryNode.from_dict(self.node_1),
+            story_domain.StoryNode.from_dict(self.node_2)
         ]
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_3'
@@ -265,45 +265,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
-    def test_get_next_node_id_to_be_completed_by_user(self):
-        # If the user doesn't exist, assume they haven't made any progress on
-        # the story. This means the initial nodes should be
-        # suggested.
-        self.assertEqual(
-            story_services.get_next_node_id_to_be_completed_by_user(
-                'Fake', self.STORY_1_ID), self.NODE_ID_1)
-
-        # There should be an exception if the story does not exist.
-        with self.assertRaises(Exception):
-            story_services.get_next_node_id_to_be_completed_by_user(
-                self.owner_id, 'Fake')
-
-        # If the user hasn't made any progress in the story yet, only the
-        # initial nodes should be suggested.
-        self.assertEqual(
-            story_services.get_story_by_id(self.STORY_1_ID).first_node_id,
-            self.NODE_ID_1)
-        self.assertEqual(
-            story_services.get_next_node_id_to_be_completed_by_user(
-                self.owner_id, self.STORY_1_ID), self.NODE_ID_1)
-
-        # If the user completes the first node, a new one should be
-        # recommended and the old one should no longer be recommended.
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(
-            story_services.get_next_node_id_to_be_completed_by_user(
-                self.owner_id, self.STORY_1_ID), self.NODE_ID_2)
-
-        # Completing all of the nodes should yield no other nodes
-        # to suggest.
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        self.assertEqual(
-            story_services.get_next_node_id_to_be_completed_by_user(
-                self.owner_id, self.STORY_1_ID), None)
-
-    def test_record_played_node_in_story_context(self):
-        # Ensure that node played within the context of a story are
+    def test_record_completed_node_in_story_context(self):
+        # Ensure that node completed within the context of a story are
         # recorded correctly. This test actually validates both
         # test_get_completed_node_ids and
         # test_get_next_node_id_to_be_completed_by_user.
@@ -315,7 +278,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.assertIsNone(completion_model)
 
         # If the user 'completes an node', the model should record it.
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
 
         completion_model = self._get_progress_model(
@@ -327,7 +290,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         # If the same node is completed again within the context of this
         # story, it should not be duplicated.
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
@@ -340,9 +303,9 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.story = self.save_new_story(
             self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes'
         )
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_ID_1, self.NODE_ID_1)
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_ID_1, self.NODE_ID_2)
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
@@ -351,9 +314,9 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.NODE_ID_1])
 
         # If two more nodes are completed, they are recorded.
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        story_services.record_played_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
