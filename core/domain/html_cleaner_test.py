@@ -830,6 +830,3 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     html_cleaner.add_dimensions_to_noninteractive_image_tag(
                         test_case['html_content'], 'unused'),
                     test_case['expected_output'])
-
-    def test_create_image(self):
-        html_cleaner.create_image()
