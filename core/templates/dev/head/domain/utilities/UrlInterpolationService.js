@@ -106,10 +106,6 @@ oppia.factory('UrlInterpolationService', [
         var EMPTY_VARIABLE_REGEX = /<>/;
         var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
-        // Parameter values can only contain alphanumerical characters, spaces,
-        // hyphens, underscores, periods or the equal to symbol.
-        var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-|[.]|=|\(|\))+$/;
-
         if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
             urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
           AlertsService.fatalWarning(
@@ -123,15 +119,6 @@ oppia.factory('UrlInterpolationService', [
           if (!UtilsService.isString(value)) {
             AlertsService.fatalWarning(
               'Parameters passed into interpolateUrl must be strings.');
-            return null;
-          }
-
-          // Ensure the value is valid.
-          if (!value.match(VALID_URL_PARAMETER_VALUE_REGEX)) {
-            AlertsService.fatalWarning(
-              'Parameter values passed into interpolateUrl must only contain ' +
-              'alphanumerical characters, hyphens, underscores, parentheses ' +
-              'or spaces: \'' + value + '\'');
             return null;
           }
 

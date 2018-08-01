@@ -186,47 +186,26 @@ describe('URL Interpolation Service', function() {
     })).toThrow(new Error(
       'Invalid URL template received: \'/test_url/<<name>>\''));
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<value>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, parentheses or ' +
-      'spaces: \'<value>\''));
+    })).toEqual('/test_url/%3Cvalue%3E');
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<<value>>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, parentheses or ' +
-      'spaces: \'<<value>>\''));
+    })).toEqual('/test_url/%3C%3Cvalue%3E%3E');
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, parentheses or ' +
-      'spaces: \'<>\''));
+    })).toEqual('/test_url/%3C%3E');
 
-    // Values cannot contain non-alphanumerical characters or spaces, including
-    // newlines or website symbols.
-    expect(function() {
-      uis.interpolateUrl('/test_url/?<query_name>=<query_value>', {
-        query_name: 'website',
-        query_value: 'https://www.oppia.org/'
-      });
-    }).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, parentheses or ' +
-      'spaces: \'https://www.oppia.org/\''));
+    expect(uis.interpolateUrl('/test_url/?<query_name>=<query_value>', {
+      query_name: 'website',
+      query_value: 'https://www.oppia.org/'
+    })).toEqual('/test_url/?website=https%3A%2F%2Fwww.oppia.org%2F');
 
-    expect(function() {
-      uis.interpolateUrl('/test_url/<name>', {
-        name: 'value\nmultiple lines'
-      });
-    }).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, parentheses or ' +
-      'spaces: \'value\nmultiple lines\''));
+    expect(uis.interpolateUrl('/test_url/<name>', {
+      name: 'value\nmultiple lines'
+    })).toEqual('/test_url/value%0Amultiple%20lines');
   });
 
   it('should throw an error for missing parameters', function() {
