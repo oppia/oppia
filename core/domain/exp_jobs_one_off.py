@@ -27,7 +27,7 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -514,7 +514,7 @@ class ExplorationContentValidationJobForTextAngular(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_TEXTANGULAR)
 
         for key in err_dict:
@@ -548,7 +548,7 @@ class ExplorationMigrationValidationJobForTextAngular(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True)
 
         for key in err_dict:
@@ -582,7 +582,7 @@ class ExplorationContentValidationJobForCKEditor(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_CKEDITOR)
 
         for key in err_dict:
@@ -621,7 +621,7 @@ class ExplorationMigrationValidationJobForCKEditor(
 
         html_list = exploration.get_all_html_content_strings()
         try:
-            err_dict = html_cleaner.validate_rte_format(
+            err_dict = html_validation_service.validate_rte_format(
                 html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
         except Exception as e:
             yield (
@@ -718,7 +718,8 @@ class InteractionCustomizationArgsValidationJob(
 
         html_list = exploration.get_all_html_content_strings()
         try:
-            err_dict = html_cleaner.validate_customization_args(html_list)
+            err_dict = html_validation_service.validate_customization_args(
+                html_list)
         except Exception as e:
             yield (
                 'Error in validating customization args for exploration %s' % (

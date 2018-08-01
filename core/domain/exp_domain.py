@@ -28,6 +28,7 @@ import string
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
@@ -3535,7 +3536,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_textangular)
+                state_dict, html_validation_service.convert_to_textangular)
         return states_dict
 
     @classmethod
@@ -3552,7 +3553,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.add_caption_attr_to_image)
+                state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
@@ -3570,7 +3571,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor)
         return states_dict
 
     @classmethod
