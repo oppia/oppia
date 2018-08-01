@@ -693,4 +693,3 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, values)
-
