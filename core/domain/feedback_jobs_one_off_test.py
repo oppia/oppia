@@ -236,20 +236,20 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
         threads = feedback_services.get_threads(self.EXP_ID_1)
 
-        self.assertEqual(threads[0].subject, u'a small summary')
-        self.assertEqual(threads[1].subject, u'Some subject')
+        self.assertEqual(threads[6].subject, u'a small summary')
+        self.assertEqual(threads[5].subject, u'Some subject')
         self.assertEqual(
-            threads[2].subject,
+            threads[4].subject,
             u'It has to convert to a substring as it exceeds...')
         self.assertEqual(
             threads[3].subject,
             u'ItisjustaverylongsinglewordfortestinggetAbbreviate...')
-        self.assertEqual(threads[4].subject, u'(Feedback from a learner)')
+        self.assertEqual(threads[2].subject, u'(Feedback from a learner)')
         self.assertEqual(
-            threads[5].subject,
+            threads[1].subject,
             u'Itisjustaverylongsinglewordfortesting')
         self.assertEqual(
-            threads[6].subject,
+            threads[0].subject,
             u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...')
 
         self.assertEqual(threads[0].last_updated, threads_old[0].last_updated)

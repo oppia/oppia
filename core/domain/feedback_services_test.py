@@ -164,8 +164,8 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     def test_get_closed_threads_with_suggestions(self):
         threads = feedback_services.get_closed_threads(self.EXP_ID1, True)
         self.assertEqual(len(threads), 2)
-        self.assertEqual(threads[0].id, self.THREAD_ID2)
-        self.assertEqual(threads[1].id, self.THREAD_ID3)
+        thread_ids = [thread.id for thread in threads]
+        self.assertItemsEqual(thread_ids, [self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_closed_threads_without_suggestions(self):
         threads = feedback_services.get_closed_threads(self.EXP_ID1, False)
@@ -175,15 +175,15 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     def test_get_all_threads_with_suggestion(self):
         threads = feedback_services.get_all_threads(self.EXP_ID1, True)
         self.assertEqual(len(threads), 3)
-        self.assertEqual(threads[0].id, self.THREAD_ID1)
-        self.assertEqual(threads[1].id, self.THREAD_ID2)
-        self.assertEqual(threads[2].id, self.THREAD_ID3)
+        thread_ids = [thread.id for thread in threads]
+        self.assertItemsEqual(
+            thread_ids, [self.THREAD_ID1, self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_all_threads_without_suggestion(self):
         threads = feedback_services.get_all_threads(self.EXP_ID1, False)
         self.assertEqual(len(threads), 2)
-        self.assertEqual(threads[0].id, self.THREAD_ID4)
-        self.assertEqual(threads[1].id, self.THREAD_ID5)
+        thread_ids = [thread.id for thread in threads]
+        self.assertItemsEqual(thread_ids, [self.THREAD_ID4, self.THREAD_ID5])
 
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):

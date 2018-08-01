@@ -155,9 +155,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             list(FeedbackThreadModel). List of threads associated with the
                 exploration. Doesn't include deleted entries.
         """
-        return cls.get_all().filter(
-            cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(limit)
+        return cls.get_all().filter(cls.exploration_id == exploration_id).order(
+            -cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
