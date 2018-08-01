@@ -167,8 +167,7 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
-       * Given an image path relative to /assets/images folder,
-       * returns the complete url path to that image.
+       * Given an story id returns the complete url path to that image.
        */
       getStoryUrl: function(storyId) {
         validateResourcePath(storyId);
