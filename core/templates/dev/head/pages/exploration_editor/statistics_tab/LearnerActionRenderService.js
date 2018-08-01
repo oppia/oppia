@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+LearnerActions[]// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ oppia.factory('LearnerActionRenderService', [
     /**
      * Renders the correct HTML for the table display for MultipleIncorrect
      * issue.
-     * @param {list(LearnerAction)} finalBlock.
+     * @param {LearnerAction[]} finalBlock.
      * @returns {string}
      */
     var renderLearnerActionsTableForMultipleIncorrectIssue = function(
@@ -189,7 +189,7 @@ oppia.factory('LearnerActionRenderService', [
       /**
        * Returns the HTML for the final display block in a MultipleIncorrect
        * issue. This accounts for the table to be displayed.
-       * @param {list(LearnerAction)} block.
+       * @param {LearnerAction[]} block.
        * @param {int} actionStartIndex.
        * @returns {string}
        */
@@ -222,8 +222,8 @@ oppia.factory('LearnerActionRenderService', [
       /**
        * Splits up the entire set of learner actions into correct display blocks
        * to be displayed in sequence in the playthroughs modal.
-       * @param {list(learnerActions)} learnerActions.
-       * @returns {list(list(learnerActions))}
+       * @param {LearnerActions[]} learnerActions.
+       * @returns {LearnerActions[][]}
        */
       getDisplayBlocks: function(learnerActions) {
         var lastIndex = learnerActions.length - 1;
