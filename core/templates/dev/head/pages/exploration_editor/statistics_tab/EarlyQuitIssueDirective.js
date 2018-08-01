@@ -77,11 +77,13 @@ oppia.directive('earlyQuitIssueDirective', [
                         playthrough.actions);
 
                     var blockActionIndexMapping = {};
-                    var i = $scope.displayBlocks.length - 1, accumulator = 1;
-                    for (i; i >= 0; i--) {
-                      blockActionIndexMapping[i] = accumulator;
-                      accumulator += $scope.displayBlocks[i].length;
-                    }
+                    var i = 0;
+                    var total = $scope.displayBlocks.reduce(
+                      function(runningTotal, displayBlock) {
+                        blockActionIndexMapping[i] = runningTotal;
+                        i += 1;
+                        return runningTotal + displayBlock.length;
+                      }, 1);
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
 
