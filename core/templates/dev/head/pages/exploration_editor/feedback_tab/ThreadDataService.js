@@ -82,11 +82,14 @@ oppia.factory('ThreadDataService', [
           }
           for (var i = 0; i < suggestionThreads.length; i++) {
             for (var j = 0; j < res[1].data.suggestions.length; j++) {
+              var suggestion = (
+                SuggestionObjectFactory.createFromBackendDict(
+                  res[1].data.suggestions[j]));
               if (suggestionThreads[i].thread_id ===
-                  res[1].data.suggestions[j].threadId()) {
+                  suggestion.threadId()) {
                 var suggestionThread = (
                   SuggestionThreadObjectFactory.createFromBackendDicts(
-                    suggestionThreads[i], res[1].data.suggestions[i]));
+                    suggestionThreads[i], res[1].data.suggestions[j]));
                 _data.suggestionThreads.push(suggestionThread);
                 break;
               }
