@@ -173,7 +173,7 @@ describe('Learner dashboard functionality', function() {
       }
     });
 
-  fit('visits the collection player and plays the correct collection',
+  it('visits the collection player and plays the correct collection',
     function () {
       if (!browser.isMobile) {
         users.createAndLoginAdminUser('collectionCreator@learnerDashboard.com',
