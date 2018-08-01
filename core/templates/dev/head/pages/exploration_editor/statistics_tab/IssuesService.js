@@ -24,6 +24,20 @@ oppia.factory('IssuesService', [
     var explorationVersion = null;
     var currentPlaythrough = null;
 
+    var renderEarlyQuitIssueStatement = function() {
+      return 'Several learners exited the exploration in less than a minute.';
+    };
+
+    var renderEarlyQuitIssueSuggestions = function(issue) {
+      var suggestions = [
+        $sce.trustAsHtml(
+          'Review the cards up to and including <span class="state_link">' +
+          '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
+          ' errors, ambiguities or insufficient motivation.'
+        )];
+      return suggestions;
+    };
+
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
@@ -42,6 +56,16 @@ oppia.factory('IssuesService', [
             function(playthrough) {
               return playthrough;
             });
+      },
+      renderIssueStatement: function(issue) {
+        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+          return renderEarlyQuitIssueStatement();
+        }
+      },
+      renderIssueSuggestions: function(issue) {
+        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+          return renderEarlyQuitIssueSuggestions(issue);
+        }
       }
     };
   }]);
