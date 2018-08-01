@@ -29,12 +29,20 @@ oppia.factory('IssuesService', [
     };
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
+<<<<<<< HEAD
       var suggestions = [
         $sce.trustAsHtml(
           'Review the cards up to and including <span class="state_link">' +
           '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
           ' errors, ambiguities or insufficient motivation.'
         )];
+=======
+      var suggestions = [$sce.trustAsHtml(
+        'Review the cards up to and including <span class="state_link">' +
+        '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
+        ' errors, ambiguities or insufficient motivation.'
+      )];
+>>>>>>> container_directive
       return suggestions;
     };
 
@@ -45,17 +53,22 @@ oppia.factory('IssuesService', [
       },
       getIssues: function() {
         return IssuesBackendApiService.fetchIssues(
-          explorationId, explorationVersion).then(
-            function(issues) {
-              return issues;
-            });
+          explorationId, explorationVersion).then(function(issues) {
+          return issues;
+        });
       },
       getPlaythrough: function(playthroughId) {
         return IssuesBackendApiService.fetchPlaythrough(
+<<<<<<< HEAD
           explorationId, playthroughId).then(
             function(playthrough) {
               return playthrough;
             });
+=======
+          explorationId, playthroughId).then(function(playthrough) {
+          return playthrough;
+        });
+>>>>>>> container_directive
       },
       renderIssueStatement: function(issue) {
         if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
