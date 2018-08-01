@@ -173,7 +173,8 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
         incomplete_activities.add_exploration_id('exp_id1')
 
         self.assertListEqual(
-            incomplete_activities.exploration_ids, ['exp_id0', 'exp_id1'])
+            incomplete_activities.exploration_ids,
+            ['exp_id0', 'exp_id1'])
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
@@ -199,7 +200,8 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
         incomplete_activities.add_collection_id('collect_id1')
 
         self.assertListEqual(
-            incomplete_activities.collection_ids, ['collect_id0', 'collect_id1'])
+            incomplete_activities.collection_ids,
+            ['collect_id0', 'collect_id1'])
 
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
@@ -240,7 +242,8 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
         completed_activities.add_exploration_id('exp_id1')
 
         self.assertListEqual(
-            completed_activities.exploration_ids, ['exp_id0', 'exp_id1'])
+            completed_activities.exploration_ids,
+            ['exp_id0', 'exp_id1'])
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
@@ -266,7 +269,8 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
         completed_activities.add_collection_id('collect_id1')
 
         self.assertListEqual(
-            completed_activities.collection_ids, ['collect_id0', 'collect_id1'])
+            completed_activities.collection_ids,
+            ['collect_id0', 'collect_id1'])
 
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
@@ -355,7 +359,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist.add_collection_id_to_list('collect_id1')
 
         self.assertListEqual(
-            learner_playlist.collection_ids, ['collect_id0', 'collect_id1'])
+            learner_playlist.collection_ids,
+            ['collect_id0', 'collect_id1'])
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
