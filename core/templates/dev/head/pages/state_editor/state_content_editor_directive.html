@@ -21,14 +21,6 @@
     <div class="oppia-editable-section-mask protractor-test-state-edit-content">
     </div>
   </div>
-
-  <div ng-if="StateContentService.savedMemento && !StateContentService.savedMemento.isEmpty()">
-    <audio-translations-editor component-name="<[COMPONENT_NAME_CONTENT]>"
-                               content-id="StateContentService.savedMemento.getContentId()"
-                               on-start-edit="onAudioTranslationsStartEditAction"
-                               on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
-    </audio-translations-editor>
-  </div>
 </div>
 
 <div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">

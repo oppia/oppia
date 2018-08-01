@@ -67,14 +67,6 @@
   </div>
 </div>
 
-<div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback && outcome.feedback.getContentId()">
-  <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
-                             content-id="outcome.feedback.getContentId()"
-                             on-start-edit="onAudioTranslationsStartEditAction"
-                             on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
-  </audio-translations-editor>
-</div>
-
 <br ng-if="displayFeedback">
 
 <div ng-if="!destinationEditorIsOpen"
