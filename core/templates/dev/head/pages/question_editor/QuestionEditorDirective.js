@@ -132,6 +132,8 @@ oppia.directive('questionEditor', [
           };
 
           $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
+            $scope.questionStateData.contentIdsToAudioTranslations =
+              angular.copy(displayedValue);
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {

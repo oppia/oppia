@@ -73,7 +73,7 @@
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="(getOutcome() && isOutcomeLooping()) || (!isCorrect() && !getOutcome().dest && isInQuestionMode())">
+  <span ng-if="getOutcome() && (isOutcomeLooping() || (!isCorrect() && !getOutcome().dest && isInQuestionMode()))">
     <em>(try again)</em>
   </span>
 </div>

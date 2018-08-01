@@ -36,6 +36,7 @@ oppia.directive('questionsTab', [
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
+            $scope.skillId = null;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
@@ -48,7 +49,17 @@ oppia.directive('questionsTab', [
               $scope.misconceptions);
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
+              return;
             }
+            EditableQuestionBackendApiService.createQuestion(
+              $scope.skillId, $scope.question.toBackendDict(true)
+            ).then(function() {
+              TopicEditorStateService.fetchQuestionSummaries(
+                $scope.topic.getId(), function() {
+                  _initTab();
+                }
+              );
+            });
           };
 
           $scope.createQuestion = function() {
@@ -105,17 +116,6 @@ oppia.directive('questionsTab', [
                   AlertsService.addWarning();
                 });
             });
-          };
-
-          $scope.showQuestionEditor = function(id) {
-            EditableQuestionBackendApiService.fetchQuestion(id).then(
-              function(questionBackendDict) {
-                var question = QuestionObjectFactory.createFromBackendDict(
-                  questionBackendDict);
-                $scope.questionId = question.getId();
-                $scope.questionStateData = question.getStateData();
-                $scope.questionEditorIsShown = true;
-              });
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);

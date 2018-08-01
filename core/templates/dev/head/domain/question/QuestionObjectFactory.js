@@ -99,6 +99,19 @@ oppia.factory('QuestionObjectFactory', [
       );
     };
 
+    Question.prototype.toBackendDict = function(newQuestion) {
+      var questionBackendDict = {
+        question_state_data: this._stateData.toBackendDict(),
+        language_code: this._languageCode,
+        version: 1
+      };
+      if (!newQuestion) {
+        questionBackendDict.id = this._id;
+        questionBackendDict.version = this._version;
+      }
+      return questionBackendDict;
+    };
+
     return Question;
   }
 ]);

@@ -38,19 +38,20 @@ class QuestionCreationHandler(base.BaseHandler):
         if (
                 ('id' in question_dict) or
                 ('question_state_data' not in question_dict) or
-                ('language_code' not in question_dict) or
-                ('question_state_schema_version' not in question_dict)):
+                ('language_code' not in question_dict)):
             raise self.InvalidInputException
 
-        if (
-                (question_dict['question_state_schema_version'] !=
-                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION) or
-                (question_dict['version'] != 1)):
+        if question_dict['version'] != 1:
             raise self.InvalidInputException
 
+        question_dict['question_state_schema_version'] = (
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question(self.user_id, question)
+        self.values.update({
+            'question_id': question.id
+        })
         self.render_json(self.values)
 
 

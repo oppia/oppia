@@ -23,8 +23,8 @@
           class="list-item">
         <td> <[$index + 1]> </td>
         <td>
-          <a ng-click="showQuestionEditor(question.id)" class="list-summary">
-            <span> <[question.question_content]> </span>
+          <a class="list-summary">
+            <angular-html-bind html-data="question.question_content"></angular-html-bind>
           </a>
         </td>
       </tr>
