@@ -149,9 +149,9 @@ describe('Learner dashboard functionality', function() {
       if (!browser.isMobile) {
         users.createAndLoginUser('expCreator@learnerDashboard.com',
           'expCreator');
-        // Create an exploration named 'Test Exploration Player'.
+        // Create an exploration named 'Exploration Player Test'.
         workflow.createAndPublishExploration(
-          'Test Exploration Player',
+          'Exploration Player Test',
           'Astronomy',
           'To test the exploration player',
           'English'
@@ -168,22 +168,28 @@ describe('Learner dashboard functionality', function() {
           'http://localhost:9001/explore/24');
       } else {
         libraryPage.get();
-        libraryPage.findExploration('Test Exploration Player');
-        libraryPage.playExploration('Test Exploration Player');
+        libraryPage.findExploration('Exploration Player Test');
+        libraryPage.playExploration('Exploration Player Test');
       }
     });
 
   it('visits the collection player and plays the correct collection',
     function () {
       if (!browser.isMobile) {
-        users.createAndLoginAdminUser('collectionCreator@learnerDashboard.com',
-          'collectionCreator');
+        users.createAndLoginUser('expOfCollectionCreator@learnerDashboard.com',
+          'expOfCollectionCreator');
         workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
           'To test collection player',
           'English'
         );
+        users.logout();
+
+        // Login to admin account
+        users.createAndLoginAdminUser(
+          'collectionPlayerTestAdm@learnerDashboard.com',
+          'collectionPlayerTestAdm');
         workflow.createCollectionAsAdmin();
         collectionEditorPage.searchForAndAddExistingExploration(
           'Demo Exploration');
@@ -345,7 +351,7 @@ describe('Learner dashboard functionality', function() {
         'testCollectionAdm@learnerDashboard.com',
         'testcollectionAdmlearnerDashboard');
       // Create new 'Test Collection' containing
-      // exploration 'Head of Collection'.
+      // exploration 'Dummy Exploration'.
       workflow.createCollectionAsAdmin();
       collectionEditorPage.searchForAndAddExistingExploration(
         'Dummy Exploration');
