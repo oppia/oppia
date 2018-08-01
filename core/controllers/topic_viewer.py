@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the topics viewer page."""
+"""Controllers for the topic viewer page."""
 
 from core.controllers import base
 from core.domain import acl_decorators
@@ -74,6 +74,9 @@ class TopicViewerPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
+            raise self.PageNotFoundException
 
         self.values.update({
             'topic_name': topic.name

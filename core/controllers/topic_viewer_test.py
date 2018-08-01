@@ -63,7 +63,7 @@ class TopicViewerPage(BaseTopicViewerControllerTest):
 
             self.assertEqual(response.status_int, 200)
 
-    def test_any_user_cannot_access_unpublished_topic_viewer_page(self):
+    def test_no_user_can_access_unpublished_topic_viewer_page(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'topic1_name'),

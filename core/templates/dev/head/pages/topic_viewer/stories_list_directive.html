@@ -16,10 +16,10 @@
        ng-swipe-left="scroll(false)">
     <div class="oppia-topic-viewer-carousel-tiles">
       <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
-        <canonical-story-summary-tile story-id="canonicalStory.id"
-                                      title="canonicalStory.title"
-                                      description="canonicalStory.description">
-        </canonical-story-summary-tile>
+        <story-summary-tile story-id="canonicalStory.id"
+                            title="canonicalStory.title"
+                            description="canonicalStory.description">
+        </story-summary-tile>
       </md-card>
     </div>
   </div>

@@ -1796,11 +1796,11 @@ def can_access_topic_viewer_page(handler):
             bool. Whether the user can access topic viewer page.
         """
         topic = topic_services.get_topic_by_name(topic_name)
-        topic_id = topic.id
 
         if topic is None:
             raise self.PageNotFoundException
 
+        topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
             topic_id, strict=False)
 

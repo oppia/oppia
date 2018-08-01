@@ -42,9 +42,6 @@ oppia.factory('TopicViewerBackendApiService', [
 
     return {
       fetchTopicData: function(topicName) {
-        if (topicDataDict) {
-          return topicDataDict;
-        }
         return $q(function(resolve, reject) {
           _fetchTopicData(topicName, resolve, reject);
         });

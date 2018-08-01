@@ -25,9 +25,10 @@ oppia.directive('topicsViewerNavbarBreadcrumb', [
       controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
         function($scope, TopicViewerBackendApiService, UrlService) {
           TopicViewerBackendApiService.fetchTopicData(
-            UrlService.getTopicNameFromLearnerUrl()).then(function(response) {
-            $scope.topicName = response.topic_name;
-          });
+            UrlService.getTopicNameFromLearnerUrl()).then(
+            function(topicDataDict) {
+              $scope.topicName = topicDataDict.topic_name;
+            });
         }
       ]
     };

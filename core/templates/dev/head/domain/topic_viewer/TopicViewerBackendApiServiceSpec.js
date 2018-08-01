@@ -42,7 +42,7 @@ describe('Topic viewer backend API service', function() {
         description: 'Story Description',
       },
       additional_story_dicts: {
-        id: '0',
+        id: '1',
         title: 'Story Title',
         description: 'Story Description',
       }

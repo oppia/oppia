@@ -211,12 +211,13 @@ def get_topic_by_name(topic_name):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    topic_model = topic_models.TopicModel.get_by_name(topic_name)[0]
-    if topic_model:
-        topic = get_topic_from_model(topic_model)
-        return topic
-    else:
+    topic_model = topic_models.TopicModel.get_by_name(topic_name)
+
+    if not topic_model:
         return None
+
+    topic = get_topic_from_model(topic_model[0])
+    return topic
 
 
 def get_topic_summary_by_id(topic_id, strict=True):
