@@ -95,6 +95,76 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.put()
 
 
+class StoryExplorationLinkModel(base_models.BaseModel):
+    """Model for storing Story-Exploration Links."""
+
+    # The ID of the story.
+    story_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the exploration linked to the story.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+
+    @classmethod
+    def get_model_id(cls, story_id, exploration_id):
+        """Returns the model id by combining the story and exploration ids.
+
+        Args:
+            story_id: str. The ID of the story.
+            exploration_id: str. The ID of the exploration linked to the story.
+
+        Returns:
+            str. The calculated model id.
+        """
+        return '%s:%s' % (story_id, exploration_id)
+
+    @classmethod
+    def create(cls, story_id, exploration_id):
+        """Creates a new StoryExplorationLink entry.
+
+        Args:
+            story_id: str. ID of the story linked to the exploration.
+            exploration_id: str. ID of the exploration linked to the story.
+
+        Raises:
+            Exception. The given story is already linked to the given
+                exploration.
+
+        Returns:
+            StoryExplorationLinkModel. Instance of the new
+                StoryExplorationLinkModel entry.
+        """
+        story_exploration_link_id = cls.get_model_id(story_id, exploration_id)
+        if cls.get(story_exploration_link_id, strict=False) is not None:
+            raise Exception(
+                'The given story is already linked to the given exploration')
+
+        story_exploration_link_model_instance = cls(
+            id=story_exploration_link_id,
+            story_id=story_id,
+            exploration_id=exploration_id
+        )
+        return story_exploration_link_model_instance
+
+    @classmethod
+    def get_story_id_linked_to_exploration(cls, exploration_id):
+        """Fetches the id of the story that the exploration is linked to.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            str|None. The id of the story linked to the exploration or None, if
+                no story is linked to it.
+        """
+        story_exploration_link_model = cls.query(
+            cls.exploration_id == exploration_id
+        ).get()
+
+        if story_exploration_link_model is None:
+            return None
+
+        return story_exploration_link_model.story_id
+
+
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
 

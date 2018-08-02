@@ -24,12 +24,14 @@ import copy
 import logging
 
 from core.domain import exp_services
+from core.domain import question_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
 import utils
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(story_models, question_models,) = (
+    models.Registry.import_models([models.NAMES.story, models.NAMES.question]))
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -63,6 +65,69 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_schema_version)
         story_schema_version += 1
+
+
+def create_new_story_exploration_link(story_id, exploration_id):
+    """Creates a new StoryExplorationLink model.
+
+    Args:
+        story_id: str. ID of the story linked to the exploration.
+        exploration_id: str. ID of the exploration linked to the story.
+    """
+    story_exploration_link_model = (
+        story_models.StoryExplorationLinkModel.create(story_id, exploration_id))
+    story_exploration_link_model.put()
+
+
+def get_pretests_for_exploration(exploration_id):
+    """Checks if an exploration is linked to a story and returns prerequisite
+    skills if so.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+
+    Returns:
+        list(Question)|None. The list of questions which are the pretests for
+            the exploration, if it is linked to a story, else None.
+    """
+    story_id = (
+        story_models.StoryExplorationLinkModel.get_story_id_linked_to_exploration( #pylint: disable=line-too-long
+            exploration_id))
+
+    if story_id is None:
+        return None
+
+    story = get_story_by_id(story_id)
+    prerequisite_skill_ids = None
+    for node in story.story_contents.nodes:
+        if node.exploration_id == exploration_id:
+            prerequisite_skill_ids = node.prerequisite_skill_ids
+            break
+
+    if prerequisite_skill_ids is None:
+        return None
+
+    question_ids, _ = (
+        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
+            prerequisite_skill_ids, None))
+
+    questions = question_services.get_questions_by_ids(question_ids)
+    return questions
+
+
+def delete_story_exploration_link(story_id, exploration_id):
+    """Deletes a StoryExplorationLink model.
+
+    Args:
+        story_id: str. ID of the story linked to the exploration.
+        exploration_id: str. ID of the exploration linked to the story.
+    """
+    story_exploration_link_id = (
+        story_models.StoryExplorationLinkModel.get_model_id(
+            story_id, exploration_id))
+    story_exploration_link_model = story_models.StoryExplorationLinkModel.get(
+        story_exploration_link_id)
+    story_exploration_link_model.delete()
 
 
 # Repository GET methods.

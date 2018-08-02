@@ -14,6 +14,8 @@
 
 """Tests the methods defined in story services."""
 
+from core.domain import question_services
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
@@ -78,6 +80,44 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_commit_log_entry.commit_type, 'create')
         self.assertEqual(story_commit_log_entry.story_id, self.STORY_ID)
         self.assertEqual(story_commit_log_entry.user_id, self.USER_ID)
+
+    def test_create_and_get_story_exploration_link_link(self):
+        self.save_new_default_exploration(
+            'exp_id', self.USER_ID, title='TitleA')
+
+        SKILL_ID = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            SKILL_ID, 'user', 'Description')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+            'old_value': [],
+            'new_value': [SKILL_ID],
+            'node_id': 'node_1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': 'exp_id',
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list,
+            'Updated Node 1.')
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, self.USER_ID,
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            question_id, SKILL_ID)
+        story_services.create_new_story_exploration_link(
+            self.STORY_ID, 'exp_id')
+        questions = story_services.get_pretests_for_exploration('exp_id')
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].to_dict(), question.to_dict())
 
     def test_get_story_summary_by_id(self):
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)

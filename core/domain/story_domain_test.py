@@ -408,3 +408,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
+
+
+class StoryExplorationLinkDomainTest(test_utils.GenericTestBase):
+    """Test for Story Exploration Link Domain object."""
+
+    def test_to_dict(self):
+        expected_object_dict = {
+            'story_id': 'story_id',
+            'exploration_id': 'exploration_id',
+        }
+        observed_object = story_domain.StoryExplorationLink(
+            'story_id', 'exploration_id')
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
