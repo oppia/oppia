@@ -35,7 +35,7 @@ var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -45,14 +45,14 @@ describe('Learner dashboard functionality', function() {
   var learnerDashboardPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  var clickContinueButton = function() {
+  var clickContinueButton = function () {
     waitFor.elementToBeClickable(
       continueButton, 'Could not click continue button');
     continueButton.click();
     waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktop = function() {
+  var createDummyExplorationOnDesktop = function () {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     waitFor.pageToFullyLoad();
@@ -90,7 +90,7 @@ describe('Learner dashboard functionality', function() {
     workflow.publishExploration();
   };
 
-  beforeAll(function() {
+  beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
@@ -105,6 +105,8 @@ describe('Learner dashboard functionality', function() {
       adminPage.reloadExploration('learner_flow_test.yaml');
       // Load /explore/25
       adminPage.reloadExploration('exploration_player_test.yaml');
+      // Load /collection/0
+      adminPage.reloadCollection(0);
       // Load /collection/1
       adminPage.reloadCollection(1);
       users.logout();
@@ -119,7 +121,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('visits the exploration player and plays the correct exploration',
-    function() {
+    function () {
       if (!browser.isMobile) {
         users.createAndLoginUser('expCreator@learnerDashboard.com',
           'expCreator');
@@ -141,7 +143,7 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('visits the collection player and plays the correct collection',
-    function() {
+    function () {
       if (!browser.isMobile) {
         users.createAndLoginUser('expOfCollectionCreator@learnerDashboard.com',
           'expOfCollectionCreator');
@@ -163,7 +165,7 @@ describe('Learner dashboard functionality', function() {
         collectionEditorPage.saveDraft();
         collectionEditorPage.closeSaveModal();
         collectionEditorPage.publishCollection();
-        collectionEditorPage.setTitle('Collection Player Test');
+        collectionEditorPage.setTitle('Introduction to Collections in Oppia');
         collectionEditorPage.setObjective(
           'This is a collection to test player.');
         collectionEditorPage.setCategory('Algebra');
@@ -174,11 +176,11 @@ describe('Learner dashboard functionality', function() {
       users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       libraryPage.get();
-      libraryPage.findCollection('Collection Player Test');
-      libraryPage.playCollection('Collection Player Test');
+      libraryPage.findCollection('Introduction to Collections in Oppia');
+      libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('displays incomplete and completed explorations', function() {
+  it('displays incomplete and completed explorations', function () {
     // Create explorations for desktop testing.
     if (!browser.isMobile) {
       users.createAndLoginUser('originalCreator@learnerDashboard.com',
@@ -221,10 +223,6 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findExploration('Test Exploration');
     libraryPage.playExploration('Test Exploration');
     waitFor.pageToFullyLoad();
-    // The exploration header is only visible in desktop browsers.
-    if (!browser.isMobile) {
-      explorationPlayerPage.expectExplorationNameToBe('Test Exploration');
-    }
     oppiaLogo.click();
     waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
@@ -266,7 +264,7 @@ describe('Learner dashboard functionality', function() {
       libraryPage.playExploration('Dummy Exploration');
       // Wait for player page to completely load
       waitFor.pageToFullyLoad();
-      general.getExplorationIdFromPlayer().then(function(explorationId) {
+      general.getExplorationIdFromPlayer().then(function (explorationId) {
         general.openEditor(explorationId);
       });
       explorationEditorPage.navigateToSettingsTab();
@@ -285,7 +283,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('displays incomplete and completed collections', function() {
+  it('displays incomplete and completed collections', function () {
     // Create a collection for desktop testing.
     if (!browser.isMobile) {
       users.createAndLoginUser('explorationCreator@learnerDashboard.com',
@@ -327,16 +325,26 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     waitFor.pageToFullyLoad();
+    // Click on the first exploration of the collection.
+    var firstExploration = element.all(
+      by.css('.protractor-test-collection-exploration')).first();
+    // Click first exploration in collection.
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
+    waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
     if (browser.isMobile) {
+      // In mobile, 'Play Exploration' button also needs to be clicked
+      // to begin an exploration which is a part of a collection.
+      var playExploration = element(
+        by.css('.protractor-test-play-exploration-button'));
+      waitFor.elementToBeClickable(
+        playExploration, 'Could not click play exploration button');
+      playExploration.click();
+      waitFor.pageToFullyLoad();
       clickContinueButton();
     } else {
-      var firstExploration = element.all(
-        by.css('.protractor-test-collection-exploration')).first();
-      // Click first exploration in collection.
-      waitFor.elementToBeClickable(
-        firstExploration, 'Could not click first exploration in collection');
-      firstExploration.click();
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.expectExplorationToNotBeOver();
     }
@@ -349,29 +357,30 @@ describe('Learner dashboard functionality', function() {
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
     learnerDashboardPage.checkIncompleteCollectionSection('Test Collection');
-    // Find and play 'Test Collection'.
+    // Now find and play 'Test Collection' completely.
     libraryPage.get();
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     waitFor.pageToFullyLoad();
-    // Complete all remaining explorations of the collection.
-    if (browser.isMobile) {
-      // The first exploration is already completed.
-      // Second exploration.
-      browser.get('/explore/20?collection_id=1');
-      waitFor.pageToFullyLoad();
-      clickContinueButton();
-      // Third exploration.
-      browser.get('/explore/21?collection_id=1');
-      waitFor.pageToFullyLoad();
-      clickContinueButton();
-    } else {
-      var firstExploration = element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+    var firstExploration = element.all(
+      by.css('.protractor-test-collection-exploration')).first();
       // Click first exploration in collection.
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
+    waitFor.pageToFullyLoad();
+    if (browser.isMobile) {
+      var playExploration = element(
+        by.css('.protractor-test-play-exploration-button'));
       waitFor.elementToBeClickable(
-        firstExploration, 'Could not click first exploration in collection');
-      firstExploration.click();
+        playExploration, 'Could not click play exploration button');
+      playExploration.click();
+      waitFor.pageToFullyLoad();
+      clickContinueButton();
+      waitFor.pageToFullyLoad();
+      clickContinueButton();
+      waitFor.pageToFullyLoad();
+    } else {
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.submitAnswer(
@@ -405,7 +414,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  afterEach(function() {
+  afterEach(function () {
     if (browser.isMobile) {
       general.checkForConsoleErrors([
         // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.
@@ -413,7 +422,7 @@ describe('Learner dashboard functionality', function() {
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Exploration Player Test"',
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Collection Player Test"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Introduction to Collections in Oppia"',
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
         'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Dummy Exploration"',
