@@ -172,11 +172,11 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-echo Checking if pillow is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/pillow-5.1.0" ]; then
+echo Checking if PIL is installed in third_party
+if [ ! -d "$THIRD_PARTY_DIR/PIL" ]; then
   echo Installing pillow
 
-  pip install Pillow==5.1.0 --target="$THIRD_PARTY_DIR/pillow-5.1.0"
+  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$THIRD_PARTY_DIR/PIL"
 fi
 
 # install pre-push script
