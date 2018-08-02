@@ -3904,3 +3904,12 @@ span.oppia-issues-learner-action {
 .oppia-issues-issue-dir {
   font-family: montserrat, sans-serif;
 }
+
+.oppia-issues-learner-action-table {
+  width: 100%;
+  border: 1px solid black;
+}
+
+table.oppia-issues-learner-action-table th, td {
+  border: 1px solid black;
+}

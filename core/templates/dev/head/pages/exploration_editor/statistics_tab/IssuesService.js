@@ -18,7 +18,10 @@
 
 oppia.factory('IssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
-  function($sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT) {
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  function(
+      $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -28,11 +31,29 @@ oppia.factory('IssuesService', [
       return 'Several learners exited the exploration in less than a minute.';
     };
 
+    var renderMultipleIncorrectIssueStatement = function(stateName) {
+      var statement =
+        'Several learners submitted answers to card "' + stateName +
+        '" several times, then gave up and quit.';
+      return statement;
+    };
+
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [$sce.trustAsHtml(
         'Review the cards up to and including <span class="state_link">' +
         '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
         ' errors, ambiguities or insufficient motivation.'
+      )];
+      return suggestions;
+    };
+
+    var renderMultipleIncorrectIssueSuggestions = function(stateName) {
+      var suggestions = [$sce.trustAsHtml(
+        'Check the wording of the card <span class="state_link">"' +
+        stateName + '</span> to ensure it is not confusing.'
+      ), $sce.trustAsHtml(
+        'Consider addressing the answers submitted in the sample playthroughs' +
+        ' explicitly, using answer groups.'
       )];
       return suggestions;
     };
@@ -55,13 +76,21 @@ oppia.factory('IssuesService', [
         });
       },
       renderIssueStatement: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueStatement();
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueStatement(
+            issue.issueCustomizationArgs.state_name.value);
         }
       },
       renderIssueSuggestions: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(issue);
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueSuggestions(
+            issue.issueCustomizationArgs.state_name.value);
         }
       }
     };
