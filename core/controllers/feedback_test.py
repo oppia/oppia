@@ -754,13 +754,13 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
 
         threads = response_dict['threads']
-        accepted_suggestion_thread_id = threads[0]['thread_id']
-        rejected_suggestion_thread_id = threads[1]['thread_id']
-        unsuccessful_accept_thread_id = threads[2]['thread_id']
+        accepted_suggestion_thread_id = threads[5]['thread_id']
+        rejected_suggestion_thread_id = threads[4]['thread_id']
+        unsuccessful_accept_thread_id = threads[3]['thread_id']
 
-        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
-        self.assertEqual(threads[1]['subject'], 'A new value.')
-        self.assertEqual(threads[2]['subject'], 'Empty suggestion')
+        self.assertEqual(threads[5]['subject'], 'Suggestion for state A.')
+        self.assertEqual(threads[4]['subject'], 'A new value.')
+        self.assertEqual(threads[3]['subject'], 'Empty suggestion')
 
         # Accept a suggestion.
         self._accept_suggestion(
@@ -857,8 +857,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
         threads = response_dict['threads']
-        accepted_suggestion_thread_id = threads[0]['thread_id']
-        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
+        thread = threads[len(threads) - 1]
+        accepted_suggestion_thread_id = thread['thread_id']
+        self.assertEqual(thread['subject'], 'Suggestion for state A.')
 
         # Accept a suggestion.
         self._accept_suggestion(
@@ -881,8 +882,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
         threads = response_dict['threads']
-        accepted_suggestion_thread_id = threads[0]['thread_id']
-        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
+        thread = threads[len(threads) - 1]
+        accepted_suggestion_thread_id = thread['thread_id']
+        self.assertEqual(thread['subject'], 'Suggestion for state A.')
 
         # Accept a suggestion.
         self._accept_suggestion(
