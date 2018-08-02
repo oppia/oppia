@@ -98,6 +98,7 @@
 	"I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Text shown on the stats card on the creator dashboard - This is a label for the Total Plays of a creator's explorations.",
 	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Text shown on the stats card on the creator dashboard - This is a label for the total subscriber count of a creator.\n{{Identical|Subscriber}}",
 	"I18N_DASHBOARD_SUBSCRIBERS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows the list of users who have subscribed to the user.\n{{Identical|Subscriber}}",
+	"I18N_DASHBOARD_SUGGESTIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows the list of suggestions created by the user, and the suggestions that can be reviewed by the user.",
 	"I18N_DASHBOARD_TABLE_HEADING_EXPLORATION": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Explorations column.\n{{Identical|Exploration}}",
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Last Updated column.\n{{Identical|Last updated}}",
 	"I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Open Threads column.",

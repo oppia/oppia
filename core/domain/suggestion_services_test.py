@@ -493,6 +493,46 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
+    def test_query_suggestions_that_can_be_reviewed_by_user(self):
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category1', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category2', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category3', 5)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', {}, 'category1', 'exploration.exp1.thread_1')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', {}, 'category2', 'exploration.exp1.thread_2')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', {}, 'category3', 'exploration.exp1.thread_3')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', {}, 'category1', 'exploration.exp1.thread_4')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', {}, 'category2', 'exploration.exp1.thread_5')
+        self.assertEqual(len(
+            suggestion_services
+            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
+        self.assertEqual(len(
+            suggestion_services
+            .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
+
+
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 

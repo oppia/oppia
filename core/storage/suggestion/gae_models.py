@@ -196,3 +196,22 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.last_updated < threshold_time).fetch()
+
+    @classmethod
+    def get_in_review_suggestions_in_score_categories(cls, score_categories):
+        """Gets all suggestions which are in review in the given
+        score_categories.
+
+        Args:
+            score_categories: list(str): list of score categories to query for.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are in the given
+                score categories.
+        """
+        if len(score_categories) == 0:
+            raise Exception('Recieved empty list of score categories')
+
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.score_category.IN(score_categories)).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)

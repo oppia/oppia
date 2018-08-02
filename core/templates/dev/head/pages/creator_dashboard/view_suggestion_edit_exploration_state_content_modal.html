@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <h3>Review Suggestion</h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong>Current:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind ng-if="oldContent" html-data="oldContent.html">
+        </angular-html-bind>
+        <div ng-if="!oldContent" style="color: red;">Oops! This state no longer exists!</div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong>Suggested:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind html-data="newContent.html">
+        </angular-html-bind>
+      </div>
+    </div>
+  </section>
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+    Review message (required if rejecting):
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <div ng-show="errorMessage" class="oppia-suggestion-review-error">
+    <[ errorMessage ]>
+  </div>
+  <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-danger" ng-show="isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
+</div>

@@ -278,6 +278,32 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
 
 
+def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
+    """Returns a list of suggestions which need to be reviewed, in categories
+    where the user has crossed the minimum score to review.
+
+    Args:
+        user_id: str. The ID of the user.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
+    """
+    scores = get_all_scores_of_user(user_id)
+    score_categories = []
+    for score_category, score in scores.items():
+        if score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW:
+            score_categories.append(score_category)
+
+    if len(score_categories) == 0:
+        return []
+
+    return (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_suggestions_in_score_categories(
+        score_categories))
+
+
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
     """Returns the UserContributionScoring domain object corresponding to the
     UserContributionScoringModel

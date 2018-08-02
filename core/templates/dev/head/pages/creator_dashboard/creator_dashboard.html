@@ -25,7 +25,7 @@
   <background-banner></background-banner>
   <div class="oppia-dashboard-container" ng-controller="CreatorDashboard" style="position: relative;">
     <div class="oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
-         style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0"
+         style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0 || mySuggestionsList.length > 0  || suggestionsToReviewList.length > 0"
          ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
       <md-card layout="row">
         <div class="average-ratings stats-card">
@@ -57,7 +57,7 @@
       </md-card>
     </div>
 
-    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
+    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0 || mySuggestionsList.length > 0 || suggestionsToReviewList.length > 0">
       <ul class="oppia-dashboard-tabs">
         <li ng-if="explorationsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
@@ -66,8 +66,6 @@
              translate="I18N_DASHBOARD_EXPLORATIONS">
           </a>
         </li>
-        <!-- A layout fix when the 'My Collections' tab is absent. -->
-        <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
         <li ng-if="canCreateCollections && collectionsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
           <a class="oppia-dashboard-tabs-text"
@@ -81,6 +79,13 @@
           <a class="oppia-dashboard-tabs-text"
              ng-click="setActiveTab('mySubscribers')"
              translate="I18N_DASHBOARD_SUBSCRIBERS">
+          </a>
+        </li>
+        <li ng-if="mySuggestionsList.length > 0 || suggestionsToReviewList.length > 0"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'suggestions'}">
+          <a class="oppia-dashboard-tabs-text"
+             ng-click="setActiveTab('suggestions')"
+             translate="I18N_DASHBOARD_SUGGESTIONS">
           </a>
         </li>
 
@@ -102,12 +107,12 @@
       </ul>
     </div>
 
-    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
+    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && mySuggestionsList.length === 0 && suggestionsToReviewList.length === 0">
       <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
-      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text">
+      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && mySuggestionsList.length === 0 && suggestionsToReviewList.length === 0" class="oppia-dashboard-empty-text">
         <md-card layout="row"
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
@@ -375,6 +380,94 @@
           </collection-summary-tile>
         </span>
       </ul>
+    </div>
+
+    <md-card class="oppia-suggestion-table">
+      <div ng-if="activeTab === 'suggestions'">
+        <div ng-if="!activeThread">
+          <div ng-if="mySuggestionsList.length > 0">
+            <h2>Suggestions created</h2>
+            <thread-table threads="mySuggestionsList"
+                          on-click-row="setActiveThread">
+            </thread-table>
+            <br>
+          </div>
+
+          <div ng-if="suggestionsToReviewList.length > 0">
+            <h2>Suggestions to review</h2>
+            <thread-table threads="suggestionsToReviewList"
+                          on-click-row="setActiveThread">
+            </thread-table>
+            <br>
+          </div>
+        </div>
+
+          <div ng-if="activeThread">
+            <div class="row">
+              <div class="col-lg-7 col-md-7 col-sm-7">
+                <span class="oppia-back-arrow">
+                  <button type="button" class="btn btn-default btn-xs" ng-click="clearActiveThread()">
+                    <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
+                  </button>
+                </span>
+                <span style="font-size: larger" ng-show="activeThread.isSuggestionThread()">Suggestion: <[activeThread.subject]></span>
+              </div>
+
+              <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
+                <div class="pull-right">
+                  <span ng-class="getLabelClass(activeThread.status)">
+                    <[getHumanReadableStatus(activeThread.status)]>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" ng-if="activeThread.messages">
+              <div style="margin-top: 10px;" class="col-lg-12 col-md-12 col-sm-12">
+                <table class="table">
+                  <tr ng-repeat="m in activeThread.messages|orderBy:'message_id'">
+                    <td>
+                      <div class="row">
+                        <div class="col-lg-5 col-md-5 col-sm-5">
+                          <span ng-if="$index !== 0">#<[m.message_id]></span>
+                          <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
+                          <span ng-if="!m.author_username">(anonymously submitted)</span>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                          <span ng-if="m.message_id !== 0">
+                            <span ng-if="m.updated_status">
+                              <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'</em>
+                            </span>
+                            <span ng-if="m.updated_subject">
+                              <em>Subject changed to '<[m.updated_subject]>'</em>
+                            </span>
+                          </span>
+                        </div>
+
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                          <span><[getLocaleAbbreviatedDatetimeString(m.created_on)]></span>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <div style="white-space: pre-wrap;"><[m.text]></div>
+                          <div ng-if="activeThread.isSuggestionThread() && $index == 0">
+                            <button class="btn btn-<[getSuggestionButtonType()]>" style="margin-top: 6px; margin-bottom: 6px" ng-click="showSuggestionModal()">
+                              View Suggestion
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </md-card>
+      </div>
     </div>
   </div>
   <style>
@@ -658,6 +751,10 @@
       padding-left: 0;
     }
 
+    .oppia-suggestion-table {
+      background: white;
+    }
+
     @media(max-width: 815px) {
       .oppia-dashboard-container .oppia-dashboard-tabs {
         justify-content: center;
@@ -746,6 +843,11 @@
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/suggestion/SuggestionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/suggestion/SuggestionThreadObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>

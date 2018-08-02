@@ -90,7 +90,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         observed_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id))
 
-
         self.assertEqual(
             observed_suggestion_model.suggestion_type,
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
@@ -269,3 +268,64 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestions()), 0)
+
+    def test_get_by_score_categories(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'exploration.exp1.thread_6')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'exploration.exp1.thread_7')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category3',
+            'exploration.exp1.thread_8')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'exploration.exp1.thread_9')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'exploration.exp1.thread_10')
+
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(['category1'])), 1)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(['category2'])), 2)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(
+                ['category1', 'category2'])), 3)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(
+                ['category1', 'category2', 'category3'])), 4)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(
+                ['category1', 'category_invalid'])), 1)
+        with self.assertRaisesRegexp(
+                Exception, 'Recieved empty list of score categories'):
+            self.assertEqual(len(
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_suggestions_in_score_categories([])), 0)
