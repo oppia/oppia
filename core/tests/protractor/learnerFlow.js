@@ -325,9 +325,12 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     waitFor.pageToFullyLoad();
-    // Click on the first exploration of the collection.
-    var firstExploration = element.all(
-      by.css('.protractor-test-collection-exploration')).first();
+    // The collection player has two sets of SVGs -- one which is
+    // rendered for desktop and the other which is rendered for mobile.
+    var firstExploration = browser.isMobile ? element.all(
+      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      element.all(
+        by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
@@ -362,9 +365,13 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     waitFor.pageToFullyLoad();
-    var firstExploration = element.all(
-      by.css('.protractor-test-collection-exploration')).first();
-      // Click first exploration in collection.
+    // The collection player has two sets of SVGs -- one which is
+    // rendered for desktop and the other which is rendered for mobile.
+    var firstExploration = browser.isMobile ? element.all(
+      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      element.all(
+        by.css('.protractor-test-collection-exploration')).first();
+    // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
     firstExploration.click();
