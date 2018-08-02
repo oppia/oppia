@@ -173,10 +173,10 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
 fi
 
 echo Checking if PIL is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/PIL" ]; then
-  echo Installing pillow
+if [ ! -d "$THIRD_PARTY_DIR/PIL-1.1.7" ]; then
+  echo Installing PIL
 
-  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$THIRD_PARTY_DIR/PIL"
+  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$THIRD_PARTY_DIR/PIL-1.1.7"
 fi
 
 # install pre-push script
