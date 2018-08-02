@@ -4755,9 +4755,8 @@ states:
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Create a default exploration.
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            self.exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
         self.mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, self.exploration.version)
@@ -4778,13 +4777,12 @@ states:
         """Test that state id mapping is unchanged when exploration params are
         changed.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                })], 'Changes.')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Changes.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4802,12 +4800,11 @@ states:
         """Test that new state id is added in state id mapping when new state is
         added in exploration.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4826,18 +4823,17 @@ states:
         """Test that state id is removed from state id mapping when the
         state is removed from exploration.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'new state',
-                })], 'delete state')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state',
+            })], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4855,19 +4851,18 @@ states:
         """Test that state id mapping is changed accordingly when a state
         is renamed in exploration.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'new state',
-                    'new_state_name': 'state',
-                })], 'Change state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'state',
+            })], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4886,14 +4881,13 @@ states:
         """Test that state id mapping is changed accordingly when interaction
         id of state is changed.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': self.exploration.init_state_name,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'MultipleChoiceInput'
-                })], 'Update interaction.')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            })], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4912,37 +4906,36 @@ states:
         """Test that state id mapping is changed accordingly for series
         of add, rename, remove and update state changes.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'new state',
-                    'new_state_name': 'state'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'extra state'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'MultipleChoiceInput'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'extra state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'new state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                })], 'Heavy changes')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'state'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'extra state'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'extra state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'new state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            })], 'Heavy changes')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -4959,33 +4952,32 @@ states:
         self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 3)
 
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'state',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'extra state',
-                    'new_state_name': 'state'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'MultipleChoiceInput'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'extra state'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'extra state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'new state',
-                    'new_state_name': 'other state'
-                })], 'Heavy changes 2')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'state',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'extra state',
+                'new_state_name': 'state'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'extra state'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'extra state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'other state'
+            })], 'Heavy changes 2')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
