@@ -26,14 +26,16 @@ oppia.controller('SubtopicViewer', [
       var topicIdAndSubtopicId = UrlService.getTopicIdAndSubtopicIdFromUrl();
       topicId = topicIdAndSubtopicId.topicId;
       subtopicId = topicIdAndSubtopicId.subtopicId;
-      SubtopicViewerBackendApiService.fetchSubtopicData(topicId, subtopicId).then(
+      SubtopicViewerBackendApiService.fetchSubtopicData(
+        topicId, subtopicId).then(
         function(response) {
-          $scope.subtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
-            id: subtopicId,
-            topic_id: topicId,
-            html_data: response.subtopic_html_data,
-            language_code: response.language_code
-          });
+          $scope.subtopicPage =
+            SubtopicPageObjectFactory.createFromBackendDict({
+              id: subtopicId,
+              topic_id: topicId,
+              html_data: response.subtopic_html_data,
+              language_code: response.language_code
+            });
         }
       );
     };

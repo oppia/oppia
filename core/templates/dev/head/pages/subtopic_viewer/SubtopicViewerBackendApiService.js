@@ -22,7 +22,8 @@ oppia.constant(
 
 oppia.factory('SubtopicViewerBackendApiService', [
   '$http', '$q', 'SUBTOPIC_VIEWER_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, SUBTOPIC_VIEWER_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  function(
+      $http, $q, SUBTOPIC_VIEWER_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchSubtopicData = function(
         topicId, subtopicId, successCallback, errorCallback) {
       var subtopicDataUrl = UrlInterpolationService.interpolateUrl(

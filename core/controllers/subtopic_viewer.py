@@ -33,8 +33,6 @@ class SubtopicPageDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id)
 

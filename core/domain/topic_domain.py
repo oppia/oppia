@@ -653,6 +653,8 @@ class Topic(object):
 
         Args:
             subtopic_id: str. The id of the subtopic to be found.
+            strict: bool. Whether to fail noisily if no subtopic with the given
+            id exists in the datastore.
 
         Returns:
             Subtopic. Returns the subtopic with the given id.
