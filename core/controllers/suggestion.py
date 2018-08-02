@@ -31,9 +31,6 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         suggestion_services.create_suggestion(
             self.payload.get('suggestion_type'),
             self.payload.get('target_type'), self.payload.get('target_id'),
@@ -53,9 +50,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException('Invalid format for suggestion_id.'
                                              ' It must contain 3 parts'
@@ -96,9 +90,6 @@ class SuggestionListHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
         # element is the value of the field being queried.
