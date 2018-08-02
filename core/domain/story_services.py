@@ -578,6 +578,7 @@ def get_node_ids_completed_in_stories(user_id, story_ids):
 
     return node_ids_completed_in_stories
 
+
 def get_completed_nodes_in_story(user_id, story_id):
     """Returns nodes that are completed in a story
 
