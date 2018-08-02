@@ -22,10 +22,14 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
+from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -197,6 +201,65 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_state_classifier_mapping,
             retrieved_state_classifier_mapping)
+
+
+class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
+    """Test the handler for initialising exploration with
+    state_classifier_mapping.
+    """
+
+    def test_get_exploration_pretests(self):
+        super(ExplorationPretestsUnitTest, self).setUp()
+        STORY_ID = story_services.get_new_story_id()
+        self.save_new_story(
+            STORY_ID, 'user', 'Title', 'Description', 'Notes'
+        )
+        SKILL_ID = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            SKILL_ID, 'user', 'Description')
+
+        exp_id = '0'
+        exp_id_2 = '1'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+        exp_services.delete_demo('1')
+        exp_services.load_demo('1')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+            'old_value': [],
+            'new_value': [SKILL_ID],
+            'node_id': 'node_1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': exp_id,
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            'user', STORY_ID, change_list, 'Updated Node 1.')
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, 'user',
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            question_id, SKILL_ID)
+        story_services.create_new_story_exploration_link(
+            STORY_ID, exp_id)
+        # Call the handler.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertEqual(
+            [question.to_dict()],
+            exploration_dict['pretest_question_dicts'])
+
+        exploration_dict_2 = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2))
+        self.assertEqual(
+            [], exploration_dict_2['pretest_question_dicts'])
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):

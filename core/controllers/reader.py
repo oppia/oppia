@@ -36,6 +36,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -281,12 +282,22 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
+        pretest_questions = (
+            story_services.get_pretests_for_exploration(exploration_id))
+
+        pretest_question_dicts = []
+        if pretest_questions is not None:
+            pretest_question_dicts = [
+                question.to_dict() for question in pretest_questions
+            ]
+
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
+            'pretest_question_dicts': pretest_question_dicts,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
