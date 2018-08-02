@@ -16,8 +16,8 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import topic_services
 from core.domain import subtopic_page_services
+from core.domain import topic_services
 import feconf
 
 
