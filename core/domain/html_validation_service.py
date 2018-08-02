@@ -17,11 +17,9 @@
 """HTML validation service."""
 
 import json
-import re
 
 import bs4
-import constants
-from extensions.objects.models import objects
+from extensions.rich_text_components import components
 import feconf
 
 
@@ -686,78 +684,26 @@ def validate_customization_args(html_list):
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     err_dict = {}
-    rich_text_component_list = [
-        'oppia-noninteractive-link',
-        'oppia-noninteractive-math',
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-video',
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-tabs'
-    ]
+    RICH_TEXT_COMPONENTS = OPPIA_INLINE_COMPONENTS + OPPIA_BLOCK_COMPONENTS
 
+    tag_dict = {}
     for html_string in html_list:
         soup = bs4.BeautifulSoup(
             html_string.encode(encoding='utf-8'), 'html.parser')
 
-        for tag_name in rich_text_component_list:
+        for tag_name in RICH_TEXT_COMPONENTS:
             for tag in soup.findAll(name=tag_name):
-                err_msg = _validate_customization_args_in_tag(tag)
+                tag_dict[tag] = html_string
 
-                if err_msg:
-                    if err_msg not in err_dict:
-                        err_dict[err_msg] = [html_string]
-                    elif html_string not in err_dict[err_msg]:
-                        err_dict[err_msg].append(html_string)
-
-            if tag_name not in [
-                    'oppia-noninteractive-collapsible',
-                    'oppia-noninteractive-tabs']:
-                for collapsible in soup.findAll(
-                        name='oppia-noninteractive-collapsible'):
-                    # This is wrapped in try catch block since any invalid
-                    # content such as int will not be convertible in Beautiful
-                    # Soup format. Also missing attributes will result in error
-                    # when we try to extract them here.
-                    try:
-                        content_html = json.loads(
-                            unescape_html(collapsible['content-with-value']))
-                        soup_for_collapsible = bs4.BeautifulSoup(
-                            content_html, 'html.parser')
-                        for tag in soup_for_collapsible.findAll(name=tag_name):
-                            err_msg = _validate_customization_args_in_tag(tag)
-
-                            if err_msg:
-                                if err_msg not in err_dict:
-                                    err_dict[err_msg] = [html_string]
-                                elif html_string not in err_dict[err_msg]:
-                                    err_dict[err_msg].append(html_string)
-                    except Exception:
-                        continue
-
-                for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-                    # This is wrapped in try catch block since any invalid
-                    # content such as int will not be convertible in Beautiful
-                    # Soup format. Also missing attributes will result in error
-                    # when we try to extract them here.
-                    try:
-                        tab_content_json = unescape_html(
-                            tabs['tab_contents-with-value'])
-                        tab_content_list = json.loads(tab_content_json)
-                        for tab_content in tab_content_list:
-                            content_html = tab_content['content']
-                            soup_for_tabs = bs4.BeautifulSoup(
-                                content_html, 'html.parser')
-                            for tag in soup_for_tabs.findAll(name=tag_name):
-                                err_msg = _validate_customization_args_in_tag(
-                                    tag)
-
-                                if err_msg:
-                                    if err_msg not in err_dict:
-                                        err_dict[err_msg] = [html_string]
-                                    elif html_string not in err_dict[err_msg]:
-                                        err_dict[err_msg].append(html_string)
-                    except Exception:
-                        continue
+    for tag in tag_dict:
+        html_string = tag_dict[tag]
+        err_msg_list = list(_validate_customization_args_in_tag(tag))
+        for err_msg in err_msg_list:
+            if err_msg:
+                if err_msg not in err_dict:
+                    err_dict[err_msg] = [html_string]
+                elif html_string not in err_dict[err_msg]:
+                    err_dict[err_msg].append(html_string)
 
     return err_dict
 
@@ -768,123 +714,54 @@ def _validate_customization_args_in_tag(tag):
     Args:
         tag: bs4.element.Tag. The html tag to be validated.
 
-    Returns:
-        str. An empty string if the tag has valid attributes otherwise the
-            error message.
+    Yields:
+        Error message if the attributes of tag are invalid.
     """
 
-    with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
-        rich_text_components = constants.parse_json_from_js(f)
-
-    # Mapping of type to classes defined in objects.py.
-    obj_types_to_obj_classes = {
-        'SanitizedUrl': objects.SanitizedUrl,
-        'unicode': objects.UnicodeString,
-        'MathLatexString': objects.MathLatexString,
-        'Filepath': objects.Filepath,
-        'int': objects.Int,
-        'bool': objects.Boolean,
-        'html': objects.Html
+    COMPONENT_TYPES_TO_COMPONENT_CLASSES = {
+        'oppia-noninteractive-collapsible': components.Collapsible,
+        'oppia-noninteractive-image': components.Image,
+        'oppia-noninteractive-link': components.Link,
+        'oppia-noninteractive-math': components.Math,
+        'oppia-noninteractive-tabs': components.Tabs,
+        'oppia-noninteractive-video': components.Video
     }
-    filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
-
+    SIMPLE_COMPONENTS = {
+        'oppia-noninteractive-image',
+        'oppia-noninteractive-link',
+        'oppia-noninteractive-math',
+        'oppia-noninteractive-video'
+    }
     tag_name = tag.name
-    tag_key = tag_name.replace('oppia-noninteractive-', '').capitalize()
-    component = rich_text_components[tag_key]
-    # This flag is set to true if the html string is invalid.
-    err_msg = ''
-    customization_args = component['customization_arg_specs']
-    required_attr_names = [
-        (arg['name'] + '-with-value') for arg in customization_args]
-
+    value_dict = {}
     attrs = tag.attrs
-    attr_names = attrs.keys()
-    # Ensure that no tag attribute is missing and also check
-    # there is no extra attribute.
-    if set(attr_names) != set(required_attr_names):
-        err_msg = "Invalid attributes"
-        return err_msg
 
-    for customization_arg in customization_args:
-        arg_name = customization_arg['name'] + '-with-value'
-        arg_value = json.loads(unescape_html(attrs[arg_name]))
-        schema = customization_arg['schema']
-        if tag_name != 'oppia-noninteractive-tabs':
-            if schema['type'] != 'custom':
-                arg_type = obj_types_to_obj_classes[schema['type']]
-            else:
-                arg_type = obj_types_to_obj_classes[schema['obj_type']]
-            try:
-                arg_type.normalize(arg_value)
-                # To ensure filepath is in valid format.
-                if tag_name == 'oppia-noninteractive-image':
-                    if arg_type == objects.Filepath:
-                        if not re.match(filename_re, arg_value):
-                            err_msg = "Invalid filepath"
+    for attr in attrs:
+        value_dict[attr] = json.loads(unescape_html(attrs[attr]))
 
-                # To ensure video id has 11 chars.
-                elif tag_name == 'oppia-noninteractive-video':
-                    if arg_type == objects.UnicodeString:
-                        if len(arg_value) != 11:
-                            err_msg = "Video id length is not 11"
+    try:
+        COMPONENT_TYPES_TO_COMPONENT_CLASSES[tag_name].validate(value_dict)
+        if tag_name == 'oppia-noninteractive-collapsible':
+            content_html = value_dict['content-with-value']
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html, 'html.parser')
+            for component_name in SIMPLE_COMPONENTS:
+                for component_tag in soup_for_collapsible.findAll(
+                        name=component_name):
+                    for err_msg in _validate_customization_args_in_tag(
+                            component_tag):
+                        yield err_msg
 
-                # To ensure that nested collapsible or tab
-                # is not present in collapsible component.
-                elif tag_name == 'oppia-noninteractive-collapsible':
-                    inner_soup = bs4.BeautifulSoup(
-                        arg_value.encode(encoding='utf-8'),
-                        'html.parser')
-                    collapsible_count = len(inner_soup.findAll(
-                        name='oppia-noninteractive-collapsible'))
-                    tabs_count = len(inner_soup.findAll(
-                        name='oppia-noninteractive-tabs'))
-                    if collapsible_count or tabs_count:
-                        err_msg = "Nested tabs and collapsible"
-
-            except Exception as e:
-                err_msg = str(e)
-        else:
-            # This block is to check args for tab component.
-            # Ensure that arg is a list and each element item in
-            # the list is a dictionary.
-            if isinstance(arg_value, list) and (
-                    all(isinstance(item, dict) for item in (
-                        arg_value))):
-                for value in arg_value:
-                    value_keys = value.keys()
-                    # Each item has exactly two keys namely content
-                    # and title.
-                    if set(value_keys) != set(['content', 'title']):
-                        err_msg = "Invalid attributes in tab contents"
-                    else:
-                        content = value['content']
-                        title = value['title']
-                        title_dict = schema['items']['properties'][0]
-                        content_dict = schema['items']['properties'][1]
-                        title_type = obj_types_to_obj_classes[
-                            title_dict['schema']['type']]
-                        content_type = obj_types_to_obj_classes[
-                            content_dict['schema']['type']]
-                        try:
-                            title_type.normalize(title)
-                            content_type.normalize(content)
-                            # To ensure that nested collapsible or tab
-                            # is not present in tabs component.
-                            inner_soup = bs4.BeautifulSoup(
-                                content.encode(encoding='utf-8'),
-                                'html.parser')
-                            collapsible = inner_soup.findAll(
-                                name='oppia-noninteractive-collapsible')
-                            collapsible_count = len(collapsible)
-                            tabs = inner_soup.findAll(
-                                name='oppia-noninteractive-tabs')
-                            tabs_count = len(tabs)
-                            if collapsible_count or tabs_count:
-                                err_msg = "Nested tabs and collapsible"
-                        except Exception as e:
-                            err_msg = str(e)
-
-            else:
-                err_msg = "Invalid type for tab contents"
-
-    return err_msg
+        elif tag_name == 'oppia-noninteractive-tabs':
+            tab_content_list = value_dict['tab_contents-with-value']
+            for tab_content in tab_content_list:
+                content_html = tab_content['content']
+                soup_for_tabs = bs4.BeautifulSoup(
+                    content_html, 'html.parser')
+                for component_name in SIMPLE_COMPONENTS:
+                    for component_tag in soup_for_tabs.findAll(name=tag_name):
+                        for err_msg in _validate_customization_args_in_tag(
+                                component_tag):
+                            yield err_msg
+    except Exception as e:
+        yield str(e)

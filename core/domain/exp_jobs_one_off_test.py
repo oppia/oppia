@@ -1420,17 +1420,19 @@ class InteractionCustomizationArgsValidationJobTest(
         self.process_and_flush_pending_tasks()
 
         actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
+
         expected_output = [(
-            '[u\'oppia-noninteractive-image\', '
+            '[u\'Invalid filepath\', '
             '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" caption-with-value'
             '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
             'png&amp;quot;"></oppia-noninteractive-image>\']]'
         ), (
-            '[u\'oppia-noninteractive-link\', '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://link'
-            '.com&amp;quot;"></oppia-noninteractive-link></p>\']]'
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
+            'https://\'; received htt://link.com", '
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
+            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
+            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)
