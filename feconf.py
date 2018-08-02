@@ -555,6 +555,7 @@ DEMO_EXPLORATIONS = {
     u'22': 'protractor_mobile_test_exploration.yaml',
     u'23': 'rating_test.yaml',
     u'24': 'learner_flow_test.yaml',
+    u'25': 'exploration_player_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
