@@ -17,7 +17,7 @@
  * a state.
  */
 
-oppia.factory('EditorStateService', [
+oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
       $log, SolutionValidityService) {
@@ -30,6 +30,7 @@ oppia.factory('EditorStateService', [
     // service, the given solutions would be automatically verified for the set
     // interaction.
     var interaction = null;
+    var misconceptions = null;
 
     return {
       getActiveStateName: function() {
@@ -41,6 +42,12 @@ oppia.factory('EditorStateService', [
           return;
         }
         activeStateName = newActiveStateName;
+      },
+      setMisconceptions: function(newMisconceptions) {
+        misconceptions = newMisconceptions;
+      },
+      getMisconceptions: function() {
+        return misconceptions;
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;
@@ -69,7 +76,7 @@ oppia.factory('EditorStateService', [
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
       },
-      getInQuestionMode: function() {
+      isInQuestionMode: function() {
         return inQuestionMode;
       },
       setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {

@@ -23,37 +23,106 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', 'AlertsService', 'TopicEditorStateService',
+        '$scope', '$uibModal', 'AlertsService', 'TopicEditorStateService',
         'QuestionCreationService', 'EditableQuestionBackendApiService',
+        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        function(
-            $scope, AlertsService, TopicEditorStateService,
+        'StateEditorService', function(
+            $scope, $uibModal, AlertsService, TopicEditorStateService,
             QuestionCreationService, EditableQuestionBackendApiService,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
+            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            StateEditorService) {
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
-            $scope.questionId = null;
+            $scope.question = null;
+            $scope.skillId = null;
             $scope.topic = TopicEditorStateService.getTopic();
+            $scope.topicRights = TopicEditorStateService.getTopicRights();
+            $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
           };
 
-          $scope.createQuestion = function() {
-            $scope.questionStateData =
-              QuestionObjectFactory.createDefaultQuestionState();
-            $scope.questionEditorIsShown = true;
-            $scope.questionId = null;
+          $scope.saveAndPublishQuestion = function() {
+            var validationErrors = $scope.question.validate(
+              $scope.misconceptions);
+            if (validationErrors) {
+              AlertsService.addWarning(validationErrors);
+              return;
+            }
+            EditableQuestionBackendApiService.createQuestion(
+              $scope.skillId, $scope.question.toBackendDict(
+                true, $scope.schemaVersion)
+            ).then(function() {
+              TopicEditorStateService.fetchQuestionSummaries(
+                $scope.topic.getId(), function() {
+                  _initTab();
+                }
+              );
+            });
           };
 
-          $scope.showQuestionEditor = function(id) {
-            EditableQuestionBackendApiService.fetchQuestion(id).then(
-              function(questionBackendDict) {
-                var question = QuestionObjectFactory.createFromBackendDict(
-                  questionBackendDict);
-                $scope.questionId = question.getId();
-                $scope.questionStateData = question.getStateData();
-                $scope.questionEditorIsShown = true;
-              });
+          $scope.createQuestion = function() {
+            var allSkillSummaries = [];
+            allSkillSummaries = allSkillSummaries.concat(
+              $scope.topic.getUncategorizedSkillSummaries());
+            for (var i = 0; i < $scope.topic.getSubtopics().length; i++) {
+              var subtopic = $scope.topic.getSubtopics()[i];
+              allSkillSummaries = allSkillSummaries.concat(
+                subtopic.getSkillSummaries());
+            }
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/questions/' +
+                'select_skill_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.selectedSkillId = null;
+                  $scope.skillSummaries = allSkillSummaries;
+
+                  $scope.selectSkill = function(skillId) {
+                    $scope.selectedSkillId = skillId;
+                  };
+
+                  $scope.done = function() {
+                    $uibModalInstance.close($scope.selectedSkillId);
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(skillId) {
+              $scope.skillId = skillId;
+              EditableQuestionBackendApiService.fetchStatesSchemaVersion().then(
+                function(schemaVersion) {
+                  $scope.schemaVersion = schemaVersion;
+                }, function(error) {
+                  AlertsService.addWarning();
+                });
+              EditableSkillBackendApiService.fetchSkill(
+                skillId).then(
+                function(skillDict) {
+                  $scope.misconceptions = skillDict.misconceptions.map(function(
+                      misconceptionsBackendDict) {
+                    return MisconceptionObjectFactory.createFromBackendDict(
+                      misconceptionsBackendDict);
+                  });
+                  $scope.question =
+                    QuestionObjectFactory.createDefaultQuestion();
+                  $scope.questionId = $scope.question.getId();
+                  $scope.questionStateData = $scope.question.getStateData();
+                  $scope.questionEditorIsShown = true;
+                }, function(error) {
+                  AlertsService.addWarning();
+                });
+            });
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);

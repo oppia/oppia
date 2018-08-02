@@ -19,35 +19,66 @@
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
+  var _sampleQuestionBackendDict = null;
 
   beforeEach(module('oppia'));
 
+  beforeEach(function() {
+    module(function($provide) {
+      $provide.constant('INTERACTION_SPECS', {
+        TextInput: {
+          can_have_solution: true
+        }
+      });
+    });
+  });
+
   beforeEach(inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-    var sampleQuestionBackendDict = {
+    _sampleQuestionBackendDict = {
       id: 'question_id',
       question_state_data: {
         content: {
-          html: 'Question 1'
+          html: 'Question 1',
+          content_id: 'content_1'
         },
-        content_ids_to_audio_translations: {},
         interaction: {
-          answer_groups: [],
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                content_id: 'content_5',
+                html: ''
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }],
+          }],
           confirmed_unclassified_answers: [],
           customization_args: {},
           default_outcome: {
             dest: null,
             feedback: {
-              html: 'Correct Answer'
+              html: 'Correct Answer',
+              content_id: 'content_2'
             },
             param_changes: [],
-            labelled_as_correct: true
+            labelled_as_correct: false
           },
           hints: [
             {
               hint_content: {
-                html: 'Hint 1'
+                html: 'Hint 1',
+                content_id: 'content_3'
               }
             }
           ],
@@ -55,18 +86,26 @@ describe('Question object factory', function() {
             correct_answer: 'This is the correct answer',
             answer_is_exclusive: false,
             explanation: {
-              html: 'Solution explanation'
+              html: 'Solution explanation',
+              content_id: 'content_4'
             }
           },
           id: 'TextInput'
         },
-        param_changes: []
+        param_changes: [],
+        content_ids_to_audio_translations: {
+          content_1: {},
+          content_2: {},
+          content_3: {},
+          content_4: {},
+          content_5: {}
+        }
       },
       language_code: 'en',
       version: 1
     };
     _sampleQuestion = QuestionObjectFactory.createFromBackendDict(
-      sampleQuestionBackendDict);
+      _sampleQuestionBackendDict);
   }));
 
   it('should correctly get various fields of the question', function() {
@@ -83,7 +122,38 @@ describe('Question object factory', function() {
     expect(interaction.solution.correctAnswer).toEqual(
       'This is the correct answer');
     var defaultOutcome = interaction.defaultOutcome;
-    expect(defaultOutcome.labelledAsCorrect).toEqual(true);
+    expect(defaultOutcome.labelledAsCorrect).toEqual(false);
     expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
+  });
+
+  it('should correctly get backend dict', function() {
+    expect(
+      _sampleQuestion.toBackendDict(true, 25).question_state_schema_version
+    ).toEqual(25);
+
+    expect(_sampleQuestion.toBackendDict(true, 25).id).toEqual(null);
+    expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
+  });
+
+  it('should correctly validate question', function() {
+    var interaction = _sampleQuestion.getStateData().interaction;
+    var misconception1 = MisconceptionObjectFactory.create(
+      'id', 'name', 'notes', 'feedback');
+    var misconception2 = MisconceptionObjectFactory.create(
+      'id_2', 'name_2', 'notes', 'feedback');
+    expect(_sampleQuestion.validate([misconception1, misconception2])).toEqual(
+      'The following misconceptions should also be caught: name, name_2');
+
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    expect(_sampleQuestion.validate([])).toEqual(
+      'At least one answer should be marked correct');
+
+    interaction.solution = null;
+    expect(_sampleQuestion.validate([])).toEqual(
+      'A solution must be specified');
+
+    interaction.hints = [];
+    expect(_sampleQuestion.validate([])).toEqual(
+      'At least 1 hint should be specfied');
   });
 });

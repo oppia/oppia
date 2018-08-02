@@ -18,15 +18,13 @@
 
 oppia.directive('solutionEditor', [
   '$uibModal', 'UrlInterpolationService', 'StateSolutionService',
-  'EditorStateService', 'ExplorationStatesService',
-  'ExplorationWarningsService', 'AlertsService',
+  'StateEditorService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'StateInteractionIdService', 'StateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($uibModal, UrlInterpolationService, StateSolutionService,
-      EditorStateService, ExplorationStatesService,
-      ExplorationWarningsService, AlertsService,
+      StateEditorService, AlertsService,
       SolutionObjectFactory, SolutionVerificationService,
       ContextService, ExplorationHtmlFormatterService,
       StateInteractionIdService, StateCustomizationArgsService,

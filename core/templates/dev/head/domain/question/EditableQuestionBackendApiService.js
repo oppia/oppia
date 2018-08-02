@@ -19,12 +19,41 @@
 oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   '/question_editor_handler/data/<question_id>');
+oppia.constant(
+  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
+oppia.constant(
+  'QUESTION_SKILL_LINK_URL_TEMPLATE',
+  '/manage_question_skill_link/<question_id>/<skill_id>');
+oppia.constant('SCHEMA_VERSION_URL', '/states_schema_version');
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
-  function($http, $q, EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+  'UrlInterpolationService', 'QUESTION_CREATION_URL',
+  'QUESTION_SKILL_LINK_URL_TEMPLATE', 'SCHEMA_VERSION_URL',
+  function(
+      $http, $q, EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+      UrlInterpolationService, QUESTION_CREATION_URL,
+      QUESTION_SKILL_LINK_URL_TEMPLATE, SCHEMA_VERSION_URL) {
+    var _createQuestion = function(
+        skillId, questionDict, successCallback, errorCallback) {
+      var questionCreationUrl = UrlInterpolationService.interpolateUrl(
+        QUESTION_CREATION_URL, {
+          skill_id: skillId
+        });
+      var postData = {
+        question_dict: questionDict
+      };
+      $http.post(questionCreationUrl, postData).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     var _fetchQuestion = function(questionId, successCallback, errorCallback) {
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
@@ -35,6 +64,18 @@ oppia.factory('EditableQuestionBackendApiService', [
         var questionDict = angular.copy(response.data.question_dict);
         if (successCallback) {
           successCallback(questionDict);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSchemaVersion = function(successCallback, errorCallback) {
+      $http.get(SCHEMA_VERSION_URL).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.schema_version);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -71,9 +112,21 @@ oppia.factory('EditableQuestionBackendApiService', [
     };
 
     return {
+      createQuestion: function(skillId, questionDict) {
+        return $q(function(resolve, reject) {
+          _createQuestion(skillId, questionDict, resolve, reject);
+        });
+      },
+
       fetchQuestion: function(questionId) {
         return $q(function(resolve, reject) {
           _fetchQuestion(questionId, resolve, reject);
+        });
+      },
+
+      fetchStatesSchemaVersion: function() {
+        return $q(function(resolve, reject) {
+          _fetchSchemaVersion(resolve, reject);
         });
       },
 

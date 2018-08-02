@@ -33,7 +33,7 @@ oppia.factory('TrainingDataEditorPanelService', [
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance', '$filter',
-            'ExplorationStatesService', 'EditorStateService', 'AlertsService',
+            'ExplorationStatesService', 'StateEditorService', 'AlertsService',
             'AnswerClassificationService', 'ContextService',
             'StateInteractionIdService', 'AngularNameService',
             'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
@@ -41,7 +41,7 @@ oppia.factory('TrainingDataEditorPanelService', [
             'StateCustomizationArgsService', 'TrainingDataService',
             'TrainingModalService', 'FocusManagerService',
             function($scope, $injector, $uibModalInstance, $filter,
-                ExplorationStatesService, EditorStateService, AlertsService,
+                ExplorationStatesService, StateEditorService, AlertsService,
                 AnswerClassificationService, ContextService,
                 StateInteractionIdService, AngularNameService,
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
@@ -49,7 +49,7 @@ oppia.factory('TrainingDataEditorPanelService', [
                 StateCustomizationArgsService, TrainingDataService,
                 TrainingModalService, FocusManagerService) {
               var _explorationId = ContextService.getExplorationId();
-              var _stateName = EditorStateService.getActiveStateName();
+              var _stateName = StateEditorService.getActiveStateName();
               $scope.stateName = _stateName;
               var _state = ExplorationStatesService.getState(_stateName);
               var answerGroupIndex = (

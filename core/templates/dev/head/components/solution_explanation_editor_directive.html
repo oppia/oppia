@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <div ng-if="StateSolutionService.savedMemento.explanation && !StateSolutionService.savedMemento.explanation.isEmpty()">
+  <div ng-if="!isInQuestionMode && StateSolutionService.savedMemento.explanation && !StateSolutionService.savedMemento.explanation.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
                                content-ids-to-audio-translations="StateContentIdsToAudioTranslationsService.displayed"
                                content-id="StateSolutionService.displayed.explanation.getContentId()"
