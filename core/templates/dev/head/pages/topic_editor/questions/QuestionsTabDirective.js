@@ -52,7 +52,8 @@ oppia.directive('questionsTab', [
               return;
             }
             EditableQuestionBackendApiService.createQuestion(
-              $scope.skillId, $scope.question.toBackendDict(true)
+              $scope.skillId, $scope.question.toBackendDict(
+                true, $scope.schemaVersion)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
                 $scope.topic.getId(), function() {
@@ -99,6 +100,12 @@ oppia.directive('questionsTab', [
 
             modalInstance.result.then(function(skillId) {
               $scope.skillId = skillId;
+              EditableQuestionBackendApiService.fetchStatesSchemaVersion().then(
+                function(schemaVersion) {
+                  $scope.schemaVersion = schemaVersion;
+                }, function(error) {
+                  AlertsService.addWarning();
+                });
               EditableSkillBackendApiService.fetchSkill(
                 skillId).then(
                 function(skillDict) {

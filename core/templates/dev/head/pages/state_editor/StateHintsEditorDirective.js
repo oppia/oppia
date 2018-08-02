@@ -44,10 +44,7 @@ oppia.directive('stateHintsEditor', [
           $scope.EditabilityService = EditabilityService;
           $scope.StateHintsService = StateHintsService;
           $scope.activeHintIndex = null;
-          $scope.canEdit = GLOBALS.can_edit;
-          if (StateEditorService.isInQuestionMode()) {
-            $scope.canEdit = EditabilityService.isEditable();
-          }
+          $scope.canEdit = EditabilityService.isEditable();
 
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');

@@ -1992,7 +1992,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 

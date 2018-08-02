@@ -77,7 +77,7 @@
 
 <br ng-if="displayFeedback">
 
-<div ng-if="!destinationEditorIsOpen"
+<div ng-if="!destinationEditorIsOpen && !isInQuestionMode"
      style="height: 100%;"
      title="<[isEditable() ? 'Change the destination card' : '']>">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
@@ -112,7 +112,7 @@
   </div>
 </div>
 
-<div ng-if="isEditable() && destinationEditorIsOpen">
+<div ng-if="isEditable() && destinationEditorIsOpen && !isInQuestionMode">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"

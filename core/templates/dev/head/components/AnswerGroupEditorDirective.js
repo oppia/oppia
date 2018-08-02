@@ -55,7 +55,7 @@ oppia.directive('answerGroupEditor', [
           $scope.misconceptions = StateEditorService.getMisconceptions();
 
           var _getTaggedMisconceptionName = function(misconceptionId) {
-            if (!$scope.misconceptions) {
+            if ($scope.misconceptions === null) {
               return;
             }
             for (var i = 0; i < $scope.misconceptions.length; i++) {

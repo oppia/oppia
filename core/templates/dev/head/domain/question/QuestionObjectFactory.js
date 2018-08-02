@@ -80,12 +80,19 @@ oppia.factory('QuestionObjectFactory', [
       if (!atLeastOneAnswerCorrect) {
         return 'At least one answer should be marked correct';
       }
+      var pendingMisconceptionNamesToTag = [];
       for (var i = 0; i < misconceptions.length; i++) {
         if (!taggedMisconceptionIds[misconceptions[i].getId()]) {
-          return (
-            'The following misconception should also be caught: ' +
-            misconceptions[i].getName());
+          pendingMisconceptionNamesToTag.push(misconceptions[i].getName());
         }
+      }
+      if (pendingMisconceptionNamesToTag.length > 0) {
+        var returnString =
+          'The following misconceptions should also be caught:';
+        pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
+          returnString = returnString + ' ' + misconceptionName + ',';
+        });
+        return returnString.slice(0, -1);
       }
       return false;
     };
@@ -99,15 +106,18 @@ oppia.factory('QuestionObjectFactory', [
       );
     };
 
-    Question.prototype.toBackendDict = function(newQuestion) {
+    Question.prototype.toBackendDict = function(isNewQuestion, schemaVersion) {
       var questionBackendDict = {
+        id: null,
         question_state_data: this._stateData.toBackendDict(),
         language_code: this._languageCode,
         version: 1
       };
-      if (!newQuestion) {
+      if (!isNewQuestion) {
         questionBackendDict.id = this._id;
         questionBackendDict.version = this._version;
+      } else {
+        questionBackendDict.question_state_schema_version = schemaVersion;
       }
       return questionBackendDict;
     };
