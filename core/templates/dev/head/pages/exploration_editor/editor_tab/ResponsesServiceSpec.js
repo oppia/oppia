@@ -148,44 +148,30 @@ describe('Responses Service', function() {
     it('should return null if no answer choices provided', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
+/*
+      destUpdates = {
+        dest: 'Test',
+        refresherExplorationId: null,
+        missingPrerequisiteSkillId: null
+      }
+*/
+    it('should update the rules', function() {
+      let rule = rof.createNew('Equals', {x: 'New answer'});
+      let ruleUpdates = {
+        rules: [rule]
+      };
 
-    describe('Manipulate answer group', function() {
+      rs.updateAnswerGroup(0, ruleUpdates);
+      expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
+    });
 
-      let ruleUpdates;
-      let feedbackUpdates;
-      let destUpdates;
+    it('should update the feedback', function() {
+      let feedback = shtml.createDefault('New feedback', 'feedback_1');
+      let feedbackUpdates = {feedback}
 
-      let rule;
-
-      beforeEach(function() {
-        rule = rof.createNew('Equals', {x: 'New answer'});
-        ruleUpdates = {
-          rules: [rule]
-        };
-
-        feedbackUpdates = {
-          feedback: {
-            contentId: "feedback_1",
-            html: 'New feedback'
-          }
-        };
-
-        destUpdates = {
-          dest: 'Test',
-          refresherExplorationId: null,
-          missingPrerequisiteSkillId: null
-        }
-      });
-
-      it('should update the rules', function() {
-        rs.updateAnswerGroup(0, ruleUpdates);
-        expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
-      });
-
-      it('should update the feedback', function() {
-        rs.updateAnswerGroup(0, feedbackUpdates);
-        expect(rs.getAnswerGroup(0).feedback).toEqual(feedbackUpdates.feedback);
-      });
+      rs.updateAnswerGroup(0, feedbackUpdates);
+      expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
+    });
 /*
 
       it('should delete the answer group', function() {
@@ -201,7 +187,6 @@ describe('Responses Service', function() {
         expect(rs.getAnswerGroup(activeIndex)).toEqual(updates);
       })
 */
-    });
 
     it('should update answer choices', function() {
       rs.updateAnswerChoices('some answer');
