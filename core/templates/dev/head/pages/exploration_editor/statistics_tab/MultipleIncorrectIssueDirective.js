@@ -78,7 +78,7 @@ oppia.directive('multipleIncorrectIssueDirective', [
 
                     var blockActionIndexMapping = {};
                     var total = $scope.displayBlocks.reduce(
-                      function(runningTotal, displayBlock) {
+                      function(runningTotal, displayBlock, i) {
                         blockActionIndexMapping[i] = runningTotal;
                         return runningTotal + displayBlock.length;
                       }, 1);
