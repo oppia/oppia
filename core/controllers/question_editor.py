@@ -130,6 +130,13 @@ class EditableQuestionDataHandler(base.BaseHandler):
             question_domain.QuestionChange(change)
             for change in self.payload.get('change_list')
         ]
+
+        for change in change_list:
+            if (
+                    change.cmd ==
+                    question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
+                raise self.InvalidInputException
+
         question_services.update_question(
             self.user_id, question_id, change_list,
             commit_message)
