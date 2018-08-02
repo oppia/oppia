@@ -843,13 +843,3 @@ def get_filepath_of_object_image(filename, exp_id):
     img = Image.open(imageFile)
     width, height = img.size
     return {'filename': filename, 'height': height, 'width': width}
-
-
-def create_image():
-    """This is for testing that PIL works or not. If the backend tests
-        fail, it means that PIL is not there.
-
-    Returns:
-        null. It returns nothing.
-    """
-    Image.new('RGB', (60, 30), color='red')
