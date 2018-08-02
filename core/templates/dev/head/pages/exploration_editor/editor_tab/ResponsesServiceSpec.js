@@ -19,7 +19,8 @@
 describe('Responses Service', function() {
   describe('ResponsesService', function() {
     let $httpBackend;
-    let scope, siis, ecs, rs, ess, rof;
+    let scope;
+    let siis, ecs, rs, ess, rof;
     let mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -153,18 +154,12 @@ describe('Responses Service', function() {
       let feedbackUpdates;
       let destUpdates;
 
+      let rule;
+
       beforeEach(function() {
-/*
+        rule = rof.createNew('Equals', {x: 'New answer'});
         ruleUpdates = {
-          rule: [{
-            inputs: {x: 'New answer'},
-            type: 'Equals'
-          }],
-        };
-*/
-        ruleUpdates = {
-          type: 'Equals',
-          inputs: {x: 'New answer'}
+          rules: [rule]
         };
 
         feedbackUpdates = {
@@ -183,8 +178,7 @@ describe('Responses Service', function() {
 
       it('should update the rules', function() {
         rs.updateAnswerGroup(0, ruleUpdates);
-        console.log(rs.getAnswerGroup(0).rules.inputs);
-        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates);
+        expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
       });
 
       it('should update the feedback', function() {
