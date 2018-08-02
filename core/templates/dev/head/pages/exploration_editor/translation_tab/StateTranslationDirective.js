@@ -27,10 +27,16 @@ oppia.directive('stateTranslation', [
       controller: [
         '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
+        'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'ExplorationCorrectnessFeedbackService', 'RouterService',
         function(
             $scope, $filter, $timeout, $rootScope, EditorStateService,
-            ExplorationStatesService, ExplorationInitStateNameService) {
+            ExplorationStatesService, ExplorationInitStateNameService,
+            INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
+            ExplorationCorrectnessFeedbackService, RouterService) {
           // Define tab constants.
+          $scope.ExplorationCorrectnessFeedbackService =
+            ExplorationCorrectnessFeedbackService;
           $scope.TAB_ID_CONTENT = 'content';
           $scope.TAB_ID_FEEDBACK = 'feedback';
           $scope.TAB_ID_HINTS = 'hints';
@@ -53,10 +59,75 @@ oppia.directive('stateTranslation', [
             return ($scope.activatedTabId === tabId);
           };
 
+          $scope.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
+          };
+
           $scope.onTabClick = function(tabId) {
             $scope.activatedTabId = tabId;
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
+          };
+
+          $scope.summarizeDefaultOutcome = function(
+              defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+            if (!defaultOutcome) {
+              return '';
+            }
+
+            var summary = '';
+            var hasFeedback = defaultOutcome.hasNonemptyFeedback();
+
+            if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+              summary =
+                INTERACTION_SPECS[interactionId].default_outcome_heading;
+            } else if (answerGroupCount > 0) {
+              summary = 'All other answers';
+            } else {
+              summary = 'All answers';
+            }
+
+            if (hasFeedback && shortenRule) {
+              summary = $filter('wrapTextWithEllipsis')(
+                summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+            }
+            summary = '[' + summary + '] ';
+
+            if (hasFeedback) {
+              summary +=
+                $filter(
+                  'convertToPlainText'
+                )(defaultOutcome.feedback.getHtml());
+            }
+            return summary;
+          };
+
+          $scope.summarizeAnswerGroup = function(
+              answerGroup, interactionId, answerChoices, shortenRule) {
+            var summary = '';
+            var outcome = answerGroup.outcome;
+            var hasFeedback = outcome.hasNonemptyFeedback();
+
+            if (answerGroup.rules) {
+              var firstRule = $filter('convertToPlainText')(
+                $filter('parameterizeRuleDescription')(
+                  answerGroup.rules[0], interactionId, answerChoices));
+              summary = 'Answer ' + firstRule;
+
+              if (hasFeedback && shortenRule) {
+                summary = $filter('wrapTextWithEllipsis')(
+                  summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+              }
+              summary = '[' + summary + '] ';
+            }
+
+            if (hasFeedback) {
+              summary += (
+                shortenRule ?
+                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
+                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            }
+            return summary;
           };
 
           $scope.isDisabled = function(tabId) {

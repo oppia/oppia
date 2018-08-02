@@ -59,7 +59,7 @@
     <meta property="og:type" content="article">
     <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
 
-    <link rel="apple-touch-icon" href="{{get_static_resource_url('/assets/images/logo/favicon.png')}}">
+    <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
 
     <!-- The title is bound to the rootScope. The content of the block
     maintitle can be a string or a translation id. If it is a translation it
@@ -79,7 +79,6 @@
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: JSON.parse(
           '{{additional_angular_modules|js_string}}'),
-        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         can_create_collections: JSON.parse(
           '{{can_create_collections|js_string}}'),
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
@@ -90,7 +89,6 @@
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
         SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
-        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         iframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
@@ -183,50 +181,50 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
+    <script src="/templates/dev/head/app.js"></script>
+    <script src="/templates/dev/head/directives.js"></script>
+    <script src="/templates/dev/head/filters.js"></script>
+    <script src="/templates/dev/head/i18n.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
+    <script src="/templates/dev/head/pages/Base.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ContextService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DateTimeFormatService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/StateRulesStatsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ConstructTranslationIdsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UserService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/WindowDimensionsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/BackgroundMaskService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
+    <script src="/templates/dev/head/services/AlertsService.js"></script>
+    <script src="/templates/dev/head/services/ContextService.js"></script>
+    <script src="/templates/dev/head/services/UtilsService.js"></script>
+    <script src="/templates/dev/head/services/DebouncerService.js"></script>
+    <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
+    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+    <script src="/templates/dev/head/services/ValidatorsService.js"></script>
+    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
+    <script src="/templates/dev/head/services/RteHelperService.js"></script>
+    <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
+    <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
+    <script src="/templates/dev/head/services/UserService.js"></script>
+    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
+    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
+    <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
+    <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
+    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
+    <script src="/templates/dev/head/components/alerts/AlertMessageDirective.js"></script>
+    <script src="/templates/dev/head/components/create_button/CreateActivityButtonDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/promo/PromoBarDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/promo/PromoBarDirective.js"></script>
+    <script src="/templates/dev/head/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
+    <script src="/templates/dev/head/components/social_buttons/SocialButtonsDirective.js"></script>
+    <script src="/templates/dev/head/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/TopicCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/SkillCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/StoryCreationService.js"></script>
+    <script src="/templates/dev/head/components/CollectionCreationService.js"></script>
+    <script src="/templates/dev/head/components/ExplorationCreationService.js"></script>
+    <script src="/templates/dev/head/components/TopicCreationService.js"></script>
+    <script src="/templates/dev/head/components/SkillCreationService.js"></script>
+    <script src="/templates/dev/head/components/StoryCreationService.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CkEditorRteDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
+    <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+    <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
+    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
 
     {% block footer_js %}
     {% endblock footer_js %}
