@@ -842,7 +842,6 @@ def get_filepath_of_object_image(filename, exp_id):
     imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
     img = Image.open(imageFile)
     width, height = img.size
-    img.close()
     return {'filename': filename, 'height': height, 'width': width}
 
 
