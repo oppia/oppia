@@ -26,7 +26,7 @@ describe('States object factory', function() {
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
 
-      GLOBALS.NEW_STATE_TEMPLATE = {
+      constants.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
         content: {
           content_id: 'content',

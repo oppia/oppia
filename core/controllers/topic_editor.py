@@ -18,6 +18,9 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import dependency_registry
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
@@ -30,6 +33,8 @@ from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
+
+import jinja2
 
 
 class TopicEditorStoryHandler(base.BaseHandler):
@@ -120,6 +125,8 @@ class TopicEditorQuestionHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
+    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
+
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
@@ -135,10 +142,32 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
-            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR
+            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR,
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'additional_angular_modules': additional_angular_modules,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'ALLOWED_INTERACTION_CATEGORIES': (
+                feconf.ALLOWED_INTERACTION_CATEGORIES)
         })
 
         self.render_template(

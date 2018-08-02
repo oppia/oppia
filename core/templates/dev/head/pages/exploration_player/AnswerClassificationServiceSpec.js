@@ -135,7 +135,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
-        acs.getMatchingClassificationResult(explorationId, stateName, state, 0);
+        acs.getMatchingClassificationResult(stateName, state.interaction, 0);
       }).toThrow();
     });
 
@@ -143,7 +143,7 @@ describe('Answer classification service with string classifier disabled',
        'spec', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 10, rules)
+          stateName, state.interaction, 10, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
         EXPLICIT_CLASSIFICATION)
@@ -151,7 +151,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 5, rules)
+          stateName, state.interaction, 5, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
         EXPLICIT_CLASSIFICATION)
@@ -159,7 +159,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 6, rules)
+          stateName, state.interaction, 6, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
         EXPLICIT_CLASSIFICATION)
@@ -169,7 +169,7 @@ describe('Answer classification service with string classifier disabled',
     it('should return the default rule if no answer group matches', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 7, rules)
+          stateName, state.interaction, 7, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION)
@@ -227,7 +227,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(function() {
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0);
+          stateName, state.interaction, 0);
       }).toThrow();
     });
   });
@@ -383,7 +383,7 @@ describe('Answer classification service with string classifier enabled',
       // in PredictionAlgorithmRegistryService.
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0, rules)
+          stateName, state.interaction, 0, rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[1].outcome, 1, null,
@@ -395,7 +395,7 @@ describe('Answer classification service with string classifier enabled',
        'interaction is not trainable', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state2, 0, rules)
+          stateName, state2.interaction, 0, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION)
@@ -520,7 +520,7 @@ describe('Answer classification service with training data classification',
        'and interaction is trainable', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 'abc', rules)
+          stateName, state.interaction, 'abc', rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[0].outcome, 0, null,
@@ -529,7 +529,7 @@ describe('Answer classification service with training data classification',
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 'xyz', rules)
+          stateName, state.interaction, 'xyz', rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[1].outcome, 1, null,
@@ -541,7 +541,7 @@ describe('Answer classification service with training data classification',
       'classification', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 'input', rules)
+          stateName, state.interaction, 'input', rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[1].outcome, 1, 0,

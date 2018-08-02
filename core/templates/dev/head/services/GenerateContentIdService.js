@@ -18,12 +18,12 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'stateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
+  'StateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
   'COMPONENT_NAME_HINT', function(
-      stateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
+      StateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
       COMPONENT_NAME_HINT) {
     var generateIdForHintOrFeedback = function(componentName) {
-      var contentIdList = stateContentIdsToAudioTranslationsService
+      var contentIdList = StateContentIdsToAudioTranslationsService
         .displayed.getAllContentId();
       var searchKey = componentName + '_';
       var count = 0;
