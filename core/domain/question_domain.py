@@ -164,7 +164,8 @@ class Question(object):
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
         object to contain an idea and a version. To be used to validate the
-        question before it is finalized."""
+        question before it is finalized.
+        """
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
