@@ -19,7 +19,7 @@
 describe('Responses Service', function() {
   describe('ResponsesService', function() {
     let $httpBackend;
-    let scope, siis, ecs, rs, ess
+    let scope, siis, ecs, rs, ess, rof;
     let mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -56,6 +56,7 @@ describe('Responses Service', function() {
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
       rs = $injector.get('ResponsesService');
+      rof = $injector.get('RuleObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -75,7 +76,7 @@ describe('Responses Service', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [{
-                rule_type: 'Contains',
+                rule_type: 'Equals',
                 inputs: {
                   x: 'Answer'
                 }
@@ -153,11 +154,17 @@ describe('Responses Service', function() {
       let destUpdates;
 
       beforeEach(function() {
+/*
         ruleUpdates = {
-          rules: [{
+          rule: [{
             inputs: {x: 'New answer'},
             type: 'Equals'
           }],
+        };
+*/
+        ruleUpdates = {
+          type: 'Equals',
+          inputs: {x: 'New answer'}
         };
 
         feedbackUpdates = {
@@ -176,7 +183,8 @@ describe('Responses Service', function() {
 
       it('should update the rules', function() {
         rs.updateAnswerGroup(0, ruleUpdates);
-        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates.rules);
+        console.log(rs.getAnswerGroup(0).rules.inputs);
+        expect(rs.getAnswerGroup(0).rules).toEqual(ruleUpdates);
       });
 
       it('should update the feedback', function() {
