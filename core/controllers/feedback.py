@@ -14,7 +14,6 @@
 
 """Controllers for the feedback thread page."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import exp_services
