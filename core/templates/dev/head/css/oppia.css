@@ -3749,6 +3749,10 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 8px;
 }
 
+span.learner-action {
+  margin-bottom: 2em;
+}
+
 span.oppia-issues-learner-action {
   display: block;
   margin-bottom: 2em;
