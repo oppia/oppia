@@ -491,6 +491,25 @@ def get_suggestion(thread_id):
     return _get_suggestion_from_model(model) if model else None
 
 
+def get_multiple_threads(thread_ids):
+    """Gets multiple feedback threads.
+
+    Args:
+        thread_ids: list(str). The list of thread IDs.
+
+    Returns:
+        list(FeedbackThread). The list of feedback threads.
+    """
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        return [_get_thread_from_model(t)
+                for t in feedback_models.GeneralFeedbackThreadModel.get_multi(
+                    thread_ids)]
+    else:
+        return [_get_thread_from_model(t)
+                for t in feedback_models.FeedbackThreadModel.get_multi(
+                    thread_ids)]
+
+
 def _get_thread_from_model(thread_model):
     """Converts the given FeedbackThreadModel to a FeedbackThread object.
 

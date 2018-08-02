@@ -46,8 +46,6 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
   IMPACT: 'Impact'
 });
 
-oppia.constant('')
-
 oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$window', '$uibModal',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
@@ -61,7 +59,7 @@ oppia.controller('CreatorDashboard', [
       $scope, $rootScope, $http, $window, $uibModal, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      SuggestionObjectFactory,  SuggestionThreadObjectFactory,
+      SuggestionObjectFactory, SuggestionThreadObjectFactory,
       UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
@@ -92,6 +90,7 @@ oppia.controller('CreatorDashboard', [
 
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
+    $scope.canReviewActiveThread = null;
 
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
@@ -190,15 +189,20 @@ oppia.controller('CreatorDashboard', [
 
     $scope.setActiveThread = function(threadId) {
       _fetchMessages(threadId);
-      var allThreads = [].concat(
-        $scope.mySuggestionsList, $scope.suggestionsToReviewList);
-      for (var i = 0; i < allThreads.length; i++) {
-        if (allThreads[i].threadId === threadId) {
-          $scope.activeThread = allThreads[i];
+      for (var i = 0; i < $scope.mySuggestionsList.length; i++) {
+        if ($scope.mySuggestionsList[i].threadId === threadId) {
+          $scope.activeThread = $scope.mySuggestionsList[i];
+          $scope.canReviewActiveThread = false;
           break;
         }
       }
-      console.log($scope.activeThread)
+      for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
+        if ($scope.suggestionsToReviewList[i].threadId === threadId) {
+          $scope.activeThread = $scope.suggestionsToReviewList[i];
+          $scope.canReviewActiveThread = true;
+          break;
+        }
+      }
     };
 
     $scope.showSuggestionModal = function() {
@@ -215,15 +219,7 @@ oppia.controller('CreatorDashboard', [
         size: 'lg',
         resolve: {
           suggestionIsHandled: function() {
-            return $scope.activeThread.isSuggestionHandled();;
-          },
-          suggestionIsValid: function() {
-            /*if ($scope.activeThread.suggestion.suggestionType ===
-                'edit_exploration_state_content') {
-              return ExplorationStatesService.hasState(
-                $scope.activeThread.getSuggestionStateName());
-            }*/
-            return true;
+            return $scope.activeThread.isSuggestionHandled();
           },
           suggestionStatus: function() {
             return $scope.activeThread.getSuggestionStatus();
@@ -236,32 +232,31 @@ oppia.controller('CreatorDashboard', [
           },
           newContent: function() {
             return $scope.activeThread.suggestion.newValue;
+          },
+          canReviewActiveThread: function() {
+            return $scope.canReviewActiveThread;
           }
         },
         controller: [
           '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
-          'suggestionIsValid', 'suggestionStatus', 'description', 'oldContent',
-          'newContent', function(
+          'suggestionStatus', 'description', 'oldContent',
+          'newContent', 'canReviewActiveThread', function(
               $scope, $log, $uibModalInstance, suggestionIsHandled,
-              suggestionIsValid, suggestionStatus, description, oldContent,
-              newContent) {
+              suggestionStatus, description, oldContent,
+              newContent, canReviewActiveThread) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
               'rejected.';
-            var SUGGESTION_INVALID_MSG = 'This suggestion is not valid' +
-              ' anymore. It cannot be accepted.';
-            var ACTION_ACCEPT_SUGGESTION = 'accept'
-            var ACTION_REJECT_SUGGESTION = 'reject'
+            var ACTION_ACCEPT_SUGGESTION = 'accept';
+            var ACTION_REJECT_SUGGESTION = 'reject';
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canReject = $scope.isNotHandled;
-            $scope.canAccept = $scope.isNotHandled && suggestionIsValid;
+            $scope.canAccept = $scope.isNotHandled;
 
             if (!$scope.isNotHandled) {
               $scope.errorMessage = (suggestionStatus === 'accepted') ?
                 SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
-            } else if (!suggestionIsValid) {
-              $scope.errorMessage = SUGGESTION_INVALID_MSG;
             } else {
               $scope.errorMessage = '';
             }
@@ -270,7 +265,7 @@ oppia.controller('CreatorDashboard', [
             $scope.newContent = newContent;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
-            console.log(newContent)
+            $scope.canReviewActiveThread = canReviewActiveThread;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -292,17 +287,18 @@ oppia.controller('CreatorDashboard', [
           }
         ]
       }).result.then(function(result) {
-        console.log($scope.activeThread)
         $http.put(
-            '/generalsuggestionactionhandler/' + 'exploration/' +
-            $scope.activeThread.suggestion.targetId + '/' +
-            $scope.activeThread.suggestion.suggestionId, {
-              action: result.action,
-              commitMessage: result.commitMessage,
-              reviewMessage: result.reviewMessage
-            }).then(null,  function() {
-              $log.error('Error resolving suggestion');
-            });
+          '/generalsuggestionactionhandler/' +
+          $scope.activeThread.suggestion.targetType + '/' +
+          $scope.activeThread.suggestion.targetId + '/' +
+          $scope.activeThread.suggestion.suggestionId, {
+            action: result.action,
+            commitMessage: result.commitMessage,
+            reviewMessage: result.reviewMessage
+          }
+        ).then(null, function() {
+          $log.error('Error resolving suggestion');
+        });
       });
     };
 
@@ -342,48 +338,48 @@ oppia.controller('CreatorDashboard', [
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
-        var number_of_created_suggestions = (
+        var numberOfCreatedSuggestions = (
           responseData.threads_for_created_suggestions_list.length);
-        var numebr_of_suggestions_to_review = (
+        var numberOfSuggestionsToReview = (
           responseData.threads_for_suggestions_to_review_list.length);
         $scope.mySuggestionsList = [];
-        for (var i = 0; i < number_of_created_suggestions; i++) {
+        for (var i = 0; i < numberOfCreatedSuggestions; i++) {
           if (responseData.created_suggestions_list.length !==
-              number_of_created_suggestions) {
+              numberOfCreatedSuggestions) {
             $log.error('Number of suggestions does not match number of ' +
                        'suggestion threads');
           }
-          for (var j = 0; j < number_of_created_suggestions; j++) {
-             var suggestion = SuggestionObjectFactory.createFromBackendDict(
+          for (var j = 0; j < numberOfCreatedSuggestions; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
               responseData.created_suggestions_list[j]);
-             var threadDict = (
+            var threadDict = (
               responseData.threads_for_created_suggestions_list[i]);
-             if (threadDict['thread_id'] === suggestion.threadId()) {
+            if (threadDict.thread_id === suggestion.threadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   threadDict, responseData.created_suggestions_list[j]));
               $scope.mySuggestionsList.push(suggestionThread);
-             }
+            }
           }
         }
         $scope.suggestionsToReviewList = [];
-        for (var i = 0; i < numebr_of_suggestions_to_review; i++) {
+        for (var i = 0; i < numberOfSuggestionsToReview; i++) {
           if (responseData.created_suggestions_list.length !==
-              numebr_of_suggestions_to_review) {
+              numberOfSuggestionsToReview) {
             $log.error('Number of suggestions does not match number of ' +
                        'suggestion threads');
           }
-          for (var j = 0; j < numebr_of_suggestions_to_review; j++) {
-             var suggestion = SuggestionObjectFactory.createFromBackendDict(
+          for (var j = 0; j < numberOfSuggestionsToReview; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
               responseData.created_suggestions_list[j]);
-             var threadDict = (
+            var threadDict = (
               responseData.threads_for_created_suggestions_list[i]);
-             if (threadDict['thread_id'] === suggestion.threadId()) {
+            if (threadDict.thread_id === suggestion.threadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   threadDict, responseData.created_suggestions_list[j]));
               $scope.suggestionsToReviewList.push(suggestionThread);
-             }
+            }
           }
         }
 
@@ -398,7 +394,7 @@ oppia.controller('CreatorDashboard', [
         } else if ($scope.explorationsList.length === 0 && (
           $scope.mySuggestionsList.length > 0 ||
           $scope.suggestionsToReviewList.length > 0)) {
-          $scope.activeTab = 'suggestions'
+          $scope.activeTab = 'suggestions';
         } else {
           $scope.activeTab = 'myExplorations';
         }

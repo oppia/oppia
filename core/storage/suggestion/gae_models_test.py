@@ -325,7 +325,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .get_in_review_suggestions_in_score_categories(
                 ['category1', 'category_invalid'])), 1)
         with self.assertRaisesRegexp(
-                Exception, 'Recieved empty list of score categories'):
+            Exception, 'Recieved empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_in_review_suggestions_in_score_categories([])), 0)

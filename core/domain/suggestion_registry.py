@@ -208,7 +208,7 @@ class BaseSuggestion(object):
             'pre_accept_validate.')
 
     def populate_old_value_of_change(self):
-        """Populates the old_value field of the change. """
+        """Populates the old_value field of the change."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')

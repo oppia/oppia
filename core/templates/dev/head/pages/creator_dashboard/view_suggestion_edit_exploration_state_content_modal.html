@@ -20,7 +20,7 @@
       </div>
     </div>
   </section>
-  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canReviewActiveThread">
     Review message (required if rejecting):
     <input type="text" ng-model="reviewMessage" style="width: 100%">
     Brief Description of Changes (required if accepting):
@@ -33,6 +33,6 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-danger" ng-show="isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
-  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
+  <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
 </div>

@@ -243,9 +243,8 @@ class CreatorDashboardHandler(base.BaseHandler):
         creator_dashboard_display_pref = (
             user_settings.creator_dashboard_display_pref)
 
-        suggestions_created_by_user = (
-            suggestion_services.query_suggestions(
-                [('author_id', self.user_id)]))
+        suggestions_created_by_user = suggestion_services.query_suggestions(
+            [('author_id', self.user_id)])
         suggestions_which_can_be_reviewed = (
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
@@ -261,21 +260,25 @@ class CreatorDashboardHandler(base.BaseHandler):
         suggestion_dicts_which_can_be_reviewed = (
             [s.to_dict() for s in suggestions_which_can_be_reviewed])
 
-        ids_of_suggestions_created_by_user= (
-            [suggestion_services.get_thread_id_from_suggestion_id(
-                s['suggestion_id']) for s in suggestion_dicts_created_by_user])
+        ids_of_suggestions_created_by_user = (
+            [s['suggestion_id'] for s in suggestion_dicts_created_by_user])
         ids_of_suggestions_which_can_be_reviewed = (
-            [suggestion_services.get_thread_id_from_suggestion_id(
-                s['suggestion_id'])
+            [s['suggestion_id']
              for s in suggestion_dicts_which_can_be_reviewed])
 
+        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            ids_of_suggestions_created_by_user = (
+                ['.'.join(t.split('.')[1:])
+                 for t in ids_of_suggestions_created_by_user])
+            ids_of_suggestions_which_can_be_reviewed = (
+                ['.'.join(t.split('.')[1:])
+                 for t in ids_of_suggestions_which_can_be_reviewed])
+
         threads_linked_to_suggestions_by_user = (
-            [feedback_services._get_thread_from_model(t).to_dict()
-             for t in feedback_models.FeedbackThreadModel.get_multi(
+            [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_created_by_user)])
         threads_linked_to_suggestions_which_can_be_reviewed = (
-            [feedback_services._get_thread_from_model(t).to_dict()
-             for t in feedback_models.FeedbackThreadModel.get_multi(
+            [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_which_can_be_reviewed)])
 
         self.values.update({
