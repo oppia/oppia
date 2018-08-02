@@ -107,7 +107,10 @@ oppia.factory('LearnerActionRenderService', [
         }
         var answer =
           finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback = finalBlock[i].actionCustomizationArgs.feedback.value;
+        // If {{answer}} exists in feedback, replace it with the actual answer.
+        var feedback =
+          finalBlock[i].actionCustomizationArgs.feedback.value._html.replace(
+            '{{answer}}', answer);
         tableHTML +=
           '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
       }
