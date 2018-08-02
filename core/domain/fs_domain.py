@@ -486,6 +486,27 @@ class GcsFileSystem(object):
         """
         raise NotImplementedError
 
+    def get_file_content(self, filepath, exp_id):  # pylint: disable=unused-argument
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            exp_id: str. The ID of the exploration to which file belongs.
+
+        Returns:
+            Content. The content of the file.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        gcs.open(gcs_file_url)
+        contents = gcs_file.read()
+        gcs_file.close()
+
+        return contents
+
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
             unused_user_id: str. Unused argument.
