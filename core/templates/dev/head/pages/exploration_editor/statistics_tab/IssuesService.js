@@ -18,7 +18,10 @@
 
 oppia.factory('IssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
-  function($sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT) {
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
+  function(
+      $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -29,15 +32,15 @@ oppia.factory('IssuesService', [
     };
 
     var renderCyclicTransitionsIssueStatement = function(stateName) {
-      return
+      return (
         'Several learners ended up in a cyclic loop revisiting card "' +
-        stateName + '" many times.'
+        stateName + '" many times.');
     }
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [$sce.trustAsHtml(
         'Review the cards up to and including <span class="state_link">' +
-        '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
+        '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
         ' errors, ambiguities or insufficient motivation.'
       )];
       return suggestions;
@@ -48,10 +51,11 @@ oppia.factory('IssuesService', [
       var finalIndex = stateNames.length - 1;
       var suggestions = [$sce.trustAsHtml(
         'Check that the concept presented in <span class="state_link">"' +
-        stateNames[0] + '</span> has been reinforced sufficiently by the time' +
+        stateNames[0] + '"</span> has been reinforced sufficiently by the time' +
         ' the learner gets to <span class="state_link">"' +
         stateNames[finalIndex] + '</span>.'
       )];
+      return suggestions;
     };
 
     return {

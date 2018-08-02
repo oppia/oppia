@@ -54,7 +54,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration_editor/statistics_tab/' +
-                  'cyclic_transitions_issue_directive.html'),
+                  'playthrough_modal_directive.html'),
                 backdrop: true,
                 resolve: {
                   playthrough: function() {
@@ -78,7 +78,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
 
                     var blockActionIndexMapping = {};
                     var total = $scope.displayBlocks.reduce(
-                      function(runningTotal, displayBlock) {
+                      function(runningTotal, displayBlock, i) {
                         blockActionIndexMapping[i] = runningTotal;
                         return runningTotal + displayBlock.length;
                       }, 1);
@@ -99,11 +99,6 @@ oppia.directive('cyclicTransitionsIssueDirective', [
 
                     $scope.renderBlockHtml = function(displayBlock) {
                       var index = $scope.getDisplayBlockIndex(displayBlock);
-                      if (index == 0) {
-                        var service = LearnerActionRenderService
-                        return service.renderFinalDisplayBlockForMISIssueHTML(
-                          displayBlock, blockActionIndexMapping[index]);
-                      }
                       return LearnerActionRenderService.renderDisplayBlockHTML(
                         displayBlock, blockActionIndexMapping[index]);
                     };
