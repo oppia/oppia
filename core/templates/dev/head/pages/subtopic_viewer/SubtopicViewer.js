@@ -28,7 +28,6 @@ oppia.controller('SubtopicViewer', [
       subtopicId = topicIdAndSubtopicId.subtopicId;
       SubtopicViewerBackendApiService.fetchSubtopicData(topicId, subtopicId).then(
         function(response) {
-          $scope.subtopicTitle = response.subtopic_title;
           $scope.subtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
             id: subtopicId,
             topic_id: topicId,

@@ -9,8 +9,18 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-
-
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span>
+        {{ topic_title }}
+      </span>
+      <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+      <span>
+        {{ subtopic_title }}
+      </span>
+    </li>
+  </ul>
 {% endblock navbar_breadcrumb %}
 
 
@@ -18,7 +28,7 @@
   <div ng-controller="SubtopicViewer" style="position: relative;">
     <div>
       <div class="oppia-static-header">
-        <h1><[subtopicTitle]></h1>
+        <h1>{{ subtopic_title }}</h1>
       </div>
       <background-banner></background-banner>
     </div>
@@ -28,7 +38,6 @@
         </angular-html-bind>
       </div>
     </div>
-
   </div>
 {% endblock content %}
 
