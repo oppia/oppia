@@ -45,7 +45,7 @@ describe('Learner dashboard functionality', function() {
   var learnerDashboardPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  var clickContinueButton = function () {
+  var clickContinueButton = function() {
     waitFor.elementToBeClickable(
       continueButton, 'Could not click continue button');
     continueButton.click();
@@ -90,34 +90,6 @@ describe('Learner dashboard functionality', function() {
     workflow.publishExploration();
   };
 
-  var checkIncompleteExplorationSection = function(explorationTitle) {
-    learnerDashboardPage.navigateToInCompleteSection();
-    learnerDashboardPage.navigateToIncompleteExplorationsSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
-  };
-
-  var checkCompleteExplorationSection = function(explorationTitle) {
-    learnerDashboardPage.navigateToCompletedSection();
-    learnerDashboardPage.navigateToCompletedExplorationsSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
-  };
-
-  var checkIncompleteCollectionSection = function(collectionTitle) {
-    learnerDashboardPage.navigateToInCompleteSection();
-    learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
-  };
-
-  var checkCompleteCollectionSection = function(collectionTitle) {
-    learnerDashboardPage.navigateToCompletedSection();
-    learnerDashboardPage.navigateToCompletedCollectionsSection();
-    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
-  };
-
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -127,10 +99,12 @@ describe('Learner dashboard functionality', function() {
       var ADM_VISITOR = 'admVisitor';
       users.createAndLoginAdminUserMobile(
         'admVisitor@learner.com', ADM_VISITOR);
-      // Load /explore/24
-      adminPage.reloadExploration('learner_flow_test.yaml');
       // Load /explore/22
       adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
+      // Load /explore/24
+      adminPage.reloadExploration('learner_flow_test.yaml');
+      // Load /explore/25
+      adminPage.reloadExploration('exploration_player_test.yaml');
       // Load /collection/1
       adminPage.reloadCollection(1);
       users.logout();
@@ -145,7 +119,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('visits the exploration player and plays the correct exploration',
-    function () {
+    function() {
       if (!browser.isMobile) {
         users.createAndLoginUser('expCreator@learnerDashboard.com',
           'expCreator');
@@ -161,20 +135,13 @@ describe('Learner dashboard functionality', function() {
       var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
       users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      if (browser.isMobile) {
-        browser.get('/explore/24');
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/explore/24');
-      } else {
-        libraryPage.get();
-        libraryPage.findExploration('Exploration Player Test');
-        libraryPage.playExploration('Exploration Player Test');
-      }
+      libraryPage.get();
+      libraryPage.findExploration('Exploration Player Test');
+      libraryPage.playExploration('Exploration Player Test');
     });
 
   it('visits the collection player and plays the correct collection',
-    function () {
+    function() {
       if (!browser.isMobile) {
         users.createAndLoginUser('expOfCollectionCreator@learnerDashboard.com',
           'expOfCollectionCreator');
@@ -206,16 +173,9 @@ describe('Learner dashboard functionality', function() {
       var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
       users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      if (browser.isMobile) {
-        browser.get('/collection/1');
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/collection/1');
-      } else {
-        libraryPage.get();
-        libraryPage.findCollection('Collection Player Test');
-        libraryPage.playCollection('Collection Player Test');
-      }
+      libraryPage.get();
+      libraryPage.findCollection('Collection Player Test');
+      libraryPage.playCollection('Collection Player Test');
     });
 
   it('displays incomplete and completed explorations', function() {
@@ -237,15 +197,15 @@ describe('Learner dashboard functionality', function() {
     users.createAndLoginUser('learner@learnerDashboard.com',
       'learnerlearnerDashboard');
     // Go to 'Dummy Exploration'.
+    libraryPage.get();
+    libraryPage.findExploration('Dummy Exploration');
+    libraryPage.playExploration('Dummy Exploration');
+    waitFor.pageToFullyLoad();
     // Leave this exploration incomplete.
     if (browser.isMobile) {
-      browser.get('/explore/24');
-      waitFor.pageToFullyLoad();
       clickContinueButton();
     } else {
-      libraryPage.get();
-      libraryPage.findExploration('Dummy Exploration');
-      libraryPage.playExploration('Dummy Exploration');
+      // The exploration header is only visible in desktop browsers.
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.expectExplorationToNotBeOver();
@@ -257,38 +217,33 @@ describe('Learner dashboard functionality', function() {
     waitFor.pageToFullyLoad();
 
     // Go to 'Test Exploration'.
-    // Complete this exploration.
-    if (browser.isMobile) {
-      browser.get('/explore/22');
-      waitFor.pageToFullyLoad();
-    } else {
-      libraryPage.get();
-      libraryPage.findExploration('Test Exploration');
-      libraryPage.playExploration('Test Exploration');
+    libraryPage.get();
+    libraryPage.findExploration('Test Exploration');
+    libraryPage.playExploration('Test Exploration');
+    waitFor.pageToFullyLoad();
+    // The exploration header is only visible in desktop browsers.
+    if (!browser.isMobile) {
       explorationPlayerPage.expectExplorationNameToBe('Test Exploration');
     }
     oppiaLogo.click();
     waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    checkIncompleteExplorationSection('Dummy Exploration');
-
+    learnerDashboardPage.checkIncompleteExplorationSection('Dummy Exploration');
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    checkCompleteExplorationSection('Test Exploration');
+    learnerDashboardPage.checkCompleteExplorationSection('Test Exploration');
 
+    libraryPage.get();
+    libraryPage.findExploration('Dummy Exploration');
+    libraryPage.playExploration('Dummy Exploration');
+    waitFor.pageToFullyLoad();
     // Now complete the 'Dummmy Exploration'.
     if (browser.isMobile) {
-      browser.get('/explore/24');
-      waitFor.pageToFullyLoad();
       clickContinueButton();
       // Navigate to the second page.
       clickContinueButton();
     } else {
-      libraryPage.get();
-      libraryPage.findExploration('Dummy Exploration');
-      libraryPage.playExploration('Dummy Exploration');
-      waitFor.pageToFullyLoad();
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.submitAnswer(
@@ -296,8 +251,8 @@ describe('Learner dashboard functionality', function() {
     }
     // Both should be added to the completed section.
     learnerDashboardPage.get();
-    checkCompleteExplorationSection('Dummy Exploration');
-    checkCompleteExplorationSection('Test Exploration');
+    learnerDashboardPage.checkCompleteExplorationSection('Dummy Exploration');
+    learnerDashboardPage.checkCompleteExplorationSection('Test Exploration');
     users.logout();
 
     // For desktop, go to the exploration editor page and
@@ -368,15 +323,14 @@ describe('Learner dashboard functionality', function() {
       'learner4@learnerDashboard.com', 'learner4learnerDashboard');
 
     // Go to 'Test Collection' and play it.
+    libraryPage.get();
+    libraryPage.findCollection('Test Collection');
+    libraryPage.playCollection('Test Collection');
+    waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
     if (browser.isMobile) {
-      browser.get('/explore/19?collection_id=1');
-      waitFor.pageToFullyLoad();
       clickContinueButton();
     } else {
-      libraryPage.get();
-      libraryPage.findCollection('Test Collection');
-      libraryPage.playCollection('Test Collection');
       var firstExploration = element.all(
         by.css('.protractor-test-collection-exploration')).first();
       // Click first exploration in collection.
@@ -394,10 +348,14 @@ describe('Learner dashboard functionality', function() {
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    checkIncompleteCollectionSection('Test Collection');
-
+    learnerDashboardPage.checkIncompleteCollectionSection('Test Collection');
+    // Find and play 'Test Collection'.
+    libraryPage.get();
+    libraryPage.findCollection('Test Collection');
+    libraryPage.playCollection('Test Collection');
+    waitFor.pageToFullyLoad();
+    // Complete all remaining explorations of the collection.
     if (browser.isMobile) {
-      // Complete all remaining explorations of the collection.
       // The first exploration is already completed.
       // Second exploration.
       browser.get('/explore/20?collection_id=1');
@@ -408,27 +366,21 @@ describe('Learner dashboard functionality', function() {
       waitFor.pageToFullyLoad();
       clickContinueButton();
     } else {
-      libraryPage.get();
-      libraryPage.findCollection('Test Collection');
-      libraryPage.playCollection('Test Collection');
       var firstExploration = element.all(
         by.css('.protractor-test-collection-exploration')).first();
       // Click first exploration in collection.
       waitFor.elementToBeClickable(
         firstExploration, 'Could not click first exploration in collection');
       firstExploration.click();
-
-      // Complete the exploration and rate it 5 stars!
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'Those were all the questions I had!');
-      explorationPlayerPage.rateExploration(5);
     }
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     learnerDashboardPage.get();
-    checkCompleteCollectionSection('Test Collection');
+    learnerDashboardPage.checkCompleteCollectionSection('Test Collection');
     users.logout();
 
     // For desktop, create another exploration and add it to
@@ -449,12 +401,39 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       users.login('learner4@learnerDashboard.com');
       learnerDashboardPage.get();
-      checkIncompleteCollectionSection('Test Collection');
+      learnerDashboardPage.checkIncompleteCollectionSection('Test Collection');
     }
   });
 
-  afterEach(function () {
-    general.checkForConsoleErrors([]);
+  afterEach(function() {
+    if (browser.isMobile) {
+      general.checkForConsoleErrors([
+        // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Exploration Player Test"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Collection Player Test"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Dummy Exploration"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Exploration"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Dummy Exploration"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Collection"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Collection"',
+        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "'
+      ]);
+    } else {
+      general.checkForConsoleErrors([]);
+    }
     users.logout();
   });
 });

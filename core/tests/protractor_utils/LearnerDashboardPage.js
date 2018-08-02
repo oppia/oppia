@@ -171,6 +171,34 @@ var LearnerDashboardPage = function() {
       feedbackMessage.first(), 'Feedback Message takes too long to appear');
     expect(feedbackMessage.first().getText()).toMatch(message);
   };
+
+  this.checkIncompleteExplorationSection = function(explorationTitle) {
+    this.navigateToInCompleteSection();
+    this.navigateToIncompleteExplorationsSection();
+    this.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  this.checkCompleteExplorationSection = function(explorationTitle) {
+    this.navigateToCompletedSection();
+    this.navigateToCompletedExplorationsSection();
+    this.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  this.checkIncompleteCollectionSection = function(collectionTitle) {
+    this.navigateToInCompleteSection();
+    this.navigateToIncompleteCollectionsSection();
+    this.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
+  };
+
+  this.checkCompleteCollectionSection = function(collectionTitle) {
+    this.navigateToCompletedSection();
+    this.navigateToCompletedCollectionsSection();
+    this.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
+  };
 };
 
 exports.LearnerDashboardPage = LearnerDashboardPage;
