@@ -144,15 +144,6 @@ exports.config = {
         'Checking whether the suites in "full" match the actual suites...');
       var suitesInFull = exports.config.suites.full;
       var allSuiteGroups = Object.keys(exports.config.suites);
-      var numOfSuitesInFull = suitesInFull.length;
-      var actualNumOfSuites = allSuiteGroups.length - 1;
-      if (numOfSuitesInFull !== actualNumOfSuites) {
-        // eslint-disable-next-line no-console
-        console.log(
-          'The number of suites in "full" do not match ' +
-          'the actual number of suites');
-        process.exit(1);
-      }
       for (var suiteIndex in allSuiteGroups) {
         if (allSuiteGroups[suiteIndex] === 'full') {
           continue;
@@ -162,7 +153,9 @@ exports.config = {
         suiteFile = exports.config.suites[suiteGroup][0];
         if (!suitesInFull.includes(suiteFile)) {
           // eslint-disable-next-line no-console
-          console.log('The suites in "full" do not match the actual suites');
+          console.log(
+            'Expected test file ' + suiteFile + 'to be in "full" ' +
+            'but it was not present.');
           process.exit(1);
         }
       }
