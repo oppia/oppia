@@ -28,6 +28,12 @@ oppia.factory('IssuesService', [
       return 'Several learners exited the exploration in less than a minute.';
     };
 
+    var renderCyclicTransitionsIssueStatement = function(stateName) {
+      return
+        'Several learners ended up in a cyclic loop revisiting card "' +
+        stateName + '" many times.'
+    }
+
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [$sce.trustAsHtml(
         'Review the cards up to and including <span class="state_link">' +
@@ -35,6 +41,17 @@ oppia.factory('IssuesService', [
         ' errors, ambiguities or insufficient motivation.'
       )];
       return suggestions;
+    };
+
+    var renderCyclicTransitionsIssueSuggestions = function(issue) {
+      var stateNames = issue.issueCustomizationArgs.state_names.value;
+      var finalIndex = stateNames.length - 1;
+      var suggestions = [$sce.trustAsHtml(
+        'Check that the concept presented in <span class="state_link">"' +
+        stateNames[0] + '</span> has been reinforced sufficiently by the time' +
+        ' the learner gets to <span class="state_link">"' +
+        stateNames[finalIndex] + '</span>.'
+      )];
     };
 
     return {
@@ -55,13 +72,20 @@ oppia.factory('IssuesService', [
         });
       },
       renderIssueStatement: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueStatement();
+        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
+          return renderCyclicTransitionsIssueStatement(
+            issue.issueCustomizationArgs.state_names.value[0]);
         }
       },
       renderIssueSuggestions: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(issue);
+        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
+          return renderCyclicTransitionsIssueSuggestions(issue);
         }
       }
     };
