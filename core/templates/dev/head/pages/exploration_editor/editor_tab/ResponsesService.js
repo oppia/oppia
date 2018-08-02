@@ -128,7 +128,7 @@ oppia.factory('ResponsesService', [
       _saveAnswerGroups(_answerGroups);
     };
 
-    var _updateAnswerGroupsAudioTranslation = function () {
+    var _updateAnswerGroupsAudioTranslation = function() {
       stateContentIdsToAudioTranslationsService.displayed.
         deleteAllFeedbackContentId();
       for (var i = 0; i < _answerGroups.length; i++) {

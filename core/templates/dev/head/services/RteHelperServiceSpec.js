@@ -22,7 +22,7 @@ describe('RteHelperService', function() {
     RteHelperService = $injector.get('RteHelperService');
   }));
 
-  it('should return text with no extra new lines or spaces', function () {
+  it('should return text with no extra new lines or spaces', function() {
     var testData = [[
       '<p>abc</p>', '<p>abc</p>'
     ], [

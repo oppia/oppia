@@ -35,7 +35,7 @@ var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Learner dashboard functionality', function () {
+describe('Learner dashboard functionality', function() {
   var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -45,14 +45,14 @@ describe('Learner dashboard functionality', function () {
   var learnerDashboardPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  var clickContinueButton = function () {
+  var clickContinueButton = function() {
     waitFor.elementToBeClickable(
       continueButton, 'Could not click continue button');
     continueButton.click();
     waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktop = function () {
+  var createDummyExplorationOnDesktop = function() {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     waitFor.pageToFullyLoad();
@@ -90,7 +90,7 @@ describe('Learner dashboard functionality', function () {
     workflow.publishExploration();
   };
 
-  beforeAll(function () {
+  beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
@@ -121,7 +121,7 @@ describe('Learner dashboard functionality', function () {
   });
 
   it('visits the exploration player and plays the correct exploration',
-    function () {
+    function() {
       if (!browser.isMobile) {
         users.createAndLoginUser('expCreator@learnerDashboard.com',
           'expCreator');
@@ -143,7 +143,7 @@ describe('Learner dashboard functionality', function () {
     });
 
   it('visits the collection player and plays the correct collection',
-    function () {
+    function() {
       if (!browser.isMobile) {
         users.createAndLoginUser('expOfCollectionCreator@learnerDashboard.com',
           'expOfCollectionCreator');
@@ -180,7 +180,7 @@ describe('Learner dashboard functionality', function () {
       libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('displays incomplete and completed explorations', function () {
+  it('displays incomplete and completed explorations', function() {
     // Create explorations for desktop testing.
     if (!browser.isMobile) {
       users.createAndLoginUser('originalCreator@learnerDashboard.com',
@@ -264,7 +264,7 @@ describe('Learner dashboard functionality', function () {
       libraryPage.playExploration('Dummy Exploration');
       // Wait for player page to completely load
       waitFor.pageToFullyLoad();
-      general.getExplorationIdFromPlayer().then(function (explorationId) {
+      general.getExplorationIdFromPlayer().then(function(explorationId) {
         general.openEditor(explorationId);
       });
       explorationEditorPage.navigateToSettingsTab();
@@ -283,7 +283,7 @@ describe('Learner dashboard functionality', function () {
     }
   });
 
-  it('displays incomplete and completed collections', function () {
+  it('displays incomplete and completed collections', function() {
     // Create a collection for desktop testing.
     if (!browser.isMobile) {
       users.createAndLoginUser('explorationCreator@learnerDashboard.com',
@@ -414,7 +414,7 @@ describe('Learner dashboard functionality', function () {
     }
   });
 
-  afterEach(function () {
+  afterEach(function() {
     if (browser.isMobile) {
       general.checkForConsoleErrors([
         // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.

@@ -50,7 +50,7 @@ oppia.directive('solutionEditor', [
             ui_config: {}
           };
 
-          $scope.getAnswerHtml = function () {
+          $scope.getAnswerHtml = function() {
             return ExplorationHtmlFormatterService.getAnswerHtml(
               stateSolutionService.savedMemento.correctAnswer,
               stateInteractionIdService.savedMemento,
