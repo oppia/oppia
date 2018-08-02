@@ -392,36 +392,14 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        if 'question_state_data' not in self.change.question_dict:
-            raise utils.ValidationError(
-                'Expected question dict to contain question_state_data')
-
-        if 'language_code' not in self.change.question_dict:
-            raise utils.ValidationError(
-                'Expected question dict to contain language_code')
-
-        if not isinstance(
-                self.change.question_dict['language_code'], basestring):
-            raise utils.ValidationError('Expected language code to be a string')
-
-        if not utils.is_valid_language_code(
-                self.change.question_dict['language_code']):
-            raise utils.ValidationError(
-                'Expected language code to be a valid language code')
-
-        if (
-                'question_state_schema_version' not in
-                self.change.question_dict):
-            raise utils.ValidationError(
-                'Expected question dict to contain'
-                ' question_state_schema_version')
-
+        question = question_domain.Question(
+            None, exp_domain.State.from_dict(
+                self.change.question_dict['question_state_data']),
+            self.change.question_dict['question_state_schema_version'],
+            self.change.question_dict['language_code'], None)
+        question.partial_validate()
         question_state_schema_version = (
             self.change.question_dict['question_state_schema_version'])
-        if not isinstance(question_state_schema_version, int):
-            raise utils.ValidationError(
-                'Expected question state schema version to be int')
-
         if not (
                 question_state_schema_version >= 1 and
                 question_state_schema_version <=
