@@ -20,7 +20,7 @@ describe('Responses Service', function() {
   describe('ResponsesService', function() {
     let $httpBackend;
     let scope;
-    let siis, ecs, rs, ess, rof;
+    let siis, ecs, rs, ess, rof, shtml;
     let mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -58,6 +58,7 @@ describe('Responses Service', function() {
       ess = $injector.get('ExplorationStatesService');
       rs = $injector.get('ResponsesService');
       rof = $injector.get('RuleObjectFactory');
+      shtml = $injector.get('SubtitledHtmlObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
