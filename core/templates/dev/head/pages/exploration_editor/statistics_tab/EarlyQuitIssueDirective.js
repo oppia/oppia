@@ -77,11 +77,9 @@ oppia.directive('earlyQuitIssueDirective', [
                         playthrough.actions);
 
                     var blockActionIndexMapping = {};
-                    var i = 0;
                     var total = $scope.displayBlocks.reduce(
                       function(runningTotal, displayBlock) {
                         blockActionIndexMapping[i] = runningTotal;
-                        i += 1;
                         return runningTotal + displayBlock.length;
                       }, 1);
 
@@ -105,39 +103,37 @@ oppia.directive('earlyQuitIssueDirective', [
                         displayBlock, blockActionIndexMapping[index]);
                     };
 
+                    var getRemainingActionsElements = function(pIdx, i) {
+                      return document.getElementById(
+                        'remainingActions' + pIdx.toString() + i.toString());
+                    };
+
                     $scope.showRemainingActions = function(pIdx) {
                       if ($scope.maxHidden === 1) {
-                        document.getElementById(
-                          'remainingActions' + pIdx.toString() +
-                          $scope.maxHidden.toString()).style.display = 'block';
+                        getRemainingActionsElements(
+                            pIdx, $scope.maxHidden).style.display = 'block';
                         document.getElementById('arrowDiv').style.display =
                           'none';
                       } else {
                         var currentShown = 0, i;
                         for (i = $scope.maxHidden; i > 0; i--) {
-                          if (document.getElementById(
-                            'remainingActions' + pIdx.toString() +
-                            i.toString()).style.display === 'block') {
+                          if (getRemainingActionsElements(
+                              pIdx, i).style.display === 'block') {
                             currentShown = i;
                             break;
                           }
                         }
                         if (currentShown === 0) {
-                          document.getElementById(
-                            'remainingActions' + pIdx.toString() +
-                            $scope.maxHidden.toString()).style.display =
-                              'block';
+                          getRemainingActionsElements(
+                            pIdx, $scope.maxHidden).style.display = 'block';
                         } else if (currentShown === 2) {
-                          document.getElementById(
-                            'remainingActions' + pIdx.toString() +
-                            '1').style.display = 'block';
+                          getRemainingActionsElements(
+                              pIdx, 1).style.display = 'block';
                           document.getElementById(
                             'arrowDiv').style.display = 'none';
                         } else {
-                          document.getElementById(
-                            'remainingActions' + pIdx.toString() +
-                            (currentShown - 1).toString()).style.display =
-                              'block';
+                          getRemainingActionsElements(
+                            pIdx, currentShown - 1).style.display = 'block';
                         }
                       }
                     };
