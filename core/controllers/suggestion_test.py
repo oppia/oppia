@@ -16,7 +16,6 @@
 
 """Tests for suggestion controllers."""
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -422,7 +421,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 suggestion_models.STATUS_ACCEPTED)
             questions, _ = (
                 question_services.get_question_summaries_linked_to_skills(
-                    [self.SKILL_ID], ''))
+                    5, [self.SKILL_ID], ''))
             self.assertEqual(len(questions), 1)
             self.assertEqual(questions[0].creator_id, self.author_id)
             self.assertEqual(

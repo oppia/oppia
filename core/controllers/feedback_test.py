@@ -16,7 +16,6 @@
 
 """Tests for the feedback controllers."""
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services

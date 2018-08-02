@@ -17,7 +17,6 @@
 
 """Controllers for suggestions."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
@@ -91,9 +90,6 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
