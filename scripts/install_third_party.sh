@@ -176,7 +176,7 @@ echo Checking if pillow is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/pillow-5.1.0" ]; then
   echo Installing pillow
 
-  pip install Pillow==5.1.0 --target="$THIRD_PARTY_DIR/pillow-5.1.0"
+  CFLAGS="-I/usr/pkg/include" pip install Pillow==5.1.0 --target="$THIRD_PARTY_DIR/pillow-5.1.0"
 fi
 
 # install pre-push script
