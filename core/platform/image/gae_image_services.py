@@ -40,7 +40,7 @@ def get_image_dimensions(filename, exp_id):
         fs_domain.ExplorationFileSystem if (
             feconf.DEV_MODE)
         else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
 
     imageFile = fs.getImageFile(filename)
     img = Image.open(imageFile)
