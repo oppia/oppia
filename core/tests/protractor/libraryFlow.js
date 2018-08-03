@@ -48,23 +48,13 @@ describe('Library pages tour', function() {
   };
 
   var rateExploration = function() {
+    var adminPage = new AdminPage.AdminPage();
+    users.createUser('random@gmail.com', 'random');
+    users.login('random@gmail.com', true);
+    // We need an exploration to rate here.
     if (browser.isMobile) {
-      var adminPage = new AdminPage.AdminPage();
-      var LIB_ADM_VISITOR = 'libAdmVisitor';
-      // When logging-in on mobile devices, popups and suggestions
-      // might block the login button.
-      // See https://discuss.appium.io/t/how-to-disable-popups-on-android-chrome-browser-through-automation/5935
-      // At the moment, there does not exist a reliable way to
-      // disable them. Therefore the best
-      // way to deal with them is to use an
-      // entirely different email id.
-      users.createAndLoginAdminUserMobile(
-        'libAdmVisitor@library.com', LIB_ADM_VISITOR);
-      // Load /explore/22
       adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
     } else {
-      users.createUser('random@gmail.com', 'random');
-      users.login('random@gmail.com');
       workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
