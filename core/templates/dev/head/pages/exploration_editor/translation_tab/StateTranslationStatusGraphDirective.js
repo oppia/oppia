@@ -43,7 +43,7 @@ oppia.directive('stateTranslationStatusGraph', [
                 EditorStateService.getActiveStateName(),
                 stateData.contentIdsToAudioTranslations);
               $rootScope.$broadcast('refreshStateTranslation');
-              $rootScope.loadingMessage = '';
+              $rootScope.$broadcast('refreshAudioTranslationBar');
             }
           };
         }

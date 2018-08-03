@@ -84,7 +84,6 @@ oppia.directive('stateTranslation', [
               $scope.activeContentId = $scope.stateSolution.explanation
                 .getContentId();
             }
-            $scope.$broadcast('refreshAudioTranslationBar');
           };
 
           $scope.summarizeDefaultOutcome = function(
