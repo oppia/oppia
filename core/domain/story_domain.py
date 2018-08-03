@@ -920,38 +920,6 @@ class Story(object):
         self.story_contents.initial_node_id = new_initial_node_id
 
 
-class StoryExplorationLink(object):
-    """Domain object for a Story Exploration Link.
-
-    Attributes:
-        story_id: str. The ID of the story.
-        exploration_id: str. The ID of the exploration to which the story is
-            linked.
-    """
-
-    def __init__(self, story_id, exploration_id):
-        """Constructs a Story Exploration Link domain object.
-
-        Args:
-            story_id: str. The ID of the story.
-            exploration_id: str. The ID of the exploration to which the story is
-                linked.
-        """
-        self.story_id = story_id
-        self.exploration_id = exploration_id
-
-    def to_dict(self):
-        """Returns a dictionary representation of this domain object.
-
-        Returns:
-            dict. A dict representing this StoryExplorationLink object.
-        """
-        return {
-            'story_id': self.story_id,
-            'exploration_id': self.exploration_id,
-        }
-
-
 class StorySummary(object):
     """Domain object for Story Summary."""
 

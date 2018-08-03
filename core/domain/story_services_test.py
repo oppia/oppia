@@ -113,9 +113,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
             question_id, SKILL_ID)
-        story_services.create_new_story_exploration_link(
+        questions = story_services.get_pretest_questions(
             self.STORY_ID, 'exp_id')
-        questions = story_services.get_pretests_for_exploration('exp_id')
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].to_dict(), question.to_dict())
 

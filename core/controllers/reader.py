@@ -247,6 +247,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.request.get('v')
+        story_id = self.request.get('story_id')
         version = int(version) if version else None
 
         try:
@@ -282,11 +283,10 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
-        pretest_questions = (
-            story_services.get_pretests_for_exploration(exploration_id))
-
         pretest_question_dicts = []
-        if pretest_questions is not None:
+        if story_id:
+            pretest_questions = (
+                story_services.get_pretest_questions(story_id, exploration_id))
             pretest_question_dicts = [
                 question.to_dict() for question in pretest_questions
             ]

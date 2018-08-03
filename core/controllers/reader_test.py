@@ -247,17 +247,17 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
             question_id, SKILL_ID)
-        story_services.create_new_story_exploration_link(
-            STORY_ID, exp_id)
         # Call the handler.
         exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+            '%s/%s?story_id=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id, STORY_ID))
         self.assertEqual(
             [question.to_dict()],
             exploration_dict['pretest_question_dicts'])
 
         exploration_dict_2 = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2))
+            '%s/%s?story_id=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, STORY_ID))
         self.assertEqual(
             [], exploration_dict_2['pretest_question_dicts'])
 
