@@ -94,23 +94,8 @@ describe('Learner dashboard functionality', function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
-
-    if (browser.isMobile) {
-      var ADM_VISITOR = 'admVisitor';
-      users.createAndLoginAdminUserMobile(
-        'admVisitor@learner.com', ADM_VISITOR);
-      // Load /explore/22
-      adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
-      // Load /explore/24
-      adminPage.reloadExploration('learner_flow_test.yaml');
-      // Load /explore/25
-      adminPage.reloadExploration('exploration_player_test.yaml');
-      // Load /collection/0
-      adminPage.reloadCollection(0);
-      // Load /collection/1
-      adminPage.reloadCollection(1);
-      users.logout();
-    } else {
+    // The editor and player page objects are only required for desktop testing.
+    if (!browser.isMobile) {
       collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
       creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
       explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -122,18 +107,21 @@ describe('Learner dashboard functionality', function() {
 
   it('visits the exploration player and plays the correct exploration',
     function() {
-      if (!browser.isMobile) {
-        users.createAndLoginUser('expCreator@learnerDashboard.com',
-          'expCreator');
-        // Create an exploration named 'Exploration Player Test'.
+      users.createUser('expCreator@learnerDashboard.com',
+        'expCreator');
+      users.login('expCreator@learnerDashboard.com', true);
+      // Create or load an exploration named 'Exploration Player Test'.
+      if (browser.isMobile) {
+        adminPage.reloadExploration('exploration_player_test.yaml');
+      } else {
         workflow.createAndPublishExploration(
           'Exploration Player Test',
           'Astronomy',
           'To test the exploration player',
           'English'
         );
-        users.logout();
       }
+      users.logout();
       var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
       users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
@@ -144,21 +132,24 @@ describe('Learner dashboard functionality', function() {
 
   it('visits the collection player and plays the correct collection',
     function() {
-      if (!browser.isMobile) {
-        users.createAndLoginUser('expOfCollectionCreator@learnerDashboard.com',
-          'expOfCollectionCreator');
+      users.createUser('expOfCollectionCreator@learnerDashboard.com',
+        'expOfCollectionCreator');
+      users.login('expOfCollectionCreator@learnerDashboard.com', true);
+      // Create or load a collection named
+      // 'Introduction to Collections in Oppia'.
+      if (browser.isMobile) {
+        adminPage.reloadCollection(0);
+      } else {
         workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
           'To test collection player',
           'English'
         );
-        users.logout();
-
-        // Login to admin account
-        users.createAndLoginAdminUser(
-          'collectionPlayerTestAdm@learnerDashboard.com',
-          'collectionPlayerTestAdm');
+        // Update the role of the user to admin since only admin users
+        // can create a collection.
+        adminPage.get();
+        adminPage.updateRole('expOfCollectionCreator', 'admin');
         workflow.createCollectionAsAdmin();
         collectionEditorPage.searchForAndAddExistingExploration(
           'Demo Exploration');
@@ -170,8 +161,8 @@ describe('Learner dashboard functionality', function() {
           'This is a collection to test player.');
         collectionEditorPage.setCategory('Algebra');
         collectionEditorPage.saveChanges();
-        users.logout();
       }
+      users.logout();
       var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
       users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
@@ -181,10 +172,14 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('displays incomplete and completed explorations', function() {
-    // Create explorations for desktop testing.
-    if (!browser.isMobile) {
-      users.createAndLoginUser('originalCreator@learnerDashboard.com',
-        'originalCreator');
+    users.createUser('originalCreator@learnerDashboard.com',
+      'originalCreator');
+    users.login('originalCreator@learnerDashboard.com', true);
+    // Create or load explorations.
+    if (browser.isMobile) {
+      adminPage.reloadExploration('learner_flow_test.yaml');
+      adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
+    } else {
       // Create exploration 'Dummy Exploration'
       createDummyExplorationOnDesktop();
       // Create a second exploration named 'Test Exploration'.
@@ -194,8 +189,8 @@ describe('Learner dashboard functionality', function() {
         'To expand the horizon of the minds!',
         'English'
       );
-      users.logout();
     }
+    users.logout();
     users.createAndLoginUser('learner@learnerDashboard.com',
       'learnerlearnerDashboard');
     // Go to 'Dummy Exploration'.
@@ -284,10 +279,13 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('displays incomplete and completed collections', function() {
-    // Create a collection for desktop testing.
-    if (!browser.isMobile) {
-      users.createAndLoginUser('explorationCreator@learnerDashboard.com',
-        'explorationCreator');
+    users.createUser('explorationCreator@learnerDashboard.com',
+      'explorationCreator');
+    users.login('explorationCreator@learnerDashboard.com', true);
+    // Create or load a collection.
+    if (browser.isMobile) {
+      adminPage.reloadCollection(1);
+    } else {
       // Create first exploration named 'Dummy Exploration'.
       createDummyExplorationOnDesktop();
       // Create a second exploration named 'Collection Exploration'.
@@ -297,12 +295,10 @@ describe('Learner dashboard functionality', function() {
         'To be a part of a collection!',
         'English'
       );
-      users.logout();
-
-      // Login to admin account
-      users.createAndLoginAdminUser(
-        'testCollectionAdm@learnerDashboard.com',
-        'testcollectionAdmlearnerDashboard');
+      // Update the role of the user to admin since only admin users
+      // can create a collection.
+      adminPage.get();
+      adminPage.updateRole('explorationCreator', 'admin');
       // Create new 'Test Collection' containing
       // exploration 'Dummy Exploration'.
       workflow.createCollectionAsAdmin();
@@ -315,8 +311,8 @@ describe('Learner dashboard functionality', function() {
       collectionEditorPage.setObjective('This is a test collection.');
       collectionEditorPage.setCategory('Algebra');
       collectionEditorPage.saveChanges();
-      users.logout();
     }
+    users.logout();
     users.createAndLoginUser(
       'learner4@learnerDashboard.com', 'learner4learnerDashboard');
 
@@ -403,9 +399,13 @@ describe('Learner dashboard functionality', function() {
     // 'Test Collection'.
     if (!browser.isMobile) {
       // Add exploration 'Collection Exploration' to 'Test Collection'
-      // and publish it
-      users.login('testCollectionAdm@learnerDashboard.com');
+      // and publish it.
+      users.login('explorationCreator@learnerDashboard.com');
       creatorDashboardPage.get();
+      waitFor.pageToFullyLoad();
+      // Click on 'Collections' tab.
+      var collectionsTab = element(by.css('.protractor-test-collections-tab'));
+      collectionsTab.click();
       creatorDashboardPage.navigateToCollectionEditor();
       collectionEditorPage.searchForAndAddExistingExploration(
         'Collection Exploration');
@@ -422,34 +422,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   afterEach(function() {
-    if (browser.isMobile) {
-      general.checkForConsoleErrors([
-        // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Exploration Player Test"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Introduction to Collections in Oppia"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Dummy Exploration"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Exploration"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Dummy Exploration"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Collection"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Collection"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "'
-      ]);
-    } else {
-      general.checkForConsoleErrors([]);
-    }
+    general.checkForConsoleErrors([]);
     users.logout();
   });
 });
