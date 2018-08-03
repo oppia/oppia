@@ -49,7 +49,6 @@ describe('Responses Service', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-
     beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
