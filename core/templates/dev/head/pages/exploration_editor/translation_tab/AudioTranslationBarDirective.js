@@ -161,6 +161,8 @@ oppia.directive('audioTranslationBar', [
           $scope.saveRecordedAudio = function() {
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
+            var contentId = $scope.contentId;
+            var languageCode = $scope.languageCode;
             var recordedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
             $scope.showRecorderWarning = false;
@@ -169,12 +171,11 @@ oppia.directive('audioTranslationBar', [
               recordedAudioFile).then(function() {
               if ($scope.audioIsUpdating) {
                 StateContentIdsToAudioTranslationsService.displayed
-                  .deleteAudioTranslation(
-                    $scope.contentId, $scope.languageCode);
+                  .deleteAudioTranslation(contentId, languageCode);
                 $scope.audioIsUpdating = false;
               }
               StateContentIdsToAudioTranslationsService.displayed
-                .addAudioTranslation($scope.contentId, $scope.languageCode,
+                .addAudioTranslation(contentId, languageCode,
                   filename, recordedAudioFile.size);
               saveContentIdsToAudioTranslationChanges();
               AlertsService.addSuccessMessage(
