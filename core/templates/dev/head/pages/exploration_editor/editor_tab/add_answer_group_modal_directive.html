@@ -38,6 +38,7 @@
     <br>
 
     <outcome-destination-editor outcome="tmpOutcome"
+                                ng-if="!questionModeEnabled"
                                 outcome-has-feedback="!isLinearWithNoFeedback(tmpOutcome)"
                                 add-state="addState">
     </outcome-destination-editor>
