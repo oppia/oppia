@@ -47,18 +47,18 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$window', 'DateTimeFormatService',
-  'AlertsService', 'CreatorDashboardBackendApiService',
+  '$scope', '$rootScope', '$http', '$uibModal', '$window',
+  'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'QuestionObjectFactory' 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $window, DateTimeFormatService,
+      $scope, $rootScope, $http, $uibModal, $window, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      UrlInterpolationService, FATAL_ERROR_CODES,
+      QuestionObjectFactory, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -187,6 +187,20 @@ oppia.controller('CreatorDashboard', [
 
     $scope.getCompleteThumbnailIconUrl = function (iconUrl) {
       return UrlInterpolationService.getStaticImageUrl(iconUrl);
+    };
+
+    $scope.showCreateQuestionModal = function() {
+
+      var questionStateData = null;
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/creator_dashboard/create_question_modal.html'),
+        backdrop: true,
+        size: 'lg',
+        resolve: {
+          questionStateData
+        }
+      })
     };
 
     $rootScope.loadingMessage = 'Loading';
