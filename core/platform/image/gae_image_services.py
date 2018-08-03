@@ -16,19 +16,17 @@
 
 """Provides app identity services."""
 
-import cStringIO
-import urllib
 import feconf
 
 from PIL import Image
 
-from core.domain import filepath_domain
+from core.domain import fs_domain
 from core.platform import models
 
 app_identity_services = models.Registry.import_app_identity_services()
 
-def get_image_filepath_object(filename, exp_id):
-    """Gets the filepath object of the image with the given filename
+def get_image_dimensions(filename, exp_id):
+    """Gets the dimensions of the image with the given filename
 
     Args:
         filename: str. Name of the file whose dimensions need to be
@@ -36,17 +34,15 @@ def get_image_filepath_object(filename, exp_id):
         exp_id: str. Exploration id.
 
     Returns:
-        object. filepath object of the image.
+        tuple. Returns height and width of the image.
     """
-    url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
-        app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-        filename)) if not feconf.DEV_MODE else (
-            'http://localhost:8181/imagehandler/%s/%s' % (
-                exp_id, filename))
-    print url
-    imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if (
+            feconf.DEV_MODE)
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+
+    imageFile = fs.getImageFile(filename)
     img = Image.open(imageFile)
     width, height = img.size
-    filepath = filepath_domain.Filepath(
-        filename, height=height, width=width)
-    return filepath.to_dict()
+    return height, width

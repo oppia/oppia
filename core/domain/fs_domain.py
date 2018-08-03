@@ -16,8 +16,10 @@
 
 """Domain objects representing a file system and a file stream."""
 
+import cStringIO
 import logging
 import os
+import urllib
 
 from core.platform import models
 import feconf
@@ -190,6 +192,20 @@ class ExplorationFileSystem(object):
         else:
             return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
+
+        def getImageFile(self, filename):
+        """Gets the image file with the given filename.
+
+        Args:
+            filename: str. The name of the image file.
+
+        Returns:
+            str. The content of the file.
+        """
+        url = ('http://localhost:8181/imagehandler/%s/%s' % (
+                self._exploration_id, filename))
+        imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
+        return imageFile
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -485,6 +501,21 @@ class GcsFileSystem(object):
                 classes.
         """
         raise NotImplementedError
+
+    def getImageFile(self, filename):
+        """Gets the image file with the given filename.
+
+        Args:
+            filename: str. The name of the image file.
+
+        Returns:
+            str. The content of the file.
+        """
+        url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
+            app_identity_services.get_gcs_resource_bucket_name(),
+            self._exploration_id, filename))
+        imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
+        return imageFile
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:

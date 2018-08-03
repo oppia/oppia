@@ -23,10 +23,11 @@ import logging
 import urllib
 import urlparse
 
-from PIL import Image
 import bleach
 import bs4
+from core.domain import filepath_domain
 from core.domain import rte_component_registry
+
 from core.platform import models
 import feconf
 
@@ -836,4 +837,7 @@ def get_filepath_of_object_image(filename, exp_id):
     Returns:
         object. filepath object of the image.
     """
-    return image_services.get_image_filepath_object(filename, exp_id)
+    height, width = image_services.get_image_dimensions(filename, exp_id)
+    filepath = filepath_domain.Filepath(
+    filename, height=height, width=width)
+    return filepath.to_dict()
