@@ -111,14 +111,14 @@ oppia.directive('cyclicTransitionsIssueDirective', [
                     $scope.showRemainingActions = function(pIdx) {
                       if ($scope.maxHidden === 1) {
                         getRemainingActionsElements(
-                            pIdx, $scope.maxHidden).style.display = 'block';
+                          pIdx, $scope.maxHidden).style.display = 'block';
                         document.getElementById('arrowDiv').style.display =
                           'none';
                       } else {
                         var currentShown = 0, i;
                         for (i = $scope.maxHidden; i > 0; i--) {
                           if (getRemainingActionsElements(
-                              pIdx, i).style.display === 'block') {
+                            pIdx, i).style.display === 'block') {
                             currentShown = i;
                             break;
                           }
@@ -128,7 +128,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
                             pIdx, $scope.maxHidden).style.display = 'block';
                         } else if (currentShown === 2) {
                           getRemainingActionsElements(
-                              pIdx, 1).style.display = 'block';
+                            pIdx, 1).style.display = 'block';
                           document.getElementById(
                             'arrowDiv').style.display = 'none';
                         } else {

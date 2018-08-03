@@ -35,7 +35,7 @@ oppia.factory('IssuesService', [
       return (
         'Several learners ended up in a cyclic loop revisiting card "' +
         stateName + '" many times.');
-    }
+    };
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [$sce.trustAsHtml(
@@ -51,8 +51,8 @@ oppia.factory('IssuesService', [
       var finalIndex = stateNames.length - 1;
       var suggestions = [$sce.trustAsHtml(
         'Check that the concept presented in <span class="state_link">"' +
-        stateNames[0] + '"</span> has been reinforced sufficiently by the time' +
-        ' the learner gets to <span class="state_link">"' +
+        stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
+        'time the learner gets to <span class="state_link">"' +
         stateNames[finalIndex] + '</span>.'
       )];
       return suggestions;
