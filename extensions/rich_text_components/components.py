@@ -22,7 +22,7 @@ import bs4
 from extensions.objects.models import objects
 
 
-class BaseObject(object):
+class BaseComponent(object):
     """Base object class.
 
     This is the superclass for rich text components in Oppia, such as
@@ -49,7 +49,7 @@ class BaseObject(object):
             arg_obj_class.normalize(value_dict[arg_name])
 
 
-class Collapsible(BaseObject):
+class Collapsible(BaseComponent):
     """Class for Collapsible component."""
 
     customization_args = {
@@ -73,7 +73,7 @@ class Collapsible(BaseObject):
             raise Exception('Nested tabs and collapsible')
 
 
-class Image(BaseObject):
+class Image(BaseComponent):
     """Class for Image component."""
 
     customization_args = {
@@ -92,7 +92,7 @@ class Image(BaseObject):
             raise Exception('Invalid filepath')
 
 
-class Link(BaseObject):
+class Link(BaseComponent):
     """Class for Link component."""
 
     customization_args = {
@@ -101,7 +101,7 @@ class Link(BaseObject):
     }
 
 
-class Math(BaseObject):
+class Math(BaseComponent):
     """Class for Math component."""
 
     customization_args = {
@@ -109,7 +109,7 @@ class Math(BaseObject):
     }
 
 
-class Tabs(BaseObject):
+class Tabs(BaseComponent):
     """Class for Tabs component."""
 
     customization_args = {
@@ -145,7 +145,7 @@ class Tabs(BaseObject):
             raise Exception('Invalid attributes')
 
 
-class Video(BaseObject):
+class Video(BaseComponent):
     """Class for Video component."""
 
     customization_args = {
