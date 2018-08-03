@@ -18,7 +18,7 @@
 
 describe('Responses Service', function() {
   describe('ResponsesService', function() {
-    let $httpBackend;
+    let httpBackend;
     let scope;
     let siis, ecs, rs, ess, rof, shtml;
     let mockExplorationData;
@@ -51,7 +51,7 @@ describe('Responses Service', function() {
 
     beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
+      httpBackend = $injector.get('$httpBackend');
       siis = $injector.get('stateInteractionIdService');
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
