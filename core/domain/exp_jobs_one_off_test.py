@@ -1233,7 +1233,7 @@ class ExplorationContentValidationJobForCKEditorTest(
 
 
 class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
-    
+
     COMMITER_ID = 'ADMIN'
     COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
     EXP_ID = 'eid'
@@ -1253,7 +1253,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
         fs.commit(
             self.COMMITER_ID, self.FILENAME, imageData,
             mimetype=mimetype)
-        
+
         job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
         exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()

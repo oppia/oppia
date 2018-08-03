@@ -717,7 +717,6 @@ class ValidationOfImagesOnGCS(jobs.BaseMapReduceOneOffJobManager):
                     yield (WRONG_INSTANCE_ID, instance_id)
                 else:
                     filename = catched_groups.group(2)
-                    filepath = 'assets/' + filename
                     exploration_id = catched_groups.group(1)
                     fs = fs_domain.AbstractFileSystem(
                         fs_domain.GcsFileSystem(exploration_id))
