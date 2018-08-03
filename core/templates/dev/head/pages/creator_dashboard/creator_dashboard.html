@@ -70,7 +70,7 @@
         <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
         <li ng-if="canCreateCollections && collectionsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-          <a class="oppia-dashboard-tabs-text"
+          <a class="oppia-dashboard-tabs-text protractor-test-collections-tab"
              ng-click="setActiveTab('myCollections')"
              translate="I18N_DASHBOARD_COLLECTIONS">
           </a>
