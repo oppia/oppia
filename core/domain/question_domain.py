@@ -163,7 +163,7 @@ class Question(object):
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
-        object to contain an idea and a version. To be used to validate the
+        object to contain an ID and a version. To be used to validate the
         question before it is finalized.
         """
 
@@ -233,6 +233,11 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected version to be an integer, received %s' %
                 self.version)
+
+        if self.version < 1:
+            raise utils.ValidationError(
+                'Expected version to be greater than or equal to 1, '
+                'received %s' % self.version)
 
         self.partial_validate()
 
