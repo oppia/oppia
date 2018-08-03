@@ -195,7 +195,7 @@ oppia.directive('stateTranslation', [
             }
           };
 
-          $scope.tabStatusColourStyle = function (tabId) {
+          $scope.tabStatusColorStyle = function (tabId) {
             if (!$scope.isDisabled(tabId)) {
               var color = TranslationStatusService
                 .getActiveStateComponentStatusColor(tabId);

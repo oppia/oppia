@@ -67,7 +67,7 @@ oppia.directive('stateGraphViz', [
         // corresponding node opacities.
         opacityMap: '=',
         showWarningSign: '@',
-        showNeedsUpdateSign: '@'
+        showTranslationWarnings: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
@@ -277,7 +277,7 @@ oppia.directive('stateGraphViz', [
 
             $scope.getNodeErrorMessage = function(nodeLabel) {
               var warnings = null;
-              if ($scope.showNeedsUpdateSign) {
+              if ($scope.showTranslationWarnings) {
                 warnings =
                   TranslationStatusService.getAllStatesNeedUpdatewarning();
               } else {
