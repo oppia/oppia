@@ -33,11 +33,10 @@ from core.platform import models
 import feconf
 import utils
 
-from google.appengine.api import images
-from google.appengine.ext import blobstore
-
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
+
+image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
@@ -703,43 +702,13 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
     def map(exp_model):
         # This job is allowed to run only in Production environment since it
         # uses GcsFileSystem which can't be used in Development environment.
-        if feconf.DEV_MODE:
+        if not feconf.DEV_MODE:
             instance_id = exp_model.id
             exploration = exp_services.get_exploration_by_id(exp_model.id)
             filenames = exp_services.get_image_filenames_from_exploration(
                 exploration)
             for filename in filenames:
-                filename_wo_extension = filename[:filename.rfind('.')]
-                extension = filename[filename.rfind('.') + 1:]
-
-                # gcs_url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
-                #         app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-                #         filename))
-                # blob_key = blobstore.create_gcs_key(gcs_url)
-                # original_img = images.Image(blob_key=blob_key)
-
-                # print img.height
-                # print width
-
-                # fs = fs_domain.AbstractFileSystem(
-                #     fs_domain.GcsFileSystem(exp_id))
-
-                # content = fs.get_file_content(filename, exp_id)
-
-                # compressed_content = images.resize(
-                #     image_data=content, width=width*8/10, height=height*8/10)
-                # fs.commit(
-                #     'ADMIN', 'image/%s%s.%s' % (
-                #         filename_wo_extension, '_compressed', extension),
-                #     compressed_content, mimetype='image/%s' % filetype)
-
-                # micro_content = images.resize(
-                #     image_data=content, width=width*7/10, height=height*7/10)
-                # fs.commit(
-                #     'ADMIN', 'image/%s%s.%s' % (
-                #         filename_wo_extension, '_micro', extension),
-                #     micro_content, mimetype='image/%s' % filetype)
-
+                image_services.create_different_versions(filename, exp_model.id)
                 yield ('Added the three versions', exp_model.id)
 
 

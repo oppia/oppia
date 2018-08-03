@@ -47,6 +47,7 @@ import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
+image_services = models.Registry.import_gae_image_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
@@ -773,6 +774,7 @@ class ImageUploadHandler(EditorHandler):
                 'different name.' % filename)
 
         fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
+        image_services.create_different_versions(filename, exploration_id)
 
         self.render_json({'filepath': filename})
 

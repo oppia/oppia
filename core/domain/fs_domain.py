@@ -471,6 +471,27 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
+        def get_file_content(self, filepath, exp_id):  # pylint: disable=unused-argument
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            exp_id: str. The ID of the exploration to which file belongs.
+
+        Returns:
+            Content. The content of the file.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        gcs_file = cloudstorage.open(gcs_file_url)
+        contents = gcs_file.read()
+        gcs_file.close()
+
+        return contents
+
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
         """Raises NotImplementedError if the method is not implemented in the
         derived classes.
@@ -599,6 +620,19 @@ class AbstractFileSystem(object):
         """
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
+
+    def get_file_content(self, filepath, exp_id):  # pylint: disable=unused-argument
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            exp_id: str. The ID of the exploration to which file belongs.
+
+        Returns:
+            Content. The content of the file.
+        """
+        return self._impl.get_file_content(filepath)
 
     def open(self, filepath, version=None, mode='r'):
         """Returns a stream with the file content. Similar to open(...).
