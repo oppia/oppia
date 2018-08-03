@@ -1652,7 +1652,7 @@ def get_image_filenames_from_exploration(exploration):
     for state in exploration.states.itervalues():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions']['value']['imagePath']['filename'])
 
     html_list = exploration.get_all_html_content_strings()
     rte_components_in_exp = []
@@ -1665,7 +1665,8 @@ def get_image_filenames_from_exploration(exploration):
         if 'id' in rte_comp and (
                 str(rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
+                rte_comp['customization_args']['filepath-with-value'][
+                    'filename'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
 
