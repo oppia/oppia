@@ -86,8 +86,8 @@ exports.config = {
       'protractor/accessibility.js',
       'protractor/learnerFlow.js',
       'protractor/libraryFlow.js',
-      'protractor/loginFlow.js',
       'protractor_mobile/navigation.js',
+      'protractor/profileFlow.js',
       'protractor/subscriptionsFlow.js'
     ],
 
@@ -103,12 +103,12 @@ exports.config = {
       'protractor/libraryFlow.js'
     ],
 
-    login: [
-      'protractor/loginFlow.js'
-    ],
-
     navigation: [
       'protractor_mobile/navigation.js'
+    ],
+
+    profile: [
+      'protractor/profileFlow.js'
     ],
 
     subscriptions: [
@@ -154,7 +154,7 @@ exports.config = {
         if (!suitesInFull.includes(suiteFile)) {
           // eslint-disable-next-line no-console
           console.log(
-            'Expected test file ' + suiteFile + 'to be in "full" ' +
+            'Expected test file ' + suiteFile + ' to be in "full" ' +
             'but it was not present.');
           process.exit(1);
         }

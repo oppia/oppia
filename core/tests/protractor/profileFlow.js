@@ -23,14 +23,14 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Login flow', function() {
+describe('Profile flow', function() {
   var learnerDashboardPage = null;
 
   beforeAll(function() {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
     users.createAndLoginUser(
-      'desktopAndMobileVisitor@loginFlow.com', VISITOR_USERNAME);
+      'desktopAndMobileVisitor@profileFlow.com', VISITOR_USERNAME);
   });
 
   it('should land on the learner dashboard after successful login',
@@ -41,7 +41,7 @@ describe('Login flow', function() {
 
   describe('profile dropdown menu', function() {
     beforeEach(function() {
-      users.login('desktopAndMobileVisitor@loginFlow.com');
+      users.login('desktopAndMobileVisitor@profileFlow.com');
       learnerDashboardPage.get();
       var profileDropdown = element(by.css(
         '.protractor-test-profile-dropdown'));
