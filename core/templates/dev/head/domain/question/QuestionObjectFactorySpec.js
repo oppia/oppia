@@ -128,10 +128,10 @@ describe('Question object factory', function() {
 
   it('should correctly get backend dict', function() {
     expect(
-      _sampleQuestion.toBackendDict(true, 25).question_state_schema_version
-    ).toEqual(25);
+      _sampleQuestion.toBackendDict(true).question_state_schema_version
+    ).toEqual(24);
 
-    expect(_sampleQuestion.toBackendDict(true, 25).id).toEqual(null);
+    expect(_sampleQuestion.toBackendDict(true, 24).id).toEqual(null);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 

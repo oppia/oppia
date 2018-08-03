@@ -292,7 +292,7 @@ oppia.directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
-                  $scope.isInQuestionMode =
+                  $scope.questionModeEnabled =
                     StateEditorService.isInQuestionMode();
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
@@ -301,10 +301,12 @@ oppia.directive('stateResponses', [
                   var feedbackContentId = GenerateContentIdService.getNextId(
                     COMPONENT_NAME_FEEDBACK);
 
-                  $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                    stateName, feedbackContentId, '', []);
-                  if ($scope.isInQuestionMode) {
-                    $scope.tmpOutcome.dest = null;
+                  if ($scope.questionModeEnabled) {
+                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+                      null, feedbackContentId, '', []);
+                  } else {
+                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+                      stateName, feedbackContentId, '', []);
                   }
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {

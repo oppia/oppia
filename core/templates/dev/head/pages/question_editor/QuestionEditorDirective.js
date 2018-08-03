@@ -105,9 +105,6 @@ oppia.directive('questionEditor', [
           };
 
           $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
-            for (var i = 0; i < newAnswerGroups.length; i++) {
-              newAnswerGroups[i].outcome.dest = null;
-            }
             StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
           };

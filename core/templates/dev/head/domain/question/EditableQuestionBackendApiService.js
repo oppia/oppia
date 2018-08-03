@@ -24,16 +24,15 @@ oppia.constant(
 oppia.constant(
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
   '/manage_question_skill_link/<question_id>/<skill_id>');
-oppia.constant('SCHEMA_VERSION_URL', '/states_schema_version');
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   'UrlInterpolationService', 'QUESTION_CREATION_URL',
-  'QUESTION_SKILL_LINK_URL_TEMPLATE', 'SCHEMA_VERSION_URL',
+  'QUESTION_SKILL_LINK_URL_TEMPLATE',
   function(
       $http, $q, EDITABLE_QUESTION_DATA_URL_TEMPLATE,
       UrlInterpolationService, QUESTION_CREATION_URL,
-      QUESTION_SKILL_LINK_URL_TEMPLATE, SCHEMA_VERSION_URL) {
+      QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
         skillId, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
@@ -64,18 +63,6 @@ oppia.factory('EditableQuestionBackendApiService', [
         var questionDict = angular.copy(response.data.question_dict);
         if (successCallback) {
           successCallback(questionDict);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _fetchSchemaVersion = function(successCallback, errorCallback) {
-      $http.get(SCHEMA_VERSION_URL).then(function(response) {
-        if (successCallback) {
-          successCallback(response.data.schema_version);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -121,12 +108,6 @@ oppia.factory('EditableQuestionBackendApiService', [
       fetchQuestion: function(questionId) {
         return $q(function(resolve, reject) {
           _fetchQuestion(questionId, resolve, reject);
-        });
-      },
-
-      fetchStatesSchemaVersion: function() {
-        return $q(function(resolve, reject) {
-          _fetchSchemaVersion(resolve, reject);
         });
       },
 

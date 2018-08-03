@@ -155,6 +155,8 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
+# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -648,7 +650,6 @@ QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
-SCHEMA_VERSION_URL = '/states_schema_version'
 SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'

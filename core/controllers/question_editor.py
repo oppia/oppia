@@ -25,21 +25,6 @@ from core.domain import skill_services
 import feconf
 
 
-class QuestionDataSchemaVersionHandler(base.BaseHandler):
-    """Returns the schema version of the question state data."""
-
-    @acl_decorators.can_manage_question_skill_status
-    def get(self):
-        """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        self.values.update({
-            'schema_version': feconf.CURRENT_STATES_SCHEMA_VERSION
-        })
-        self.render_json(self.values)
-
-
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
