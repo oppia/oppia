@@ -249,6 +249,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
@@ -258,7 +259,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
     os.path.join('third_party', 'mutagen-1.38'),
-    os.path.join('third_party', 'PIL-1.1.7'),
+    # os.path.join('third_party', 'PIL-1.1.7'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
 ]
 for path in _PATHS_TO_INSERT:
