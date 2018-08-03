@@ -225,14 +225,14 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.getUploadedAudioTrimer = function() {
-            if(AudioPlayerService.isTrackLoaded()) {
+            if (AudioPlayerService.isTrackLoaded()) {
               var currentTime = $filter('formatTimer')(AudioPlayerService
                 .getCurrentTime());
               var duration = $filter('formatTimer')(AudioPlayerService
                 .getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
-              return '--:-- / --:--'
+              return '--:-- / --:--';
             }
           };
 
@@ -259,7 +259,8 @@ oppia.directive('audioTranslationBar', [
               if ($scope.recorder.status.isPlaying) {
                 $scope.recorder.playbackPause();
               }
-              if ($scope.recorder.status.isRecording && $scope.audioBlob) {
+              if ($scope.recorder.status.isRecording &&
+                $scope.showRecorderWarning) {
                 $scope.recorder.stopRecord();
                 $rootScope.loadingMessage = 'loading';
               }
