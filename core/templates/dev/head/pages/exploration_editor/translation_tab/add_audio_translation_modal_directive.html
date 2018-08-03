@@ -13,9 +13,9 @@
                                  on-file-changed="updateUploadedFile"
                                  on-file-cleared="clearUploadedFile">
             </audio-file-uploader>
-            <div ng-if="isUpdatingAudio"
+            <div ng-if="isAudioAvailable"
                  class="oppia-updated-audio-file-upload-message">
-              <strong>Note:</strong> You're going to update the audio translation and this will delete the already available audio.
+              <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.
             </div>
             <div ng-if="errorMessage"
                  class="oppia-audio-file-upload-field-error-message">
