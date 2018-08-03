@@ -219,7 +219,6 @@ oppia.directive('stateTranslation', [
             $scope.activeAnswerGroupIndex = null;
 
             $scope.onTabClick($scope.TAB_ID_CONTENT);
-            $scope.$broadcast('refreshAudioTranslationBar');
           };
 
           // TODO(DubeySandeep): We need to call initStateTranslation() here in
