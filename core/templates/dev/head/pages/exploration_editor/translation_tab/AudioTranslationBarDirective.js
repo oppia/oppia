@@ -225,11 +225,15 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.getUploadedAudioTrimer = function() {
-            var currentTime = $filter('formatTimer')(AudioPlayerService
-              .getCurrentTime());
-            var duration = $filter('formatTimer')(AudioPlayerService
-              .getAudioDuration());
-            return currentTime + ' / ' + duration;
+            if(AudioPlayerService.isTrackLoaded()) {
+              var currentTime = $filter('formatTimer')(AudioPlayerService
+                .getCurrentTime());
+              var duration = $filter('formatTimer')(AudioPlayerService
+                .getAudioDuration());
+              return currentTime + ' / ' + duration;
+            } else {
+              return '--:-- / --:--'
+            }
           };
 
           $scope.isPlayingUploadedAudio = function() {
