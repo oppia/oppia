@@ -691,9 +691,9 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
-class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for deleting the images in the exploration
-    from the GAE.
+class ValidationOfImagesOnGCS(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for checking that all the images in the GAE are there in
+        the GCS or not.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -719,29 +719,61 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
                     filename = catched_groups.group(2)
                     filepath = 'assets/' + filename
                     exploration_id = catched_groups.group(1)
-                    filemetadata_model = (
-                        file_models.FileMetadataModel.get_model(
-                            exploration_id, filepath, False))
-
                     fs = fs_domain.AbstractFileSystem(
                         fs_domain.GcsFileSystem(exploration_id))
 
                     if not fs.isfile('image/%s' % filename):
                         yield (FILE_IS_NOT_IN_GCS, file_model.id)
-                    else:
-                        file_model.delete(
-                            'ADMIN',
-                            'Deleting file_model for image from GAE',
-                            True)
-                        filemetadata_model.delete(
-                            'ADMIN',
-                            'Deleting filemetamodel for image from GAE',
-                            True)
-                        yield (FILE_DELETED, file_model.id)
+
 
     @staticmethod
     def reduce(status, values):
-        if status == FILE_IS_NOT_IN_GCS:
-            yield (NO_OF_FILES_NOT_IN_GCS, len(values))
-        else:
+        yield (status, values)
+
+
+class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for deleting the images in the exploration
+        from the GAE.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileModel]
+
+    @staticmethod
+    def map(file_model):
+        instance_id = file_model.id
+        filetype = instance_id[instance_id.rfind('.') + 1:]
+        # To separate the image entries from the audio entries we get from
+        # the FileSnapshotContentModel.
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            pattern = re.compile(
+                r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+                    ALLOWED_IMAGE_EXTENSIONS) + '))$')
+            catched_groups = pattern.match(instance_id)
+            if not catched_groups:
+                yield (WRONG_INSTANCE_ID, instance_id)
+            else:
+                filename = catched_groups.group(2)
+                filepath = 'assets/' + filename
+                exploration_id = catched_groups.group(1)
+                filemetadata_model = (
+                    file_models.FileMetadataModel.get_model(
+                        exploration_id, filepath, False))
+
+                file_model.delete(
+                    'ADMIN',
+                    'Deleting file_model for image from GAE',
+                    True)
+                filemetadata_model.delete(
+                    'ADMIN',
+                    'Deleting filemetamodel for image from GAE',
+                    True)
+                yield (FILE_DELETED, file_model.id)
+
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_DELETED:
             yield (NO_OF_FILES_DELETED, len(values))
+        else:
+            yield (status, values)

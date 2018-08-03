@@ -1231,6 +1231,41 @@ class ExplorationContentValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
+class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
+    
+    COMMITER_ID = 'ADMIN'
+    COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
+    EXP_ID = 'eid'
+    FILENAME = 'imageFile.png'
+
+    def setUp(self):
+        super(DeleteImagesFromGAEJobTest, self).setUp()
+        self.process_and_flush_pending_tasks()
+
+    def test_for_deletion_job(self):
+        """Checks that images get deleted from the GAE after running the job.
+        """
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        imageData = ''
+        mimetype = 'image/png'
+        fs.commit(
+            self.COMMITER_ID, 'image/%s' % self.FILENAME, imageData,
+            mimetype=mimetype)
+        
+        job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
+        exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
+        expected_output = [
+            "[u'Number of files that got deleted', u'1']"
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+
 class ExplorationMigrationValidationJobForCKEditorTest(
         test_utils.GenericTestBase):
 
