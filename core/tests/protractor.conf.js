@@ -103,8 +103,8 @@ exports.config = {
       'protractor/libraryFlow.js'
     ],
 
-    profile: [
-      'protractor/profileFlow.js'
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
     ],
 
     publication: [

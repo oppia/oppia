@@ -87,7 +87,7 @@ exports.config = {
       'protractor/learnerFlow.js',
       'protractor/libraryFlow.js',
       'protractor_mobile/navigation.js',
-      'protractor/profileFlow.js',
+      'protractor/profileMenuFlow.js',
       'protractor/subscriptionsFlow.js'
     ],
 
@@ -107,8 +107,8 @@ exports.config = {
       'protractor_mobile/navigation.js'
     ],
 
-    profile: [
-      'protractor/profileFlow.js'
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
     ],
 
     subscriptions: [
