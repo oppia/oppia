@@ -24,6 +24,7 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -1250,7 +1251,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
         imageData = ''
         mimetype = 'image/png'
         fs.commit(
-            self.COMMITER_ID, 'image/%s' % self.FILENAME, imageData,
+            self.COMMITER_ID, self.FILENAME, imageData,
             mimetype=mimetype)
         
         job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
@@ -1260,7 +1261,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
         expected_output = [
-            "[u'Number of files that got deleted', u'1']"
+            u"[u'Number of files that got deleted', 1]"
         ]
 
         self.assertEqual(actual_output, expected_output)
