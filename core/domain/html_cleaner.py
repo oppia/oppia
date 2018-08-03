@@ -31,6 +31,7 @@ from core.platform import models
 import feconf
 
 app_identity_services = models.Registry.import_app_identity_services()
+image_services = models.Registry.import_gae_image_services()
 
 
 def filter_a(name, value):
@@ -835,11 +836,4 @@ def get_filepath_of_object_image(filename, exp_id):
     Returns:
         object. filepath object of the image.
     """
-    url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
-        app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-        filename)) if not feconf.DEV_MODE else (
-            'http://localhost:8181/imagehandler/%s/%s' % (exp_id, filename))
-    imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
-    img = Image.open(imageFile)
-    width, height = img.size
-    return {'filename': filename, 'height': height, 'width': width}
+    return image_services.get_image_filepath_object(filename, exp_id)
