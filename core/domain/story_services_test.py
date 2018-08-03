@@ -234,6 +234,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             story_domain.StoryNode.from_dict(self.node_1),
             story_domain.StoryNode.from_dict(self.node_2)
         ]
+        self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_3'
         story_services.save_new_story(self.USER_ID, story)
@@ -264,6 +265,16 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             story_services.get_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
+
+    def test_get_completed_nodes_in_story(self):
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+
+        for ind, completed_nodes in enumerate(
+                story_services.get_completed_nodes_in_story(
+                    self.owner_id, self.STORY_1_ID)):
+            self.assertEqual(
+                completed_nodes.to_dict(), self.nodes[ind].to_dict())
 
     def test_record_completed_node_in_story_context(self):
         # Ensure that node completed within the context of a story are

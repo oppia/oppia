@@ -277,9 +277,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # IDs of feedback thread ids (new framework) that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
-    # IDs of feedback thread ids (new framework) that this user subscribes to.
-    general_feedback_thread_ids = ndb.StringProperty(
-        repeated=True, indexed=True)
     # IDs of the learners who have subscribed to this user.
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
@@ -574,6 +571,8 @@ class StoryProgressModel(base_models.BaseModel):
 
     Please note instances of this progress model will persist even after a
     story is deleted.
+
+    ID for this model is of format "{{USER_ID}}.{{STORY_ID}}".
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -585,6 +584,15 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
+        """"Generates the id for StoryProgressModel.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            str. The model id corresponding to user_id and story_id.
+        """
         return '%s.%s' % (user_id, story_id)
 
     @classmethod
@@ -647,6 +655,9 @@ class StoryProgressModel(base_models.BaseModel):
         """Gets the StoryProgressModel for the given user and story
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
+
+        Note: This method is not responsible for creating the instance of
+        the class in the datastore. It just returns an instance of the class.
 
         Args:
             user_id: str. The id of the user.

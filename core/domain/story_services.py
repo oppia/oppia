@@ -546,7 +546,7 @@ def get_completed_node_ids(user_id, story_id):
         story_id: str. ID of the story.
 
     Returns:
-        list(str). List of the node ids completed in  story.
+        list(str). List of the node ids completed in story.
     """
     progress_model = user_models.StoryProgressModel.get(user_id, story_id)
 
@@ -561,20 +561,18 @@ def get_node_ids_completed_in_stories(user_id, story_ids):
         story_ids: list(str). IDs of the stories.
 
     Returns:
-        list(list(str)). List of the node ids completed in each
-            story.
+        dict(list(str)). Dict of the story id and the node ids completed
+            in each story as key-value pairs.
     """
     progress_models = user_models.StoryProgressModel.get_multi(
         user_id, story_ids)
 
-    node_ids_completed_in_stories = []
+    node_ids_completed_in_stories = {}
 
     for progress_model in progress_models:
         if progress_model:
-            node_ids_completed_in_stories.append(
+            node_ids_completed_in_stories[progress_model.story_id] = (
                 progress_model.completed_nodes)
-        else:
-            node_ids_completed_in_stories.append([])
 
     return node_ids_completed_in_stories
 
@@ -596,7 +594,7 @@ def get_completed_nodes_in_story(user_id, story_id):
     completed_node_ids = get_completed_node_ids(user_id, story_id)
     for node in story.story_contents.nodes:
         if node.id in completed_node_ids:
-            completed_nodes = [node.to_dict()]
+            completed_nodes.extend([node])
 
     return completed_nodes
 
