@@ -254,11 +254,6 @@ oppia.directive('audioTranslationBar', [
               if ($scope.recorder.status.isPlaying) {
                 $scope.recorder.playbackPause();
               }
-              if ($scope.recorder.status.isRecording) {
-                $scope.audioBlob = null;
-                $scope.recorder.stopRecord();
-                $rootScope.loadingMessage = 'loading';
-              }
               if ($scope.recorder.status.isConverting) {
                 $rootScope.loadingMessage = 'loading';
               }
