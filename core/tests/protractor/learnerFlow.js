@@ -395,8 +395,19 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.checkCompleteCollectionSection('Test Collection');
     users.logout();
 
-    // For desktop, create another exploration and add it to
-    // 'Test Collection'.
+    // This part of the test is desktop-only for the following reasons:
+    // 1. A user can only add an existing exploration to a collection it has
+    //    created. For desktop tests, a user creates a collection and later on,
+    //    it adds an existing exploration to the same collection. In case of
+    //    mobile tests, a predefined collection is loaded and is not created by
+    //    the user. Therefore, it cannot add an existing exploration to the
+    //    predefined collection.
+    // 2. This part involves the collection editor page, which has certain
+    //    components that are not mobile-friendly.
+    // 3. Creating and later on, editing a collection involves an admin user and
+    //    not a super admin. For mobile tests, we sign-in as a super admin.
+    // 4. The feature of adding an existing exploration to a collection using
+    //    the collection editor page is in beta presently.
     if (!browser.isMobile) {
       // Add exploration 'Collection Exploration' to 'Test Collection'
       // and publish it.
