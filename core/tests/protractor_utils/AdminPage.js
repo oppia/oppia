@@ -49,19 +49,20 @@ var AdminPage = function(){
     var reloadCollectionButtons = element.all(by.css(
       '.protractor-test-reload-collection-button'));
 
-    var explorationTitleElement = function(explorationElement) {
+    var getExplorationTitleElement = function(explorationElement) {
       return explorationElement.element(
         by.css('.protractor-test-reload-exploration-title')
       );
     };
 
-    var explorationElementReloadButton = function(explorationElement) {
+    var getExplorationElementReloadButton = function(explorationElement) {
       return explorationElement.element(
         by.css('.protractor-test-reload-exploration-button')
       );
     };
 
     this.reloadCollection = function(collectionId) {
+      this.get();
       reloadCollectionButtons.get(collectionId).click();
       general.acceptAlert();
       // Time is needed for the reloading to complete.
@@ -76,11 +77,11 @@ var AdminPage = function(){
     this.reloadExploration = function(name) {
       this.get();
       explorationElements.map(function(explorationElement) {
-        explorationTitleElement(explorationElement)
+        getExplorationTitleElement(explorationElement)
           .getText().then(function(title) {
           // We use match here in case there is whitespace around the name
             if (title.match(name)) {
-              explorationElementReloadButton(explorationElement).click();
+              getExplorationElementReloadButton(explorationElement).click();
               general.acceptAlert();
               // Time is needed for the reloading to complete.
               waitFor.textToBePresentInElement(

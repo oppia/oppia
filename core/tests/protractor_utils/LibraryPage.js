@@ -61,21 +61,16 @@ var LibraryPage = function(){
 
   var _submitSearchQuery = function(searchQuery) {
     // The library page has two search bar input elements.
-    if (browser.isMobile) {
-      // The second search bar input element is visible when the library
-      // page is rendered for mobile device.
+    // The first search bar input element is visible only in a desktop
+    // browser and is invisible in case of a mobile browser.
+    // The second search bar input element is visible when the library
+    // page is rendered for mobile device.
 
-      // get function is a zero-based index.
-      var mobileSearchInput = searchInputs.get(1);
-      mobileSearchInput.clear();
-      mobileSearchInput.sendKeys(searchQuery);
-    } else {
-      // The first search bar input element is visible only in a desktop
-      // browser and is invisible in case of a mobile browser.
-      var desktopSearchInput = searchInputs.first();
-      desktopSearchInput.clear();
-      desktopSearchInput.sendKeys(searchQuery);
-    }
+    // get function is a zero-based index.
+    var searchInput = (
+      browser.isMobile ? searchInputs.get(1) : searchInputs.first());
+    searchInput.clear();
+    searchInput.sendKeys(searchQuery);
   };
 
   this.get = function() {
