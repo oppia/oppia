@@ -719,7 +719,7 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration)
             for filename in filenames:
                 fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(exp_model.id))
+                    fs_domain.GcsFileSystem(exp_model.id))
                 fs.create_compressed_versions_of_image('image/%s' % filename)
                 yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
 
