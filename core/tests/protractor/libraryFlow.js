@@ -95,19 +95,7 @@ describe('Library pages tour', function() {
   });
 
   afterEach(function() {
-    if (browser.isMobile) {
-      general.checkForConsoleErrors([
-        // TODO(apb7): Remove these when https://github.com/oppia/oppia/issues/5363 is resolved.
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: Test Exploration"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Mismatch"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "SearchQuery: python"',
-        'http://localhost:9001/third_party/static/angularjs-1.5.8/angular.min.js 117:9 "Input: "'
-      ]);
-    } else {
-      general.checkForConsoleErrors([]);
-    }
+    general.checkForConsoleErrors([]);
   });
 });
 
