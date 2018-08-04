@@ -23,7 +23,7 @@ from core.tests import test_utils
 from extensions.rich_text_components import components
 
 
-class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
+class ComponentValidationUnitTests(test_utils.GenericTestBase):
     """Tests validation of rich text components."""
 
     def check_validation(self, cls, valid_items, invalid_items):
@@ -217,5 +217,5 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
                 defined_components.append(name)
-        defined_components.remove('BaseComponent')
+        defined_components.remove('BaseRteComponent')
         self.assertEqual(set(defined_components), set(actual_components))

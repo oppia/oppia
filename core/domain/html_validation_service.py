@@ -19,7 +19,7 @@
 import json
 
 import bs4
-from extensions.rich_text_components import components
+from extensions.rich_text_components import component_registry
 import feconf
 
 
@@ -115,18 +115,12 @@ def wrap_with_siblings(tag, p):
 
 
 # List of oppia noninteractive inline components.
-OPPIA_INLINE_COMPONENTS = [
-    'oppia-noninteractive-link',
-    'oppia-noninteractive-math'
-]
+INLINE_COMPONENTS_TAG_NAMES = (
+    component_registry.Registry.get_inline_components())
 
 # List of oppia noninteractive block components.
-OPPIA_BLOCK_COMPONENTS = [
-    'oppia-noninteractive-image',
-    'oppia-noninteractive-video',
-    'oppia-noninteractive-collapsible',
-    'oppia-noninteractive-tabs'
-]
+BLOCK_COMPONENTS_TAG_NAMES = (
+    component_registry.Registry.get_block_components())
 
 
 def convert_to_textangular(html_data):
@@ -292,7 +286,7 @@ def convert_to_textangular(html_data):
                 wrap_with_siblings(tag, soup.new_tag('p'))
 
     # Ensure that oppia inline components are wrapped in an allowed parent.
-    for tag_name in OPPIA_INLINE_COMPONENTS:
+    for tag_name in INLINE_COMPONENTS_TAG_NAMES:
         for tag in soup.findAll(name=tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -303,7 +297,7 @@ def convert_to_textangular(html_data):
             link.unwrap()
 
     # Ensure that oppia block components are wrapped in an allowed parent.
-    for tag_name in OPPIA_BLOCK_COMPONENTS:
+    for tag_name in BLOCK_COMPONENTS_TAG_NAMES:
         for tag in soup.findAll(name=tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -440,7 +434,7 @@ def convert_to_ckeditor(html_data):
                     tag.unwrap()
 
     # Move block components out of p, pre, strong and em tags.
-    for tag_name in OPPIA_BLOCK_COMPONENTS:
+    for tag_name in BLOCK_COMPONENTS_TAG_NAMES:
         for tag in soup.findAll(name=tag_name):
             while tag.parent.name in ['p', 'pre', 'strong', 'em']:
                 new_parent_for_prev = soup.new_tag(tag.parent.name)
@@ -684,19 +678,20 @@ def validate_customization_args(html_list):
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     err_dict = {}
-    RICH_TEXT_COMPONENTS = OPPIA_INLINE_COMPONENTS + OPPIA_BLOCK_COMPONENTS
+    RICH_TEXT_COMPONENTS_TAG_NAMES = (
+        INLINE_COMPONENTS_TAG_NAMES + BLOCK_COMPONENTS_TAG_NAMES)
 
-    tag_dict = {}
+    tags_to_original_html_strings = {}
     for html_string in html_list:
         soup = bs4.BeautifulSoup(
             html_string.encode(encoding='utf-8'), 'html.parser')
 
-        for tag_name in RICH_TEXT_COMPONENTS:
+        for tag_name in RICH_TEXT_COMPONENTS_TAG_NAMES:
             for tag in soup.findAll(name=tag_name):
-                tag_dict[tag] = html_string
+                tags_to_original_html_strings[tag] = html_string
 
-    for tag in tag_dict:
-        html_string = tag_dict[tag]
+    for tag in tags_to_original_html_strings:
+        html_string = tags_to_original_html_strings[tag]
         err_msg_list = list(_validate_customization_args_in_tag(tag))
         for err_msg in err_msg_list:
             if err_msg:
@@ -718,15 +713,9 @@ def _validate_customization_args_in_tag(tag):
         Error message if the attributes of tag are invalid.
     """
 
-    COMPONENT_TYPES_TO_COMPONENT_CLASSES = {
-        'oppia-noninteractive-collapsible': components.Collapsible,
-        'oppia-noninteractive-image': components.Image,
-        'oppia-noninteractive-link': components.Link,
-        'oppia-noninteractive-math': components.Math,
-        'oppia-noninteractive-tabs': components.Tabs,
-        'oppia-noninteractive-video': components.Video
-    }
-    SIMPLE_COMPONENTS = {
+    COMPONENT_TYPES_TO_COMPONENT_CLASSES = (
+        component_registry.Registry.get_component_type_to_component_classes())
+    SIMPLE_COMPONENTS_TAG_NAMES = {
         'oppia-noninteractive-image',
         'oppia-noninteractive-link',
         'oppia-noninteractive-math',
@@ -745,7 +734,7 @@ def _validate_customization_args_in_tag(tag):
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html, 'html.parser')
-            for component_name in SIMPLE_COMPONENTS:
+            for component_name in SIMPLE_COMPONENTS_TAG_NAMES:
                 for component_tag in soup_for_collapsible.findAll(
                         name=component_name):
                     for err_msg in _validate_customization_args_in_tag(
@@ -758,7 +747,7 @@ def _validate_customization_args_in_tag(tag):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html, 'html.parser')
-                for component_name in SIMPLE_COMPONENTS:
+                for component_name in SIMPLE_COMPONENTS_TAG_NAMES:
                     for component_tag in soup_for_tabs.findAll(name=tag_name):
                         for err_msg in _validate_customization_args_in_tag(
                                 component_tag):

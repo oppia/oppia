@@ -22,7 +22,7 @@ import bs4
 from extensions.objects.models import objects
 
 
-class BaseComponent(object):
+class BaseRteComponent(object):
     """Base object class.
 
     This is the superclass for rich text components in Oppia, such as
@@ -49,7 +49,7 @@ class BaseComponent(object):
             arg_obj_class.normalize(value_dict[arg_name])
 
 
-class Collapsible(BaseComponent):
+class Collapsible(BaseRteComponent):
     """Class for Collapsible component."""
 
     customization_args = {
@@ -65,15 +65,15 @@ class Collapsible(BaseComponent):
         inner_soup = bs4.BeautifulSoup(
             content.encode(encoding='utf-8'),
             'html.parser')
-        collapsible_count = len(inner_soup.findAll(
-            name='oppia-noninteractive-collapsible'))
-        tabs_count = len(inner_soup.findAll(
-            name='oppia-noninteractive-tabs'))
-        if collapsible_count or tabs_count:
+        collapsible = inner_soup.findAll(
+            name='oppia-noninteractive-collapsible')
+        tabs = inner_soup.findAll(
+            name='oppia-noninteractive-tabs')
+        if len(collapsible) or len(tabs):
             raise Exception('Nested tabs and collapsible')
 
 
-class Image(BaseComponent):
+class Image(BaseRteComponent):
     """Class for Image component."""
 
     customization_args = {
@@ -92,7 +92,7 @@ class Image(BaseComponent):
             raise Exception('Invalid filepath')
 
 
-class Link(BaseComponent):
+class Link(BaseRteComponent):
     """Class for Link component."""
 
     customization_args = {
@@ -101,7 +101,7 @@ class Link(BaseComponent):
     }
 
 
-class Math(BaseComponent):
+class Math(BaseRteComponent):
     """Class for Math component."""
 
     customization_args = {
@@ -109,7 +109,7 @@ class Math(BaseComponent):
     }
 
 
-class Tabs(BaseComponent):
+class Tabs(BaseRteComponent):
     """Class for Tabs component."""
 
     customization_args = {
@@ -132,11 +132,9 @@ class Tabs(BaseComponent):
                         'html.parser')
                     collapsible = inner_soup.findAll(
                         name='oppia-noninteractive-collapsible')
-                    collapsible_count = len(collapsible)
                     tabs = inner_soup.findAll(
                         name='oppia-noninteractive-tabs')
-                    tabs_count = len(tabs)
-                    if collapsible_count or tabs_count:
+                    if len(collapsible) or len(tabs):
                         raise Exception('Nested tabs and collapsible')
 
             else:
@@ -145,7 +143,7 @@ class Tabs(BaseComponent):
             raise Exception('Invalid attributes')
 
 
-class Video(BaseComponent):
+class Video(BaseRteComponent):
     """Class for Video component."""
 
     customization_args = {
