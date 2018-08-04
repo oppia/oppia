@@ -18,25 +18,17 @@
 
 from core.domain import calculation_registry
 from core.tests import test_utils
+from extensions.answer_summarizers import models
 
 
 class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
-    def test_calculation_registry(self):
-        """Do some sanity checks on the calculation registry."""
-        self.assertEqual(
-            len(calculation_registry.Registry.calculations_dict), 0)
-        calculation_registry.Registry.get_calculation_by_id('AnswerFrequencies')
-        self.assertEqual(
-            len(calculation_registry.Registry.calculations_dict), 6)
-
     def test_get_calculation_by_id(self):
         self.assertTrue(
             isinstance(
                 calculation_registry.Registry.get_calculation_by_id(
-                    'Top5AnswerFrequencies'),
-                calculation_registry.Registry.calculations_dict[
-                    'Top5AnswerFrequencies']))
+                    'AnswerFrequencies'),
+                models.AnswerFrequencies))
         with self.assertRaises(TypeError):
             calculation_registry.Registry.get_calculation_by_id('a')

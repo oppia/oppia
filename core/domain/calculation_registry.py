@@ -25,7 +25,7 @@ class Registry(object):
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
-    calculations_dict = {}
+    _calculations_dict = {}
 
     @classmethod
     def _refresh_registry(cls):
