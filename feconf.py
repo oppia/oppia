@@ -155,11 +155,13 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
+# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 24
+CURRENT_STATES_SCHEMA_VERSION = 24
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -205,6 +207,10 @@ DEFAULT_EXPLORATION_TITLE = ''
 DEFAULT_EXPLORATION_CATEGORY = ''
 # Default objective for a newly-minted exploration.
 DEFAULT_EXPLORATION_OBJECTIVE = ''
+
+# NOTE TO DEVELOPERS: If any of the 5 constants below are modified, the
+# corresponding field in NEW_STATE_TEMPLATE in constants.js also has to be
+# modified.
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
@@ -639,7 +645,6 @@ TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
-QUESTION_CREATION_URL = '/question_editor_handler/create_new'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'

@@ -16,16 +16,18 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-describe('State Editor controller', function() {
-  describe('StateEditor', function() {
+describe('Exploration editor tab controller', function() {
+  describe('ExplorationEditorTab', function() {
     var scope, ecs, ess, scs;
 
     beforeEach(module('oppia'));
     beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
-      ecs = $injector.get('EditorStateService');
+      rootScope = $injector.get('$rootScope');
+      spyOn(rootScope, '$broadcast');
+      ecs = $injector.get('StateEditorService');
       ess = $injector.get('ExplorationStatesService');
-      scs = $injector.get('stateContentService');
+      scs = $injector.get('StateContentService');
 
       ess.init({
         'First State': {
@@ -154,16 +156,21 @@ describe('State Editor controller', function() {
         }
       });
 
-      $controller('StateEditor', {
+      $controller('ExplorationEditorTab', {
         $scope: scope,
         ExplorationStatesService: ess
       });
     }));
 
-    it('should initialize the state name and related properties', function() {
+    it('should correctly broadcast the stateEditorInitialized flag with ' +
+       'the state data', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
-      expect(scs.savedMemento.getHtml()).toEqual('This is some content.');
+      expect(
+        rootScope.$broadcast
+      ).toHaveBeenCalledWith(
+        'stateEditorInitialized', ess.getState('Third State')
+      );
     });
   });
 });

@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import html_cleaner
+from core.domain import interaction_registry
 from core.platform import models
 import feconf
 import utils
@@ -179,13 +180,14 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
+        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_state_data.interaction
         for answer_group in interaction.answer_groups:
-            if answer_group.labelled_as_correct:
+            if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
-            if answer_group.dest is not None:
+            if answer_group.outcome.dest is not None:
                 dest_is_specified = True
 
         if interaction.default_outcome.labelled_as_correct:
@@ -209,7 +211,9 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint')
 
-        if interaction.solution is None:
+        if (
+                (interaction.solution is None) and
+                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
@@ -244,7 +248,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            feconf.CURRENT_STATES_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_language_code(self, language_code):

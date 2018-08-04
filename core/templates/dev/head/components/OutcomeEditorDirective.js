@@ -27,21 +27,24 @@ oppia.directive('outcomeEditor', [
         getOnSaveFeedbackFn: '&onSaveFeedback',
         getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
-        suppressWarnings: '&suppressWarnings'
+        onSaveContentIdsToAudioTranslations: '=',
+        areWarningsSuppressed: '&warningsAreSuppressed',
+        addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditorStateService',
-        'stateContentIdsToAudioTranslationsService',
-        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
-        'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
+        '$scope', '$uibModal', 'StateEditorService',
+        'StateContentIdsToAudioTranslationsService',
+        'StateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
+        'INTERACTION_SPECS',
         function(
-            $scope, $uibModal, EditorStateService,
-            stateContentIdsToAudioTranslationsService,
-            stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
-            ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
+            $scope, $uibModal, StateEditorService,
+            StateContentIdsToAudioTranslationsService,
+            StateInteractionIdService, COMPONENT_NAME_FEEDBACK,
+            INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
@@ -49,22 +52,22 @@ oppia.directive('outcomeEditor', [
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
-          $scope.stateContentIdsToAudioTranslationsService =
-            stateContentIdsToAudioTranslationsService;
+          $scope.StateContentIdsToAudioTranslationsService =
+            StateContentIdsToAudioTranslationsService;
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return StateEditorService.getCorrectnessFeedbackEnabled();
           };
 
           // This returns false if the current interaction ID is null.
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-          };
-
-          $scope.isCorrectnessFeedbackEnabled = function() {
-            return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
@@ -77,9 +80,11 @@ oppia.directive('outcomeEditor', [
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               var feedbackContentId = $scope.outcome.feedback.getContentId();
-              stateContentIdsToAudioTranslationsService.displayed
+              StateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(feedbackContentId);
-              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.onSaveContentIdsToAudioTranslations(
+                StateContentIdsToAudioTranslationsService.displayed);
             });
           };
 
@@ -123,11 +128,11 @@ oppia.directive('outcomeEditor', [
           $scope.isSelfLoop = function(outcome) {
             return (
               outcome &&
-              outcome.dest === EditorStateService.getActiveStateName());
+              outcome.dest === StateEditorService.getActiveStateName());
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
@@ -169,7 +174,7 @@ oppia.directive('outcomeEditor', [
             $scope.savedOutcome.feedback = angular.copy(
               $scope.outcome.feedback);
             var feedbackContentId = $scope.savedOutcome.feedback.getContentId();
-            if (stateContentIdsToAudioTranslationsService.displayed
+            if (StateContentIdsToAudioTranslationsService.displayed
               .hasUnflaggedAudioTranslations(feedbackContentId) &&
               fromClickSaveFeedbackButton && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();

@@ -20,12 +20,12 @@ oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'SolutionValidityService',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES) {
+      WARNING_TYPES, STATE_ERROR_MESSAGES, SolutionValidityService) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -50,7 +50,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !ExplorationStatesService.isSolutionValid(stateName)) {
+            !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
