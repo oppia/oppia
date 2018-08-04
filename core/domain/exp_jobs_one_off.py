@@ -705,7 +705,6 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
         # This job is allowed to run only in Production environment since it
         # uses GcsFileSystem which can't be used in Development environment.
         if not feconf.DEV_MODE:
-            instance_id = exp_model.id
             exploration = exp_services.get_exploration_by_id(exp_model.id)
             filenames = exp_services.get_image_filenames_from_exploration(
                 exploration)
