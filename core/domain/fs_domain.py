@@ -595,7 +595,7 @@ class GcsFileSystem(object):
         org_image_content = self.get_file_content(filepath)
         compressed_image_content = gae_image_services.compress_image(
             org_image_content, scaling_factor=0.8)
-        micro_image_content = gae_image_services.compress(
+        micro_image_content = gae_image_services.compress_image(
             org_image_content, scaling_factor=0.7)
 
         self.commit(
