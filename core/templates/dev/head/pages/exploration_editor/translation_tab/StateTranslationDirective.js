@@ -25,12 +25,12 @@ oppia.directive('stateTranslation', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
+        '$scope', '$filter', '$timeout', '$rootScope', 'StateEditorService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
         'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'ExplorationCorrectnessFeedbackService', 'RouterService',
         function(
-            $scope, $filter, $timeout, $rootScope, EditorStateService,
+            $scope, $filter, $timeout, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
             INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             ExplorationCorrectnessFeedbackService, RouterService) {
@@ -184,12 +184,12 @@ oppia.directive('stateTranslation', [
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
-            if (!EditorStateService.getActiveStateName()) {
-              EditorStateService.setActiveStateName(
+            if (!StateEditorService.getActiveStateName()) {
+              StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.displayed);
             }
 
-            var stateName = EditorStateService.getActiveStateName();
+            var stateName = StateEditorService.getActiveStateName();
 
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);

@@ -20,7 +20,7 @@
 oppia.controller('PreviewTab', [
   '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
-  'ExplorationCategoryService', 'EditorStateService',
+  'ExplorationCategoryService', 'StateEditorService',
   'ExplorationInitStateNameService', 'ExplorationParamChangesService',
   'ExplorationParamSpecsService', 'ExplorationStatesService',
   'ExplorationTitleService', 'ExplorationPlayerService',
@@ -29,7 +29,7 @@ oppia.controller('PreviewTab', [
   function(
       $scope, $uibModal, $q, $timeout, LearnerParamsService,
       ExplorationDataService, ExplorationAdvancedFeaturesService,
-      ExplorationCategoryService, EditorStateService,
+      ExplorationCategoryService, StateEditorService,
       ExplorationInitStateNameService, ExplorationParamChangesService,
       ExplorationParamSpecsService, ExplorationStatesService,
       ExplorationTitleService, ExplorationPlayerService,
@@ -37,7 +37,7 @@ oppia.controller('PreviewTab', [
       UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
     ExplorationDataService.getData().then(function() {
-      var initStateNameForPreview = EditorStateService.getActiveStateName();
+      var initStateNameForPreview = StateEditorService.getActiveStateName();
       var manualParamChanges = [];
 
       // Show a warning message if preview doesn't start from the first state
@@ -134,7 +134,7 @@ oppia.controller('PreviewTab', [
     // preview mode, ensuring that the state does not change when toggling
     // between editor and preview.
     $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-      EditorStateService.setActiveStateName(stateName);
+      StateEditorService.setActiveStateName(stateName);
     });
 
     $scope.allParams = {};
