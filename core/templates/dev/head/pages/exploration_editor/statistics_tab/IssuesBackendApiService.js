@@ -23,12 +23,17 @@ oppia.constant(
   'FETCH_PLAYTHROUGH_URL',
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
+oppia.constant(
+  'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
+
 oppia.factory('IssuesBackendApiService', [
   '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
+  'RESOLVE_ISSUE_URL',
   function(
       $http, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL) {
+      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
+      RESOLVE_ISSUE_URL) {
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {
@@ -41,6 +46,13 @@ oppia.factory('IssuesBackendApiService', [
         FETCH_PLAYTHROUGH_URL, {
           exploration_id: expId,
           playthrough_id: playthroughId
+        });
+    };
+
+    var getFullResolveIssueUrl = function(explorationId) {
+      return UrlInterpolationService.interpolateUrl(
+        RESOLVE_ISSUE_URL, {
+          exploration_id: explorationId
         });
     };
     return {
@@ -62,6 +74,12 @@ oppia.factory('IssuesBackendApiService', [
             return PlaythroughObjectFactory.createFromBackendDict(
               playthroughDict);
           });
+      },
+      resolveIssue: function(issue, expId, expVersion) {
+        $http.post(getFullResolveIssueUrl(expId), {
+          exp_issue_dict: ExplorationIssueObjectFactory.toBackendDict(issue),
+          exp_version: expVersion
+        });
       }
     };
   }]);

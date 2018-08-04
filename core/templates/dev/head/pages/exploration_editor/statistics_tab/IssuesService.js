@@ -63,6 +63,10 @@ oppia.factory('IssuesService', [
         if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(issue);
         }
+      },
+      resolveIssue: function(issue) {
+        IssuesBackendApiService.resolveIssue(
+          issue, explorationId, explorationVersion);
       }
     };
   }]);

@@ -60,6 +60,13 @@ oppia.directive('issuesDirective', [
               'issueNav' + nextIssueIndex).classList.add('bg-clr');
             $scope.currentIssueIndex = nextIssueIndex;
           };
+
+          $scope.resolveIssue = function(currentIssueIndex) {
+            var issue = $scope.issues[currentIssueIndex];
+            IssuesService.resolveIssue(issue);
+            // TODO(pranavsid98): Figure out how to do a hard refresh.
+            $scope.issues.splice(currentIssueIndex, 1);
+          };
         }
       ]
     };

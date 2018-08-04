@@ -11,18 +11,27 @@
       </div>
     </div>
     <div class="col-md-9 oppia-issues-border-gray">
-      <div ng-repeat="issue in issues">
-        <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
-          <div ng-if="issue.issueType == 'EarlyQuit'">
-            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+      <div class="row">
+        <div ng-repeat="issue in issues">
+          <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
+            <div ng-if="issue.issueType == 'EarlyQuit'">
+              <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
           </div>
-        </div>
-        <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
-          <div ng-if="issue.issueType == 'EarlyQuit'">
-            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+          <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
+            <div ng-if="issue.issueType == 'EarlyQuit'">
+              <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
           </div>
+          <!-- TODO(pranavsid98): Implement remaining issue types. -->
         </div>
-        <!-- TODO(pranavsid98): Implement remaining issue types. -->
+      </div>
+      <div class="row">
+        <div class="oppia-pt4 oppia-pb2 justify-content-end">
+          <button type="button" onclick="resolveIssue(currentIssueIndex)" class="oppia-issues-bg-clr oppia-issues-text-white oppia-ft-14 oppia-issues-btn-resolve">
+              Mark as Resolved
+          </button>
+        </div>
       </div>
     </div>
   </div>
