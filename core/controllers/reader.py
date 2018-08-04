@@ -285,20 +285,20 @@ class ExplorationHandler(base.BaseHandler):
                 }
 
         pretest_question_dicts = []
+        next_cursor = None
         if story_id:
             story = story_services.get_story_by_id(story_id, strict=False)
             if story is None:
                 raise self.InvalidInputException
 
-            if (
-                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id)
-                    is None):
+            if not story.has_exploration(exploration_id):
                 raise self.InvalidInputException
 
-            pretest_questions = (
+            pretest_questions, next_cursor = (
                 question_services.get_questions_by_skill_ids(
                     feconf.NUM_PRETEST_QUESTIONS,
-                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id))
+                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
+                    '')
             )
             pretest_question_dicts = [
                 question.to_dict() for question in pretest_questions
@@ -311,6 +311,7 @@ class ExplorationHandler(base.BaseHandler):
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
             'pretest_question_dicts': pretest_question_dicts,
+            'next_cursor_for_pretests': next_cursor,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
@@ -319,6 +320,38 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
+        })
+        self.render_json(self.values)
+
+
+class PretestHandler(base.BaseHandler):
+    """Provides subsequent pretest questions after initial batch."""
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id):
+        """Handles GET request."""
+        start_cursor = self.request.get('cursor')
+        story_id = self.request.get('story_id')
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise self.InvalidInputException
+
+        if not story.has_exploration(exploration_id):
+            raise self.InvalidInputException
+
+        pretest_questions, next_start_cursor = (
+            question_services.get_questions_by_skill_ids(
+                feconf.NUM_PRETEST_QUESTIONS,
+                story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
+                start_cursor)
+        )
+        pretest_question_dicts = [
+            question.to_dict() for question in pretest_questions
+        ]
+
+        self.values.update({
+            'pretest_question_dicts': pretest_question_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
