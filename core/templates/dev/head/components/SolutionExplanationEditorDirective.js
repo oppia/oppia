@@ -35,7 +35,7 @@ oppia.directive('solutionExplanationEditor', [
             StateContentIdsToAudioTranslationsService, StateSolutionService,
             COMPONENT_NAME_SOLUTION) {
           $scope.isEditable = EditabilityService.isEditable();
-          $scope.isInQuestionMode = StateEditorService.isInQuestionMode();
+          $scope.questionModeEnabled = StateEditorService.isInQuestionMode();
           $scope.editSolutionForm = {};
           $scope.explanationEditorIsOpen = false;
 
