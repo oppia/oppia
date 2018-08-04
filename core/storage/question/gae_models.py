@@ -231,7 +231,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_ids, next_cursor_str
 
     @classmethod
-    def get_question_skill_models_of_skill(cls, skill_id):
+    def get_models_by_skill_id(cls, skill_id):
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
