@@ -1253,6 +1253,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
         fs.commit(
             self.COMMITER_ID, self.FILENAME, imageData,
             mimetype=mimetype)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
 
         job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
         exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
@@ -1264,6 +1265,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
             u"[u'Number of files that got deleted', 1]"
         ]
 
+        self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(actual_output, expected_output)
 
 
