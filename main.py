@@ -373,9 +373,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
         question_editor.EditableQuestionDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.SCHEMA_VERSION_URL,
-        question_editor.QuestionDataSchemaVersionHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

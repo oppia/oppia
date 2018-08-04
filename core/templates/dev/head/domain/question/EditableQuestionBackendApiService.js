@@ -71,18 +71,6 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _fetchSchemaVersion = function(successCallback, errorCallback) {
-      $http.get(SCHEMA_VERSION_URL).then(function(response) {
-        if (successCallback) {
-          successCallback(response.data.schema_version);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
     var _updateQuestion = function(
         questionId, questionVersion, commitMessage, changeList,
         successCallback, errorCallback) {
@@ -120,12 +108,6 @@ oppia.factory('EditableQuestionBackendApiService', [
       fetchQuestion: function(questionId) {
         return $q(function(resolve, reject) {
           _fetchQuestion(questionId, resolve, reject);
-        });
-      },
-
-      fetchStatesSchemaVersion: function() {
-        return $q(function(resolve, reject) {
-          _fetchSchemaVersion(resolve, reject);
         });
       },
 
