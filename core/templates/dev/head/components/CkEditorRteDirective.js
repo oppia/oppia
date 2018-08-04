@@ -166,8 +166,8 @@ oppia.directive('ckEditorRte', [
               .css('background-image', 'url("/extensions' + icon + '")')
               .css('background-position', 'center')
               .css('background-repeat', 'no-repeat')
-              .css('height', '26px')
-              .css('width', '26px')
+              .css('height', '24px')
+              .css('width', '24px')
               .css('padding', '0px 0px');
           });
 
@@ -175,8 +175,8 @@ oppia.directive('ckEditorRte', [
             .css('height', '22px');
 
           $('.cke_button_icon')
-            .css('height', '26px')
-            .css('width', '26px');
+            .css('height', '24px')
+            .css('width', '24px');
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
 
