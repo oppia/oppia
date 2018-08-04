@@ -690,6 +690,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (status, values)
 
+
 class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for checking that all the images in the GAE are there in
     the GCS or not.
