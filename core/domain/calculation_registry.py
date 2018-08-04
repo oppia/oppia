@@ -42,7 +42,7 @@ class Registry(object):
             if 'BaseCalculation' not in ancestor_names:
                 continue
 
-            cls.calculations_dict[clazz.__name__] = clazz
+            cls._calculations_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_calculation_by_id(cls, calculation_id):
@@ -51,9 +51,9 @@ class Registry(object):
         Refreshes once if the class is not found; subsequently, throws an
         error.
         """
-        if calculation_id not in cls.calculations_dict:
+        if calculation_id not in cls._calculations_dict:
             cls._refresh_registry()
-        if calculation_id not in cls.calculations_dict:
+        if calculation_id not in cls._calculations_dict:
             raise TypeError(
                 '\'%s\' is not a valid calculation id.' % calculation_id)
-        return cls.calculations_dict[calculation_id]()
+        return cls._calculations_dict[calculation_id]()
