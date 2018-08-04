@@ -332,7 +332,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
 
-    # Needs to be 12 characteds long.
+    # Needs to be 12 characters long.
     SKILL_ID = 'skill1234567'
 
     SKILL_DESCRIPTION = 'skill to link question to'
