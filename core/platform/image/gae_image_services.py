@@ -16,12 +16,12 @@
 
 """Provides app identity services."""
 import io
-import feconf
 
 from PIL import Image
-from google.appengine.api import images
-
 from core.platform import models
+import feconf
+
+from google.appengine.api import images
 
 app_identity_services = models.Registry.import_app_identity_services()
 
