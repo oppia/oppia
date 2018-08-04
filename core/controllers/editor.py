@@ -774,9 +774,8 @@ class ImageUploadHandler(EditorHandler):
 
         fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
 
-        if not feconf.DEV_MODE:
-            fs.create_compressed_versions_of_image(
-                '%s/%s' % (self._FILENAME_PREFIX, filename))
+        fs.create_compressed_versions_of_image(
+            '%s/%s' % (self._FILENAME_PREFIX, filename))
 
         self.render_json({'filepath': filename})
 
