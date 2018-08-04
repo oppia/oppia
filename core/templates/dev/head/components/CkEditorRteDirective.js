@@ -85,30 +85,18 @@ oppia.directive('ckEditorRte', [
 
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
-          'widget', '/third_party/static/ckeditor-widget-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
-          'lineutils',
-          '/third_party/static/ckeditor-lineutils-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
           'sharedspace',
           '/third_party/static/ckeditor-sharedspace-4.9.2/', 'plugin.js');
         // Pre plugin is not available for 4.9.2 version of CKEditor. This is
         // a self created plugin (other plugins are provided by CKEditor).
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
-          'indentblock',
-          '/third_party/static/ckeditor-indentblock-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
-          'blockquote',
-          '/third_party/static/ckeditor-blockquote-4.9.2/', 'plugin.js');
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
-          extraPlugins:
-          'indentblock,pre,blockquote,widget,lineutils,sharedspace,' +
-          pluginNames,
+          extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: true,
+          removePlugins: 'indentblock',
           title: false,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
@@ -187,7 +175,6 @@ oppia.directive('ckEditorRte', [
             .css('height', '22px');
 
           $('.cke_button_icon')
-            .css('opacity', '1.0')
             .css('height', '26px')
             .css('width', '26px');
           ck.setData(wrapComponents(ngModel.$viewValue));
@@ -205,7 +192,31 @@ oppia.directive('ckEditorRte', [
         }, null, null, 20);
 
         ck.on('change', function() {
-          ngModel.$setViewValue(ck.getData());
+          var elt = $('<div>' + ck.getData() + '</div>');
+          var textElt = elt[0].childNodes;
+          for (var i = textElt.length; i > 0; i--) {
+            for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+              if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+                (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                  textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+                textElt[i - 1].childNodes[j - 1].remove();
+              } else {
+                break;
+              }
+            }
+            if (textElt[i - 1].childNodes.length === 0) {
+              if (textElt[i - 1].nodeName === 'BR' ||
+                (textElt[i - 1].nodeName === '#text' &&
+                  textElt[i - 1].nodeValue.trim() === '') ||
+                  textElt[i - 1].nodeName === 'P') {
+                textElt[i - 1].remove();
+                continue;
+              }
+            } else {
+              break;
+            }
+          }
+          ngModel.$setViewValue(elt.html());
         });
 
         ngModel.$render = function() {

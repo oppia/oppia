@@ -1,0 +1,93 @@
+<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown">
+  <div class="questions">
+    <h3 class="form-heading"> Questions included in this topic </h3>
+    <button class="btn btn-default"
+            ng-click="createQuestion()"
+            style="float: right;">
+      Create Question
+    </button>
+    <table class="dashboard-table">
+      <colgroup>
+        <col style="width: 10%;">
+        <col style="width: 90%;">
+      </colgroup>
+      <tr>
+        <th class="dashboard-table-headings">
+          <p> No. </p>
+        </th>
+        <th class="dashboard-table-headings">
+          <p> Question Content </p>
+        </th>
+      </tr>
+      <tr ng-repeat="question in questionSummaries"
+          class="list-item">
+        <td> <[$index + 1]> </td>
+        <td>
+          <a ng-click="showQuestionEditor(question.id)" class="list-summary">
+            <span> <[question.question_content]> </span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <h4 ng-if="questionSummaries.length === 0" style="color: gray;">
+      Click on Create Question to create a new question and link it to a skill in this topic
+    </h4>
+  </div>
+</md-card>
+<question-editor ng-if="questionEditorIsShown"
+                 question-id="questionId"
+                 question-state-data="questionStateData">
+</question-editor>
+
+<style>
+  questions-tab .oppia-page-card {
+    margin-top: 2%;
+    margin-left: 10%;
+    width: 80%;
+  }
+
+  questions-tab .dashboard-table {
+    font-size: 15px;
+    text-align: center;
+    width: 100%;
+  }
+
+  questions-tab .list-summary,
+  questions-tab .list-summary:active,
+  questions-tab .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  questions-tab .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  questions-tab .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+
+  questions-tab .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  questions-tab .list-item:hover {
+    background-color: #ededed;
+  }
+
+  questions-tab .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+
+  @media(max-width: 815px) {
+    questions-tab .list-summary .additional-text{
+      display: none;
+    }
+  }
+</style>

@@ -188,7 +188,8 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_collection_rights_handler(self):
         collection_id = 'collection_id'
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, 'A title', 'A Category', 'An Objective')
+            collection_id, title='A title',
+            category='A Category', objective='An Objective')
         collection_services.save_new_collection(self.owner_id, collection)
 
         # Check that collection is published correctly.
@@ -221,7 +222,8 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         collection_id = 'collection_id'
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, 'A title', 'A Category', 'An Objective')
+            collection_id, title='A title',
+            category='A Category', objective='An Objective')
         collection_services.save_new_collection(self.owner_id, collection)
 
         # Check that collection is published correctly.
@@ -256,7 +258,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response_dict = self.put_json(
             '/collection_editor_handler/publish/%s' % collection_id,
             {'version': collection.version},
-            csrf_token)
+            csrf_token=csrf_token)
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
@@ -268,6 +270,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response_dict = self.put_json(
             '/collection_editor_handler/unpublish/%s' % collection_id,
             {'version': collection.version},
-            csrf_token)
+            csrf_token=csrf_token)
         self.assertTrue(response_dict['is_private'])
         self.logout()

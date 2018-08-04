@@ -21,7 +21,7 @@
     <div>
       <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
     </div>
-    <div ng-if="topicSummaries.length > 0 || untriagedSkillSummaries.length > 0">
+    <div ng-if="topicSummaries.length > 0 || untriagedSkillSummaries.length > 0 || unpublishedSkillSummaries.length > 0">
       <ul class="dashboard-tabs">
         <li ng-if="topicSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
@@ -31,10 +31,17 @@
           </a>
         </li>
         <li ng-if="untriagedSkillSummaries.length > 0"
-            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_SKILLS)">
+             ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
              Untriaged Skills
+          </a>
+        </li>
+        <li ng-if="unpublishedSkillSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNPUBLISHED_SKILLS}">
+          <a class="dashboard-tabs-text"
+             ng-click="setActiveTab(TAB_NAME_UNPUBLISHED_SKILLS)">
+             Unpublished Skills
           </a>
         </li>
       </ul>
@@ -46,15 +53,20 @@
         </topics-list>
       </div>
 
-      <div ng-if="activeTab === TAB_NAME_SKILLS">
+      <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
         <skills-list skill-summaries="untriagedSkillSummaries"
+                     editable-topic-summaries="editableTopicSummaries">
+        </skills-list>
+      </div>
+
+      <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
+        <skills-list skill-summaries="unpublishedSkillSummaries"
                      editable-topic-summaries="editableTopicSummaries">
         </skills-list>
       </div>
     </div>
 
-
-    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && untriagedSkillSummaries.length === 0">
+    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && untriagedSkillSummaries.length === 0 && unpublishedSkillSummaries.length === 0">
       <blockquote class="intro-card">
         <p class="intro-card-message" style="padding-top: 6px;">
           No topics or skills have been created yet.
@@ -203,14 +215,14 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/topic/EditableTopicBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
 {% endblock footer_js %}

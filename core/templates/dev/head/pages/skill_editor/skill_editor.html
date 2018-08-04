@@ -26,31 +26,59 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/MisconceptionEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorStateService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorNavbarDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/MisconceptionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/SkillEditor.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/SkillEditorStateService.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/SkillEditorNavbarDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/ConceptCardObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/MisconceptionObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/EditableSkillBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillUpdateService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillRightsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/ConceptCardObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/MisconceptionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillRightsBackendApiService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SummaryListHeaderDirective.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillUpdateService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
+  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+
+  <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
+  <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+  <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
+
+  <script src="/templates/dev/head/components/SummaryListHeaderDirective.js"></script>
+
+  <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
+  {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}

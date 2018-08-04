@@ -30,8 +30,6 @@ describe('Testing filters', function() {
     'parameterizeRuleDescription',
     'normalizeWhitespace',
     'convertToPlainText',
-    'summarizeAnswerGroup',
-    'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',

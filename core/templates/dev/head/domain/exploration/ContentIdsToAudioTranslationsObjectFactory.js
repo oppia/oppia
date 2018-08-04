@@ -93,7 +93,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
     };
 
     ContentIdsToAudioTranslations.prototype.deleteAllFeedbackContentId =
-      function(contentId) {
+      function() {
         var ContentIdList = this.getAllContentId();
         var searchKey = COMPONENT_NAME_FEEDBACK + '_';
         for (index in ContentIdList) {

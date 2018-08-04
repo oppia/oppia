@@ -18,13 +18,17 @@
 oppia.constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
 
+oppia.constant(
+  'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
+  '/topic_editor_question_handler/<topic_id>');
+
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
   'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE', 'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
       SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService,
-      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
+      TOPIC_EDITOR_STORY_URL_TEMPLATE, TOPIC_EDITOR_QUESTION_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -64,6 +68,26 @@ oppia.factory('EditableTopicBackendApiService', [
           response.data.canonical_story_summary_dicts);
         if (successCallback) {
           successCallback(canonicalStorySummaries);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchQuestions = function(
+        topicId, successCallback, errorCallback) {
+      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_EDITOR_QUESTION_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+
+      $http.get(questionsDataUrl).then(function(response) {
+        var questionSummaries = angular.copy(
+          response.data.question_summary_dicts);
+        if (successCallback) {
+          successCallback(questionSummaries);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -149,6 +173,12 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchStories: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchStories(topicId, resolve, reject);
+        });
+      },
+
+      fetchQuestions: function(topicId) {
+        return $q(function(resolve, reject) {
+          _fetchQuestions(topicId, resolve, reject);
         });
       },
 

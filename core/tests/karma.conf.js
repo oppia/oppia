@@ -24,7 +24,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
-      'third_party/static/math-expressions-370a77/build/math-expressions.js',
+      'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
       generatedJs,
       'core/templates/dev/head/*.js',
@@ -117,7 +117,14 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      prependPrefix: '/'
+      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // the key that we use for that cache needs to be exactly the same as
+      // the templateUrl in directive JS. The stripPrefix and prependPrefix are
+      // used for modifying the $templateCache keys.
+      // If the key starts with core/ we need to get rid of that.
+      stripPrefix: 'core/',
+      // Every key must start with /.
+      prependPrefix: '/',
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'

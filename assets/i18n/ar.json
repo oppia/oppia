@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "شغل",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "التقييم",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "إجابات لم يتم حلها",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "لوحة تحكم المواضيع والمهارات",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "سحب صورة إلى هذه المنطقة",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "رفع ملف",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تعطيل الاستكشاف",
@@ -194,6 +195,7 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "مسح",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "تشغيل",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "تشغيل تسلسل الهدف",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "تنسيقات الوحدات المحتملة",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "هل تريد بالتأكيد إعادة تعيين الرمز؟",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "إلغاء",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "التأكيد مطلوب",
@@ -434,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "المنتدى",
 	"I18N_SIDEBAR_GET_STARTED": "ابدأ",
 	"I18N_SIDEBAR_LIBRARY_LINK": "المكتبة",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "مؤسسة أوبيا",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "التعليم مع أوبيا",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "من خلال تحديد المربع الموجود على يمين هذا النص، فإنك تقر وتوافق وتقبل الالتزام ببنود <[sitename]>شروط الاستخدام، الموجودة<a href=\"/terms\" target=\"_blank\">هنا</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "إرسال والبدء في المساهمة",
@@ -520,5 +523,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "الدخول عن طريق جوجل",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "التعليم مع أوبيا",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "لديك ما مجموعه <[totalSubscribers]> مشترك.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "إلغاء الاشتراك"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "إلغاء الاشتراك",
+	"I18N_WORKED_EXAMPLE": "مثال على العمل"
 }

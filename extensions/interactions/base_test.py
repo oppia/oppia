@@ -328,12 +328,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%s.js">'
                 '</script>' % (interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%sValidationService.js"></script>' % (
                     interaction_id, interaction_id),
                 html_file_content)
@@ -350,7 +350,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the specified interaction id is the same as the class
             # name.
-            self.assertTrue(interaction_id, interaction.__class__.__name__)
+            self.assertTrue(interaction_id, msg=interaction.__class__.__name__)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
@@ -454,9 +454,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertNotEqual(
-                    len(interaction.rules_dict), 1,
-                    'Expected trainable interaction to have more than just a '
-                    'classifier: %s' % interaction_id)
+                    len(interaction.rules_dict), 1, msg=(
+                        'Expected trainable interaction to have more '
+                        'classifier: %s' % interaction_id))
 
     def test_linear_interactions(self):
         """Sanity-check for the number of linear interactions."""
@@ -492,6 +492,6 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        self.assertEqual(len(missing_interaction_ids), 0, (
+        self.assertEqual(len(missing_interaction_ids), 0, msg=(
             'Missing interaction IDs in demo exploration: %s' %
             missing_interaction_ids))
