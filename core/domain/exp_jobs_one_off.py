@@ -43,6 +43,8 @@ _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
+ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
+    'Added compressed versions of images in exploration')
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
 
@@ -691,8 +693,8 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for creating different versions of the images
-    in the exploration from the GAE to GCS.
+    """One-off job for creating compressed versions of the images
+    of the exploration in the GCS.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -708,8 +710,10 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
             filenames = exp_services.get_image_filenames_from_exploration(
                 exploration)
             for filename in filenames:
-                image_services.create_different_versions(filename, exp_model.id)
-                yield ('Added the three versions', exp_model.id)
+                fs = fs_domain.AbstractFileSystem(
+                        fs_domain.GcsFileSystem(exp_model.id))
+                fs.create_compressed_versions_of_image('image/%s' % filename)
+                yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
 
 
     @staticmethod
