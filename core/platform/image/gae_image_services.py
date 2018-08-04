@@ -53,7 +53,7 @@ def compress_image(image_content, scaling_factor=1):
     if not feconf.DEV_MODE:
         height, width = get_image_dimensions(image_content)
         return images.resize(
-            image_data=image_content, width=(width * scaling_factor),
-            height=(height * scaling_factor))
+            image_data=image_content, width=int(width * scaling_factor),
+            height=int(height * scaling_factor))
     else:
         return image_content
