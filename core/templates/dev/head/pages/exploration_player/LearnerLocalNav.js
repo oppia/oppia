@@ -20,13 +20,13 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$uibModal', '$http', 'ExplorationPlayerService', 'AlertsService',
+  '$scope', '$uibModal', '$http', 'ExplorationEngineService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
   'FLAG_EXPLORATION_URL_TEMPLATE', function(
-      $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
+      $scope, $uibModal, $http, ExplorationEngineService, AlertsService,
       FocusManagerService, UrlInterpolationService,
       FLAG_EXPLORATION_URL_TEMPLATE) {
-    $scope.explorationId = ExplorationPlayerService.getExplorationId();
+    $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = GLOBALS.username;
     $scope.showLearnerSuggestionModal = function() {
@@ -38,12 +38,12 @@ oppia.controller('LearnerLocalNav', [
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationPlayerService',
+          'ExplorationEngineService',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationPlayerService) {
+              ExplorationEngineService) {
             var stateName = PlayerPositionService.getCurrentStateName();
-            $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
+            $scope.originalHtml = ExplorationEngineService.getStateContentHtml(
               stateName);
             $scope.description = '';
             // ng-model needs to bind to a property of an object on
@@ -62,16 +62,16 @@ oppia.controller('LearnerLocalNav', [
 
             $scope.submitSuggestion = function() {
               var data = {
-                id: ExplorationPlayerService.getExplorationId(),
-                version: ExplorationPlayerService.getExplorationVersion(),
+                id: ExplorationEngineService.getExplorationId(),
+                version: ExplorationEngineService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
                 suggestionHtml: $scope.suggestionData.suggestionHtml
               };
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 data = {
-                  target_id: ExplorationPlayerService.getExplorationId(),
-                  version: ExplorationPlayerService.getExplorationVersion(),
+                  target_id: ExplorationEngineService.getExplorationId(),
+                  version: ExplorationEngineService.getExplorationVersion(),
                   stateName: stateName,
                   suggestion_type: 'edit_exploration_state_content',
                   target_type: 'exploration',

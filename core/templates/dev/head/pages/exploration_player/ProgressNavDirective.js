@@ -31,12 +31,12 @@ oppia.directive('progressNav', [
         '/pages/exploration_player/progress_nav_directive.html'),
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
-        'PlayerTranscriptService', 'ExplorationPlayerService',
-        'ExplorationPlayerStateService', 'WindowDimensionsService',
+        'PlayerTranscriptService', 'ExplorationEngineService',
+        'WindowDimensionsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         function($scope, $rootScope, PlayerPositionService, UrlService,
-            PlayerTranscriptService, ExplorationPlayerService,
-            ExplorationPlayerStateService, WindowDimensionsService,
+            PlayerTranscriptService, ExplorationEngineService,
+            WindowDimensionsService,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
@@ -53,13 +53,13 @@ oppia.directive('progressNav', [
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
             $scope.conceptCardIsBeingShown =
-              ExplorationPlayerStateService.isStateShowingConceptCard(
+              ExplorationEngineService.isStateShowingConceptCard(
                 $scope.activeCard.stateName);
             if (!$scope.conceptCardIsBeingShown) {
-              var interaction = ExplorationPlayerService.getInteraction(
+              var interaction = ExplorationEngineService.getInteraction(
                 $scope.activeCard.stateName);
               interactionIsInline = (
-                ExplorationPlayerStateService.isInteractionInline(
+                ExplorationEngineService.isInteractionInline(
                   $scope.activeCard.stateName));
               $scope.interactionCustomizationArgs =
                 interaction.customizationArgs;
@@ -100,7 +100,7 @@ oppia.directive('progressNav', [
 
             return (interactionHasNavSubmitButton && (
               interactionIsInline ||
-              !ExplorationPlayerService.canWindowShowTwoCards()
+              !ExplorationEngineService.canWindowShowTwoCards()
             ));
           };
 

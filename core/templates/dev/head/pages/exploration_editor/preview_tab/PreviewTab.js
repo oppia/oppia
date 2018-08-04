@@ -23,7 +23,7 @@ oppia.controller('PreviewTab', [
   'ExplorationCategoryService', 'StateEditorService',
   'ExplorationInitStateNameService', 'ExplorationParamChangesService',
   'ExplorationParamSpecsService', 'ExplorationStatesService',
-  'ExplorationTitleService', 'ExplorationPlayerService',
+  'ExplorationTitleService', 'ExplorationEngineService',
   'ParameterMetadataService', 'ParamChangeObjectFactory',
   'UrlInterpolationService',
   function(
@@ -32,7 +32,7 @@ oppia.controller('PreviewTab', [
       ExplorationCategoryService, StateEditorService,
       ExplorationInitStateNameService, ExplorationParamChangesService,
       ExplorationParamSpecsService, ExplorationStatesService,
-      ExplorationTitleService, ExplorationPlayerService,
+      ExplorationTitleService, ExplorationEngineService,
       ParameterMetadataService, ParamChangeObjectFactory,
       UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
@@ -113,7 +113,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      ExplorationPlayerService.initSettingsFromEditor(
+      ExplorationEngineService.initSettingsFromEditor(
         stateName, manualParamChanges);
       $scope.isExplorationPopulated = true;
     };
@@ -123,7 +123,7 @@ oppia.controller('PreviewTab', [
       $scope.isExplorationPopulated = false;
       initStateNameForPreview = ExplorationInitStateNameService.savedMemento;
       $timeout(function() {
-        ExplorationPlayerService.init(function(exploration, initHtml,
+        ExplorationEngineService.init(function(exploration, initHtml,
             newParams) {
           $scope.loadPreviewState(initStateNameForPreview, []);
         });

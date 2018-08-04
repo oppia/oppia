@@ -24,7 +24,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-oppia.factory('ExplorationPlayerService', [
+oppia.factory('ExplorationEngineService', [
   '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService',
   'EditableExplorationBackendApiService', 'ContextService',
@@ -221,8 +221,6 @@ oppia.factory('ExplorationPlayerService', [
        */
       init: function(successCallback) {
         answerIsBeingProcessed = false;
-        PlayerTranscriptService.init();
-
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             _explorationId).then(function(data) {
@@ -327,6 +325,30 @@ oppia.factory('ExplorationPlayerService', [
       },
       getInteraction: function(stateName) {
         return exploration.getInteraction(stateName);
+      },
+      isInteractionInline: function(stateName) {
+        if (stateName === null) {
+          return true;
+        }
+        return exploration.isInteractionInline(stateName);
+      },
+      getInteractionInstructions: function(stateName) {
+        return exploration.getInteractionInstructions(stateName);
+      },
+      isStateTerminal: function(stateName) {
+        return exploration.isStateTerminal(stateName);
+      },
+      isStateShowingConceptCard: function(stateName) {
+        if (stateName === null) {
+          return true;
+        }
+        return false;
+      },
+      getAuthorRecommendedExpIds: function(stateName) {
+        return exploration.getAuthorRecommendedExpIds(stateName);
+      },
+      getLanguageCode: function() {
+        return exploration.getLanguageCode();
       },
       getRandomSuffix: function() {
         // This is a bit of a hack. When a refresh to a $scope variable happens,
@@ -441,7 +463,6 @@ oppia.factory('ExplorationPlayerService', [
 
         answerIsBeingProcessed = false;
 
-        oldStateName = PlayerTranscriptService.getLastStateName();
         var refreshInteraction = (
           oldStateName !== newStateName ||
           exploration.isInteractionInline(oldStateName));
@@ -468,13 +489,14 @@ oppia.factory('ExplorationPlayerService', [
             StatsReportingService.recordStateCompleted(newStateName);
           }
         }
+        var onSameCard = (oldStateName === newStateName);
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId, missingPrerequisiteSkillId);
+          refresherExplorationId, missingPrerequisiteSkillId, onSameCard);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

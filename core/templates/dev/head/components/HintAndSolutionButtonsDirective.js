@@ -25,13 +25,13 @@ oppia.directive('hintAndSolutionButtons', [
         '/components/hint_and_solution_buttons_directive.html'),
       controller: [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',
-        'ExplorationPlayerService', 'PlayerTranscriptService',
+        'ExplorationEngineService', 'PlayerTranscriptService',
         'HintAndSolutionModalService', 'DeviceInfoService',
         'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
-            ExplorationPlayerService, PlayerTranscriptService,
+            ExplorationEngineService, PlayerTranscriptService,
             HintAndSolutionModalService, DeviceInfoService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED, INTERACTION_SPECS) {
@@ -58,9 +58,9 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.isHintButtonVisible = function(index) {
             return HintsAndSolutionManagerService.isHintViewable(index) &&
-              !INTERACTION_SPECS[ExplorationPlayerService.getInteraction(
+              !INTERACTION_SPECS[ExplorationEngineService.getInteraction(
                 PlayerPositionService.getCurrentStateName()).id].is_terminal &&
-                !INTERACTION_SPECS[ExplorationPlayerService.getInteraction(
+                !INTERACTION_SPECS[ExplorationEngineService.getInteraction(
                   PlayerPositionService.getCurrentStateName()).id].is_linear;
           };
 
@@ -94,7 +94,7 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.displaySolutionModal = function() {
             $scope.solutionModalIsActive = true;
-            ExplorationPlayerService.recordSolutionHit(latestStateName);
+            ExplorationEngineService.recordSolutionHit(latestStateName);
             var promise = HintAndSolutionModalService.displaySolutionModal();
             promise.result.then(null, function() {
               $scope.solutionModalIsActive = false;
@@ -104,8 +104,8 @@ oppia.directive('hintAndSolutionButtons', [
           $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, data) {
             latestStateName = data.stateName;
             HintsAndSolutionManagerService.reset(
-              ExplorationPlayerService.getHints(data.stateName),
-              ExplorationPlayerService.getSolution(data.stateName)
+              ExplorationEngineService.getHints(data.stateName),
+              ExplorationEngineService.getSolution(data.stateName)
             );
             resetLocalHintsArray();
           });
