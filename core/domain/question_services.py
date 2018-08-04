@@ -75,11 +75,12 @@ def delete_question_skill_link(question_id, skill_id):
     question_skill_link_model.delete()
 
 
-def get_questions_by_skill_ids(skill_ids):
+def get_questions_by_skill_ids(question_count, skill_ids):
     """Returns the questions linked to the given skill ids.
 
 
     Args:
+        question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
 
@@ -89,7 +90,7 @@ def get_questions_by_skill_ids(skill_ids):
     """
     question_ids, _ = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            skill_ids, None))
+            question_count, skill_ids, None))
 
     return get_questions_by_ids(question_ids)
 
@@ -172,11 +173,13 @@ def get_question_by_id(question_id, strict=True):
         return None
 
 
-def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
+def get_question_summaries_linked_to_skills(
+        question_count, skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
 
     Args:
+        question_count: int. The number of question summaries to return.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
         start_cursor: str. The starting point from which the batch of
@@ -201,7 +204,7 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
             'time is not supported currently.')
     question_ids, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            skill_ids, start_cursor)
+            question_count, skill_ids, start_cursor)
     )
 
     question_summaries = get_question_summaries_by_ids(question_ids)
