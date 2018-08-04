@@ -10,12 +10,9 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         USERNAME: JSON.parse('{{username|js_string}}'),
         USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
-        PROFILE_PICTURE_DATA_URL: JSON.parse('{{profile_picture_data_url|js_string}}'),
         IS_MODERATOR: JSON.parse('{{is_moderator|js_string}}'),
         IS_SUPER_ADMIN: JSON.parse('{{is_super_admin|js_string}}'),
         LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
-        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
-        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
         DEMO_COLLECTIONS: JSON.parse('{{demo_collections|js_string}}'),
@@ -29,7 +26,8 @@
         UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
         VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
       }
     </script>
 
@@ -38,7 +36,6 @@
 
   <body>
     <admin-navbar username="username" user-email="userEmail"
-                  profile-picture-data-url="profilePictureDataUrl"
                   is-moderator="isModerator" is-super-admin="isSuperAdmin"
                   logout-url="logoutUrl">
     </admin-navbar>
@@ -80,56 +77,57 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+    <script src="/templates/dev/head/app.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/Admin.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminNavbarDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminRouterService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminTaskManagerService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/Admin.js"></script>
+    <script src="/templates/dev/head/pages/admin/AdminNavbarDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/AdminRouterService.js"></script>
+    <script src="/templates/dev/head/pages/admin/AdminTaskManagerService.js"></script>
+    <script src="/templates/dev/head/pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RolesTabDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RoleGraphDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+    <script src="/templates/dev/head/pages/admin/roles_tab/RolesTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/roles_tab/RoleGraphDirective.js"></script>
+    <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
+    <script src="/templates/dev/head/filters.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ContextService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
+    <script src="/templates/dev/head/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
+    <script src="/templates/dev/head/directives.js"></script>
+    <script src="/templates/dev/head/services/AlertsService.js"></script>
+    <script src="/templates/dev/head/services/ContextService.js"></script>
+    <script src="/templates/dev/head/services/UtilsService.js"></script>
+    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+    <script src="/templates/dev/head/services/DebouncerService.js"></script>
+    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+    <script src="/templates/dev/head/services/RteHelperService.js"></script>
+    <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
+    <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
+    <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+    <script src="/templates/dev/head/services/UserService.js"></script>
+    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
+    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
+    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionEvaluatorService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionParserService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
+    <script src="/templates/dev/head/expressions/ExpressionSyntaxTreeService.js"></script>
+    <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>
+    <script src="/templates/dev/head/expressions/ExpressionParserService.js"></script>
+    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
 
     {% include 'components/rich_text_components.html' %}
 

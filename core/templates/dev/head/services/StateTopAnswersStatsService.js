@@ -62,7 +62,7 @@ oppia.factory('StateTopAnswersStatsService', [
       allAnswersCacheEntry.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            explorationId, stateName, state, answerStats.answer,
+            stateName, state, answerStats.answer,
             interactionRulesService);
         if (!answerStats.isAddressed) {
           unresolvedAnswersCacheEntry.push(answerStats);

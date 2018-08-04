@@ -88,7 +88,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
 
-        self.save_new_default_exploration('A', self.owner_id, 'TitleA')
+        self.save_new_default_exploration('A', self.owner_id, title='TitleA')
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
@@ -97,7 +97,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 }
             })
 
-        self.save_new_default_exploration('B', self.owner_id, 'TitleB')
+        self.save_new_default_exploration('B', self.owner_id, title='TitleB')
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
@@ -285,7 +285,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 1: 3 initial explorations.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', None))
+                    ''))
             self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
             found_exp_ids += exp_ids
@@ -293,7 +293,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 2: 3 more explorations.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
             found_exp_ids += exp_ids
@@ -301,7 +301,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 3: 1 final exploration.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(exp_ids), 1)
             self.assertIsNone(search_cursor)
             found_exp_ids += exp_ids
@@ -794,7 +794,7 @@ title: Title
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exp.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
         test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
@@ -1180,7 +1180,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
@@ -1260,7 +1260,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -1344,13 +1344,15 @@ title: A title
         self.assertEqual(exploration.version, 3)
 
         # Download version 2.
-        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 2)
+        zip_file_output = exp_services.export_to_zip_file(
+            self.EXP_ID, version=2)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
-        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 3)
+        zip_file_output = exp_services.export_to_zip_file(
+            self.EXP_ID, version=3)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
@@ -2468,7 +2470,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.owner_id,
-                all_exp_titles[i],
+                title=all_exp_titles[i],
                 category=all_exp_categories[i])
 
         # We're only publishing the first 4 explorations, so we're not
@@ -2889,7 +2891,7 @@ title: Old Title
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2915,14 +2917,14 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self):
         exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_then_reversion_maintains_valid_exploration(self):
@@ -3020,7 +3022,7 @@ title: Old Title
             exploration_model, run_conversion=False)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The exploration should be valid after conversion.
         exploration.validate(strict=True)
@@ -3060,12 +3062,12 @@ title: Old Title
             'committer_id': feconf.MIGRATION_BOT_USERNAME,
             'commit_message':
                 'Update exploration states from schema version 0 to %d.' %
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+                feconf.CURRENT_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
                 'to_version': str(
-                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                    feconf.CURRENT_STATES_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }
@@ -3114,7 +3116,7 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(exp_id)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The converted exploration should be up-to-date and properly
         # converted.

@@ -25,12 +25,14 @@ oppia.controller('StatisticsTab', [
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  'ENABLE_PLAYTHROUGH_VIZ',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE,
+      ENABLE_PLAYTHROUGH_VIZ) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -52,6 +54,8 @@ oppia.controller('StatisticsTab', [
     };
     var _EXPLORATION_STATS_VERSION_ALL = 'all';
     $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
+
+    $scope.playthroughVizEnabled = ENABLE_PLAYTHROUGH_VIZ;
 
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -111,8 +115,13 @@ oppia.controller('StatisticsTab', [
       });
     };
 
+    var stateStatsModalIsOpen = false;
     $scope.onClickStateInStatsGraph = function(stateName) {
-      $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
+      if (!stateStatsModalIsOpen) {
+        stateStatsModalIsOpen = true;
+        $scope.showStateStatsModal(
+          stateName, $scope.highlightStates[stateName]);
+      }
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
@@ -225,6 +234,10 @@ oppia.controller('StatisticsTab', [
                 $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
+
+              $scope.$on('$destroy', function() {
+                stateStatsModalIsOpen = false;
+              });
 
               $scope.navigateToStateEditor = function() {
                 $scope.cancel();

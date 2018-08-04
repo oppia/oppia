@@ -18,6 +18,15 @@
         <span ng-if="item.type == 'checkboxes'" style="color: black;">
           <object-editor obj-type="SetOfHtmlString" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
         </span>
+        <span ng-if="item.type == 'dropdown'" style="color: black;">
+          <object-editor obj-type="ListOfSetsOfHtmlStrings" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
+        </span>
+        <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" style="color: black;">
+          <object-editor obj-type="DragAndDropHtmlString" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
+        </span>
+        <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" style="color: black;">
+          <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
+        </span>
         <span ng-if="item.type != 'select' && item.type != 'noneditable'">
           <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.inputs[item.varName]" style="color: black;"></object-editor>
         </span>

@@ -70,7 +70,7 @@ def _migrate_states_schema(versioned_exploration_states):
     found in exp_domain.py and, in fact, many of the conversion functions for
     states are also used in the YAML conversion pipeline. If the current
     exploration states schema version changes
-    (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
+    (feconf.CURRENT_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
 
@@ -90,14 +90,14 @@ def _migrate_states_schema(versioned_exploration_states):
         states_schema_version = 0
 
     if not (0 <= states_schema_version
-            <= feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     while (states_schema_version <
-           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+           feconf.CURRENT_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states, states_schema_version)
         states_schema_version += 1
@@ -155,7 +155,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_states_schema(versioned_exploration_states)
 
     return exp_domain.Exploration(
@@ -874,12 +874,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
     # Trigger statistics model update.
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states, change_list)
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
@@ -896,7 +898,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     if feconf.ENABLE_PLAYTHROUGHS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff=exp_versions_diff,
             revert_to_version=None)
@@ -1422,6 +1423,10 @@ def revert_exploration(
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
+
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=None, revert_to_version=revert_to_version)
 
     if feconf.ENABLE_PLAYTHROUGHS:
         current_exploration = get_exploration_by_id(

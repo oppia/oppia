@@ -48,9 +48,10 @@ oppia.factory('StateRulesStatsService', [
         var explorationId = ContextService.getExplorationId();
 
         return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
-            {exploration_id: explorationId, state_name: state.name})
+          '/createhandler/state_rules_stats/' + [
+            encodeURIComponent(explorationId),
+            encodeURIComponent(state.name)
+          ].join('/')
         ).then(function(response) {
           return {
             state_name: state.name,
@@ -65,7 +66,7 @@ oppia.factory('StateRulesStatsService', [
                         is_addressed: (
                           AnswerClassificationService
                             .isClassifiedExplicitlyOrGoesToNewState(
-                              explorationId, state.name, state,
+                              state.name, state,
                               vizInfoDatum.answer, interactionRulesService))
                       }, vizInfoDatum);
                     })

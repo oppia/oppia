@@ -82,7 +82,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
                 }],
                 'commit_message': 'Translated first state content',
                 'version': 1
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         # Checking the response to have audio translations.
         self.assertEqual(
             response['states'][state_name]['content_ids_to_audio_translations'],
@@ -99,7 +99,8 @@ class TranslatorTest(BaseTranslatorControllerTest):
                 }],
                 'commit_message': 'Changed exp objective',
                 'version': 1
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=400)
         # Checking the response to have error.
         self.assertEqual(
             response, {'status_code': 400,
@@ -169,7 +170,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
         }
         response = self.put_json(
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID,
-            payload, self.csrf_token)
+            payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertEqual(
@@ -183,7 +184,8 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID, {
                 'change_list': self.INVALID_DRAFT_CHANGELIST,
                 'version': 1,
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertEqual(
@@ -203,7 +205,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
         }
         response = self.put_json(
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID,
-            payload, self.csrf_token)
+            payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertEqual(
@@ -215,7 +217,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
     def test_discard_draft(self):
         self.post_json(
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID, {},
-            self.csrf_token)
+            csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertIsNone(exp_user_data.draft_change_list)

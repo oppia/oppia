@@ -56,7 +56,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !ExplorationStatesService.isSolutionValid(stateName)) {
+            !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
