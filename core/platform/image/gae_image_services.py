@@ -15,78 +15,45 @@
 # limitations under the License.
 
 """Provides app identity services."""
-
+import io
 import feconf
 
 from PIL import Image
-from google.appengine.ext import blobstore
 from google.appengine.api import images
 
-from core.domain import fs_domain
 from core.platform import models
 
 app_identity_services = models.Registry.import_app_identity_services()
 
-def get_image_dimensions(filename, exp_id):
-    """Gets the dimensions of the image with the given filename
+
+def get_image_dimensions(file_content):
+    """Gets the dimensions of the image with the given file_content.
 
     Args:
-        filename: str. Name of the file whose dimensions need to be
-            calculated.
-        exp_id: str. Exploration id.
+        file_content: str. The content of the file.
 
     Returns:
         tuple. Returns height and width of the image.
     """
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if (
-            feconf.DEV_MODE)
-        else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-
-    imageFile = fs.getImageFile(filename)
-    img = Image.open(imageFile)
+    img = Image.open(io.BytesIO(file_content))
     width, height = img.size
     return height, width
 
-def create_different_versions(filename, exp_id):
-    """Creates two versions of the image by compressing the original image
+
+def compress_image(image_content, scaling_factor=1):
+    """Compresses the image by resizing the image with the scaling factor.
 
     Args:
-        filename: str. Name of the file whose dimensions need to be
-            calculated.
-        exp_id: str. Exploration id.
+        image_content: str. Content of the file to be compressed.
+        scaling_factor: int. The number by which the image will be scaled.
 
     Returns:
-        
+        str. Returns the content of the compressed image.
     """
     if not feconf.DEV_MODE:
-        gcs_url = ('/gs/%s/%s/assets/image/%s' % (
-                app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-                filename))
-        blob_key = blobstore.create_gs_key(gcs_url)
-        original_img = images.Image(blob_key=blob_key)
-        org_height = original_img.height
-        org_width = original_img.width
-        
-        filename_wo_filetype = filename[:filename.rfind('.')]
-        filetype = filename[filename.rfind('.') + 1:]
-
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exp_id))
-        content = fs.get_file_content(filename, exp_id)
-
-        compressed_content = images.resize(
-            image_data=content, width=org_width*8/10, height=org_height*8/10)
-        fs.commit(
-            'ADMIN', 'image/%s_compressed.%s' % (
-                filename_wo_filetype, filetype),
-            compressed_content, mimetype='image/%s' % filetype)
-
-        micro_content = images.resize(
-            image_data=content, width=org_width*7/10, height=org_height*7/10)
-        fs.commit(
-            'ADMIN', 'image/%s_micro.%s' % (
-                filename_wo_filetype, filetype),
-            micro_content, mimetype='image/%s' % filetype)
-        
-        
+        height, width = get_image_dimensions(image_content)
+        return images.resize(
+            image_data=image_content, width=(width * scaling_factor),
+            height=(height * scaling_factor))
+    else:
+        return image_content
