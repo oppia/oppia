@@ -255,11 +255,17 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             [question.to_dict()],
             exploration_dict['pretest_question_dicts'])
 
-        exploration_dict_2 = self.get_json(
+        response = self.testapp.get(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, STORY_ID))
-        self.assertEqual(
-            [], exploration_dict_2['pretest_question_dicts'])
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, STORY_ID),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 400)
+
+        response = self.testapp.get(
+            '%s/%s?story_id=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, 'story'),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 400)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):

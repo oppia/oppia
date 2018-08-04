@@ -69,6 +69,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'not found'):
             question_services.get_question_by_id('question_id')
 
+    def test_get_questions_by_skill_ids(self):
+        question_services.create_new_question_skill_link(
+            self.question_id, 'skill_1')
+        questions = question_services.get_questions_by_skill_ids(['skill_1'])
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(

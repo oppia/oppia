@@ -619,6 +619,23 @@ class Story(object):
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
 
+    def get_prerequisite_skill_ids_for_exp_id(self, exp_id):
+        """Returns the prerequisite skill ids of the node having the given
+        exploration id.
+
+        Args:
+            exp_id: str. The ID of the exploration linked to the story,
+
+        Returns:
+            list(str)|None. The list of prerequisite skill ids for the
+                exploration or None, if no node is linked to it.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exp_id:
+                return node.prerequisite_skill_ids
+
+        return None
+
     def to_dict(self):
         """Returns a dict representing this Story domain object.
 

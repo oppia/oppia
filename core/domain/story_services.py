@@ -24,14 +24,12 @@ import copy
 import logging
 
 from core.domain import exp_services
-from core.domain import question_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
 import utils
 
-(story_models, question_models,) = (
-    models.Registry.import_models([models.NAMES.story, models.NAMES.question]))
+(story_models,) = models.Registry.import_models([models.NAMES.story])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -65,39 +63,6 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_schema_version)
         story_schema_version += 1
-
-
-def get_pretest_questions(story_id, exploration_id):
-    """Checks if an exploration is linked to a story and returns prerequisite
-    skills if so.
-
-    Args:
-        story_id: str. The ID of story linked to the exploration.
-        exploration_id: str. ID of the exploration.
-
-    Returns:
-        list(Question). The list of questions which are the pretests for
-            the exploration, if it is linked to a story, else empty list.
-    """
-    story = get_story_by_id(story_id, strict=False)
-    if story is None:
-        return []
-
-    prerequisite_skill_ids = None
-    for node in story.story_contents.nodes:
-        if node.exploration_id == exploration_id:
-            prerequisite_skill_ids = node.prerequisite_skill_ids
-            break
-
-    if prerequisite_skill_ids is None:
-        return []
-
-    question_ids, _ = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            prerequisite_skill_ids, None))
-
-    questions = question_services.get_questions_by_ids(question_ids)
-    return questions
 
 
 # Repository GET methods.

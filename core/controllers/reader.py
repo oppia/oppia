@@ -31,6 +31,7 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -285,8 +286,19 @@ class ExplorationHandler(base.BaseHandler):
 
         pretest_question_dicts = []
         if story_id:
+            story = story_services.get_story_by_id(story_id, strict=False)
+            if story is None:
+                raise self.InvalidInputException
+
+            if (
+                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id)
+                    is None):
+                raise self.InvalidInputException
+
             pretest_questions = (
-                story_services.get_pretest_questions(story_id, exploration_id))
+                question_services.get_questions_by_skill_ids(
+                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id))
+            )
             pretest_question_dicts = [
                 question.to_dict() for question in pretest_questions
             ]
