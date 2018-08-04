@@ -234,11 +234,6 @@ class Question(object):
                 'Expected version to be an integer, received %s' %
                 self.version)
 
-        if self.version < 1:
-            raise utils.ValidationError(
-                'Expected version to be greater than or equal to 1, '
-                'received %s' % self.version)
-
         self.partial_validate()
 
     @classmethod
