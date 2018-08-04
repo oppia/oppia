@@ -20,8 +20,10 @@
 
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
+  'ExplorationStatesService', 'StateEditorService', 'GraphDataService',
   function(
-      $rootScope, $http, ResponsesService, RuleObjectFactory) {
+      $rootScope, $http, ResponsesService, RuleObjectFactory,
+      ExplorationStatesService, StateEditorService, GraphDataService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -72,12 +74,26 @@ oppia.factory('TrainingDataService', [
 
       if (updatedAnswerGroups) {
         ResponsesService.save(
-          answerGroups, ResponsesService.getDefaultOutcome());
+          answerGroups, ResponsesService.getDefaultOutcome(),
+          function(newAnswerGroups, newDefaultOutcome) {
+            ExplorationStatesService.saveInteractionAnswerGroups(
+              StateEditorService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
+
+            ExplorationStatesService.saveInteractionDefaultOutcome(
+              StateEditorService.getActiveStateName(),
+              angular.copy(newDefaultOutcome));
+
+            GraphDataService.recompute();
+          });
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
+        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
+          StateEditorService.getActiveStateName(),
+          angular.copy(confirmedUnclassifiedAnswers));
       }
     };
 
@@ -121,13 +137,19 @@ oppia.factory('TrainingDataService', [
         // confirmed unclassified answers.
         _removeAnswer(answer);
 
-        var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
-        var trainingData = answerGroup.trainingData;
+        var answerGroups = ResponsesService.getAnswerGroups();
+        var answerGroup = answerGroups[answerGroupIndex];
 
         // Train the rule to include this answer.
-        trainingData.push(answer);
+        answerGroup.trainingData.push(answer);
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: trainingData
+          trainingData: answerGroup.trainingData
+        }, function(newAnswerGroups) {
+          ExplorationStatesService.saveInteractionAnswerGroups(
+            StateEditorService.getActiveStateName(),
+            angular.copy(newAnswerGroups));
+
+          GraphDataService.recompute();
         });
       },
 
@@ -141,6 +163,9 @@ oppia.factory('TrainingDataService', [
         confirmedUnclassifiedAnswers.push(answer);
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
+        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
+          StateEditorService.getActiveStateName(),
+          angular.copy(confirmedUnclassifiedAnswers));
       },
 
       isConfirmedUnclassifiedAnswer: function(answer) {
@@ -153,8 +178,18 @@ oppia.factory('TrainingDataService', [
         var trainingData = ResponsesService.getAnswerGroup(
           answerGroupIndex).trainingData;
         _removeAnswerFromTrainingData(answer, trainingData);
+
+        var answerGroups = ResponsesService.getAnswerGroups();
+        answerGroups[answerGroupIndex].trainingData = trainingData;
+
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
+        }, function(newAnswerGroups) {
+          ExplorationStatesService.saveInteractionAnswerGroups(
+            StateEditorService.getActiveStateName(),
+            angular.copy(newAnswerGroups));
+
+          GraphDataService.recompute();
         });
       }
     };

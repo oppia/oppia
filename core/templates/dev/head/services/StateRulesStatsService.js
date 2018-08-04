@@ -66,7 +66,7 @@ oppia.factory('StateRulesStatsService', [
                         is_addressed: (
                           AnswerClassificationService
                             .isClassifiedExplicitlyOrGoesToNewState(
-                              explorationId, state.name, state,
+                              state.name, state,
                               vizInfoDatum.answer, interactionRulesService))
                       }, vizInfoDatum);
                     })
