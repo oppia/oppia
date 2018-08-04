@@ -1,4 +1,26 @@
-var ScreenShotReporter = require('protractor-screenshot-reporter');
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Protractor configuration to run tests on Browserstack.
+ */
+
+var browserstack = require('browserstack-local');
+var dotenv = require('dotenv');
+
+// eslint-disable-next-line angular/di
+var result = dotenv.config({path: 'core/tests/.browserstack.env'});
 
 // A reference configuration file.
 exports.config = {
@@ -45,7 +67,7 @@ exports.config = {
   // The address of a running selenium server. If specified, Protractor will
   // connect to an already running instance of selenium. This usually looks like
   // seleniumAddress: 'http://localhost:4444/wd/hub'
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub',
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
@@ -57,42 +79,20 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    // The tests on Travis are run individually to parallelize
-    // them. Therefore, we mention the complete directory
-    // in 'full'.
+    // When running the tests on browserstack, all suites should be added
+    // in 'full' individually. This is to parallelize the suites on
+    // browserstack.
     full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
+      'protractor/accessibility.js',
+      'protractor/learnerFlow.js',
+      'protractor/libraryFlow.js',
+      'protractor_mobile/navigation.js',
+      'protractor/profileMenuFlow.js',
+      'protractor/subscriptionsFlow.js'
     ],
 
-    // Unfortunately, adding more than one file to a test suite results in
-    // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
       'protractor/accessibility.js'
-    ],
-
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
-    editorAndPlayer: [
-      'protractor_desktop/editorAndPlayer.js',
-    ],
-
-    editorFeatures: [
-      'protractor_desktop/editorFeatures.js'
-    ],
-
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
-
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
-
-    learnerDashboardSubscriptionsAndFeedbackThreads: [
-      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
     ],
 
     learner: [
@@ -103,25 +103,17 @@ exports.config = {
       'protractor/libraryFlow.js'
     ],
 
+    navigation: [
+      'protractor_mobile/navigation.js'
+    ],
+
     profileMenu: [
       'protractor/profileMenuFlow.js'
     ],
 
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    stateEditor: [
-      'protractor_desktop/stateEditor.js',
-    ],
-
     subscriptions: [
       'protractor/subscriptionsFlow.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -131,19 +123,67 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    browserName: 'chrome',
-    chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
-    },
-    prefs: {
-      intl: {
-        accept_languages: 'en-EN'
+    'browserstack.user': process.env.USERNAME,
+    'browserstack.key': process.env.ACCESS_KEY,
+    'browserstack.local': true,
+    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+    'browserstack.debug': true,
+    'browserstack.networkLogs': true,
+    'browserstack.appium_version': '1.7.2',
+    device: process.env.DEVICE,
+    os_version: process.env.OS_VERSION,
+    real_mobile: 'true',
+    browserName: ''
+  },
+
+  // Code to start browserstack local before start of test
+  beforeLaunch: function() {
+    var checkSuites = function() {
+      // eslint-disable-next-line no-console
+      console.log(
+        'Checking whether the suites in "full" match the actual suites...');
+      var suitesInFull = exports.config.suites.full;
+      var allSuiteGroups = Object.keys(exports.config.suites);
+      for (var suiteIndex in allSuiteGroups) {
+        if (allSuiteGroups[suiteIndex] === 'full') {
+          continue;
+        }
+        suiteGroup = allSuiteGroups[suiteIndex];
+        // The suiteFile is the first element of each suiteGroup array.
+        suiteFile = exports.config.suites[suiteGroup][0];
+        if (!suitesInFull.includes(suiteFile)) {
+          // eslint-disable-next-line no-console
+          console.log(
+            'Expected test file ' + suiteFile + ' to be in "full" ' +
+            'but it was not present.');
+          process.exit(1);
+        }
       }
-    },
-    loggingPrefs: {
-      driver: 'INFO',
-      browser: 'INFO'
-    }
+    };
+    checkSuites();
+    // eslint-disable-next-line no-console
+    console.log('Connecting browserstack local');
+    return new Promise(function(resolve, reject) {
+      exports.bs_local = new browserstack.Local();
+      exports.bs_local.start({
+        key: exports.config.capabilities['browserstack.key']
+      }, function(error) {
+        if (error) {
+          return reject(error);
+        }
+        // eslint-disable-next-line no-console
+        console.log('Connected. Now testing...');
+
+        resolve();
+      });
+    });
+  },
+
+  // Code to stop browserstack local after end of test
+  afterLaunch: function() {
+    return new Promise(function(resolve, reject) {
+      exports.bs_local.stop(resolve);
+    });
   },
 
   // If you would like to run more than one instance of webdriver on the same
@@ -161,59 +201,14 @@ exports.config = {
   // body, but is necessary if ng-app is on a descendant of <body>
   rootElement: 'body',
 
-  // A callback function called once protractor is ready and available, and
-  // before the specs are executed
-  // You can specify a file containing code to run by setting onPrepare to
-  // the filename string.
   onPrepare: function() {
-    browser.isMobile = false;
-    // At this point, global 'protractor' object will be set up, and jasmine
-    // will be available. For example, you can add a Jasmine reporter with:
-    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
-    //         'outputdir/', true, true));
-
-    // This is currently pulled out into a flag because it sometimes obscures
-    // the actual protractor error logs and does not close the browser after
-    // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
-    // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
-
-    if (_ADD_SCREENSHOT_REPORTER) {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
-        // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
-        // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
-        },
-        takeScreenShotsOnlyForFailedSpecs: true
-      }));
-    }
+    browser.isMobile = true;
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'all',
       displaySpecDuration: true
     }));
-
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
-  },
-
-  // The params object will be passed directly to the protractor instance,
-  // and can be accessed from your test. It is an arbitrary object and can
-  // contain anything you may need in your test.
-  // This can be changed via the command line as:
-  //   --params.login.user 'Joe'
-  params: {
-    login: {
-      user: 'Jane',
-      password: '1234'
-    }
   },
 
   // ----- The test framework -----
@@ -237,31 +232,5 @@ exports.config = {
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
     defaultTimeoutInterval: 1200000
-  },
-
-  // ----- Options to be passed to mocha -----
-  //
-  // See the full list at http://visionmedia.github.io/mocha/
-  mochaOpts: {
-    ui: 'bdd',
-    reporter: 'list'
-  },
-
-  // ----- Options to be passed to cucumber -----
-  cucumberOpts: {
-    // Require files before executing the features.
-    require: 'cucumber/stepDefinitions.js',
-    // Only execute the features or scenarios with tags matching @dev.
-    // This may be an array of strings to specify multiple tags to include.
-    tags: '@dev',
-    // How to format features (default: progress)
-    format: 'summary'
-  },
-
-  // ----- The cleanup step -----
-  //
-  // A callback function called once the tests have finished running and
-  // the webdriver instance has been shut down. It is passed the exit code
-  // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  }
 };

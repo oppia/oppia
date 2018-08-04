@@ -18,7 +18,7 @@
 
 oppia.directive('skillConceptCardEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
-  function (
+  function(
       UrlInterpolationService, SkillUpdateService, SkillEditorStateService) {
     return {
       restrict: 'E',

@@ -34,7 +34,7 @@ oppia.factory('FractionObjectFactory', [
       this.denominator = denominator;
     };
 
-    Fraction.prototype.toString = function () {
+    Fraction.prototype.toString = function() {
       var fractionString = '';
       if (this.numerator !== 0) {
         fractionString += this.numerator + '/' + this.denominator;
@@ -60,17 +60,17 @@ oppia.factory('FractionObjectFactory', [
       };
     };
 
-    Fraction.prototype.toFloat = function () {
+    Fraction.prototype.toFloat = function() {
       var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
       var floatVal = (totalParts / this.denominator);
       return this.isNegative ? -floatVal : floatVal;
     };
 
-    Fraction.prototype.getIntegerPart = function () {
+    Fraction.prototype.getIntegerPart = function() {
       return this.isNegative ? -this.wholeNumber : this.wholeNumber;
     };
 
-    Fraction.prototype.convertToSimplestForm = function () {
+    Fraction.prototype.convertToSimplestForm = function() {
       var gcd = function(x, y) {
         return y === 0 ? x : gcd(y, x % y);
       };
