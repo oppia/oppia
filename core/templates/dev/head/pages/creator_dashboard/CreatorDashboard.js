@@ -185,7 +185,7 @@ oppia.controller('CreatorDashboard', [
       return value;
     };
 
-    $scope.getCompleteThumbnailIconUrl = function (iconUrl) {
+    $scope.getCompleteThumbnailIconUrl = function(iconUrl) {
       return UrlInterpolationService.getStaticImageUrl(iconUrl);
     };
 
