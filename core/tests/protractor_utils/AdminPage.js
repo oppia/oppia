@@ -34,6 +34,66 @@ var AdminPage = function(){
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="statusMessage"]'));
 
+  // The reload functions are used for mobile testing
+  // done via Browserstack. These functions may cause
+  // a problem when used to run tests directly on Travis.
+  if (general.isInDevMode()) {
+    var explorationElements = element.all(by.css(
+      '.protractor-test-reload-exploration-row'
+    ));
+
+    var reloadAllExplorationsButtons = element.all(by.css(
+      '.protractor-test-reload-all-explorations-button'
+    ));
+
+    var reloadCollectionButtons = element.all(by.css(
+      '.protractor-test-reload-collection-button'));
+
+    var getExplorationTitleElement = function(explorationElement) {
+      return explorationElement.element(
+        by.css('.protractor-test-reload-exploration-title')
+      );
+    };
+
+    var getExplorationElementReloadButton = function(explorationElement) {
+      return explorationElement.element(
+        by.css('.protractor-test-reload-exploration-button')
+      );
+    };
+
+    this.reloadCollection = function(collectionId) {
+      this.get();
+      reloadCollectionButtons.get(collectionId).click();
+      general.acceptAlert();
+      // Time is needed for the reloading to complete.
+      waitFor.textToBePresentInElement(
+        statusMessage, 'Data reloaded successfully.',
+        'Collection could not be reloaded');
+      return true;
+    };
+
+    // The name should be as given in the admin page (including '.yaml' if
+    // necessary).
+    this.reloadExploration = function(name) {
+      this.get();
+      explorationElements.map(function(explorationElement) {
+        getExplorationTitleElement(explorationElement)
+          .getText().then(function(title) {
+          // We use match here in case there is whitespace around the name
+            if (title.match(name)) {
+              getExplorationElementReloadButton(explorationElement).click();
+              general.acceptAlert();
+              // Time is needed for the reloading to complete.
+              waitFor.textToBePresentInElement(
+                statusMessage, 'Data reloaded successfully.',
+                'Exploration could not be reloaded');
+              return true;
+            }
+          });
+      });
+    };
+  }
+
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
       .getText()
