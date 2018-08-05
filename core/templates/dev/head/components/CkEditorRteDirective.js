@@ -166,8 +166,8 @@ oppia.directive('ckEditorRte', [
               .css('background-image', 'url("/extensions' + icon + '")')
               .css('background-position', 'center')
               .css('background-repeat', 'no-repeat')
-              .css('height', '26px')
-              .css('width', '26px')
+              .css('height', '24px')
+              .css('width', '24px')
               .css('padding', '0px 0px');
           });
 
@@ -175,8 +175,8 @@ oppia.directive('ckEditorRte', [
             .css('height', '22px');
 
           $('.cke_button_icon')
-            .css('height', '26px')
-            .css('width', '26px');
+            .css('height', '24px')
+            .css('width', '24px');
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
 
@@ -192,7 +192,31 @@ oppia.directive('ckEditorRte', [
         }, null, null, 20);
 
         ck.on('change', function() {
-          ngModel.$setViewValue(ck.getData());
+          var elt = $('<div>' + ck.getData() + '</div>');
+          var textElt = elt[0].childNodes;
+          for (var i = textElt.length; i > 0; i--) {
+            for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+              if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+                (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                  textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+                textElt[i - 1].childNodes[j - 1].remove();
+              } else {
+                break;
+              }
+            }
+            if (textElt[i - 1].childNodes.length === 0) {
+              if (textElt[i - 1].nodeName === 'BR' ||
+                (textElt[i - 1].nodeName === '#text' &&
+                  textElt[i - 1].nodeValue.trim() === '') ||
+                  textElt[i - 1].nodeName === 'P') {
+                textElt[i - 1].remove();
+                continue;
+              }
+            } else {
+              break;
+            }
+          }
+          ngModel.$setViewValue(elt.html());
         });
 
         ngModel.$render = function() {

@@ -23,11 +23,13 @@ oppia.directive('answerGroupEditor', [
       scope: {
         addState: '=',
         displayFeedback: '=',
+        getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        getTaggedMisconceptionId: '&taggedMisconceptionId',
         isEditable: '=',
         onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
@@ -37,21 +39,85 @@ oppia.directive('answerGroupEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'StateInteractionIdService', 'ResponsesService',
-        'AlertsService', 'INTERACTION_SPECS', 'EditorStateService',
+        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
+        'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
-        'ENABLE_ML_CLASSIFIERS',
+        'ENABLE_ML_CLASSIFIERS', 'ResponsesService',
         function(
-            $scope, StateInteractionIdService, ResponsesService,
-            AlertsService, INTERACTION_SPECS, EditorStateService,
+            $scope, $rootScope, $uibModal, StateInteractionIdService,
+            AlertsService, INTERACTION_SPECS, StateEditorService,
             RuleObjectFactory, TrainingDataEditorPanelService,
-            ENABLE_ML_CLASSIFIERS) {
+            ENABLE_ML_CLASSIFIERS, ResponsesService) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
+          $scope.misconceptionName = null;
+          $scope.misconceptions = StateEditorService.getMisconceptions();
+
+          var _getTaggedMisconceptionName = function(misconceptionId) {
+            for (var i = 0; i < $scope.misconceptions.length; i++) {
+              if (
+                $scope.misconceptions[i].getId() === misconceptionId) {
+                $scope.misconceptionName = $scope.misconceptions[i].getName();
+              }
+            }
+          };
+
+          _getTaggedMisconceptionName($scope.getTaggedMisconceptionId());
 
           $scope.isInQuestionMode = function() {
-            return EditorStateService.getInQuestionMode();
+            return StateEditorService.isInQuestionMode();
+          };
+
+          $scope.tagAnswerGroupWithMisconception = function() {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/questions/' +
+                'tag_misconception_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', 'StateEditorService',
+                function($scope, $uibModalInstance, StateEditorService) {
+                  $scope.misconceptions =
+                    StateEditorService.getMisconceptions();
+                  $scope.selectedMisconception = null;
+                  $scope.misconceptionFeedbackIsUsed = false;
+
+                  $scope.selectMisconception = function(misconception) {
+                    $scope.selectedMisconception = angular.copy(misconception);
+                  };
+
+                  $scope.toggleMisconceptionFeedbackUsage = function() {
+                    $scope.misconceptionFeedbackIsUsed =
+                      !$scope.misconceptionFeedbackIsUsed;
+                  };
+
+                  $scope.done = function() {
+                    $uibModalInstance.close({
+                      misconception: $scope.selectedMisconception,
+                      feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
+                    });
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(returnObject) {
+              var misconception = returnObject.misconception;
+              var feedbackIsUsed = returnObject.feedbackIsUsed;
+              var outcome = angular.copy($scope.outcome);
+              if (feedbackIsUsed) {
+                outcome.feedback.setHtml(misconception.getFeedback());
+                $scope.getOnSaveAnswerGroupFeedbackFn()(outcome);
+                $rootScope.$broadcast('externalSave');
+              }
+              $scope.getOnSaveTaggedMisconception()(misconception.getId());
+              _getTaggedMisconceptionName(misconception.getId());
+            });
           };
 
           $scope.getAnswerChoices = function() {

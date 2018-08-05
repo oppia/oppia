@@ -70,7 +70,7 @@
         <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
         <li ng-if="canCreateCollections && collectionsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-          <a class="oppia-dashboard-tabs-text"
+          <a class="oppia-dashboard-tabs-text protractor-test-collections-tab"
              ng-click="setActiveTab('myCollections')"
              translate="I18N_DASHBOARD_COLLECTIONS">
           </a>
@@ -114,7 +114,7 @@
           <div>
             <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
             <button type="button"
-                    class="btn oppia-dashboard-intro-button oppia-transition-200"
+                    class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
                     ng-click="createNewExploration()"
                     translate="I18N_CREATE_EXPLORATION">
             </button>
