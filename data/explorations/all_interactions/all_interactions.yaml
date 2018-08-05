@@ -94,7 +94,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: []
+            x: ['Choice 2', 'Choice 1']
           rule_type: IsEqualToOrdering
       confirmed_unclassified_answers: []
       customization_args:
