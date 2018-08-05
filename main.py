@@ -218,7 +218,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_QUESTION_URL,
+        r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,

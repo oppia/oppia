@@ -215,6 +215,7 @@ GENERATED_FILE_PATHS = (
     'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.js',
     'core/templates/dev/head/mathjaxConfig.js',

@@ -55,7 +55,7 @@ describe('State Interaction controller', function() {
     beforeEach(inject(function(
         $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
-      ecs = $injector.get('EditorStateService');
+      ecs = $injector.get('StateEditorService');
       cls = $injector.get('ChangeListService');
       ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('StateInteractionIdService');
@@ -151,7 +151,7 @@ describe('State Interaction controller', function() {
 
       var stateEditorCtrl = $controller('ExplorationEditorTab', {
         $scope: scope,
-        EditorStateService: ecs,
+        StateEditorService: ecs,
         ChangeListService: cls,
         ExplorationStatesService: ess,
         EditabilityService: {
