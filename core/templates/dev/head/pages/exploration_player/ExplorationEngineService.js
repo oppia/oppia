@@ -306,8 +306,8 @@ oppia.factory('ExplorationEngineService', [
       getExplorationLanguageCode: function() {
         return exploration.languageCode;
       },
-      getStateContentHtml: function(stateName) {
-        return exploration.getUninterpolatedContentHtml(stateName);
+      getStateContentHtml: function() {
+        return exploration.getUninterpolatedContentHtml(currentStateName);
       },
       getStateContentAudioTranslations: function() {
         return exploration.getAudioTranslations(currentStateName);
@@ -542,9 +542,9 @@ oppia.factory('ExplorationEngineService', [
             DEFAULT_PROFILE_IMAGE_PATH));
         }
       },
-      recordSolutionHit: function(stateName) {
+      recordSolutionHit: function() {
         if (!_editorPreviewMode) {
-          StatsReportingService.recordSolutionHit(stateName);
+          StatsReportingService.recordSolutionHit(currentStateName);
         }
       },
       recordLeaveForRefresherExp: function(refresherExpId) {

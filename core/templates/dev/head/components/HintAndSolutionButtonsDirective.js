@@ -94,7 +94,7 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.displaySolutionModal = function() {
             $scope.solutionModalIsActive = true;
-            ExplorationEngineService.recordSolutionHit(latestStateName);
+            ExplorationEngineService.recordSolutionHit();
             var promise = HintAndSolutionModalService.displaySolutionModal();
             promise.result.then(null, function() {
               $scope.solutionModalIsActive = false;
