@@ -37,14 +37,15 @@ oppia.directive('stateContentEditor', [
       controller: [
         '$scope', '$uibModal', 'StateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService', 'COMPONENT_NAME_CONTENT',
-        'StateContentIdsToAudioTranslationsService',
+        'StateContentIdsToAudioTranslationsService', 'StateEditorService',
         function(
             $scope, $uibModal, StateContentService, EditabilityService,
             EditorFirstTimeEventsService, COMPONENT_NAME_CONTENT,
-            StateContentIdsToAudioTranslationsService) {
+            StateContentIdsToAudioTranslationsService, StateEditorService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.contentId = null;
           $scope.StateContentService = StateContentService;
           if (StateContentService.displayed) {
