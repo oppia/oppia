@@ -78,8 +78,7 @@ oppia.directive('tutorCard', [
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             $scope.conceptCardIsBeingShown =
-              ExplorationEngineService.isStateShowingConceptCard(
-                $scope.activeCard.stateName);
+              ExplorationEngineService.isStateShowingConceptCard();
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
@@ -89,18 +88,15 @@ oppia.directive('tutorCard', [
               $scope.interactionIsInline = true;
             } else {
               $scope.interactionIsInline = (
-                ExplorationEngineService.isInteractionInline(
-                  $scope.activeCard.stateName));
+                ExplorationEngineService.isInteractionInline());
             }
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
-                ExplorationEngineService.getInteractionInstructions(
-                  $scope.activeCard.stateName));
+                ExplorationEngineService.getInteractionInstructions());
               $scope.contentAudioTranslations = (
-                ExplorationEngineService.getStateContentAudioTranslations(
-                  $scope.activeCard.stateName));
+                ExplorationEngineService.getStateContentAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
@@ -177,8 +173,8 @@ oppia.directive('tutorCard', [
             if ($scope.conceptCardIsBeingShown) {
               return false;
             }
-            return ExplorationEngineService.isContentAudioTranslationAvailable(
-              $scope.activeCard.stateName);
+            return (
+              ExplorationEngineService.isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -188,8 +184,7 @@ oppia.directive('tutorCard', [
 
           $scope.isOnTerminalCard = function() {
             return $scope.activeCard &&
-              ExplorationEngineService.isStateTerminal(
-                $scope.activeCard.stateName);
+              ExplorationEngineService.isStateTerminal();
           };
 
           $scope.getInputResponsePairId = function(index) {

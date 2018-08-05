@@ -40,8 +40,7 @@ oppia.factory('HintAndSolutionModalService', [
               $scope.isHint = true;
               $scope.hint = HintsAndSolutionManagerService.displayHint(index);
               var contentIdsToAudioTranslations =
-                ExplorationEngineService.getContentIdsToAudioTranslations(
-                  PlayerPositionService.getCurrentStateName());
+                ExplorationEngineService.getContentIdsToAudioTranslations();
               var hintContentId = $scope.hint.getContentId();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
                 contentIdsToAudioTranslations.getBindableAudioTranslations(
@@ -70,15 +69,13 @@ oppia.factory('HintAndSolutionModalService', [
               var solution = HintsAndSolutionManagerService.displaySolution();
               var solutionContentId = solution.explanation.getContentId();
               var contentIdsToAudioTranslations =
-                ExplorationEngineService.getContentIdsToAudioTranslations(
-                  PlayerPositionService.getCurrentStateName());
+                ExplorationEngineService.getContentIdsToAudioTranslations();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
                 contentIdsToAudioTranslations.getBindableAudioTranslations(
                   solutionContentId), solution.explanation.getHtml(),
                 COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
-              var interaction = ExplorationEngineService.getInteraction(
-                PlayerPositionService.getCurrentStateName());
+              var interaction = ExplorationEngineService.getInteraction();
               $scope.shortAnswerHtml = solution.getOppiaShortAnswerResponseHtml(
                 interaction);
               $scope.solutionExplanationHtml =

@@ -49,18 +49,17 @@ oppia.directive('progressNav', [
             $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(
               $scope.activeCardIndex);
+            ExplorationEngineService.setCurrentStateName(
+              $scope.activeCard.stateName);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
             $scope.conceptCardIsBeingShown =
-              ExplorationEngineService.isStateShowingConceptCard(
-                $scope.activeCard.stateName);
+              ExplorationEngineService.isStateShowingConceptCard();
             if (!$scope.conceptCardIsBeingShown) {
-              var interaction = ExplorationEngineService.getInteraction(
-                $scope.activeCard.stateName);
+              var interaction = ExplorationEngineService.getInteraction();
               interactionIsInline = (
-                ExplorationEngineService.isInteractionInline(
-                  $scope.activeCard.stateName));
+                ExplorationEngineService.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 interaction.customizationArgs;
               $scope.interactionId = interaction.id;

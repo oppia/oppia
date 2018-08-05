@@ -58,10 +58,10 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.isHintButtonVisible = function(index) {
             return HintsAndSolutionManagerService.isHintViewable(index) &&
-              !INTERACTION_SPECS[ExplorationEngineService.getInteraction(
-                PlayerPositionService.getCurrentStateName()).id].is_terminal &&
-                !INTERACTION_SPECS[ExplorationEngineService.getInteraction(
-                  PlayerPositionService.getCurrentStateName()).id].is_linear;
+              !INTERACTION_SPECS[
+                ExplorationEngineService.getInteraction().id].is_terminal &&
+                !INTERACTION_SPECS[
+                  ExplorationEngineService.getInteraction().id].is_linear;
           };
 
           $scope.isSolutionButtonVisible = function() {
@@ -101,11 +101,10 @@ oppia.directive('hintAndSolutionButtons', [
             });
           };
 
-          $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, data) {
-            latestStateName = data.stateName;
+          $scope.$on(EVENT_NEW_CARD_OPENED, function(evt) {
             HintsAndSolutionManagerService.reset(
-              ExplorationEngineService.getHints(data.stateName),
-              ExplorationEngineService.getSolution(data.stateName)
+              ExplorationEngineService.getHints(),
+              ExplorationEngineService.getSolution()
             );
             resetLocalHintsArray();
           });
