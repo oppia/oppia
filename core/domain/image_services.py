@@ -33,7 +33,12 @@ def get_image_dimensions(filename, exp_id):
     Returns:
         tuple. Returns height and width of the image.
     """
-    filepath = 'image/%s' % filename
+    # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
+    # it is 'image/filename'
+    filepath = filename if (
+        feconf.DEV_MODE)
+        else 'image/%s' % filename
+
     file_system_class = (
         fs_domain.ExplorationFileSystem if (
             feconf.DEV_MODE)
@@ -52,7 +57,13 @@ def create_compressed_versions_of_image(filename, exp_id):
         filename: str. The filename of the image in exploration.
         exp_id: str. ID of the exploration.
     """
-    filepath = 'image/%s' % filename
+    # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
+    # it is 'image/filename'
+    filepath = (
+        filename if (
+            feconf.DEV_MODE)
+        else 'image/%s' % filename)
+
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
 
@@ -68,12 +79,24 @@ def create_compressed_versions_of_image(filename, exp_id):
     micro_image_content = gae_image_services.compress_image(
         org_image_content, 0.7)
 
+    compressed_image_filename = '%s_compressed.%s' % (
+        filename_wo_filetype, filetype)
+    compressed_image_filepath = (
+        compressed_image_filename if (
+            feconf.DEV_MODE)
+        else 'image/%s' % compressed_image_filename)
+
+    micro_image_filename = '%s_micro.%s' % (
+        filename_wo_filetype, filetype)
+    micro_image_filepath = (
+        micro_image_filename if (
+            feconf.DEV_MODE)
+        else 'image/%s' micro_image_filename)
+
     fs.commit(
-        'ADMIN', 'image/%s_compressed.%s' % (
-            filename_wo_filetype, filetype),
+        'ADMIN', compressed_image_filepath,
         compressed_image_content, mimetype='image/%s' % filetype)
 
     fs.commit(
-        'ADMIN', 'image/%s_micro.%s' % (
-            filename_wo_filetype, filetype),
+        'ADMIN', micro_image_filepath,
         micro_image_content, mimetype='image/%s' % filetype)
