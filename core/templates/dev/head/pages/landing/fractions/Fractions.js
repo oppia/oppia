@@ -41,5 +41,11 @@ oppia.controller('Fractions', [
         $window.location = '/splash';
       }, 150);
     };
+
+    $scope.onClickExploreLessonsButton = function() {
+      $timeout(function() {
+        $window.location = '/library';
+      }, 150);
+    };
   }
 ]);
