@@ -69,7 +69,7 @@ oppia.factory('ExplorationWarningsService', [
     // - edges: a list of edges, each of which is an object with keys 'source',
     //     and 'target'.
     var _getUnreachableNodeNames = function(
-      initNodeIds, nodes, edges) {
+        initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -224,7 +224,7 @@ oppia.factory('ExplorationWarningsService', [
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
-        stateWithoutInteractionIds) {
+          stateWithoutInteractionIds) {
         _extendStateWarnings(
           stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
       });
@@ -245,7 +245,7 @@ oppia.factory('ExplorationWarningsService', [
 
         if (unreachableStateNames.length) {
           angular.forEach(unreachableStateNames, function(
-            unreachableStateName) {
+              unreachableStateName) {
             _extendStateWarnings(
               unreachableStateName, STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
           });
