@@ -35,16 +35,17 @@ def get_image_dimensions(filename, exp_id):
     """
     # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
     # it is 'image/filename'
-    filepath = filename if (
-        feconf.DEV_MODE)
-        else 'image/%s' % filename
+    filepath = (
+        filename if (
+            feconf.DEV_MODE)
+        else 'image/%s' % filename)
 
     file_system_class = (
         fs_domain.ExplorationFileSystem if (
             feconf.DEV_MODE)
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-    content = fs.get_file_content(filepath)
+    content = fs.get(filepath)
     height, width = gae_image_services.get_image_dimensions(content)
     return height, width
 
@@ -73,11 +74,11 @@ def create_compressed_versions_of_image(filename, exp_id):
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
 
-    org_image_content = fs.get_file_content(filepath)
+    original_image_content = fs.get(filepath)
     compressed_image_content = gae_image_services.compress_image(
-        org_image_content, 0.8)
+        original_image_content, 0.8)
     micro_image_content = gae_image_services.compress_image(
-        org_image_content, 0.7)
+        original_image_content, 0.7)
 
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
@@ -91,7 +92,7 @@ def create_compressed_versions_of_image(filename, exp_id):
     micro_image_filepath = (
         micro_image_filename if (
             feconf.DEV_MODE)
-        else 'image/%s' micro_image_filename)
+        else 'image/%s' % micro_image_filename)
 
     fs.commit(
         'ADMIN', compressed_image_filepath,
