@@ -201,7 +201,11 @@ class ExplorationFileSystem(object):
         Returns:
             str. The content property of the FileModel of the image file.
         """
-        return self._get_file_data(filepath, None).content
+        fileModel = self._get_file_data(filepath, None)
+        if fileModel == None:
+            return None
+        else:
+            return fileModel.content
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -508,6 +512,8 @@ class GcsFileSystem(object):
         gcs_file_url = (
             '/%s/%s/assets/%s' % (
                 bucket_name, self._exploration_id, filepath))
+        if not self.isfile(filepath):
+            return None
         gcs_file = cloudstorage.open(gcs_file_url)
         contents = gcs_file.read()
         gcs_file.close()
