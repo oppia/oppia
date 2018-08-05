@@ -23,8 +23,8 @@ oppia.factory('CurrentInteractionService', [
   function() {
     var _submitAnswer;
     var _onSubmit;
-    var _shouldHideSubmitButton;
     var _validityCheckFn;
+    var _preSubmitHooks = [];
 
     return {
       setOnSubmitFn: function(onSubmit) {
@@ -36,17 +36,13 @@ oppia.factory('CurrentInteractionService', [
          */
         _onSubmit = onSubmit;
       },
-      registerCurrentInteraction: function(
-          submitAnswer,
-          validityCheckFn,
-          shouldHideSubmitButton) {
+      registerCurrentInteraction: function(submitAnswer, validityCheckFn) {
         /**
          * Every interaction directive should register themselves here,
          * even those which do not use the progress nav. All arguments are
          * optional.
          *
-         * @param {function} submitAnswer - Called when the learner presses the
-         *   progress nav's submit button. Should grab the learner's answer
+         * @param {function} submitAnswer - Should grab the learner's answer
          *   and pass it to onSubmit. The interaction can omit this param if
          *   it does not use the progress nav's submit button
          *   (ex: MultipleChoiceInput).
@@ -54,18 +50,34 @@ oppia.factory('CurrentInteractionService', [
          *   to decide whether or not to disable the submit button. The
          *   interaction can omit this param if it does not use the progress
          *   nav's submit button.
-         * @param {boolean} shouldHideSubmitButton - Interactions which do not
-         *   use the progress nav submit button can hide it entirely with this
-         *   flag. Omitting this param is the same as passing in false.
          */
         _submitAnswer = submitAnswer;
         _validityCheckFn = validityCheckFn;
-        _shouldHideSubmitButton = Boolean(shouldHideSubmitButton);
+      },
+      registerPreSubmitHook: function(hookFn) {
+        /* Register a time hook that will be called right before onSubmit.
+         * All hooks for the current interaction will be cleared right
+         * before loading the next card.
+         */
+        _preSubmitHooks.push(hookFn);
+      },
+      clearPreSubmitHooks: function() {
+        /* Clear out all the hooks for the current interaction. Should
+         * be called before loading the next card.
+         */
+        _preSubmitHooks = [];
       },
       onSubmit: function(answer, interactionRulesService) {
+        for (var i = 0; i < _preSubmitHooks.length; i++) {
+          hookFn = _preSubmitHooks[i];
+          hookFn();
+        }
         _onSubmit(answer, interactionRulesService);
       },
       submitAnswer: function() {
+        /* This starts the answer submit process, it should be called once the
+         * learner presses the "Submit" button.
+         */
         if (typeof _submitAnswer === 'undefined') {
           throw Error('The current interaction did not ' +
                       'register a submitAnswer function.');
@@ -74,14 +86,14 @@ oppia.factory('CurrentInteractionService', [
         }
       },
       isSubmitButtonDisabled: function() {
+        /* Returns whether or not the Submit button should be disabled based on
+         * the validity of the current answer.
+         */
         if (typeof _validityCheckFn === 'undefined') {
           return false;
         } else {
           return !_validityCheckFn();
         }
-      },
-      isSubmitButtonShown: function() {
-        return _shouldHideSubmitButton;
       },
     };
   }

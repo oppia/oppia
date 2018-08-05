@@ -728,6 +728,7 @@ oppia.directive('conversationSkin', [
                         contentHtml +
                         ExplorationPlayerService.getRandomSuffix());
                     }
+                    CurrentInteractionService.clearPreSubmitHooks();
                   }
                   $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
