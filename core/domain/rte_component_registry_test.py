@@ -16,6 +16,7 @@
 
 import inspect
 import os
+import pkgutil
 import re
 import string
 import struct
@@ -23,7 +24,6 @@ import struct
 from core.domain import obj_services
 from core.domain import rte_component_registry
 from core.tests import test_utils
-from extensions.rich_text_components import components
 import feconf
 import schema_utils
 import schema_utils_test
@@ -218,7 +218,10 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         obtained_tag_list_with_attrs = (
             rte_component_registry.Registry.get_tag_list_with_attrs())
         actual_tag_list_with_attrs = {}
-        for name, obj in inspect.getmembers(components):
+        module_fullname = 'extensions.rich_text_components.components'
+        module_obj = pkgutil.find_loader(module_fullname).load_module(
+            'components')
+        for name, obj in inspect.getmembers(module_obj):
             if inspect.isclass(obj) and name != 'BaseRteComponent':
                 tag_name = 'oppia-noninteractive-%s' % name.lower()
                 attrs = obj.customization_args.keys()
@@ -247,7 +250,10 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         obtained_component_classes = (
             component_types_to_component_classes.values())
         actual_component_classes = []
-        for name, obj in inspect.getmembers(components):
+        module_fullname = 'extensions.rich_text_components.components'
+        module_obj = pkgutil.find_loader(module_fullname).load_module(
+            'components')
+        for name, obj in inspect.getmembers(module_obj):
             if inspect.isclass(obj) and name != 'BaseRteComponent':
                 actual_component_classes.append(obj)
         self.assertEqual(

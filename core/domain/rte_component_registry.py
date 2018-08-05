@@ -17,6 +17,7 @@
 """Registry for custom rich-text components."""
 
 import inspect
+import pkgutil
 
 import constants
 import feconf
@@ -70,17 +71,13 @@ class Registry(object):
     @classmethod
     def get_component_types_to_component_classes(cls):
         """Get component classes mapping for component types."""
-        # Importing this at top of file creates a circular dependency:
-        # rte_component_registry imports components
-        # components imports objects
-        # objects imports schema_utils
-        # schema_utils imports html_cleaner
-        # html_cleaner imports rte_component_registry.
-        from extensions.rich_text_components import components # pylint: disable=relative-import
+        module_fullname = 'extensions.rich_text_components.components'
+        module_obj = pkgutil.find_loader(module_fullname).load_module(
+            'components')
         component_types_to_component_classes = {}
         component_names = cls.get_all_rte_components().keys()
         for component_name in component_names:
-            for name, obj in inspect.getmembers(components):
+            for name, obj in inspect.getmembers(module_obj):
                 if inspect.isclass(obj) and name == component_name:
                     component_types_to_component_classes[
                         'oppia-noninteractive-%s' % component_name.lower()] = (
