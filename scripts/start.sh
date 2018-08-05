@@ -102,9 +102,6 @@ echo Starting GAE development server
 
 ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG)&
 
-# Store the job id of the most recent background command
-# which is starting server
-JOB_ID=$!
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
@@ -134,4 +131,12 @@ fi
 
 echo Done!
 
-wait $JOB_ID
+# Function for waiting for the servers to go down.
+function cleanup {
+  while ( nc -vz localhost 8181 >/dev/null 2>&1 ); do sleep 1; done
+}
+
+# Runs cleanup function on exit.
+trap cleanup Exit
+
+wait
