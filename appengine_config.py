@@ -71,6 +71,13 @@ def webapp_add_wsgi_middleware(app):
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+pil_path = os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7')
+
+if not os.path.isdir(pil_path):
+    raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
+sys.path.insert(0, pil_path)
+
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'bleach-1.2.2'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
