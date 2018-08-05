@@ -77,7 +77,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
                         playthrough.actions);
 
                     var blockActionIndexMapping = {};
-                    var total = $scope.displayBlocks.reduce(
+                    $scope.displayBlocks.reduce(
                       function(runningTotal, displayBlock, i) {
                         blockActionIndexMapping[i] = runningTotal;
                         return runningTotal + displayBlock.length;
@@ -108,7 +108,17 @@ oppia.directive('cyclicTransitionsIssueDirective', [
                         'remainingActions' + pIdx.toString() + i.toString());
                     };
 
+                    /**
+                     * Shows the remaining display blocks and the arrow div. If
+                     * there is only one display block, the arrow div is not
+                     * shown at all. If the current shown display block is the
+                     * second last display block, the arrow div is hidden after
+                     * the final display block is shown. Else, the following
+                     * display block is displayed.
+                     */
                     $scope.showRemainingActions = function(pIdx) {
+                      // If there is only one display block left to be shown,
+                      // the arrow is not required.
                       if ($scope.maxHidden === 1) {
                         getRemainingActionsElements(
                           pIdx, $scope.maxHidden).style.display = 'block';
@@ -126,7 +136,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
                         if (currentShown === 0) {
                           getRemainingActionsElements(
                             pIdx, $scope.maxHidden).style.display = 'block';
-                        } else if (currentShown === 2) {
+                        } else if (currentShown === $scope.maxHidden - 1) {
                           getRemainingActionsElements(
                             pIdx, 1).style.display = 'block';
                           document.getElementById(
