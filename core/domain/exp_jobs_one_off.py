@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import image_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -36,7 +37,6 @@ import utils
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
-image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
@@ -683,7 +683,6 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                             content, mimetype='image/%s' % filetype)
                         yield (FILE_COPIED, 1)
 
-
     @staticmethod
     def reduce(status, values):
         if status == FILE_COPIED:
@@ -709,11 +708,9 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
             filenames = exp_services.get_image_filenames_from_exploration(
                 exploration)
             for filename in filenames:
-                fs = fs_domain.AbstractFileSystem(
-                    fs_domain.GcsFileSystem(exp_model.id))
-                fs.create_compressed_versions_of_image('image/%s' % filename)
+                image_services.create_compressed_versions_of_image(
+                    filename, exp_model.id)
                 yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
-
 
     @staticmethod
     def reduce(status, values):
