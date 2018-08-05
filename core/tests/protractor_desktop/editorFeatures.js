@@ -94,162 +94,154 @@ describe('Exploration history', function() {
         highlighted: false
       },
       4: {
-        text: '  html: \'<p>enter 6 to continue</p>',
+        text: '  html: <p>enter 6 to continue</p>',
         highlighted: true
       },
       5: {
-        text: ' ',
-        highlighted: true
-      },
-      6: {
-        text: '    \'',
-        highlighted: true
-      },
-      7: {
         text: 'content_ids_to_audio_translations:',
         highlighted: false
       },
-      8: {
+      6: {
         text: '  content: {}',
         highlighted: false
       },
-      9: {
+      7: {
         text: '  default_outcome: {}',
         highlighted: false
       },
-      10: {
+      8: {
         text: '  feedback_1: {}',
         highlighted: true
       },
-      11: {
+      9: {
         text: 'interaction:',
         highlighted: false
       },
-      12: {
+      10: {
         text: '  answer_groups:',
         highlighted: true
       },
-      13: {
+      11: {
         text: '  - outcome:',
         highlighted: true
       },
-      14: {
+      12: {
         text: '      dest: second',
         highlighted: true
       },
-      15: {
+      13: {
         text: '      feedback:',
         highlighted: true
       },
-      16: {
+      14: {
         text: '        content_id: feedback_1',
         highlighted: true
       },
-      17: {
+      15: {
         text: '        html: \'\'',
         highlighted: true
       },
-      18: {
+      16: {
         text: '      labelled_as_correct: false',
         highlighted: true
       },
-      19: {
+      17: {
         text: '      missing_prerequisite_skill_id: null',
         highlighted: true
       },
-      20: {
+      18: {
         text: '      param_changes: []',
         highlighted: true
       },
-      21: {
+      19: {
         text: '      refresher_exploration_id: null',
         highlighted: true
       },
-      22: {
+      20: {
         text: '    rule_specs:',
         highlighted: true
       },
-      23: {
+      21: {
         text: '    - inputs:',
         highlighted: true
       },
-      24: {
+      22: {
         text: '        x: 6',
         highlighted: true
       },
-      25: {
+      23: {
         text: '      rule_type: Equals',
         highlighted: true
       },
-      26: {
+      24: {
         text: '    tagged_misconception_id: null',
         highlighted: true
       },
-      27: {
+      25: {
         text: '    training_data: []',
         highlighted: true
       },
-      28: {
+      26: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      29: {
+      27: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      30: {
+      28: {
         text: '  default_outcome:',
         highlighted: false
       },
-      31: {
+      29: {
         text: '    dest: first',
         highlighted: true
       },
-      32: {
+      30: {
         text: '    feedback:',
         highlighted: false
       },
-      33: {
+      31: {
         text: '      content_id: default_outcome',
         highlighted: false
       },
-      34: {
+      32: {
         text: '      html: \'\'',
         highlighted: false
       },
-      35: {
+      33: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      36: {
+      34: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
-      37: {
+      35: {
         text: '    param_changes: []',
         highlighted: false
       },
-      38: {
+      36: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      39: {
+      37: {
         text: '  hints: []',
         highlighted: false
       },
-      40: {
+      38: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      41: {
+      39: {
         text: '  solution: null',
         highlighted: false
       },
-      42: {
+      40: {
         text: 'param_changes: []',
         highlighted: false
       },
-      43: {
+      41: {
         text: ' ',
         highlighted: false
       }
@@ -364,9 +356,7 @@ describe('Exploration history', function() {
       'classifier_model_id: null\n' +
       'content:\n' +
       '  content_id: content\n' +
-      '  html: \'<p>this is card 2</p>\n' +
-      '\n' +
-      '    \'\n' +
+      '  html: <p>this is card 2</p>\n' +
       'content_ids_to_audio_translations:\n' +
       '  content: {}\n' +
       '  default_outcome: {}\n' +
