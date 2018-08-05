@@ -29,7 +29,7 @@ class Registry(object):
 
     @classmethod
     def _refresh_registry(cls):
-        cls.calculations_dict.clear()
+        cls._calculations_dict.clear()
 
         # Add new visualization instances to the registry.
         for name, clazz in inspect.getmembers(
