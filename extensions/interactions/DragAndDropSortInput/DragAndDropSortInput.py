@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Python configuration for DragAndDropSort interaction."""
+"""Python configuration for DragAndDropSortInput interaction."""
 
 from extensions.interactions import base
 
 
-class DragAndDropSort(base.BaseInteraction):
+class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""
 
     name = 'Drag And Drop Sort'

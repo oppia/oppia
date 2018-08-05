@@ -24,7 +24,8 @@ oppia.factory('ResponsesService', [
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'ExplorationWarningsService',
   'stateContentIdsToAudioTranslationsService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'COMPONENT_NAME_DEFAULT_OUTCOME', 'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
@@ -33,7 +34,8 @@ oppia.factory('ResponsesService', [
       stateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, ExplorationWarningsService,
       stateContentIdsToAudioTranslationsService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      COMPONENT_NAME_DEFAULT_OUTCOME, INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -126,6 +128,16 @@ oppia.factory('ResponsesService', [
       _saveAnswerGroups(_answerGroups);
     };
 
+    var _updateAnswerGroupsAudioTranslation = function () {
+      stateContentIdsToAudioTranslationsService.displayed.
+        deleteAllFeedbackContentId();
+      for (var i = 0; i < _answerGroups.length; i++) {
+        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+          _answerGroups[i].outcome.feedback.getContentId());
+      }
+      stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+    };
+
     var _saveDefaultOutcome = function(newDefaultOutcome) {
       var oldDefaultOutcome = _defaultOutcomeMemento;
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
@@ -182,23 +194,29 @@ oppia.factory('ResponsesService', [
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
           _answerGroups = [];
-          stateContentIdsToAudioTranslationsService.displayed
-            .deleteAllFeedbackContentId();
-          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
+
+        // This is necessary in order to keep the audio translations of the
+        // answer groups in sync with the answer groups that are fetched from
+        // the cache.
+        _updateAnswerGroupsAudioTranslation();
 
         // Preserve the default outcome unless the interaction is terminal.
         // Recreate the default outcome if switching away from a terminal
         // interaction.
         if (newInteractionId) {
-          var defaultOutcomeContentId = 'default_outcome';
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
+            stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+              COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), defaultOutcomeContentId,
-              '', []);
+              EditorStateService.getActiveStateName(),
+              COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
+            stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              COMPONENT_NAME_DEFAULT_OUTCOME);
           }
+          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
 
         _confirmedUnclassifiedAnswers = [];
@@ -347,6 +365,55 @@ oppia.factory('ResponsesService', [
               rules: newRules
             });
           });
+        }
+
+        // If the interaction is DragAndDropSortInput, update the answer groups
+        // to refer to the new answer options.
+        if (stateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
+            oldAnswerChoices) {
+          // If the length of the answer choices array changes, then there is
+          // surely any deletion or modification or addition in the array. We
+          // simply set answer groups to refer to default value. If the length
+          // of the answer choices array remains the same and all the choices in
+          // the previous array are present, then no change is required.
+          // However, if any of the choices is not present, we set answer groups
+          // to refer to the default value containing new answer choices.
+          var anyChangesHappened = false;
+          if (oldAnswerChoices.length !== newAnswerChoices.length) {
+            anyChangesHappened = true;
+          } else {
+            // Check if any modification happened in answer choices.
+            var numAnswerChoices = oldAnswerChoices.length;
+            for (var i = 0; i < numAnswerChoices; i++) {
+              var choiceIsPresent = false;
+              for (var j = 0; j < numAnswerChoices; j++) {
+                if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+                  choiceIsPresent = true;
+                  break;
+                }
+              }
+              if (choiceIsPresent === false) {
+                anyChangesHappened = true;
+                break;
+              }
+            }
+          }
+
+          if (anyChangesHappened) {
+            _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+              var newRules = angular.copy(answerGroup.rules);
+              newRules.forEach(function(rule) {
+                for (var key in rule.inputs) {
+                  var newInputValue = [];
+                  rule.inputs[key] = newInputValue;
+                }
+              });
+
+              _updateAnswerGroup(answerGroupIndex, {
+                rules: newRules
+              });
+            });
+          }
         }
       },
       getAnswerGroups: function() {
