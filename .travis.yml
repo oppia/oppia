@@ -108,8 +108,7 @@ script:
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
 # Run e2e tests for mobile in dev mode since the demo explorations and collections are only available in the dev mode and not in production mode.
-#- if [ "$RUN_E2E_TESTS_MOBILE" == 'true' ] && [ "$TRAVIS_BRANCH" == 'develop' ] && [ "$TRAVIS_EVENT_TYPE" == 'push' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
-- if [ "$RUN_E2E_TESTS_MOBILE" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
+- if [ "$RUN_E2E_TESTS_MOBILE" == 'true' ] && [ "$TRAVIS_BRANCH" == 'develop' ] && [ "$TRAVIS_EVENT_TYPE" == 'push' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
 
 after_success:
 - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ]; then codecov; fi
