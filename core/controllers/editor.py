@@ -30,6 +30,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import image_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -772,8 +773,8 @@ class ImageUploadHandler(EditorHandler):
 
         fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
 
-        fs.create_compressed_versions_of_image(
-            '%s/%s' % (self._FILENAME_PREFIX, filename))
+        image_services.create_compressed_versions_of_image(
+            filename, exploration_id)
 
         self.render_json({'filepath': filename})
 

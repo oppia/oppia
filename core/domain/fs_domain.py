@@ -192,44 +192,16 @@ class ExplorationFileSystem(object):
             return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
 
-    def get_file_content(self, filepath):  # pylint: disable=unused-argument
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+    def get_file_content(self, filepath):
+        """Gets the content of the file.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
+        Returns:
+            str. The content property of the FileModel of the image file.
         """
-        raise NotImplementedError
-
-    def get_image_dimensions(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
-    def create_compressed_versions_of_image(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
+        return self._get_file_data(filepath, None).content
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -463,32 +435,6 @@ class DiskBackedFileSystem(object):
         """
         raise NotImplementedError
 
-    def get_image_dimensions(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
-    def create_compressed_versions_of_image(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
     def listdir(self, dir_name):
         """Raises NotImplementedError if the method is not implemented in the
         derived classes.
@@ -567,46 +513,6 @@ class GcsFileSystem(object):
         gcs_file.close()
 
         return contents
-
-    def get_image_dimensions(self, filepath):
-        """Gets the dimensions of the image with the given filename
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            tuple. Returns height and width of the image.
-        """
-        content = self.get_file_content(filepath)
-        height, width = gae_image_services.get_image_dimensions(content)
-        return height, width
-
-    def create_compressed_versions_of_image(self, filepath):
-        """Creates two compressed versions of the image by compressing the
-        original image.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-        """
-        filename = filepath[filepath.rfind('/') + 1:]
-        filename_wo_filetype = filename[:filename.rfind('.')]
-        filetype = filename[filename.rfind('.') + 1:]
-
-        org_image_content = self.get_file_content(filepath)
-        compressed_image_content = gae_image_services.compress_image(
-            org_image_content, 0.8)
-        micro_image_content = gae_image_services.compress_image(
-            org_image_content, 0.7)
-
-        self.commit(
-            'ADMIN', 'image/%s_compressed.%s' % (
-                filename_wo_filetype, filetype),
-            compressed_image_content, mimetype='image/%s' % filetype)
-
-        self.commit(
-            'ADMIN', 'image/%s_micro.%s' % (
-                filename_wo_filetype, filetype),
-            micro_image_content, mimetype='image/%s' % filetype)
 
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
         """Raises NotImplementedError if the method is not implemented in the
@@ -727,31 +633,6 @@ class AbstractFileSystem(object):
         """
         self._check_filepath(filepath)
         return self._impl.get_file_content(filepath)
-
-    def get_image_dimensions(self, filepath):
-        """Gets the dimensions of the image with the given filename
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            tuple. Returns height and width of the image.
-        """
-        self._check_filepath(filepath)
-        return self._impl.get_image_dimensions(filepath)
-
-    def create_compressed_versions_of_image(self, filepath):
-        """Creates two compressed versions of the image by compressing the
-        original image.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            null. It doesn't return anything.
-        """
-        self._check_filepath(filepath)
-        return self._impl.create_compressed_versions_of_image(filepath)
 
     def open(self, filepath, version=None, mode='r'):
         """Returns a stream with the file content. Similar to open(...).
