@@ -133,6 +133,10 @@ echo Done!
 
 # Function for waiting for the servers to go down.
 function cleanup {
+  echo ""
+  echo "  INFORMATION"
+  echo "  Cleaning up the servers."
+  echo ""
   while ( nc -vz localhost 8181 >/dev/null 2>&1 ); do sleep 1; done
 }
 
