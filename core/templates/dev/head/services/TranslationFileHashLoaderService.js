@@ -34,7 +34,7 @@ oppia.factory('TranslationFileHashLoaderService', [
         UrlInterpolationService.getStaticAssetUrl(fileUrl)
       ).then(function(result) {
         return result.data;
-      }, function () {
+      }, function() {
         return $q.reject(options.key);
       });
     };

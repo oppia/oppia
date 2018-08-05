@@ -33,8 +33,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var ERROR_PAGE_URL_SUFFIX = '/console_errors';
-
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
     element(by.cssContainingText('option', language)).click();
@@ -87,37 +85,6 @@ describe('Basic user journeys', function() {
     });
   });
 
-  describe('Login Flow', function() {
-    beforeEach(function() {
-      users.createAndLoginUser('randomuser@gmail.com', 'r4nd0m');
-    });
-
-    it('visits the links in the dropdown', function() {
-      var profileDropdown = element(by.css(
-        '.protractor-test-profile-dropdown'));
-
-      var classNames = [
-        '.protractor-test-profile-link',
-        '.protractor-test-dashboard-link',
-        '.protractor-test-preferences-link',
-        '.protractor-test-notifications-link'
-      ];
-      classNames.forEach(function(className) {
-        browser.actions().mouseMove(profileDropdown).perform();
-        var dropdownElement = element.all(by.css(className)).first();
-        waitFor.elementToBeClickable(
-          dropdownElement, 'Could not click topnav dropdown');
-        dropdownElement.click();
-        waitFor.pageToFullyLoad();
-      });
-    });
-
-    afterEach(function() {
-      general.checkForConsoleErrors([]);
-      users.logout();
-    });
-  });
-
   describe('Preferences', function() {
     var preferencesPage = null;
 
@@ -149,69 +116,7 @@ describe('Basic user journeys', function() {
 
     afterEach(function() {
       general.checkForConsoleErrors([]);
-    });
-  });
-
-  describe('Library pages tour', function() {
-    var EXPLORATION_TITLE = 'Test Exploration';
-    var EXPLORATION_OBJECTIVE = 'To learn testing';
-    var EXPLORATION_CATEGORY = 'Algorithms';
-    var EXPLORATION_LANGUAGE = 'English';
-    var EXPLORATION_RATING = 4;
-    var SEARCH_TERM = 'python';
-    var libraryPage = null;
-    var explorationPlayerPage = null;
-
-    beforeEach(function() {
-      libraryPage = new LibraryPage.LibraryPage();
-      explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    });
-
-    var visitRecentlyPublishedPage = function() {
-      browser.get('library/recently_published');
-      waitFor.pageToFullyLoad();
-    };
-
-    it('visits the search page', function() {
-      libraryPage.get();
-      libraryPage.findExploration(SEARCH_TERM);
-      expect(browser.getCurrentUrl()).toContain('search/find?q=python');
-    });
-
-    it('visits the library index page', function() {
-      libraryPage.get();
-    });
-
-    it('visits the top rated page', function() {
-      // To visit the top rated page, at least one
-      // exploration has to be rated by the user
-      users.createUser('random@gmail.com', 'random');
-      users.login('random@gmail.com');
-      workflow.createAndPublishExploration(
-        EXPLORATION_TITLE,
-        EXPLORATION_CATEGORY,
-        EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE
-      );
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
-      explorationPlayerPage.rateExploration(EXPLORATION_RATING);
-
-      libraryPage.get();
-      element(by.css('.protractor-test-library-top-rated')).click();
-      waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toContain('library/top_rated');
       users.logout();
-    });
-
-    it('visits the recent explorations page', function() {
-      visitRecentlyPublishedPage();
-      expect(browser.getCurrentUrl()).toContain('library/recently_published');
-    });
-
-    afterEach(function() {
-      general.checkForConsoleErrors([]);
     });
   });
 });
@@ -459,16 +364,5 @@ describe('Site language', function() {
     waitFor.pageToFullyLoad();
     _selectLanguage('English');
     general.checkForConsoleErrors([]);
-  });
-});
-
-
-describe('Cache Slugs', function() {
-  it('should check that errors get logged for missing resources', function() {
-    browser.get(ERROR_PAGE_URL_SUFFIX);
-    var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
-    ];
-    general.checkConsoleErrorsExist(expectedErrors);
   });
 });

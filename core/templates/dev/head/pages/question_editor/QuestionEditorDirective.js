@@ -24,7 +24,9 @@ oppia.directive('questionEditor', [
       restrict: 'E',
       scope: {
         getQuestionId: '&questionId',
-        getQuestionStateData: '&questionStateData'
+        getMisconceptions: '&misconceptions',
+        canEditQuestion: '&',
+        questionStateData: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
@@ -33,17 +35,20 @@ oppia.directive('questionEditor', [
         'EditabilityService', 'EditableQuestionBackendApiService',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateContentService', 'StateContentIdsToAudioTranslationsService',
-        'INTERACTION_SPECS', 'EditorStateService', 'ResponsesService',
+        'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService',
         function(
             $scope, $rootScope, AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateContentService, StateContentIdsToAudioTranslationsService,
-            INTERACTION_SPECS, EditorStateService, ResponsesService,
+            INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService) {
-          EditabilityService.markEditable();
-          EditorStateService.setActiveStateName('question');
+          if ($scope.canEditQuestion()) {
+            EditabilityService.markEditable();
+          }
+          StateEditorService.setActiveStateName('question');
+          StateEditorService.setMisconceptions($scope.getMisconceptions());
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 
@@ -71,16 +76,13 @@ oppia.directive('questionEditor', [
           };
 
           var _init = function() {
-            EditorStateService.setStateNames([]);
-            EditorStateService.setCorrectnessFeedbackEnabled(true);
-            EditorStateService.setInQuestionMode(true);
+            StateEditorService.setStateNames([]);
+            StateEditorService.setCorrectnessFeedbackEnabled(true);
+            StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            var stateData = $scope.getQuestionStateData();
+            var stateData = $scope.questionStateData;
+            stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              ResponsesService.save(
-                [], stateData.interaction.defaultOutcome,
-                function(newAnswerGroups, newDefaultOutcome) {}
-              );
               $rootScope.$broadcast('stateEditorInitialized', stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
@@ -94,44 +96,49 @@ oppia.directive('questionEditor', [
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
+            $scope.questionStateData.content = angular.copy(displayedValue);
             $scope.interactionIsShown = true;
           };
 
           $scope.saveInteractionId = function(displayedValue) {
-            EditorStateService.setInteractionId(angular.copy(displayedValue));
+            StateEditorService.setInteractionId(angular.copy(displayedValue));
           };
 
           $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
-            EditorStateService.setInteractionAnswerGroups(
+            StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
-            $scope.recomputeGraph();
           };
 
           $scope.saveInteractionDefaultOutcome = function(newOutcome) {
-            EditorStateService.setInteractionDefaultOutcome(
+            StateEditorService.setInteractionDefaultOutcome(
               angular.copy(newOutcome));
-            $scope.recomputeGraph();
           };
 
           $scope.saveInteractionCustomizationArgs = function(displayedValue) {
-            EditorStateService.setInteractionCustomizationArgs(
+            StateEditorService.setInteractionCustomizationArgs(
               angular.copy(displayedValue));
           };
 
           $scope.saveSolution = function(displayedValue) {
-            EditorStateService.setInteractionSolution(
+            StateEditorService.setInteractionSolution(
               angular.copy(displayedValue));
           };
 
           $scope.saveHints = function(displayedValue) {
-            EditorStateService.setInteractionHints(
+            StateEditorService.setInteractionHints(
               angular.copy(displayedValue));
           };
 
           $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
+            $scope.questionStateData.contentIdsToAudioTranslations =
+              angular.copy(displayedValue);
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            _init();
+          });
+
+          $scope.$on('onInteractionIdChanged', function(evt) {
             _init();
           });
         }

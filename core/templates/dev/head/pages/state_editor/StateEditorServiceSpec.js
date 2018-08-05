@@ -23,7 +23,7 @@ describe('Editor state service', function() {
     var ecs = null;
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('EditorStateService');
+      ecs = $injector.get('StateEditorService');
     }));
 
     it('should correctly set and get state names', function() {
