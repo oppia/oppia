@@ -43,6 +43,7 @@ def get_image_dimensions(filename, exp_id):
     height, width = gae_image_services.get_image_dimensions(content)
     return height, width
 
+
 def create_compressed_versions_of_image(filename, exp_id):
     """Creates two compressed versions of the image by compressing the
     original image.
