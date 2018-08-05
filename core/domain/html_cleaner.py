@@ -26,13 +26,12 @@ import urlparse
 import bleach
 import bs4
 from core.domain import filepath_domain
+from core.domain import image_services
 from core.domain import rte_component_registry
-
 from core.platform import models
 import feconf
 
 app_identity_services = models.Registry.import_app_identity_services()
-image_services = models.Registry.import_gae_image_services()
 
 
 def filter_a(name, value):
