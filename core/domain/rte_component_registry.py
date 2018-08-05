@@ -16,6 +16,8 @@
 
 """Registry for custom rich-text components."""
 
+import inspect
+
 import constants
 import feconf
 import utils
@@ -64,3 +66,68 @@ class Registry(object):
                 for ca_spec in component_specs['customization_arg_specs']]
 
         return component_tags
+
+    @classmethod
+    def get_component_types_to_component_classes(cls):
+        """Get component classes mapping for component types."""
+        # Importing this at top of file creates a circular dependency:
+        # rte_component_registry imports components
+        # components import objects
+        # objects import schema_utils
+        # schema_utils import html_cleaner
+        # html_cleaner import rte_component_registry.
+        from extensions.rich_text_components import components # pylint: disable=relative-import
+        component_types_to_component_classes = {}
+        component_names = cls.get_all_rte_components().keys()
+        for component_name in component_names:
+            for name, obj in inspect.getmembers(components):
+                if inspect.isclass(obj) and name == component_name:
+                    component_types_to_component_classes[
+                        'oppia-noninteractive-%s' % component_name.lower()] = (
+                            obj)
+
+        return component_types_to_component_classes
+
+    @classmethod
+    def get_inline_components(cls):
+        """Gets an list of inline component tags."""
+        rich_text_components_specs = cls.get_all_rte_components()
+        inline_component_tag_names = []
+        for component_spec in rich_text_components_specs.values():
+            if not component_spec['is_block_element']:
+                inline_component_tag_names.append(
+                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
+        return inline_component_tag_names
+
+    @classmethod
+    def get_block_components(cls):
+        """Gets an list of block component tags."""
+        rich_text_components_specs = cls.get_all_rte_components()
+        block_component_tag_names = []
+        for component_spec in rich_text_components_specs.values():
+            if component_spec['is_block_element']:
+                block_component_tag_names.append(
+                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
+        return block_component_tag_names
+
+    @classmethod
+    def get_simple_components(cls):
+        """Gets an list of simple component tags."""
+        rich_text_components_specs = cls.get_all_rte_components()
+        simple_component_tag_names = []
+        for component_spec in rich_text_components_specs.values():
+            if not component_spec['is_complex']:
+                simple_component_tag_names.append(
+                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
+        return simple_component_tag_names
+
+    @classmethod
+    def get_complex_components(cls):
+        """Gets an list of complex component tags."""
+        rich_text_components_specs = cls.get_all_rte_components()
+        complex_component_tag_names = []
+        for component_spec in rich_text_components_specs.values():
+            if component_spec['is_complex']:
+                complex_component_tag_names.append(
+                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
+        return complex_component_tag_names

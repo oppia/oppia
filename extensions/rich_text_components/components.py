@@ -32,6 +32,8 @@ class BaseRteComponent(object):
     # These values should be overridden in subclasses.
     customization_args = {}
 
+    arg_schema = {}
+
     @classmethod
     def validate(cls, value_dict):
         """Validates customization args for a rich text component.
@@ -39,13 +41,17 @@ class BaseRteComponent(object):
         Raises:
           TypeError: if any customization arg is invalid.
         """
-        required_attr_names = cls.customization_args.keys()
+        if cls.arg_schema:
+            required_attrs = cls.arg_schema
+        else:
+            required_attrs = cls.customization_args
+        required_attr_names = required_attrs.keys()
         attr_names = value_dict.keys()
         if set(attr_names) != set(required_attr_names):
             raise Exception('Invalid attributes')
 
         for arg_name in required_attr_names:
-            arg_obj_class = cls.customization_args[arg_name]
+            arg_obj_class = required_attrs[arg_name]
             arg_obj_class.normalize(value_dict[arg_name])
 
 
@@ -53,8 +59,8 @@ class Collapsible(BaseRteComponent):
     """Class for Collapsible component."""
 
     customization_args = {
-        'content-with-value': objects.Html,
-        'heading-with-value': objects.UnicodeString
+        'heading-with-value': objects.UnicodeString,
+        'content-with-value': objects.Html
     }
 
     @classmethod
@@ -78,8 +84,8 @@ class Image(BaseRteComponent):
 
     customization_args = {
         'filepath-with-value': objects.Filepath,
-        'alt-with-value': objects.UnicodeString,
-        'caption-with-value': objects.UnicodeString
+        'caption-with-value': objects.UnicodeString,
+        'alt-with-value': objects.UnicodeString
     }
 
     @classmethod
@@ -96,9 +102,10 @@ class Link(BaseRteComponent):
     """Class for Link component."""
 
     customization_args = {
-        'url-with-value': objects.SanitizedUrl,
-        'text-with-value': objects.UnicodeString
+        'text-with-value': objects.UnicodeString,
+        'url-with-value': objects.SanitizedUrl
     }
+    is_simple = True
 
 
 class Math(BaseRteComponent):
@@ -113,6 +120,9 @@ class Tabs(BaseRteComponent):
     """Class for Tabs component."""
 
     customization_args = {
+        'tab_contents-with-value': list
+    }
+    arg_schema = {
         'content': objects.Html,
         'title': objects.UnicodeString
     }
