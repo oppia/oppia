@@ -17,10 +17,8 @@
 """HTML sanitizing service."""
 
 import HTMLParser
-import cStringIO
 import json
 import logging
-import urllib
 import urlparse
 
 import bleach
@@ -838,5 +836,5 @@ def get_filepath_of_object_image(filename, exp_id):
     """
     height, width = image_services.get_image_dimensions(filename, exp_id)
     filepath = filepath_domain.Filepath(
-    filename, height=height, width=width)
+        filename, height=height, width=width)
     return filepath.to_dict()

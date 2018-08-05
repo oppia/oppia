@@ -24,7 +24,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 
 def get_image_dimensions(filename, exp_id):
-    """Gets the dimensions of the image with the given filename
+    """Gets the dimensions of the image with the given filename.
 
     Args:
         filename: str. The filename of the image in exploration.
@@ -34,7 +34,7 @@ def get_image_dimensions(filename, exp_id):
         tuple. Returns height and width of the image.
     """
     # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
-    # it is 'image/filename'
+    # it is 'image/filename'.
     filepath = (
         filename if (
             feconf.DEV_MODE)
@@ -59,7 +59,7 @@ def create_compressed_versions_of_image(filename, exp_id):
         exp_id: str. ID of the exploration.
     """
     # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
-    # it is 'image/filename'
+    # it is 'image/filename'.
     filepath = (
         filename if (
             feconf.DEV_MODE)

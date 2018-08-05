@@ -16,10 +16,8 @@
 
 """Domain objects representing a file system and a file stream."""
 
-import cStringIO
 import logging
 import os
-import urllib
 
 from core.platform import models
 import feconf
@@ -473,7 +471,7 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
-    def _get_file_data(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
+    def _get_file_data(self, filepath):
         """Gets the content of the file stored in GCS
         Args:
             filepath: str. The path to the relevant file within the exploration.

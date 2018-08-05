@@ -16,10 +16,8 @@
 
 """Tests for the HTML sanitizer."""
 
-import io
 import bs4
 import os
-from PIL import Image
 from core.domain import html_cleaner
 from core.domain import fs_domain
 from core.tests import test_utils
@@ -193,7 +191,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     strings to valid RTE format.
     """
     owner_id = 'ADMIN'
-    EXP_ID  = 'eid'
+    EXP_ID = 'eid'
     def test_wrap_with_siblings(self):
         test_cases = [{
             'html_content': (
@@ -827,7 +825,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
-        fs.commit(self.owner_id, 'abc.png', raw_image, 'image/png')
+        fs.commit(self.owner_id, 'abc.png', raw_image, mimetype='image/png')
         self.assertEqual(fs.isfile('abc.png'), True)
         for test_case in test_cases:
             self.assertEqual(
