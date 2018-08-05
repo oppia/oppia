@@ -21,7 +21,7 @@ describe('Solution object factory', function() {
 
   describe('SolutionObjectFactory', function() {
     var scope, sof, solution;
-    beforeEach(inject(function ($injector, $rootScope) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       sof = $injector.get('SolutionObjectFactory');
       solution = sof.createFromBackendDict({

@@ -36,7 +36,7 @@ describe('Embedding', function() {
   explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-  var createCountingExploration = function () {
+  var createCountingExploration = function() {
     // Intro.
     explorationEditorMainTab.setStateName('Intro');
     explorationEditorMainTab.setContent(forms.toRichText(
