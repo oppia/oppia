@@ -875,7 +875,7 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: str or None. The id of the tagged
+            tagged_misconception_id: int or None. The id of the tagged
                 misconception for the answer group, when a state is part of a
                 Question object that tests a particular skill.
         """
@@ -909,9 +909,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, basestring):
+            if not isinstance(self.tagged_misconception_id, int):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be a string, '
+                    'Expected tagged misconception id to be an int, '
                     'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
@@ -2002,7 +2002,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 

@@ -734,6 +734,8 @@ class ImageUploadHandler(EditorHandler):
         # Verify that the file type matches the supplied extension.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
+        if filename.rfind('.') == 0:
+            raise self.InvalidInputException('Invalid filename')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
                 'Filenames should not include slashes (/) or consecutive dot '

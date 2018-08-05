@@ -329,12 +329,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%s.js">'
                 '</script>' % (interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%sValidationService.js"></script>' % (
                     interaction_id, interaction_id),
                 html_file_content)

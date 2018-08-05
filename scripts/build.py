@@ -27,7 +27,7 @@ import subprocess
 import threading
 import time
 
-ASSETS_SRC_DIR = os.path.join('assets', '')
+ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
@@ -42,7 +42,8 @@ EXTENSIONS_STAGING_DIR = (
     os.path.join('backend_prod_files', 'extensions', ''))
 EXTENSIONS_OUT_DIR = os.path.join('build', 'extensions', '')
 
-TEMPLATES_DEV_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR_CORE = os.path.join('core', 'templates', 'dev', 'head', '')
 TEMPLATES_STAGING_DIR = (
     os.path.join('backend_prod_files', 'templates', 'head', ''))
 TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
@@ -200,7 +201,18 @@ def process_html(source_path, target_path, file_hashes):
         if filepath.endswith('.html'):
             continue
         filepath_with_hash = _insert_hash(filepath, file_hash)
-        content = content.replace(filepath, filepath_with_hash)
+        content = content.replace(
+            '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+            '%s%s' % (TEMPLATES_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (ASSETS_DEV_DIR, filepath),
+            '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (EXTENSIONS_DEV_DIR, filepath),
+            '%s%s' % (EXTENSIONS_OUT_DIR, filepath_with_hash))
+        content = content.replace(
+            '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
+            '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
     content = REMOVE_WS(' ', content)
     d = open(target_path, 'w+')
     d.write(content)
@@ -519,10 +531,9 @@ def save_hashes_as_json(target_filepath, file_hashes):
 
     file_hash = generate_md5_hash(target_filepath)
     relative_filepath = os.path.relpath(
-        target_filepath, os.path.join(os.path.curdir, 'build'))
+        target_filepath, os.path.join(os.path.curdir, 'build', 'assets'))
     filepath_with_hash = _insert_hash(target_filepath, file_hash)
     os.rename(target_filepath, filepath_with_hash)
-
     file_hashes[relative_filepath] = file_hash
 
 
@@ -605,11 +616,14 @@ def generate_build_directory():
     """
     print 'Building Oppia in production mode...'
 
+    # The keys for hashes are filepaths relative to the subfolders of the future
+    # /build folder. This is so that the replacing inside the HTML files works
+    # correctly.
     hashes = dict()
 
     # Create hashes for assets, copy directories and files to build/assets.
-    hashes.update(get_file_hashes(ASSETS_SRC_DIR))
-    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
+    hashes.update(get_file_hashes(ASSETS_DEV_DIR))
+    copy_files_source_to_target(ASSETS_DEV_DIR, ASSETS_OUT_DIR, hashes)
 
     # Process third_party resources, create hashes for them and copy them into
     # build/third_party/generated.
@@ -627,14 +641,14 @@ def generate_build_directory():
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
     # Create hashes for all template files.
-    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
+    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR_CORE))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
     save_hashes_as_json(HASHES_JSON, hashes)
 
     # Minify all template files copy them into build/templates/head.
-    build_files(TEMPLATES_DEV_DIR, TEMPLATES_STAGING_DIR, hashes)
+    build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 

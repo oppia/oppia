@@ -36,7 +36,7 @@ oppia.directive('pieChart', [function() {
 
       // Need to wait for load statement in editor template to finish.
       // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function () {
+      google.charts.setOnLoadCallback(function() {
         if (!chart) {
           chart = new google.visualization.PieChart($element[0]);
         }

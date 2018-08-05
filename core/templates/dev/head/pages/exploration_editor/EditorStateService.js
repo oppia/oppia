@@ -17,7 +17,7 @@
  * in the exploration is currently active.
  */
 
-oppia.factory('EditorStateService', [
+oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
       $log, SolutionValidityService) {
@@ -69,7 +69,7 @@ oppia.factory('EditorStateService', [
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
       },
-      getInQuestionMode: function() {
+      isInQuestionMode: function() {
         return inQuestionMode;
       },
       setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {

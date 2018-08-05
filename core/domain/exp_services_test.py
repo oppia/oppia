@@ -802,7 +802,7 @@ title: Title
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exp.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
         test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
@@ -1188,7 +1188,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
@@ -1268,7 +1268,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -2899,7 +2899,7 @@ title: Old Title
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2925,14 +2925,14 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self):
         exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_then_reversion_maintains_valid_exploration(self):
@@ -3030,7 +3030,7 @@ title: Old Title
             exploration_model, run_conversion=False)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The exploration should be valid after conversion.
         exploration.validate(strict=True)
@@ -3070,12 +3070,12 @@ title: Old Title
             'committer_id': feconf.MIGRATION_BOT_USERNAME,
             'commit_message':
                 'Update exploration states from schema version 0 to %d.' %
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+                feconf.CURRENT_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
                 'to_version': str(
-                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                    feconf.CURRENT_STATES_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }
@@ -3124,7 +3124,7 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(exp_id)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The converted exploration should be up-to-date and properly
         # converted.

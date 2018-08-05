@@ -70,7 +70,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     found in exp_domain.py and, in fact, many of the conversion functions for
     states are also used in the YAML conversion pipeline. If the current
     exploration states schema version changes
-    (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
+    (feconf.CURRENT_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
 
@@ -91,14 +91,14 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
         states_schema_version = 0
 
     if not (0 <= states_schema_version
-            <= feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     while (states_schema_version <
-           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+           feconf.CURRENT_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states, states_schema_version,
             exploration_id)
@@ -157,7 +157,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_states_schema(
             versioned_exploration_states, exploration_model.id)
 
