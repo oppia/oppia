@@ -35,7 +35,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var multipleChoiceAnswerOptions = function (optionNum) {
+  var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
   };
@@ -626,15 +626,18 @@ var ExplorationEditorMainTab = function() {
       Continue: 'General',
       EndExploration: 'General',
       ImageClickInput: 'General',
+      ItemSelectionInput: 'General',
       MultipleChoiceInput: 'General',
       TextInput: 'General',
       FractionInput: 'Math',
       GraphInput: 'Math',
       LogicProof: 'Math',
       NumericInput: 'Math',
-      NumberWithUnits: 'Math',
       SetInput: 'Math',
+      MathExpressionInput: 'Math',
+      NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
+      PencilCodeEditor: 'Programming',
       MusicNotesInput: 'Music',
       InteractiveMap: 'Geography'
     };

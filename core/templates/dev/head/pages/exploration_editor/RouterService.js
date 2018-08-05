@@ -18,11 +18,11 @@
 
 oppia.factory('RouterService', [
   '$rootScope', '$location', '$window', '$timeout', '$interval',
-  'ExplorationInitStateNameService', 'EditorStateService',
+  'ExplorationInitStateNameService', 'StateEditorService',
   'ExplorationStatesService',
   function(
       $rootScope, $location, $window, $timeout, $interval,
-      ExplorationInitStateNameService, EditorStateService,
+      ExplorationInitStateNameService, StateEditorService,
       ExplorationStatesService) {
     var MAIN_TAB = 'main';
     var TRANSLATION_TAB = 'translation';
@@ -96,7 +96,7 @@ oppia.factory('RouterService', [
         if (ExplorationStatesService.isInitialized()) {
           $interval.cancel(waitForStatesToLoad);
           if (ExplorationStatesService.hasState(putativeStateName)) {
-            EditorStateService.setActiveStateName(putativeStateName);
+            StateEditorService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
             }
@@ -137,10 +137,10 @@ oppia.factory('RouterService', [
         return;
       }
       if (newStateName) {
-        EditorStateService.setActiveStateName(newStateName);
+        StateEditorService.setActiveStateName(newStateName);
       }
       $location.path('/' + pathType + '/' +
-                     EditorStateService.getActiveStateName());
+                     StateEditorService.getActiveStateName());
       $window.scrollTo(0, 0);
     };
 

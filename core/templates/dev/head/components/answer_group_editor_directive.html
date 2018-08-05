@@ -97,7 +97,7 @@
       + Add Another Possible Answer
     </button>
 
-    <div ng-if="isEditable && isCurrentInteractionTrainable()">
+    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isInQuestionMode()">
       <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
         <i class="material-icons md-24">playlist_add</i> Modify Training Data
       </button>
@@ -112,6 +112,16 @@
                   on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
                   on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()"
                   outcome="outcome"
-                  suppress-warnings="suppressWarnings()">
+                  add-state="addState"
+                  warnings-are-suppressed="suppressWarnings()"
+                  on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
   </outcome-editor>
+
+  <div ng-if="isInQuestionMode() && getTaggedMisconceptionId() !== null">
+    <label> Tagged Misconception: </label>
+    <[misconceptionName]>
+  </div>
+  <button type="button" ng-if="isEditable && isInQuestionMode() && rules && !outcome.labelledAsCorrect" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" style="padding-top: 5px;" ng-click="tagAnswerGroupWithMisconception()">
+    Tag with misconception
+  </button>
 </div>

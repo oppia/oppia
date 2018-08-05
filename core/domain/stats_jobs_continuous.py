@@ -136,10 +136,10 @@ class InteractionAnswerSummariesMRJobManager(
         # contain the version they correspond to. Otherwise, if they map to
         # VERSION_ALL, then multiple versions may be included.
         if exploration_version != VERSION_ALL and (
-                len(versions) != 1 or versions[0] != exploration_version):
+                len(versions) != 1 or versions[0] != int(exploration_version)):
             yield (
-                'Expected a single version when aggregating answers for '
-                'exploration %s (v=%s), but found: %s' % (
+                'ERROR: Expected a single version when aggregating answers '
+                'for exploration %s (v=%s), but found: %s' % (
                     exploration_id, exploration_version, versions))
 
         # Map interaction IDs and StateAnswersModel IDs to exploration versions.
@@ -161,14 +161,14 @@ class InteractionAnswerSummariesMRJobManager(
         for version, interaction_ids in versioned_interaction_ids.iteritems():
             if len(interaction_ids) != 1:
                 yield (
-                    'Expected exactly one interaction ID for exploration %s '
-                    'and version %s, found: %s' % (
+                    'ERROR: Expected exactly one interaction ID for '
+                    'exploration %s and version %s, found: %s' % (
                         exploration_id, version, len(interaction_ids)))
         for version, item_ids in versioned_item_ids.iteritems():
             if not item_ids:
                 yield (
-                    'Expected at least one item ID for exploration %s and '
-                    'version %s, found: %s' % (
+                    'ERROR: Expected at least one item ID for exploration %s '
+                    'and version %s, found: %s' % (
                         exploration_id, version, len(item_ids)))
 
         # Filter out any item IDs which happen at and before a version with a
@@ -195,8 +195,8 @@ class InteractionAnswerSummariesMRJobManager(
                 if latest_interaction_id != loaded_interaction_id and (
                         latest_version != exp.version):
                     yield (
-                        'Ignoring answers submitted to version %s and below '
-                        'since the latest exploration version is %s' % (
+                        'INFO: Ignoring answers submitted to version %s and '
+                        'below since the latest exploration version is %s' % (
                             latest_version, exp.version))
                     versions = []
 

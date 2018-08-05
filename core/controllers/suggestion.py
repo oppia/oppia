@@ -1,3 +1,4 @@
+
 # coding: utf-8
 #
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
@@ -49,12 +50,9 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'
 
-
-    # TODO (nithesh): Add permissions for users with enough scores to review
-    # Will be added as part of milestone 2 of the generalized review system
-    # project.
-    @acl_decorators.can_edit_exploration
-    def put(self, exploration_id, suggestion_id):
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_exploration)
+    def put(self, target_id, suggestion_id):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
@@ -67,7 +65,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to explorations.')
 
-        if suggestion_id.split('.')[1] != exploration_id:
+        if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException('The exploration id provided does '
                                              'not match the exploration id '
                                              'present as part of the '
@@ -75,6 +73,11 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion.author_id == self.user_id:
+            raise self.UnauthorizedUserException('You cannot accept/reject your'
+                                                 ' own suggestion.')
+
         if action == self.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
@@ -91,52 +94,25 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
-    LIST_TYPE_AUTHOR = 'author'
-    LIST_TYPE_ID = 'id'
-    LIST_TYPE_REVIEWER = 'reviewer'
-    LIST_TYPE_STATUS = 'status'
-    LIST_TYPE_SUGGESTION_TYPE = 'type'
-    LIST_TYPE_TARGET_ID = 'target'
-
-    LIST_TYPES_TO_SERVICES_MAPPING = {
-        LIST_TYPE_AUTHOR: suggestion_services.get_suggestions_by_author,
-        LIST_TYPE_ID: suggestion_services.get_suggestion_by_id,
-        LIST_TYPE_REVIEWER: suggestion_services.get_suggestions_reviewed_by,
-        LIST_TYPE_STATUS: suggestion_services.get_suggestions_by_status,
-        LIST_TYPE_SUGGESTION_TYPE: suggestion_services.get_suggestion_by_type,
-        LIST_TYPE_TARGET_ID: suggestion_services.get_suggestions_by_target_id
-    }
-
-    PARAMS_FOR_LIST_TYPES = {
-        LIST_TYPE_AUTHOR: ['author_id'],
-        LIST_TYPE_ID: ['suggestion_id'],
-        LIST_TYPE_REVIEWER: ['reviewer_id'],
-        LIST_TYPE_STATUS: ['status'],
-        LIST_TYPE_SUGGESTION_TYPE: ['suggestion_type'],
-        LIST_TYPE_TARGET_ID: ['target_type', 'target_id']
-    }
-
-    def get_params_from_request(self, request, list_type):
-        return [request.get(param_name)
-                for param_name in self.PARAMS_FOR_LIST_TYPES[list_type]]
-
     @acl_decorators.open_access
     def get(self):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
-        list_type = self.request.get('list_type')
+        # The query_fields_and_values variable is a list of tuples. The first
+        # element in each tuple is the field being queried and the second
+        # element is the value of the field being queried.
+        # request.GET.items() parses the params from the url into the above
+        # format. So in the url, the query should be passed as:
+        # ?field1=value1&field2=value2...fieldN=valueN.
+        query_fields_and_values = self.request.GET.items()
 
-        if list_type not in self.LIST_TYPES_TO_SERVICES_MAPPING:
-            raise self.InvalidInputException('Invalid list type.')
+        for query in query_fields_and_values:
+            if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % query[0])
 
-        params = self.get_params_from_request(self.request, list_type)
-        suggestions = self.LIST_TYPES_TO_SERVICES_MAPPING[list_type](*params)
-
-        # When querying by ID, only a single suggestion is retrieved, so we make
-        # it a list.
-        if list_type == self.LIST_TYPE_ID:
-            suggestions = [suggestions]
+        suggestions = suggestion_services.query_suggestions(
+            query_fields_and_values)
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)

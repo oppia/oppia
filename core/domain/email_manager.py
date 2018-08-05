@@ -917,7 +917,8 @@ def send_user_query_email(
     sender_email = user_services.get_email_from_user_id(sender_id)
     _send_bulk_mail(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
-        sender_email, sender_name, bulk_email_model_id)
+        sender_email, sender_name,
+        instance_id=bulk_email_model_id)
     return bulk_email_model_id
 
 

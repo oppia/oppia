@@ -239,7 +239,7 @@
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
           <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
-            <svg class="protractor-test-collection-exploration"
+            <svg class="protractor-mobile-test-collection-exploration"
                  width="100"
                  height="150"
                  xmlns="http://www.w3.org/2000/svg"
@@ -382,27 +382,27 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
+  <script src="/templates/dev/head/pages/collection_player/CollectionPlayer.js"></script>
+  <script src="/templates/dev/head/pages/collection_player/CollectionNodeListDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/BrowserCheckerService.js"></script>
+  <script src="/templates/dev/head/domain/collection/CollectionNodeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/collection/CollectionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/collection/GuestCollectionProgressService.js"></script>
+  <script src="/templates/dev/head/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/utilities/BrowserCheckerService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/NumberWithUnitsObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
-`  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/pages/collection_player/collectionFooterDirective.js"></script>
+  <script src="/templates/dev/head/components/share/SharingLinksDirective.js"></script>
+`  <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
+  <script src="/templates/dev/head/components/attribution_guide/AttributionGuideDirective.js"></script>
+  <script src="/templates/dev/head/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+  <script src="/templates/dev/head/components/RatingComputationService.js"></script>
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
 {% endblock footer_js %}

@@ -466,7 +466,7 @@ def fetch_gravatar(email):
         logging.error('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if result.status_code == 200:
-            if imghdr.what(None, result.content) == 'png':
+            if imghdr.what(None, h=result.content) == 'png':
                 return utils.convert_png_binary_to_data_url(result.content)
         else:
             logging.error(
@@ -1603,5 +1603,20 @@ def is_admin(user_id):
     """
     user_role = get_user_role_from_id(user_id)
     if user_role == feconf.ROLE_ID_ADMIN:
+        return True
+    return False
+
+
+def is_topic_manager(user_id):
+    """Checks if a user with given user_id is a topic manager.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user is a topic manager.
+    """
+    user_role = get_user_role_from_id(user_id)
+    if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
         return True
     return False

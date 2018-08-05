@@ -875,7 +875,7 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: str or None. The id of the tagged
+            tagged_misconception_id: int or None. The id of the tagged
                 misconception for the answer group, when a state is part of a
                 Question object that tests a particular skill.
         """
@@ -909,9 +909,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, basestring):
+            if not isinstance(self.tagged_misconception_id, int):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be a string, '
+                    'Expected tagged misconception id to be an int, '
                     'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
@@ -1277,6 +1277,13 @@ class InteractionInstance(object):
                     rule_spec_html = rule_spec.inputs['x']
                     html_list = html_list + rule_spec_html
 
+        if self.id == 'DragAndDropSortInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html_list = rule_spec.inputs['x']
+                    for rule_spec_html in rule_spec_html_list:
+                        html_list = html_list + rule_spec_html
+
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
@@ -1289,7 +1296,9 @@ class InteractionInstance(object):
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
 
-        if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
+        if self.id in (
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
             customization_args_html_list = (
                 self.customization_args['choices']['value'])
             html_list = html_list + customization_args_html_list
@@ -1299,26 +1308,6 @@ class InteractionInstance(object):
 
 class State(object):
     """Domain object for a state."""
-
-    NULL_INTERACTION_DICT = {
-        'id': None,
-        'customization_args': {},
-        'answer_groups': [],
-        'default_outcome': {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': {
-                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
-                'html': ''
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        },
-        'confirmed_unclassified_answers': [],
-        'hints': [],
-        'solution': None,
-    }
 
     def __init__(
             self, content, param_changes, interaction,
@@ -2003,7 +1992,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
@@ -4356,7 +4345,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title, category)
+            yaml_content, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

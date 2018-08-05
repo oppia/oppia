@@ -20,7 +20,6 @@ import collections
 import copy
 import itertools
 
-from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.platform import models
@@ -174,7 +173,7 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
 
 
 def handle_stats_creation_for_new_exp_version(
-        exp_id, exp_version, state_names, change_list):
+        exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
     """Retrieves the ExplorationStatsModel for the old exp_version and makes
     any required changes to the structure of the model. Then, a new
     ExplorationStatsModel is created for the new exp_version.
@@ -183,8 +182,10 @@ def handle_stats_creation_for_new_exp_version(
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
-        change_list: list(ExplorationChange). A list of changes introduced in
-            this commit.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
     """
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
@@ -195,18 +196,38 @@ def handle_stats_creation_for_new_exp_version(
             exp_id, new_exp_version, state_names)
         return
 
-    # Handling state additions, deletions and renames.
-    for change in change_list:
-        if change.cmd == exp_domain.CMD_ADD_STATE:
-            exploration_stats.state_stats_mapping[
-                change.state_name
-            ] = stats_domain.StateStats.create_default()
-        elif change.cmd == exp_domain.CMD_DELETE_STATE:
-            exploration_stats.state_stats_mapping.pop(change.state_name)
-        elif change.cmd == exp_domain.CMD_RENAME_STATE:
-            exploration_stats.state_stats_mapping[
-                change.new_state_name
-            ] = exploration_stats.state_stats_mapping.pop(change.old_state_name)
+    # Handling reverts.
+    if revert_to_version:
+        old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
+        # If the old exploration issues model doesn't exist, the current model
+        # is carried over (this is a fallback case for some tests, and can
+        # never happen in production.)
+        if old_exp_stats:
+            exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
+            exploration_stats.num_actual_starts_v2 = (
+                old_exp_stats.num_actual_starts_v2)
+            exploration_stats.num_completions_v2 = (
+                old_exp_stats.num_completions_v2)
+            exploration_stats.state_stats_mapping = (
+                old_exp_stats.state_stats_mapping)
+        exploration_stats.exp_version = new_exp_version
+        create_stats_model(exploration_stats)
+        return
+
+    # Handling state deletions.
+    for state_name in exp_versions_diff.deleted_state_names:
+        exploration_stats.state_stats_mapping.pop(state_name)
+
+    # Handling state additions.
+    for state_name in exp_versions_diff.added_state_names:
+        exploration_stats.state_stats_mapping[state_name] = (
+            stats_domain.StateStats.create_default())
+
+    # Handling state renames.
+    for new_state_name in exp_versions_diff.new_to_old_state_names:
+        exploration_stats.state_stats_mapping[new_state_name] = (
+            exploration_stats.state_stats_mapping.pop(
+                exp_versions_diff.new_to_old_state_names[new_state_name]))
 
     exploration_stats.exp_version = new_exp_version
 

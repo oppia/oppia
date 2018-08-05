@@ -54,20 +54,12 @@ def create_suggestion(
             accepted/rejected the suggestion.
     """
 
-    # TODO(nithesh): Remove the check for target type once the feedback threads
-    # are generalised for all types of entities. As at the moment feedback
-    # threads can only be linked to explorations, we have this check.
-    # This will be completed as a part of milestone 2 of the generalised review
-    # system project.
-    if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        thread_id = feedback_services.create_thread(
-            target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
-        # This line and the if..else will be removed after the feedback thread
-        # migration is complete and the IDs for both models match.
-        thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
-    else:
-        raise Exception('Feedback threads can only be linked to explorations')
+    thread_id = feedback_services.create_thread(
+        target_type, target_id, None, author_id, description,
+        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
+
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
 
     status = suggestion_models.STATUS_IN_REVIEW
 
@@ -119,78 +111,21 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
-def get_suggestions_by_author(author_id):
-    """Gets a list of suggestions by the given author.
+def query_suggestions(query_fields_and_values):
+    """Queries for suggestions.
 
     Args:
-        author_id: str. The ID of the author of the suggestions.
+        query_fields_and_values: list(tuple(str, str)). A list of queries. The
+            first element in each tuple is the field to be queried, and the
+            second element is its value.
 
     Returns:
-        list(Suggestion). A list of suggestions by the given author.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_author(
-            author_id)]
-
-
-def get_suggestions_reviewed_by(reviewer_id):
-    """Gets a list of suggestions that have been reviewed by the given user.
-
-    Args:
-        reviewer_id: str. The ID of the reviewer of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions reviewed by the given user.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_reviewed_by(reviewer_id)]
-
-
-def get_suggestions_by_status(status):
-    """Gets a list of suggestions with the given status.
-
-    Args:
-        status: str. The status of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions with the given status.
+        list(Suggestion). A list of suggestions that match the given query
+        values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_status(status)]
-
-
-def get_suggestion_by_type(suggestion_type):
-    """Gets a list of suggestions with the given type.
-
-    Args:
-        suggestion_type: str. The type of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions of the given type.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_type(suggestion_type)]
-
-
-def get_suggestions_by_target_id(target_type, target_id):
-    """Gets a list of suggestions to the entity with the given ID.
-
-    Args:
-        target_type: str. The type of target entity the suggestion is linked to.
-        target_id: str. The ID of the target entity the suggestion is linked to.
-
-    Returns:
-        list(Suggestion). A list of suggestions linked to the entity.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_target_id(target_type, target_id)]
+            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+                query_fields_and_values)]
 
 
 def get_all_stale_suggestions():
@@ -244,23 +179,6 @@ def mark_review_completed(suggestion, status, reviewer_id):
     _update_suggestion(suggestion)
 
 
-# TODO (nithesh): This function is temporary. At the moment, the feedback
-# threads id is of the form exp_id.<random_str> while the suggestion ids are of
-# the form entity_type.entity_id.<random_str>. Once the feedback thread ID
-# migration is complete, these two IDs will be matched, and this function will
-# be removed.
-def get_thread_id_from_suggestion_id(suggestion_id):
-    """Gets the thread_id from the suggestion_id.
-
-    Args:
-        suggestion_id: str. The ID of the suggestion.
-
-    Returns:
-        str. The thread ID linked to the suggestion.
-    """
-    return suggestion_id[suggestion_id.find('.') + 1:]
-
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -308,7 +226,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     suggestion.accept(commit_message)
 
     feedback_services.create_message(
-        get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
+        suggestion.suggestion_id, reviewer_id,
         feedback_models.STATUS_CHOICES_FIXED, None, review_message)
 
 
@@ -331,7 +249,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
     feedback_services.create_message(
-        get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
+        suggestion.suggestion_id, reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
 
 

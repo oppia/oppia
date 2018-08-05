@@ -137,7 +137,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_use_default_num_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -165,7 +165,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_use_custom_number_of_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -180,13 +180,14 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with put_ctx, add_docs_ctx, assert_raises_ctx:
-            gae_search_services.add_documents_to_index([doc], 'my_index', 42)
+            gae_search_services.add_documents_to_index(
+                [doc], 'my_index', retries=42)
 
         self.assertEqual(add_docs_counter.times_called, 42)
 
     def test_arguments_are_preserved_in_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -203,7 +204,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             add_docs_counter)
 
         with put_ctx, add_docs_ctx:
-            gae_search_services.add_documents_to_index([doc], 'my_index', 4)
+            gae_search_services.add_documents_to_index(
+                [doc], 'my_index', retries=4)
 
         self.assertEqual(add_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')
@@ -213,7 +215,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         docs = [{'id': 'doc1', 'prop': 'val1'},
                 {'id': 'doc2', 'prop': 'val2'},
                 {'id': 'doc3', 'prop': 'val3'}]
-        error = self._get_put_error(3, 1)
+        error = self._get_put_error(3, transient=1)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             error,
@@ -228,7 +230,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             add_docs_counter)
 
         with put_ctx, add_docs_ctx:
-            gae_search_services.add_documents_to_index(docs, 'my_index', 5)
+            gae_search_services.add_documents_to_index(
+                docs, 'my_index', retries=5)
 
         self.assertEqual(add_docs_counter.times_called, 5)
         for i in xrange(1, 4):
@@ -309,7 +312,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         return search.DeleteError('lol', results=results)
 
     def test_use_default_num_retries(self):
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete,
             exception,
@@ -337,7 +340,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete, exception, 42)
 
@@ -353,7 +356,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.SearchFailureError)
         with delete_ctx, delete_docs_ctx, assert_raises_ctx:
             gae_search_services.delete_documents_from_index(
-                ['id'], 'index', 42)
+                ['id'], 'index', retries=42)
 
         self.assertEqual(delete_docs_counter.times_called, 42)
 
@@ -362,7 +365,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         index.put([search.Document(doc_id='doc', fields=[
             search.TextField(name='prop', value='val')
         ])])
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete, exception, 3)
 
@@ -376,7 +379,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             delete_docs_counter)
         with index_ctx, delete_docs_ctx:
             gae_search_services.delete_documents_from_index(
-                ['doc'], 'index', 4)
+                ['doc'], 'index', retries=4)
 
         self.assertEqual(delete_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')

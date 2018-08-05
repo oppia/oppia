@@ -222,8 +222,28 @@ oppia.filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
+          } else if (varType === 'ListOfSetsOfHtmlStrings') {
+            replacementText = '[';
+            var key = inputs[varName];
+            for (var i = 0; i < key.length; i++) {
+              replacementText += '[';
+              for (var j = 0; j < key[i].length; j++) {
+                replacementText += $filter('formatRtePreview')(key[i][j]);
+                if (j < key[i].length - 1) {
+                  replacementText += ',';
+                }
+              }
+              replacementText += ']';
+              if (i < key.length - 1) {
+                replacementText += ',';
+              }
+            }
+            replacementText += ']';
+          } else if (varType === 'DragAndDropPositiveInt') {
+            replacementText = inputs[varName] + '';
           } else {
-            // The following case is for MultipleChoiceInput
+            // The following case is for MultipleChoiceInput and
+            // DragAndDropHtmlString.
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =

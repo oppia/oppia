@@ -38,7 +38,7 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
         self.no_user = None
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.owner_ids = [self.editor_id]
 
         self.report_text = 'AD'

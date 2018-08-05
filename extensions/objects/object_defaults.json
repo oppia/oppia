@@ -1,6 +1,8 @@
 {
     "CodeString": "",
     "CoordTwoDim": [0.0, 0.0],
+    "DragAndDropHtmlString": "",
+    "DragAndDropPositiveInt": 1,
     "Graph": {
         "edges": [],
         "isDirected": false,
@@ -13,6 +15,7 @@
     "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
+    "ListOfSetsOfHtmlStrings": [],
     "LogicErrorCategory": "mistake",
     "MusicPhrase": [],
     "NonnegativeInt": 0,

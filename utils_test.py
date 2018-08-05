@@ -209,18 +209,6 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/subjects/Lightbulb.svg')
 
-    def test_get_asset_dir_prefix_returns_correct_slug(self):
-
-        with self.swap(feconf, 'DEV_MODE', True):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertEqual('', asset_dir_prefix)
-
-        with self.swap(feconf, 'DEV_MODE', False):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertTrue(asset_dir_prefix.startswith('/build'))
-
     def test_are_datetimes_close(self):
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
@@ -235,7 +223,8 @@ class UtilsTests(test_utils.GenericTestBase):
         string1 = 'Home'
         string2 = u'Лорем'
         self.assertEqual(utils.convert_to_str(string1), string1)
-        self.assertEqual(utils.convert_to_str(string2), string2.encode('utf-8'))
+        self.assertEqual(
+            utils.convert_to_str(string2), string2.encode(encoding='utf-8'))
 
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
