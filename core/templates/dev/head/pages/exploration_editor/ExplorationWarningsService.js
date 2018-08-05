@@ -17,15 +17,17 @@
  */
 
 oppia.factory('ExplorationWarningsService', [
-  '$injector', 'GraphDataService', 'ExplorationStatesService',
-  'ExpressionInterpolationService', 'ExplorationParamChangesService',
-  'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'SolutionValidityService',
+  '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
+  'ExpressionInterpolationService', 'GraphDataService',
+  'ParameterMetadataService', 'SolutionValidityService',
+  'StateTopAnswersStatsService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'WARNING_TYPES',
   function(
-      $injector, GraphDataService, ExplorationStatesService,
-      ExpressionInterpolationService, ExplorationParamChangesService,
-      ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, SolutionValidityService) {
+      $injector, ExplorationParamChangesService, ExplorationStatesService,
+      ExpressionInterpolationService, GraphDataService,
+      ParameterMetadataService, SolutionValidityService,
+      StateTopAnswersStatsService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -50,7 +52,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !SolutionValidityService.isSolutionValid(stateName)) {
+          !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -67,7 +69,7 @@ oppia.factory('ExplorationWarningsService', [
     // - edges: a list of edges, each of which is an object with keys 'source',
     //     and 'target'.
     var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges) {
+      initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -147,7 +149,7 @@ oppia.factory('ExplorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rules.length === 0 &&
-            group.trainingData.length === 0) {
+          group.trainingData.length === 0) {
           indexes.push(i);
         }
       }
@@ -222,7 +224,7 @@ oppia.factory('ExplorationWarningsService', [
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
-          stateWithoutInteractionIds) {
+        stateWithoutInteractionIds) {
         _extendStateWarnings(
           stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
       });
@@ -243,7 +245,7 @@ oppia.factory('ExplorationWarningsService', [
 
         if (unreachableStateNames.length) {
           angular.forEach(unreachableStateNames, function(
-              unreachableStateName) {
+            unreachableStateName) {
             _extendStateWarnings(
               unreachableStateName, STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
           });
