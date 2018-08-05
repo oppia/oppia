@@ -26,7 +26,6 @@ import utils
 import cloudstorage
 
 app_identity_services = models.Registry.import_app_identity_services()
-gae_image_services = models.Registry.import_gae_image_services()
 (file_models,) = models.Registry.import_models([
     models.NAMES.file
 ])
@@ -191,21 +190,6 @@ class ExplorationFileSystem(object):
         else:
             return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
-
-    def get_file_content(self, filepath):
-        """Gets the content of the file.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            str. The content property of the FileModel of the image file.
-        """
-        fileModel = self._get_file_data(filepath, None)
-        if fileModel == None:
-            return None
-        else:
-            return fileModel.content
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -426,19 +410,6 @@ class DiskBackedFileSystem(object):
         """
         raise NotImplementedError
 
-    def get_file_content(self, filepath):  # pylint: disable=unused-argument
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
     def listdir(self, dir_name):
         """Raises NotImplementedError if the method is not implemented in the
         derived classes.
@@ -500,7 +471,7 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
-    def get_file_content(self, filepath):  # pylint: disable=unused-argument
+    def _get_file_data(self, filepath):
         """Gets the content of the file stored in GCS
         Args:
             filepath: str. The path to the relevant file within the exploration.
@@ -512,28 +483,35 @@ class GcsFileSystem(object):
         gcs_file_url = (
             '/%s/%s/assets/%s' % (
                 bucket_name, self._exploration_id, filepath))
-        if not self.isfile(filepath):
-            return None
         gcs_file = cloudstorage.open(gcs_file_url)
         contents = gcs_file.read()
         gcs_file.close()
 
         return contents
 
-    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+        """Gets a file as an unencoded stream of raw bytes.
+
+        If `version` argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other file systems.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. The version of the file.
-            mode: str. The mode in which the file is to be opened.
+            version: str. Unused argument.
+            mode: str. Unused argument.
 
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
+        Returns:
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
         """
-        raise NotImplementedError
+        if self.isfile(filepath):
+            data = self._get_file_data(filepath)
+            return FileStreamWithMetadata(data, None, None)
+        else:
+            return None
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
@@ -627,18 +605,6 @@ class AbstractFileSystem(object):
         """
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
-
-    def get_file_content(self, filepath):  # pylint: disable=unused-argument
-        """Gets the content of the file with the given filepath.
-
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            Content. The content of the file.
-        """
-        self._check_filepath(filepath)
-        return self._impl.get_file_content(filepath)
 
     def open(self, filepath, version=None, mode='r'):
         """Returns a stream with the file content. Similar to open(...).
