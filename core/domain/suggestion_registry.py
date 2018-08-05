@@ -403,10 +403,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not (
                 question_state_schema_version >= 1 and
                 question_state_schema_version <=
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+                feconf.CURRENT_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
-                '%s' % feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
 
         if not self.change.skill_id:
             raise utils.ValidationError('Expected change to contain skill_id')
@@ -419,7 +419,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.validate()
         if (
                 question_dict['question_state_schema_version'] !=
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+                feconf.CURRENT_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 

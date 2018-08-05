@@ -352,7 +352,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_schema_version': (
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                feconf.CURRENT_STATES_SCHEMA_VERSION)
         }
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
             with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
