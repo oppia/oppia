@@ -92,6 +92,13 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_model.deleted:
             return
 
+        RELEVANT_COMMIT_CMDS = [
+            exp_domain.CMD_ADD_STATE,
+            exp_domain.CMD_RENAME_STATE,
+            exp_domain.CMD_DELETE_STATE,
+            exp_models.ExplorationModel.CMD_REVERT_COMMIT
+        ]
+
         # Find the latest version number.
         exploration = exp_services.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
@@ -101,9 +108,13 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_instances = exp_models.ExplorationModel.get_multi_versions(
             exploration.id, versions)
 
-        old_exp_stats_instances = (
+        old_exp_stats_models = (
             stats_models.ExplorationStatsModel.get_multi_versions(
                 exploration.id, versions))
+        old_exp_stats_instances = [(
+            stats_services.get_exploration_stats_from_model(exp_stats_model)
+            if exp_stats_model else None
+        ) for exp_stats_model in old_exp_stats_models]
 
         # Get list of snapshot models for each version of the exploration.
         snapshots_by_version = (
@@ -124,10 +135,15 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exp_version, state_stats_mapping))
                 if exp_version > 1:
                     prev_exp_stats = exp_stats_instances[exp_version - 2]
-                    change_list = snapshots_by_version[exp_version - 1][
+                    change_dicts = snapshots_by_version[exp_version - 1][
                         'commit_cmds']
-                    exp_versions_diff = (
-                        exp_domain.ExplorationVersionsDiff(change_list))
+                    change_list = [
+                        exp_domain.ExplorationChange(change_dict)
+                        for change_dict in change_dicts
+                        if change_dict['cmd'] in RELEVANT_COMMIT_CMDS]
+                    exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                        change_list)
+
                     # Copy v1 stats.
                     exp_stats_default.num_starts_v1 = (
                         prev_exp_stats.num_starts_v1)
@@ -166,15 +182,15 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 exp_stats_instances.append(exp_stats_default)
                 stats_services.create_stats_model(exp_stats_default)
+                yield (
+                    'ExplorationStatsModel for missing versions regenerated: ',
+                    '%s v%s' % (exploration.id, exp_version))
             else:
                 exp_stats_instances.append(exp_stats)
-        yield(
-            exploration.id,
-            'ExplorationStatsModel for missing versions regenerated.')
 
     @staticmethod
-    def reduce(exp_id, values):
-        yield "%s: %s" % (exp_id, values)
+    def reduce(message, values):
+        yield (message, values)
 
 
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -244,7 +260,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on)
+                    'created_on': str(item.created_on),
+                    'session_id': item.session_id
                 })
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
@@ -253,7 +270,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
                     'version': item.exp_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
                 })
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
@@ -262,7 +280,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                     'version': item.exploration_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
                 })
         else:
             raise Exception('Bad item: %s' % type(item))
@@ -381,19 +400,30 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_stats_dict = copy.deepcopy(prev_stats_dict)
 
             # Compute the statistics for events corresponding to this version.
+            exp_started_session_ids, exp_completed_session_ids = set(), set()
+            exp_actually_started_session_ids = set()
             state_hit_session_ids, solution_hit_session_ids = set(), set()
             while event_dict['version'] == version:
                 state_stats = (exp_stats_dict['state_stats_mapping'][
                     event_dict['state_name']])
                 if event_dict['event_type'] == (
                         feconf.EVENT_TYPE_START_EXPLORATION):
-                    exp_stats_dict['num_starts_v2'] += 1
+                    if event_dict['session_id'] not in exp_started_session_ids:
+                        exp_stats_dict['num_starts_v2'] += 1
+                        exp_started_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
-                    exp_stats_dict['num_actual_starts_v2'] += 1
+                    if event_dict['session_id'] not in (
+                            exp_actually_started_session_ids):
+                        exp_stats_dict['num_actual_starts_v2'] += 1
+                        exp_actually_started_session_ids.add(
+                            event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_COMPLETE_EXPLORATION):
-                    exp_stats_dict['num_completions_v2'] += 1
+                    if event_dict['session_id'] not in (
+                            exp_completed_session_ids):
+                        exp_stats_dict['num_completions_v2'] += 1
+                        exp_completed_session_ids.add(event_dict['session_id'])
                 elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ANSWER_SUBMITTED):
                     state_stats['total_answers_count_v2'] += 1

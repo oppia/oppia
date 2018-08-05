@@ -32,7 +32,7 @@ describe('GenerateContentIdService', function() {
 
   beforeEach(inject(function($injector) {
     gcis = $injector.get('GenerateContentIdService');
-    scitat = $injector.get('stateContentIdsToAudioTranslationsService');
+    scitat = $injector.get('StateContentIdsToAudioTranslationsService');
     citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
     scitat.displayed = citatof.createFromBackendDict(citatDict);
   }));

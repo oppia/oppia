@@ -29,11 +29,9 @@ oppia.directive('explorationFooter', [
       controller: [
         '$scope', '$http', '$log', 'ContextService',
         'ExplorationSummaryBackendApiService', 'WindowDimensionsService',
-        'ExplorationPlayerService',
         function(
             $scope, $http, $log, ContextService,
-            ExplorationSummaryBackendApiService, WindowDimensionsService,
-            ExplorationPlayerService) {
+            ExplorationSummaryBackendApiService, WindowDimensionsService) {
           $scope.explorationId = ContextService.getExplorationId();
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;

@@ -474,5 +474,39 @@ var constants = {
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false,
 
-  "ENABLE_NEW_STRUCTURES": false
+  "ENABLE_NEW_STRUCTURES": false,
+
+  "NEW_STATE_TEMPLATE": {
+      "classifier_model_id": null,
+      "content": {
+          "html": "",
+          "content_id": "content"
+      },
+      "interaction": {
+            "id": null,
+            "customization_args": {},
+            "answer_groups": [],
+            "default_outcome": {
+                "dest": "Introduction",
+                "feedback": {
+                    "content_id": "default_outcome",
+                    "html": ""
+                },
+                "labelled_as_correct": false,
+                "param_changes": [],
+                "refresher_exploration_id": null,
+                "missing_prerequisite_skill_id": null
+            },
+            "confirmed_unclassified_answers": [],
+            "hints": [],
+            "solution": null
+        },
+      "param_changes": [],
+      "content_ids_to_audio_translations": {
+          "content": {},
+          "default_outcome": {}
+      }
+  },
+
+  "CURRENT_STATES_SCHEMA_VERSION": 24
 };
