@@ -15,34 +15,45 @@
 # limitations under the License.
 
 """Provides app identity services."""
-
-import feconf
+import io
 
 from PIL import Image
-
-from core.domain import fs_domain
 from core.platform import models
+import feconf
+
+from google.appengine.api import images
 
 app_identity_services = models.Registry.import_app_identity_services()
 
-def get_image_dimensions(filename, exp_id):
-    """Gets the dimensions of the image with the given filename
+
+def get_image_dimensions(file_content):
+    """Gets the dimensions of the image with the given file_content.
 
     Args:
-        filename: str. Name of the file whose dimensions need to be
-            calculated.
-        exp_id: str. Exploration id.
+        file_content: str. The content of the file.
 
     Returns:
-        tuple. Returns height and width of the image.
+        tuple(int). Returns height and width of the image.
     """
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if (
-            feconf.DEV_MODE)
-        else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-
-    imageFile = fs.getImageFile(filename)
-    img = Image.open(imageFile)
+    img = Image.open(io.BytesIO(file_content))
     width, height = img.size
     return height, width
+
+
+def compress_image(image_content, scaling_factor):
+    """Compresses the image by resizing the image with the scaling factor.
+
+    Args:
+        image_content: str. Content of the file to be compressed.
+        scaling_factor: float. The number by which the image will be scaled.
+
+    Returns:
+        str. Returns the content of the compressed image.
+    """
+    if not feconf.DEV_MODE:
+        height, width = get_image_dimensions(image_content)
+        return images.resize(
+            image_data=image_content, width=int(width * scaling_factor),
+            height=int(height * scaling_factor))
+    else:
+        return image_content

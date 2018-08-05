@@ -193,20 +193,6 @@ class ExplorationFileSystem(object):
             return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
 
-        def getImageFile(self, filename):
-        """Gets the image file with the given filename.
-
-        Args:
-            filename: str. The name of the image file.
-
-        Returns:
-            str. The content of the file.
-        """
-        url = ('http://localhost:8181/imagehandler/%s/%s' % (
-                self._exploration_id, filename))
-        imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
-        return imageFile
-
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
 
@@ -487,35 +473,47 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
-    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+    def _get_file_data(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
+        """Gets the content of the file stored in GCS
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Returns:
+            Content. The content of the file.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        gcs_file = cloudstorage.open(gcs_file_url)
+        contents = gcs_file.read()
+        gcs_file.close()
+
+        return contents
+
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+        """Gets a file as an unencoded stream of raw bytes.
+
+        If `version` argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other file systems.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. The version of the file.
-            mode: str. The mode in which the file is to be opened.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
-    def getImageFile(self, filename):
-        """Gets the image file with the given filename.
-
-        Args:
-            filename: str. The name of the image file.
+            version: str. Unused argument.
+            mode: str. Unused argument.
 
         Returns:
-            str. The content of the file.
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
         """
-        url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
-            app_identity_services.get_gcs_resource_bucket_name(),
-            self._exploration_id, filename))
-        imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
-        return imageFile
+        if self.isfile(filepath):
+            data = self._get_file_data(filepath)
+            return FileStreamWithMetadata(data, None, None)
+        else:
+            return None
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
