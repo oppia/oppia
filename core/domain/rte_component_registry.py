@@ -72,10 +72,10 @@ class Registry(object):
         """Get component classes mapping for component types."""
         # Importing this at top of file creates a circular dependency:
         # rte_component_registry imports components
-        # components import objects
-        # objects import schema_utils
-        # schema_utils import html_cleaner
-        # html_cleaner import rte_component_registry.
+        # components imports objects
+        # objects imports schema_utils
+        # schema_utils imports html_cleaner
+        # html_cleaner imports rte_component_registry.
         from extensions.rich_text_components import components # pylint: disable=relative-import
         component_types_to_component_classes = {}
         component_names = cls.get_all_rte_components().keys()
