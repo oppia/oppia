@@ -77,7 +77,7 @@ oppia.directive('earlyQuitIssueDirective', [
                         playthrough.actions);
 
                     var blockActionIndexMapping = {};
-                    var total = $scope.displayBlocks.reduce(
+                    $scope.displayBlocks.reduce(
                       function(runningTotal, displayBlock, i) {
                         blockActionIndexMapping[i] = runningTotal;
                         return runningTotal + displayBlock.length;
