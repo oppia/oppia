@@ -135,6 +135,11 @@ oppia.factory('StateTopAnswersStatsService', [
           stateTopAnswersStatsCache.hasOwnProperty(stateName);
       },
 
+      /** @returns {string[]} - list of state names with recorded stats. */
+      getStateNamesWithStats: function() {
+        return Object.keys(stateTopAnswersStatsCache);
+      },
+
       /**
        * @param {string} stateName
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
