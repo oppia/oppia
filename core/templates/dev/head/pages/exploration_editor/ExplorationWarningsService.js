@@ -16,16 +16,22 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+// When an unresolved answer's frequency exceeds this threshold, an exploration
+// will be blocked from publishing until it gets resolved.
+oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
-  'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'SolutionValidityService',
+  'ParameterMetadataService', 'StateTopAnswersStatsService',
+  'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
-      ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, SolutionValidityService) {
+      ParameterMetadataService, StateTopAnswersStatsService,
+      INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -173,10 +179,31 @@ oppia.factory('ExplorationWarningsService', [
       return results;
     };
 
+    var _getStatesWithUnresolvedAnswers = function() {
+      return ExplorationStatesService.getStateNames().filter(
+        function(stateName) {
+          return (
+            StateTopAnswersStatsService.hasStateStats(stateName) &&
+            StateTopAnswersStatsService.getUnresolvedStateStats(stateName).some(
+              function(answerStats) {
+                return answerStats.frequency >=
+                  UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+              }));
+        });
+    };
+
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
       hasCriticalStateWarning = false;
+
+      var _extendStateWarnings = function(stateName, newWarning) {
+        if (stateWarnings.hasOwnProperty(stateName)) {
+          stateWarnings[stateName].push(newWarning);
+        } else {
+          stateWarnings[stateName] = [newWarning];
+        }
+      };
 
       GraphDataService.recompute();
       var _graphData = GraphDataService.getGraphData();
@@ -193,11 +220,7 @@ oppia.factory('ExplorationWarningsService', [
             interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
-            if (stateWarnings.hasOwnProperty(stateName)) {
-              stateWarnings[stateName].push(interactionWarnings[j].message);
-            } else {
-              stateWarnings[stateName] = [interactionWarnings[j].message];
-            }
+            _extendStateWarnings(stateName, interactionWarnings[j].message);
 
             if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
               hasCriticalStateWarning = true;
@@ -209,22 +232,18 @@ oppia.factory('ExplorationWarningsService', [
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
           stateWithoutInteractionIds) {
-        if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
-          stateWarnings[stateWithoutInteractionIds].push(
-            STATE_ERROR_MESSAGES.ADD_INTERACTION);
-        } else {
-          stateWarnings[stateWithoutInteractionIds] = [
-            STATE_ERROR_MESSAGES.ADD_INTERACTION];
-        }
+        _extendStateWarnings(
+          stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
+      });
+
+      var statesWithUnresolvedAnswers = _getStatesWithUnresolvedAnswers();
+      angular.forEach(statesWithUnresolvedAnswers, function(stateName) {
+        _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
       angular.forEach(statesWithIncorrectSolution, function(state) {
-        if (stateWarnings.hasOwnProperty(state)) {
-          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
-        } else {
-          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
-        }
+        _extendStateWarnings(state, STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
       });
 
       if (_graphData) {
@@ -234,13 +253,8 @@ oppia.factory('ExplorationWarningsService', [
         if (unreachableStateNames.length) {
           angular.forEach(unreachableStateNames, function(
               unreachableStateName) {
-            if (stateWarnings.hasOwnProperty(unreachableStateName)) {
-              stateWarnings[unreachableStateName].push(
-                STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
-            } else {
-              stateWarnings[unreachableStateName] =
-                [STATE_ERROR_MESSAGES.STATE_UNREACHABLE];
-            }
+            _extendStateWarnings(
+              unreachableStateName, STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
           });
         } else {
           // Only perform this check if all states are reachable.
@@ -249,13 +263,8 @@ oppia.factory('ExplorationWarningsService', [
             _getReversedLinks(_graphData.links), false);
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
-              if (stateWarnings.hasOwnProperty(deadEndState)) {
-                stateWarnings[deadEndState].push(
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-              } else {
-                stateWarnings[deadEndState] = [
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-              }
+              _extendStateWarnings(
+                deadEndState, STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
             });
           }
         }
