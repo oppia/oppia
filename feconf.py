@@ -493,7 +493,8 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'ImageClickInput',
         'ItemSelectionInput',
         'MultipleChoiceInput',
-        'TextInput'
+        'TextInput',
+        'DragAndDropSortInput'
     ],
 }, {
     'name': 'Math',
