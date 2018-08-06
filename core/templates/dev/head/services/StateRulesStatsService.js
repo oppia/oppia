@@ -58,22 +58,17 @@ oppia.factory('StateRulesStatsService', [
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
-                var vizInfoDataWithAddressedInfo = {};
                 if (vizInfo.addressed_info_is_supported) {
-                  vizInfoDataWithAddressedInfo = {
-                    data: vizInfo.data.map(function(vizInfoDatum) {
-                      return Object.assign({
-                        is_addressed: (
-                          AnswerClassificationService
-                            .isClassifiedExplicitlyOrGoesToNewState(
-                              state.name, state,
-                              vizInfoDatum.answer, interactionRulesService))
-                      }, vizInfoDatum);
-                    })
-                  };
+                  vizInfo = {data: vizInfo};
+                  angular.forEach(vizInfo, function(vizInfoDatum) {
+                    vizInfoDatum.is_addressed =
+                      AnswerClassificationService
+                        .isClassifiedExplicitlyOrGoesToNewState(
+                          state.name, state, vizInfoDatum.answer,
+                          interactionRulesService)
+                  });
                 }
-
-                return Object.assign({}, vizInfo, vizInfoDataWithAddressedInfo);
+                return vizInfo;
               })
           };
         });
