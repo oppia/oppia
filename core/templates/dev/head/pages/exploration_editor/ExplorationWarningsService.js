@@ -179,13 +179,12 @@ oppia.factory('ExplorationWarningsService', [
     };
 
     var _getStatesWithAnswersThatMustBeResolved = function() {
-      return StateTopAnswersStatsService.getStateNamesWithStats().forEach(
+      return StateTopAnswersStatsService.getStateNamesWithStats().filter(
         function(stateName) {
           return StateTopAnswersStatsService.getUnresolvedStateStats(
-            stateName
-          ).some(function(stats) {
-            return stats.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
-          });
+            stateName).some(function(stats) {
+              return stats.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+            });
         });
     };
 
