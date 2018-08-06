@@ -8,14 +8,14 @@
 
   <li>
     <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/<[activityType]>/<[activityId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareEvent('facebook')" target="_window">
-      <i class="oppia-share-icons fa fa-facebook"></i>
+      <i class="oppia-share-icons fa fa-facebook-square"></i>
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </li>
 
   <li>
     <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fa fa-twitter"></i>
+      <i class="oppia-share-icons fa fa-twitter-square"></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </li>
@@ -76,15 +76,20 @@
     color: #dd4b39;
   }
 
-  i.oppia-share-icons.fa.fa-facebook {
+  i.oppia-share-icons.fa.fa-facebook-square {
     color: #3b5998;
   }
 
-  i.oppia-share-icons.fa.fa-twitter {
+  i.oppia-share-icons.fa.fa-twitter-square {
     color: #1da1f2;
   }
 
   i.oppia-share-icons.fa.fa-chalkboard-teacher {
     color: #50a15f;
+  }
+
+  i.oppia-share-icons.fa.fa-code {
+    font-weight: 600;
+    color: #459788;
   }
 </style>
