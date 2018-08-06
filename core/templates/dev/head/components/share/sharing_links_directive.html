@@ -16,20 +16,20 @@
   <li>
     <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('twitter')" target="_window">
       <i class="oppia-share-icons fa fa-twitter"></i>
-      <span class="oppia-icon-accessibility-label">Twitter</span>    
+      <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </li>
 
   <li>
     <a ng-href="https://classroom.google.com/share?url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('classroom')" target="_window">
-      <img class="share-option-img" ng-src="<[classroomUrl]>" alt="Classroom">    
+      <img class="share-option-img" ng-src="<[classroomUrl]>" alt="Classroom">
     </a>
   </li>
 
   <li ng-if="shareType === 'exploration'">
     <a href="" ng-click="showEmbedExplorationModal(explorationId)" tabindex="0">
       <i class="oppia-share-icons fa fa-code"></i>
-      <span class="oppia-icon-accessibility-label">Embed this Exploration</span>  
+      <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </li>
 </ul>
