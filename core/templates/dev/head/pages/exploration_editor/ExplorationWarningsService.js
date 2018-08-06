@@ -16,16 +16,22 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+// When an unresolved answer's frequency exceeds this threshold, an exploration
+// will be blocked from publishing until it gets resolved.
+oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'StateTopAnswersStatsService',
-  'INTERACTION_SPECS', 'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
+  'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, StateTopAnswersStatsService,
-      INTERACTION_SPECS, WARNING_TYPES, STATE_ERROR_MESSAGES) {
+      INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -50,7 +56,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !ExplorationStatesService.isSolutionValid(stateName)) {
+            !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -178,8 +184,11 @@ oppia.factory('ExplorationWarningsService', [
         function(stateName) {
           return (
             StateTopAnswersStatsService.hasStateStats(stateName) &&
-            StateTopAnswersStatsService.getUnresolvedStateStats(
-              stateName).length > 0);
+            StateTopAnswersStatsService.getUnresolvedStateStats(stateName).some(
+              function(answerStats) {
+                return answerStats.frequency >=
+                  UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+              }));
         });
     };
 

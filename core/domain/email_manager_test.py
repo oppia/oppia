@@ -105,7 +105,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, self.EXPLORATION_TITLE)
+            'A', self.editor_id, title=self.EXPLORATION_TITLE)
 
         self.expected_email_subject = (
             '%s - invitation to collaborate') % self.EXPLORATION_TITLE
@@ -1093,7 +1093,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
 
         self.expected_email_subject = (
             'You\'ve received 3 new messages on your explorations')
@@ -1195,7 +1195,7 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
         self.can_send_emails_ctx = self.swap(
@@ -1279,7 +1279,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
 
@@ -1362,7 +1362,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
         self.can_send_emails_ctx = self.swap(
@@ -1457,7 +1457,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         self.set_moderators([self.moderator2_username, self.MODERATOR_USERNAME])
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.owner_ids = [self.editor_id]
 
         self.report_text = 'AD'
@@ -1821,7 +1821,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, True])
         self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [True, True])
+            user_ids, exp_id, False), msg=[True, True])
 
         # First user have muted feedback notifications for this exploration,
         # therefore he should receive only suggestion emails.
@@ -1850,7 +1850,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
         self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [False, False])
+            user_ids, exp_id, False), msg=[False, False])
 
         # Both users have unmuted feedback/suggestion emails for this
         # exploration, but all emails are still disabled globally,
@@ -1864,7 +1864,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
         self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [False, False])
+            user_ids, exp_id, False), msg=[False, False])
 
         # Both user have enabled all emails globally, therefore they should
         # receive all emails.
@@ -1875,4 +1875,4 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, True])
         self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [True, True])
+            user_ids, exp_id, False), msg=[True, True])

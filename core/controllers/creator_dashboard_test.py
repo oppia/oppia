@@ -588,7 +588,8 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['num_total_threads'], 0)
 
         def mock_get_thread_analytics_multi(unused_exploration_ids):
-            return [feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)]
+            return [feedback_domain.FeedbackAnalytics(
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3)]
 
         with self.swap(
             feedback_services, 'get_thread_analytics_multi',
@@ -702,7 +703,7 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_a_id = self.post_json(
-            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 

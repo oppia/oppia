@@ -13,7 +13,7 @@
         </div>
         <strong>Explanation:</strong>
         <span>
-          <angular-html-bind class="oppia-rte-editor" html-data="stateSolutionService.savedMemento.explanation.getHtml()">
+          <angular-html-bind class="oppia-rte-editor" html-data="StateSolutionService.savedMemento.explanation.getHtml()">
           </angular-html-bind>
         </span>
       </div>
@@ -25,7 +25,7 @@
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                           local-value="stateSolutionService.displayed.explanation._html">
+                           local-value="StateSolutionService.displayed.explanation._html">
       </schema-based-editor>
     </div>
 
@@ -38,7 +38,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!stateSolutionService.displayed.explanation.getHtml()"
+                ng-disabled="!StateSolutionService.displayed.explanation.getHtml()"
                 ng-click="saveThisExplanation()">
           Save
         </button>
@@ -48,12 +48,13 @@
     </div>
   </div>
 
-  <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
+  <div ng-if="!questionModeEnabled && StateSolutionService.savedMemento.explanation && !StateSolutionService.savedMemento.explanation.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
-                               content-ids-to-audio-translations="stateContentIdsToAudioTranslationsService.displayed"
-                               content-id="stateSolutionService.displayed.explanation.getContentId()"
+                               content-ids-to-audio-translations="StateContentIdsToAudioTranslationsService.displayed"
+                               content-id="StateSolutionService.displayed.explanation.getContentId()"
                                on-start-edit="onAudioTranslationsStartEditAction"
-                               on-change="onAudioTranslationsEdited">
+                               on-change="onAudioTranslationsEdited"
+                               on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
     </audio-translations-editor>
   </div>
 </div>

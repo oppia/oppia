@@ -30,6 +30,8 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -249,7 +251,7 @@ title: Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
@@ -304,7 +306,7 @@ tags: []
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -447,8 +449,10 @@ tags: []
             data['csrf_token'] = csrf_token
 
         json_response = self._send_post_request(
-            self.testapp, url, data, expect_errors, expected_status_int,
-            upload_files)
+            self.testapp, url, data,
+            expect_errors=expect_errors,
+            expected_status_int=expected_status_int,
+            upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
@@ -548,7 +552,7 @@ tags: []
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
             response = self.testapp.post(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
                     'payload': json.dumps({
                         'username': username,
@@ -573,7 +577,7 @@ tags: []
                 'new_config_property_values': {
                     config_obj.name: new_config_value,
                 }
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -594,7 +598,7 @@ tags: []
             '/adminrolehandler', {
                 'username': username,
                 'role': user_role
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -893,7 +897,10 @@ tags: []
                 exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective,
+            collection_id,
+            title=title,
+            category=category,
+            objective=objective,
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
@@ -901,7 +908,10 @@ tags: []
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
-                exploration_id, owner_id, title, category, objective,
+                exploration_id, owner_id,
+                title=title,
+                category=category,
+                objective=objective,
                 end_state_name=end_state_name)
         collection.add_node(exploration.id)
 
@@ -980,6 +990,27 @@ tags: []
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
+
+    def save_new_question(
+            self, question_id, owner_id, question_state_data,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Question and saves it.
+
+        Args:
+            question_id: str. ID for the question to be created.
+            owner_id: str. The id of the user creating the question.
+            question_state_data: State. The state data for the question.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
+
+        Returns:
+            Question. A newly-created question.
+        """
+        question = question_domain.Question(
+            question_id, question_state_data,
+            feconf.CURRENT_STATES_SCHEMA_VERSION, language_code, 0)
+        question_services.add_question(owner_id, question)
+        return question
 
     def save_new_skill(
             self, skill_id, owner_id,
@@ -1179,7 +1210,7 @@ class AppEngineTestBase(TestBase):
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Counts the jobs in the given queue."""
-        return len(self.get_pending_tasks(queue_name))
+        return len(self.get_pending_tasks(queue_name=queue_name))
 
     def get_pending_tasks(self, queue_name=None):
         """Returns the jobs in the given queue. If queue_name is None, defaults
@@ -1245,7 +1276,8 @@ class AppEngineTestBase(TestBase):
         Returns:
             dict. The default question_data dict.
         """
-        state = exp_domain.State.create_default_state(default_dest_state_name)
+        state = exp_domain.State.create_default_state(
+            default_dest_state_name, is_initial_state=True)
         solution_explanation = exp_domain.SubtitledHtml(
             'solution', 'Solution explanation')
         solution = exp_domain.Solution(
@@ -1263,7 +1295,6 @@ class AppEngineTestBase(TestBase):
         state.content_ids_to_audio_translations['hint_1'] = {}
         state.interaction.solution = solution
         state.content_ids_to_audio_translations['solution'] = {}
-        state = state.to_dict()
         return state
 
 

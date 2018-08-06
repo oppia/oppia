@@ -453,3 +453,52 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_jobs(
                 exp_id, 1, [false_state_name]))
         self.assertEqual(classifier_training_jobs, [None])
+
+    def test_convert_strings_to_float_numbers_in_classifier_data(self):
+        """Make sure that all values are converted correctly."""
+        test_dict = {
+            'a': {
+                'ab': 'abcd',
+                'ad': {
+                    'ada': 'abcdef',
+                    'adc': [{
+                        'adca': 'abcd',
+                        'adcb': '0.1234',
+                        'adcc': ['ade', 'afd'],
+                    }],
+                },
+                'ae': [['123', '0.123'], ['abc']],
+            },
+            'b': {
+                'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
+                'bg': ['abc', 'def', 'ghi'],
+                'bh': ['abc', '123'],
+            },
+            'c': '1.123432',
+        }
+
+        expected_dict = {
+            'a': {
+                'ab': 'abcd',
+                'ad': {
+                    'ada': 'abcdef',
+                    'adc': [{
+                        'adca': 'abcd',
+                        'adcb': 0.1234,
+                        'adcc': ['ade', 'afd']
+                    }]
+                },
+                'ae': [['123', 0.123], ['abc']],
+            },
+            'b': {
+                'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
+                'bg': ['abc', 'def', 'ghi'],
+                'bh': ['abc', '123'],
+            },
+            'c': 1.123432,
+        }
+
+        output_dict = (
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+                test_dict))
+        self.assertDictEqual(expected_dict, output_dict)

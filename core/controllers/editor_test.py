@@ -20,8 +20,8 @@ import logging
 import os
 import zipfile
 
+from constants import constants
 from core.controllers import creator_dashboard
-from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -139,7 +139,14 @@ class EditorTest(BaseEditorControllerTest):
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
+        self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
+        # Validates if the current NEW_STATE_TEMPLATE is the latest version
+        # by validating it.
+        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
+        self.assertEqual(
+            feconf.CURRENT_STATES_SCHEMA_VERSION,
+            constants.CURRENT_STATES_SCHEMA_VERSION)
+
 
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
@@ -151,7 +158,7 @@ class EditorTest(BaseEditorControllerTest):
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
-            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
 
         response = self.testapp.get('/create/%s' % exp_id)
@@ -160,7 +167,8 @@ class EditorTest(BaseEditorControllerTest):
         self.put_json(
             publish_url, {
                 'make_public': True,
-            }, csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400)
 
         self.logout()
 
@@ -186,8 +194,9 @@ class EditorTest(BaseEditorControllerTest):
 
         def _put_and_expect_400_error(payload):
             return self.put_json(
-                '/createhandler/data/0', payload, csrf_token,
-                expect_errors=True, expected_status_int=400)
+                '/createhandler/data/0', payload,
+                csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=400)
 
         # A request with no version number is invalid.
         response_dict = _put_and_expect_400_error(_get_payload('New state'))
@@ -195,42 +204,42 @@ class EditorTest(BaseEditorControllerTest):
 
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('New state', 123))
+            _get_payload('New state', version=123))
         self.assertIn('which is too old', response_dict['error'])
 
         # A request with an empty state name is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('', current_version))
+            _get_payload('', version=current_version))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a really long state name is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('a' * 100, current_version))
+            _get_payload('a' * 100, version=current_version))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a state name containing invalid characters is
         # invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('[Bad State Name]', current_version))
+            _get_payload('[Bad State Name]', version=current_version))
         self.assertIn('Invalid character [', response_dict['error'])
 
         # A name cannot have spaces at the front or back.
         response_dict = _put_and_expect_400_error(
-            _get_payload('  aa', current_version))
+            _get_payload('  aa', version=current_version))
         self.assertIn('start or end with whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('aa\t', current_version))
+            _get_payload('aa\t', version=current_version))
         self.assertIn('end with whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('\n', current_version))
+            _get_payload('\n', version=current_version))
         self.assertIn('end with whitespace', response_dict['error'])
 
         # A name cannot have consecutive whitespace.
         response_dict = _put_and_expect_400_error(
-            _get_payload('The   B', current_version))
+            _get_payload('The   B', version=current_version))
         self.assertIn('Adjacent whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('The\t\tB', current_version))
+            _get_payload('The\t\tB', version=current_version))
         self.assertIn('Adjacent whitespace', response_dict['error'])
 
         self.logout()
@@ -834,7 +843,8 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 '/createhandler/revert/%s' % self.EXP_ID, {
                     'current_version': 2,
                     'revert_to_version': rev_version
-                }, csrf_token, expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=400)
 
             # Check error message.
             if not isinstance(rev_version, int):
@@ -859,7 +869,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             '/createhandler/revert/%s' % self.EXP_ID, {
                 'current_version': 2,
                 'revert_to_version': rev_version
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         # Check that exploration is really reverted to version 1.
         reader_dict = self.get_json(
@@ -1003,25 +1013,25 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
                 'new_member_role': rights_manager.ROLE_VIEWER
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.TRANSLATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_TRANSLATOR
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         self.logout()
 
@@ -1071,7 +1081,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-            }, csrf_token, expect_errors=True, expected_status_int=401)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
@@ -1113,7 +1124,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token, expect_errors=True, expected_status_int=401)
+                }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
@@ -1134,7 +1146,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token, expect_errors=True, expected_status_int=401)
+                }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
@@ -1160,7 +1173,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
             rights_url, {
                 'version': exploration.version,
                 'make_community_owned': True
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         self.logout()
 
@@ -1214,7 +1227,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'mute': True,
                 'message_type': 'feedback'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         exp_email_preferences = (
             user_services.get_email_preferences_for_exploration(
@@ -1227,13 +1240,13 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'mute': True,
                 'message_type': 'suggestion'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.put_json(
             emails_url, {
                 'version': exploration.version,
                 'mute': False,
                 'message_type': 'feedback'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         exp_email_preferences = (
             user_services.get_email_preferences_for_exploration(
@@ -1290,7 +1303,8 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
                     'email_body': None,
                     'version': 1,
-                }, csrf_token, expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=400)
             self.assertIn(
                 'Moderator actions should include an email',
                 response_dict['error'])
@@ -1299,7 +1313,8 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
                     'email_body': '',
                     'version': 1,
-                }, csrf_token, expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=400)
             self.assertIn(
                 'Moderator actions should include an email',
                 response_dict['error'])
@@ -1313,14 +1328,14 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             }
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token, expect_errors=True,
-                expected_status_int=500)
+                valid_payload, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=500)
 
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                    valid_payload, csrf_token)
+                    valid_payload, csrf_token=csrf_token)
 
             # Log out.
             self.logout()
@@ -1348,7 +1363,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token)
+                valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
             messages = self.mail_stub.get_sent_messages(
@@ -1411,8 +1426,8 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             # The user should receive an 'unauthorized user' error.
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token, expect_errors=True,
-                expected_status_int=401)
+                valid_payload, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=401)
 
             self.logout()
 
@@ -1509,7 +1524,8 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
         response = self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
+            '/issuesdatahandler/%s' % (self.EXP_ID),
+            params={'exp_version': 1})
         self.assertEqual(len(response), 2)
         self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
         self.assertEqual(
@@ -1523,7 +1539,8 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         exp_issues_model.put()
 
         response = self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
+            '/issuesdatahandler/%s' % (self.EXP_ID),
+            params={'exp_version': 1})
         self.assertEqual(len(response), 1)
         self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
 
@@ -1658,7 +1675,7 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
             {
                 'exp_issue_dict': self.exp_issue_dict,
                 'exp_version': 1
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
 
         exp_issues = stats_services.get_exp_issues(self.EXP_ID, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -1679,7 +1696,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
             {
                 'exp_issue_dict': self.exp_issue_dict,
                 'exp_version': 1
-            }, self.csrf_token, expect_errors=True, expected_status_int=404)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=404)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
@@ -1692,7 +1710,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
             {
                 'exp_issue_dict': self.exp_issue_dict,
                 'exp_version': 1
-            }, self.csrf_token, expect_errors=True, expected_status_int=404)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=404)
 
 
 class EditorAutosaveTest(BaseEditorControllerTest):
@@ -1763,7 +1782,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
 
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
+            '/createhandler/data/%s' % self.EXP_ID2,
+            params={'apply_draft': True})
         # Title updated because change list was applied.
         self.assertEqual(response['title'], 'Updated title')
         self.assertTrue(response['is_version_of_draft_valid'])
@@ -1777,7 +1797,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         exp_user_data.draft_change_list_exp_version = 20
         exp_user_data.put()
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
+            '/createhandler/data/%s' % self.EXP_ID2,
+            params={'apply_draft': True})
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertFalse(response['is_version_of_draft_valid'])
@@ -1787,7 +1808,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
 
     def test_exploration_loaded_without_draft_as_draft_does_not_exist(self):
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID3, {'apply_draft': True})
+            '/createhandler/data/%s' % self.EXP_ID3,
+            params={'apply_draft': True})
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertIsNone(response['is_version_of_draft_valid'])
@@ -1802,7 +1824,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         }
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
-            self.csrf_token)
+            csrf_token=self.csrf_token)
         # Check that draft change list hasn't been updated.
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID1))
@@ -1816,12 +1838,13 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.DRAFT_CHANGELIST,
                 'version': 1,
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.INVALID_CHANGELIST,
                 'version': 2,
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
@@ -1839,7 +1862,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         }
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
-            self.csrf_token)
+            csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
@@ -1854,7 +1877,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         }
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
-            self.csrf_token)
+            csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
@@ -1865,7 +1888,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     def test_discard_draft(self):
         self.post_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
-            self.csrf_token)
+            csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertIsNone(exp_user_data.draft_change_list)

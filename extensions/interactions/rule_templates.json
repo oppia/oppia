@@ -23,6 +23,20 @@
     }
   },
   "Continue": {},
+  "DragAndDropSortInput": {
+    "IsEqualToOrdering": {
+      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+    },
+    "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+    },
+    "HasElementXAtPositionY": {
+      "description": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}"
+    },
+    "HasElementXBeforeElementY": {
+      "description": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}"
+    }
+  },
   "EndExploration": {},
   "FractionInput": {
     "IsExactlyEqualTo": {

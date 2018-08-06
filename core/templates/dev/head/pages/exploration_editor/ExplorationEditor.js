@@ -39,7 +39,7 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'ExplorationDataService', 'EditorStateService', 'ExplorationTitleService',
+  'ExplorationDataService', 'StateEditorService', 'ExplorationTitleService',
   'ExplorationCategoryService', 'ExplorationObjectiveService',
   'ExplorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationInitStateNameService', 'ExplorationTagsService',
@@ -53,10 +53,11 @@ oppia.controller('ExplorationEditor', [
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService', 'StateClassifierMappingService',
+  'ThreadDataService', 'StateClassifierMappingService', 'IssuesService',
+  'ENABLE_PLAYTHROUGH_VIZ',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      ExplorationDataService, EditorStateService, ExplorationTitleService,
+      ExplorationDataService, StateEditorService, ExplorationTitleService,
       ExplorationCategoryService, ExplorationObjectiveService,
       ExplorationLanguageCodeService, ExplorationRightsService,
       ExplorationInitStateNameService, ExplorationTagsService,
@@ -70,9 +71,10 @@ oppia.controller('ExplorationEditor', [
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService, StateClassifierMappingService) {
+      ThreadDataService, StateClassifierMappingService, IssuesService,
+      ENABLE_PLAYTHROUGH_VIZ) {
     $scope.EditabilityService = EditabilityService;
-    $scope.EditorStateService = EditorStateService;
+    $scope.StateEditorService = StateEditorService;
 
     /** ********************************************************
      * Called on initial load of the exploration editor page.
@@ -131,6 +133,9 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
+        if (ENABLE_PLAYTHROUGH_VIZ) {
+          IssuesService.initSession(data.exploration_id, data.version);
+        }
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -167,12 +172,16 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markTranslatable();
         }
 
+        if (ExplorationRightsService.isPublic()) {
+          StateTopAnswersStatsService.init(data.stateTopAnswersStats);
+        }
+
         GraphDataService.recompute();
 
-        if (!EditorStateService.getActiveStateName() ||
+        if (!StateEditorService.getActiveStateName() ||
             !ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
-          EditorStateService.setActiveStateName(
+              StateEditorService.getActiveStateName())) {
+          StateEditorService.setActiveStateName(
             ExplorationInitStateNameService.displayed);
         }
 
@@ -209,7 +218,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (ExplorationStatesService.getState(
-          EditorStateService.getActiveStateName())) {
+          StateEditorService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
           $scope.$broadcast('refreshStateTranslation');
         }

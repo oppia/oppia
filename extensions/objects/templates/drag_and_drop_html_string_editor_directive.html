@@ -1,0 +1,26 @@
+<style>
+  .container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 15px;
+  }
+</style>
+
+<div class="container-fluid">
+  <div ng-repeat="choice in choices track by $index">
+    <span class="drag-and-drop-select-container">
+      <div class="row">
+        <label class="container">
+          <div class="col-sm-1">
+            <input type="radio" ng-model="selectedItem" ng-click="selection(selectedItem)"
+                   ng-value="choice.id" name="{{name}}">
+          </div>
+          <div class="col-sm-10">
+            <angular-html-bind html-data="choice.id" ></angular-html-bind>
+          </div>
+        </label>
+      </div>
+    </span>
+  </div>
+</div>

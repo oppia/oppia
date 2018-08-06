@@ -33,7 +33,7 @@ ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
 ISSUE_REGEX = re.compile(r'#(\d+)')
 GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
-FECONF_VAR_NAMES = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
+FECONF_VAR_NAMES = ['CURRENT_STATES_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 
@@ -211,7 +211,7 @@ def main():
     current_release = _get_current_version_tag()
     base_commit = _get_base_commit_with_develop(current_release)
     new_release_logs = _gather_logs(base_commit)
-    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
+    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
     issue_links = _extract_issues(new_release_logs)
     feconf_version_changes = _check_versions(current_release)
     setup_changes = _check_setup_scripts(current_release)

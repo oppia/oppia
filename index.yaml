@@ -112,6 +112,13 @@ indexes:
   - name: exploration_id
   - name: last_updated
 
+- kind: FeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: last_updated
+    direction: desc
+
 - kind: GeneralSuggestionModel
   properties:
   - name: deleted
