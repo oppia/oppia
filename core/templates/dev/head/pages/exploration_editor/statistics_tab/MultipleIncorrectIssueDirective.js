@@ -100,9 +100,9 @@ oppia.directive('multipleIncorrectIssueDirective', [
                     $scope.renderBlockHtml = function(displayBlock) {
                       var index = $scope.getDisplayBlockIndex(displayBlock);
                       if (index === 0) {
-                        var service = LearnerActionRenderService;
-                        return service.renderFinalDisplayBlockForMISIssueHTML(
-                          displayBlock, blockActionIndexMapping[index]);
+                        return LearnerActionRenderService
+                          .renderFinalDisplayBlockForMISIssueHTML(
+                            displayBlock, blockActionIndexMapping[index]);
                       }
                       return LearnerActionRenderService.renderDisplayBlockHTML(
                         displayBlock, blockActionIndexMapping[index]);

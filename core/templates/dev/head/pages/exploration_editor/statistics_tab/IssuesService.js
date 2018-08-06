@@ -38,6 +38,7 @@ oppia.factory('IssuesService', [
         'Several learners submitted answers to card "' + stateName +
         '" several times, then gave up and quit.';
       return statement;
+    };
 
     var renderCyclicTransitionsIssueStatement = function(stateName) {
       return (
@@ -61,6 +62,9 @@ oppia.factory('IssuesService', [
       ), $sce.trustAsHtml(
         'Consider addressing the answers submitted in the sample playthroughs' +
         ' explicitly, using answer groups.'
+      )];
+      return suggestions;
+    };
 
     var renderCyclicTransitionsIssueSuggestions = function(issue) {
       var stateNames = issue.issueCustomizationArgs.state_names.value;
