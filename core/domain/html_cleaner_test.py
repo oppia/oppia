@@ -16,10 +16,11 @@
 
 """Tests for the HTML sanitizer."""
 
-import bs4
 import os
-from core.domain import html_cleaner
+
+import bs4
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.tests import test_utils
 import feconf
 
