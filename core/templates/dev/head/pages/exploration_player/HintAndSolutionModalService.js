@@ -75,7 +75,7 @@ oppia.factory('HintAndSolutionModalService', [
                   solutionContentId), solution.explanation.getHtml(),
                 COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
-              var interaction = ExplorationEngineService.getInteraction();
+              var interaction = ExplorationEngineService.getCurrentInteraction();
               $scope.shortAnswerHtml = solution.getOppiaShortAnswerResponseHtml(
                 interaction);
               $scope.solutionExplanationHtml =

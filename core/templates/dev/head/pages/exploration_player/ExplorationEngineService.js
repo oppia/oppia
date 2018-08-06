@@ -32,11 +32,11 @@ oppia.factory('ExplorationEngineService', [
   'ExpressionInterpolationService', 'GuestCollectionProgressService',
   'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
   'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughService',
+  'PlayerTranscriptService', 'PlaythroughService', 'INTERACTION_SPECS',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService', 'UserService',
   'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
-  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
@@ -46,15 +46,14 @@ oppia.factory('ExplorationEngineService', [
       ExpressionInterpolationService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
       NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughService,
+      PlayerTranscriptService, PlaythroughService, INTERACTION_SPECS,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UserService,
       WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
-      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
+      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
-    var _editorPreviewMode = (
-      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
+    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
@@ -222,74 +221,47 @@ oppia.factory('ExplorationEngineService', [
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(successCallback) {
+      init: function(
+          explorationDict, explorationVersion, preferredAudioLanguage,
+          autoTtsEnabled, successCallback) {
         answerIsBeingProcessed = false;
         if (_editorPreviewMode) {
-          EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            _explorationId).then(function(data) {
-            exploration = ExplorationObjectFactory.createFromBackendDict(
-              data);
-            exploration.setInitialStateName(initStateName);
-            initParams(manualParamChanges);
-            AudioTranslationLanguageService.init(
-              exploration.getAllAudioLanguageCodes(),
-              null,
-              exploration.getLanguageCode(),
-              data.auto_tts_enabled);
-            AudioPreloaderService.init(exploration);
-            AudioPreloaderService.kickOffAudioPreloader(initStateName);
-            PlayerCorrectnessFeedbackEnabledService.init(
-              data.correctness_feedback_enabled);
-            _loadInitialState(successCallback);
-            NumberAttemptsService.reset();
-          });
+          exploration = ExplorationObjectFactory.createFromBackendDict(
+            explorationDict);
+          exploration.setInitialStateName(initStateName);
+          initParams(manualParamChanges);
+          AudioTranslationLanguageService.init(
+            exploration.getAllAudioLanguageCodes(),
+            null,
+            exploration.getLanguageCode(),
+            explorationDict.auto_tts_enabled);
+          AudioPreloaderService.init(exploration);
+          AudioPreloaderService.kickOffAudioPreloader(initStateName);
+          _loadInitialState(successCallback);
         } else {
-          var loadedExploration = null;
-          if (version) {
-            loadedExploration = (
-              ReadOnlyExplorationBackendApiService.loadExploration(
-                _explorationId, version));
-          } else {
-            loadedExploration = (
-              ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                _explorationId));
-          }
-          loadedExploration.then(function(data) {
-            exploration = ExplorationObjectFactory.createFromBackendDict(
-              data.exploration);
-            version = data.version;
-            initParams([]);
-
-            StateClassifierMappingService.init(data.state_classifier_mapping);
-
-            StatsReportingService.initSession(
-              _explorationId, exploration.title,
-              version, data.session_id, GLOBALS.collectionId);
-
-            if (ENABLE_PLAYTHROUGH_RECORDING) {
-              PlaythroughService.initSession(_explorationId, version);
-            }
-
-            AudioTranslationLanguageService.init(
-              exploration.getAllAudioLanguageCodes(),
-              data.preferred_audio_language_code,
-              exploration.getLanguageCode(),
-              data.auto_tts_enabled);
-            AudioPreloaderService.init(exploration);
-            AudioPreloaderService.kickOffAudioPreloader(
-              exploration.getInitialState().name);
-            ImagePreloaderService.init(exploration);
-            ImagePreloaderService.kickOffImagePreloader(
-              exploration.getInitialState().name);
-            PlayerCorrectnessFeedbackEnabledService.init(
-              data.correctness_feedback_enabled);
-            _loadInitialState(successCallback);
-            $rootScope.$broadcast('playerServiceInitialized');
-          });
+          exploration = ExplorationObjectFactory.createFromBackendDict(
+            explorationDict);
+          version = explorationVersion;
+          initParams([]);
+          AudioTranslationLanguageService.init(
+            exploration.getAllAudioLanguageCodes(),
+            preferredAudioLanguage,
+            exploration.getLanguageCode(),
+            autoTtsEnabled);
+          AudioPreloaderService.init(exploration);
+          AudioPreloaderService.kickOffAudioPreloader(
+            exploration.getInitialState().name);
+          ImagePreloaderService.init(exploration);
+          ImagePreloaderService.kickOffImagePreloader(
+            exploration.getInitialState().name);
+          _loadInitialState(successCallback);
         }
       },
       setCurrentStateName: function(stateName) {
         currentStateName = stateName;
+      },
+      getCurrentStateName: function() {
+        return currentStateName;
       },
       setUpcomingStateName: function() {
         currentStateName = nextStateName;
@@ -320,7 +292,7 @@ oppia.factory('ExplorationEngineService', [
           exploration.getAudioTranslations(currentStateName)).length > 0 ||
           AudioTranslationLanguageService.isAutogeneratedAudioAllowed();
       },
-      getInteractionHtml: function(labelForFocusTarget) {
+      getCurrentInteractionHtml: function(labelForFocusTarget) {
         var interactionId = exploration.getInteractionId(currentStateName);
         if (!interactionId) {
           return null;
@@ -341,7 +313,7 @@ oppia.factory('ExplorationEngineService', [
           true,
           labelForFocusTarget);
       },
-      getInteraction: function() {
+      getCurrentInteraction: function() {
         return exploration.getInteraction(currentStateName);
       },
       isInteractionInline: function() {
@@ -353,7 +325,7 @@ oppia.factory('ExplorationEngineService', [
       isNextInteractionInline: function() {
         return exploration.isInteractionInline(nextStateName);
       },
-      getInteractionInstructions: function() {
+      getCurrentInteractionInstructions: function() {
         return exploration.getInteractionInstructions(currentStateName);
       },
       getNextInteractionInstructions: function() {
@@ -374,21 +346,15 @@ oppia.factory('ExplorationEngineService', [
       getLanguageCode: function() {
         return exploration.getLanguageCode();
       },
-      getRandomSuffix: function() {
-        // This is a bit of a hack. When a refresh to a $scope variable happens,
-        // AngularJS compares the new value of the variable to its previous
-        // value. If they are the same, then the variable is not updated.
-        // Appending a random suffix makes the new value different from the
-        // previous one, and thus indirectly forces a refresh.
-        var randomSuffix = '';
-        var N = Math.round(Math.random() * 1000);
-        for (var i = 0; i < N; i++) {
-          randomSuffix += ' ';
-        }
-        return randomSuffix;
-      },
       getHints: function() {
         return exploration.getInteraction(currentStateName).hints;
+      },
+      doesInteractionSupportHints: function() {
+        return (
+          !INTERACTION_SPECS[
+            exploration.getInteraction(currentStateName).id].is_terminal &&
+          !INTERACTION_SPECS[
+            exploration.getInteraction(currentStateName).id].is_linear);
       },
       getSolution: function() {
         return exploration.getInteraction(currentStateName).solution;
@@ -527,36 +493,6 @@ oppia.factory('ExplorationEngineService', [
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
-      },
-      // Returns a promise for the user profile picture, or the default image if
-      // user is not logged in or has not uploaded a profile picture, or the
-      // player is in preview mode.
-      getUserProfileImageAsync: function() {
-        if (!_editorPreviewMode) {
-          return UserService.getProfileImageDataUrlAsync()
-            .then(function(dataUrl) {
-              return dataUrl;
-            });
-        } else {
-          return $q.resolve(UrlInterpolationService.getStaticImageUrl(
-            DEFAULT_PROFILE_IMAGE_PATH));
-        }
-      },
-      recordSolutionHit: function() {
-        if (!_editorPreviewMode) {
-          StatsReportingService.recordSolutionHit(currentStateName);
-        }
-      },
-      recordLeaveForRefresherExp: function(refresherExpId) {
-        if (!_editorPreviewMode) {
-          StatsReportingService.recordLeaveForRefresherExp(
-            currentStateName, refresherExpId);
-        }
-      },
-      // Returns whether the screen is wide enough to fit two
-      // cards (e.g., the tutor and supplemental cards) side-by-side.
-      canWindowShowTwoCards: function() {
-        return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
       }
     };
   }

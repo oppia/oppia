@@ -37,7 +37,7 @@ oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
 
 // The enforced waiting period before the first hint request.
-oppia.constant('WAIT_FOR_FIRST_HINT_MSEC', 60000);
+oppia.constant('WAIT_FOR_FIRST_HINT_MSEC', 6000);
 // The enforced waiting period before each of the subsequent hint requests.
 oppia.constant('WAIT_FOR_SUBSEQUENT_HINTS_MSEC', 30000);
 

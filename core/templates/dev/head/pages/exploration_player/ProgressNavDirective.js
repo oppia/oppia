@@ -32,11 +32,11 @@ oppia.directive('progressNav', [
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationEngineService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         function($scope, $rootScope, PlayerPositionService, UrlService,
             PlayerTranscriptService, ExplorationEngineService,
-            WindowDimensionsService,
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
@@ -57,7 +57,7 @@ oppia.directive('progressNav', [
             $scope.conceptCardIsBeingShown =
               ExplorationEngineService.isStateShowingConceptCard();
             if (!$scope.conceptCardIsBeingShown) {
-              var interaction = ExplorationEngineService.getInteraction();
+              var interaction = ExplorationEngineService.getCurrentInteraction();
               interactionIsInline = (
                 ExplorationEngineService.isInteractionInline());
               $scope.interactionCustomizationArgs =
@@ -90,6 +90,12 @@ oppia.directive('progressNav', [
             }
           };
 
+          // Returns whether the screen is wide enough to fit two
+          // cards (e.g., the tutor and supplemental cards) side-by-side.
+          $scope.canWindowShowTwoCards = function() {
+            return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
+          };
+
           $scope.shouldGenericSubmitButtonBeShown = function() {
             if ($scope.interactionId === 'ItemSelectionInput' &&
                 $scope.interactionCustomizationArgs
@@ -99,7 +105,7 @@ oppia.directive('progressNav', [
 
             return (interactionHasNavSubmitButton && (
               interactionIsInline ||
-              !ExplorationEngineService.canWindowShowTwoCards()
+              !$scope.canWindowShowTwoCards()
             ));
           };
 

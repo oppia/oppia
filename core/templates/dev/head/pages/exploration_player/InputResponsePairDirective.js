@@ -48,7 +48,7 @@ oppia.directive('inputResponsePair', [
           };
 
           $scope.getAnswerHtml = function() {
-            var interaction = ExplorationEngineService.getInteraction();
+            var interaction = ExplorationEngineService.getCurrentInteraction();
             if ($scope.data) {
               return ExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.data.learnerInput, interaction.id,
@@ -59,7 +59,7 @@ oppia.directive('inputResponsePair', [
           // Returns a HTML string representing a short summary of the answer
           // , or null if the answer does not have to be summarized.
           $scope.getShortAnswerHtml = function() {
-            var interaction = ExplorationEngineService.getInteraction();
+            var interaction = ExplorationEngineService.getCurrentInteraction();
             var shortAnswerHtml = '';
             if ($scope.data && interaction.id &&
                 INTERACTION_SPECS[interaction.id].needs_summary) {
