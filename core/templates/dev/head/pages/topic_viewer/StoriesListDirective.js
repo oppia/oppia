@@ -21,7 +21,7 @@ oppia.directive('storiesList', [
       restrict: 'E',
       scope: {
         getTopicId: '&topicId',
-        getCanonicalStories: '&canonicalStoryList',
+        getCanonicalStories: '&canonicalStoriesList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_viewer/stories_list_directive.html'),

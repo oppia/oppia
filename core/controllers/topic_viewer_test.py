@@ -43,12 +43,12 @@ class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_name')
+            self.topic_id, 'public_topic_name')
         self.topic.canonical_story_ids.append(self.story_id)
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic1_name')
+            self.topic_id_1, 'private_topic_name')
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -59,14 +59,14 @@ class TopicViewerPage(BaseTopicViewerControllerTest):
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'topic_name'))
+                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
             self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'topic1_name'),
+                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
                 expect_errors=True)
 
             self.assertEqual(response.status_int, 404)
@@ -77,9 +77,9 @@ class TopicPageDataHandler(BaseTopicViewerControllerTest):
     def test_get(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic_name'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
 
-            self.assertEqual(json_response['topic_name'], 'topic_name')
+            self.assertEqual(json_response['topic_name'], 'public_topic_name')
             self.assertEqual(
                 json_response['canonical_story_dicts'][0]['id'], 'story')
             self.assertEqual(

@@ -21,6 +21,27 @@ from core.domain import topic_services
 import feconf
 
 
+class TopicViewerPage(base.BaseHandler):
+    """Renders the topic viewer page."""
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name):
+        """Handles GET requests."""
+
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'topic_name': topic.name
+        })
+        self.render_template('/pages/topic_viewer/topic_viewer.html')
+
+
 class TopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
@@ -61,24 +82,3 @@ class TopicPageDataHandler(base.BaseHandler):
             'additional_story_dicts': additional_story_dicts
         })
         self.render_json(self.values)
-
-
-class TopicViewerPage(base.BaseHandler):
-    """Manages to render topic viewer page."""
-
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name):
-        """Handles GET requests."""
-
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_name(topic_name)
-
-        if topic is None:
-            raise self.PageNotFoundException
-
-        self.values.update({
-            'topic_name': topic.name
-        })
-        self.render_template('/pages/topic_viewer/topic_viewer.html')

@@ -108,6 +108,17 @@ describe('Url Service', function() {
     }).toThrow();
   });
 
+  it('should correctly retrieve topic name from url', function() {
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(
+      UrlService.getTopicNameFromLearnerUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topc/abcdefgijklm';
+    expect(function(){
+      UrlService.getTopicNameFromLearnerUrl();
+    }).toThrow();
+  });
+
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
     expect(function(){

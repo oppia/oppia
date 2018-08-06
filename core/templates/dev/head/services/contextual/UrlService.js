@@ -60,7 +60,7 @@ oppia.factory('UrlService', ['$window', function($window) {
       if (pathname.match(/\/(story|topic)/g)) {
         return pathname.split('/')[2];
       }
-      throw Error('Invalid topic name');
+      throw Error('Invalid URL for topic');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();

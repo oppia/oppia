@@ -35,7 +35,7 @@ oppia.controller('TopicViewer', [
     $rootScope.loadingMessage = 'Loading';
     TopicViewerBackendApiService.fetchTopicData($scope.topicName).then(
       function(topicDataDict) {
-        $scope.canonicalStoryList = topicDataDict.canonical_story_dicts;
+        $scope.canonicalStoriesList = topicDataDict.canonical_story_dicts;
         $rootScope.loadingMessage = '';
       },
       function(errorResponse) {

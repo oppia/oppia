@@ -171,7 +171,7 @@ oppia.factory('UrlInterpolationService', [
        */
       getStoryUrl: function(storyId) {
         validateResourcePath(storyId);
-        return getCompleteUrl('/story' + storyId);
+        return '/story' + storyId;
       },
 
       /**

@@ -299,6 +299,10 @@ describe('URL Interpolation Service', function() {
       hashes['/path_test/hash_test.html'] + '.html');
   });
 
+  it('should interpolate URLs not requiring parameters', function() {
+    expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
+  });
+
   it('should throw an error for empty path', function() {
     expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
       new Error(

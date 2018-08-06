@@ -28,17 +28,17 @@
       </div>
     </div>
     <div ng-if="activeTab === 'story'" class="oppia-story-tab">
-      <stories-list topic-id="topicId" canonical-story-list="canonicalStoryList"></stories-list>
+      <stories-list topic-id="topicId" canonical-stories-list="canonicalStoriesList"></stories-list>
     </div>
   </div>
   <style>
     .oppia-topic-viewer-tabs-container {
-      width: 70%;
       margin: 0 auto;
+      width: 70%;
     }
     .oppia-story-tab {
-      width: fit-content;
       margin: 0 auto;
+      width: fit-content;
     }
     .oppia-topic-viewer-container .oppia-topic-name {
       color: #01645c;
@@ -51,9 +51,9 @@
     }
     .oppia-topic-viewer-container {
       color: black;
-      text-decoration: none;
-      margin: 0 auto;
       font-family: 'Roboto', Arial, sans-serif;
+      margin: 0 auto;
+      text-decoration: none;
     }
     .oppia-topic-viewer-tabs span {
       display: -webkit-flex;
@@ -73,14 +73,14 @@
 
     .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
     .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
+      background-color: #e7e7e2;
       border-top: 4px solid #009688;
       color: #009688;
-      background-color: #e7e7e2;
     }
     .oppia-topic-viewer-tabs {
-      width: fit-content;
       background-color: #7e7e7e;
       margin: 0 auto 0 10%;
+      width: fit-content;
     }
     .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
       font-size: 1em;

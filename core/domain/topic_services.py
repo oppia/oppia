@@ -213,10 +213,10 @@ def get_topic_by_name(topic_name):
     """
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
 
-    if not topic_model:
+    if topic_model is None:
         return None
 
-    topic = get_topic_from_model(topic_model[0])
+    topic = get_topic_from_model(topic_model)
     return topic
 
 
@@ -287,7 +287,14 @@ def save_new_topic(committer_id, topic):
     Args:
         committer_id: str. ID of the committer.
         topic: Topic. Topic to be saved.
+
+    Raises:
+        Exception. Topic with same name already exists.
     """
+    existing_topic = get_topic_by_name(topic.name)
+    if existing_topic is not None:
+        raise Exception('Topic with name \'%s\' already exists' % topic.name)
+
     commit_message = (
         'New topic created with name \'%s\'.' % topic.name)
     _create_topic(

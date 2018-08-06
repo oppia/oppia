@@ -45,14 +45,15 @@
 </div>
 
 <style>
-  .oppia-topic-viewer-low-width {
-    width: min-content;
+  stories-list .oppia-topic-viewer-low-width {
     margin: 0 auto;
+    width: min-content;
   }
   .oppia-story-tab .oppia-story-summary-tile {
     background-color: #fff;
     cursor: pointer;
     display: inline-block;
+    height: 400px;
     margin: 25px;
     padding: 0;
     position: relative;
@@ -62,9 +63,8 @@
     -webkit-transition: all 300ms;
     white-space: normal;
     width: 308px;
-    height: 400px;
   }
-  .oppia-topic-viewer-carousel-scroller {
+  stories-list div .oppia-topic-viewer-carousel-scroller {
     color: #2c4841;
     cursor: default;
     float: left;
@@ -78,21 +78,21 @@
   .md-button.oppia-topic-viewer-carousel-scroller {
     cursor: pointer;
   }
-  .oppia-topic-viewer-carousel-scroller i {
+  stories-list div .oppia-topic-viewer-carousel-scroller i {
     font-size: 36px;
     margin: 0;
     padding: 0;
     top: 50%;
   }
-  .oppia-topic-viewer-carousel-tiles {
+  .oppia-topic-viewer-carousel .oppia-topic-viewer-carousel-tiles {
     white-space: nowrap;
   }
-  .oppia-topic-viewer-carousel {
+  stories-list div .oppia-topic-viewer-carousel {
     float: left;
+    height: 430px;
     max-width: 1070px;
     overflow: hidden;
     position: relative;
     width: auto;
-    height: 430px;
   }
 </style>
