@@ -95,25 +95,25 @@ oppia.directive('unresolvedAnswersOverview', [
                 'teach_oppia_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
-                'ExplorationHtmlFormatterService', 'TrainingModalService',
-                'StateInteractionIdService', 'StateCustomizationArgsService',
-                'ContextService', 'StateEditorService',
-                'ExplorationStatesService', 'TrainingDataService',
-                'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
-                'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
-                'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-                'AlertsService',
+                '$filter', '$http', '$injector', '$scope', '$uibModalInstance',
+                'AlertsService', 'AngularNameService',
+                'AnswerClassificationService', 'ContextService',
+                'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+                'StateCustomizationArgsService', 'StateEditorService',
+                'StateInteractionIdService', 'TrainingDataService',
+                'TrainingModalService', 'UrlInterpolationService',
+                'DEFAULT_OUTCOME_CLASSIFICATION', 'EXPLICIT_CLASSIFICATION',
+                'TRAINING_DATA_CLASSIFICATION',
                 function(
-                    $scope, $injector, $uibModalInstance, $http, $filter,
-                    ExplorationHtmlFormatterService, TrainingModalService,
-                    StateInteractionIdService, StateCustomizationArgsService,
-                    ContextService, StateEditorService,
-                    ExplorationStatesService, TrainingDataService,
-                    AnswerClassificationService, EXPLICIT_CLASSIFICATION,
-                    UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
-                    AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION,
-                    AlertsService) {
+                    $filter, $http, $injector, $scope, $uibModalInstance,
+                    AlertsService, AngularNameService,
+                    AnswerClassificationService, ContextService,
+                    ExplorationHtmlFormatterService, ExplorationStatesService,
+                    StateCustomizationArgsService, StateEditorService,
+                    StateInteractionIdService, TrainingDataService,
+                    TrainingModalService, UrlInterpolationService,
+                    DEFAULT_OUTCOME_CLASSIFICATION, EXPLICIT_CLASSIFICATION,
+                    TRAINING_DATA_CLASSIFICATION) {
                   var _explorationId = (
                     ContextService.getExplorationId());
                   var _stateName = StateEditorService.getActiveStateName();
