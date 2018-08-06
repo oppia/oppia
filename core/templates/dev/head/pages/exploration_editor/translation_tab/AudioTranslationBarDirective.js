@@ -94,15 +94,16 @@ oppia.directive('audioTranslationBar', [
 
           var getTranslationTabBusyMessage = function() {
             var message = '';
-            if($scope.recorder.status.isRecording) {
-              message = 'It seems like you haven\'t stopped recording, please' +
-                ' stop recording and either save or cancel the recording!'
-            } else if($scope.recorder.status.isConverting) {
+            if ($scope.recorder.status.isRecording) {
+              message = 'You haven\'t finished recording. Please stop ' +
+                'recording and either save or cancel the recording.';
+            } else if ($scope.recorder.status.isConverting) {
               message = 'It seems like recorded audio is still getting ' +
-                'converted into mp3 please wait till it\'s done!'
-            } else if($scope.showRecorderWarning) {
-              message = 'It looks like you haven\'t saved the recorded audio,' +
-                ' please save/cancel the recorded audio.'
+                'converted into mp3. Please wait until the audio has finished' +
+                ' processing.';
+            } else if ($scope.showRecorderWarning) {
+              message = 'You haven\'t saved your recording. Please save or ' +
+                'cancel the recording.';
             }
             return message;
           };
@@ -225,7 +226,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.$on('showTranslationTabBusyModal', function() {
             $scope.openTranslationTabBusyModal();
-          })
+          });
 
           $scope.openTranslationTabBusyModal = function() {
             $uibModal.open({
@@ -241,14 +242,13 @@ oppia.directive('audioTranslationBar', [
               controller: [
                 '$scope', '$uibModalInstance', 'message',
                 function( $scope, $uibModalInstance, message) {
-                  console.log(message);
                   $scope.busyMessage = message;
                   $scope.gotIt = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
-            })
+            });
           };
 
           $scope.playPauseUploadedAudioTranslation = function(languageCode) {

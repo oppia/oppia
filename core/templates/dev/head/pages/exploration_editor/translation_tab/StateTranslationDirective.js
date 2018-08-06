@@ -66,11 +66,8 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.onTabClick = function(tabId) {
-            if($scope.isTranslationTabBusy) {
+            if ($scope.isTranslationTabBusy) {
               $rootScope.$broadcast('showTranslationTabBusyModal');
-              return;
-            }
-            if ($scope.activatedTabId === tabId) {
               return;
             }
             if (tabId === $scope.TAB_ID_CONTENT) {
@@ -179,11 +176,11 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.changeActiveHintIndex = function(newIndex) {
-            if($scope.isTranslationTabBusy) {
+            if ($scope.isTranslationTabBusy) {
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
-            if($scope.activeHintIndex === newIndex) {
+            if ($scope.activeHintIndex === newIndex) {
               return;
             }
             $scope.activeHintIndex = newIndex;
@@ -192,11 +189,11 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-            if($scope.isTranslationTabBusy) {
+            if ($scope.isTranslationTabBusy) {
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
-            if($scope.activeAnswerGroupIndex === newIndex) {
+            if ($scope.activeAnswerGroupIndex === newIndex) {
               return;
             }
             $scope.activeAnswerGroupIndex = newIndex;

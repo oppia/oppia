@@ -58,9 +58,10 @@ oppia.directive('translatorOverview', [
             }));
 
           $scope.changeTranslationLanguage = function() {
-            if($scope.isTranslationTabBusy) {
+            if ($scope.isTranslationTabBusy) {
+              $scope.languageCode = $window.localStorage.getItem(
+                LAST_SELECTED_TRANSLATION_LANGUAGE);
               $rootScope.$broadcast('showTranslationTabBusyModal');
-              $scope.languageCode = prevLanguageCode;
               return;
             }
             TranslationLanguageService.setActiveLanguageCode(

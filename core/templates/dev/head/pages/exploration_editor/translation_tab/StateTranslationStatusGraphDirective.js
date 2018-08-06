@@ -37,8 +37,8 @@ oppia.directive('stateTranslationStatusGraph', [
             return StateEditorService.getActiveStateName();
           };
           $scope.onClickStateInMap = function(newStateName) {
-            if($scope.isTranslationTabBusy) {
-              $rootScope.$broadcast("showTranslationTabBusyModal");
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
             StateEditorService.setActiveStateName(newStateName);
