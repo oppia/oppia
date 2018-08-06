@@ -16,12 +16,16 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+// When an unresolved answer's frequency exceeds this threshold, an exploration
+// will be blocked from publishing until it gets resolved.
+oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService',
   'ParameterMetadataService', 'StateTopAnswersStatsService',
   'SolutionValidityService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
-  'WARNING_TYPES',
+  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, ExplorationParamChangesService, ExplorationStatesService,
       ExpressionInterpolationService, GraphDataService,
@@ -178,10 +182,12 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithUnresolvedAnswers = function() {
       return ExplorationStatesService.getStateNames().filter(
         function(stateName) {
-          return (
-            StateTopAnswersStatsService.hasStateStats(stateName) &&
-            StateTopAnswersStatsService.getUnresolvedStateStats(
-              stateName).length > 0);
+          return StateTopAnswersStatsService.hasStateStats(stateName) &&
+            StateTopAnswersStatsService.getUnresolvedStateStats(stateName).some(
+              function(answerStats) {
+                return answerStats.frequency >=
+                  UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+              });
         });
     };
 
