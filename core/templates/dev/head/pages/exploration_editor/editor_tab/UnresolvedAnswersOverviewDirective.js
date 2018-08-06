@@ -30,16 +30,16 @@ oppia.directive('unresolvedAnswersOverview', [
         'unresolved_answers_overview_directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'EditabilityService',
-        'ExplorationRightsService',
-        'ExplorationStatesService', 'StateEditorService',
-        'StateTopAnswersStatsService', 'StateInteractionIdService',
-        'INTERACTION_SPECS', 'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
+        'ExplorationRightsService', 'ExplorationStatesService',
+        'StateEditorService', 'StateInteractionIdService',
+        'StateTopAnswersStatsService', 'INTERACTION_SPECS',
+        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
         function(
             $rootScope, $scope, $uibModal, EditabilityService,
-            ExplorationRightsService,
-            ExplorationStatesService, StateEditorService,
-            StateTopAnswersStatsService, StateInteractionIdService,
-            INTERACTION_SPECS, SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
+            ExplorationRightsService, ExplorationStatesService,
+            StateEditorService, StateInteractionIdService,
+            StateTopAnswersStatsService, INTERACTION_SPECS,
+            SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
