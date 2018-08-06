@@ -193,6 +193,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     """
     owner_id = 'ADMIN'
     EXP_ID = 'eid'
+
     def test_wrap_with_siblings(self):
         test_cases = [{
             'html_content': (
