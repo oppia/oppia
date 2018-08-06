@@ -22,10 +22,14 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
+from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -197,6 +201,86 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_state_classifier_mapping,
             retrieved_state_classifier_mapping)
+
+
+class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
+    """Test the handler for initialising exploration with
+    state_classifier_mapping.
+    """
+
+    def test_get_exploration_pretests(self):
+        super(ExplorationPretestsUnitTest, self).setUp()
+        STORY_ID = story_services.get_new_story_id()
+        self.save_new_story(
+            STORY_ID, 'user', 'Title', 'Description', 'Notes'
+        )
+        SKILL_ID = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            SKILL_ID, 'user', 'Description')
+
+        exp_id = '0'
+        exp_id_2 = '1'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+        exp_services.delete_demo('1')
+        exp_services.load_demo('1')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+            'old_value': [],
+            'new_value': [SKILL_ID],
+            'node_id': 'node_1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': exp_id,
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            'user', STORY_ID, change_list, 'Updated Node 1.')
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, 'user',
+            self._create_valid_question_data('ABC'))
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, 'user',
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            question_id, SKILL_ID)
+        question_services.create_new_question_skill_link(
+            question_id_2, SKILL_ID)
+        # Call the handler.
+        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+            exploration_dict = self.get_json(
+                '%s/%s?story_id=%s' % (
+                    feconf.EXPLORATION_INIT_URL_PREFIX, exp_id, STORY_ID))
+            next_cursor = exploration_dict['next_cursor_for_pretests']
+
+            self.assertEqual(len(exploration_dict['pretest_question_dicts']), 1)
+            json_response = self.get_json(
+                '%s/%s?story_id=%s&cursor=%s' % (
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
+                    next_cursor))
+            self.assertEqual(len(json_response['pretest_question_dicts']), 1)
+            self.assertNotEqual(
+                json_response['pretest_question_dicts'][0]['id'],
+                exploration_dict['pretest_question_dicts'][0]['id'])
+
+        response = self.testapp.get(
+            '%s/%s?story_id=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, STORY_ID),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 400)
+
+        response = self.testapp.get(
+            '%s/%s?story_id=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, 'story'),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 400)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):

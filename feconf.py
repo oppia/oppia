@@ -381,6 +381,9 @@ ENABLE_GENERALIZED_FEEDBACK_THREADS = False
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
 
+# No. of pretest questions to display.
+NUM_PRETEST_QUESTIONS = 3
+
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
@@ -615,6 +618,7 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
+EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
