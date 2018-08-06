@@ -300,6 +300,10 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   font-style: italic;
 }
 
+table.oppia-issues-learner-action-table td, th {
+  border: 1px solid black;
+}
+
 /* Change the color of odd-numbered lines in a table. */
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
@@ -3911,9 +3915,5 @@ span.oppia-issues-learner-action {
 
 .oppia-issues-learner-action-table {
   width: 100%;
-  border: 1px solid black;
-}
-
-table.oppia-issues-learner-action-table th,td {
   border: 1px solid black;
 }
