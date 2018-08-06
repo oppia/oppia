@@ -65,8 +65,6 @@ oppia.factory('ExplorationEngineService', [
     var currentStateName = null;
     var nextStateName = null;
 
-    var explorationActuallyStarted = false;
-
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initialStateName = null;
@@ -160,39 +158,6 @@ oppia.factory('ExplorationEngineService', [
 
       LearnerParamsService.init(startingParams);
     };
-
-    $rootScope.$on('playerStateChange', function(evt, newStateName) {
-      // To restart the preloader for the new state if required.
-      if (!_editorPreviewMode) {
-        ImagePreloaderService.onStateChange(newStateName);
-      }
-      // Ensure the transition to a terminal state properly logs the end of the
-      // exploration.
-      if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
-        StatsReportingService.recordExplorationCompleted(
-          newStateName, LearnerParamsService.getAllParams());
-
-        // If the user is a guest, has completed this exploration within the
-        // context of a collection, and the collection is whitelisted, record
-        // their temporary progress.
-        var collectionAllowsGuestProgress = (
-          WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-            GLOBALS.collectionId) !== -1);
-        if (collectionAllowsGuestProgress && !_isLoggedIn) {
-          GuestCollectionProgressService.recordExplorationCompletedInCollection(
-            GLOBALS.collectionId, _explorationId);
-        }
-
-        // For single state explorations, when the exploration reaches the
-        // terminal state and explorationActuallyStarted is false, record
-        // exploration actual start event.
-        if (!explorationActuallyStarted) {
-          StatsReportingService.recordExplorationActuallyStarted(
-            newStateName);
-          explorationActuallyStarted = true;
-        }
-      }
-    });
 
     return {
       // This should only be used in editor preview mode. It sets the
@@ -331,8 +296,11 @@ oppia.factory('ExplorationEngineService', [
       getNextInteractionInstructions: function() {
         return exploration.getInteractionInstructions(nextStateName);
       },
-      isStateTerminal: function() {
+      isCurrentStateTerminal: function() {
         return exploration.isStateTerminal(currentStateName);
+      },
+      isNextStateTerminal: function() {
+        return exploration.isStateTerminal(nextStateName);
       },
       isStateShowingConceptCard: function() {
         if (currentStateName === null) {
@@ -457,38 +425,18 @@ oppia.factory('ExplorationEngineService', [
         var refreshInteraction = (
           oldStateName !== newStateName ||
           exploration.isInteractionInline(oldStateName));
-
-        if (!_editorPreviewMode) {
-          var isFirstHit = Boolean(visitedStateNames.indexOf(
-            newStateName) === -1);
-          if (newStateName !== oldStateName) {
-            StatsReportingService.recordStateTransition(
-              oldStateName, newStateName, answer,
-              LearnerParamsService.getAllParams(), isFirstHit);
-
-            StatsReportingService.recordStateCompleted(oldStateName);
-            visitedStateNames.push(newStateName);
-
-            if (oldStateName === exploration.initStateName && (
-              !explorationActuallyStarted)) {
-              StatsReportingService.recordExplorationActuallyStarted(
-                oldStateName);
-              explorationActuallyStarted = true;
-            }
-          }
-          if (exploration.isStateTerminal(newStateName)) {
-            StatsReportingService.recordStateCompleted(newStateName);
-          }
-        }
+        var isFirstHit = Boolean(visitedStateNames.indexOf(
+          newStateName) === -1);
+        visitedStateNames.push(newStateName);
         nextStateName = newStateName;
         var onSameCard = (oldStateName === newStateName);
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
-        $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId, missingPrerequisiteSkillId, onSameCard);
+          refresherExplorationId, missingPrerequisiteSkillId, onSameCard,
+          (oldState === exploration.initStateName), isFirstHit);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

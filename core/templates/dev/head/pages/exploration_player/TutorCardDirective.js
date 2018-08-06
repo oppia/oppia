@@ -193,7 +193,7 @@ oppia.directive('tutorCard', [
 
           $scope.isOnTerminalCard = function() {
             return $scope.activeCard &&
-              ExplorationEngineService.isStateTerminal();
+              ExplorationEngineService.isCurrentStateTerminal();
           };
 
           $scope.getInputResponsePairId = function(index) {
