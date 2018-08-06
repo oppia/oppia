@@ -48,8 +48,8 @@ describe('TrainingDataService', function() {
   beforeEach(inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    siis = $injector.get('stateInteractionIdService');
-    ecs = $injector.get('EditorStateService');
+    siis = $injector.get('StateInteractionIdService');
+    ecs = $injector.get('StateEditorService');
     cls = $injector.get('ChangeListService');
     ess = $injector.get('ExplorationStatesService');
     rs = $injector.get('ResponsesService');

@@ -164,9 +164,11 @@ oppia.factory('PlaythroughService', [
     };
 
     var storePlaythrough = function(isNewPlaythrough) {
+      var playthroughId = isNewPlaythrough ? null : playthrough.playthroughId;
       var promise = $http.post(getFullPlaythroughUrl(), {
         playthrough_data: playthrough.toBackendDict(),
-        issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+        issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION,
+        playthrough_id: playthroughId
       });
       if (isNewPlaythrough) {
         promise.then(function(response) {
@@ -232,7 +234,7 @@ oppia.factory('PlaythroughService', [
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -247,13 +249,13 @@ oppia.factory('PlaythroughService', [
             interaction_id: {
               value: interactionId
             },
-            answer: {
+            submitted_answer: {
               value: answer
             },
             feedback: {
               value: feedback
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -272,7 +274,7 @@ oppia.factory('PlaythroughService', [
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -281,7 +283,7 @@ oppia.factory('PlaythroughService', [
             state_name: {
               value: stateName
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -290,7 +292,7 @@ oppia.factory('PlaythroughService', [
       },
       recordPlaythrough: function(isExplorationComplete) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
         if (isExplorationComplete) {

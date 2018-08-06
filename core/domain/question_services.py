@@ -48,6 +48,33 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
+def create_new_question_skill_link(question_id, skill_id):
+    """Creates a new QuestionSkillLink model.
+
+    Args:
+        question_id: str. ID of the question linked to the skill.
+        skill_id: str. ID of the skill to which the question is linked.
+    """
+    question_skill_link_model = question_models.QuestionSkillLinkModel.create(
+        question_id, skill_id)
+    question_skill_link_model.put()
+
+
+def delete_question_skill_link(question_id, skill_id):
+    """Deleted a QuestionSkillLink model.
+
+    Args:
+        question_id: str. ID of the question linked to the skill.
+        skill_id: str. ID of the skill to which the question is linked.
+    """
+    question_skill_link_id = (
+        question_models.QuestionSkillLinkModel.get_model_id(
+            question_id, skill_id))
+    question_skill_link_model = question_models.QuestionSkillLinkModel.get(
+        question_skill_link_id)
+    question_skill_link_model.delete()
+
+
 def get_new_question_id():
     """Returns a new question id.
 
@@ -126,6 +153,42 @@ def get_question_by_id(question_id, strict=True):
         return None
 
 
+def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
+    """Returns the list of question summaries linked to all the skills given by
+    skill_ids.
+
+    Args:
+        skill_ids: list(str). The ids of skills for which the linked questions
+            are to be retrieved.
+        start_cursor: str. The starting point from which the batch of
+            questions are to be returned. This value should be urlsafe.
+
+    Raises:
+        Exception. Querying linked question summaries for more than 3 skills at
+        a time is not supported currently.
+
+    Returns:
+        list(QuestionSummary), str. The list of question summaries linked to the
+            given skill_ids and the next cursor value to be used for the next
+            page (or None if no more pages are left). The returned next cursor
+            value is urlsafe.
+    """
+    if len(skill_ids) == 0:
+        return [], None
+
+    if len(skill_ids) > 3:
+        raise Exception(
+            'Querying linked question summaries for more than 3 skills at a '
+            'time is not supported currently.')
+    question_ids, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
+            skill_ids, start_cursor)
+    )
+
+    question_summaries = get_question_summaries_by_ids(question_ids)
+    return question_summaries, next_cursor
+
+
 def get_questions_by_ids(question_ids):
     """Returns a list of domain objects representing questions.
 
@@ -144,6 +207,28 @@ def get_questions_by_ids(question_ids):
         else:
             questions.append(None)
     return questions
+
+
+def get_question_summaries_by_ids(question_ids):
+    """Returns a list of domain objects representing question summaries.
+
+    Args:
+        question_ids: list(str). List of question ids.
+
+    Returns:
+        list(QuestionSummary|None). A list of domain objects representing
+        question summaries with the given ids or None when the id is not valid.
+    """
+    question_summary_model_list = (
+        question_models.QuestionSummaryModel.get_multi(question_ids))
+    question_summaries = []
+    for question_summary_model in question_summary_model_list:
+        if question_summary_model is not None:
+            question_summaries.append(
+                get_question_summary_from_model(question_summary_model))
+        else:
+            question_summaries.append(None)
+    return question_summaries
 
 
 def apply_change_list(question_id, change_list):

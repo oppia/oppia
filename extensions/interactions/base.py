@@ -43,7 +43,6 @@ from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 import feconf
-import jinja_utils
 import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
@@ -198,7 +197,7 @@ class BaseInteraction(object):
         """
         html_templates = utils.get_file_contents(os.path.join(
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
+        return html_templates
 
     @property
     def validator_html(self):

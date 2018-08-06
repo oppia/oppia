@@ -20,7 +20,76 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import skill_domain
+from core.domain import skill_services
 import feconf
+
+
+class QuestionCreationHandler(base.BaseHandler):
+    """A handler that creates the question model given a question dict."""
+
+    @acl_decorators.can_manage_question_skill_status
+    def post(self, skill_id):
+        """Handles POST requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        if skill is None:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
+
+        question_dict = self.payload.get('question_dict')
+        if (
+                (question_dict['id'] is not None) or
+                ('question_state_data' not in question_dict) or
+                ('language_code' not in question_dict) or
+                (question_dict['version'] != 1) or
+                (question_dict['question_state_schema_version'] != (
+                    feconf.CURRENT_STATES_SCHEMA_VERSION))):
+            raise self.InvalidInputException
+
+
+        question_dict['id'] = question_services.get_new_question_id()
+        question = question_domain.Question.from_dict(question_dict)
+        question_services.add_question(self.user_id, question)
+        question_services.create_new_question_skill_link(
+            question.id, skill_id)
+        self.values.update({
+            'question_id': question.id
+        })
+        self.render_json(self.values)
+
+
+class QuestionSkillLinkHandler(base.BaseHandler):
+    """A handler for linking and unlinking questions to or from a skill."""
+
+    @acl_decorators.can_manage_question_skill_status
+    def post(self, question_id, skill_id):
+        """Links a question to a skill."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        if skill is None:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
+
+        question_services.create_new_question_skill_link(
+            question_id, skill_id)
+        self.render_json(self.values)
+
+    @acl_decorators.can_manage_question_skill_status
+    def delete(self, question_id, skill_id):
+        """Unlinks a question from a skill."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        question_services.delete_question_skill_link(
+            question_id, skill_id)
+        self.render_json(self.values)
 
 
 class EditableQuestionDataHandler(base.BaseHandler):

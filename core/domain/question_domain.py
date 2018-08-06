@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import html_cleaner
+from core.domain import interaction_registry
 from core.platform import models
 import feconf
 import utils
@@ -136,13 +137,19 @@ class Question(object):
             'version': self.version
         }
 
-    def validate(self, strict=False):
-        """Validates the Question domain object before it is saved.
+    @classmethod
+    def create_default_question_state(cls):
+        """Return a State domain object with default value for being used as
+        question state data.
 
-        Args:
-            strict: bool. Whether the complete validation has to be done to the
-                question, which is usually done before question submission.
+        Returns:
+            State. The corresponding State domain object.
         """
+        return exp_domain.State.create_default_state(
+            None, is_initial_state=True)
+
+    def validate(self):
+        """Validates the Question domain object before it is saved."""
 
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
@@ -173,42 +180,44 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if strict:
-            at_least_one_correct_answer = False
-            dest_is_specified = False
-            interaction = self.question_state_data.interaction
-            for answer_group in interaction.answer_groups:
-                if answer_group.labelled_as_correct:
-                    at_least_one_correct_answer = True
-                if answer_group.dest is not None:
-                    dest_is_specified = True
-
-            if interaction.default_outcome.labelled_as_correct:
+        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
+        at_least_one_correct_answer = False
+        dest_is_specified = False
+        interaction = self.question_state_data.interaction
+        for answer_group in interaction.answer_groups:
+            if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
-
-            if interaction.default_outcome.dest is not None:
+            if answer_group.outcome.dest is not None:
                 dest_is_specified = True
 
-            if not at_least_one_correct_answer:
-                raise utils.ValidationError(
-                    'Expected at least one answer group to have a correct ' +
-                    'answer.'
-                )
+        if interaction.default_outcome.labelled_as_correct:
+            at_least_one_correct_answer = True
 
-            if dest_is_specified:
-                raise utils.ValidationError(
-                    'Expected all answer groups to have destination as None.'
-                )
+        if interaction.default_outcome.dest is not None:
+            dest_is_specified = True
 
-            if not interaction.hints:
-                raise utils.ValidationError(
-                    'Expected the question to have at least one hint')
+        if not at_least_one_correct_answer:
+            raise utils.ValidationError(
+                'Expected at least one answer group to have a correct ' +
+                'answer.'
+            )
 
-            if interaction.solution is None:
-                raise utils.ValidationError(
-                    'Expected the question to have a solution'
-                )
-            self.question_state_data.validate({}, False)
+        if dest_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination as None.'
+            )
+
+        if not interaction.hints:
+            raise utils.ValidationError(
+                'Expected the question to have at least one hint')
+
+        if (
+                (interaction.solution is None) and
+                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
+            raise utils.ValidationError(
+                'Expected the question to have a solution'
+            )
+        self.question_state_data.validate({}, False)
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -235,12 +244,11 @@ class Question(object):
         Returns:
             Question. A Question domain object with default values.
         """
-        default_question_state_data = exp_domain.State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True)
+        default_question_state_data = cls.create_default_question_state()
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            feconf.CURRENT_STATES_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_language_code(self, language_code):
@@ -297,8 +305,8 @@ class QuestionSummary(object):
             'id': self.id,
             'creator_id': self.creator_id,
             'question_content': self.question_content,
-            'last_updated': self.last_updated,
-            'created_on': self.created_on
+            'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
+            'created_on_msec': utils.get_time_in_millisecs(self.created_on)
         }
 
 

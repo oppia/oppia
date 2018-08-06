@@ -38,10 +38,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'ExplorationPlayerService', 'CurrentInteractionService',
+        'CurrentInteractionService',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            ExplorationPlayerService, CurrentInteractionService) {
+            CurrentInteractionService) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],

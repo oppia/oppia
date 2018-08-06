@@ -27,11 +27,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
         'WindowDimensionsService', 'UrlService',
-        'ExplorationPlayerService', 'CurrentInteractionService',
+        'CurrentInteractionService',
         function(
             $scope, $attrs, $uibModal, logicProofRulesService,
             WindowDimensionsService, UrlService,
-            ExplorationPlayerService, CurrentInteractionService) {
+            CurrentInteractionService) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 

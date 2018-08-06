@@ -1,15 +1,15 @@
 <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
-  <h3 ng-if="!stateInteractionIdService.displayed">
+  <h3 ng-if="!StateInteractionIdService.displayed">
     Choose Interaction
   </h3>
 
-  <h3 ng-if="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
-    Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
+  <h3 ng-if="StateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
+    Customize Interaction (<[INTERACTION_SPECS[StateInteractionIdService.displayed].name]>)
   </h3>
 </div>
 
 <div class="modal-body">
-  <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
+  <div ng-if="!StateInteractionIdService.displayed" ng-cloak>
     <uib-tabset>
       <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
                heading="<[category.name]>" active="category.active"
@@ -27,17 +27,17 @@
     </uib-tabset>
   </div>
 
-  <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="interaction-editor-form protractor-test-interaction-editor">
+  <form ng-if="StateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="interaction-editor-form protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-      <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+      <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <div style="margin-bottom: 15px;"></div>
     </div>
   </form>
 
-  <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
+  <form ng-if="StateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
     This interaction cannot be modified. To delete it, close this popup and click the 'x' button in the top-right corner.
   </form>
 </div>
@@ -45,7 +45,7 @@
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+  <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
   <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
   <div class="btn-group"

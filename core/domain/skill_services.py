@@ -157,6 +157,7 @@ def get_skill_from_model(skill_model, run_conversion=True):
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
         skill_model.version, skill_model.next_misconception_id,
+        skill_model.superseding_skill_id, skill_model.all_questions_merged,
         skill_model.created_on, skill_model.last_updated)
 
 
@@ -336,7 +337,9 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         skill_contents=skill.skill_contents.to_dict(),
         next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
-        skill_contents_schema_version=skill.skill_contents_schema_version
+        skill_contents_schema_version=skill.skill_contents_schema_version,
+        superseding_skill_id=skill.superseding_skill_id,
+        all_questions_merged=skill.all_questions_merged
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -386,6 +389,12 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
+                    skill.update_superseding_skill_id(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
+                    skill.record_that_all_questions_are_merged(change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
@@ -477,6 +486,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
 
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
+    skill_model.superseding_skill_id = skill.superseding_skill_id
+    skill_model.all_questions_merged = skill.all_questions_merged
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
     skill_model.skill_contents_schema_version = (
@@ -485,6 +496,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
     ]
+    skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     memcache_services.delete(_get_skill_memcache_key(skill.id))
