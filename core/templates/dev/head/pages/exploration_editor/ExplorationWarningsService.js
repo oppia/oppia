@@ -19,8 +19,8 @@
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService',
-  'ParameterMetadataService', 'SolutionValidityService',
-  'StateTopAnswersStatsService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'ParameterMetadataService', 'StateTopAnswersStatsService',
+  'SolutionValidityService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'WARNING_TYPES',
   function(
       $injector, ExplorationParamChangesService, ExplorationStatesService,
