@@ -2143,8 +2143,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
         # TODO(sll): Remove this check once App Engine supports 3-letter
