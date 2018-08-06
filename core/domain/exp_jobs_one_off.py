@@ -42,12 +42,11 @@ FILE_ALREADY_EXISTS = 'File already exists in GCS'
 FILE_FOUND_IN_GCS = 'File found in GCS'
 FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
 FILE_DELETED = 'File has been deleted'
-NO_OF_FILES_DELETED = 'Number of files that got deleted'
-NO_OF_FILES_NOT_IN_GCS = 'Number of files that are not in GCS are'
+NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
-FILE_MODEL_ID_PATTERN = re.compile(
+FILE_MODEL_ID_REGEX = re.compile(
     r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 
@@ -666,7 +665,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             # To separate the image entries from the audio entries we get from
             # the FileSnapshotContentModel.
             if filetype in ALLOWED_IMAGE_EXTENSIONS:
-                catched_groups = FILE_MODEL_ID_PATTERN.match(instance_id)
+                catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
                 if not catched_groups:
                     yield (WRONG_INSTANCE_ID, instance_id)
                 else:
@@ -709,7 +708,7 @@ class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
             # To separate the image entries from the audio entries we get from
             # the FileSnapshotContentModel.
             if filetype in ALLOWED_IMAGE_EXTENSIONS:
-                catched_groups = FILE_MODEL_ID_PATTERN.match(instance_id)
+                catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
                 if not catched_groups:
                     yield (WRONG_INSTANCE_ID, instance_id)
                 else:
@@ -746,7 +745,7 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
         # To separate the image entries from the audio entries we get from
         # the FileSnapshotContentModel.
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            catched_groups = FILE_MODEL_ID_PATTERN.match(instance_id)
+            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
             if not catched_groups:
                 yield (WRONG_INSTANCE_ID, instance_id)
             else:
@@ -770,6 +769,6 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(status, values):
         if status == FILE_DELETED:
-            yield (NO_OF_FILES_DELETED, len(values))
+            yield (NUMBER_OF_FILES_DELETED, len(values))
         else:
             yield (status, values)
