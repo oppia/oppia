@@ -74,13 +74,11 @@ oppia.directive('stateGraphViz', [
       controller: [
         '$element', '$filter', '$scope', '$timeout',
         'ExplorationWarningsService', 'StateGraphLayoutService',
-        'StateTopAnswersStatsService', 'MAX_NODES_PER_ROW',
-        'MAX_NODE_LABEL_LENGTH',
+        'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
             ExplorationWarningsService, StateGraphLayoutService,
-            StateTopAnswersStatsService, MAX_NODES_PER_ROW,
-            MAX_NODE_LABEL_LENGTH) {
+            MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var redrawGraph = function() {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
@@ -184,13 +182,8 @@ oppia.directive('stateGraphViz', [
             };
 
             $scope.isStateFlagged = function(nodeId) {
-              var isHighlightedState = $scope.highlightStates &&
+              return $scope.highlightStates &&
                 $scope.highlightStates.hasOwnProperty(nodeId);
-              var doesStateHaveUnresolvedAnswers =
-                StateTopAnswersStatsService.hasStateStats() &&
-                StateTopAnswersStatsService.getUnresolvedStateStats(
-                  nodeId).length > 0;
-              return isHighlightedState || doesStateHaveUnresolvedAnswers;
             };
 
             $scope.getNodeTitle = function(node) {
