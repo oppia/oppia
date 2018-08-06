@@ -17,92 +17,6 @@
  * data for the feedback tab of the exploration editor.
  */
 
-describe('retrieving threads service', function() {
-  var expId = '12345';
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(function() {
-    module('oppia');
-    module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-      $provide.constant('USE_NEW_SUGGESTION_FRAMEWORK', false);
-    });
-  });
-
-  var ThreadDataService, httpBackend;
-  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
-    ThreadDataService = _ThreadDataService_;
-    httpBackend = $httpBackend;
-  }));
-
-  it('should retrieve feedback threads', function() {
-    var mockFeedbackThreads = [
-      {
-        last_updated: 1441870501230.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Feedback from a learner',
-        summary: null,
-        thread_id: 'abc1'
-      },
-      {
-        last_updated: 1441870501231.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Feedback from a learner',
-        summary: null,
-        thread_id: 'abc2'
-      }
-    ];
-
-    var mockOpenSuggestionThreads = [
-      {
-        last_updated: 1441870501232.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Suggestion from a learner',
-        summary: null,
-        thread_id: 'abc3'
-      },
-      {
-        last_updated: 1441870501233.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Suggestion from a learner',
-        summary: null,
-        thread_id: 'abc4'
-      }
-    ];
-
-    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads
-    });
-
-    httpBackend.whenGET(
-      '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
-    ).respond({
-      threads: mockOpenSuggestionThreads
-    });
-
-    ThreadDataService.fetchThreads(function() {
-      for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(ThreadDataService.data.feedbackThreads).toContain(
-          mockFeedbackThreads[i]);
-      }
-      for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
-        expect(ThreadDataService.data.suggestionThreads).toContain(
-          mockOpenSuggestionThreads[i]);
-      }
-    });
-    httpBackend.flush();
-  });
-});
-
 describe('retrieving threads service new framework', function() {
   var expId = '12345';
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -112,7 +26,6 @@ describe('retrieving threads service new framework', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
-      $provide.constant('USE_NEW_SUGGESTION_FRAMEWORK', true);
     });
   });
 

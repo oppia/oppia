@@ -2216,9 +2216,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = generate_state_id_mapping_model(
         exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
@@ -2268,9 +2265,6 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = (
         generate_state_id_mapping_model_for_reverted_exploration(
             exploration_id, current_version, revert_to_version))
@@ -2286,9 +2280,6 @@ def delete_state_id_mapping_model_for_exploration(
         exploration_id: str. Id of the exploration.
         exploration_version: int. Latest version of the exploration.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)

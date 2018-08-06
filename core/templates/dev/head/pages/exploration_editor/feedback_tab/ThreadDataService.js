@@ -28,18 +28,12 @@ oppia.factory('ThreadDataService', [
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
-    var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
-    var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
-      _expId + '/';
+    var _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
+    var _SUGGESTION_ACTION_HANDLER_URL = (
+      '/generalsuggestionactionhandler/' + 'exploration/' + _expId + '/');
     var _THREAD_HANDLER_PREFIX = '/threadhandler/';
     var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
     var _THREAD_STATUS_OPEN = 'open';
-
-    if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-      _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
-      _SUGGESTION_ACTION_HANDLER_URL = '/generalsuggestionactionhandler/' +
-        'exploration/' + _expId + '/';
-    }
 
     // All the threads for this exploration. This is a list whose entries are
     // objects, each representing threads. The 'messages' key of this object
@@ -55,16 +49,10 @@ oppia.factory('ThreadDataService', [
     var _fetchThreads = function(successCallback) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var params = {
-        list_type: 'all',
-        has_suggestion: true
+        list_type: 'target',
+        target_type: 'exploration',
+        target_id: _expId
       };
-      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-        params = {
-          list_type: 'target',
-          target_type: 'exploration',
-          target_id: _expId
-        };
-      }
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: params
       });
@@ -74,30 +62,25 @@ oppia.factory('ThreadDataService', [
           FeedbackThreadObjectFactory.createFromBackendDict);
 
         _data.suggestionThreads = [];
-        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          var suggestionThreads = res[0].data.suggestion_thread_dicts;
-          if (suggestionThreads.length !== res[1].data.suggestions.length) {
-            $log.error('Number of suggestion threads doesn\'t match number of' +
-                       'suggestion objects');
-          }
-          for (var i = 0; i < suggestionThreads.length; i++) {
-            for (var j = 0; j < res[1].data.suggestions.length; j++) {
-              var suggestion = (
-                SuggestionObjectFactory.createFromBackendDict(
-                  res[1].data.suggestions[j]));
-              if (suggestionThreads[i].thread_id ===
-                  suggestion.threadId()) {
-                var suggestionThread = (
-                  SuggestionThreadObjectFactory.createFromBackendDicts(
-                    suggestionThreads[i], res[1].data.suggestions[j]));
-                _data.suggestionThreads.push(suggestionThread);
-                break;
-              }
+        var suggestionThreads = res[0].data.suggestion_thread_dicts;
+        if (suggestionThreads.length !== res[1].data.suggestions.length) {
+          $log.error('Number of suggestion threads doesn\'t match number of' +
+                     'suggestion objects');
+        }
+        for (var i = 0; i < suggestionThreads.length; i++) {
+          for (var j = 0; j < res[1].data.suggestions.length; j++) {
+            var suggestion = (
+              SuggestionObjectFactory.createFromBackendDict(
+                res[1].data.suggestions[j]));
+            if (suggestionThreads[i].thread_id ===
+                suggestion.threadId()) {
+              var suggestionThread = (
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  suggestionThreads[i], res[1].data.suggestions[j]));
+              _data.suggestionThreads.push(suggestionThread);
+              break;
             }
           }
-        } else {
-          _data.suggestionThreads = res[1].data.threads.map(
-            FeedbackThreadObjectFactory.createFromBackendDict);
         }
         if (successCallback) {
           successCallback();
@@ -111,9 +94,6 @@ oppia.factory('ThreadDataService', [
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].threadId === threadId) {
             allThreads[i].setMessages(response.data.messages);
-            if (!constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              allThreads[i].suggestion = response.data.suggestion;
-            }
             break;
           }
         }
@@ -220,39 +200,23 @@ oppia.factory('ThreadDataService', [
           action: action
         };
 
-        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          // TODO(nithesh): Remove manual construction of suggestion ID once the
-          // feedback threads are migrated and threadId matches suggestionId.
-          suggestionId = 'exploration.' + threadId;
-          payload.review_message = reviewMsg;
-          if (action === ACTION_ACCEPT_SUGGESTION) {
-            payload.commit_message = commitMsg;
-          }
-          _openThreadsCount -= 1;
-          $http.put(
-            _SUGGESTION_ACTION_HANDLER_URL + suggestionId, payload).then(
-            onSuccess, function() {
-              _openThreadsCount += 1;
-              if (onFailure) {
-                onFailure();
-              }
-            }
-          );
-        } else {
-          if (action === ACTION_ACCEPT_SUGGESTION) {
-            payload.commit_message = commitMsg;
-            payload.audio_update_required = audioUpdateRequired;
-          }
-          _openThreadsCount -= 1;
-          $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
-            onSuccess, function() {
-              _openThreadsCount += 1;
-              if (onFailure) {
-                onFailure();
-              }
-            }
-          );
+        // TODO(nithesh): Remove manual construction of suggestion ID once the
+        // feedback threads are migrated and threadId matches suggestionId.
+        suggestionId = 'exploration.' + threadId;
+        payload.review_message = reviewMsg;
+        if (action === ACTION_ACCEPT_SUGGESTION) {
+          payload.commit_message = commitMsg;
         }
+        _openThreadsCount -= 1;
+        $http.put(
+          _SUGGESTION_ACTION_HANDLER_URL + suggestionId, payload).then(
+          onSuccess, function() {
+            _openThreadsCount += 1;
+            if (onFailure) {
+              onFailure();
+            }
+          }
+        );
       }
     };
   }
