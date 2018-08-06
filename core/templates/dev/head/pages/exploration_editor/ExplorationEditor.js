@@ -227,7 +227,9 @@ oppia.controller('ExplorationEditor', [
           // they are not needed to interact with the editor.
           StateTopAnswersStatsBackendApiService.fetchStats(
             $scope.explorationId
-          ).then(StateTopAnswersStatsService.init);
+          ).then(StateTopAnswersStatsService.init).then(function() {
+            $scope.$broadcast('refreshStateEditor');
+          });
         }
       });
     };
