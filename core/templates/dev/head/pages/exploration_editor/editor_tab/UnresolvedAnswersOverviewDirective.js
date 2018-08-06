@@ -163,7 +163,7 @@ oppia.directive('unresolvedAnswersOverview', [
                       var answer = item.answer;
                       var classificationResult = (
                         acs.getMatchingClassificationResult(
-                          _explorationId, _stateName, _state, answer,
+                          _stateName, _state.interaction, answer,
                           rulesService));
                       var classificationType = (
                         classificationResult.classificationCategorization);
