@@ -52,7 +52,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-          !SolutionValidityService.isSolutionValid(stateName)) {
+            !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -149,7 +149,7 @@ oppia.factory('ExplorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rules.length === 0 &&
-          group.trainingData.length === 0) {
+            group.trainingData.length === 0) {
           indexes.push(i);
         }
       }
