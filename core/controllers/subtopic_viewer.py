@@ -52,7 +52,7 @@ class SubtopicViewerPage(base.BaseHandler):
     """Manages to render subtopic viewer page."""
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, topic_id, subtopic_id):
+    def get(self):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
