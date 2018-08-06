@@ -16,6 +16,7 @@
 
 """Tests for the image service."""
 import os
+
 from core.domain import fs_domain
 from core.domain import image_services
 from core.tests import test_utils
