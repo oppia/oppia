@@ -20,27 +20,33 @@ oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_status_graph_directive.html'),
       controller: [
         '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
-        'EditorStateService', 'StateContentIdsToAudioTranslationsService',
+        'StateEditorService', 'StateContentIdsToAudioTranslationsService',
         function(
             $scope, $rootScope, ExplorationStatesService, GraphDataService,
-            EditorStateService, StateContentIdsToAudioTranslationsService) {
+            StateEditorService, StateContentIdsToAudioTranslationsService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.getActiveStateName = function() {
-            return EditorStateService.getActiveStateName();
+            return StateEditorService.getActiveStateName();
           };
           $scope.onClickStateInMap = function(newStateName) {
-            EditorStateService.setActiveStateName(newStateName);
-            var stateName = EditorStateService.getActiveStateName();
+            if($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast("showTranslationTabBusyModal");
+              return;
+            }
+            StateEditorService.setActiveStateName(newStateName);
+            var stateName = StateEditorService.getActiveStateName();
             var stateData = ExplorationStatesService.getState(stateName);
             if (stateName && stateData) {
               StateContentIdsToAudioTranslationsService.init(
-                EditorStateService.getActiveStateName(),
+                StateEditorService.getActiveStateName(),
                 stateData.contentIdsToAudioTranslations);
               $rootScope.$broadcast('refreshStateTranslation');
               $rootScope.$broadcast('refreshAudioTranslationBar');

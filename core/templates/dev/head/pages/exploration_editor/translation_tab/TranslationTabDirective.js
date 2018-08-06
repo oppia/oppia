@@ -29,6 +29,7 @@ oppia.directive('translationTab', [
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', function($scope, $rootScope) {
         $rootScope.loadingMessage = 'Loading';
+        $scope.isTranslationTabBusy = false;
         $scope.$on('refreshTranslationTab', function() {
           $scope.$broadcast('refreshStateTranslation');
         });

@@ -214,6 +214,14 @@ oppia.factory('TopicEditorStateService', [
         return _questionSummaries;
       },
 
+      fetchQuestionSummaries: function(topicId, callback) {
+        EditableTopicBackendApiService.fetchQuestions(topicId).then(
+          function(questionSummaries) {
+            _setQuestionSummaries(questionSummaries);
+            callback();
+          });
+      },
+
       /**
        * Returns the current subtopic page to be shared among the topic
        * editor. Please note any changes to this subtopic page will be

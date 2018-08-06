@@ -23,7 +23,9 @@ oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translator_overview_directive.html'),
@@ -56,6 +58,11 @@ oppia.directive('translatorOverview', [
             }));
 
           $scope.changeTranslationLanguage = function() {
+            if($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              $scope.languageCode = prevLanguageCode;
+              return;
+            }
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
             $rootScope.$broadcast('refreshAudioTranslationBar');
