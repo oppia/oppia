@@ -228,7 +228,7 @@ oppia.factory('ExplorationEngineService', [
       getCurrentStateName: function() {
         return currentStateName;
       },
-      setUpcomingStateName: function() {
+      recordAddNewCard: function() {
         currentStateName = nextStateName;
       },
       getExplorationId: function() {

@@ -500,7 +500,7 @@ oppia.directive('conversationSkin', [
           };
           var _addNewCard = function(
               stateName, newParams, contentHtml, interactionHtml) {
-            ExplorationEngineService.setUpcomingStateName();
+            ExplorationEngineService.recordAddNewCard();
             PlayerTranscriptService.addNewCard(
               stateName, newParams, contentHtml, interactionHtml, false);
 
