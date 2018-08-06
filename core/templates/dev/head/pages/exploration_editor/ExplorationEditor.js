@@ -161,7 +161,7 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_suggestion_notifications);
 
         if (ExplorationRightsService.isPublic()) {
-    StateTopAnswersStatsService.init(data.stateTopStats);
+          StateTopAnswersStatsService.init(data.stateTopStats);
         }
 
         if (GLOBALS.can_edit) {
