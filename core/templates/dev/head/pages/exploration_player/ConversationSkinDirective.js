@@ -408,10 +408,8 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isOnTerminalCard = function() {
-            if (!$scope.inPretestMode) {
-              return $scope.activeCard &&
-                ExplorationEngineService.isCurrentStateTerminal();
-            }
+            return $scope.activeCard &&
+              ExplorationEngineService.isCurrentStateTerminal();
           };
 
           var isSupplementalCardNonempty = function(card) {
