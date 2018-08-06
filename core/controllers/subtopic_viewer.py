@@ -33,12 +33,17 @@ class SubtopicPageDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
+
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id)
 
         self.values.update({
             'subtopic_html_data': subtopic_page.html_data,
-            'language_code': subtopic_page.language_code
+            'language_code': subtopic_page.language_code,
+            'topic_title': topic.name,
+            'subtopic_title': subtopic.title
         })
         self.render_json(self.values)
 
@@ -53,11 +58,4 @@ class SubtopicViewerPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
-
-        self.values.update({
-            'topic_title': topic.name,
-            'subtopic_title': subtopic.title
-        })
         self.render_template('/pages/subtopic_viewer/subtopic_viewer.html')

@@ -1825,7 +1825,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 
 
 def can_access_subtopic_viewer_page(handler):
-    """Decorator to check whether user can acces subtopic viewer page."""
+    """Decorator to check whether user can access subtopic viewer page."""
 
     def test_can_access_subtopic_viewer(self, topic_id, subtopic_id, **kwargs):
         """Checks if the user can access subtopic viewer page.

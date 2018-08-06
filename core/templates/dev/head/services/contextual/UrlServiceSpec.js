@@ -145,4 +145,22 @@ describe('Url Service', function() {
       UrlService.getSkillIdFromUrl();
     }).toThrow();
   });
+
+  it('should correctly retrieve subtopic id from url', function() {
+    mockLocation.pathname = '/skill/abcdefghijkl/0';
+    expect(
+      UrlService.getTopicIdAndSubtopicIdFromUrl()
+    ).toEqual({
+      topicId: 'abcdefghijkl',
+      subtopicId: '0'
+    });
+    mockLocation.pathname = '/skill/abcdefghijk';
+    expect(function() {
+      UrlService.getTopicIdAndSubtopicIdFromUrl();
+    }).toThrow();
+    mockLocation.pathname = '/skill/abcdefghijkl/a';
+    expect(function() {
+      UrlService.getTopicIdAndSubtopicIdFromUrl();
+    }).toThrow();
+  });
 });
