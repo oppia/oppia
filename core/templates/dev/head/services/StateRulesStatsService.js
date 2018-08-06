@@ -59,8 +59,7 @@ oppia.factory('StateRulesStatsService', [
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
                 if (vizInfo.addressed_info_is_supported) {
-                  vizInfo = {data: vizInfo};
-                  angular.forEach(vizInfo, function(vizInfoDatum) {
+                  vizInfo.data.forEach(function(vizInfoDatum) {
                     vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
