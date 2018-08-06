@@ -182,12 +182,13 @@ oppia.directive('stateGraphViz', [
             };
 
             $scope.isStateFlagged = function(nodeId) {
-              return (
-                $scope.highlightStates &&
-                $scope.highlightStates.hasOwnProperty(nodeId)) || (
-                StateTopAnswersStatsService.hasStateStats(nodeId) &&
+              var isHighlightedState = $scope.highlightStates &&
+                $scope.highlightStates.hasOwnProperty(nodeId);
+              var doesStateHaveUnresolvedAnswers =
+                StateTopAnswersStatsService.hasStateStats() &&
                 StateTopAnswersStatsService.getUnresolvedStateStats(
-                  nodeId).length > 0);
+                  nodeId).length > 0;
+              return isHighlightedState || doesStateHaveUnresolvedAnswers;
             };
 
             $scope.getNodeTitle = function(node) {
