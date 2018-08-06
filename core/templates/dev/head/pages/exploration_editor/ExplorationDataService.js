@@ -21,7 +21,8 @@ oppia.factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'UrlService',
-  function($http, $log, $q, $window, AlertsService,
+  function(
+      $http, $log, $q, $window, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
       ReadOnlyExplorationBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
