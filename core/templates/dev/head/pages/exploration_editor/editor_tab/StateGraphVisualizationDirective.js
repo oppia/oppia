@@ -73,12 +73,14 @@ oppia.directive('stateGraphViz', [
         'state_graph_visualization_directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
-        'ExplorationWarningsService', 'StateTopAnswersStatsService',
-        'StateGraphLayoutService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+        'ExplorationWarningsService', 'StateGraphLayoutService',
+        'StateTopAnswersStatsService', 'MAX_NODE_LABEL_LENGTH',
+        'MAX_NODES_PER_ROW',
         function(
             $element, $filter, $scope, $timeout,
-            ExplorationWarningsService, StateTopAnswersStatsService,
-            StateGraphLayoutService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+            ExplorationWarningsService, StateGraphLayoutService,
+            StateTopAnswersStatsService, MAX_NODE_LABEL_LENGTH,
+            MAX_NODES_PER_ROW) {
           var redrawGraph = function() {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
