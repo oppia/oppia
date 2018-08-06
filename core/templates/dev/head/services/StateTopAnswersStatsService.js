@@ -131,8 +131,8 @@ oppia.factory('StateTopAnswersStatsService', [
        * given state.
        */
       hasStateStats: function(stateName) {
-        return (
-          isInitialized && stateTopAnswersStatsCache.hasOwnProperty(stateName));
+        return isInitialized &&
+          stateTopAnswersStatsCache.hasOwnProperty(stateName);
       },
 
       /**
