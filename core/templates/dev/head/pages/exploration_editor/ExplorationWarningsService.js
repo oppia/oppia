@@ -17,7 +17,7 @@
  */
 
 // When an unresolved answer's frequency exceeds this threshold, an exploration
-// will be blocked from publishing until it gets resolved.
+// will be blocked from being published until the answer is resolved.
 oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
 
 oppia.factory('ExplorationWarningsService', [
