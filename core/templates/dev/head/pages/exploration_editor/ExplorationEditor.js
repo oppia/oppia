@@ -229,6 +229,7 @@ oppia.controller('ExplorationEditor', [
             $scope.explorationId
           ).then(StateTopAnswersStatsService.init).then(function() {
             $scope.$broadcast('refreshStateEditor');
+            ExplorationWarningsService.updateWarnings();
           });
         }
       });
