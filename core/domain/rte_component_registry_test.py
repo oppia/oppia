@@ -247,17 +247,21 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(obtained_component_tags), set(actual_component_tags))
 
-        obtained_component_classes = (
-            component_types_to_component_classes.values())
-        actual_component_classes = []
+        obtained_component_class_names = [
+            component_class.__name__
+            for component_class in component_types_to_component_classes.values()
+        ]
+        actual_component_class_names = []
         module_fullname = 'extensions.rich_text_components.components'
         module_obj = pkgutil.find_loader(module_fullname).load_module(
             'components')
         for name, obj in inspect.getmembers(module_obj):
             if inspect.isclass(obj) and name != 'BaseRteComponent':
-                actual_component_classes.append(obj)
+                actual_component_class_names.append(name)
+
         self.assertEqual(
-            set(obtained_component_classes), set(actual_component_classes))
+            set(obtained_component_class_names),
+            set(actual_component_class_names))
 
     def test_get_inline_components(self):
         """Test get_inline_components method."""
