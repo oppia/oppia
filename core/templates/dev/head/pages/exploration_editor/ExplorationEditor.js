@@ -228,8 +228,8 @@ oppia.controller('ExplorationEditor', [
           StateTopAnswersStatsBackendApiService.fetchStats(
             $scope.explorationId
           ).then(StateTopAnswersStatsService.init).then(function() {
-            $scope.$broadcast('refreshStateEditor');
             ExplorationWarningsService.updateWarnings();
+            $scope.$broadcast('refreshStateEditor');
           });
         }
       });
