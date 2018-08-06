@@ -49,8 +49,8 @@ oppia.directive('progressNav', [
             $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(
               $scope.activeCardIndex);
-            ExplorationEngineService.setCurrentStateName(
-              $scope.activeCard.stateName);
+            ExplorationEngineService.setCurrentStateIndex(
+              $scope.activeCardIndex);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);

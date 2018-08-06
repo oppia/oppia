@@ -445,8 +445,7 @@ oppia.directive('conversationSkin', [
           var _navigateToActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            ExplorationEngineService.setCurrentStateName(
-              $scope.activeCard.stateName);
+            ExplorationEngineService.setCurrentStateIndex(index);
             $rootScope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             /* A hash value is added to URL for scrolling to Oppia feedback

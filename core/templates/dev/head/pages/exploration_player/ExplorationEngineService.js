@@ -134,7 +134,6 @@ oppia.factory('ExplorationEngineService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
-        visitedStateNames.push(exploration.initStateName);
       }
       currentStateName = exploration.initStateName;
       nextStateName = exploration.initStateName;
@@ -206,6 +205,7 @@ oppia.factory('ExplorationEngineService', [
         } else {
           exploration = ExplorationObjectFactory.createFromBackendDict(
             explorationDict);
+          visitedStateNames.push(exploration.getInitialState().name);
           version = explorationVersion;
           initParams([]);
           AudioTranslationLanguageService.init(
@@ -222,8 +222,8 @@ oppia.factory('ExplorationEngineService', [
           _loadInitialState(successCallback);
         }
       },
-      setCurrentStateName: function(stateName) {
-        currentStateName = stateName;
+      setCurrentStateIndex: function(index) {
+        currentStateName = angular.copy(visitedStateNames[index]);
       },
       getCurrentStateName: function() {
         return currentStateName;
@@ -383,7 +383,11 @@ oppia.factory('ExplorationEngineService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
-
+        var isFirstHit = Boolean(visitedStateNames.indexOf(
+          newStateName) === -1);
+        if (oldStateName !== newStateName) {
+          visitedStateNames.push(newStateName);
+        }
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
@@ -425,9 +429,6 @@ oppia.factory('ExplorationEngineService', [
         var refreshInteraction = (
           oldStateName !== newStateName ||
           exploration.isInteractionInline(oldStateName));
-        var isFirstHit = Boolean(visitedStateNames.indexOf(
-          newStateName) === -1);
-        visitedStateNames.push(newStateName);
         nextStateName = newStateName;
         var onSameCard = (oldStateName === newStateName);
 
