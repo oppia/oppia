@@ -171,6 +171,13 @@ describe('StateTopAnswersStatsService', function() {
     });
   });
 
+  describe('.getStateNamesWithStats', function() {
+    it('only returns state names that have stats', function() {
+      expect(this.stass.getStateNamesWithStats()).toContain('Hola');
+      expect(this.stass.getStateNamesWithStats()).not.toContain('Me Llamo');
+    });
+  });
+
   describe('Cache Maintenance', function() {
     beforeEach(inject(function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
