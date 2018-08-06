@@ -8,7 +8,7 @@
   </div>
   <div class="row oppia-pt2" style="margin-top: 0.5rem;">
     <div ng-repeat="displayBlock in displayBlocks" style="text-align: left; margin-left: 0.2rem;">
-      <div ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" ng-bind-html="renderBlockHtml(displayBlock, (createDisplayBlockNavId(displayBlock))" id="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" style="display: none;"></div>
+      <div ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" ng-bind-html="renderBlockHtml(displayBlock, createDisplayBlockNavId(displayBlock))" id="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" style="display: none;"></div>
     </div>
     <div ng-if="isDisplayBlockOnInitDisplay(displayBlocks[0])" ng-bind-html="renderBlockHtml(displayBlocks[0], 1)" class="oppia-issues-highlight"></div>
   </div>
