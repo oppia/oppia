@@ -65,7 +65,7 @@ oppia.factory('StateRulesStatsService', [
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
                           state.name, state, vizInfoDatum.answer,
-                          interactionRulesService)
+                          interactionRulesService);
                   });
                 }
                 return vizInfo;
