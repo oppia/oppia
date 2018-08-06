@@ -175,8 +175,7 @@ describe('StateTopAnswersStatsService', function() {
     it('only returns state names that have stats', function() {
       this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
 
-      expect(this.stass.getStateNamesWithStats()).toContain('Hola');
-      expect(this.stass.getStateNamesWithStats()).not.toContain('Me Llamo');
+      expect(this.stass.getStateNamesWithStats()).toEqual(['Hola']);
     });
   });
 
