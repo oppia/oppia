@@ -179,7 +179,7 @@ oppia.factory('ExplorationWarningsService', [
       return results;
     };
 
-    var _getStatesWithUnresolvedAnswers = function() {
+    var _getStatesWithAnswersThatMustBeResolved = function() {
       return ExplorationStatesService.getStateNames().filter(
         function(stateName) {
           return StateTopAnswersStatsService.hasStateStats(stateName) &&
@@ -235,7 +235,8 @@ oppia.factory('ExplorationWarningsService', [
           stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
       });
 
-      var statesWithUnresolvedAnswers = _getStatesWithUnresolvedAnswers();
+      var statesWithAnswersThatMustBeResolved =
+        _getStatesWithAnswersThatMustBeResolved();
       angular.forEach(statesWithUnresolvedAnswers, function(stateName) {
         _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
