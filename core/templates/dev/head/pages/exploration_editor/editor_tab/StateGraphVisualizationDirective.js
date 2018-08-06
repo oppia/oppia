@@ -74,8 +74,8 @@ oppia.directive('stateGraphViz', [
       controller: [
         '$element', '$filter', '$scope', '$timeout',
         'ExplorationWarningsService', 'StateGraphLayoutService',
-        'StateTopAnswersStatsService', 'MAX_NODE_LABEL_LENGTH',
-        'MAX_NODES_PER_ROW',
+        'StateTopAnswersStatsService', 'MAX_NODES_PER_ROW',
+        'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
             ExplorationWarningsService, StateGraphLayoutService,
