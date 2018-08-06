@@ -97,7 +97,7 @@ oppia.directive('unresolvedAnswersOverview', [
               controller: [
                 '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
                 'ExplorationHtmlFormatterService', 'TrainingModalService',
-                'StateInteractionIdService', 'stateCustomizationArgsService',
+                'StateInteractionIdService', 'StateCustomizationArgsService',
                 'ContextService', 'StateEditorService',
                 'ExplorationStatesService', 'TrainingDataService',
                 'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
@@ -107,7 +107,7 @@ oppia.directive('unresolvedAnswersOverview', [
                 function(
                     $scope, $injector, $uibModalInstance, $http, $filter,
                     ExplorationHtmlFormatterService, TrainingModalService,
-                    StateInteractionIdService, stateCustomizationArgsService,
+                    StateInteractionIdService, StateCustomizationArgsService,
                     ContextService, StateEditorService,
                     ExplorationStatesService, TrainingDataService,
                     AnswerClassificationService, EXPLICIT_CLASSIFICATION,
@@ -174,7 +174,7 @@ oppia.directive('unresolvedAnswersOverview', [
                         var answerTemplate = (
                           ExplorationHtmlFormatterService.getAnswerHtml(
                             answer, StateInteractionIdService.savedMemento,
-                            stateCustomizationArgsService.savedMemento));
+                            StateCustomizationArgsService.savedMemento));
                         var feedbackHtml = (
                           classificationResult.outcome.feedback.getHtml());
                         $scope.unresolvedAnswers.push({
