@@ -31,7 +31,7 @@ oppia.factory('ExplorationWarningsService', [
       ExpressionInterpolationService, GraphDataService,
       ParameterMetadataService, StateTopAnswersStatsService,
       SolutionValidityService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
-      WARNING_TYPES) {
+      UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
