@@ -242,18 +242,33 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_services.update_story(
             'user', STORY_ID, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
-        question = self.save_new_question(
+        self.save_new_question(
             question_id, 'user',
+            self._create_valid_question_data('ABC'))
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
             question_id, SKILL_ID)
+        question_services.create_new_question_skill_link(
+            question_id_2, SKILL_ID)
         # Call the handler.
-        exploration_dict = self.get_json(
-            '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id, STORY_ID))
-        self.assertEqual(
-            [question.to_dict()],
-            exploration_dict['pretest_question_dicts'])
+        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+            exploration_dict = self.get_json(
+                '%s/%s?story_id=%s' % (
+                    feconf.EXPLORATION_INIT_URL_PREFIX, exp_id, STORY_ID))
+            next_cursor = exploration_dict['next_cursor_for_pretests']
+
+            self.assertEqual(len(exploration_dict['pretest_question_dicts']), 1)
+            json_response = self.get_json(
+                '%s/%s?story_id=%s&cursor=%s' % (
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
+                    next_cursor))
+            self.assertEqual(len(json_response['pretest_question_dicts']), 1)
+            self.assertNotEqual(
+                json_response['pretest_question_dicts'][0]['id'],
+                exploration_dict['pretest_question_dicts'][0]['id'])
 
         response = self.testapp.get(
             '%s/%s?story_id=%s' % (

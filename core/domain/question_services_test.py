@@ -72,7 +72,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1')
-        questions = question_services.get_questions_by_skill_ids(2, ['skill_1'])
+        questions, _ = (
+            question_services.get_questions_by_skill_ids(2, ['skill_1'], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
 

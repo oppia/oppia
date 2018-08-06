@@ -633,8 +633,21 @@ class Story(object):
         for node in self.story_contents.nodes:
             if node.exploration_id == exp_id:
                 return node.prerequisite_skill_ids
-
         return None
+
+    def has_exploration(self, exp_id):
+        """Checks whether an exploration is present in the story.
+
+        Args:
+            exp_id: str. The ID of the exploration linked to the story,
+
+        Returns:
+            bool. Whether the exploration is linked to the story.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exp_id:
+                return True
+        return False
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.

@@ -75,24 +75,27 @@ def delete_question_skill_link(question_id, skill_id):
     question_skill_link_model.delete()
 
 
-def get_questions_by_skill_ids(question_count, skill_ids):
+def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
     """Returns the questions linked to the given skill ids.
-
 
     Args:
         question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
+        start_cursor: str. The starting point from which the batch of
+            questions are to be returned. This value should be urlsafe.
 
     Returns:
-        list(Question). The list of questions which are linked to the given
-            skill ids.
+        list(Question), str. The list of questions which are linked to the given
+            skill ids and the next cursor value to be used for the next
+            batch of questions (or None if no more pages are left). The returned
+            next cursor value is urlsafe.
     """
-    question_ids, _ = (
+    question_ids, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            question_count, skill_ids, None))
+            question_count, skill_ids, start_cursor))
 
-    return get_questions_by_ids(question_ids)
+    return get_questions_by_ids(question_ids), next_cursor
 
 
 def get_new_question_id():
@@ -190,10 +193,10 @@ def get_question_summaries_linked_to_skills(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), str. The list of question summaries linked to the
-            given skill_ids and the next cursor value to be used for the next
-            page (or None if no more pages are left). The returned next cursor
-            value is urlsafe.
+        list(QuestionSummary), str|None. The list of question summaries linked
+            to the given skill_ids and the next cursor value to be used for the
+            next page (or None if no more pages are left). The returned next
+            cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], None
