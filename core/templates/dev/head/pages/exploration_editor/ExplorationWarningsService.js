@@ -234,7 +234,7 @@ oppia.factory('ExplorationWarningsService', [
 
       var statesWithAnswersThatMustBeResolved =
         _getStatesWithAnswersThatMustBeResolved();
-      angular.forEach(statesWithUnresolvedAnswers, function(stateName) {
+      angular.forEach(statesWithAnswersThatMustBeResolved, function(stateName) {
         _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
 
