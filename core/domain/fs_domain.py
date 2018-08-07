@@ -471,24 +471,6 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
-    def _get_file_data(self, filepath):
-        """Gets the content of the file stored in GCS
-        Args:
-            filepath: str. The path to the relevant file within the exploration.
-
-        Returns:
-            Content. The content of the file.
-        """
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_file_url = (
-            '/%s/%s/assets/%s' % (
-                bucket_name, self._exploration_id, filepath))
-        gcs_file = cloudstorage.open(gcs_file_url)
-        contents = gcs_file.read()
-        gcs_file.close()
-
-        return contents
-
     def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
         """Gets a file as an unencoded stream of raw bytes.
 
@@ -508,7 +490,13 @@ class GcsFileSystem(object):
                 domain object if the file exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
-            data = self._get_file_data(filepath)
+            bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+            gcs_file_url = (
+                '/%s/%s/assets/%s' % (
+                    bucket_name, self._exploration_id, filepath))
+            gcs_file = cloudstorage.open(gcs_file_url)
+            data = gcs_file.read()
+            gcs_file.close()
             return FileStreamWithMetadata(data, None, None)
         else:
             return None
