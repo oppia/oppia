@@ -528,3 +528,15 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
     return formattedOutput.trim();
   };
 }]);
+
+oppia.filter('formatTimer', [function() {
+  return function(input) {
+    var formatNum = function(n) {
+      return (n < 10 ? '0' : '') + n;
+    };
+
+    var seconds = input % 60;
+    var minutes = Math.floor(input / 60);
+    return (formatNum(minutes) + ':' + formatNum(seconds));
+  };
+}]);

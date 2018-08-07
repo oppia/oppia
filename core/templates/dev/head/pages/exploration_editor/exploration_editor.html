@@ -78,7 +78,7 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'translation'">
+      <div ng-if="getTabStatuses().active === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
@@ -291,6 +291,8 @@
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
+
 
   <script src="/templates/dev/head/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
