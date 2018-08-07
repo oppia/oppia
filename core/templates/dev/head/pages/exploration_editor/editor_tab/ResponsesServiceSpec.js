@@ -18,7 +18,7 @@
 
 describe('Responses Service', function() {
   describe('ResponsesService', function() {
-    let httpBackend;
+    let $httpBackend;
     let scope;
     let siis, ecs, rs, ess, rof, shtml;
     let mockExplorationData;
@@ -51,7 +51,7 @@ describe('Responses Service', function() {
 
     beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
-      httpBackend = $injector.get('$httpBackend');
+      $httpBackend = $injector.get('$httpBackend');
       siis = $injector.get('stateInteractionIdService');
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
@@ -155,8 +155,8 @@ describe('Responses Service', function() {
       }
 */
     it('should update the rules', function() {
-      let rule = rof.createNew('Equals', {x: 'New answer'});
-      let ruleUpdates = {
+      const rule = rof.createNew('Equals', {x: 'New answer'});
+      const ruleUpdates = {
         rules: [rule]
       };
 
@@ -165,8 +165,8 @@ describe('Responses Service', function() {
     });
 
     it('should update the feedback', function() {
-      let feedback = shtml.createDefault('New feedback', 'feedback_1');
-      let feedbackUpdates = {feedback}
+      const feedback = shtml.createDefault('New feedback', 'feedback_1');
+      const feedbackUpdates = {feedback}
 
       rs.updateAnswerGroup(0, feedbackUpdates);
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
