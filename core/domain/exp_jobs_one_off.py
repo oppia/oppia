@@ -28,7 +28,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
-from core.domain import image_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -703,7 +702,6 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
     def map(exp_model):
         exploration = exp_services.get_exploration_by_id(exp_model.id)
         current_version = exploration.version
-        print current_version
         filenames = []
         for version in range(current_version):
             exploration = exp_services.get_exploration_by_id(
@@ -719,7 +717,7 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
             filepath = (
                 filename if feconf.DEV_MODE else 'image/%s' % filename)
             raw_data = fs.get(filepath)
-            image_services.create_compressed_versions_of_image(
+            exp_services.save_original_and_compressed_versions_of_image(
                 'ADMIN', filename, exp_model.id, raw_data)
         yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
 

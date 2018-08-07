@@ -51,6 +51,7 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+gae_image_services = models.Registry.import_gae_image_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -1662,17 +1663,14 @@ def get_image_filenames_from_exploration(exploration):
     return list(set(filenames))
 
 
-def save_image_file(
-        user_id, exp_id, filename, original_image_content,
-        compressed_image_content, micro_image_content):
+def save_original_and_compressed_versions_of_image(
+        user_id, filename, exp_id, original_image_content):
     """Saves the three versions of the image file.
 
     Args:
         exp_id: str. The id of the exploration.
         filename: str. The name of the image file.
         original_image_content: str. The content of the original image.
-        compressed_image_content: str. The content of the compressed image.
-        micro_image_content: str. The content of the micro image.
         user_id: str. The id of the user who wants to upload the image.
     """
     filepath = (
@@ -1697,6 +1695,11 @@ def save_image_file(
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+
+    compressed_image_content = gae_image_services.compress_image(
+        original_image_content, 0.8)
+    micro_image_content = gae_image_services.compress_image(
+        original_image_content, 0.7)
 
     # Because in case of CreateVersionsOfImageJob the image, the original image
     # is already there.
