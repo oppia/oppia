@@ -28,7 +28,7 @@
 
   <li ng-if="shareType === 'exploration'">
     <a href="" ng-click="showEmbedExplorationModal(explorationId)" tabindex="0">
-      <i class="oppia-share-icons fa fa-code"></i>
+      <i class="material-icons md-48 embed-link">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </li>
@@ -38,23 +38,23 @@
   .oppia-sharing-links .embed-link {
     color: white;
     background: #009688;
-    border-radius: 2px;
-    height: 40px;
+    border-radius: 6px;
+    height: 34px;
     margin: 3px;
     padding-top: -webkit-calc(50% - 15px);
     padding-top: -moz-calc(50% - 15px);
     padding-top: -o-calc(50% - 15px);
     padding-top: calc(50% - 15px);
     text-align: center;
-    width: 40px;
-  }
+    width: 34px;
+}
 
   .oppia-sharing-links .share-option-img {
-    border-radius: 2px;
-    height: 100%;
-    margin: 3px;
-    width: 40px;
-  }
+    border-radius: 5px;
+    height: 34px;
+    margin: 0 3px;
+    width: 34px;
+}
 
   .oppia-sharing-links a:focus .share-option-img,
   .oppia-sharing-links a:focus .embed-link {
@@ -88,8 +88,4 @@
     color: #50a15f;
   }
 
-  i.oppia-share-icons.fa.fa-code {
-    font-weight: 600;
-    color: #459788;
-  }
 </style>
