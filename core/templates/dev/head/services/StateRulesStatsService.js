@@ -58,8 +58,9 @@ oppia.factory('StateRulesStatsService', [
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
-                if (vizInfo.addressed_info_is_supported) {
-                  vizInfo.data.forEach(function(vizInfoDatum) {
+                var newVizInfo = angular.copy(vizInfo);
+                if (newVizInfo.addressed_info_is_supported) {
+                  newVizInfo.data.forEach(function(vizInfoDatum) {
                     vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
@@ -67,7 +68,7 @@ oppia.factory('StateRulesStatsService', [
                           interactionRulesService);
                   });
                 }
-                return vizInfo;
+                return newVizInfo;
               })
           };
         });
