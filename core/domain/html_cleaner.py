@@ -841,7 +841,7 @@ def get_filepath_of_object_image(filename, exp_id):
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
     filepath = (
         filename if feconf.DEV_MODE
-        else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+        else ('image/%s' % filename))
     content = fs.get(filepath)
     height, width = gae_image_services.get_image_dimensions(content)
     fileinfo = fileinfo_domain.Fileinfo(
