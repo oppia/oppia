@@ -1099,7 +1099,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
-class SaveOriginalAndCompressedVersionsOfImageTests(ExplorationServicesUnitTests):
+class SaveOriginalAndCompressedVersionsOfImageTests(
+        ExplorationServicesUnitTests):
     """Test for saving the three versions of the image file."""
 
     EXPLORATION_ID = 'exp_id'
@@ -1111,10 +1112,6 @@ class SaveOriginalAndCompressedVersionsOfImageTests(ExplorationServicesUnitTests
     def test_save_original_and_compressed_versions_of_image(self):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
-        compressed_image_content = gae_image_services.compress_image(
-            original_image_content, 0.8)
-        micro_image_content = gae_image_services.compress_image(
-            original_image_content, 0.7)
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
         self.assertEqual(fs.isfile(self.FILENAME), False)
