@@ -91,7 +91,7 @@ oppia.directive('supplementalCard', [
           $scope.submitAnswer = function(answer, interactionRulesService) {
             // Do not clear the help card or submit an answer if there is an
             // upcoming card.
-            if ($scope.activeCard.destStateName) {
+            if ($scope.activeCard.getDestStateName()) {
               return;
             }
 

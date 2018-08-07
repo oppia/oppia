@@ -693,7 +693,7 @@ oppia.directive('conversationSkin', [
             // Safety check to prevent double submissions from occurring.
             if ($scope.answerIsBeingProcessed ||
               !$scope.isCurrentCardAtEndOfTranscript() ||
-              $scope.activeCard.destStateName) {
+              $scope.activeCard.getDestStateName()) {
               return;
             }
 
@@ -752,7 +752,8 @@ oppia.directive('conversationSkin', [
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
-                    PlayerTranscriptService.getLastCard().inputResponsePairs);
+                    PlayerTranscriptService.getLastCard().
+                      getInputResponsePairs());
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
                   $scope.$broadcast(EVENT_AUTOPLAY_AUDIO, {
                     audioTranslations: feedbackAudioTranslations,
@@ -778,7 +779,7 @@ oppia.directive('conversationSkin', [
                       });
                     }
                     if (missingPrerequisiteSkillId) {
-                      $scope.activeCard.leadsToConceptCard = true;
+                      $scope.activeCard.setLeadsToConceptCard(true);
                       ConceptCardBackendApiService.fetchConceptCard(
                         missingPrerequisiteSkillId
                       ).then(function(conceptCardBackendDict) {
@@ -939,7 +940,7 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
-            if ($scope.activeCard.leadsToConceptCard) {
+            if ($scope.activeCard.getLeadsToConceptCard()) {
               ExplorationEngineService.recordAddNewCard();
               _addNewCard(
                 null, null, $scope.conceptCard.getExplanation(), null);
