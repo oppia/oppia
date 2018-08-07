@@ -700,12 +700,15 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        exploration = exp_services.get_exploration_by_id(exp_model.id)
-        current_version = exploration.version
+        current_version = exp_model.version
+        version_numbers = range(1, current_version + 1)
+        list_of_exploration_models = (
+            exp_model.get_multi_versions(
+                exp_model.id, version_numbers))
         filenames = []
-        for version in range(current_version):
-            exploration = exp_services.get_exploration_by_id(
-                exp_model.id, version=version)
+        for exploration_model in list_of_exploration_models:
+            exploration = exp_services.get_exploration_from_model(
+                exploration_model)
             filenames_in_version = (
                 exp_services.get_image_filenames_from_exploration(exploration))
             filenames = list(set().union(filenames, filenames_in_version))
