@@ -24,7 +24,7 @@ import feconf
 
 
 class ImageServicesTests(test_utils.GenericTestBase):
-    """Test functions in image_services."""
+    """Test for functions in image_services."""
 
     EXP_ID = 'exp_id'
     FILENAME = 'image.png'
@@ -32,26 +32,16 @@ class ImageServicesTests(test_utils.GenericTestBase):
     MICRO_IMAGE_FILENAME = 'image_micro.png'
     USER = 'ADMIN'
 
-    def test_get_image_dimensions(self):
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
-        fs.commit(self.USER, self.FILENAME, raw_image, mimetype='image/png')
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-        height, width = image_services.get_image_dimensions(
-            self.FILENAME, self.EXP_ID)
-        # The dimensions of the core/test/img.png are (32, 32)
-        self.assertEqual(height, 32)
-        self.assertEqual(width, 32)
-
     def test_create_compressed_versions_of_image(self):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            raw_image = f.read()
+            original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
-        fs.commit(self.USER, self.FILENAME, raw_image, mimetype='image/png')
+        self.assertEqual(fs.isfile(self.FILENAME), False)
+        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
         image_services.create_compressed_versions_of_image(
-            self.FILENAME, self.EXP_ID)
+            self.USER, self.FILENAME, self.EXP_ID, original_image_content)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
         self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
         self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)

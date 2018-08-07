@@ -45,7 +45,8 @@ def compress_image(image_content, scaling_factor):
 
     Args:
         image_content: str. Content of the file to be compressed.
-        scaling_factor: float. The number by which the image will be scaled.
+        scaling_factor: float. The number by which the dimensions of the image
+            will be scaled.
 
     Returns:
         str. Returns the content of the compressed image.
