@@ -701,16 +701,27 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        # This job is allowed to run only in Production environment since it
-        # uses GcsFileSystem which can't be used in Development environment.
-        if not feconf.DEV_MODE:
-            exploration = exp_services.get_exploration_by_id(exp_model.id)
-            filenames = exp_services.get_image_filenames_from_exploration(
-                exploration)
-            for filename in filenames:
-                image_services.create_compressed_versions_of_image(
-                    filename, exp_model.id)
-                yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
+        exploration = exp_services.get_exploration_by_id(exp_model.id)
+        current_version = exploration.version
+        print current_version
+        filenames = []
+        for version in range(current_version):
+            exploration = exp_services.get_exploration_by_id(
+                exp_model.id, version=version)
+            filenames_in_version = (
+                exp_services.get_image_filenames_from_exploration(exploration))
+            filenames = list(set().union(filenames, filenames_in_version))
+        for filename in filenames:
+            file_system_class = (
+                fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+                else fs_domain.GcsFileSystem)
+            fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
+            filepath = (
+                filename if feconf.DEV_MODE else 'image/%s' % filename)
+            raw_data = fs.get(filepath)
+            image_services.create_compressed_versions_of_image(
+                'ADMIN', filename, exp_model.id, raw_data)
+        yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
 
     @staticmethod
     def reduce(status, values):

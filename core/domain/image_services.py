@@ -16,88 +16,28 @@
 
 """Service for managing operations on images."""
 
-from core.domain import fs_domain
+from core.domain import exp_services
 from core.platform import models
-import feconf
 
 gae_image_services = models.Registry.import_gae_image_services()
 
 
-def get_image_dimensions(filename, exp_id):
-    """Gets the dimensions of the image with the given filename
-
-    Args:
-        filename: str. The filename of the image in exploration.
-        exp_id: str. ID of the exploration.
-
-    Returns:
-        tuple. Returns height and width of the image.
-    """
-    # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
-    # it is 'image/filename'.
-    filepath = (
-        filename if (
-            feconf.DEV_MODE)
-        else 'image/%s' % filename)
-
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if (
-            feconf.DEV_MODE)
-        else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-    content = fs.get(filepath)
-    height, width = gae_image_services.get_image_dimensions(content)
-    return height, width
-
-
-def create_compressed_versions_of_image(filename, exp_id):
+def create_compressed_versions_of_image(
+        user_id, filename, exp_id, original_image_content):
     """Creates two compressed versions of the image by compressing the
     original image.
 
     Args:
-        filename: str. The filename of the image in exploration.
+        filename: str. The filename of the image.
         exp_id: str. ID of the exploration.
+        original_image_content: str. Content of the image.
+        user_id: str. The id of the user who wants to upload the image.
     """
-    # Because the filepath in DEV_MODE is 'filename' whereas in PROD_MODE
-    # it is 'image/filename'.
-    filepath = (
-        filename if (
-            feconf.DEV_MODE)
-        else 'image/%s' % filename)
-
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if (
-            feconf.DEV_MODE)
-        else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-
-    original_image_content = fs.get(filepath)
     compressed_image_content = gae_image_services.compress_image(
         original_image_content, 0.8)
     micro_image_content = gae_image_services.compress_image(
         original_image_content, 0.7)
 
-    compressed_image_filename = '%s_compressed.%s' % (
-        filename_wo_filetype, filetype)
-    compressed_image_filepath = (
-        compressed_image_filename if (
-            feconf.DEV_MODE)
-        else 'image/%s' % compressed_image_filename)
-
-    micro_image_filename = '%s_micro.%s' % (
-        filename_wo_filetype, filetype)
-    micro_image_filepath = (
-        micro_image_filename if (
-            feconf.DEV_MODE)
-        else 'image/%s' % micro_image_filename)
-
-    fs.commit(
-        'ADMIN', compressed_image_filepath,
-        compressed_image_content, mimetype='image/%s' % filetype)
-
-    fs.commit(
-        'ADMIN', micro_image_filepath,
-        micro_image_content, mimetype='image/%s' % filetype)
+    exp_services.save_image_file(
+        user_id, exp_id, filename, original_image_content,
+        compressed_image_content, micro_image_content)

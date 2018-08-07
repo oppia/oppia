@@ -1662,6 +1662,58 @@ def get_image_filenames_from_exploration(exploration):
     return list(set(filenames))
 
 
+def save_image_file(
+        user_id, exp_id, filename, original_image_content,
+        compressed_image_content, micro_image_content):
+    """Saves the three versions of the image file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        filename: str. The name of the image file.
+        original_image_content: str. The content of the original image.
+        compressed_image_content: str. The content of the compressed image.
+        micro_image_content: str. The content of the micro image.
+        user_id: str. The id of the user who wants to upload the image.
+    """
+    filepath = (
+        filename if feconf.DEV_MODE else 'image/%s' % filename)
+
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+
+    compressed_image_filename = '%s_compressed.%s' % (
+        filename_wo_filetype, filetype)
+    compressed_image_filepath = (
+        compressed_image_filename if feconf.DEV_MODE
+        else 'image/%s' % compressed_image_filename)
+
+    micro_image_filename = '%s_micro.%s' % (
+        filename_wo_filetype, filetype)
+    micro_image_filepath = (
+        micro_image_filename if feconf.DEV_MODE
+        else 'image/%s' % micro_image_filename)
+
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+
+    # Because in case of CreateVersionsOfImageJob the image, the original image
+    # is already there.
+    if not fs.isfile(filepath):
+        fs.commit(
+            user_id, filepath, original_image_content,
+            mimetype='image/%s' % filetype)
+
+    fs.commit(
+        user_id, compressed_image_filepath,
+        compressed_image_content, mimetype='image/%s' % filetype)
+
+    fs.commit(
+        user_id, micro_image_filepath,
+        micro_image_content, mimetype='image/%s' % filetype)
+
+
 def get_number_of_ratings(ratings):
     """Gets the total number of ratings represented by the given ratings
     object.
