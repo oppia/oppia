@@ -218,14 +218,14 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         obtained_tag_list_with_attrs = (
             rte_component_registry.Registry.get_tag_list_with_attrs())
         actual_tag_list_with_attrs = {}
-        module_fullname = 'extensions.rich_text_components.components'
-        module_obj = pkgutil.find_loader(module_fullname).load_module(
-            'components')
-        for name, obj in inspect.getmembers(module_obj):
-            if inspect.isclass(obj) and name != 'BaseRteComponent':
-                tag_name = 'oppia-noninteractive-%s' % name.lower()
-                attrs = obj.customization_args.keys()
-                actual_tag_list_with_attrs[tag_name] = attrs
+        component_specs = (
+            rte_component_registry.Registry.get_all_rte_components())
+        for component_spec in component_specs.values():
+            tag_name = 'oppia-noninteractive-%s' % component_spec['frontend_id']
+            attr_names = [
+                '%s-with-value' % attr['name'] for attr in component_spec[
+                    'customization_arg_specs']]
+            actual_tag_list_with_attrs[tag_name] = attr_names
         self.assertEqual(
             set(obtained_tag_list_with_attrs.keys()),
             set(actual_tag_list_with_attrs.keys()))
@@ -252,10 +252,15 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
             for component_class in component_types_to_component_classes.values()
         ]
         actual_component_class_names = []
-        module_fullname = 'extensions.rich_text_components.components'
-        module_obj = pkgutil.find_loader(module_fullname).load_module(
-            'components')
-        for name, obj in inspect.getmembers(module_obj):
+
+        rte_path = [feconf.RTE_EXTENSIONS_DIR]
+
+        for loader, name, _ in pkgutil.iter_modules(path=rte_path):
+            if name == 'components':
+                module = loader.find_module(name).load_module(name)
+                break
+
+        for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj) and name != 'BaseRteComponent':
                 actual_component_class_names.append(name)
 
@@ -263,56 +268,21 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
             set(obtained_component_class_names),
             set(actual_component_class_names))
 
-    def test_get_inline_components(self):
-        """Test get_inline_components method."""
+    def test_get_component_tag_names(self):
+        """Test get_component_tag_names method."""
         component_specs = (
             rte_component_registry.Registry.get_all_rte_components())
-        actual_inline_components = [
-            'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
-            if not component_spec['is_block_element']]
-        obtained_inline_components = (
-            rte_component_registry.Registry.get_inline_components())
-        self.assertEqual(
-            set(actual_inline_components), set(obtained_inline_components))
-
-    def test_get_block_components(self):
-        """Test get_block_components method."""
-        component_specs = (
-            rte_component_registry.Registry.get_all_rte_components())
-        actual_block_components = [
-            'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
-            if component_spec['is_block_element']]
-        obtained_block_components = (
-            rte_component_registry.Registry.get_block_components())
-        self.assertEqual(
-            set(actual_block_components), set(obtained_block_components))
-
-    def test_get_simple_components(self):
-        """Test get_simple_components method."""
-        component_specs = (
-            rte_component_registry.Registry.get_all_rte_components())
-        actual_simple_components = [
-            'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
-            if not component_spec['is_complex']
-        ]
-        obtained_simple_components = (
-            rte_component_registry.Registry.get_simple_components())
-        self.assertEqual(
-            set(actual_simple_components), set(obtained_simple_components))
-
-    def test_get_complex_components(self):
-        """Test get_complex_components method."""
-        component_specs = (
-            rte_component_registry.Registry.get_all_rte_components())
-        actual_complex_components = [
-            'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
-            if component_spec['is_complex']
-        ]
-        obtained_complex_components = (
-            rte_component_registry.Registry.get_complex_components())
-        self.assertEqual(
-            set(actual_complex_components), set(obtained_complex_components))
+        keys = ['is_block_element', 'is_complex']
+        expected_values = [True, False]
+        for key in keys:
+            for expected_value in expected_values:
+                actual_component_tag_names = [
+                    'oppia-noninteractive-%s' % component_spec['frontend_id']
+                    for component_spec in component_specs.values()
+                    if component_spec[key] == expected_value]
+                obtained_component_tag_names = (
+                    rte_component_registry.Registry.get_component_tag_names(
+                        key, expected_value))
+                self.assertEqual(
+                    set(actual_component_tag_names),
+                    set(obtained_component_tag_names))

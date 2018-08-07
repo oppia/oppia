@@ -19,20 +19,31 @@
 import re
 
 import bs4
+import constants
 from extensions.objects.models import objects
+import feconf
 
 
 class BaseRteComponent(object):
-    """Base object class.
+    """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as
     Image and Video.
     """
 
-    # These values should be overridden in subclasses.
-    customization_args = {}
+    with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
+        rich_text_component_specs = constants.parse_json_from_js(f)
 
-    arg_schema = {}
+    obj_types_to_obj_classes = {
+        'unicode': objects.UnicodeString,
+        'html': objects.Html,
+        'Filepath': objects.Filepath,
+        'SanitizedUrl': objects.SanitizedUrl,
+        'MathLatexString': objects.MathLatexString,
+        'ListOfTabs': objects.ListOfTabs,
+        'int': objects.Int,
+        'bool': objects.Boolean
+    }
 
     @classmethod
     def validate(cls, value_dict):
@@ -41,27 +52,36 @@ class BaseRteComponent(object):
         Raises:
           TypeError: if any customization arg is invalid.
         """
-        if cls.arg_schema:
-            required_attrs = cls.arg_schema
-        else:
-            required_attrs = cls.customization_args
-        required_attr_names = required_attrs.keys()
+        arg_names_to_obj_classes = {}
+        customization_arg_specs = cls.rich_text_component_specs[
+            cls.__name__]['customization_arg_specs']
+        for customization_arg_spec in customization_arg_specs:
+            arg_name = '%s-with-value' % customization_arg_spec['name']
+            schema = customization_arg_spec['schema']
+            if schema['type'] != 'custom':
+                obj_type = schema['type']
+            else:
+                obj_type = schema['obj_type']
+            obj_class = cls.obj_types_to_obj_classes[obj_type]
+            arg_names_to_obj_classes[arg_name] = obj_class
+
+        required_attr_names = arg_names_to_obj_classes.keys()
         attr_names = value_dict.keys()
+
         if set(attr_names) != set(required_attr_names):
-            raise Exception('Invalid attributes')
+            missing_attr_names = list(
+                set(required_attr_names) - set(attr_names))
+            extra_attr_names = list(set(attr_names) - set(required_attr_names))
+            raise Exception('Missing attributes: %s, Extra attributes: %s' % (
+                str(missing_attr_names), str(extra_attr_names)))
 
         for arg_name in required_attr_names:
-            arg_obj_class = required_attrs[arg_name]
+            arg_obj_class = arg_names_to_obj_classes[arg_name]
             arg_obj_class.normalize(value_dict[arg_name])
 
 
 class Collapsible(BaseRteComponent):
     """Class for Collapsible component."""
-
-    customization_args = {
-        'heading-with-value': objects.UnicodeString,
-        'content-with-value': objects.Html
-    }
 
     @classmethod
     def validate(cls, value_dict):
@@ -82,12 +102,6 @@ class Collapsible(BaseRteComponent):
 class Image(BaseRteComponent):
     """Class for Image component."""
 
-    customization_args = {
-        'filepath-with-value': objects.Filepath,
-        'caption-with-value': objects.UnicodeString,
-        'alt-with-value': objects.UnicodeString
-    }
-
     @classmethod
     def validate(cls, value_dict):
         """Validates Image component."""
@@ -101,67 +115,33 @@ class Image(BaseRteComponent):
 class Link(BaseRteComponent):
     """Class for Link component."""
 
-    customization_args = {
-        'text-with-value': objects.UnicodeString,
-        'url-with-value': objects.SanitizedUrl
-    }
-    is_simple = True
-
 
 class Math(BaseRteComponent):
     """Class for Math component."""
-
-    customization_args = {
-        'raw_latex-with-value': objects.MathLatexString
-    }
 
 
 class Tabs(BaseRteComponent):
     """Class for Tabs component."""
 
-    customization_args = {
-        'tab_contents-with-value': list
-    }
-    arg_schema = {
-        'content': objects.Html,
-        'title': objects.UnicodeString
-    }
-
     @classmethod
     def validate(cls, value_dict):
         """Validates Tab component."""
-        if 'tab_contents-with-value' in value_dict:
-            tab_contents = value_dict['tab_contents-with-value']
-            if isinstance(tab_contents, list) and (
-                    all(isinstance(item, dict) for item in (
-                        tab_contents))):
-                for tab_content in tab_contents:
-                    super(Tabs, cls).validate(tab_content)
-                    inner_soup = bs4.BeautifulSoup(
-                        tab_content['content'].encode(encoding='utf-8'),
-                        'html.parser')
-                    collapsible = inner_soup.findAll(
-                        name='oppia-noninteractive-collapsible')
-                    tabs = inner_soup.findAll(
-                        name='oppia-noninteractive-tabs')
-                    if len(collapsible) or len(tabs):
-                        raise Exception('Nested tabs and collapsible')
-
-            else:
-                raise Exception('Invalid type for tab contents')
-        else:
-            raise Exception('Invalid attributes')
+        super(Tabs, cls).validate(value_dict)
+        tab_contents = value_dict['tab_contents-with-value']
+        for tab_content in tab_contents:
+            inner_soup = bs4.BeautifulSoup(
+                tab_content['content'].encode(encoding='utf-8'),
+                'html.parser')
+            collapsible = inner_soup.findAll(
+                name='oppia-noninteractive-collapsible')
+            tabs = inner_soup.findAll(
+                name='oppia-noninteractive-tabs')
+            if len(collapsible) or len(tabs):
+                raise Exception('Nested tabs and collapsible')
 
 
 class Video(BaseRteComponent):
     """Class for Video component."""
-
-    customization_args = {
-        'video_id-with-value': objects.UnicodeString,
-        'start-with-value': objects.Int,
-        'end-with-value': objects.Int,
-        'autoplay-with-value': objects.Boolean
-    }
 
     @classmethod
     def validate(cls, value_dict):

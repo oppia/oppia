@@ -70,14 +70,23 @@ class Registry(object):
 
     @classmethod
     def get_component_types_to_component_classes(cls):
-        """Get component classes mapping for component types."""
-        module_fullname = 'extensions.rich_text_components.components'
-        module_obj = pkgutil.find_loader(module_fullname).load_module(
-            'components')
+        """Get component classes mapping for component types.
+
+        Returns:
+            dict. A dict mapping from rte component types to rte component
+                classes.
+        """
+        rte_path = [feconf.RTE_EXTENSIONS_DIR]
+
+        for loader, name, _ in pkgutil.iter_modules(path=rte_path):
+            if name == 'components':
+                module = loader.find_module(name).load_module(name)
+                break
+
         component_types_to_component_classes = {}
         component_names = cls.get_all_rte_components().keys()
         for component_name in component_names:
-            for name, obj in inspect.getmembers(module_obj):
+            for name, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and name == component_name:
                     component_types_to_component_classes[
                         'oppia-noninteractive-%s' % component_name.lower()] = (
@@ -86,45 +95,23 @@ class Registry(object):
         return component_types_to_component_classes
 
     @classmethod
-    def get_inline_components(cls):
-        """Gets an list of inline component tags."""
-        rich_text_components_specs = cls.get_all_rte_components()
-        inline_component_tag_names = []
-        for component_spec in rich_text_components_specs.values():
-            if not component_spec['is_block_element']:
-                inline_component_tag_names.append(
-                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
-        return inline_component_tag_names
+    def get_component_tag_names(cls, key, expected_value):
+        """Get a list of component tag names which have the expected
+        value of a key.
 
-    @classmethod
-    def get_block_components(cls):
-        """Gets an list of block component tags."""
-        rich_text_components_specs = cls.get_all_rte_components()
-        block_component_tag_names = []
-        for component_spec in rich_text_components_specs.values():
-            if component_spec['is_block_element']:
-                block_component_tag_names.append(
-                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
-        return block_component_tag_names
+        Args:
+            key: str. The key to be checked in component spec.
+            expected_value: bool. The expected value of the key to select
+                the components.
 
-    @classmethod
-    def get_simple_components(cls):
-        """Gets an list of simple component tags."""
+        Returns:
+            list(str). A list of component tag names which have the expected
+                value of a key.
+        """
         rich_text_components_specs = cls.get_all_rte_components()
-        simple_component_tag_names = []
+        component_tag_names = []
         for component_spec in rich_text_components_specs.values():
-            if not component_spec['is_complex']:
-                simple_component_tag_names.append(
+            if component_spec[key] == expected_value:
+                component_tag_names.append(
                     'oppia-noninteractive-%s' % component_spec['frontend_id'])
-        return simple_component_tag_names
-
-    @classmethod
-    def get_complex_components(cls):
-        """Gets an list of complex component tags."""
-        rich_text_components_specs = cls.get_all_rte_components()
-        complex_component_tag_names = []
-        for component_spec in rich_text_components_specs.values():
-            if component_spec['is_complex']:
-                complex_component_tag_names.append(
-                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
-        return complex_component_tag_names
+        return component_tag_names
