@@ -56,7 +56,7 @@ oppia.directive('translatorOverview', [
                     languageCode))
               };
             }));
-          $scope.getTranslationProgressStyle = function () {
+          $scope.getTranslationProgressStyle = function() {
             var numberRequiredAudio = TranslationStatusService
               .getExplorationAudioRequiredCount();
             var notAvailable = TranslationStatusService
