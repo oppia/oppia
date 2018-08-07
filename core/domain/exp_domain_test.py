@@ -18,7 +18,7 @@
 
 import copy
 import os
-
+import functools
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import html_cleaner
@@ -31,7 +31,7 @@ import utils
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
     return {'filename': filename, 'height': 490, 'width': 120}
 
 
@@ -4427,8 +4427,8 @@ title: Title
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
@@ -4438,8 +4438,8 @@ title: Title
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
@@ -4800,14 +4800,16 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
                 html_cleaner.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
+        add_dimensions_to_noninteractive_image_tag = functools.partial(
+            html_cleaner.add_dimensions_to_noninteractive_image_tag,
+            'eid')
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
             self.assertEqual(
                 exp_domain.State.convert_html_fields_in_state(
-                    state_dict,
-                    html_cleaner.add_dimensions_to_noninteractive_image_tag),
+                    state_dict, add_dimensions_to_noninteractive_image_tag),
                 state_dict_with_image_dimensions)
 
 

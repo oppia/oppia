@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for methods in the fileinfo registry."""
+"""Tests for methods in the Fileinfo object of image."""
 
 from core.domain import fileinfo_domain
 from core.tests import test_utils

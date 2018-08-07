@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $attrs.imageAndRegionsWithValue);
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          $scope.filepath = imageAndRegions.imagePath;
+          $scope.fileinfo = imageAndRegions.imagePath;
           $scope.imageUrl = '';
           $scope.loadingIndicatorUrl = UrlInterpolationService
             .getStaticImageUrl(LOADING_INDICATOR_URL);
@@ -58,7 +58,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.isLoadingIndicatorShown = true;
             $scope.dimensions = (
               ImagePreloaderService.getDimensionsOfImage(
-                $scope.filepath.filename));
+                $scope.fileinfo.filename));
             // For aligning the gif to the center of it's container
             var loadingIndicatorSize = (
               ($scope.dimensions.height < 124) ? 24 : 120);
@@ -71,7 +71,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
 
             $scope.loadImage = function() {
-              ImagePreloaderService.getImageUrl($scope.filepath.filename)
+              ImagePreloaderService.getImageUrl($scope.fileinfo.filename)
                 .then(function(objectUrl) {
                   $scope.isTryAgainShown = false;
                   $scope.isLoadingIndicatorShown = false;
@@ -88,7 +88,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // showing images in the exploration editor or in preview mode. So
             // we directly assign the url to the imageUrl.
             $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(), $scope.filepath.filename);
+              ContextService.getExplorationId(), $scope.fileinfo.filename);
           }
 
           $scope.mouseX = 0;

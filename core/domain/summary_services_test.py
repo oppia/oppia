@@ -254,12 +254,12 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+        def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
             return {'filename': filename, 'height': 490, 'width': 120}
 
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
             self.post_json(
                 '/adminhandler', {

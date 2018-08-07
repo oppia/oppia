@@ -37,7 +37,7 @@ import utils
 search_services = models.Registry.import_search_services()
 
 
-def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
     return {'filename': filename, 'height': 490, 'width': 120}
 
 
@@ -627,8 +627,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Verify the new exploration has been migrated by the job.
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
             updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
@@ -1073,8 +1073,8 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 updated_html, unicode(test_cases[index]['expected_output']))
 
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
             exp_services.save_new_exploration(
                 self.albert_id, updated_exploration)
 

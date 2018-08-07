@@ -31,6 +31,7 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
+import functools
 import feconf
 import jinja_utils
 import schema_utils
@@ -1767,7 +1768,7 @@ class State(object):
 
     @classmethod
     def convert_html_fields_in_state(
-            cls, state_dict, conversion_fn, additional_data=None):
+            cls, state_dict, conversion_fn):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -1775,32 +1776,24 @@ class State(object):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            additional_data: dict. A dict which contains any additional
-                argument required.
 
         Returns:
             dict. The converted state_dict.
         """
-        # We need exp_id only for adding dimensions to the images. So for other
-        # conversion_fn we assign exp_id as 'unused'.
-        exp_id = 'unused'
-        if additional_data and 'exp_id' in additional_data:
-            exp_id = additional_data['exp_id']
-
         state_dict['content']['html'] = (
-            conversion_fn(state_dict['content']['html'], exp_id))
+            conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
             interaction_feedback_html = state_dict[
                 'interaction']['default_outcome']['feedback']['html']
             state_dict['interaction']['default_outcome']['feedback'][
-                'html'] = conversion_fn(interaction_feedback_html, exp_id)
+                'html'] = conversion_fn(interaction_feedback_html)
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
             answer_group_html = answer_group['outcome']['feedback']['html']
             state_dict['interaction']['answer_groups'][
                 answer_group_index]['outcome']['feedback']['html'] = (
-                    conversion_fn(answer_group_html, exp_id))
+                    conversion_fn(answer_group_html))
             if state_dict['interaction']['id'] == 'ItemSelectionInput':
                 for rule_spec_index, rule_spec in enumerate(
                         answer_group['rule_specs']):
@@ -1808,18 +1801,18 @@ class State(object):
                         state_dict['interaction']['answer_groups'][
                             answer_group_index]['rule_specs'][
                                 rule_spec_index]['inputs']['x'][x_index] = (
-                                    conversion_fn(x, exp_id))
+                                    conversion_fn(x))
         for hint_index, hint in enumerate(
                 state_dict['interaction']['hints']):
             hint_html = hint['hint_content']['html']
             state_dict['interaction']['hints'][hint_index][
-                'hint_content']['html'] = conversion_fn(hint_html, exp_id)
+                'hint_content']['html'] = conversion_fn(hint_html)
 
         if state_dict['interaction']['solution']:
             solution_html = state_dict[
                 'interaction']['solution']['explanation']['html']
             state_dict['interaction']['solution']['explanation']['html'] = (
-                conversion_fn(solution_html, exp_id))
+                conversion_fn(solution_html))
 
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput'):
@@ -1828,7 +1821,7 @@ class State(object):
                         'choices']['value']):
                 state_dict['interaction']['customization_args'][
                     'choices']['value'][value_index] = conversion_fn(
-                        value, exp_id)
+                        value)
 
         return state_dict
 
@@ -3565,7 +3558,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v24_dict_to_v25_dict(cls, states_dict, exp_id):
+    def _convert_states_v24_dict_to_v25_dict(cls, exp_id, states_dict):
         """Converts from version 24 to 25. Version 25 adds the dimensions of
         images in the oppia-noninteractive-image tags.
 
@@ -3579,16 +3572,18 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for key, state_dict in states_dict.iteritems():
+            add_dimensions_to_noninteractive_image_tag = functools.partial(
+                html_cleaner.add_dimensions_to_noninteractive_image_tag,
+                exp_id)
             states_dict[key] = State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_dimensions_to_noninteractive_image_tag,
-                additional_data={'exp_id': exp_id})
+                add_dimensions_to_noninteractive_image_tag)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
-                        html_cleaner.get_filepath_of_object_image(
+                        html_cleaner.get_fileinfo_of_object_image(
                             filename, exp_id))
 
         return states_dict
@@ -3619,10 +3614,10 @@ class Exploration(object):
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
+        if current_states_schema_version == 24:
+            conversion_fn = functools.partial(conversion_fn, exploration_id)
         versioned_exploration_states['states'] = conversion_fn(
-            versioned_exploration_states['states'], exploration_id) if (
-                current_states_schema_version == 24) else (
-                    conversion_fn(versioned_exploration_states['states']))
+            versioned_exploration_states['states'])
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
@@ -4171,7 +4166,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 30
 
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['id'], exploration_dict['states'])
         exploration_dict['states_schema_version'] = 25
 
         return exploration_dict

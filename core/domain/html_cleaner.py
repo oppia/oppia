@@ -258,12 +258,11 @@ OPPIA_BLOCK_COMPONENTS = [
 ]
 
 
-def convert_to_textangular(html_data, unused_exp_id=''):
+def convert_to_textangular(html_data):
     """This function converts the html to TextAngular supported format.
 
     Args:
         html_data: str. HTML string to be converted.
-        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -479,12 +478,11 @@ def convert_to_textangular(html_data, unused_exp_id=''):
     return unicode(soup).replace('<br/>', '<br>')
 
 
-def convert_to_ckeditor(html_data, unused_exp_id=''):
+def convert_to_ckeditor(html_data):
     """This function converts html strings to CKEditor supported format.
 
     Args:
         html_data: str. HTML string to be converted.
-        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -779,13 +777,12 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def add_caption_attr_to_image(html_string, unused_exp_id=''):
+def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
         html_string. str: HTML string in which the caption attribute is to be
             added.
-        unused_exp_id. str: Unused argument.
 
     Returns:
         str. Updated HTML string with the caption attribute for all
@@ -801,7 +798,7 @@ def add_caption_attr_to_image(html_string, unused_exp_id=''):
     return unicode(soup)
 
 
-def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
+def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags.
 
     Args:
@@ -819,11 +816,11 @@ def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
         filename = unescape_html(image['filepath-with-value'])
         filename = filename[1:-1]
         image['filepath-with-value'] = escape_html(json.dumps(
-            get_filepath_of_object_image(filename, exp_id)))
+            get_fileinfo_of_object_image(filename, exp_id)))
     return unicode(soup)
 
 
-def get_filepath_of_object_image(filename, exp_id):
+def get_fileinfo_of_object_image(filename, exp_id):
     """Gets the dimensions of the image file.
 
     Args:
@@ -832,7 +829,7 @@ def get_filepath_of_object_image(filename, exp_id):
         exp_id: str. Exploration id.
 
     Returns:
-        object. filepath object of the image.
+        dict. A dict representing Fileinfo object of the image.
     """
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE

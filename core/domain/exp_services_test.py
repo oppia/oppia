@@ -610,12 +610,12 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
 
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+        def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
             return {'filename': filename, 'height': 490, 'width': 120}
 
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
             for exp_id in demo_exploration_ids:
                 start_time = datetime.datetime.utcnow()

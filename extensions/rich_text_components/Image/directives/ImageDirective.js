@@ -33,7 +33,7 @@ oppia.directive('oppiaNoninteractiveImage', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Image/directives/image_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.filepath = HtmlEscaperService.escapedJsonToObj(
+        $scope.fileinfo = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
         $scope.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
@@ -45,7 +45,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $scope.isLoadingIndicatorShown = true;
           $scope.dimensions = (
             ImagePreloaderService.getDimensionsOfImage(
-              $scope.filepath.filename));
+              $scope.fileinfo.filename));
           // For aligning the gif to the center of it's container
           var loadingIndicatorSize = (
             ($scope.dimensions.height < 124) ? 24 : 120);
@@ -60,7 +60,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $scope.loadImage = function() {
             $scope.isLoadingIndicatorShown = true;
             $scope.isTryAgainShown = false;
-            ImagePreloaderService.getImageUrl($scope.filepath.filename)
+            ImagePreloaderService.getImageUrl($scope.fileinfo.filename)
               .then(function(objectUrl) {
                 $scope.isTryAgainShown = false;
                 $scope.isLoadingIndicatorShown = false;
@@ -77,7 +77,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
           $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getExplorationId(), $scope.filepath.filename);
+            ContextService.getExplorationId(), $scope.fileinfo.filename);
         }
 
         $scope.imageCaption = '';

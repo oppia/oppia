@@ -30,9 +30,9 @@ class Fileinfo(object):
         """Constructs Fileinfo domain object.
 
         Args:
-        filename: str. Name of the image file.
-        height: int. Height of the image.
-        width: int. Width of the image.
+            filename: str. Name of the image file.
+            height: int. Height of the image.
+            width: int. Width of the image.
         """
         self.filename = filename
         self.height = height
@@ -42,7 +42,7 @@ class Fileinfo(object):
         """Returns a dict representing Fileinfo domain object.
 
         Returns:
-            A dict, containing filename, height and width of an image.
+            dict. The dict containing filename, height and width of an image.
         """
         return {
             'filename': self.filename,

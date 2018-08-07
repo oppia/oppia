@@ -832,5 +832,5 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_cleaner.add_dimensions_to_noninteractive_image_tag(
-                    test_case['html_content'], self.EXP_ID),
+                    self.EXP_ID, test_case['html_content']),
                 test_case['expected_output'])

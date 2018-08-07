@@ -480,12 +480,12 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+        def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
             return {'filename': filename, 'height': 490, 'width': 120}
 
         with self.swap(
-            html_cleaner, 'get_filepath_of_object_image',
-            _mock_get_filepath_of_object_image):
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
             exp_services.load_demo(self._DEMO_EXPLORATION_ID)
             exploration = exp_services.get_exploration_by_id(
                 self._DEMO_EXPLORATION_ID)
