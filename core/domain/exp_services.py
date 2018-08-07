@@ -1701,20 +1701,24 @@ def save_original_and_compressed_versions_of_image(
     micro_image_content = gae_image_services.compress_image(
         original_image_content, 0.7)
 
-    # Because in case of CreateVersionsOfImageJob the image, the original image
-    # is already there.
+    # Because in case of CreateVersionsOfImageJob, the original image is
+    # already there. Also, even if the compressed, micro versions for some
+    # image exists, then this would prevent from creating another copy of
+    # the same.
     if not fs.isfile(filepath):
         fs.commit(
             user_id, filepath, original_image_content,
             mimetype='image/%s' % filetype)
 
-    fs.commit(
-        user_id, compressed_image_filepath,
-        compressed_image_content, mimetype='image/%s' % filetype)
+    if not fs.isfile(compressed_image_filepath):
+        fs.commit(
+            user_id, compressed_image_filepath,
+            compressed_image_content, mimetype='image/%s' % filetype)
 
-    fs.commit(
-        user_id, micro_image_filepath,
-        micro_image_content, mimetype='image/%s' % filetype)
+    if not fs.isfile(micro_image_filepath):
+        fs.commit(
+            user_id, micro_image_filepath,
+            micro_image_content, mimetype='image/%s' % filetype)
 
 
 def get_number_of_ratings(ratings):
