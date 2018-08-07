@@ -956,7 +956,9 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<ol><li>This is last case</li><oppia-noninteractive-image '
-                    'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                    'filepath-with-value="{&amp;quot;filename&amp;quot;:'
+                    ' &amp;quot;2tree.png&amp;quot;, &amp;quot;width'
+                    '&amp;quot;: 120, &amp;quot;height&amp;quot;: 490}">'
                     '</oppia-noninteractive-image></ol>'
                 )
             },
@@ -984,7 +986,9 @@ class ExplorationMigrationValidationJobForTextAngularTest(
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
-                'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                'filepath-with-value="{&amp;quot;filename&amp;quot;:'
+                ' &amp;quot;2tree.png&amp;quot;, &amp;quot;width'
+                '&amp;quot;: 120, &amp;quot;height&amp;quot;: 490}">'
                 '</oppia-noninteractive-image></ol>\']]'
             )
         ]
@@ -1279,8 +1283,11 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                '<p><oppia-noninteractive-image filepath-with-value='
+                '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                'random.png&amp;quot;, &amp;quot;width'
+                '&amp;quot;: 120, &amp;quot;height&amp;quot;: 490}">'
+                '</oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
@@ -1318,9 +1325,11 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    'random.png&amp;quot;, &amp;quot;width'
+                    '&amp;quot;: 120, &amp;quot;height&amp;quot;: 490}">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
 
                 )
             },
