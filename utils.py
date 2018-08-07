@@ -626,6 +626,19 @@ def get_thumbnail_icon_url_for_category(category):
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
+def is_valid_language_code(language_code):
+    """Checks if the given language code is a valid language code.
+
+    Args:
+        language_code: str. The language code.
+
+    Returns:
+        bool. Whether the language code is valid or not.
+    """
+    language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
+    return language_code in language_codes
+
+
 def _get_short_language_description(full_language_description):
     """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
     the corresponding short description.
