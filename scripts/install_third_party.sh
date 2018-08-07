@@ -174,7 +174,7 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-echo Checking if PIL is installed in third_party
+echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
