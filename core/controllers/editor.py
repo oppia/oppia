@@ -30,7 +30,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import image_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -772,7 +771,7 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        image_services.create_compressed_versions_of_image(
+        exp_services.save_original_and_compressed_versions_of_image(
             self.user_id, filename, exploration_id, raw)
 
         self.render_json({'filepath': filename})

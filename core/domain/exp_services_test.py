@@ -1099,7 +1099,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
-class SaveImageFileTests(ExplorationServicesUnitTests):
+class SaveOriginalAndCompressedVersionsOfImageTests(ExplorationServicesUnitTests):
     """Test for saving the three versions of the image file."""
 
     EXPLORATION_ID = 'exp_id'
@@ -1108,7 +1108,7 @@ class SaveImageFileTests(ExplorationServicesUnitTests):
     MICRO_IMAGE_FILENAME = 'image_micro.png'
     USER = 'ADMIN'
 
-    def test_save_image_file(self):
+    def test_save_original_and_compressed_versions_of_image(self):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
         compressed_image_content = gae_image_services.compress_image(
@@ -1120,10 +1120,9 @@ class SaveImageFileTests(ExplorationServicesUnitTests):
         self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
         self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
-        exp_services.save_image_file(
-            self.USER, self.EXPLORATION_ID, self.FILENAME,
-            original_image_content, compressed_image_content,
-            micro_image_content)
+        exp_services.save_original_and_compressed_versions_of_image(
+            self.USER, self.FILENAME, self.EXPLORATION_ID,
+            original_image_content)
         self.assertEqual(fs.isfile(self.FILENAME), True)
         self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
         self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
