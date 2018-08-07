@@ -6,6 +6,7 @@ gae_runtime/*
 third_party/*
 backend_prod_files/*
 core/templates/prod/*
+core/tests/.browserstack.env
 .coverage*
 .viminfo
 libpeerconnection.log

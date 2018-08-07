@@ -506,5 +506,7 @@ var constants = {
           "content": {},
           "default_outcome": {}
       }
-  }
+  },
+
+  "CURRENT_STATES_SCHEMA_VERSION": 24
 };

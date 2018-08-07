@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import html_cleaner
+from core.domain import interaction_registry
 from core.platform import models
 import feconf
 import utils
@@ -34,6 +35,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
+CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION = 'create_new_fully_specified_question'
 
 # The following commands are deprecated, as these functionalities will be
 # handled by a QuestionSkillLink class in the future.
@@ -59,6 +61,8 @@ class QuestionChange(object):
                 below, together with the other keys in the dict:
                 - 'update question property' (with property_name, new_value
                 and old_value)
+                - 'create_new_fully_specified_question' (with question_dict,
+                skill_id)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -76,12 +80,23 @@ class QuestionChange(object):
             else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
 
+        if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
+            self.question_dict = change_dict['question_dict']
+            self.skill_id = change_dict['skill_id']
+
     def to_dict(self):
         """Returns a dict representing QuestionChange domain object.
 
         Returns:
             dict. A dict representing QuestionChange instance.
         """
+        if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
+            return {
+                'cmd': self.cmd,
+                'question_dict': self.question_dict,
+                'skill_id': self.skill_id
+            }
+
         return {
             'cmd': self.cmd,
             'property_name': self.property_name,
@@ -147,22 +162,16 @@ class Question(object):
         return exp_domain.State.create_default_state(
             None, is_initial_state=True)
 
-    def validate(self):
-        """Validates the Question domain object before it is saved."""
-
-        if not isinstance(self.id, basestring):
-            raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
+    def partial_validate(self):
+        """Validates the Question domain object, but doesn't require the
+        object to contain an ID and a version. To be used to validate the
+        question before it is finalized.
+        """
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-
-        if not isinstance(self.version, int):
-            raise utils.ValidationError(
-                'Expected version to be an integer, received %s' %
-                self.version)
 
         if not isinstance(self.question_state_schema_version, int):
             raise utils.ValidationError(
@@ -174,18 +183,18 @@ class Question(object):
                 'Expected question state data to be a State object, '
                 'received %s' % self.question_state_data)
 
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
+        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_state_data.interaction
         for answer_group in interaction.answer_groups:
-            if answer_group.labelled_as_correct:
+            if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
-            if answer_group.dest is not None:
+            if answer_group.outcome.dest is not None:
                 dest_is_specified = True
 
         if interaction.default_outcome.labelled_as_correct:
@@ -209,11 +218,27 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint')
 
-        if interaction.solution is None:
+        if (
+                (interaction.solution is None) and
+                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
         self.question_state_data.validate({}, False)
+
+    def validate(self):
+        """Validates the Question domain object before it is saved."""
+
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected ID to be a string, received %s' % self.id)
+
+        if not isinstance(self.version, int):
+            raise utils.ValidationError(
+                'Expected version to be an integer, received %s' %
+                self.version)
+
+        self.partial_validate()
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -244,7 +269,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            feconf.CURRENT_STATES_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_language_code(self, language_code):

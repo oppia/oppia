@@ -73,13 +73,15 @@ oppia.directive('stateGraphViz', [
         '/pages/exploration_editor/editor_tab/' +
         'state_graph_visualization_directive.html'),
       controller: [
-        '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
-        'ExplorationWarningsService', 'MAX_NODES_PER_ROW',
-        'TranslationStatusService', 'MAX_NODE_LABEL_LENGTH',
+        '$element', '$filter', '$scope', '$timeout',
+        'ExplorationWarningsService', 'StateGraphLayoutService',
+        'TranslationStatusService', 'MAX_NODES_PER_ROW',
+        'MAX_NODE_LABEL_LENGTH',
         function(
-            $scope, $element, $timeout, $filter, StateGraphLayoutService,
-            ExplorationWarningsService, MAX_NODES_PER_ROW,
-            TranslationStatusService, MAX_NODE_LABEL_LENGTH) {
+            $element, $filter, $scope, $timeout,
+            ExplorationWarningsService, StateGraphLayoutService,
+            TranslationStatusService, MAX_NODES_PER_ROW,
+            MAX_NODE_LABEL_LENGTH) {
           var redrawGraph = function() {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
@@ -184,9 +186,8 @@ oppia.directive('stateGraphViz', [
             };
 
             $scope.isStateFlagged = function(nodeId) {
-              return (
-                $scope.highlightStates &&
-                $scope.highlightStates.hasOwnProperty(nodeId));
+              return $scope.highlightStates &&
+                $scope.highlightStates.hasOwnProperty(nodeId);
             };
 
             $scope.getNodeTitle = function(node) {

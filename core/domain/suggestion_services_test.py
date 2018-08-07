@@ -39,7 +39,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     target_id = 'exp1'
     target_version_at_submission = 1
-    change_cmd = {
+    change = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
@@ -99,7 +99,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
-            'change_cmd': {
+            'change': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
@@ -120,7 +120,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
 
             observed_suggestion = suggestion_services.get_suggestion_by_id(
@@ -149,7 +149,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -198,7 +198,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -244,7 +244,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -276,7 +276,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -301,7 +301,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -332,7 +332,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
-                        self.author_id, self.change_cmd, 'test description',
+                        self.author_id, self.change, 'test description',
                         self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -374,7 +374,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     target_id_1 = 'exp1'
     target_id_2 = 'exp2'
     target_version_at_submission = 1
-    change_cmd = {
+    change = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
@@ -432,33 +432,33 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, self.target_version_at_submission,
-                    self.author_id_1, self.change_cmd, 'test description',
+                    self.author_id_1, self.change, 'test description',
                     self.reviewer_id_1)
 
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, self.target_version_at_submission,
-                    self.author_id_1, self.change_cmd, 'test description', None)
+                    self.author_id_1, self.change, 'test description', None)
 
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, self.target_version_at_submission,
-                    self.author_id_1, self.change_cmd, 'test description', None)
+                    self.author_id_1, self.change, 'test description', None)
 
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, self.target_version_at_submission,
-                    self.author_id_2, self.change_cmd, 'test description',
+                    self.author_id_2, self.change, 'test description',
                     self.reviewer_id_2)
 
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, self.target_version_at_submission,
-                    self.author_id_2, self.change_cmd, 'test description',
+                    self.author_id_2, self.change, 'test description',
                     self.reviewer_id_2)
 
     def test_get_by_author(self):
@@ -583,7 +583,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.new_content = exp_domain.SubtitledHtml(
             'content', 'new content').to_dict()
 
-        self.change_cmd = {
+        self.change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'State 1',
@@ -601,7 +601,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.EXP_ID, self.target_version_at_submission,
-                    self.author_id, self.change_cmd, 'test description', None)
+                    self.author_id, self.change, 'test description', None)
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -627,7 +627,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.EXP_ID, self.target_version_at_submission,
-                    self.author_id, self.change_cmd, 'test description', None)
+                    self.author_id, self.change, 'test description', None)
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -656,7 +656,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.EXP_ID, self.target_version_at_submission,
-                    self.author_id, self.change_cmd, 'test description', None)
+                    self.author_id, self.change, 'test description', None)
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)

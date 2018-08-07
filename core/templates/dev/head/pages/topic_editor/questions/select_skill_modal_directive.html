@@ -1,0 +1,16 @@
+<div class="modal-header">
+  <h3>
+    Select the skill to link the question to:
+  </h3>
+</div>
+<div class="modal-body new-subtopic-title-editor">
+  <div ng-repeat="skillSummary in skillSummaries track by $index">
+    <button class="btn btn-default" style="width: 100%" ng-click="selectSkill(skillSummary.getId())">
+      <[skillSummary.getDescription()]>
+    </button>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+  <button class="btn btn-success" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
+</div>
