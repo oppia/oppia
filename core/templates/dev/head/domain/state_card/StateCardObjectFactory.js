@@ -18,69 +18,68 @@
  */
 
 oppia.factory('StateCardObjectFactory', [function() {
-    var StateCard = function(
-        stateName, currentParams, contentHtml, interactionHtml,
-        leadsToConceptCard, destStateName, inputResponsePairs) {
-      this._stateName = stateName;
-      this._currentParams = currentParams;
-      this._contentHtml = contentHtml;
-      this._interactionHtml = interactionHtml;
-      this._leadsToConceptCard = leadsToConceptCard;
-      this._destStateName = destStateName;
-      this._inputResponsePairs = inputResponsePairs;
-    };
+  var StateCard = function(
+      stateName, currentParams, contentHtml, interactionHtml,
+      leadsToConceptCard, destStateName, inputResponsePairs) {
+    this._stateName = stateName;
+    this._currentParams = currentParams;
+    this._contentHtml = contentHtml;
+    this._interactionHtml = interactionHtml;
+    this._leadsToConceptCard = leadsToConceptCard;
+    this._destStateName = destStateName;
+    this._inputResponsePairs = inputResponsePairs;
+  };
 
-    StateCard.prototype.getDestStateName = function() {
-        return this._destStateName;
-    };
+  StateCard.prototype.getDestStateName = function() {
+    return this._destStateName;
+  };
 
-    StateCard.prototype.getStateName = function() {
-        return this._stateName;
-    };
+  StateCard.prototype.getStateName = function() {
+    return this._stateName;
+  };
 
-    StateCard.prototype.getCurrentParams = function() {
-        return this._currentParams;
-    };
+  StateCard.prototype.getCurrentParams = function() {
+    return this._currentParams;
+  };
 
-    StateCard.prototype.getContentHtml = function() {
-        return this._contentHtml;
-    };
+  StateCard.prototype.getContentHtml = function() {
+    return this._contentHtml;
+  };
 
-    StateCard.prototype.getInteractionHtml = function() {
-        return this._interactionHtml;
-    };
+  StateCard.prototype.getInteractionHtml = function() {
+    return this._interactionHtml;
+  };
 
-    StateCard.prototype.getLeadsToConceptCard = function() {
-        return this._leadsToConceptCard;
-    };
+  StateCard.prototype.getLeadsToConceptCard = function() {
+    return this._leadsToConceptCard;
+  };
 
-    StateCard.prototype.getInputResponsePairs = function() {
-        return this._inputResponsePairs;
-    };
+  StateCard.prototype.getInputResponsePairs = function() {
+    return this._inputResponsePairs;
+  };
 
-    StateCard.prototype.addInputResponsePair = function(inputResponsePair) {
-        this._inputResponsePairs.push(angular.copy(inputResponsePair));
-    };
+  StateCard.prototype.addInputResponsePair = function(inputResponsePair) {
+    this._inputResponsePairs.push(angular.copy(inputResponsePair));
+  };
 
-    StateCard.prototype.setDestStateName = function(destStateName) {
-        this._destStateName = destStateName;
-    };
+  StateCard.prototype.setDestStateName = function(destStateName) {
+    this._destStateName = destStateName;
+  };
 
-    StateCard.prototype.setInteractionHtml = function(interactionHtml) {
-        this._interactionHtml = interactionHtml;
-    };
+  StateCard.prototype.setInteractionHtml = function(interactionHtml) {
+    this._interactionHtml = interactionHtml;
+  };
 
-    StateCard.prototype.setLeadsToConceptCard = function(leadsToConceptCard) {
-        this._leadsToConceptCard = leadsToConceptCard;
-    };
+  StateCard.prototype.setLeadsToConceptCard = function(leadsToConceptCard) {
+    this._leadsToConceptCard = leadsToConceptCard;
+  };
 
-    StateCard.createNewCard = function(
-        stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
-      return new StateCard(
-        stateName, params, contentHtml, interactionHtml,
-        leadsToConceptCard, null, []);
-    };
+  StateCard.createNewCard = function(
+      stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
+    return new StateCard(
+      stateName, params, contentHtml, interactionHtml,
+      leadsToConceptCard, null, []);
+  };
 
-    return StateCard;
-  }
-]);
+  return StateCard;
+}]);
