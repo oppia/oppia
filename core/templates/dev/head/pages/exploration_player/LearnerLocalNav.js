@@ -99,7 +99,7 @@ oppia.controller('LearnerLocalNav', [
             assigned_reviewer_id: null,
             final_reviewer_id: null,
             description: result.description,
-            change_cmd: {
+            change: {
               cmd: 'edit_state_property',
               property_name: 'content',
               state_name: result.stateName,
