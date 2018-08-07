@@ -18,9 +18,11 @@
 
 oppia.factory('IssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   function(
       $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
     var issues = null;
     var explorationId = null;
@@ -29,6 +31,13 @@ oppia.factory('IssuesService', [
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
+    };
+
+    var renderMultipleIncorrectIssueStatement = function(stateName) {
+      var statement =
+        'Several learners submitted answers to card "' + stateName +
+        '" several times, then gave up and quit.';
+      return statement;
     };
 
     var renderCyclicTransitionsIssueStatement = function(stateName) {
@@ -42,6 +51,17 @@ oppia.factory('IssuesService', [
         'Review the cards up to and including <span class="state_link">' +
         '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
         ' errors, ambiguities or insufficient motivation.'
+      )];
+      return suggestions;
+    };
+
+    var renderMultipleIncorrectIssueSuggestions = function(stateName) {
+      var suggestions = [$sce.trustAsHtml(
+        'Check the wording of the card <span class="state_link">"' +
+        stateName + '</span> to ensure it is not confusing.'
+      ), $sce.trustAsHtml(
+        'Consider addressing the answers submitted in the sample playthroughs' +
+        ' explicitly, using answer groups.'
       )];
       return suggestions;
     };
@@ -79,6 +99,9 @@ oppia.factory('IssuesService', [
         var issueType = issue.issueType;
         if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueStatement();
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueStatement(
+            issue.issueCustomizationArgs.state_name.value);
         } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
           return renderCyclicTransitionsIssueStatement(
             issue.issueCustomizationArgs.state_names.value[0]);
@@ -88,6 +111,9 @@ oppia.factory('IssuesService', [
         var issueType = issue.issueType;
         if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(issue);
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueSuggestions(
+            issue.issueCustomizationArgs.state_name.value);
         } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
           return renderCyclicTransitionsIssueSuggestions(issue);
         }

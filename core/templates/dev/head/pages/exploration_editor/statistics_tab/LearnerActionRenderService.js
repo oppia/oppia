@@ -107,7 +107,9 @@ oppia.factory('LearnerActionRenderService', [
         }
         var answer =
           finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback = finalBlock[i].actionCustomizationArgs.feedback.value;
+        var feedback =
+          finalBlock[i].actionCustomizationArgs.feedback.value._html;
+        feedback = feedback.replace('{{answer}}', answer);
         tableHTML +=
           '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
       }
