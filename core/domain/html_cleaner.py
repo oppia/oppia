@@ -679,8 +679,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     for html_data in html_list:
         if run_migration:
             if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                soup_data = convert_to_textangular(
-                    html_data, unused_exp_id='unused')
+                soup_data = convert_to_textangular(html_data)
             else:
                 soup_data = convert_to_ckeditor(html_data)
         else:
