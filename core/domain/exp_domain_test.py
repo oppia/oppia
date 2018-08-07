@@ -17,8 +17,8 @@
 """Tests for exploration domain objects and methods defined on them."""
 
 import copy
-import os
 import functools
+import os
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import html_cleaner

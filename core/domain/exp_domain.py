@@ -22,6 +22,7 @@ should therefore be independent of the specific storage models used.
 """
 
 import copy
+import functools
 import logging
 import re
 import string
@@ -31,7 +32,6 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
-import functools
 import feconf
 import jinja_utils
 import schema_utils
