@@ -306,7 +306,6 @@ oppia.directive('conversationSkin', [
           // This variable is used only when viewport is narrow.
           // Indicates whether the tutor card is displayed.
           var tutorCardIsDisplayedIfNarrow = true;
-          var version = GLOBALS.explorationVersion;
 
           $scope.explorationId = ExplorationEngineService.getExplorationId();
           $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
@@ -500,7 +499,6 @@ oppia.directive('conversationSkin', [
           };
           var _addNewCard = function(
               stateName, newParams, contentHtml, interactionHtml) {
-            ExplorationEngineService.recordAddNewCard();
             PlayerTranscriptService.addNewCard(
               stateName, newParams, contentHtml, interactionHtml, false);
 
@@ -564,6 +562,7 @@ oppia.directive('conversationSkin', [
           };
 
           var _initializeExplorationServices = function(returnDict) {
+            var version = GLOBALS.explorationVersion;
             var explorationId = ContextService.getExplorationId();
             StateClassifierMappingService.init(
               returnDict.state_classifier_mapping);
@@ -628,6 +627,7 @@ oppia.directive('conversationSkin', [
             var explorationId = ContextService.getExplorationId();
             PlayerPositionService.init(_navigateToActiveCard);
             PlayerTranscriptService.init();
+            var version = GLOBALS.explorationVersion;
 
             if (_editorPreviewMode) {
               EditableExplorationBackendApiService.fetchApplyDraftExploration(
@@ -734,11 +734,11 @@ oppia.directive('conversationSkin', [
                   if (ExplorationEngineService.isNextStateTerminal()) {
                     StatsReportingService.recordStateCompleted(newStateName);
                   }
-                }
-                if (wasOldStateInitial && !explorationActuallyStarted) {
-                  StatsReportingService.recordExplorationActuallyStarted(
-                    oldStateName);
-                  explorationActuallyStarted = true;
+                  if (wasOldStateInitial && !explorationActuallyStarted) {
+                    StatsReportingService.recordExplorationActuallyStarted(
+                      oldStateName);
+                    explorationActuallyStarted = true;
+                  }
                 }
                 $rootScope.$broadcast('playerStateChange', newStateName);
                 // Do not wait if the interaction is supplemental -- there's
@@ -892,6 +892,7 @@ oppia.directive('conversationSkin', [
           $scope.showPendingCard = function(
               newStateName, newParams, newContentHtml) {
             $scope.startCardChangeAnimation = true;
+            ExplorationEngineService.recordAddNewCard();
 
             $timeout(function() {
               var newInteractionHtml =
@@ -939,6 +940,7 @@ oppia.directive('conversationSkin', [
               return;
             }
             if ($scope.activeCard.leadsToConceptCard) {
+              ExplorationEngineService.recordAddNewCard();
               _addNewCard(
                 null, null, $scope.conceptCard.getExplanation(), null);
               return;

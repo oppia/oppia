@@ -193,6 +193,7 @@ oppia.factory('ExplorationEngineService', [
           exploration = ExplorationObjectFactory.createFromBackendDict(
             explorationDict);
           exploration.setInitialStateName(initStateName);
+          visitedStateNames = [exploration.getInitialState().name];
           initParams(manualParamChanges);
           AudioTranslationLanguageService.init(
             exploration.getAllAudioLanguageCodes(),
@@ -437,7 +438,7 @@ oppia.factory('ExplorationEngineService', [
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
           refresherExplorationId, missingPrerequisiteSkillId, onSameCard,
-          (oldState === exploration.initStateName), isFirstHit);
+          (oldStateName === exploration.initStateName), isFirstHit);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
