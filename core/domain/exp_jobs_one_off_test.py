@@ -856,10 +856,23 @@ class CreateVersionsOfImageJobTest(test_utils.GenericTestBase):
         state2.update_interaction_default_outcome(default_outcome_dict2)
         exp_services.save_new_exploration(self.USER, exploration)
 
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+
+        self.assertEqual(fs.isfile('random1_compressed.png'), False)
+        self.assertEqual(fs.isfile('random1_micro.png'), False)
+        self.assertEqual(fs.isfile('random2_compressed.png'), False)
+        self.assertEqual(fs.isfile('random2_micro.png'), False)
+
         job_id = exp_jobs_one_off.CreateVersionsOfImageJob.create_new()
         exp_jobs_one_off.CreateVersionsOfImageJob.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
+
+        self.assertEqual(fs.isfile('random1_compressed.png'), True)
+        self.assertEqual(fs.isfile('random1_micro.png'), True)
+        self.assertEqual(fs.isfile('random2_compressed.png'), True)
+        self.assertEqual(fs.isfile('random2_micro.png'), True)
 
         actual_output = (
             exp_jobs_one_off.CreateVersionsOfImageJob.get_output(
