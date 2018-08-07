@@ -147,13 +147,7 @@ describe('Responses Service', function() {
     it('should return null if no answer choices provided', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
-/*
-      destUpdates = {
-        dest: 'Test',
-        refresherExplorationId: null,
-        missingPrerequisiteSkillId: null
-      }
-*/
+
     it('should update the rules', function() {
       const rule = rof.createNew('Equals', {x: 'New answer'});
       const ruleUpdates = {
@@ -170,6 +164,17 @@ describe('Responses Service', function() {
 
       rs.updateAnswerGroup(0, feedbackUpdates);
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
+    });
+
+    it('should update the destination', function() {
+      const destUpdates = {
+        dest: 'Test',
+        refresherExplorationId: null,
+        missingPrerequisiteSkillId: null
+      };
+
+      rs.updateAnswerGroup(0, destUpdates);
+      expect(rs.getAnswerGroup(0).outcome.dest).toEqual(destUpdates.dest);
     });
 /*
 
