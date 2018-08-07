@@ -174,6 +174,13 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
+echo Checking if PIL is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
+  echo Installing PIL
+
+  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
