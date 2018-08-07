@@ -382,7 +382,7 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
-oppia.config(['recorderServiceProvider', function (recorderServiceProvider) {
+oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
   recorderServiceProvider.forceSwf(false);
   recorderServiceProvider.withMp3Conversion(true, {
     bitRate: 128

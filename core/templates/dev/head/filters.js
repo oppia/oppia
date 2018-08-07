@@ -529,9 +529,9 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
   };
 }]);
 
-oppia.filter('formatTimer', [function () {
-  return function (input) {
-    var formatNum = function (n) {
+oppia.filter('formatTimer', [function() {
+  return function(input) {
+    var formatNum = function(n) {
       return (n < 10 ? '0' : '') + n;
     };
 
