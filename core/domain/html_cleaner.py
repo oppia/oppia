@@ -23,9 +23,8 @@ import urlparse
 
 import bleach
 import bs4
-from core.domain import filepath_domain
-fron core.domain import fs_domain
-from core.domain import image_services
+from core.domain import fileinfo_domain
+from core.domain import fs_domain
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
@@ -839,12 +838,12 @@ def get_filepath_of_object_image(filename, exp_id):
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
     filepath = (
         filename if feconf.DEV_MODE
         else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
     content = fs.get(filepath)
-    height, width = gae_mage_services.get_image_dimensions(content)
-    filepath = filepath_domain.Filepath(
+    height, width = gae_image_services.get_image_dimensions(content)
+    fileinfo = fileinfo_domain.Fileinfo(
         filename, height=height, width=width)
-    return filepath.to_dict()
+    return fileinfo.to_dict()

@@ -14,24 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for methods in the filepath registry."""
+"""Tests for methods in the fileinfo registry."""
 
-from core.domain import filepath_domain
+from core.domain import fileinfo_domain
 from core.tests import test_utils
 
 
-class FilepathDomainUnitTests(test_utils.GenericTestBase):
-    """Tests for Filepath domain class."""
+class FileinfoDomainUnitTests(test_utils.GenericTestBase):
+    """Tests for Fileinfo domain class."""
 
     def setUp(self):
-        super(FilepathDomainUnitTests, self).setUp()
-        self.filepath = filepath_domain.Filepath(
+        super(FileinfoDomainUnitTests, self).setUp()
+        self.fileinfo = fileinfo_domain.Fileinfo(
             'image.png', height=120, width=450)
 
     def test_to_dict(self):
-        filepath_dict = self.filepath.to_dict()
+        fileinfo_dict = self.fileinfo.to_dict()
         self.assertEqual(
-            filepath_dict,
+            fileinfo_dict,
             {
                 'filename': 'image.png',
                 'height': 120,

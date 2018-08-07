@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object for Filepath object of an image."""
+"""Domain object for Fileinfo object of an image."""
 
 
-class Filepath(object):
-    """Domain object for image Filepath.
+class Fileinfo(object):
+    """Domain object for image Fileinfo.
 
     Attributes:
         filename: str. Name of the image file.
@@ -27,7 +27,7 @@ class Filepath(object):
     """
 
     def __init__(self, filename, height=0, width=0):
-        """Constructs Filepath domain object.
+        """Constructs Fileinfo domain object.
 
         Args:
         filename: str. Name of the image file.
@@ -39,7 +39,7 @@ class Filepath(object):
         self.width = width
 
     def to_dict(self):
-        """Returns a dict representing Filepath domain object.
+        """Returns a dict representing Fileinfo domain object.
 
         Returns:
             A dict, containing filename, height and width of an image.
