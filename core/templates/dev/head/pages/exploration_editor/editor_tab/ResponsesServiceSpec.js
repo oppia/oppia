@@ -176,15 +176,12 @@ describe('Responses Service', function() {
       rs.updateAnswerGroup(0, destUpdates);
       expect(rs.getAnswerGroup(0).outcome.dest).toEqual(destUpdates.dest);
     });
+
+    it('should delete the answer group', function() {
+      rs.deleteAnswerGroup(0);
+      expect(rs.getAnswerGroupCount()).toEqual(0);
+    });
 /*
-
-      it('should delete the answer group', function() {
-        let initialLength = rs.getAnswerGroupCount();
-        rs.updateAnswerGroup(0, updates);
-        rs.deleteAnswerGroup(initialLength);
-        expect(rs.AnswerGroupCount()).toEqual(initialLength);
-      });
-
       it('should update active answer group', function() {
         rs.updateActiveAnswerGroup(updates);
         let activeIndex = rs.getActiveAnswerGroupIndex();
