@@ -60,7 +60,6 @@ oppia.factory('ThreadDataService', [
       };
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         params = {
-          list_type: 'target',
           target_type: 'exploration',
           target_id: _expId
         };
@@ -86,7 +85,7 @@ oppia.factory('ThreadDataService', [
                 SuggestionObjectFactory.createFromBackendDict(
                   res[1].data.suggestions[j]));
               if (suggestionThreads[i].thread_id ===
-                  suggestion.threadId()) {
+                  suggestion.getThreadId()) {
                 var suggestionThread = (
                   SuggestionThreadObjectFactory.createFromBackendDicts(
                     suggestionThreads[i], res[1].data.suggestions[j]));
@@ -221,9 +220,11 @@ oppia.factory('ThreadDataService', [
         };
 
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          // TODO(nithesh): Remove manual construction of suggestion ID once the
-          // feedback threads are migrated and threadId matches suggestionId.
-          suggestionId = 'exploration.' + threadId;
+          if (constants.ENABLE_GENERALIZED_FEEDBACK_THREADS) {
+            suggestionId = threadId;
+          } else {
+            suggestionId = 'exploration.' + threadId;
+          }
           payload.review_message = reviewMsg;
           if (action === ACTION_ACCEPT_SUGGESTION) {
             payload.commit_message = commitMsg;

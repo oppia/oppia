@@ -49,45 +49,47 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
     def test_that_reply_emails_are_added_to_thread(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Create thread.
-            feedback_services.create_thread(
-                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
-                'a_state_name', self.user_id_a, 'a subject', 'some text')
+            with self.swap(
+                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                feedback_services.create_thread(
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
+                    'a_state_name', self.user_id_a, 'a subject', 'some text')
 
-            threadlist = feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
-            thread_id = threadlist[0].id
+                threadlist = feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+                thread_id = threadlist[0].id
 
-            # Create another message.
-            feedback_services.create_message(
-                thread_id, self.user_id_b, None, None, 'user b message')
+                # Create another message.
+                feedback_services.create_message(
+                    thread_id, self.user_id_b, None, None, 'user b message')
 
-            # Check that there are 2 messages in thread.
-            messages = feedback_services.get_messages(thread_id)
-            self.assertEqual(len(messages), 2)
+                # Check that there are 2 messages in thread.
+                messages = feedback_services.get_messages(thread_id)
+                self.assertEqual(len(messages), 2)
 
-            # Check that received_via_email is set to False.
-            self.assertFalse(messages[0].received_via_email)
+                # Check that received_via_email is set to False.
+                self.assertFalse(messages[0].received_via_email)
 
-            # Get reply_to id for user A.
-            model = email_models.FeedbackEmailReplyToIdModel.get(
-                self.user_id_a, thread_id)
+                # Get reply_to id for user A.
+                model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                    self.user_id_a, thread_id)
 
-            recipient_email = 'reply+%s@%s' % (
-                model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
-            # Send email to Oppia.
-            self.post_email(
-                str(recipient_email), self.USER_A_EMAIL, 'feedback email reply',
-                'New reply')
+                recipient_email = 'reply+%s@%s' % (
+                    model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
+                # Send email to Oppia.
+                self.post_email(
+                    str(recipient_email), self.USER_A_EMAIL,
+                    'feedback email reply', 'New reply')
 
-            # Check that new message is added.
-            messages = feedback_services.get_messages(thread_id)
-            self.assertEqual(len(messages), 3)
+                # Check that new message is added.
+                messages = feedback_services.get_messages(thread_id)
+                self.assertEqual(len(messages), 3)
 
-            # Check content of message is correct.
-            msg = messages[-1]
-            self.assertEqual(msg.text, 'New reply')
-            self.assertEqual(msg.author_id, self.user_id_a)
-            self.assertTrue(msg.received_via_email)
+                # Check content of message is correct.
+                msg = messages[-1]
+                self.assertEqual(msg.text, 'New reply')
+                self.assertEqual(msg.author_id, self.user_id_a)
+                self.assertTrue(msg.received_via_email)
 
     def test_that_assertion_is_raised_for_fake_reply_to_id(self):
         # Generate reply email.

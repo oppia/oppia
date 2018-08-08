@@ -90,8 +90,9 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_exp_id_from_thread_id(self):
         thread_id = 'exp1.1234'
-        self.assertEqual(
-            feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            self.assertEqual(
+                feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
 
 
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
@@ -150,12 +151,15 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             thread.put()
 
     def test_create_and_get_suggestion(self):
-        with self.swap(
-            feedback_models.FeedbackThreadModel,
-            'generate_new_thread_id', self._generate_thread_id):
-            feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name', 'description', '')
-        suggestion = feedback_services.get_suggestion(self.THREAD_ID6)
+
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            with self.swap(
+                feedback_models.FeedbackThreadModel,
+                'generate_new_thread_id', self._generate_thread_id):
+                feedback_services.create_suggestion(
+                    self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
+                    '')
+            suggestion = feedback_services.get_suggestion(self.THREAD_ID6)
         thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID6)
         expected_suggestion_dict = {
             'exploration_id': self.EXP_ID2,
@@ -169,41 +173,48 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
 
     def test_get_open_threads_with_suggestions(self):
-        threads = feedback_services.get_open_threads(
-            'exploration', self.EXP_ID1, True)
+
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_open_threads(
+                'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID1)
 
     def test_get_open_threads_without_suggestions(self):
-        threads = feedback_services.get_open_threads(
-            'exploration', self.EXP_ID1, False)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_open_threads(
+                'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID5)
 
     def test_get_closed_threads_with_suggestions(self):
-        threads = feedback_services.get_closed_threads(
-            'exploration', self.EXP_ID1, True)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_closed_threads(
+                'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 2)
         thread_ids = [thread.id for thread in threads]
         self.assertItemsEqual(thread_ids, [self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_closed_threads_without_suggestions(self):
-        threads = feedback_services.get_closed_threads(
-            'exploration', self.EXP_ID1, False)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_closed_threads(
+                'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID4)
 
     def test_get_all_threads_with_suggestion(self):
-        threads = feedback_services.get_all_threads(
-            'exploration', self.EXP_ID1, True)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_all_threads(
+                'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 3)
         thread_ids = [thread.id for thread in threads]
         self.assertItemsEqual(
             thread_ids, [self.THREAD_ID1, self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_all_threads_without_suggestion(self):
-        threads = feedback_services.get_all_threads(
-            'exploration', self.EXP_ID1, False)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_all_threads(
+                'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 2)
         thread_ids = [thread.id for thread in threads]
         self.assertItemsEqual(thread_ids, [self.THREAD_ID4, self.THREAD_ID5])
@@ -253,9 +264,14 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             category='Architecture', language_code='fi')
 
     def _get_all_messages_read(self, user_id, thread_id):
-        feedback_thread_user_model = (
-            feedback_models.FeedbackThreadUserModel.get(
-                user_id, thread_id))
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            feedback_thread_user_model = (
+                feedback_models.GeneralFeedbackThreadUserModel.get(
+                    user_id, thread_id))
+        else:
+            feedback_thread_user_model = (
+                feedback_models.FeedbackThreadUserModel.get(
+                    user_id, thread_id))
 
         return (
             feedback_thread_user_model.message_ids_read_by_user if
