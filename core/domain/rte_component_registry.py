@@ -115,3 +115,39 @@ class Registry(object):
                 component_tag_names.append(
                     'oppia-noninteractive-%s' % component_spec['frontend_id'])
         return component_tag_names
+
+    @classmethod
+    def get_inline_component_tag_names(cls):
+        """Get a list of inline component tag names.
+
+        Returns:
+            list(str). A list of inline component tag names.
+        """
+        return cls.get_component_tag_names('is_block_element', False)
+
+    @classmethod
+    def get_block_component_tag_names(cls):
+        """Get a list of block component tag names.
+
+        Returns:
+            list(str). A list of block component tag names.
+        """
+        return cls.get_component_tag_names('is_block_element', True)
+
+    @classmethod
+    def get_simple_component_tag_names(cls):
+        """Get a list of simple component tag names.
+
+        Returns:
+            list(str). A list of simple component tag names.
+        """
+        return cls.get_component_tag_names('is_complex', False)
+
+    @classmethod
+    def get_complex_component_tag_names(cls):
+        """Get a list of complex component tag names.
+
+        Returns:
+            list(str). A list of complex component tag names.
+        """
+        return cls.get_component_tag_names('is_complex', True)

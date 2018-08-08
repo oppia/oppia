@@ -286,3 +286,67 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     set(actual_component_tag_names),
                     set(obtained_component_tag_names))
+
+    def test_get_inline_component_tag_names(self):
+        """Test get_inline_component_tag_names method."""
+        component_specs = (
+            rte_component_registry.Registry.get_all_rte_components())
+        obtained_inline_component_tag_names = (
+            rte_component_registry.Registry.get_inline_component_tag_names())
+
+        actual_inline_component_tag_names = [
+            'oppia-noninteractive-%s' % component_spec['frontend_id']
+            for component_spec in component_specs.values()
+            if not component_spec['is_block_element']]
+
+        self.assertEqual(
+            set(actual_inline_component_tag_names),
+            set(obtained_inline_component_tag_names))
+
+    def test_get_block_component_tag_names(self):
+        """Test get_block_component_tag_names method."""
+        component_specs = (
+            rte_component_registry.Registry.get_all_rte_components())
+        obtained_block_component_tag_names = (
+            rte_component_registry.Registry.get_block_component_tag_names())
+
+        actual_block_component_tag_names = [
+            'oppia-noninteractive-%s' % component_spec['frontend_id']
+            for component_spec in component_specs.values()
+            if component_spec['is_block_element']]
+
+        self.assertEqual(
+            set(actual_block_component_tag_names),
+            set(obtained_block_component_tag_names))
+
+    def test_get_simple_component_tag_names(self):
+        """Test get_simple_component_tag_names method."""
+        component_specs = (
+            rte_component_registry.Registry.get_all_rte_components())
+        obtained_simple_component_tag_names = (
+            rte_component_registry.Registry.get_simple_component_tag_names())
+
+        actual_simple_component_tag_names = [
+            'oppia-noninteractive-%s' % component_spec['frontend_id']
+            for component_spec in component_specs.values()
+            if not component_spec['is_complex']]
+
+        self.assertEqual(
+            set(actual_simple_component_tag_names),
+            set(obtained_simple_component_tag_names))
+
+    def test_get_complex_component_tag_names(self):
+        """Test get_complex_component_tag_names method."""
+        component_specs = (
+            rte_component_registry.Registry.get_all_rte_components())
+        obtained_complex_component_tag_names = (
+            rte_component_registry.Registry.get_complex_component_tag_names())
+
+        actual_complex_component_tag_names = [
+            'oppia-noninteractive-%s' % component_spec['frontend_id']
+            for component_spec in component_specs.values()
+            if component_spec['is_complex']]
+
+        self.assertEqual(
+            set(actual_complex_component_tag_names),
+            set(obtained_complex_component_tag_names))

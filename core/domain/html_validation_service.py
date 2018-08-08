@@ -116,13 +116,11 @@ def wrap_with_siblings(tag, p):
 
 # List of oppia noninteractive inline components.
 INLINE_COMPONENT_TAG_NAMES = (
-    rte_component_registry.Registry.get_component_tag_names(
-        'is_block_element', False))
+    rte_component_registry.Registry.get_inline_component_tag_names())
 
 # List of oppia noninteractive block components.
 BLOCK_COMPONENT_TAG_NAMES = (
-    rte_component_registry.Registry.get_component_tag_names(
-        'is_block_element', True))
+    rte_component_registry.Registry.get_block_component_tag_names())
 
 
 def convert_to_textangular(html_data):
@@ -717,8 +715,7 @@ def _validate_customization_args_in_tag(tag):
 
     COMPONENT_TYPES_TO_COMPONENT_CLASSES = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
     SIMPLE_COMPONENT_TAG_NAMES = (
-        rte_component_registry.Registry.get_component_tag_names(
-            'is_complex', False))
+        rte_component_registry.Registry.get_simple_component_tag_names())
     tag_name = tag.name
     value_dict = {}
     attrs = tag.attrs
