@@ -113,6 +113,15 @@ describe('Player transcript service', function() {
     false);
     lastAnswer = pts.getLastAnswerOnActiveCard(0);
     expect(lastAnswer).toEqual('first answer');
+
+    pts.addNewCard('Third state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
+    // lastAnswer should be null as no answers were provided in the second
+    // state.
+    lastAnswer = pts.getLastAnswerOnActiveCard(1);
+    expect(lastAnswer).toEqual(null);
   });
 
   it('should record answer/feedback pairs in the correct order', function() {

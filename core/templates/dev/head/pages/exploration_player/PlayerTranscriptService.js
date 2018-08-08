@@ -79,10 +79,9 @@ oppia.factory('PlayerTranscriptService', [
         lastCard.setDestStateName(newDestStateName);
       },
       addNewInput: function(input, isHint) {
-        var card = transcript[transcript.length - 1];
+        var card = this.getLastCard();
         var pairs = card.getInputResponsePairs();
-        if (pairs.length > 0 &&
-            card.getOppiaResponse(pairs.length - 1) === null) {
+        if (pairs.length > 0 && card.getLastOppiaResponse() === null) {
           throw Error(
             'Trying to add an input before the response for the previous ' +
             'input has been received.',
@@ -121,7 +120,8 @@ oppia.factory('PlayerTranscriptService', [
       getLastAnswerOnActiveCard: function(activeCardIndex) {
         if (
           this.isLastCard(activeCardIndex) ||
-          transcript[activeCardIndex].getStateName() === null) {
+          transcript[activeCardIndex].getStateName() === null ||
+          transcript[activeCardIndex].getInputResponsePairs().length === 0) {
           return null;
         } else {
           return transcript[activeCardIndex].

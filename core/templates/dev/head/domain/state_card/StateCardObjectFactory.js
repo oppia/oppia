@@ -63,13 +63,17 @@ oppia.factory('StateCardObjectFactory', [function() {
   };
 
   StateCard.prototype.getLastInputResponsePair = function() {
+    if (this._inputResponsePairs.length === 0) {
+      return null;
+    }
     return this._inputResponsePairs[this._inputResponsePairs.length - 1];
   };
 
   StateCard.prototype.getLastOppiaResponse = function() {
-    return (
-      this._inputResponsePairs[
-        this._inputResponsePairs.length - 1].oppiaResponse);
+    if (this.getLastInputResponsePair() === null) {
+      return null;
+    }
+    return this.getLastInputResponsePair().oppiaResponse;
   };
 
   StateCard.prototype.addInputResponsePair = function(inputResponsePair) {
@@ -85,8 +89,7 @@ oppia.factory('StateCardObjectFactory', [function() {
   };
 
   StateCard.prototype.setLastOppiaResponse = function(response) {
-    this._inputResponsePairs[
-      this._inputResponsePairs.length - 1].oppiaResponse = response;
+    this.setOppiaResponse(this._inputResponsePairs.length - 1, response);
   };
 
   StateCard.prototype.setInteractionHtml = function(interactionHtml) {

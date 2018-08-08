@@ -36,6 +36,8 @@ describe('State card object factory', function() {
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction></interaction>');
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);
+    expect(_sampleCard.getLastInputResponsePair()).toEqual(null);
+    expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
     expect(_sampleCard.getDestStateName()).toEqual(null);
     expect(_sampleCard.getLeadsToConceptCard()).toEqual(false);
 
