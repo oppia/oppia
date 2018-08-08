@@ -62,12 +62,20 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteractionId = function(stateName) {
-      return this.getInteraction(stateName).id;
+      var interaction = this.getInteraction(stateName);
+      if (interaction === null) {
+        return null;
+      }
+      return interaction.id;
     };
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.getInteraction(stateName).customizationArgs;
+        var interaction = this.getInteraction(stateName);
+        if (interaction === null) {
+          return null;
+        }
+        return interaction.customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {
