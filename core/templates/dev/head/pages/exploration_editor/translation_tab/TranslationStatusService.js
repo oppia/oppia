@@ -19,9 +19,9 @@
 
 oppia.factory('TranslationStatusService', [
   'StateContentIdsToAudioTranslationsService', 'ExplorationStatesService',
-  'TranslationLanguageService', function(
+  'TranslationLanguageService', 'INTERACTION_SPECS', function(
       StateContentIdsToAudioTranslationsService, ExplorationStatesService,
-      TranslationLanguageService) {
+      TranslationLanguageService, INTERACTION_SPECS) {
     var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
@@ -46,6 +46,17 @@ oppia.factory('TranslationStatusService', [
           var contentIdsToAudioTranslations = ExplorationStatesService
             .getContentIdsToAudioTranslationsMemento(stateName);
           var allContentId = contentIdsToAudioTranslations.getAllContentId();
+          var interactionId = ExplorationStatesService
+            .getInteractionIdMemento(stateName);
+          // This is used to prevent users from adding unwanted hints audio, as
+          // of now we do not delete interaction.hints when a user deletes
+          // interaction, so these hints audio are not counted in checking
+          // status of a state.
+          if (!interactionId ||
+            INTERACTION_SPECS[interactionId].is_linear ||
+            INTERACTION_SPECS[interactionId].is_terminal) {
+            allContentId = ['content'];
+          }
           explorationAudioRequiredCount += allContentId.length;
           allContentId.forEach(function(contentId) {
             availableTranslationLanguageCodes = contentIdsToAudioTranslations
@@ -72,7 +83,7 @@ oppia.factory('TranslationStatusService', [
       }
     };
 
-    var _getContentIdListRelatedToComponent = function (componentName) {
+    var _getContentIdListRelatedToComponent = function(componentName) {
       contentIdsToAudioTranslations =
         StateContentIdsToAudioTranslationsService.displayed;
       if (contentIdsToAudioTranslations) {
@@ -190,7 +201,7 @@ oppia.factory('TranslationStatusService', [
       getActiveStateContentIdStatusColor: function(contentId) {
         return _getActiveStateContentIdStatusColor(contentId);
       },
-      getActiveStateContentIdNeedsUpdateStatus: function (contentId) {
+      getActiveStateContentIdNeedsUpdateStatus: function(contentId) {
         return _getActiveStateContentIdNeedsUpdateStatus(contentId);
       }
     };

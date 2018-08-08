@@ -23,6 +23,7 @@ oppia.directive('translationTab', [
       scope: {},
       link: function(scope) {
         scope.$broadcast('refreshTranslationTab');
+        scope.clearLoadingMessage();
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
@@ -30,6 +31,9 @@ oppia.directive('translationTab', [
       controller: ['$scope', '$rootScope', function($scope, $rootScope) {
         $rootScope.loadingMessage = 'Loading';
         $scope.isTranslationTabBusy = false;
+        $scope.clearLoadingMessage = function() {
+          $rootScope.loadingMessage = 'Loading';
+        };
         $scope.$on('refreshTranslationTab', function() {
           $scope.$broadcast('refreshStateTranslation');
         });

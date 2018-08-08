@@ -138,7 +138,7 @@ oppia.factory('ResponsesService', [
       }
       StateContentIdsToAudioTranslationsService.saveDisplayedValue();
       ExplorationStatesService.saveContentIdsToAudioTranslations(
-        EditorStateService.getActiveStateName(),
+        StateEditorService.getActiveStateName(),
         StateContentIdsToAudioTranslationsService.displayed);
     };
 

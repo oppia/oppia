@@ -161,8 +161,19 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.isDisabled = function(tabId) {
-            if (tabId === $scope.TAB_ID_FEEDBACK) {
-              if (!$scope.stateDefaultOutcome || !$scope.stateInteractionId) {
+            if (tabId === $scope.TAB_ID_CONTENT) {
+              return false;
+            }
+            // This is used to prevent users from adding unwanted audio for
+            // default_outcome and hints in Continue and EndExploration
+            // interaction.
+            if (!$scope.stateInteractionId ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_linear ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_terminal
+            ) {
+              return true;
+            } else if (tabId === $scope.TAB_ID_FEEDBACK) {
+              if (!$scope.stateDefaultOutcome) {
                 return true;
               } else {
                 return false;
@@ -179,8 +190,6 @@ oppia.directive('stateTranslation', [
               } else {
                 return false;
               }
-            } else {
-              return false;
             }
           };
 
@@ -284,7 +293,6 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
-          $rootScope.loadingMessage = '';
         }
       ]
     };
