@@ -273,10 +273,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.exploration_id = exp_id
             thread_1.put()
 
-            # Start job.
-
             with self.swap(
                 feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                # Start job.
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 1,
@@ -314,9 +313,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.exploration_id = exp_id
             thread_1.put()
 
-            # Start job.
             with self.swap(
                 feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                # Start job.
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 1,
@@ -334,9 +333,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.put()
 
-            # Restart job.
             with self.swap(
                 feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                # Restart job.
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 0,
@@ -354,9 +353,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.status = feedback_models.STATUS_CHOICES_OPEN
             thread.put()
 
-            # Restart job.
             with self.swap(
                 feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                # Restart job.
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 1,
