@@ -25,7 +25,6 @@ import re
 import shutil
 import subprocess
 import threading
-import time
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -566,7 +565,6 @@ def _execute_tasks(tasks, batch_size=24):
             task = remaining_tasks.pop()
             currently_running_tasks.append(task)
             task.start()
-        time.sleep(1)
 
 
 def build_files(source, target, file_hashes):

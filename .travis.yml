@@ -122,6 +122,8 @@ cache:
     - third_party/
     - $HOME/.cache/pip
     - $HOME/.cache/TravisChrome/
+    - backend_prod_files/templates/head/
+    - build/templates/head/
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
