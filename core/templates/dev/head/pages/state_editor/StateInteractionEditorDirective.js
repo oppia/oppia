@@ -82,7 +82,6 @@ oppia.directive('stateInteractionEditor', [
                 INTERACTION_SPECS[StateInteractionIdService.savedMemento].name :
                 '');
           };
-
           $scope.doesCurrentInteractionHaveCustomizations = function() {
             var interactionSpec = INTERACTION_SPECS[
               StateInteractionIdService.savedMemento];

@@ -29,20 +29,27 @@ oppia.directive('stateTranslation', [
       controller: [
         '$scope', '$filter', '$rootScope', 'StateEditorService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
-        'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'ExplorationCorrectnessFeedbackService', 'RouterService',
+        'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
+        'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+        'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
-            INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
-            ExplorationCorrectnessFeedbackService, RouterService) {
+            ExplorationCorrectnessFeedbackService, RouterService,
+            TranslationStatusService, COMPONENT_NAME_CONTENT,
+            COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+            COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           // Define tab constants.
+          $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
+          $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+          $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
+          $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
+
           $scope.ExplorationCorrectnessFeedbackService =
             ExplorationCorrectnessFeedbackService;
-          $scope.TAB_ID_CONTENT = 'content';
-          $scope.TAB_ID_FEEDBACK = 'feedback';
-          $scope.TAB_ID_HINTS = 'hints';
-          $scope.TAB_ID_SOLUTION = 'solution';
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -56,6 +63,8 @@ oppia.directive('stateTranslation', [
           $scope.stateHints = [];
           $scope.stateSolution = null;
           $scope.activeContentId = null;
+          $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
+            'text. Please record new audio.';
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
@@ -154,8 +163,19 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.isDisabled = function(tabId) {
-            if (tabId === $scope.TAB_ID_FEEDBACK) {
-              if (!$scope.stateDefaultOutcome || !$scope.stateInteractionId) {
+            if (tabId === $scope.TAB_ID_CONTENT) {
+              return false;
+            }
+            // This is used to prevent users from adding unwanted audio for
+            // default_outcome and hints in Continue and EndExploration
+            // interaction.
+            if (!$scope.stateInteractionId ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_linear ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_terminal
+            ) {
+              return true;
+            } else if (tabId === $scope.TAB_ID_FEEDBACK) {
+              if (!$scope.stateDefaultOutcome) {
                 return true;
               } else {
                 return false;
@@ -166,7 +186,7 @@ oppia.directive('stateTranslation', [
               } else {
                 return false;
               }
-            } else {
+            } else if (tabId === $scope.TAB_ID_SOLUTION) {
               if (!$scope.stateSolution) {
                 return true;
               } else {
@@ -204,6 +224,30 @@ oppia.directive('stateTranslation', [
               $scope.activeContentId = $scope.stateAnswerGroups[newIndex]
                 .outcome.feedback.getContentId();
             }
+          };
+
+          $scope.tabStatusColorStyle = function(tabId) {
+            if (!$scope.isDisabled(tabId)) {
+              var color = TranslationStatusService
+                .getActiveStateComponentStatusColor(tabId);
+              return {'border-top-color': color};
+            }
+          };
+
+          $scope.tabNeedUpdatesStatus = function(tabId) {
+            if (!$scope.isDisabled(tabId)) {
+              return TranslationStatusService
+                .getActiveStateComponentNeedsUpdateStatus(tabId);
+            }
+          };
+          $scope.contentIdNeedUpdates = function(contentId) {
+            return TranslationStatusService
+              .getActiveStateContentIdNeedsUpdateStatus(contentId);
+          };
+          $scope.contentIdStatusColorStyle = function(contentId) {
+            var color = TranslationStatusService
+              .getActiveStateContentIdStatusColor(contentId);
+            return {'border-left': '3px solid ' + color};
           };
 
           $scope.getHtmlSummary = function(subtitledHtml) {
