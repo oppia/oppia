@@ -63,6 +63,8 @@ oppia.directive('stateTranslation', [
           $scope.stateHints = [];
           $scope.stateSolution = null;
           $scope.activeContentId = null;
+          $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
+            'text. Please record new audio.';
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
@@ -293,6 +295,7 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
+          $rootScope.loadingMessage = '';
         }
       ]
     };
