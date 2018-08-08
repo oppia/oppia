@@ -369,15 +369,26 @@ class ListOfTabs(BaseObject):
             'type': 'dict',
             'properties': [{
                 'name': 'title',
+                'description': 'Tab title',
                 'schema': {
                     'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
                 }
             }, {
                 'name': 'content',
+                'description': 'Tab content',
                 'schema': {
                     'type': 'html',
+                    'ui_config': {
+                        'hide_complex_extensions': True
+                    }
                 }
             }]
+        },
+        'ui_config': {
+            'add_element_text': 'Add new tab'
         }
     }
 
