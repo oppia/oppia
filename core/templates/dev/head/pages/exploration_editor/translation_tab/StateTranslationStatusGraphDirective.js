@@ -20,20 +20,37 @@ oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_status_graph_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'GraphDataService', 'StateEditorService',
-        function($scope, $rootScope, GraphDataService, StateEditorService) {
+        '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
+        'StateEditorService', 'StateContentIdsToAudioTranslationsService',
+        function(
+            $scope, $rootScope, ExplorationStatesService, GraphDataService,
+            StateEditorService, StateContentIdsToAudioTranslationsService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.getActiveStateName = function() {
             return StateEditorService.getActiveStateName();
           };
           $scope.onClickStateInMap = function(newStateName) {
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
             StateEditorService.setActiveStateName(newStateName);
-            $rootScope.$broadcast('refreshStateTranslation');
+            var stateName = StateEditorService.getActiveStateName();
+            var stateData = ExplorationStatesService.getState(stateName);
+            if (stateName && stateData) {
+              StateContentIdsToAudioTranslationsService.init(
+                StateEditorService.getActiveStateName(),
+                stateData.contentIdsToAudioTranslations);
+              $rootScope.$broadcast('refreshStateTranslation');
+              $rootScope.$broadcast('refreshAudioTranslationBar');
+            }
           };
         }
       ]

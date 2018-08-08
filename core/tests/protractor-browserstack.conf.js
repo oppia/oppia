@@ -166,7 +166,8 @@ exports.config = {
     return new Promise(function(resolve, reject) {
       exports.bs_local = new browserstack.Local();
       exports.bs_local.start({
-        key: exports.config.capabilities['browserstack.key']
+        key: exports.config.capabilities['browserstack.key'],
+        forceLocal: true
       }, function(error) {
         if (error) {
           return reject(error);

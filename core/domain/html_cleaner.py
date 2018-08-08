@@ -821,7 +821,7 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
 
 
 def get_fileinfo_of_object_image(filename, exp_id):
-    """Gets the dimensions of the image file.
+    """Gets the dict containing the image's filename, height and width.
 
     Args:
         filename: str. Name of the file whose dimensions need to be
