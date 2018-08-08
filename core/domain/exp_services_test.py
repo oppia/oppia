@@ -38,6 +38,7 @@ import utils
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -1096,6 +1097,32 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.assertEqual(len(filenames), len(expected_output))
         for filename in expected_output:
             self.assertIn(filename, filenames)
+
+
+class SaveOriginalAndCompressedVersionsOfImageTests(
+        ExplorationServicesUnitTests):
+    """Test for saving the three versions of the image file."""
+
+    EXPLORATION_ID = 'exp_id'
+    FILENAME = 'image.png'
+    COMPRESSED_IMAGE_FILENAME = 'image_compressed.png'
+    MICRO_IMAGE_FILENAME = 'image_micro.png'
+    USER = 'ADMIN'
+
+    def test_save_original_and_compressed_versions_of_image(self):
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+        self.assertEqual(fs.isfile(self.FILENAME), False)
+        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
+        exp_services.save_original_and_compressed_versions_of_image(
+            self.USER, self.FILENAME, self.EXPLORATION_ID,
+            original_image_content)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
+        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
+        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
 
 
 # pylint: disable=protected-access

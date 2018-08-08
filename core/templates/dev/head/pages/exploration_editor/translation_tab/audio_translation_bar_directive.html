@@ -1,0 +1,227 @@
+<div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
+  <button class="btn oppia-audio-button" disabled>
+    <i class="material-icons">&#xE039;</i>
+  </button>
+  <div class="oppia-audio-bar-info">
+    <div ng-if="!cannotRecord && !checkingMicrophonePermission">
+      No audio recorded.<span ng-if="canTranslate"> Press <i class="material-icons">mic</i>  to start recording.</span>
+    </div>
+    <div ng-if="checkingMicrophonePermission">
+      Loading microphone.<loading-dots></loading-dots>
+    </div>
+    <div ng-if="recordingPermissionDenied && cannotRecord">
+      You need to grant permission for this application to use your microphone.
+    </div>
+    <div ng-if="unsupportedBrowser && cannotRecord">
+      Sorry, your browser does not support recording feature.
+    </div>
+  </div>
+  <button class="btn oppia-audio-button"
+          uib-tooltip="Record" tooltip-placement="bottom"
+          ng-click="checkAndStartRecording()"
+          ng-disabled="!canTranslate || cannotRecord">
+    <i class="material-icons">&#xE029;</i>
+  </button>
+  <button class="btn oppia-audio-button"
+          uib-tooltip="Upload" tooltip-placement="bottom"
+          ng-click="openAddAudioTranslationModal()"
+          ng-disabled="!canTranslate">
+    <i class="material-icons">&#xE2C6;</i>
+  </button>
+</div>
+
+<div class="oppia-audio-recording-bar" ng-show="selectedRecording">
+  <ng-audio-recorder id="<[RECORDER_ID]>"
+                     on-record-start="onRecordStart()"
+                     on-conversion-complete="onConversionComplete()"
+                     audio-model="audioBlob"
+                     time-limit="recordingTimeLimit">
+    <button class="btn oppia-audio-button"
+            ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
+            ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+      <i class="material-icons">
+        {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;']>
+      </i>
+    </button>
+    <div class="oppia-audio-visulaizer">
+      <div class="oppia-mp3-converting" ng-if="recorder.status.isConverting">
+        Converting to mp3<loading-dots></loading-dots>
+      </div>
+      <canvas-sizer id="analyser" >
+        <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording">
+          <ng-audio-recorder-analyzer height="110" wave-color="black" ></ng-audio-recorder-analyzer>
+        </div>
+
+        <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel" >
+          <ng-audio-recorder-wave-view wave-color="#009688" progress-color="#ccc" height="50"></ng-audio-recorder-wave-view>
+        </div>
+      </canvas-sizer>
+    </div>
+
+    <div class="oppia-recording-timer"
+         ng-if="recorder.status.isRecording">
+      <[recorder.elapsedTime | formatTimer]> / <[recorder.timeLimit | formatTimer]>
+    </div>
+    <button class="btn oppia-audio-button"
+            uib-tooltip="Stop" tooltip-placement="bottom"
+            ng-if="recorder.status.isRecording"
+            ng-click="recorder.stopRecord()">
+      <i class="material-icons">&#xE047;</i>
+    </button>
+  </ng-audio-recorder>
+  <button class="btn oppia-audio-button"
+          uib-tooltip="Re-take" tooltip-placement="bottom"
+          ng-if="!recorder.status.isRecording && audioBlob"
+          ng-click="reRecord()">
+    <i class="material-icons">&#xE028;</i>
+  </button>
+  <button class="btn oppia-audio-button"
+          uib-tooltip="Save" tooltip-placement="bottom"
+          ng-if="!recorder.status.isRecording && audioBlob"
+          ng-click="saveRecordedAudio()">
+    <i class="material-icons">&#xE161;</i>
+  </button>
+  <button class="btn oppia-audio-button"
+          uib-tooltip="Cancel" tooltip-placement="bottom"
+          ng-if="!recorder.status.isRecording && audioBlob"
+          ng-click="cancelRecording()">
+    <i class="material-icons">&#xE5C9;</i>
+  </button>
+</div>
+
+<div ng-if="isAudioAvailable && !audioIsUpdating">
+  <button class="btn oppia-audio-button"
+          ng-click="playPauseUploadedAudioTranslation()">
+    <i class="material-icons"><[isPlayingUploadedAudio() ? '&#xE035;' : '&#xE039;']></i>
+  </button>
+  <div class="oppia-slider-section">
+    <div ng-if="audioLoadingIndicatorIsShown">
+      <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+    </div>
+    <div ng-if="!audioLoadingIndicatorIsShown">
+      <md-slider ng-model="track.progress" ng-model-options="{getterSetter: true}" aria-label="audio-slider">
+      </md-slider>
+    </div>
+  </div>
+  <div class="oppia-recording-timer" ng-if="!audioLoadingIndicatorIsShown">
+      <[getUploadedAudioTimer()]>
+  </div>
+  <div class="oppia-audio-extra-buttons">
+    <button class="btn oppia-audio-button"
+            ng-disabled="!canTranslate"
+            uib-tooltip="Record new" tooltip-placement="bottom"
+            ng-click="updateAudio()">
+      <i class="material-icons">&#xE028;</i>
+    </button>
+    <button class="btn oppia-audio-button"
+            uib-tooltip="Delete" tooltip-placement="bottom"
+            ng-disabled="!canTranslate"
+            ng-click="openDeleteAudioTranslationModal()">
+      <i class="material-icons">&#xE872;</i>
+    </button>
+    <div class="btn dropdown oppia-audio-button" type="button"
+         ng-disabled="!canTranslate">
+      <div class="dropdown-toggle" type="button" data-toggle="dropdown">
+        <i class="material-icons">&#xE5D2;</i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li ng-click="openAddAudioTranslationModal()"><a href="">Upload audio</a></li>
+        <li ng-if="!audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Mark need update</a></li>
+        <li ng-if="audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Unmark need update</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="oppia-translation-bottom-right-container" ng-if="showRecorderWarning">
+  <span>
+    <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
+  </span>
+</div>
+
+<style>
+  .oppia-audio-recording-bar {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+  }
+  .oppia-audio-bar-info {
+    float: left;
+    width: 79%;
+    text-align: center;
+    padding: 13px 0px 13px 0px;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+  }
+  .oppia-audio-button {
+    background: white;
+    color: #009688;
+    float: left;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-radius: 0px;
+    padding: 13px;
+    width: 7%
+  }
+  .oppia-audio-visulaizer {
+    width: 72%;
+    float: left;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+  }
+  .oppia-mp3-converting {
+    text-align: center;
+    padding: 13px 0px 13px 0px;
+  }
+  .oppia-recording-timer {
+    float: left;
+    font-size: 14px;
+    width: 14%;
+    text-align: center;
+    padding: 13px 0px 13px 0px;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+  }
+  .oppia-recording-stop-warning {
+    background: red;
+  }
+  .oppia-slider-section {
+    width: 58%;
+    float: left;
+    border-left: 1px solid #ccc;
+    border-right: 2px solid #ccc;
+  }
+  .oppia-translation-bottom-right-container {
+    position: relative;
+    top: 10px;
+    text-align: center;
+    font-size: 12px;
+    color: red;
+  }
+  audio-translation-bar md-progress-linear {
+    padding-top: 20px;
+    height: 50px;
+  }
+  audio-translation-bar md-progress-linear.md-default-theme .md-bar {
+    background-color: #009688;
+  }
+  audio-translation-bar md-slider .md-thumb-container {
+    left: 4px;
+  }
+  audio-translation-bar md-slider {
+    height: 50px;
+  }
+  audio-translation-bar md-slider.md-default-theme .md-track-fill {
+    background-color: #009688;
+  }
+
+  audio-translation-bar md-slider.md-default-theme .md-thumb:after {
+    border-color: #ccc;
+    background-color: #009688;
+  }
+  canvas {
+    background: #EEA;
+    max-width: unset;
+  }
+
+</style>
