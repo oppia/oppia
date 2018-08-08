@@ -95,10 +95,16 @@ md-input-group.md-default-theme label {
 
 .md-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
-.md-button.oppia-learner-try-again-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
   color: #ffffff;
+  padding: 6px 12px;
+}
+.md-button.oppia-learner-try-again-button
+{
+  background:#ffffff;
+  border-color:#0D48A1;
+  color:  #0D48A1;
   padding: 6px 12px;
 }
 
