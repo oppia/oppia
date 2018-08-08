@@ -22,6 +22,7 @@ should therefore be independent of the specific storage models used.
 """
 
 import copy
+import functools
 import logging
 import re
 import string
@@ -1766,7 +1767,8 @@ class State(object):
             feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
     @classmethod
-    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
+    def convert_html_fields_in_state(
+            cls, state_dict, conversion_fn):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -1818,7 +1820,8 @@ class State(object):
                     state_dict['interaction']['customization_args'][
                         'choices']['value']):
                 state_dict['interaction']['customization_args'][
-                    'choices']['value'][value_index] = conversion_fn(value)
+                    'choices']['value'][value_index] = conversion_fn(
+                        value)
 
         return state_dict
 
@@ -3521,6 +3524,7 @@ class Exploration(object):
     def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
         """Converts from version 22 to 23. Version 23 ensures that all
         all oppia-noninteractive-image tags have caption attribute.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
@@ -3553,8 +3557,40 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v24_dict_to_v25_dict(cls, exp_id, states_dict):
+        """Converts from version 24 to 25. Version 25 adds the dimensions of
+        images in the oppia-noninteractive-image tags.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            exp_id: str. ID of the exploration.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            add_dimensions_to_noninteractive_image_tag = functools.partial(
+                html_cleaner.add_dimensions_to_noninteractive_image_tag,
+                exp_id)
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict,
+                add_dimensions_to_noninteractive_image_tag)
+            if state_dict['interaction']['id'] == 'ImageClickInput':
+                filename = state_dict['interaction']['customization_args'][
+                    'imageAndRegions']['value']['imagePath']
+                state_dict['interaction']['customization_args'][
+                    'imageAndRegions']['value']['imagePath'] = (
+                        html_cleaner.get_fileinfo_of_object_image(
+                            filename, exp_id))
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states, current_states_schema_version,
+            exploration_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -3570,12 +3606,15 @@ class Exploration(object):
                     initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
+            exploration_id: str. ID of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
+        if current_states_schema_version == 24:
+            conversion_fn = functools.partial(conversion_fn, exploration_id)
         versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'])
 
@@ -3583,7 +3622,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 29
+    CURRENT_EXP_SCHEMA_VERSION = 30
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4118,8 +4157,22 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v29_dict_to_v30_dict(cls, exploration_dict):
+        """Converts a v29 exploration dict into a v30 exploration dict.
+
+        Adds dimensions to all oppia-noninteractive-image tags.
+        """
+        exploration_dict['schema_version'] = 30
+
+        exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
+            exploration_dict['id'], exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 25
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
-            cls, yaml_content, title=None, category=None):
+            cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
         format.
 
@@ -4127,6 +4180,7 @@ class Exploration(object):
             yaml_content: str. The YAML representation of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
+            exp_id: str. ID of the exploration.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -4294,6 +4348,12 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 29
 
+        if exploration_schema_version == 29:
+            exploration_dict['id'] = exp_id
+            exploration_dict = cls._convert_v29_dict_to_v30_dict(
+                exploration_dict)
+            exploration_schema_version = 30
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4312,7 +4372,8 @@ class Exploration(object):
             Exception: The initial schema version of exploration is less than
                 or equal to 9.
         """
-        migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
@@ -4344,7 +4405,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title=title, category=category)
+            yaml_content, exploration_id, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

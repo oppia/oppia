@@ -359,14 +359,23 @@ class MusicPhrase(BaseObject):
 
 
 class Filepath(BaseObject):
-    """A string representing a filepath.
+    """A dict representing a filepath."""
 
-    The path will be prefixed with '[exploration_id]/assets'.
-    """
+    description = 'A dict that stores the filename, height and width of image'
 
-    description = 'A string that represents a filepath'
-
-    SCHEMA = UnicodeString.SCHEMA
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'filename',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'height',
+            'schema': Int.SCHEMA,
+        }, {
+            'name': 'width',
+            'schema': Int.SCHEMA,
+        }]
+    }
 
 
 class CheckedProof(BaseObject):

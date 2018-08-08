@@ -508,5 +508,5 @@ var constants = {
       }
   },
 
-  "CURRENT_STATES_SCHEMA_VERSION": 24
+  "CURRENT_STATES_SCHEMA_VERSION": 25
 };

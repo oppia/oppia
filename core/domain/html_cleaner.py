@@ -23,8 +23,14 @@ import urlparse
 
 import bleach
 import bs4
+from core.domain import fileinfo_domain
+from core.domain import fs_domain
 from core.domain import rte_component_registry
+from core.platform import models
 import feconf
+
+app_identity_services = models.Registry.import_app_identity_services()
+gae_image_services = models.Registry.import_gae_image_services()
 
 
 def filter_a(name, value):
@@ -790,3 +796,50 @@ def add_caption_attr_to_image(html_string):
             image['caption-with-value'] = escape_html(json.dumps(''))
 
     return unicode(soup)
+
+
+def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
+    """Adds dimensions to all oppia-noninteractive-image tags.
+
+    Args:
+        html_string: str. HTML string in which the dimensions is to be
+            added.
+        exp_id: str. Exploration id.
+
+    Returns:
+        str. Updated HTML string with the dimensions for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        filename = unescape_html(image['filepath-with-value'])
+        filename = filename[1:-1]
+        image['filepath-with-value'] = escape_html(json.dumps(
+            get_fileinfo_of_object_image(filename, exp_id)))
+    return unicode(soup)
+
+
+def get_fileinfo_of_object_image(filename, exp_id):
+    """Gets the dict containing the image's filename, height and width.
+
+    Args:
+        filename: str. Name of the file whose dimensions need to be
+            calculated.
+        exp_id: str. Exploration id.
+
+    Returns:
+        dict. A dict representing Fileinfo object of the image.
+    """
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+    filepath = (
+        filename if feconf.DEV_MODE
+        else ('image/%s' % filename))
+    content = fs.get(filepath)
+    height, width = gae_image_services.get_image_dimensions(content)
+    fileinfo = fileinfo_domain.Fileinfo(
+        filename, height=height, width=width)
+    return fileinfo.to_dict()

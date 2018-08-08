@@ -54,7 +54,11 @@ var richTextComponents = {
         "type": "custom",
         "obj_type": "Filepath"
       },
-      "default_value": ""
+      "default_value": {
+        "filename": "",
+        "height": 0,
+        "width": 0
+      }
     }, {
       "name": "caption",
       "description": "Caption for image (optional)",

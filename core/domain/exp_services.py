@@ -64,7 +64,7 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 MAX_ITERATIONS = 10
 
 
-def _migrate_states_schema(versioned_exploration_states):
+def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -76,11 +76,12 @@ def _migrate_states_schema(versioned_exploration_states):
     for that new version.
 
     Args:
-        versioned_exploration_states: A dict with two keys:
+        versioned_exploration_states: dict. A dict with two keys:
             states_schema_version: int. the states schema version for the
                 exploration.
             states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
+        exploration_id: str. ID of the exploration.
 
     Raises:
         Exception: The given states_schema_version is invalid.
@@ -100,7 +101,8 @@ def _migrate_states_schema(versioned_exploration_states):
     while (states_schema_version <
            feconf.CURRENT_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version)
+            versioned_exploration_states, states_schema_version,
+            exploration_id)
         states_schema_version += 1
 
 
@@ -157,7 +159,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATES_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states)
+        _migrate_states_schema(
+            versioned_exploration_states, exploration_model.id)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -1498,6 +1501,15 @@ def save_new_exploration_from_yaml_and_assets(
         raise Exception('Invalid YAML file: missing schema version')
     exp_schema_version = yaml_dict['schema_version']
 
+    # The assets are commited before the exploration is created because the
+    # migrating to state schema version 24 involves adding dimensions to the
+    # So we need to have images in the datastore before we could perform the
+    # migration.
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        fs.commit(committer_id, asset_filename, asset_content)
+
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
@@ -1527,10 +1539,6 @@ def save_new_exploration_from_yaml_and_assets(
                 'category': exploration.category,
             })])
 
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
 
 
 def delete_demo(exploration_id):
@@ -1645,7 +1653,7 @@ def get_image_filenames_from_exploration(exploration):
     for state in exploration.states.itervalues():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions']['value']['imagePath']['filename'])
 
     html_list = exploration.get_all_html_content_strings()
     rte_components_in_exp = []
@@ -1658,7 +1666,8 @@ def get_image_filenames_from_exploration(exploration):
         if 'id' in rte_comp and (
                 str(rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
+                rte_comp['customization_args']['filepath-with-value'][
+                    'filename'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
 

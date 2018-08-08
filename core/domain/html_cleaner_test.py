@@ -16,7 +16,10 @@
 
 """Tests for the HTML sanitizer."""
 
+import os
+
 import bs4
+from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.tests import test_utils
 import feconf
@@ -188,6 +191,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
     strings to valid RTE format.
     """
+    owner_id = 'ADMIN'
+    EXP_ID = 'eid'
 
     def test_wrap_with_siblings(self):
         test_cases = [{
@@ -783,4 +788,49 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 html_cleaner.add_caption_attr_to_image(
                     test_case['html_content']),
+                test_case['expected_output'])
+
+    def test_add_dimensions_to_noninteractive_image_tag(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'abc.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                ' is test case to check that dimensions are added to the oppia'
+                ' noninteractive image tags.</p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image filepath-with-value='
+                '"{&amp;quot;width&amp;quot;: 32, &amp;quot;height&amp;quot;:'
+                ' 32, &amp;quot;filename&amp;quot;: &amp;quot;abc.png&amp;'
+                'quot;}"></oppia-noninteractive-image>Hello this is test case'
+                ' to check that dimensions are added to the oppia '
+                'noninteractive image tags.</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'abc.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                ' is test case to check that dimensions are added to the oppia'
+                ' noninteractive image tags.</p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image filepath-with-value='
+                '"{&amp;quot;width&amp;quot;: 32, &amp;quot;height&amp;quot;:'
+                ' 32, &amp;quot;filename&amp;quot;: &amp;quot;abc.png&amp;'
+                'quot;}"></oppia-noninteractive-image>Hello this is test case'
+                ' to check that dimensions are added to the oppia '
+                'noninteractive image tags.</p>'
+            )
+        }]
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        fs.commit(self.owner_id, 'abc.png', raw_image, mimetype='image/png')
+        self.assertEqual(fs.isfile('abc.png'), True)
+        for test_case in test_cases:
+            self.assertEqual(
+                html_cleaner.add_dimensions_to_noninteractive_image_tag(
+                    self.EXP_ID, test_case['html_content']),
                 test_case['expected_output'])

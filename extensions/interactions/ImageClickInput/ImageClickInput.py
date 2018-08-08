@@ -42,7 +42,11 @@ class ImageClickInput(base.BaseInteraction):
             'obj_type': 'ImageWithRegions',
         },
         'default_value': {
-            'imagePath': '',
+            'imagePath': {
+                'filename': '',
+                'height': 0,
+                'width': 0
+            },
             'labeledRegions': []
         },
     }, {

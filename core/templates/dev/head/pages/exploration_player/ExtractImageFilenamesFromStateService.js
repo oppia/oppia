@@ -117,7 +117,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      */
     var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
-      var filenames = [];
+      var fileInfos = [];
       var dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
@@ -126,14 +126,12 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
         // We have the attribute of filepath in oppia-noninteractive-image tag.
-        // But it actually contains the filename only. We use the variable
-        // filename instead of filepath since in the end we are retrieving the
-        // filenames in the exploration.
-        var filename = JSON.parse(
+        // But it actually contains the filename, height, width of image.
+        var fileInfo = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
-        filenames.push(filename);
+        fileInfos.push(fileInfo);
       }
-      return filenames;
+      return fileInfos;
     };
 
     /**
@@ -142,15 +140,13 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     *                           images should be extracted.
     */
     var _getImageDimensionsFromFilepathValue = function(htmlStr) {
-      var filenames = (
+      var fileInfos = (
         _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
       var fileDimensions = {};
-      // Currently we don't have dimensions of the images stored in backend. So
-      // we assign default dimensions to the images 500px x 200px.
-      filenames.forEach(function(filename){
-        fileDimensions[filename] = {
-          width: 500,
-          height: 200
+      fileInfos.forEach(function(fileInfo){
+        fileDimensions[fileInfo.filename] = {
+          width: fileInfo.width,
+          height: fileInfo.height
         };
       });
       return fileDimensions;
@@ -164,14 +160,14 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var _getImageDimensionsInState = function(state) {
       var fileDimensions = {};
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-      // The Image Click Input interaction has an image whose filename is
-      // directly stored in the customizationArgs.imageAndRegion.value
-      // .imagePath
-        var filename = (
+        // The Image Click Input interaction has an image whose filename,
+        // height, is directly stored in the customizationArgs.imageAndRegion
+        // .value.imagePath as a dict.
+        var fileInfo = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        fileDimensions[filename] = {
-          width: 500,
-          height: 200
+        fileDimensions[fileInfo.filename] = {
+          width: fileInfo.width,
+          height: fileInfo.height
         };
       }
       var allHtmlOfState = _getAllHtmlOfState(state);
@@ -193,14 +189,17 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var filename = (
+        var fileInfo = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        filenamesInState.push(filename);
+        filenamesInState.push(fileInfo.filename);
       }
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
-        filenamesInState = filenamesInState.concat(
+        var fileInfos = (
           _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        fileInfos.forEach(function(fileInfo) {
+          filenamesInState.push(fileInfo.filename);
+        });
       });
       return filenamesInState;
     };

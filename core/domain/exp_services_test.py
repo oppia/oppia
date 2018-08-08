@@ -25,6 +25,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -610,29 +611,36 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
 
-        for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.utcnow()
+        def _mock_get_fileinfo_of_object_image(filename, unused_exp_id):
+            return {'filename': filename, 'height': 490, 'width': 120}
 
-            exp_services.load_demo(exp_id)
-            exploration = exp_services.get_exploration_by_id(exp_id)
-            warnings = exploration.validate(strict=True)
-            if warnings:
-                raise Exception(warnings)
+        with self.swap(
+            html_cleaner, 'get_fileinfo_of_object_image',
+            _mock_get_fileinfo_of_object_image):
 
-            duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + duration.microseconds / 1E6
-            self.log_line(
-                'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title.encode('utf-8'), processing_time))
+            for exp_id in demo_exploration_ids:
+                start_time = datetime.datetime.utcnow()
 
-        self.assertEqual(
-            exp_models.ExplorationModel.get_exploration_count(),
-            len(demo_exploration_ids))
+                exp_services.load_demo(exp_id)
+                exploration = exp_services.get_exploration_by_id(exp_id)
+                warnings = exploration.validate(strict=True)
+                if warnings:
+                    raise Exception(warnings)
 
-        for exp_id in demo_exploration_ids:
-            exp_services.delete_demo(exp_id)
-        self.assertEqual(
-            exp_models.ExplorationModel.get_exploration_count(), 0)
+                duration = datetime.datetime.utcnow() - start_time
+                processing_time = duration.seconds + duration.microseconds / 1E6
+                self.log_line(
+                    'Loaded and validated exploration %s (%.2f seconds)' %
+                    (exploration.title.encode('utf-8'), processing_time))
+
+            self.assertEqual(
+                exp_models.ExplorationModel.get_exploration_count(),
+                len(demo_exploration_ids))
+
+            for exp_id in demo_exploration_ids:
+                exp_services.delete_demo(exp_id)
+            self.assertEqual(
+                exp_models.ExplorationModel.get_exploration_count(), 0)
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
@@ -884,7 +892,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'html': (
                 '<blockquote>Hello, this is state1</blockquote><p>'
                 '<oppia-noninteractive-image filepath-with-value='
-                '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
+                '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                's1Content.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
                 '</oppia-noninteractive-image></p>')
         }
@@ -908,7 +918,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'highlightRegionsOnHover': {'value': True},
             'imageAndRegions': {
                 'value': {
-                    'imagePath': 's1ImagePath.png',
+                    'imagePath': {
+                        'filename': 's1ImagePath.png',
+                        'height': 120,
+                        'width': 490
+                    },
                     'labeledRegions': [{
                         'label': 'classdef',
                         'region': {
@@ -927,14 +941,18 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's2Choice1.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
                 ),
                 (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's2Choice2.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
@@ -945,21 +963,27 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's3Choice1.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>'),
                 (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's3Choice2.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>'),
                 (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's3Choice3.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
@@ -987,8 +1011,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'content_id': 'hint_1',
                 'html': (
                     '<p>Hello, this is html1 for state2'
-                    '<oppia-noninteractive-image filepath-with-value="'
-                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                    's2Hint1.png&amp;quot;, &amp;quot;width&amp;quot;: 120,'
+                    ' &amp;quot;height&amp;quot;: 490}" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
@@ -1016,7 +1042,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     'html': (
                         '<p>Outcome1 for state2<oppia-noninteractive-image'
                         ' filepath-with-value='
-                        '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
+                        '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                        's2AnswerGroup.png&amp;quot;, &amp;quot;width'
+                        '&amp;quot;: 120, &amp;quot;height&amp;quot;: 490}"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
@@ -1054,7 +1082,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     (
                         '<p>This is value1 for ItemSelection'
                         '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
+                        '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                        's3Choice1.png&amp;quot;, &amp;quot;width&amp;'
+                        'quot;: 120, &amp;quot;height&amp;quot;: 490}"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
@@ -1065,7 +1095,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     (
                         '<p>This is value3 for ItemSelection'
                         '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
+                        '"{&amp;quot;filename&amp;quot;: &amp;quot;'
+                        's3Choice3.png&amp;quot;, &amp;quot;width&amp;quot;:'
+                        ' 120, &amp;quot;height&amp;quot;: 490}"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
