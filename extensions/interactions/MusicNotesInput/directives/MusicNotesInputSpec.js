@@ -24,7 +24,7 @@ describe('MusicNotesInput interaction', function() {
     beforeEach(module('directiveTemplates'));
     beforeEach(module(
       'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS, function($provide) {
-        $provide.value('ExplorationPlayerService', {});
+        $provide.value('ExplorationEngineService', {});
       }
     ));
 

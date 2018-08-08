@@ -28,7 +28,7 @@ oppia.factory('PlayerPositionService', [
         onChangeCallback = callback;
       },
       getCurrentStateName: function() {
-        return PlayerTranscriptService.getCard(activeCardIndex).stateName;
+        return PlayerTranscriptService.getCard(activeCardIndex).getStateName();
       },
       setActiveCardIndex: function(index) {
         var oldIndex = activeCardIndex;

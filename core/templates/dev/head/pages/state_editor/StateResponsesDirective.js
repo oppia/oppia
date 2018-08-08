@@ -272,7 +272,7 @@ oppia.directive('stateResponses', [
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
-            var stateName = $scope.stateName;
+            var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

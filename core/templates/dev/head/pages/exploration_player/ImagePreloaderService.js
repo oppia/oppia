@@ -18,11 +18,11 @@
 
 oppia.factory('ImagePreloaderService', [
   '$q', '$uibModal', 'ContextService', 'AssetsBackendApiService',
-  'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'ComputeGraphService', 'ExtractImageFilenamesFromStateService',
+  'UrlInterpolationService', 'ComputeGraphService',
+  'ExtractImageFilenamesFromStateService',
   function($q, $uibModal, ContextService, AssetsBackendApiService,
-      ExplorationPlayerStateService, UrlInterpolationService,
-      ComputeGraphService, ExtractImageFilenamesFromStateService) {
+      UrlInterpolationService, ComputeGraphService,
+      ExtractImageFilenamesFromStateService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];
