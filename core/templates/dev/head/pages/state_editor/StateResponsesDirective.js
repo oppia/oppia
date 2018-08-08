@@ -301,13 +301,9 @@ oppia.directive('stateResponses', [
                   var feedbackContentId = GenerateContentIdService.getNextId(
                     COMPONENT_NAME_FEEDBACK);
 
-                  if ($scope.questionModeEnabled) {
-                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                      null, feedbackContentId, '', []);
-                  } else {
-                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                      stateName, feedbackContentId, '', []);
-                  }
+                  $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+                    $scope.questionModeEnabled ? null : stateName,
+                    feedbackContentId, '', []);
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (

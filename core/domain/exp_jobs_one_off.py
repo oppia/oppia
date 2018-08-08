@@ -36,6 +36,8 @@ import utils
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
+
+ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
@@ -44,6 +46,8 @@ FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
 FILE_DELETED = 'File has been deleted'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
+ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
+    'Added compressed versions of images in exploration')
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
 FILE_MODEL_ID_REGEX = re.compile(
@@ -772,3 +776,41 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
             yield (NUMBER_OF_FILES_DELETED, len(values))
         else:
             yield (status, values)
+
+
+class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating compressed versions of the images
+    of the exploration in the GCS.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        current_version = exp_model.version
+        version_numbers = range(1, current_version + 1)
+        list_of_exploration_models = (exp_model.get_multi_versions(
+            exp_model.id, version_numbers))
+        filenames = []
+        for exploration_model in list_of_exploration_models:
+            exploration = exp_services.get_exploration_from_model(
+                exploration_model)
+            filenames_in_version = (
+                exp_services.get_image_filenames_from_exploration(exploration))
+            filenames = list(set().union(filenames, filenames_in_version))
+        for filename in filenames:
+            file_system_class = (
+                fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+                else fs_domain.GcsFileSystem)
+            fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
+            filepath = (
+                filename if feconf.DEV_MODE else 'image/%s' % filename)
+            raw_data = fs.get(filepath)
+            exp_services.save_original_and_compressed_versions_of_image(
+                'ADMIN', filename, exp_model.id, raw_data)
+        yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
+
+    @staticmethod
+    def reduce(status, values):
+        yield (status, values)

@@ -18,7 +18,12 @@
 
 oppia.factory('IssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
-  function($sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT) {
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
+  function(
+      $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -28,11 +33,47 @@ oppia.factory('IssuesService', [
       return 'Several learners exited the exploration in less than a minute.';
     };
 
+    var renderMultipleIncorrectIssueStatement = function(stateName) {
+      var statement =
+        'Several learners submitted answers to card "' + stateName +
+        '" several times, then gave up and quit.';
+      return statement;
+    };
+
+    var renderCyclicTransitionsIssueStatement = function(stateName) {
+      return (
+        'Several learners ended up in a cyclic loop revisiting card "' +
+        stateName + '" many times.');
+    };
+
     var renderEarlyQuitIssueSuggestions = function(issue) {
       var suggestions = [$sce.trustAsHtml(
         'Review the cards up to and including <span class="state_link">' +
-        '"' + issue.issueCustomizationArgs.state_name.value + '</span> for' +
+        '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
         ' errors, ambiguities or insufficient motivation.'
+      )];
+      return suggestions;
+    };
+
+    var renderMultipleIncorrectIssueSuggestions = function(stateName) {
+      var suggestions = [$sce.trustAsHtml(
+        'Check the wording of the card <span class="state_link">"' +
+        stateName + '</span> to ensure it is not confusing.'
+      ), $sce.trustAsHtml(
+        'Consider addressing the answers submitted in the sample playthroughs' +
+        ' explicitly, using answer groups.'
+      )];
+      return suggestions;
+    };
+
+    var renderCyclicTransitionsIssueSuggestions = function(issue) {
+      var stateNames = issue.issueCustomizationArgs.state_names.value;
+      var finalIndex = stateNames.length - 1;
+      var suggestions = [$sce.trustAsHtml(
+        'Check that the concept presented in <span class="state_link">"' +
+        stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
+        'time the learner gets to <span class="state_link">"' +
+        stateNames[finalIndex] + '</span>.'
       )];
       return suggestions;
     };
@@ -55,13 +96,26 @@ oppia.factory('IssuesService', [
         });
       },
       renderIssueStatement: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueStatement();
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueStatement(
+            issue.issueCustomizationArgs.state_name.value);
+        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
+          return renderCyclicTransitionsIssueStatement(
+            issue.issueCustomizationArgs.state_names.value[0]);
         }
       },
       renderIssueSuggestions: function(issue) {
-        if (issue.issueType === ISSUE_TYPE_EARLY_QUIT) {
+        var issueType = issue.issueType;
+        if (issueType === ISSUE_TYPE_EARLY_QUIT) {
           return renderEarlyQuitIssueSuggestions(issue);
+        } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+          return renderMultipleIncorrectIssueSuggestions(
+            issue.issueCustomizationArgs.state_name.value);
+        } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
+          return renderCyclicTransitionsIssueSuggestions(issue);
         }
       }
     };
