@@ -40,7 +40,7 @@ class BaseRteComponent(object):
         'Filepath': objects.Filepath,
         'SanitizedUrl': objects.SanitizedUrl,
         'MathLatexString': objects.MathLatexString,
-        'ListOfTabs': objects.ListOfTabs,
+        'list': objects.ListOfTabs,
         'int': objects.Int,
         'bool': objects.Boolean
     }

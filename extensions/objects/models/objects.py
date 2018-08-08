@@ -364,26 +364,18 @@ class ListOfTabs(BaseObject):
     description = 'Tab content that contains list of tabs.'
 
     SCHEMA = {
-        "type": "list",
-        "items": {
-            "type": "dict",
-            "properties": [{
-                "name": "title",
-                "description": "Tab title",
-                "schema": {
-                    "type": "unicode",
-                    "validators": [{
-                        "id": "is_nonempty"
-                    }]
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'title',
+                'schema': {
+                    'type': 'unicode',
                 }
             }, {
-                "name": "content",
-                "description": "Tab content",
-                "schema": {
-                    "type": "html",
-                    "ui_config": {
-                        "hide_complex_extensions": True
-                    }
+                'name': 'content',
+                'schema': {
+                    'type': 'html',
                 }
             }]
         }
