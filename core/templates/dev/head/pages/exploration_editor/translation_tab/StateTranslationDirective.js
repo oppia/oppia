@@ -20,17 +20,19 @@ oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
+        '$scope', '$filter', '$rootScope', 'StateEditorService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
         'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'ExplorationCorrectnessFeedbackService', 'RouterService',
         function(
-            $scope, $filter, $timeout, $rootScope, EditorStateService,
+            $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
             INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             ExplorationCorrectnessFeedbackService, RouterService) {
@@ -41,7 +43,6 @@ oppia.directive('stateTranslation', [
           $scope.TAB_ID_FEEDBACK = 'feedback';
           $scope.TAB_ID_HINTS = 'hints';
           $scope.TAB_ID_SOLUTION = 'solution';
-          $rootScope.loadingMessage = 'Loading';
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -54,6 +55,7 @@ oppia.directive('stateTranslation', [
           $scope.stateDefaultOutcome = null;
           $scope.stateHints = [];
           $scope.stateSolution = null;
+          $scope.activeContentId = null;
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
@@ -64,9 +66,30 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.onTabClick = function(tabId) {
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            if (tabId === $scope.TAB_ID_CONTENT) {
+              $scope.activeContentId = $scope.stateContent.getContentId();
+            } else if (tabId === $scope.TAB_ID_FEEDBACK) {
+              $scope.activeAnswerGroupIndex = 0;
+              if ($scope.stateAnswerGroups.length > 0) {
+                $scope.activeContentId = $scope.stateAnswerGroups[0]
+                  .outcome.feedback.getContentId();
+              } else {
+                $scope.activeContentId = $scope.stateDefaultOutcome
+                  .feedback.getContentId();
+              }
+            } else if (tabId === $scope.TAB_ID_HINTS) {
+              $scope.activeHintIndex = 0;
+              $scope.activeContentId = $scope.stateHints[0]
+                .hintContent.getContentId();
+            } else if (tabId === $scope.TAB_ID_SOLUTION) {
+              $scope.activeContentId = $scope.stateSolution.explanation
+                .getContentId();
+            }
             $scope.activatedTabId = tabId;
-            $scope.activeHintIndex = null;
-            $scope.activeAnswerGroupIndex = null;
           };
 
           $scope.summarizeDefaultOutcome = function(
@@ -153,23 +176,35 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.changeActiveHintIndex = function(newIndex) {
-            // If the current hint is being clicked on again, close it.
-            if (newIndex === $scope.activeHintIndex) {
-              $scope.activeHintIndex = null;
-            } else {
-              $scope.activeHintIndex = newIndex;
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
             }
+            if ($scope.activeHintIndex === newIndex) {
+              return;
+            }
+            $scope.activeHintIndex = newIndex;
+            $scope.activeContentId = $scope.stateHints[newIndex]
+              .hintContent.getContentId();
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-            // If the current answer group is being clicked on again, close it.
-            if (newIndex === $scope.activeAnswerGroupIndex) {
-              $scope.activeAnswerGroupIndex = null;
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            if ($scope.activeAnswerGroupIndex === newIndex) {
+              return;
+            }
+            $scope.activeAnswerGroupIndex = newIndex;
+            if (newIndex === $scope.stateAnswerGroups.length) {
+              $scope.activeContentId = $scope.stateDefaultOutcome
+                .feedback.getContentId();
             } else {
-              $scope.activeAnswerGroupIndex = newIndex;
+              $scope.activeContentId = $scope.stateAnswerGroups[newIndex]
+                .outcome.feedback.getContentId();
             }
           };
-
 
           $scope.getHtmlSummary = function(subtitledHtml) {
             var htmlAsPlainText = $filter(
@@ -184,12 +219,12 @@ oppia.directive('stateTranslation', [
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
-            if (!EditorStateService.getActiveStateName()) {
-              EditorStateService.setActiveStateName(
+            if (!StateEditorService.getActiveStateName()) {
+              StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.displayed);
             }
 
-            var stateName = EditorStateService.getActiveStateName();
+            var stateName = StateEditorService.getActiveStateName();
 
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);
@@ -205,7 +240,8 @@ oppia.directive('stateTranslation', [
               .getInteractionIdMemento(stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
-            $rootScope.loadingMessage = '';
+
+            $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 
           // TODO(DubeySandeep): We need to call initStateTranslation() here in
@@ -215,6 +251,7 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
+          $rootScope.loadingMessage = '';
         }
       ]
     };

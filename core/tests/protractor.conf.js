@@ -57,8 +57,12 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
+    // The tests on Travis are run individually to parallelize
+    // them. Therefore, we mention the complete directory
+    // in 'full'.
     full: [
-      'protractor/*.js'
+      'protractor/*.js',
+      'protractor_desktop/*.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in
@@ -68,39 +72,55 @@ exports.config = {
     ],
 
     collections: [
-      'protractor/collections.js'
+      'protractor_desktop/collections.js'
     ],
 
     editorAndPlayer: [
-      'protractor/editorAndPlayer.js',
-    ],
-
-    stateEditor: [
-      'protractor/stateEditor.js',
+      'protractor_desktop/editorAndPlayer.js',
     ],
 
     editorFeatures: [
-      'protractor/editorFeatures.js'
+      'protractor_desktop/editorFeatures.js'
     ],
 
     embedding: [
-      'protractor/embedding.js'
+      'protractor_desktop/embedding.js'
     ],
 
     extensions: [
-      'protractor/extensions.js'
+      'protractor_desktop/extensions.js'
     ],
 
-    learnerDashboard: [
-      'protractor/learnerDashboard.js'
+    learnerDashboardSubscriptionsAndFeedbackThreads: [
+      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
+    ],
+
+    learner: [
+      'protractor/learnerFlow.js'
     ],
 
     library: [
-      'protractor/publicationAndLibrary.js'
+      'protractor/libraryFlow.js'
+    ],
+
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
+    ],
+
+    publication: [
+      'protractor_desktop/publicationAndLibrary.js'
+    ],
+
+    stateEditor: [
+      'protractor_desktop/stateEditor.js',
+    ],
+
+    subscriptions: [
+      'protractor/subscriptionsFlow.js'
     ],
 
     users: [
-      'protractor/userJourneys.js',
+      'protractor_desktop/userJourneys.js',
     ],
   },
 
@@ -146,6 +166,7 @@ exports.config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
+    browser.isMobile = false;
     // At this point, global 'protractor' object will be set up, and jasmine
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(

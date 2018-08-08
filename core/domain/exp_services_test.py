@@ -38,6 +38,7 @@ import utils
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -794,7 +795,7 @@ title: Title
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exp.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
         test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
@@ -1098,6 +1099,32 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
+class SaveOriginalAndCompressedVersionsOfImageTests(
+        ExplorationServicesUnitTests):
+    """Test for saving the three versions of the image file."""
+
+    EXPLORATION_ID = 'exp_id'
+    FILENAME = 'image.png'
+    COMPRESSED_IMAGE_FILENAME = 'image_compressed.png'
+    MICRO_IMAGE_FILENAME = 'image_micro.png'
+    USER = 'ADMIN'
+
+    def test_save_original_and_compressed_versions_of_image(self):
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+        self.assertEqual(fs.isfile(self.FILENAME), False)
+        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
+        exp_services.save_original_and_compressed_versions_of_image(
+            self.USER, self.FILENAME, self.EXPLORATION_ID,
+            original_image_content)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
+        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
+        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
+
+
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
@@ -1180,7 +1207,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
@@ -1260,7 +1287,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -2891,7 +2918,7 @@ title: Old Title
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2917,14 +2944,14 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self):
         exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_then_reversion_maintains_valid_exploration(self):
@@ -3022,7 +3049,7 @@ title: Old Title
             exploration_model, run_conversion=False)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The exploration should be valid after conversion.
         exploration.validate(strict=True)
@@ -3062,12 +3089,12 @@ title: Old Title
             'committer_id': feconf.MIGRATION_BOT_USERNAME,
             'commit_message':
                 'Update exploration states from schema version 0 to %d.' %
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+                feconf.CURRENT_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
                 'to_version': str(
-                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                    feconf.CURRENT_STATES_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }
@@ -3116,7 +3143,7 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(exp_id)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # The converted exploration should be up-to-date and properly
         # converted.

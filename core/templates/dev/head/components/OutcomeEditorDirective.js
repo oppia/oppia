@@ -34,14 +34,15 @@ oppia.directive('outcomeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditorStateService',
+        '$scope', '$uibModal', 'StateEditorService',
         'StateContentIdsToAudioTranslationsService',
         'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, $uibModal, EditorStateService,
+            $scope, $uibModal, StateEditorService,
             StateContentIdsToAudioTranslationsService,
             StateInteractionIdService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
@@ -55,7 +56,7 @@ oppia.directive('outcomeEditor', [
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return EditorStateService.getCorrectnessFeedbackEnabled();
+            return StateEditorService.getCorrectnessFeedbackEnabled();
           };
 
           // This returns false if the current interaction ID is null.
@@ -122,7 +123,7 @@ oppia.directive('outcomeEditor', [
           $scope.isSelfLoop = function(outcome) {
             return (
               outcome &&
-              outcome.dest === EditorStateService.getActiveStateName());
+              outcome.dest === StateEditorService.getActiveStateName());
           };
 
           $scope.getCurrentInteractionId = function() {

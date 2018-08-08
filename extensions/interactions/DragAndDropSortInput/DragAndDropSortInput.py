@@ -52,7 +52,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [''],
+        'default_value': ['', ''],
     }]
 
     _answer_visualization_specs = []

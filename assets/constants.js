@@ -474,7 +474,7 @@ var constants = {
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false,
 
-  "ENABLE_NEW_STRUCTURES": false,
+  "ENABLE_NEW_STRUCTURES": true,
 
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
@@ -506,5 +506,7 @@ var constants = {
           "content": {},
           "default_outcome": {}
       }
-  }
+  },
+
+  "CURRENT_STATES_SCHEMA_VERSION": 24
 };

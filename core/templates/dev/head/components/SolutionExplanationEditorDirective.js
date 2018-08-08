@@ -28,12 +28,14 @@ oppia.directive('solutionExplanationEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService',
+        '$scope', '$uibModal', 'EditabilityService', 'StateEditorService',
         'StateContentIdsToAudioTranslationsService', 'StateSolutionService',
-        function($scope, $uibModal, EditabilityService,
-            StateContentIdsToAudioTranslationsService, StateSolutionService) {
+        'COMPONENT_NAME_SOLUTION',
+        function($scope, $uibModal, EditabilityService, StateEditorService,
+            StateContentIdsToAudioTranslationsService, StateSolutionService,
+            COMPONENT_NAME_SOLUTION) {
           $scope.isEditable = EditabilityService.isEditable();
-
+          $scope.questionModeEnabled = StateEditorService.isInQuestionMode();
           $scope.editSolutionForm = {};
           $scope.explanationEditorIsOpen = false;
 

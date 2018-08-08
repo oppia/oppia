@@ -78,7 +78,7 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'translation'">
+      <div ng-if="getTabStatuses().active === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
@@ -289,6 +289,8 @@
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
+
 
   <script src="/templates/dev/head/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
@@ -296,6 +298,13 @@
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/PieChartDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/LearnerActionRenderService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesBackendApiService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/MultipleIncorrectIssueDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/CyclicTransitionsIssueDirective.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
 
@@ -313,7 +322,7 @@
   <script src="/templates/dev/head/pages/state_editor/StateSolutionEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateResponsesDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateEditorDirective.js"></script>
-  <script src="/templates/dev/head/pages/state_editor/EditorStateService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
 
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
