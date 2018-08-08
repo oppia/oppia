@@ -720,11 +720,11 @@ oppia.directive('conversationSkin', [
                   newStateName, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, contentHtml, newParams,
                   refresherExplorationId, missingPrerequisiteSkillId,
-                  onSameCard, wasOldStateInitial, isFirstHit) {
+                  remainOnCurrentCard, wasOldStateInitial, isFirstHit) {
                 if (!_editorPreviewMode) {
                   var oldStateName =
                     ExplorationEngineService.getCurrentStateName();
-                  if (!onSameCard) {
+                  if (!remainOnCurrentCard) {
                     StatsReportingService.recordStateTransition(
                       oldStateName, newStateName, answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
@@ -761,7 +761,7 @@ oppia.directive('conversationSkin', [
                     componentName: COMPONENT_NAME_FEEDBACK
                   });
 
-                  if (onSameCard) {
+                  if (remainOnCurrentCard) {
                     // Stay on the same card.
                     HintsAndSolutionManagerService.recordWrongAnswer();
 
@@ -893,7 +893,7 @@ oppia.directive('conversationSkin', [
           $scope.showPendingCard = function(
               newStateName, newParams, newContentHtml) {
             $scope.startCardChangeAnimation = true;
-            ExplorationEngineService.recordAddNewCard();
+            ExplorationEngineService.recordNewCardAdded();
 
             $timeout(function() {
               var newInteractionHtml =
@@ -941,7 +941,7 @@ oppia.directive('conversationSkin', [
               return;
             }
             if ($scope.activeCard.getLeadsToConceptCard()) {
-              ExplorationEngineService.recordAddNewCard();
+              ExplorationEngineService.recordNewCardAdded();
               _addNewCard(
                 null, null, $scope.conceptCard.getExplanation(), null);
               return;

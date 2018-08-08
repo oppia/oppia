@@ -38,6 +38,16 @@ describe('State card object factory', function() {
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);
     expect(_sampleCard.getDestStateName()).toEqual(null);
     expect(_sampleCard.getLeadsToConceptCard()).toEqual(false);
+
+    _sampleCard.addInputResponsePair({
+      oppiaResponse: 'response'
+    });
+
+    expect(_sampleCard.getOppiaResponse(0)).toEqual('response');
+    expect(_sampleCard.getLastOppiaResponse()).toEqual('response');
+    expect(_sampleCard.getLastInputResponsePair()).toEqual({
+      oppiaResponse: 'response'
+    });
   });
 
   it('should add input response pair', function() {
@@ -53,5 +63,14 @@ describe('State card object factory', function() {
     expect(_sampleCard.getDestStateName()).toEqual('state 2');
     _sampleCard.setLeadsToConceptCard(true);
     expect(_sampleCard.getLeadsToConceptCard()).toEqual(true);
+
+    _sampleCard.addInputResponsePair({
+      oppiaResponse: 'response'
+    });
+    _sampleCard.setOppiaResponse(0, 'response_2');
+    expect(_sampleCard.getOppiaResponse(0)).toEqual('response_2');
+
+    _sampleCard.setLastOppiaResponse('response_3');
+    expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');
   });
 });

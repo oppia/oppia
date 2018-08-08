@@ -129,8 +129,8 @@ oppia.controller('PreviewTab', [
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
           explorationId).then(function(returnDict) {
           ExplorationEngineService.init(
-            returnDict, null, null, null, function(exploration, initHtml,
-                newParams) {
+            returnDict, null, null, null,
+            function(exploration, initHtml, newParams) {
               $scope.loadPreviewState(initStateNameForPreview, []);
             });
           PlayerCorrectnessFeedbackEnabledService.init(

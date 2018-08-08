@@ -114,13 +114,11 @@ oppia.directive('progressNav', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
-            var lastPair = $scope.activeCard.getInputResponsePairs()[
-              $scope.activeCard.getInputResponsePairs().length - 1];
             return Boolean(
               interactionIsInline &&
               ($scope.activeCard.getDestStateName() ||
               $scope.activeCard.getLeadsToConceptCard()) &&
-              lastPair.oppiaResponse);
+              $scope.activeCard.getLastOppiaResponse());
           };
         }
       ]

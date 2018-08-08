@@ -22,32 +22,13 @@
 // learner has 'discovered' so far.
 oppia.factory('PlayerTranscriptService', [
   '$log', 'StateCardObjectFactory', function($log, StateCardObjectFactory) {
-    // Each element of this array represents a 'card' in the learner view,
-    // represented as a JavaScript object with the following keys:
-    // - stateName: the name of the state
-    // - currentParams: an object with the current parameter names and values.
-    //   Each object has two keys:
-    //   - parameterName: the name of the parameter
-    //   - parameterValue: the new value of the parameter
-    // - contentHtml: the HTML representing the non-interactive content, i.e.
-    //     what Oppia first says to the learner before asking for a response
-    // - interactionHtml: the HTML representing the interaction
-    // - inputResponsePairs: a list of input response pairs:
-    //   - learnerInput: the JS representation of the learner's input. This can
-    //       either be an answer or a request for a hint.
-    //   - oppiaResponse: the HTML representation of Oppia's response to
-    //       the learner's input. This could either be a hint or a feedback for
-    //       the learner's answer.
-    //   - isHint: A boolean value representing if the current input is a
-    //       request for a hint.
-    // - destStateName: if non-null, this means that the learner is ready to
-    //     move on. It represents the state name of the next card.
+    // Each element of this array represents a 'StateCard' domain object.
     //
     // Note that every card in this transcript is visible on the screen. The
-    // 'destStateName' field is intended to identify transcripts where there is
-    // a card 'in reserve', but the learner has not yet navigated to it -- this
-    // happens if the current card offers feedback to the learner before they
-    // carry on.
+    // 'card.getDestStateName()' field is intended to identify transcripts where
+    // there is a card 'in reserve', but the learner has not yet navigated to it
+    // -- this happens if the current card offers feedback to the learner before
+    // they carry on.
     var transcript = [];
     var numAnswersSubmitted = 0;
 
@@ -98,9 +79,10 @@ oppia.factory('PlayerTranscriptService', [
         lastCard.setDestStateName(newDestStateName);
       },
       addNewInput: function(input, isHint) {
-        var pairs = transcript[transcript.length - 1].getInputResponsePairs();
+        var card = transcript[transcript.length - 1];
+        var pairs = card.getInputResponsePairs();
         if (pairs.length > 0 &&
-            pairs[pairs.length - 1].oppiaResponse === null) {
+            card.getOppiaResponse(pairs.length - 1) === null) {
           throw Error(
             'Trying to add an input before the response for the previous ' +
             'input has been received.',
@@ -116,13 +98,13 @@ oppia.factory('PlayerTranscriptService', [
         });
       },
       addNewResponse: function(response) {
-        var pairs = transcript[transcript.length - 1].getInputResponsePairs();
-        if (pairs[pairs.length - 1].oppiaResponse !== null) {
+        var card = this.getLastCard();
+        if (card.getLastOppiaResponse() !== null) {
           throw Error(
             'Trying to add a response when it has already been added.',
             transcript);
         }
-        pairs[pairs.length - 1].oppiaResponse = response;
+        card.setLastOppiaResponse(response);
       },
       getNumCards: function() {
         return transcript.length;
@@ -136,13 +118,13 @@ oppia.factory('PlayerTranscriptService', [
         }
         return transcript[index];
       },
-      getLastAnswerOnActiveCard: function(index) {
+      getLastAnswerOnActiveCard: function(activeCardIndex) {
         if (
-          this.isLastCard(index) ||
-          transcript[index].getStateName() === null) {
+          this.isLastCard(activeCardIndex) ||
+          transcript[activeCardIndex].getStateName() === null) {
           return null;
         } else {
-          return transcript[index].
+          return transcript[activeCardIndex].
             getInputResponsePairs().slice(-1)[0].learnerInput;
         }
       },
