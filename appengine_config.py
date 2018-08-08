@@ -86,6 +86,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
+    # os.path.join(ROOT_PATH, 'third_party', 'PIL-1.1.7'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.6.0'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),

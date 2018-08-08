@@ -17,14 +17,20 @@
 """HTML sanitizing service."""
 
 import HTMLParser
+import cStringIO
 import json
 import logging
+import urllib
 import urlparse
 
+from PIL import Image
 import bleach
 import bs4
 from core.domain import rte_component_registry
+from core.platform import models
 import feconf
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 def filter_a(name, value):
@@ -252,11 +258,12 @@ OPPIA_BLOCK_COMPONENTS = [
 ]
 
 
-def convert_to_textangular(html_data):
+def convert_to_textangular(html_data, unused_exp_id=''):
     """This function converts the html to TextAngular supported format.
 
     Args:
         html_data: str. HTML string to be converted.
+        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -472,11 +479,12 @@ def convert_to_textangular(html_data):
     return unicode(soup).replace('<br/>', '<br>')
 
 
-def convert_to_ckeditor(html_data):
+def convert_to_ckeditor(html_data, unused_exp_id=''):
     """This function converts html strings to CKEditor supported format.
 
     Args:
         html_data: str. HTML string to be converted.
+        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -671,7 +679,8 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     for html_data in html_list:
         if run_migration:
             if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                soup_data = convert_to_textangular(html_data)
+                soup_data = convert_to_textangular(
+                    html_data, unused_exp_id='unused')
             else:
                 soup_data = convert_to_ckeditor(html_data)
         else:
@@ -771,12 +780,13 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def add_caption_attr_to_image(html_string):
+def add_caption_attr_to_image(html_string, unused_exp_id=''):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
         html_string. str: HTML string in which the caption attribute is to be
             added.
+        unused_exp_id. str: Unused argument.
 
     Returns:
         str. Updated HTML string with the caption attribute for all
@@ -790,3 +800,47 @@ def add_caption_attr_to_image(html_string):
             image['caption-with-value'] = escape_html(json.dumps(''))
 
     return unicode(soup)
+
+
+def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
+    """Adds dimensions to all oppia-noninteractive-image tags.
+
+    Args:
+        html_string: str. HTML string in which the dimensions is to be
+            added.
+        exp_id: str. Exploration id.
+
+    Returns:
+        str. Updated HTML string with the dimensions for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        filename = unescape_html(image['filepath-with-value'])
+        filename = filename[1:-1]
+        image['filepath-with-value'] = escape_html(json.dumps(
+            get_filepath_of_object_image(filename, exp_id)))
+    return unicode(soup)
+
+
+def get_filepath_of_object_image(filename, exp_id):
+    """Gets the dimensions of the image file.
+
+    Args:
+        filename: str. Name of the file whose dimensions need to be
+            calculated.
+        exp_id: str. Exploration id.
+
+    Returns:
+        object. filepath object of the image.
+    """
+    url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
+        app_identity_services.get_gcs_resource_bucket_name(), exp_id,
+        filename)) if not feconf.DEV_MODE else (
+            'http://localhost:8181/imagehandler/%s/%s' % (exp_id, filename))
+    imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
+    img = Image.open(imageFile)
+    width, height = img.size
+    img.close()
+    return {'filename': filename, 'height': height, 'width': width}
