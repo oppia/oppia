@@ -55,12 +55,12 @@ class TopicPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
-        canonical_stories = [
-            story_services.get_story_by_id(
+        canonical_story_summaries = [
+            story_services.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id
             in topic.canonical_story_ids]
-        additional_stories = [
-            story_services.get_story_by_id(
+        additional_story_summaries = [
+            story_services.get_story_summary_by_id(
                 additional_story_id) for additional_story_id
             in topic.additional_story_ids]
 
@@ -68,13 +68,13 @@ class TopicPageDataHandler(base.BaseHandler):
             'id': story.id,
             'title': story.title,
             'description': story.description
-        } for story in canonical_stories]
+        } for story in canonical_story_summaries]
 
         additional_story_dicts = [{
             'id': story.id,
             'title': story.title,
             'description': story.description
-        } for story in additional_stories]
+        } for story in additional_story_summaries]
 
         self.values.update({
             'topic_name': topic.name,

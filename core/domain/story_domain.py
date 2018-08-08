@@ -924,7 +924,7 @@ class StorySummary(object):
     """Domain object for Story Summary."""
 
     def __init__(
-            self, story_id, title, language_code, version,
+            self, story_id, title, description, language_code, version,
             node_count, story_model_created_on,
             story_model_last_updated):
         """Constructs a StorySummary domain object.
@@ -932,6 +932,7 @@ class StorySummary(object):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title of the story.
+            description: str. The description of the story.
             language_code: str. The language code of the story.
             version: int. The version of the story.
             node_count: int. The number of nodes present in the story.
@@ -942,6 +943,7 @@ class StorySummary(object):
         """
         self.id = story_id
         self.title = title
+        self.description = description
         self.language_code = language_code
         self.version = version
         self.node_count = node_count
@@ -957,6 +959,7 @@ class StorySummary(object):
         return {
             'id': self.id,
             'title': self.title,
+            'description': self.description,
             'language_code': self.language_code,
             'version': self.version,
             'node_count': self.node_count,

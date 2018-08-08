@@ -135,6 +135,7 @@ def get_story_summary_from_model(story_summary_model):
     """
     return story_domain.StorySummary(
         story_summary_model.id, story_summary_model.title,
+        story_summary_model.description,
         story_summary_model.language_code,
         story_summary_model.version,
         story_summary_model.node_count,
@@ -495,7 +496,7 @@ def compute_summary_of_story(story):
     """
     story_model_node_count = len(story.story_contents.nodes)
     story_summary = story_domain.StorySummary(
-        story.id, story.title, story.language_code,
+        story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_count,
         story.created_on, story.last_updated
     )
@@ -525,6 +526,7 @@ def save_story_summary(story_summary):
     story_summary_model = story_models.StorySummaryModel(
         id=story_summary.id,
         title=story_summary.title,
+        description=story_summary.description,
         language_code=story_summary.language_code,
         version=story_summary.version,
         node_count=story_summary.node_count,

@@ -43,6 +43,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
+        self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
 
     def test_get_new_story_id(self):
@@ -64,6 +65,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
+        self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
 
     def test_get_story_by_id(self):
@@ -84,6 +86,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
+        self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
 
     def test_update_story_properties(self):
