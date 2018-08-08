@@ -474,7 +474,7 @@ var constants = {
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false,
 
-  "ENABLE_NEW_STRUCTURES": true,
+  "ENABLE_NEW_STRUCTURES": false,
 
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
