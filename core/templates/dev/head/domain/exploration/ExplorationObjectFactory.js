@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationObjectFactory', [
-  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StatesObjectFactory',
-  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  '$log', 'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'StatesObjectFactory', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'UrlInterpolationService', function(
-      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StatesObjectFactory,
-      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      $log, INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
+      StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, states, title, languageCode) {
@@ -53,16 +53,21 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteraction = function(stateName) {
-      return this.states.getState(stateName).interaction;
+      var state = this.states.getState(stateName);
+      if (!state) {
+        $log.error('Invalid state name: ' + stateName);
+        return null;
+      }
+      return state.interaction;
     };
 
     Exploration.prototype.getInteractionId = function(stateName) {
-      return this.states.getState(stateName).interaction.id;
+      return this.getInteraction(stateName).id;
     };
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.states.getState(stateName).interaction.customizationArgs;
+        return this.getInteraction(stateName).customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {
