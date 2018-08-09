@@ -809,7 +809,9 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
-
+    x = 1
+    print " soup.find all noninteracrtive imae oppoa "
+    print soup.findAll(name='oppia-noninteractive-image')
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
         print "BEFORE that 1 -1"
@@ -818,6 +820,8 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
         print filename
         image['filepath-with-value'] = escape_html(json.dumps(
             get_fileinfo_of_object_image(filename, exp_id)))
+        x = x + 1
+        print "XXXXXXXXXXXX x is " + x
     return unicode(soup)
 
 
@@ -843,6 +847,8 @@ def get_fileinfo_of_object_image(filename, exp_id):
         else ('image/%s' % filename))
     print "FFFFFFFFFFFFF"
     print filepath
+    if fs.isfile(filepath):
+        print "THE FILE EXISTST"
     content = fs.get(filepath)
 
     height, width = gae_image_services.get_image_dimensions(content)
