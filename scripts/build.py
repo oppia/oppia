@@ -653,24 +653,18 @@ def rebuild_new_files(
         recently_changed_filenames: list(str). List of recently changed files.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
-    rebuild_all_HTML_files = False
+    # Always rebuild HTML files.
+    build_HTML_files(source_path, target_path, file_hashes)
     for file_name in recently_changed_filenames:
         source_file_path = os.path.join(source_path, file_name)
         target_file_path = os.path.join(target_path, file_name)
         ensure_directory_exists(target_file_path)
-        if file_name.endswith('.html') and rebuild_all_HTML_files is False:
-            process_html(source_file_path, target_file_path, file_hashes)
+        if file_name.endswith('.css') or file_name.endswith('.js'):
+            print 'Minifying %s' % file_name
+            _minify(source_file_path, target_file_path)
         else:
-            if not rebuild_all_HTML_files:
-                # Rebuilding all HTML files to reflect new hash values.
-                rebuild_all_HTML_files = True
-            if file_name.endswith('.css') or file_name.endswith('.js'):
-                _minify(source_file_path, target_file_path)
-            else:
-                shutil.copyfile(source_file_path, target_file_path)
-    if rebuild_all_HTML_files is True:
-        print "Rebuilding all HTML files"
-        build_HTML_files(source_path, target_path, file_hashes)
+            print 'Copying over %s' % file_name
+            shutil.copyfile(source_file_path, target_file_path)
 
 
 def get_new_files_from_directory(source, target):
@@ -687,9 +681,10 @@ def get_new_files_from_directory(source, target):
     file_hashes = dict()
     file_hashes.update(get_file_hashes(source))
     recently_changed_filenames = []
+    FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
     for file_name, md5_hash in file_hashes.iteritems():
         # Ignore files with certain extensions.
-        if any(file_name.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+        if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
         final_filepath = _insert_hash(
             os.path.join(target, file_name), md5_hash)
