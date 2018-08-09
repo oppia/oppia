@@ -18,13 +18,11 @@
 
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'ContextService', 'AssetsBackendApiService',
-  'ExplorationPlayerStateService', 'UrlInterpolationService',
+  'UrlInterpolationService', 'ComputeGraphService',
   'AudioTranslationLanguageService', 'LanguageUtilService',
-  'ComputeGraphService',
   function($uibModal, ContextService, AssetsBackendApiService,
-      ExplorationPlayerStateService, UrlInterpolationService,
-      AudioTranslationLanguageService, LanguageUtilService,
-      ComputeGraphService) {
+      UrlInterpolationService, ComputeGraphService,
+      AudioTranslationLanguageService, LanguageUtilService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfAudioCurrentlyDownloading = [];

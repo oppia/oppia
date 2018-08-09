@@ -17,13 +17,24 @@
             <div ng-if="issue.issueType == 'EarlyQuit'">
               <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
             </div>
+            <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
+              <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
+            <div ng-if="issue.issueType == 'CyclicStateTransitions'">
+              <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
           </div>
           <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
             <div ng-if="issue.issueType == 'EarlyQuit'">
               <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
             </div>
+            <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
+              <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
+            <div ng-if="issue.issueType == 'CyclicStateTransitions'">
+              <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+            </div>
           </div>
-        </div>
       </div>
       <div class="row">
         <div class="oppia-pt4 oppia-pb2 justify-content-end">

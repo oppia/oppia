@@ -85,11 +85,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
-        self.question.version = 'abc'
-        self._assert_validation_error('Expected version to be an integer')
-
         self.question.language_code = 1
         self._assert_validation_error('Expected language_code to be a string')
+
+        self.question.version = 'abc'
+        self._assert_validation_error('Expected version to be an integer')
 
         self.question.id = 123
         self._assert_validation_error('Expected ID to be a string')

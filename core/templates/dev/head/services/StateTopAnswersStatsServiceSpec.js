@@ -158,16 +158,24 @@ describe('StateTopAnswersStatsService', function() {
       expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
-    it('is false when the state contains no answers', function() {
+    it('is true even when the state contains no answers', function() {
       this.stass.init({answers: {Hola: []}});
 
-      expect(this.stass.hasStateStats('Hola')).toBe(false);
+      expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
     it('is false when the state does not exist', function() {
       this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
 
       expect(this.stass.hasStateStats('Me Llamo')).toBe(false);
+    });
+  });
+
+  describe('.getStateNamesWithStats', function() {
+    it('only returns state names that have stats', function() {
+      this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+
+      expect(this.stass.getStateNamesWithStats()).toEqual(['Hola']);
     });
   });
 
