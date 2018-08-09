@@ -24,6 +24,7 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -763,6 +764,127 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
 
 
+class CreateVersionsOfImageJobTest(test_utils.GenericTestBase):
+    """Tests for CreateVersionsOfImageJob one off job."""
+
+    USER = 'ADMIN'
+    EXPLORATION_ID = 'eid'
+    FILENAME_1 = 'random1.png'
+    FILENAME_2 = 'random2.png'
+
+    def setUp(self):
+        super(CreateVersionsOfImageJobTest, self).setUp()
+        self.process_and_flush_pending_tasks()
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+        fs.commit(
+            self.USER, self.FILENAME_1, original_image_content,
+            mimetype='image/png')
+        fs.commit(
+            self.USER, self.FILENAME_2, original_image_content,
+            mimetype='image/png')
+
+    def test_for_creating_versions_of_image(self):
+        """Test for creating different versions of the images."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXPLORATION_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">hello<b><i>'
+                'testing</i></b>in <b>progress</b><p>for migration</p>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">'
+                '<oppia-noninteractive-image filepath-with-value="'
+                '&amp;quot;random1.png&amp;quot;" caption-with-value="&amp;'
+                'quot;&amp;quot;" alt-with-value="&amp;'
+                'quot;&amp;quot;"></oppia-noninteractive-image><p>'
+                ' testing in progress</p>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to print something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><li>This is last case</li><oppia-noninteractive-image '
+                    'filepath-with-value="&amp;quot;random2.png&amp;quot;" '
+                    'caption-with-value="&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;">'
+                    '</oppia-noninteractive-image></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.USER, exploration)
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+
+        self.assertEqual(fs.isfile('random1_compressed.png'), False)
+        self.assertEqual(fs.isfile('random1_micro.png'), False)
+        self.assertEqual(fs.isfile('random2_compressed.png'), False)
+        self.assertEqual(fs.isfile('random2_micro.png'), False)
+
+        job_id = exp_jobs_one_off.CreateVersionsOfImageJob.create_new()
+        exp_jobs_one_off.CreateVersionsOfImageJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(fs.isfile('random1_compressed.png'), True)
+        self.assertEqual(fs.isfile('random1_micro.png'), True)
+        self.assertEqual(fs.isfile('random2_compressed.png'), True)
+        self.assertEqual(fs.isfile('random2_micro.png'), True)
+
+        actual_output = (
+            exp_jobs_one_off.CreateVersionsOfImageJob.get_output(
+                job_id))
+
+        expected_output = [
+            "[u'Added compressed versions of images in exploration', [u'eid']]"
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+
 class ExplorationContentValidationJobForTextAngularTest(
         test_utils.GenericTestBase):
 
@@ -1228,6 +1350,43 @@ class ExplorationContentValidationJobForCKEditorTest(
             )
         ]
 
+        self.assertEqual(actual_output, expected_output)
+
+
+class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
+
+    COMMITER_ID = 'ADMIN'
+    COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
+    EXP_ID = 'eid'
+    FILENAME = 'imageFile.png'
+
+    def setUp(self):
+        super(DeleteImagesFromGAEJobTest, self).setUp()
+        self.process_and_flush_pending_tasks()
+
+    def test_for_deletion_job(self):
+        """Checks that images get deleted from the GAE after running the job.
+        """
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        imageData = ''
+        mimetype = 'image/png'
+        fs.commit(
+            self.COMMITER_ID, self.FILENAME, imageData,
+            mimetype=mimetype)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
+
+        job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
+        exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
+        expected_output = [
+            u"[u'Number of files that got deleted', 1]"
+        ]
+
+        self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(actual_output, expected_output)
 
 

@@ -753,7 +753,6 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        mimetype = 'image/%s' % (extension)
 
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
@@ -770,7 +769,8 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
+        exp_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, exploration_id, raw)
 
         self.render_json({'filepath': filename})
 
