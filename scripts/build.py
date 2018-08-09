@@ -611,6 +611,34 @@ def build_files(source, target, file_hashes):
             print e
 
 
+def build_HTML_files(source, target, file_hashes):
+    """Minifies HTML files and interpolates paths in HTML to include hashes in
+    source directory and copies it to target.
+    Args:
+        source: str. Path relative to /oppia directory of directory
+            containing files and directories to be copied.
+        target: str. Path relative to /oppia directory of directory where
+            to copy the files and directories.
+        file_hashes: dict(str, str). Dictionary of file hashes.
+    """
+    print 'Processing %s' % os.path.join(os.getcwd(), source)
+    print 'Generating into %s' % os.path.join(os.getcwd(), target)
+    ensure_directory_exists(target)
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
+        for directory in dirs:
+            print 'Processing %s' % os.path.join(root, directory)
+        for filename in files:
+            if filename.endswith('.html'):
+                source_path = os.path.join(root, filename)
+                if target in source_path:
+                    continue
+                if source not in source_path:
+                    continue
+                target_path = source_path.replace(source, target)
+                ensure_directory_exists(target_path)
+                process_html(source_path, target_path, file_hashes)
+
+
 def rebuild_new_files(
         source_path, target_path, recently_changed_filenames, file_hashes):
     """Minifies list of recently changed files, removes whitespace from HTML and
@@ -625,12 +653,24 @@ def rebuild_new_files(
         recently_changed_filenames: list(str). List of recently changed files.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
+    rebuild_all_HTML_files = False
     for file_name in recently_changed_filenames:
         source_file_path = os.path.join(source_path, file_name)
         target_file_path = os.path.join(target_path, file_name)
         ensure_directory_exists(target_file_path)
-        print "Minifying %s" % target_file_path
-        minify_func(source_file_path, target_file_path, file_hashes, file_name)
+        if file_name.endswith('.html') and rebuild_all_HTML_files is False:
+            process_html(source_file_path, target_file_path, file_hashes)
+        else:
+            if not rebuild_all_HTML_files:
+                # Rebuilding all HTML files to reflect new hash values.
+                rebuild_all_HTML_files = True
+            if file_name.endswith('.css') or file_name.endswith('.js'):
+                _minify(source_file_path, target_file_path)
+            else:
+                shutil.copyfile(source_file_path, target_file_path)
+    if rebuild_all_HTML_files is True:
+        print "Rebuilding all HTML files"
+        build_HTML_files(source_path, target_path, file_hashes)
 
 
 def get_new_files_from_directory(source, target):
