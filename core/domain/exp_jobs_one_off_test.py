@@ -1199,7 +1199,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             # Start validation job on updated exploration.
             job_id = (
                 exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
                 job_id)
             self.process_and_flush_pending_tasks()
 
@@ -1477,10 +1477,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
-
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;random.png&amp;quot;">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
                 )
             },
             'labelled_as_correct': False,
