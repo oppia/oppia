@@ -149,7 +149,7 @@
 	"I18N_GET_STARTED_PAGE_HEADING": "入門！",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_1": "創建一個探索是容易且免費的。來與世界各地的學生分享您的知識，並獲得可用於提高您探索內容效果的意見回饋。",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_10": "另外隨著學習者們使用您的探索，您將有機會看到他們常發生的錯誤，有時這可以成為顯示出他們會在哪裡被混淆的新洞察。如果您認為其他學習者有機會重複犯下這些錯誤，那麼可以用額外的意見回饋來提高探索內容。您甚至可以透過詢問其它問題來讓學習者可以「更深入」、或是朝向到另一個階段前進。",
-	"I18N_GET_STARTED_PAGE_PARAGRAPH_11": "要參與 Oppia 專案以協助我們帶來自由、高品質全球教育的願景，請透過 <a href=\"mailto:admin@oppia.org\" class=\"inline-links\">admin@oppia.org</a> 聯絡我們，或 <a href=\"/contact\">發掘更多</a>來與我們社群上志願者的參與方式。我們期待能聽見來自您的回應。",
+	"I18N_GET_STARTED_PAGE_PARAGRAPH_11": "要參與 Oppia 專案以協助我們帶來自由、高品質全球教育的願景，請透過 <a href=\"mailto:admin@oppia.org\" class=\"inline-links\">admin@oppia.org</a> 聯絡我們，或<a href=\"/contact\">發掘更多</a>來與我們社群上志願者參與的方式。我們期待能聽見來自您的回應。",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING": "參與",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_2": "而您所需要開始的便是您想教學的主題。您可以創建任意大小內容的探索，探索主題內容的理想大小是您可在單一課程裡便全包含著。您還可以額外創建多個需按順序完成的相關探索，此種則被稱之為<em>集合</em>。",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING": "選擇一個主題",
