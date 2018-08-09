@@ -398,7 +398,7 @@ def copy_files_source_to_target(source, target, file_hashes):
     shutil.rmtree(target)
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
-            print 'Processing %s' % os.path.join(root, directory)
+            print 'Copying %s' % os.path.join(root, directory)
 
         for filename in files:
             source_path = os.path.join(root, filename)
@@ -591,7 +591,7 @@ def build_files(source, target, file_hashes):
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         tasks = []
         for directory in dirs:
-            print 'Processing %s' % os.path.join(root, directory)
+            print 'Building %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
             if target in source_path:
@@ -626,7 +626,7 @@ def build_HTML_files(source, target, file_hashes):
     ensure_directory_exists(target)
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
-            print 'Processing %s' % os.path.join(root, directory)
+            print 'Building %s' % os.path.join(root, directory)
         for filename in files:
             if filename.endswith('.html'):
                 source_path = os.path.join(root, filename)
