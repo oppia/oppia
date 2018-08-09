@@ -626,7 +626,8 @@ oppia.directive('filepathEditor', [
           var form = new FormData();
           form.append('image', resampledFile);
           form.append('payload', JSON.stringify({
-            filename: $scope.generateImageFilename()
+            filename: $scope.generateImageFilename(
+              dimensions.height, dimensions.width)
           }));
           form.append('csrf_token', GLOBALS.csrf_token);
 
@@ -660,7 +661,7 @@ oppia.directive('filepathEditor', [
           });
         };
 
-        $scope.generateImageFilename = function() {
+        $scope.generateImageFilename = function(height, width) {
           var date = new Date();
           return 'img_' +
               date.getFullYear() +
@@ -672,6 +673,8 @@ oppia.directive('filepathEditor', [
               ('0' + date.getSeconds()).slice(-2) +
               '_' +
               Math.random().toString(36).substr(2, 10) +
+              '_height' + height +
+              '_width' + width +
               '.' + OUTPUT_IMAGE_FORMAT;
         };
 
