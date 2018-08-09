@@ -100,20 +100,27 @@ md-input-group.md-default-theme label {
   color: #ffffff;
   padding: 6px 12px;
 }
+
 .md-button.oppia-learner-try-again-button
 {
   background:#ffffff;
+  border: 2px solid;
   border-color:#0D48A1;
   color:  #0D48A1;
-  padding: 6px 12px;
+  padding: 3px 8px;
+}
+
+.md-button.md-default-theme.oppia-learner-try-again-button:focus,
+.md-button.md-default-theme.oppia-learner-try-again-button:hover
+{
+  background-color: rgba(224,242,241,1);
+  text-decoration: none;
 }
 
 .md-button.md-default-theme.oppia-learner-confirm-button:focus,
 .md-button.md-default-theme.oppia-learner-confirm-button:hover,
 .md-button.md-default-theme.oppia-learner-got-it-button:focus,
 .md-button.md-default-theme.oppia-learner-got-it-button:hover,
-.md-button.md-default-theme.oppia-learner-try-again-button:focus,
-.md-button.md-default-theme.oppia-learner-try-again-button:hover,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
   background-color: #115FD4;
@@ -441,6 +448,16 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   min-height: 100%;
+  position: relative;
+}
+
+/*
+  Style for the oppia reload symbol in reload image button.
+*/
+.oppia-reload-symbol {
+  margin-bottom: 10px;
+  margin-left: 3px;
+  margin-right: -2px;
   position: relative;
 }
 
