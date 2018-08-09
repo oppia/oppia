@@ -130,8 +130,12 @@ oppia.directive('oppiaResponseNumberWithUnits', [
         'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
+        if (!answer.type) {
+          $scope.answer = null;
+        } else {
+          $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+            answer).toString();
+        }
       }]
     };
   }

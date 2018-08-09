@@ -19,15 +19,20 @@
 
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-  'EXPLORATION_VERSION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  'EXPLORATION_STORY_DATA_URL_TEMPLATE',
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  'EXPLORATION_VERSION_STORY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-      EXPLORATION_VERSION_DATA_URL_TEMPLATE, UrlInterpolationService) {
+      EXPLORATION_STORY_DATA_URL_TEMPLATE,
+      EXPLORATION_VERSION_DATA_URL_TEMPLATE,
+      EXPLORATION_VERSION_STORY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     // Maps previously loaded explorations to their IDs.
     var _explorationCache = [];
 
     var _fetchExploration = function(
-        explorationId, version, successCallback, errorCallback) {
-      var explorationDataUrl = _getExplorationUrl(explorationId, version);
+        explorationId, version, storyId, successCallback, errorCallback) {
+      var explorationDataUrl = _getExplorationUrl(
+        explorationId, version, storyId);
 
       $http.get(explorationDataUrl).then(function(response) {
         var exploration = angular.copy(response.data);
@@ -45,12 +50,27 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
       return _explorationCache.hasOwnProperty(explorationId);
     };
 
-    var _getExplorationUrl = function(explorationId, version) {
+    var _getExplorationUrl = function(explorationId, version, storyId) {
+      if (version && storyId) {
+        return UrlInterpolationService.interpolateUrl(
+          EXPLORATION_VERSION_STORY_DATA_URL_TEMPLATE, {
+            exploration_id: explorationId,
+            version: String(version),
+            story_id: storyId
+          });
+      }
       if (version) {
         return UrlInterpolationService.interpolateUrl(
           EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
             exploration_id: explorationId,
             version: String(version)
+          });
+      }
+      if (storyId) {
+        return UrlInterpolationService.interpolateUrl(
+          EXPLORATION_STORY_DATA_URL_TEMPLATE, {
+            exploration_id: explorationId,
+            story_id: storyId
           });
       }
       return UrlInterpolationService.interpolateUrl(
@@ -72,9 +92,9 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        * is called instead, if present. The rejection callback function is
        * passed any data returned by the backend in the case of an error.
        */
-      fetchExploration: function(explorationId, version) {
+      fetchExploration: function(explorationId, version, storyId) {
         return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, version, resolve, reject);
+          _fetchExploration(explorationId, version, storyId, resolve, reject);
         });
       },
 
@@ -88,20 +108,21 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        * will store the exploration in the cache to avoid requests from the
        * backend in further function calls.
        */
-      loadLatestExploration: function(explorationId) {
+      loadLatestExploration: function(explorationId, storyId) {
         return $q(function(resolve, reject) {
           if (_isCached(explorationId)) {
             if (resolve) {
               resolve(angular.copy(_explorationCache[explorationId]));
             }
           } else {
-            _fetchExploration(explorationId, null, function(exploration) {
-              // Save the fetched exploration to avoid future fetches.
-              _explorationCache[explorationId] = exploration;
-              if (resolve) {
-                resolve(angular.copy(exploration));
-              }
-            }, reject);
+            _fetchExploration(
+              explorationId, null, storyId, function(exploration) {
+                // Save the fetched exploration to avoid future fetches.
+                _explorationCache[explorationId] = exploration;
+                if (resolve) {
+                  resolve(angular.copy(exploration));
+                }
+              }, reject);
           }
         });
       },
@@ -113,13 +134,14 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        * cache. All previous data in the cache will still be retained after
        * this call.
        */
-      loadExploration: function(explorationId, version) {
+      loadExploration: function(explorationId, version, storyId) {
         return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, version, function(exploration) {
-            if (resolve) {
-              resolve(angular.copy(exploration));
-            }
-          }, reject);
+          _fetchExploration(
+            explorationId, version, storyId, function(exploration) {
+              if (resolve) {
+                resolve(angular.copy(exploration));
+              }
+            }, reject);
         });
       },
 

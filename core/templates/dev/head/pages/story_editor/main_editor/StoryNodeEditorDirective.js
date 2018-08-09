@@ -22,6 +22,7 @@ oppia.directive('storyNodeEditor', [
       scope: {
         getId: '&nodeId',
         getOutline: '&outline',
+        getExplorationId: '&explorationId',
         isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds'
       },
@@ -39,6 +40,7 @@ oppia.directive('storyNodeEditor', [
             $scope.story = StoryEditorStateService.getStory();
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
+            $scope.explorationId = $scope.getExplorationId();
             $scope.outlineEditorIsShown = false;
             $scope.nodeIdEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
@@ -56,6 +58,11 @@ oppia.directive('storyNodeEditor', [
           $scope.finalizeOutline = function() {
             StoryUpdateService.finalizeStoryNodeOutline(
               $scope.story, $scope.getId());
+          };
+
+          $scope.updateExplorationId = function(explorationId) {
+            StoryUpdateService.setStoryNodeExplorationId(
+              $scope.story, $scope.getId(), explorationId);
           };
 
           $scope.unfinalizeOutline = function() {

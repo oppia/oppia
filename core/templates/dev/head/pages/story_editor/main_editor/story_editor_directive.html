@@ -76,7 +76,7 @@
             <span class="story-editor-initial-node">
               <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
                 <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
-                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_boxk</i>
+                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_box</i>
               </span>
             </span>
             <span class="story-editor-delete-node">
@@ -92,6 +92,7 @@
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              outline="node.getOutline()"
+                             exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"
                              destination-node-ids="node.getDestinationNodeIds()">
           </story-node-editor>

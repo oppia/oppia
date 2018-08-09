@@ -48,10 +48,12 @@ oppia.factory('PlayerTranscriptService', [
         return result;
       },
       addNewCard: function(
-          stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
+          stateName, params, contentHtml, interactionHtml,
+          leadsToConceptCard, inPretestMode) {
         transcript.push(
           StateCardObjectFactory.createNewCard(
-            stateName, params, contentHtml, interactionHtml, leadsToConceptCard
+            stateName, params, contentHtml, interactionHtml,
+            leadsToConceptCard, inPretestMode
           )
         );
         numAnswersSubmitted = 0;
@@ -116,6 +118,15 @@ oppia.factory('PlayerTranscriptService', [
             transcript.length + ' cards.');
         }
         return transcript[index];
+      },
+      isPretestQuestion: function(index) {
+        if (index < 0 || index >= transcript.length) {
+          $log.error(
+            'Requested card with index ' + index +
+            ', but transcript only has length ' +
+            transcript.length + ' cards.');
+        }
+        return transcript[index].getInPretestMode();
       },
       getLastAnswerOnActiveCard: function(activeCardIndex) {
         if (

@@ -1,5 +1,10 @@
 <div class="node-field">
-  <label> Node Outline </label>
+  <label> Exploration ID </label>
+  <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
+    <input type="text" ng-model="explorationId">
+    <button type="submit" class="btn btn-success btn-sm">Save</button>
+  </form>
+  <label style="padding-top: 2em;"> Node Outline </label>
   <div style="float: right;">
      Outline Finalized
     <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>

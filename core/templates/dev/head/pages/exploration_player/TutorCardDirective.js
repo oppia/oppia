@@ -59,7 +59,7 @@ oppia.directive('tutorCard', [
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE', 'UserService',
         'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
-        'DEFAULT_PROFILE_IMAGE_PATH',
+        'DEFAULT_PROFILE_IMAGE_PATH', 'PretestEngineService',
         function(
             $scope, $timeout, $rootScope, $anchorScroll, $location,
             ExplorationEngineService, PlayerPositionService, UrlService,
@@ -70,8 +70,9 @@ oppia.directive('tutorCard', [
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_NEW_CARD_AVAILABLE, UserService,
             COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS,
-            DEFAULT_PROFILE_IMAGE_PATH) {
+            DEFAULT_PROFILE_IMAGE_PATH, PretestEngineService) {
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+          var currentEngineService = null;
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -80,8 +81,13 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
+            if ($scope.activeCard.getInPretestMode()) {
+              currentEngineService = PretestEngineService;
+            } else {
+              currentEngineService = ExplorationEngineService;
+            }
             $scope.conceptCardIsBeingShown =
-              ExplorationEngineService.isStateShowingConceptCard();
+              currentEngineService.isStateShowingConceptCard();
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
@@ -91,9 +97,9 @@ oppia.directive('tutorCard', [
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
-                ExplorationEngineService.getCurrentInteractionInstructions());
+                currentEngineService.getCurrentInteractionInstructions());
               $scope.contentAudioTranslations = (
-                ExplorationEngineService.getStateContentAudioTranslations());
+                currentEngineService.getStateContentAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
@@ -109,7 +115,7 @@ oppia.directive('tutorCard', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             } else {
-              return ExplorationEngineService.isInteractionInline();
+              return currentEngineService.isInteractionInline();
             }
           };
 
@@ -178,6 +184,12 @@ oppia.directive('tutorCard', [
             $scope.onChangeInteractionAnswerValidity({
               answerValidity: answerValidity
             });
+            if (
+              currentEngineService.getCurrentInteraction().id === 'CodeRepl') {
+              $scope.onChangeInteractionAnswerValidity({
+                answerValidity: true
+              });
+            }
           };
 
           $scope.isContentAudioTranslationAvailable = function() {
@@ -185,7 +197,7 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              ExplorationEngineService.isContentAudioTranslationAvailable());
+              currentEngineService.isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -195,7 +207,7 @@ oppia.directive('tutorCard', [
 
           $scope.isOnTerminalCard = function() {
             return $scope.activeCard &&
-              ExplorationEngineService.isCurrentStateTerminal();
+              currentEngineService.isCurrentStateTerminal();
           };
 
           $scope.getInputResponsePairId = function(index) {

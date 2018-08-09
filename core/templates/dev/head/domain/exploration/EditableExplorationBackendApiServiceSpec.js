@@ -169,7 +169,7 @@ describe('Editable exploration backend API service', function() {
       $httpBackend.expect('GET', '/explorehandler/init/0')
         .respond(sampleDataResults);
 
-      ReadOnlyExplorationBackendApiService.loadLatestExploration('0')
+      ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null)
         .then(function(data) {
           exploration = data;
         });

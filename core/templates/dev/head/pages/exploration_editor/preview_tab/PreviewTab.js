@@ -130,7 +130,7 @@ oppia.controller('PreviewTab', [
           explorationId).then(function(returnDict) {
           ExplorationEngineService.init(
             returnDict, null, null, null,
-            function(exploration, initHtml, newParams) {
+            function(initialStateName, initHtml, newParams) {
               $scope.loadPreviewState(initStateNameForPreview, []);
             });
           PlayerCorrectnessFeedbackEnabledService.init(

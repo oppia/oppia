@@ -84,8 +84,8 @@ describe('Read only exploration backend API service', function() {
 
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         sampleDataResults);
-      ReadOnlyExplorationBackendApiService.fetchExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.fetchExploration(
+        '0', null, null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
@@ -101,16 +101,16 @@ describe('Read only exploration backend API service', function() {
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         sampleDataResults);
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null, null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a exploration the second time should not fetch it.
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null, null).then(successHandler, failHandler);
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
@@ -125,8 +125,8 @@ describe('Read only exploration backend API service', function() {
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         500, 'Error loading exploration 0.');
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null, null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe('Read only exploration backend API service', function() {
     // Loading a exploration the first time should fetch it from the backend.
     $httpBackend.expect('GET', '/explorehandler/init/0').respond(
       sampleDataResults);
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -155,7 +155,7 @@ describe('Read only exploration backend API service', function() {
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
 
     // The exploration should be loadable from the cache.
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null).then(
       successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
@@ -166,7 +166,7 @@ describe('Read only exploration backend API service', function() {
 
     $httpBackend.expect('GET', '/explorehandler/init/0').respond(
       sampleDataResults);
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -192,7 +192,7 @@ describe('Read only exploration backend API service', function() {
 
     // A new exploration should not have been fetched from the backend. Also,
     // the returned exploration should match the expected exploration object.
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null).then(
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/

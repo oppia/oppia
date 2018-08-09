@@ -20,7 +20,8 @@
 oppia.factory('StateCardObjectFactory', [function() {
   var StateCard = function(
       stateName, currentParams, contentHtml, interactionHtml,
-      leadsToConceptCard, destStateName, inputResponsePairs) {
+      leadsToConceptCard, destStateName, inputResponsePairs,
+      inPretestMode) {
     this._stateName = stateName;
     this._currentParams = currentParams;
     this._contentHtml = contentHtml;
@@ -28,6 +29,7 @@ oppia.factory('StateCardObjectFactory', [function() {
     this._leadsToConceptCard = leadsToConceptCard;
     this._destStateName = destStateName;
     this._inputResponsePairs = inputResponsePairs;
+    this._inPretestMode = inPretestMode;
   };
 
   StateCard.prototype.getDestStateName = function() {
@@ -36,6 +38,10 @@ oppia.factory('StateCardObjectFactory', [function() {
 
   StateCard.prototype.getStateName = function() {
     return this._stateName;
+  };
+
+  StateCard.prototype.getInPretestMode = function() {
+    return this._inPretestMode;
   };
 
   StateCard.prototype.getCurrentParams = function() {
@@ -101,10 +107,11 @@ oppia.factory('StateCardObjectFactory', [function() {
   };
 
   StateCard.createNewCard = function(
-      stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
+      stateName, params, contentHtml, interactionHtml, leadsToConceptCard,
+      inPretestMode) {
     return new StateCard(
       stateName, params, contentHtml, interactionHtml,
-      leadsToConceptCard, null, []);
+      leadsToConceptCard, null, [], inPretestMode);
   };
 
   return StateCard;

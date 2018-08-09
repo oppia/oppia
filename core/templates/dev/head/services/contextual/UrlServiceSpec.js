@@ -145,4 +145,15 @@ describe('Url Service', function() {
       UrlService.getSkillIdFromUrl();
     }).toThrow();
   });
+
+  it('should correctly retrieve story id from url in player', function() {
+    mockLocation.search = '?story_id=mnopqrstuvwx';
+    expect(
+      UrlService.getStoryIdInPlayer()
+    ).toBe('mnopqrstuvwx');
+    mockLocation.search = '?story=mnopqrstuvwx';
+    expect(
+      UrlService.getStoryIdInPlayer()
+    ).toBe(null);
+  });
 });

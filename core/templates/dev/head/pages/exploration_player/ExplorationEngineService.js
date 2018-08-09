@@ -138,7 +138,7 @@ oppia.factory('ExplorationEngineService', [
       currentStateName = exploration.initStateName;
       nextStateName = exploration.initStateName;
       $rootScope.$broadcast('playerStateChange', initialState.name);
-      successCallback(exploration, questionHtml, newParams);
+      successCallback(currentStateName, questionHtml, newParams);
     };
 
     // Initialize the parameters in the exploration as specified in the
@@ -229,6 +229,9 @@ oppia.factory('ExplorationEngineService', [
       getCurrentStateName: function() {
         return currentStateName;
       },
+      isCurrentStateInitial: function() {
+        return currentStateName === exploration.initStateName;
+      },
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
       },
@@ -240,9 +243,6 @@ oppia.factory('ExplorationEngineService', [
       },
       getExplorationVersion: function() {
         return version;
-      },
-      getExplorationLanguageCode: function() {
-        return exploration.languageCode;
       },
       getStateContentHtml: function() {
         return exploration.getUninterpolatedContentHtml(currentStateName);
