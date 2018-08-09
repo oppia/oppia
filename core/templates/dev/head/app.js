@@ -75,7 +75,7 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
-oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
+oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', true);
 // Enables visualization of issues on the stats tab.
 oppia.constant('ENABLE_ISSUES', false);
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);

@@ -749,7 +749,7 @@ SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 # Whether state id mapping model should be generated and stored when exploration
 # is created or updated.
-ENABLE_STATE_ID_MAPPING = False
+ENABLE_STATE_ID_MAPPING = True
 
 # Current event models schema version. All event models with an
 # event_schema_version of 1 are the events collected before the rework of the
