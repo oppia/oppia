@@ -181,13 +181,17 @@ describe('Responses Service', function() {
       rs.deleteAnswerGroup(0);
       expect(rs.getAnswerGroupCount()).toEqual(0);
     });
-/*
-      it('should update active answer group', function() {
-        rs.updateActiveAnswerGroup(updates);
-        let activeIndex = rs.getActiveAnswerGroupIndex();
-        expect(rs.getAnswerGroup(activeIndex)).toEqual(updates);
-      })
-*/
+
+    it('should update the rules of active answer group', function() {
+      const rule = rof.createNew('Equals', {x: 'New answer'});
+      const ruleUpdates = {
+        rules: [rule]
+      };
+
+      rs.changeActiveAnswerGroupIndex(0);
+      rs.updateActiveAnswerGroup(ruleUpdates);
+      expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
+    });
 
     it('should update answer choices', function() {
       rs.updateAnswerChoices('some answer');
