@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-6-6
+version: 2-6-6-hotfix-1
 runtime: python27
 api_version: 1
 threadsafe: false
