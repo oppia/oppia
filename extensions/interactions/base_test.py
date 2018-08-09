@@ -481,7 +481,8 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
     def test_interactions_demo_exploration(self):
         def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
-            return exp_services.get_filename_generated(filename, 490, 120)
+            return exp_services.regenerate_image_filename_using_dimensions(
+                filename, 490, 120)
 
         with self.swap(
             html_cleaner, 'get_fileinfo_of_object_image',

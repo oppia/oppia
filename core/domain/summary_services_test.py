@@ -255,7 +255,8 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         csrf_token = self.get_csrf_token_from_response(response)
 
         def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
-            return exp_services.get_filename_generated(filename, 490, 120)
+            return exp_services.regenerate_image_filename_using_dimensions(
+                filename, 490, 120)
 
         with self.swap(
             html_cleaner, 'get_fileinfo_of_object_image',

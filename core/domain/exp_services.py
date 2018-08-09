@@ -106,7 +106,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
         states_schema_version += 1
 
 
-def get_filename_generated(filename, height, width):
+def regenerate_image_filename_using_dimensions(filename, height, width):
     """Returns the name of the image file with dimensions in it.
 
     Args:

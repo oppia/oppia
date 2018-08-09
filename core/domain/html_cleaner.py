@@ -833,13 +833,26 @@ def get_fileinfo_of_object_image(filename, exp_id):
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+
     filepath = (
         filename if feconf.DEV_MODE
         else ('image/%s' % filename))
+
     content = fs.get(filepath)
+
     height, width = gae_image_services.get_image_dimensions(content)
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
     renamed_filename = '%s_height_%s_width_%s.%s' % (
         filename_wo_filetype, str(height), str(width), filetype)
+    renamed_filepath = (
+        renamed_filename if feconf.DEV_MODE
+        else ('image/%s' % renamed_filename))
+    # We have to delete the old instance we have and create a new one with
+    # the new name created.
+    fs.delete('ADMIN', filepath)
+    fs.commit(
+        'ADMIN', renamed_filepath, content,
+        mimetype='image/%s' % filetype)
+
     return renamed_filename

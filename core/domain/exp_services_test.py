@@ -612,7 +612,8 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             msg='There must be at least one demo exploration.')
 
         def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
-            return exp_services.get_filename_generated(filename, 490, 120)
+            return exp_services.regenerate_image_filename_using_dimensions(
+                filename, 490, 120)
 
         with self.swap(
             html_cleaner, 'get_fileinfo_of_object_image',
@@ -641,6 +642,18 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
                 exp_services.delete_demo(exp_id)
             self.assertEqual(
                 exp_models.ExplorationModel.get_exploration_count(), 0)
+
+
+class RegenerateImageFilenameUsingDimensions(test_utils.GenericTestBase):
+    """Tests for regenerating image filename using dimensions."""
+    EXP_ID = 'eid'
+    FILENAME = 'abc.png'
+    HEIGHT = 45
+    WIDTH = 45
+    def test_regenerate_image_filename_using_dimensions(self):
+        regenerated_name = exp_services.regenerate_image_filename_using_dimensions(
+            self.FILENAME, self.HEIGHT, self.WIDTH)
+        self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
