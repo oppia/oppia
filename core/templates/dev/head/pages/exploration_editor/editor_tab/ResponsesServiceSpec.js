@@ -160,7 +160,7 @@ describe('Responses Service', function() {
 
     it('should update the feedback of the answer group', function() {
       const feedback = shtml.createDefault('New feedback', 'feedback_1');
-      const feedbackUpdates = {feedback}
+      const feedbackUpdates = {feedback};
 
       rs.updateAnswerGroup(0, feedbackUpdates);
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
@@ -198,6 +198,12 @@ describe('Responses Service', function() {
       expect(rs.getAnswerChoices()).toEqual('some answer');
     });
 
+    it('should update the feedback of the default outcome', function() {
+      const feedback = shtml.createDefault('New feedback', 'feedback_1');
+      const feedbackUpdates = {feedback};
 
+      rs.updateDefaultOutcome(feedbackUpdates);
+      expect(rs.getDefaultOutcome().feedback).toEqual(feedback);
+    })
   })
 })
