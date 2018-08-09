@@ -3569,6 +3569,8 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
+        print "states_dict is "
+        print states_dict
         for key, state_dict in states_dict.iteritems():
             print "key is " + str(key)
             print state_dict
@@ -4164,7 +4166,7 @@ class Exploration(object):
         Adds dimensions to all oppia-noninteractive-image tags.
         """
         exploration_dict['schema_version'] = 30
-
+        
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
             exploration_dict['id'], exploration_dict['states'])
         exploration_dict['states_schema_version'] = 25
@@ -4351,6 +4353,7 @@ class Exploration(object):
 
         if exploration_schema_version == 29:
             exploration_dict['id'] = exp_id
+            print "CALL WAS MADE FROM EXP DOMAIN TO CHECK IN 29 and then call v29_to_v30"
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
                 exploration_dict)
             exploration_schema_version = 30
