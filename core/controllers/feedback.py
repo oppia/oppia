@@ -64,6 +64,20 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ThreadListHandlerForTopics(base.BaseHandler):
+    """Handles listing of feedback threads linked to topics."""
+    @acl_decorators.can_edit_topic
+    def get(self, topic_id):
+        # TODO (nithesh): Add non-suggestion feedback threads when required in
+        # the future.
+        self.values.update({
+            'suggestion_thread_dicts': (
+                    [t.to_dict() for t in feedback_services.get_all_threads(
+                        feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
+            })
+        self.render_json(self.values)
+
+
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
 

@@ -25,6 +25,8 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -116,7 +118,11 @@ class CreatorDashboardPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
+                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'ALLOWED_INTERACTION_CATEGORIES': (
+                feconf.ALLOWED_INTERACTION_CATEGORIES)
         })
         self.render_template(
             'pages/creator_dashboard/creator_dashboard.html',

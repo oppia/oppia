@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown">
+<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !questionUnderReview">
   <div class="questions">
     <h3 class="form-heading"> Questions included in this topic </h3>
     <button class="btn btn-default"
@@ -6,7 +6,7 @@
             style="float: right;">
       Create Question
     </button>
-    <table class="dashboard-table">
+    <table class="dashboard-table" ng-if="questionSummaries.length > 0">
       <colgroup>
         <col style="width: 10%;">
         <col style="width: 90%;">
@@ -32,6 +32,34 @@
     <h4 ng-if="questionSummaries.length === 0" style="color: gray;">
       Click on Create Question to create a new question and link it to a skill in this topic
     </h4>
+
+    <h3 class="form-heading" ng-if="questionSuggestionThreads.length > 0"> Questions suggested to this topic </h3>
+    <table class="dashboard-table" ng-if="questionSuggestionThreads.length > 0">
+      <colgroup>
+        <col style="width: 10%;">
+        <col style="width: 80%;">
+        <col style="width: 10%">
+      </colgroup>
+      <tr>
+        <th class="dashboard-table-headings">
+          <p> No. </p>
+        </th>
+        <th class="dashboard-table-headings">
+          <p> Question Content </p>
+        </th>
+      </tr>
+      <tr ng-repeat="questionSuggestionThread in questionSuggestionThreads" ng-click="setQuestionUnderReview(questionSuggestionThread)" class="list-item">
+        <td> <[$index + 1]> </td>
+        <td>
+          <a class="list-summary">
+            <angular-html-bind html-data="questionSuggestionThread.suggestion.question.question_state_data.content"></angular-html-bind>
+          </a>
+        </td>
+        <td>
+          <p><[questionSuggestionThread.suggestion.status]></p>
+        </td>
+      </tr>
+    </table>
   </div>
 </md-card>
 
@@ -52,6 +80,20 @@
                    question-state-data="questionStateData"
                    can-edit-question="canEditQuestion">
   </question-editor>
+</div>
+
+<div ng-if="questionUnderReview">
+
+  <question-editor question-id="questionUnderReview.getId()"
+                   misconceptions="[]"
+                   question-state-data="questionUnderReview.getStateData()"
+                   can-edit-question="false">
+  </question-editor>
+
+  <textarea ng-model="suggestionReviewMessage"></textarea><br>
+  <button class="btn btn-default" ng-click="showSelectSkillModal()">Select skill</button>
+  <button class="btn btn-success" ng-click="acceptQuestion(idOfSuggestionUnderReview)">Approve</button>
+  <button class="btn btn-danger" ng-click="rejectQuestion(idOfSuggestionUnderReview)">Reject</button>
 </div>
 
 <style>

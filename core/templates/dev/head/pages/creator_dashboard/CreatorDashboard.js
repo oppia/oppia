@@ -50,7 +50,8 @@ oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$uibModal', '$window',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'QuestionObjectFactory' 'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'QuestionObjectFactory','TopicsAndSkillsDashboardBackendApiService',
+  'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -58,7 +59,8 @@ oppia.controller('CreatorDashboard', [
       $scope, $rootScope, $http, $uibModal, $window, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      QuestionObjectFactory, UrlInterpolationService, FATAL_ERROR_CODES,
+      QuestionObjectFactory, TopicsAndSkillsDashboardBackendApiService,
+      UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -190,17 +192,66 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.showCreateQuestionModal = function() {
+      var question = QuestionObjectFactory.createDefaultQuestion();
+      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+        function(response) {
+          var topicSummaries = response.data.topic_summary_dicts;
+          console.log($scope.topicSummaries)
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/creator_dashboard/create_question_modal.html'),
+            backdrop: true,
+            size: 'lg',
+            resolve: {},
+            controller: [
+              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                $scope.question = question;
+                $scope.topicId = null;
+                $scope.questionStateData = $scope.question.getStateData();
+                $scope.topicSummaries = topicSummaries;
 
-      var questionStateData = null;
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator_dashboard/create_question_modal.html'),
-        backdrop: true,
-        size: 'lg',
-        resolve: {
-          questionStateData
-        }
-      })
+                $scope.isNotValidQuestion = function() {
+                  return !$scope.question.validate()
+                };
+
+                $scope.dismissModal = function() {
+                  $uibModalInstance.dismiss();
+                };
+
+                $scope.createQuestion = function() {
+                  $uibModalInstance.close({
+                    question: question,
+                    topicId: $scope.topicId
+                  });
+                };
+              }
+            ]
+          }).result.then(function(result) {
+            var topicVersion = null;
+            for (var i = 0; i < topicSummaries.length; i++) {
+              if (topicSummaries[i].id === result.topicId) {
+                topicVersion = topicSummaries[i].version;
+                break;
+              }
+            }
+            console.log(topicVersion)
+            console.log()
+            $http.post('/generalsuggestionhandler/', {
+              suggestion_type: 'add_question',
+              target_type: 'topic',
+              target_id: result.topicId,
+              target_version_at_submission: topicVersion,
+              change: {
+                cmd: 'create_new_fully_specified_question',
+                question_dict: result.question.toBackendDict(true),
+                skill_id: null
+              },
+              description: 'question title'
+            });
+          }, function() {
+            $log('Error while submitting question')
+          });
+        });
     };
 
     $rootScope.loadingMessage = 'Loading';

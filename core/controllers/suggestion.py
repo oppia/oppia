@@ -122,7 +122,16 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
+            if (
+                suggestion.suggestion_type ==
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                # The skill_id is passed only at the time of accepting the
+                # suggestion.
+                skill_id = self.payload.get('skill_id')
+                suggestion_services.update_skill_id_for_question_suggestion(
+                    suggestion, skill_id)
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

@@ -18,17 +18,17 @@
  */
 
 oppia.factory('SuggestionThreadObjectFactory', [
-  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
+  'SuggestionObjectFactory', 'QuestionSuggestionObjectFactory',
+  function(SuggestionObjectFactory, QuestionSuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        stateName, threadId, suggestion) {
+        threadId, suggestion) {
       this.status = status;
       this.subject = subject;
       this.summary = summary;
       this.originalAuthorName = originalAuthorName;
       this.lastUpdated = lastUpdated;
       this.messageCount = messageCount;
-      this.stateName = stateName;
       this.threadId = threadId;
       this.suggestion = suggestion;
       this.messages = [];
@@ -36,15 +36,21 @@ oppia.factory('SuggestionThreadObjectFactory', [
 
     SuggestionThread.createFromBackendDicts = function(
         suggestionThreadBackendDict, suggestionBackendDict) {
-      var suggestion = SuggestionObjectFactory.createFromBackendDict(
-        suggestionBackendDict);
+      var suggestion;
+      if (suggestionBackendDict.suggestion_type === 'add_question') {
+        suggestion = QuestionSuggestionObjectFactory.createFromBackendDict(
+          suggestionBackendDict);
+      } else if (suggestionBackendDict.suggestion_type ===
+          'edit_exploration_state_content') {
+        suggestion = SuggestionObjectFactory.createFromBackendDict(
+          suggestionBackendDict);
+      }
       return new SuggestionThread(
         suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
         suggestionThreadBackendDict.summary,
         suggestionThreadBackendDict.original_author_username,
         suggestionThreadBackendDict.last_updated,
         suggestionThreadBackendDict.message_count,
-        suggestionThreadBackendDict.state_name,
         suggestionThreadBackendDict.thread_id, suggestion);
     };
 

@@ -1,13 +1,15 @@
 <div class="modal-header">
+  <h3>Select topic to create question in</h3>
+  <select ng-model="topicId" ng-options="topicSummary.id as topicSummary.name for topicSummary in topicSummaries"></select>
   <h3>Create Question</h3>
 </div>
 
 <div class="modal-body">
-    <question-editor question-id="null" question-state-data="questionStateData">
+    <question-editor question-id="null" question-state-data="questionStateData" misconceptions="[]" can-edit-question="true">
     </question-editor>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="dismissModal()">Cancel</button>
-  <button class="btn btn-danger" ng-click="createQuestion()" ng-disabled="">Reject</button>
+  <button class="btn btn-success" ng-click="createQuestion()" ng-disabled="isNotValidQuestion()">Submit</button>
 </div>

@@ -106,7 +106,7 @@ oppia.factory('QuestionObjectFactory', [
       );
     };
 
-    Question.prototype.toBackendDict = function(isNewQuestion, schemaVersion) {
+    Question.prototype.toBackendDict = function(isNewQuestion) {
       var questionBackendDict = {
         id: null,
         question_state_data: this._stateData.toBackendDict(),
