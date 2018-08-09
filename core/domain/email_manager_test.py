@@ -1573,19 +1573,21 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
     def test_that_correct_completion_email_is_sent(self):
         expected_email_subject = 'Invitation to review suggestions'
         expected_email_html_body = (
-            'Hi reviewer,<br>'
-            'You have been actively contributing quality suggestions for Oppia '
-            'content in category Algebra. In recognition of your contributions,'
-            ' we would like to have you as one of our reviewers. As a reviewer,'
-            ' you would be responsible for regularly reviewing the suggestions '
-            'in the same category and ensuring that the accepted content meets '
-            'the quality bar. If you would like to help out the '
-            'content creators to review suggestions, please visit your '
+            'Hi reviewer,<br><br>'
+            'Thank you for actively contributing high-quality suggestions for '
+            'Oppia\'s lessons in Algebra, and for helping to make these lessons'
+            ' better for students around the world!<br><br>'
+            'In recognition of your contributions, we would like to invite you'
+            ' to become one of Oppia\'s reviewers. As a reviewer, you will be '
+            'able to review suggestions in Algebra, and contribute to helping '
+            'ensure that any edits made to lessons preserve the lessons\' '
+            'quality and are beneficial for students.<br><br>'
+            'If you\'d like to help out as a reviewer, please visit your '
             '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
-            'And set the review preference for the category as yes. '
-            '<br>Note that if you do accept, you will recieve periodic '
-            'mails to review incoming suggestions.<br>'
-            'Looking forward to working with you! Thanks!<br>'
+            'and set your review preferences accordingly. Note that, if you accept,'
+            'you will receive occasional emails inviting you to review incoming '
+            'suggestions by others.<br><br>'
+            'Again, thank you for your contributions to the Oppia community!<br>'
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
@@ -1637,19 +1639,18 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
     def test_that_correct_completion_email_is_sent(self):
         expected_email_subject = 'Notification to review suggestions'
         expected_email_html_body = (
-            'Hi reviewer,<br>'
-            'There are suggestions in category %s which need to be reviewed. '
-            'As you have mentioned that you would like to review suggestions'
-            ' in these domains, we have notified you about the same. '
-            'You can view all the suggestions that need to be reviewed on '
-            'your '
-            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>.'
-            '<br>Thanks!<br>'
+            'Hi reviewer,<br><br>'
+            'Just a heads-up that there are new suggestions to '
+            'review in Algebra, which you are registered as a reviewer for.'
+            '<br><br>Please take a look at and accept/reject these suggestions '
+            'at your earliest convenience. You can visit your '
+            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+            'to view the list of suggestions that need a review.<br><br>'
+            'Thank you for helping improve Oppia\'s lessons!'
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.') % (
-                'Algebra')
+            '<a href="https://www.example.com">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(

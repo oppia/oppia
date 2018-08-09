@@ -952,20 +952,21 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
     email_subject = 'Invitation to review suggestions'
 
     email_body_template = (
-        'Hi %s,<br>'
-        'You have been actively contributing quality suggestions for Oppia '
-        'content in category %s. In recognition of your contributions, we would'
-        ' like to have you as one of our reviewers. As a reviewer, you would be'
-        ' responsible for regularly reviewing the suggestions in the same '
-        'category and ensuring that the accepted content meets the quality bar.'
-        ' If you would like to help out the '
-        'content creators to review suggestions, please visit your '
+        'Hi %s,<br><br>'
+        'Thank you for actively contributing high-quality suggestions for '
+        'Oppia\'s lessons in %s, and for helping to make these lessons better '
+        'for students around the world!<br><br>'
+        'In recognition of your contributions, we would like to invite you to '
+        'become one of Oppia\'s reviewers. As a reviewer, you will be able to '
+        'review suggestions in %s, and contribute to helping ensure that any '
+        'edits made to lessons preserve the lessons\' quality and are beneficial'
+        ' for students.<br><br>'
+        'If you\'d like to help out as a reviewer, please visit your '
         '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
-        'And set the review preference for the category as yes. '
-        '<br>Note that if you do accept, you will recieve periodic '
-        'mails to review incoming suggestions.<br>'
-        'Looking forward to working with you! '
-        'Thanks!<br>'
+        'and set your review preferences accordingly. Note that, if you accept,'
+        'you will receive occasional emails inviting you to review incoming '
+        'suggestions by others.<br><br>'
+        'Again, thank you for your contributions to the Oppia community!<br>'
         '- The Oppia Team<br>'
         '<br>%s')
 
@@ -980,7 +981,8 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
     if can_user_receive_email:
         # Send email only if recipient wants to receive.
         email_body = email_body_template % (
-            recipient_user_settings.username, category, EMAIL_FOOTER.value)
+            recipient_user_settings.username, category, category,
+            EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
@@ -1000,14 +1002,14 @@ def send_mail_to_notify_users_to_review(user_id, category):
     email_subject = 'Notification to review suggestions'
 
     email_body_template = (
-        'Hi %s,<br>'
-        'There are suggestions in category %s which need to be reviewed. '
-        'As you have mentioned that you would like to review suggestions'
-        ' in these domains, we have notified you about the same. '
-        'You can view all the suggestions that need to be reviewed on '
-        'your '
-        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>.<br>'
-        'Thanks!<br>'
+        'Hi %s,<br><br>'
+        'Just a heads-up that there are new suggestions to '
+        'review in %s, which you are registered as a reviewer for.'
+        '<br><br>Please take a look at and accept/reject these suggestions at your '
+        'earliest convenience. You can visit your '
+        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+        'to view the list of suggestions that need a review.<br><br>'
+        'Thank you for helping improve Oppia\'s lessons!'
         '- The Oppia Team<br>'
         '<br>%s')
 
