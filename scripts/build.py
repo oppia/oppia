@@ -641,9 +641,7 @@ def build_HTML_files(source, target, file_hashes):
 
 def rebuild_new_files(
         source_path, target_path, recently_changed_filenames, file_hashes):
-    """Minifies list of recently changed files, removes whitespace from HTML and
-    interpolates paths in HTML to include hashes in source directory and copies
-    it to target.
+    """Minify list of recently changed files.
 
     Args:
         source_path: str. Path relative to /oppia directory of directory
@@ -653,18 +651,12 @@ def rebuild_new_files(
         recently_changed_filenames: list(str). List of recently changed files.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
-    # Always rebuild HTML files.
-    build_HTML_files(source_path, target_path, file_hashes)
     for file_name in recently_changed_filenames:
+        print 'Minifying %s' % file_name
         source_file_path = os.path.join(source_path, file_name)
         target_file_path = os.path.join(target_path, file_name)
         ensure_directory_exists(target_file_path)
-        if file_name.endswith('.css') or file_name.endswith('.js'):
-            print 'Minifying %s' % file_name
-            _minify(source_file_path, target_file_path)
-        else:
-            print 'Copying over %s' % file_name
-            shutil.copyfile(source_file_path, target_file_path)
+        minify_func(source_file_path, target_file_path, file_hashes, file_name)
 
 
 def get_new_files_from_directory(source, target):
@@ -736,6 +728,8 @@ def generate_build_directory():
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
         build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     else:
+        # Always rebuild HTML files.
+        build_HTML_files(TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
         new_files_list = get_new_files_from_directory(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
         if new_files_list:
