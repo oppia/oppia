@@ -94,9 +94,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 class SuggestionToTopicActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to topics."""
 
-    ACTION_TYPE_ACCEPT = 'accept'
-    ACTION_TYPE_REJECT = 'reject'
-
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
@@ -122,6 +119,7 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             if (

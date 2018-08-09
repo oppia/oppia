@@ -1,0 +1,34 @@
+<div class="row oppia-issues-row-eq-height oppia-issues-bor-left oppia-issues-issue-dir">
+  <div class="col-md-3 oppia-issues-bor-btm oppia-issues-bor-right text-center oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white">
+    <div style="font-size: 1.3em;">
+      Issue <[currentIssueIdentifier]>
+    </div>
+  </div>
+  <div class="col-md-9 oppia-issues-bor-left text-center d-flex justify-content-center oppia-issues-bor-btm oppia-pt2 oppia-pb2">
+    <[issueStatement]>
+  </div>
+</div>
+<div class="row oppia-pt4">
+  <p class="oppia-issues-suggestion-header">To resolve this issue, the suggested approach is: </p>
+  <div class="oppia-pt2">
+    <ul class="oppia-issues-tips">
+      <li ng-repeat="suggestion in suggestions" ng-bind-html="suggestion"></li>
+    </ul>
+  </div>
+</div>
+<div class="row oppia-pt2">
+  <p class="oppia-issues-suggestion-header">Sample Playthroughs: </p>
+</div>
+<div class="text-center">
+  <div class="row">
+    <div ng-repeat="playthroughId in playthroughIds" class="col-md-4" style="margin-left: -40px;">
+      <div class="oppia-hexagon">
+        <div class="oppia-issues-hexagon-text">
+          <button type="button" ng-click="showPlaythrough(playthroughId)" class="oppia-issues-playthrough-modal-btn oppia-issues-playthrough-content" style="padding-top: 20px; padding-right: 5px;">
+            View <br> Playthrough <[createPlaythroughNavId(playthroughId)]>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

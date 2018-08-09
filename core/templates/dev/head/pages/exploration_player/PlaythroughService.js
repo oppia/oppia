@@ -249,13 +249,13 @@ oppia.factory('PlaythroughService', [
             interaction_id: {
               value: interactionId
             },
-            answer: {
+            submitted_answer: {
               value: answer
             },
             feedback: {
               value: feedback
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -283,7 +283,7 @@ oppia.factory('PlaythroughService', [
             state_name: {
               value: stateName
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },

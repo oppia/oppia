@@ -382,6 +382,9 @@ ENABLE_GENERALIZED_FEEDBACK_THREADS = True
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
 
+# No. of pretest questions to display.
+NUM_PRETEST_QUESTIONS = 3
+
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
@@ -491,7 +494,8 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'ImageClickInput',
         'ItemSelectionInput',
         'MultipleChoiceInput',
-        'TextInput'
+        'TextInput',
+        'DragAndDropSortInput'
     ],
 }, {
     'name': 'Math',
@@ -559,10 +563,15 @@ DEMO_EXPLORATIONS = {
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
+    u'22': 'protractor_mobile_test_exploration.yaml',
+    u'23': 'rating_test.yaml',
+    u'24': 'learner_flow_test.yaml',
+    u'25': 'exploration_player_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
-    u'0': 'welcome_to_collections.yaml'
+    u'0': 'welcome_to_collections.yaml',
+    u'1': 'learner_flow_test_collection.yaml'
 }
 
 # IDs of explorations which should not be displayable in either the learner or
@@ -611,6 +620,7 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
+EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'

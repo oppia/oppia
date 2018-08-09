@@ -29,7 +29,7 @@ describe('Solution Validity Service', function() {
       svs = $injector.get('SolutionValidityService');
 
       it('should store validity of the solution correctly',
-        function () {
+        function() {
           // Initialize SolutionValidityService.
           svs.init();
 

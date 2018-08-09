@@ -69,6 +69,7 @@ oppia.directive('questionsTab', [
             });
           };
 
+<<<<<<< HEAD
           $scope.createQuestion = function() {
             var allSkillSummaries = [];
             allSkillSummaries = allSkillSummaries.concat(

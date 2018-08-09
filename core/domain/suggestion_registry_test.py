@@ -142,10 +142,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
                 'question_dict': {
                     'question_state_data': self._create_valid_question_data(
-                        'default_state'),
+                        'default_state').to_dict(),
                     'language_code': 'en',
                     'question_state_schema_version': (
-                        feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                        feconf.CURRENT_STATES_SCHEMA_VERSION)
                 },
                 'skill_id': 'skill_1'
             },

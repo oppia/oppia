@@ -20,21 +20,23 @@
 oppia.controller('PreviewTab', [
   '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
-  'ExplorationCategoryService', 'StateEditorService',
+  'ExplorationCategoryService', 'StateEditorService', 'ContextService',
   'ExplorationInitStateNameService', 'ExplorationParamChangesService',
   'ExplorationParamSpecsService', 'ExplorationStatesService',
-  'ExplorationTitleService', 'ExplorationPlayerService',
+  'ExplorationTitleService', 'ExplorationEngineService',
   'ParameterMetadataService', 'ParamChangeObjectFactory',
-  'UrlInterpolationService',
+  'NumberAttemptsService', 'EditableExplorationBackendApiService',
+  'UrlInterpolationService', 'PlayerCorrectnessFeedbackEnabledService',
   function(
       $scope, $uibModal, $q, $timeout, LearnerParamsService,
       ExplorationDataService, ExplorationAdvancedFeaturesService,
-      ExplorationCategoryService, StateEditorService,
+      ExplorationCategoryService, StateEditorService, ContextService,
       ExplorationInitStateNameService, ExplorationParamChangesService,
       ExplorationParamSpecsService, ExplorationStatesService,
-      ExplorationTitleService, ExplorationPlayerService,
+      ExplorationTitleService, ExplorationEngineService,
       ParameterMetadataService, ParamChangeObjectFactory,
-      UrlInterpolationService) {
+      NumberAttemptsService, EditableExplorationBackendApiService,
+      UrlInterpolationService, PlayerCorrectnessFeedbackEnabledService) {
     $scope.isExplorationPopulated = false;
     ExplorationDataService.getData().then(function() {
       var initStateNameForPreview = StateEditorService.getActiveStateName();
@@ -113,7 +115,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      ExplorationPlayerService.initSettingsFromEditor(
+      ExplorationEngineService.initSettingsFromEditor(
         stateName, manualParamChanges);
       $scope.isExplorationPopulated = true;
     };
@@ -123,9 +125,17 @@ oppia.controller('PreviewTab', [
       $scope.isExplorationPopulated = false;
       initStateNameForPreview = ExplorationInitStateNameService.savedMemento;
       $timeout(function() {
-        ExplorationPlayerService.init(function(exploration, initHtml,
-            newParams) {
-          $scope.loadPreviewState(initStateNameForPreview, []);
+        var explorationId = ContextService.getExplorationId();
+        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          explorationId).then(function(returnDict) {
+          ExplorationEngineService.init(
+            returnDict, null, null, null,
+            function(exploration, initHtml, newParams) {
+              $scope.loadPreviewState(initStateNameForPreview, []);
+            });
+          PlayerCorrectnessFeedbackEnabledService.init(
+            returnDict.correctness_feedback_enabled);
+          NumberAttemptsService.reset();
         });
       }, 200);
     };

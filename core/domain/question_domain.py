@@ -164,7 +164,7 @@ class Question(object):
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
-        object to contain an idea and a version. To be used to validate the
+        object to contain an ID and a version. To be used to validate the
         question before it is finalized.
         """
 

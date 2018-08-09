@@ -332,7 +332,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
 
-    # Needs to be 12 characteds long.
+    # Needs to be 12 characters long.
     SKILL_ID = 'skill1234567'
 
     SKILL_DESCRIPTION = 'skill to link question to'
@@ -352,7 +352,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_schema_version': (
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                feconf.CURRENT_STATES_SCHEMA_VERSION)
         }
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
             with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
@@ -429,7 +429,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     suggestion_models.STATUS_ACCEPTED)
                 questions, _ = (
                     question_services.get_question_summaries_linked_to_skills(
-                        [self.SKILL_ID], ''))
+                        1, [self.SKILL_ID], ''))
                 self.assertEqual(len(questions), 1)
                 self.assertEqual(questions[0].creator_id, self.author_id)
                 self.assertEqual(

@@ -117,7 +117,7 @@
                   on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
   </outcome-editor>
 
-  <div ng-if="getTaggedMisconceptionId() !== null">
+  <div ng-if="isInQuestionMode() && getTaggedMisconceptionId() !== null">
     <label> Tagged Misconception: </label>
     <[misconceptionName]>
   </div>
