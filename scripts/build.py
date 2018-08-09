@@ -729,7 +729,7 @@ def generate_build_directory():
         build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     else:
         # Always rebuild HTML files.
-        build_HTML_files(TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
+        build_HTML_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
         new_files_list = get_new_files_from_directory(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
         if new_files_list:
