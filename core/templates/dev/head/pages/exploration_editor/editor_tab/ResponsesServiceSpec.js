@@ -216,5 +216,20 @@ describe('Responses Service', function() {
       rs.updateDefaultOutcome(destUpdates);
       expect(rs.getDefaultOutcome().dest).toEqual(destUpdates.dest);
     });
+
+    //updateConfirmedUnclassifiedAnswers
+
+    it('should update the answer choices', function() {
+      const updates = [{
+        label: '<p>Label_1</p>',
+        val: 'value_1'
+      }, {
+        label: '<p>Label_2</p>',
+        val: 'value_2'
+      }];
+
+      rs.updateAnswerChoices(updates);
+      expect(rs.getAnswerChoices()).toEqual(updates);
+    })
   })
 })
