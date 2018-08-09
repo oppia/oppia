@@ -812,7 +812,10 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
 
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
+        print "BEFORE that 1 -1"
+        print filename
         filename = filename[1:-1]
+        print filename
         image['filepath-with-value'] = escape_html(json.dumps(
             get_fileinfo_of_object_image(filename, exp_id)))
     return unicode(soup)
@@ -833,7 +836,8 @@ def get_fileinfo_of_object_image(filename, exp_id):
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-
+    print  "EXPLORATION ID IS "
+    print exp_id
     filepath = (
         filename if feconf.DEV_MODE
         else ('image/%s' % filename))

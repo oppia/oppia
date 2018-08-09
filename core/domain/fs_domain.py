@@ -240,6 +240,8 @@ class ExplorationFileSystem(object):
             FileStreamWithMetadata or None. It returns FileStreamWithMetadata
                 domain object if the file exists. Otherwise, it returns None.
         """
+        print "entered the get function of the ExploratiohnFilesyste "
+        print filepath
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
             data = self._get_file_data(filepath, version)
@@ -644,6 +646,7 @@ class AbstractFileSystem(object):
         """
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
+        print "AAAAAAAAAAAAAAAAAAAAaaentered commit for the  AbstractFileSytefunctions"
         self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 
     def delete(self, user_id, filepath):
