@@ -101,8 +101,7 @@ md-input-group.md-default-theme label {
   padding: 6px 12px;
 }
 
-.md-button.oppia-learner-try-again-button
-{
+.md-button.oppia-learner-try-again-button {
   background:#ffffff;
   border: 2px solid;
   border-color:#0D48A1;
@@ -111,8 +110,7 @@ md-input-group.md-default-theme label {
 }
 
 .md-button.md-default-theme.oppia-learner-try-again-button:focus,
-.md-button.md-default-theme.oppia-learner-try-again-button:hover
-{
+.md-button.md-default-theme.oppia-learner-try-again-button:hover {
   background-color: rgba(224,242,241,1);
   text-decoration: none;
 }
@@ -454,7 +452,7 @@ textarea {
 /*
   Style for the oppia reload symbol in reload image button.
 */
-.oppia-reload-symbol {
+.oppia-reload-image-symbol {
   margin-bottom: 10px;
   margin-left: 3px;
   margin-right: -2px;
