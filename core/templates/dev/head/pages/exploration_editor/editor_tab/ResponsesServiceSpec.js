@@ -168,7 +168,7 @@ describe('Responses Service', function() {
 
     it('should update the destination of the answer group', function() {
       const destUpdates = {
-        dest: 'Test',
+        dest: 'New dest',
         refresherExplorationId: null,
         missingPrerequisiteSkillId: null
       };
@@ -204,6 +204,17 @@ describe('Responses Service', function() {
 
       rs.updateDefaultOutcome(feedbackUpdates);
       expect(rs.getDefaultOutcome().feedback).toEqual(feedback);
-    })
+    });
+
+    it('should update the destination of the default outcome', function() {
+      const destUpdates = {
+        dest: 'New dest',
+        refresherExplorationId: null,
+        missingPrerequisiteSkillId: null
+      };
+
+      rs.updateDefaultOutcome(destUpdates);
+      expect(rs.getDefaultOutcome().dest).toEqual(destUpdates.dest);
+    });
   })
 })
