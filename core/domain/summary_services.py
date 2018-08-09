@@ -743,3 +743,28 @@ def get_recently_published_exp_summary_dicts(limit):
         reverse=True)
 
     return get_displayable_exp_summary_dicts(summaries)
+
+
+def get_displayable_story_summary_dicts(story_summary):
+    """Returns a list of displayable story summary dicts for topic
+    viewer page.
+
+    Args:
+        story_summary: list(dict). A list of story summaries.
+
+    Returns:
+        list(dict): Each dict in this list represents a story in a human
+        readable form. For example:
+        [ {
+            'id': u'story_id',
+            'description': u'Description',
+            'title': u'title'
+        }, ]
+    """
+    story_summary_dicts = [{
+        'id': story.id,
+        'title': story.title,
+        'description': story.description
+    } for story in story_summary]
+
+    return story_summary_dicts

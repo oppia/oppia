@@ -116,11 +116,7 @@ class TopicModel(base_models.VersionedModel):
         Returns:
             TopicModel. The summary model of the question.
         """
-        topic = TopicModel.query().filter(cls.name == topic_name).fetch()
-        if not topic:
-            return None
-
-        return topic[0]
+        return TopicModel.query().filter(cls.name == topic_name).get()
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

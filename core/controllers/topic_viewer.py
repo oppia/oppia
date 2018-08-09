@@ -17,6 +17,7 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
+from core.domain import summary_services
 from core.domain import topic_services
 import feconf
 
@@ -64,17 +65,15 @@ class TopicPageDataHandler(base.BaseHandler):
                 additional_story_id) for additional_story_id
             in topic.additional_story_ids]
 
-        canonical_story_dicts = [{
-            'id': summary.id,
-            'title': summary.title,
-            'description': summary.description
-        } for summary in canonical_story_summaries]
+        canonical_story_dicts = [
+            summary for summary
+            in summary_services.get_displayable_story_summary_dicts(
+                canonical_story_summaries)]
 
-        additional_story_dicts = [{
-            'id': summary.id,
-            'title': summary.title,
-            'description': summary.description
-        } for summary in additional_story_summaries]
+        additional_story_dicts = [
+            summary for summary
+            in summary_services.get_displayable_story_summary_dicts(
+                additional_story_summaries)]
 
         self.values.update({
             'topic_name': topic.name,
