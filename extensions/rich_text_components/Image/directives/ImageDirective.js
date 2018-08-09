@@ -43,8 +43,10 @@ oppia.directive('oppiaNoninteractiveImage', [
 
         if (ImagePreloaderService.inExplorationPlayer()) {
           $scope.isLoadingIndicatorShown = true;
+          console.log($scope.filepath);
           $scope.dimensions = (
             ImagePreloaderService.getDimensionsOfImage($scope.filepath));
+          console.log($scope.dimensions);
           // For aligning the gif to the center of it's container
           var loadingIndicatorSize = (
             ($scope.dimensions.height < 124) ? 24 : 120);

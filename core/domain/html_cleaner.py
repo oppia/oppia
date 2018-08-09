@@ -837,7 +837,8 @@ def get_fileinfo_of_object_image(filename, exp_id):
     filepath = (
         filename if feconf.DEV_MODE
         else ('image/%s' % filename))
-
+    print "FFFFFFFFFFFFF"
+    print filepath
     content = fs.get(filepath)
 
     height, width = gae_image_services.get_image_dimensions(content)
