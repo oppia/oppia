@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -35,6 +36,10 @@ import utils
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
+
+
+def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
+    return exp_services.get_filename_generated(filename, 490, 120)
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -622,10 +627,13 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
-        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(
-            updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+        with self.swap(
+            html_cleaner, 'get_fileinfo_of_object_image',
+            mock_get_fileinfo_of_object_image):
+            updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+            self.assertEqual(
+                updated_exp.states_schema_version,
+                feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(
@@ -1182,22 +1190,25 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 updated_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
+        with self.swap(
+            html_cleaner, 'get_fileinfo_of_object_image',
+            mock_get_fileinfo_of_object_image):
+            exp_services.save_new_exploration(
+                self.albert_id, updated_exploration)
 
-        # Start validation job on updated exploration.
-        job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
+            # Start validation job on updated exploration.
+            job_id = (
+                exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
 
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
+            actual_output = (
+                exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                    job_id))
 
-        # Test that validation passes after migration.
-        self.assertEqual(actual_output, [])
+            # Test that validation passes after migration.
+            self.assertEqual(actual_output, [])
 
 
 class ExplorationContentValidationJobForCKEditorTest(
@@ -1427,7 +1438,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
@@ -1466,7 +1477,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                    '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                     'random.png&amp;quot;"></oppia-noninteractive-image> in '
                     '</b>progress</pre>'
 

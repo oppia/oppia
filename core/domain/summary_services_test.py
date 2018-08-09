@@ -22,6 +22,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import html_cleaner
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -252,12 +253,20 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'reload_exploration',
-                'exploration_id': '2'
-            }, csrf_token=csrf_token)
-        self.logout()
+
+        def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
+            return exp_services.get_filename_generated(filename, 490, 120)
+
+        with self.swap(
+            html_cleaner, 'get_fileinfo_of_object_image',
+            mock_get_fileinfo_of_object_image):
+
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'reload_exploration',
+                    'exploration_id': '2'
+                }, csrf_token=csrf_token)
+            self.logout()
 
     def test_get_library_groups(self):
         """The exploration with id '2' is an exploration in the Mathematics
