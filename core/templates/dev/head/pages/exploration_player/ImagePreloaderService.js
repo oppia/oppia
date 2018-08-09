@@ -29,7 +29,6 @@ oppia.factory('ImagePreloaderService', [
     var _filenamesOfImageToBeDownloaded = [];
     var _filenamesOfImageFailedToDownload = [];
     var _exploration = null;
-    var _imageDimensions = null;
     var _hasImagePreloaderServiceStarted = false;
     // imageLoadedCallback is an object of objects (identified by the filenames
     // which are being downloaded at the time they are required by the
@@ -41,24 +40,9 @@ oppia.factory('ImagePreloaderService', [
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
-      _getDimensionsOfImages();
       _hasImagePreloaderServiceStarted = true;
     };
 
-    /**
-     * Gets the dimensions of the images in the exploration.
-     */
-    var _getDimensionsOfImages = function() {
-      _imageDimensions = {};
-      var states = (_states.getStateNames()).map(function(stateName) {
-        return _states.getState(stateName);
-      });
-      states.forEach(function(state){
-        Object.assign(_imageDimensions,
-          ExtractImageFilenamesFromStateService.getImageDimensionsInState(
-            state));
-      });
-    };
     /**
      * Gets the Url for the image file.
      * @param {string} filename - Filename of the image whose Url is to be
@@ -241,12 +225,32 @@ oppia.factory('ImagePreloaderService', [
       }
     };
 
+    /**
+    * Gets the dimensions of the images from the filename provided.
+    * @param {string} filename - The string from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var getDimensionsOfImage = function(filename) {
+      var height_regex = RegExp('height_[0-9]+','g');
+      var height_string = height_regex.exec(filename);
+      if(height_string) {
+      var height = height_string[0].substring(height_string[0].indexOf('_') + 1);
+      var width_regex = RegExp('width_[0-9]+','g');
+      var width_string = width_regex.exec(filename);
+      var width = width_string[0].substring(width_string[0].indexOf('_') + 1);
+      dimensions = {
+        'height': Number(height),
+        'width': Number(width)
+      };
+      
+      return dimensions;
+      }
+    };
+
     return {
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
-      getDimensionsOfImage: function(filename) {
-        return _imageDimensions[filename];
-      },
+      getDimensionsOfImage: getDimensionsOfImage,
       onStateChange: _onStateChange,
       isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {

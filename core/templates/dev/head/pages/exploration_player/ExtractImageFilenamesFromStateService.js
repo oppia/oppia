@@ -137,52 +137,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     };
 
     /**
-    * Gets the dimensions of the images from the html provided.
-    * @param {string} htmlStr - The string from which the dimensions of the
-    *                           images should be extracted.
-    */
-    var _getImageDimensionsFromFilepathValue = function(htmlStr) {
-      var filenames = (
-        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
-      var fileDimensions = {};
-      // Currently we don't have dimensions of the images stored in backend. So
-      // we assign default dimensions to the images 500px x 200px.
-      filenames.forEach(function(filename){
-        fileDimensions[filename] = {
-          width: 500,
-          height: 200
-        };
-      });
-      return fileDimensions;
-    };
-
-    /**
-    * Gets the dimensions of the images from the state provided.
-    * @param {object} state - The state from which the dimensions of the
-    *                           images should be extracted.
-    */
-    var _getImageDimensionsInState = function(state) {
-      var fileDimensions = {};
-      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-      // The Image Click Input interaction has an image whose filename is
-      // directly stored in the customizationArgs.imageAndRegion.value
-      // .imagePath
-        var filename = (
-          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        fileDimensions[filename] = {
-          width: 500,
-          height: 200
-        };
-      }
-      var allHtmlOfState = _getAllHtmlOfState(state);
-      allHtmlOfState.forEach(function(htmlStr) {
-        Object.assign(fileDimensions,
-          _getImageDimensionsFromFilepathValue(htmlStr));
-      });
-      return fileDimensions;
-    };
-
-    /**
      * Gets the filenames of all the images that are a part of the state.
      * @param {object} state - The state from which the filenames of the image
      *                         should be extracted.
@@ -206,7 +160,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     };
 
     return {
-      getImageFilenamesInState: _getImageFilenamesInState,
-      getImageDimensionsInState: _getImageDimensionsInState
+      getImageFilenamesInState: _getImageFilenamesInState
     };
   }]);

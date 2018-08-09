@@ -121,8 +121,6 @@ def get_filename_generated(filename, height, width):
     filetype = filename[filename.rfind('.') + 1:]
     dimensions = '_height_' + str(height) + '_width_' + str(width)
     filename_reset = filename_wo_filetype + dimensions + '.' + filetype
-	# renamed_filename = '%s_height_%s_width_%s.%s' % (
-    #     'filename_wo_filetype', 'height', 'width', 'filetype')
     return filename_reset
 
 

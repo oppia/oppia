@@ -149,10 +149,12 @@ describe('Image preloader service', function() {
               choices: {
                 value: [
                   '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMChoice1.png&amp;' +
+                  ' filepath-with-value="&amp;quot;' +
+                  'sIMChoice1_height_32_width_42.png&amp;' +
                   'quot;"></oppia-noninteractive-image></p>',
                   '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMChoice2.png&amp;' +
+                  ' filepath-with-value="&amp;quot;' +
+                  'sIMChoice2_height_30_width_40.png&amp;' +
                   'quot;"></oppia-noninteractive-image></p>'
                 ]
               }
@@ -166,8 +168,8 @@ describe('Image preloader service', function() {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
                           '<oppia-noninteractive-image filepath-with-value=' +
-                          '"&amp;quot;sIOFeedback.png&amp;quot;">' +
-                          '</oppia-noninteractive-image></p>'
+                          '"&amp;quot;sIOFeedback_height_50_width_50.png' +
+                          '&amp;quot;"></oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
@@ -284,7 +286,7 @@ describe('Image preloader service', function() {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p><oppia-noninteractive-image filepath-with-value="' +
-                      '&amp;quot;s6Hint1.png&amp;quot;">' +
+                      '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               }
             }],
@@ -301,24 +303,27 @@ describe('Image preloader service', function() {
     requestUrl1 = UrlInterpolationService.interpolateUrl(
       '/imagehandler/<exploration_id>/<filename>', {
         exploration_id: '1',
-        filename: 'sIMChoice1.png'
+        filename: 'sIMChoice1_height_32_width_42.png'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
       '/imagehandler/<exploration_id>/<filename>', {
         exploration_id: '1',
-        filename: 'sIMChoice2.png'
+        filename: 'sIMChoice2_height_30_width_40.png'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
       '/imagehandler/<exploration_id>/<filename>', {
         exploration_id: '1',
-        filename: 'sIOFeedback.png'
+        filename: 'sIOFeedback_height_50_width_50.png'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
       '/imagehandler/<exploration_id>/<filename>', {
         exploration_id: '1',
-        filename: 's6Hint1.png'
+        filename: 's6Hint1_height_60_width_60.png'
       });
-
+    
+    imageFileNames = [
+      'sIMChoice1_height_32_width_42.png', 'sIMChoice2_height_30_width_40.png',
+      'sIOFeedback_height_50_width_50.png', 's6Hint1_height_60_width_60.png']
     var exploration = eof.createFromBackendDict(explorationDict);
     ips.init(exploration);
     ips.kickOffImagePreloader(exploration.getInitialState().name);
@@ -331,10 +336,14 @@ describe('Image preloader service', function() {
       $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
       $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
-      expect(ips.isLoadingImageFile('sIMChoice1.png')).toBe(true);
-      expect(ips.isLoadingImageFile('sIMChoice2.png')).toBe(true);
-      expect(ips.isLoadingImageFile('sIOFeedback.png')).toBe(true);
-      expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+      expect(ips.isLoadingImageFile(
+        'sIMChoice1_height_32_width_42.png')).toBe(true);
+      expect(ips.isLoadingImageFile(
+        'sIMChoice2_height_30_width_40.png')).toBe(true);
+      expect(ips.isLoadingImageFile(
+        'sIOFeedback_height_50_width_50.png')).toBe(true);
+      expect(ips.isLoadingImageFile(
+        's6Hint1_height_60_width_60.png')).toBe(false);
       $httpBackend.flush(1);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
       $httpBackend.flush(1);
@@ -343,25 +352,32 @@ describe('Image preloader service', function() {
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
       $httpBackend.flush(1);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
-      expect(ips.isLoadingImageFile('sIMChoice1.png')).toBe(false);
-      expect(ips.isLoadingImageFile('sIMChoice2.png')).toBe(false);
-      expect(ips.isLoadingImageFile('sIOFeedback.png')).toBe(false);
-      expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+      expect(ips.isLoadingImageFile(
+        'sIMChoice1_height_32_width_42.png')).toBe(false);
+      expect(ips.isLoadingImageFile(
+        'sIMChoice2_height_30_width_40.png')).toBe(false);
+      expect(ips.isLoadingImageFile(
+        'sIOFeedback_height_50_width_50.png')).toBe(false);
+      expect(ips.isLoadingImageFile(
+        's6Hint1_height_60_width_60.png')).toBe(false);
     });
 
   it('should properly restart pre-loading from a new state', function() {
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     ips.restartImagePreloader('State 6');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
-    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(true);
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(true);
   });
 
   it('should verify that preloader starts when state changes', function() {
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
-    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(false);
     ips.onStateChange('State 6');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
-    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(true);
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(true);
   });
 
   it('should check that there is sync between AssetsBackendApi Service and' +
@@ -386,11 +402,20 @@ describe('Image preloader service', function() {
       $httpBackend.expect('GET', requestUrl4).respond(408);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
       $httpBackend.flush(3);
-      expect(ips.isInFailedDownload('sIOFeedback.png')).toBe(true);
+      expect(ips.isInFailedDownload(
+        'sIOFeedback_height_50_width_50.png')).toBe(true);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
       $httpBackend.flush(1);
-      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(true);
+      expect(ips.isInFailedDownload(
+        's6Hint1_height_60_width_60.png')).toBe(true);
       ips.restartImagePreloader('State 6');
-      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(false);
+      expect(ips.isInFailedDownload(
+        's6Hint1_height_60_width_60.png')).toBe(false);
+    });
+
+    it('should calculate the dimensions of the image file', function() {
+      dimensions = ips.getDimensionsOfImage('sIOFeedback_height_50_width_50.png');
+      expect(dimensions.width).toBe(50);
+      expect(dimensions.height).toBe(50);
     });
 });
