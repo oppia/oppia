@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <div ng-if="StateHintsService.savedMemento[getIndexPlusOne() - 1] && !StateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
+  <div ng-if="!isInQuestionMode() && StateHintsService.savedMemento[getIndexPlusOne() - 1] && !StateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_HINT]>"
                                content-id="StateHintsService.displayed[getIndexPlusOne() - 1].hintContent.getContentId()"
                                on-start-edit="onAudioTranslationsStartEditAction"

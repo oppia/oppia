@@ -585,8 +585,7 @@ class Story(object):
                 'Expected language code to be a string, received %s' %
                 self.language_code)
 
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
@@ -618,6 +617,36 @@ class Story(object):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
+
+    def get_prerequisite_skill_ids_for_exp_id(self, exp_id):
+        """Returns the prerequisite skill ids of the node having the given
+        exploration id.
+
+        Args:
+            exp_id: str. The ID of the exploration linked to the story,
+
+        Returns:
+            list(str)|None. The list of prerequisite skill ids for the
+                exploration or None, if no node is linked to it.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exp_id:
+                return node.prerequisite_skill_ids
+        return None
+
+    def has_exploration(self, exp_id):
+        """Checks whether an exploration is present in the story.
+
+        Args:
+            exp_id: str. The ID of the exploration linked to the story,
+
+        Returns:
+            bool. Whether the exploration is linked to the story.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exp_id:
+                return True
+        return False
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.

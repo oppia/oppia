@@ -19,21 +19,21 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'EditorStateService',
+  'AnswerGroupsCacheService', 'StateEditorService',
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'SolutionValidityService', 'ExplorationStatesService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, EditorStateService,
+      AnswerGroupsCacheService, StateEditorService,
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID,
+      SolutionValidityService, ExplorationStatesService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -60,21 +60,21 @@ oppia.factory('ResponsesService', [
         StateSolutionService.savedMemento.correctAnswer !== null);
 
       if (interactionCanHaveSolution && solutionExists) {
-        var interaction = EditorStateService.getInteraction();
+        var interaction = StateEditorService.getInteraction();
 
         interaction.answerGroups = angular.copy(_answerGroups);
         interaction.defaultOutcome = angular.copy(_defaultOutcome);
         var solutionIsValid = SolutionVerificationService.verifySolution(
-          EditorStateService.getActiveStateName(),
+          StateEditorService.getActiveStateName(),
           interaction,
           StateSolutionService.savedMemento.correctAnswer
         );
 
         SolutionValidityService.updateValidity(
-          EditorStateService.getActiveStateName(), solutionIsValid);
+          StateEditorService.getActiveStateName(), solutionIsValid);
         var solutionWasPreviouslyValid = (
           SolutionValidityService.isSolutionValid(
-            EditorStateService.getActiveStateName()));
+            StateEditorService.getActiveStateName()));
         if (solutionIsValid && !solutionWasPreviouslyValid) {
           AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
         } else if (!solutionIsValid && solutionWasPreviouslyValid) {
@@ -102,6 +102,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
+      if (updates.hasOwnProperty('taggedMisconceptionId')) {
+        answerGroup.taggedMisconceptionId = updates.taggedMisconceptionId;
+      }
       if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;
       }
@@ -126,7 +129,7 @@ oppia.factory('ResponsesService', [
       callback(_answerGroupsMemento);
     };
 
-    var _updateAnswerGroupsAudioTranslation = function () {
+    var _updateAnswerGroupsAudioTranslation = function() {
       StateContentIdsToAudioTranslationsService.displayed.
         deleteAllFeedbackContentId();
       for (var i = 0; i < _answerGroups.length; i++) {
@@ -134,6 +137,9 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+      ExplorationStatesService.saveContentIdsToAudioTranslations(
+        StateEditorService.getActiveStateName(),
+        StateContentIdsToAudioTranslationsService.displayed);
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -200,12 +206,12 @@ oppia.factory('ResponsesService', [
               COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(),
+              StateEditorService.getActiveStateName(),
               COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
             StateContentIdsToAudioTranslationsService.displayed.addContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
-          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          _updateAnswerGroupsAudioTranslation();
         }
 
         _confirmedUnclassifiedAnswers = [];

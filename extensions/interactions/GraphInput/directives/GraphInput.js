@@ -41,10 +41,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],

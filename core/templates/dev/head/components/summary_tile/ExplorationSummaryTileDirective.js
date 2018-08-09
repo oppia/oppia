@@ -179,7 +179,7 @@ oppia.directive('explorationSummaryTile', [
             $scope.$apply();
           });
 
-          $scope.getCompleteThumbnailIconUrl = function () {
+          $scope.getCompleteThumbnailIconUrl = function() {
             return UrlInterpolationService.getStaticImageUrl(
               $scope.getThumbnailIconUrl());
           };

@@ -49,6 +49,7 @@
 </style>
 <div class="oppia-response-header-block">
   <div class="oppia-response-header">
+    <span ng-if="showWarning()">⚠</span>
     <i class="material-icons md-18 oppia-response-tick-cross" ng-if="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse() && !isCurrentInteractionLinear()">&#x2718;</i>
     <i class="material-icons md-18 oppia-response-tick-cross" ng-if="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse() && !isCurrentInteractionLinear()">&#10004;</i>
     <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
@@ -62,7 +63,10 @@
 
   <br class="break-in-mobile">
   <span ng-if="getOutcome()">→</span>
-  <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState()"
+  <span ng-if="isCorrect() && isInQuestionMode()">
+    Continue
+  </span>
+  <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
     <[getOutcome().dest]>
   </span>
@@ -70,7 +74,7 @@
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="getOutcome() && isOutcomeLooping()">
+  <span ng-if="getOutcome() && (isOutcomeLooping() || (!isCorrect() && !getOutcome().dest && isInQuestionMode()))">
     <em>(try again)</em>
   </span>
 </div>

@@ -215,6 +215,7 @@ GENERATED_FILE_PATHS = (
     'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.js',
     'core/templates/dev/head/mathjaxConfig.js',
@@ -253,6 +254,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
