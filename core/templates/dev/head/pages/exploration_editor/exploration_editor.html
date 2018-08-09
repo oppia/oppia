@@ -78,7 +78,7 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'translation'">
+      <div ng-if="getTabStatuses().active === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
@@ -178,6 +178,7 @@
   <script src="/extensions/objects/templates/ImageWithRegionsEditor.js"></script>
   <script src="/extensions/objects/templates/IntEditor.js"></script>
   <script src="/extensions/objects/templates/ListOfSetsOfHtmlStringsEditor.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditor.js"></script>
   <script src="/extensions/objects/templates/ListOfUnicodeStringEditor.js"></script>
   <script src="/extensions/objects/templates/LogicErrorCategoryEditor.js"></script>
   <script src="/extensions/objects/templates/LogicQuestionEditor.js"></script>
@@ -291,6 +292,8 @@
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationStatusService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
@@ -357,6 +360,7 @@
   <script src="/templates/dev/head/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/state_card/StateCardObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/PlaythroughObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/ExplorationIssueObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/LearnerActionObjectFactory.js"></script>
@@ -377,7 +381,6 @@
 
   <script src="/templates/dev/head/pages/exploration_player/TutorCardDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/SupplementalCardDirective.js"></script>
-  <script src="/templates/dev/head/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlayerConstants.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/StateClassifierMappingService.js"></script>
@@ -397,7 +400,7 @@
   <script src="/templates/dev/head/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlayerPositionService.js"></script>
-  <script src="/templates/dev/head/pages/exploration_player/PlayerServices.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/ExplorationEngineService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/ProgressNavDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/StatsReportingService.js"></script>
