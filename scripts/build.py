@@ -413,6 +413,10 @@ def copy_files_source_to_target(source, target, file_hashes):
 
             target_path = source_path
             relative_path = os.path.relpath(source_path, source)
+            # Remove file that was deleted in DEV.
+            if relative_path not in file_hashes:
+                os.remove(source_path)
+                continue
             if hash_should_be_inserted(source + relative_path):
                 relative_path = (
                     _insert_hash(relative_path, file_hashes[relative_path]))
@@ -607,30 +611,31 @@ def build_files(source, target, file_hashes):
             print e
 
 
-def rebuild_new_files(source_path, target_path, new_files_list, file_hashes):
-    """Minifies list of  new files, removes whitespace from HTML and
-    interpolates paths in HTML to include hashes in source
-    directory and copies it to target.
+def rebuild_new_files(
+        source_path, target_path, recently_changed_filenames, file_hashes):
+    """Minifies list of recently changed files, removes whitespace from HTML and
+    interpolates paths in HTML to include hashes in source directory and copies
+    it to target.
 
     Args:
         source_path: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
         target_path: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
-        new_files_list: list. List of recently changed file.
+        recently_changed_filenames: list(str). List of recently changed files.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
-    for new_file in new_files_list:
-        source_file_path = (source_path + new_file).strip()
-        target_file_path = (target_path + new_file).strip()
+    for file_name in recently_changed_filenames:
+        source_file_path = os.path.join(source_path + file_name)
+        target_file_path = os.path.join(target_path + file_name)
         ensure_directory_exists(target_file_path)
         print "Minifying %s" % target_file_path
-        minify_func(source_file_path, target_file_path, file_hashes, new_file)
+        minify_func(source_file_path, target_file_path, file_hashes, file_name)
 
 
 def get_new_files_from_directory(source, target):
-    """Compare current's hashed file and newly generated hash
-    and return list of expected new files.
+    """Compare current's hashed file and newly generated hash and return list of
+    expected new files.
 
     Args:
         source: str. Path relative to /oppia where the DEV files are located.
@@ -641,15 +646,16 @@ def get_new_files_from_directory(source, target):
     """
     file_hashes = dict()
     file_hashes.update(get_file_hashes(source))
-    new_files_list = []
+    recently_changed_filenames = []
     for file_name, md5_hash in file_hashes.iteritems():
-        filepath = _insert_hash(target + file_name, md5_hash)
         # Ignore files with certain extensions.
-        if any(filepath.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+        if any(file_name.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
             continue
-        if os.path.isfile(filepath) is False:
-            new_files_list.append(file_name)
-    return new_files_list
+        final_filepath = _insert_hash(
+            os.path.join(target + file_name), md5_hash)
+        if not os.path.isfile(final_filepath):
+            recently_changed_filenames.append(file_name)
+    return recently_changed_filenames
 
 
 def generate_build_directory():
@@ -691,7 +697,7 @@ def generate_build_directory():
     save_hashes_as_json(HASHES_JSON, hashes)
 
     # Minify all template files copy them into build/templates/head.
-    if os.path.isdir(TEMPLATES_STAGING_DIR) is False:
+    if not os.path.isdir(TEMPLATES_STAGING_DIR):
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
         build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     else:
