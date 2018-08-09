@@ -175,6 +175,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
+    print "exploration_model.states_schema_version feconf.CURRENT_STATES_SCHEMA_VERSION"
+    print exploration_model.states_schema_version
+    print feconf.CURRENT_STATES_SCHEMA_VERSION
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_states_schema(
@@ -248,6 +251,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict, version=version)
         if exploration_model:
+            print "inside the get_exploration_by_id in the exp_services."
             exploration = get_exploration_from_model(exploration_model)
             memcache_services.set_multi({
                 exploration_memcache_key: exploration})
