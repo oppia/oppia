@@ -626,8 +626,8 @@ def rebuild_new_files(
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
     for file_name in recently_changed_filenames:
-        source_file_path = os.path.join(source_path + file_name)
-        target_file_path = os.path.join(target_path + file_name)
+        source_file_path = os.path.join(source_path, file_name)
+        target_file_path = os.path.join(target_path, file_name)
         ensure_directory_exists(target_file_path)
         print "Minifying %s" % target_file_path
         minify_func(source_file_path, target_file_path, file_hashes, file_name)
@@ -652,7 +652,7 @@ def get_new_files_from_directory(source, target):
         if any(file_name.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
             continue
         final_filepath = _insert_hash(
-            os.path.join(target + file_name), md5_hash)
+            os.path.join(target, file_name), md5_hash)
         if not os.path.isfile(final_filepath):
             recently_changed_filenames.append(file_name)
     return recently_changed_filenames
