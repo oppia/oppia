@@ -148,7 +148,7 @@ describe('Responses Service', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
 
-    it('should update the rules', function() {
+    it('should update the rules of the answer group', function() {
       const rule = rof.createNew('Equals', {x: 'New answer'});
       const ruleUpdates = {
         rules: [rule]
@@ -158,7 +158,7 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
     });
 
-    it('should update the feedback', function() {
+    it('should update the feedback of the answer group', function() {
       const feedback = shtml.createDefault('New feedback', 'feedback_1');
       const feedbackUpdates = {feedback}
 
@@ -166,7 +166,7 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
     });
 
-    it('should update the destination', function() {
+    it('should update the destination of the answer group', function() {
       const destUpdates = {
         dest: 'Test',
         refresherExplorationId: null,
@@ -197,5 +197,7 @@ describe('Responses Service', function() {
       rs.updateAnswerChoices('some answer');
       expect(rs.getAnswerChoices()).toEqual('some answer');
     });
+
+
   })
 })
