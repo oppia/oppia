@@ -65,16 +65,16 @@ class TopicPageDataHandler(base.BaseHandler):
             in topic.additional_story_ids]
 
         canonical_story_dicts = [{
-            'id': story.id,
-            'title': story.title,
-            'description': story.description
-        } for story in canonical_story_summaries]
+            'id': summary.id,
+            'title': summary.title,
+            'description': summary.description
+        } for summary in canonical_story_summaries]
 
         additional_story_dicts = [{
-            'id': story.id,
-            'title': story.title,
-            'description': story.description
-        } for story in additional_story_summaries]
+            'id': summary.id,
+            'title': summary.title,
+            'description': summary.description
+        } for summary in additional_story_summaries]
 
         self.values.update({
             'topic_name': topic.name,

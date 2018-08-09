@@ -116,7 +116,7 @@ describe('Url Service', function() {
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function(){
       UrlService.getTopicNameFromLearnerUrl();
-    }).toThrow();
+    }).toThrowError('Invalid URL for topic');
   });
 
   it('should correctly retrieve story id from url', function() {

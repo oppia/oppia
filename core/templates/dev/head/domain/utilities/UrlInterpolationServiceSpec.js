@@ -301,6 +301,14 @@ describe('URL Interpolation Service', function() {
 
   it('should interpolate URLs not requiring parameters', function() {
     expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
+    expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
+    expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
+    expect(function(){
+      uis.getStoryUrl('', {});
+    }).toThrowError('Empty path passed in method.');
+    expect(function(){
+      uis.getStoryUrl('storyId', {});
+    }).toThrowError('Path must start with \'/\': \'storyId\'.');
   });
 
   it('should throw an error for empty path', function() {
