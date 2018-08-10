@@ -23,7 +23,7 @@ oppia.factory('ResponsesService', [
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'ExplorationStatesService',
+  'SolutionValidityService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
@@ -32,7 +32,7 @@ oppia.factory('ResponsesService', [
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, ExplorationStatesService,
+      SolutionValidityService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
@@ -137,9 +137,6 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-      ExplorationStatesService.saveContentIdsToAudioTranslations(
-        StateEditorService.getActiveStateName(),
-        StateContentIdsToAudioTranslationsService.displayed);
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
