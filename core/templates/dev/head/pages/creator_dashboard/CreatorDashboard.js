@@ -50,7 +50,7 @@ oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$uibModal', '$window',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'QuestionObjectFactory','TopicsAndSkillsDashboardBackendApiService',
+  'QuestionObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
   'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
@@ -196,15 +196,15 @@ oppia.controller('CreatorDashboard', [
       TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
         function(response) {
           var topicSummaries = response.data.topic_summary_dicts;
-          console.log($scope.topicSummaries)
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/creator_dashboard/create_question_modal.html'),
+              '/pages/creator_dashboard/create_question_modal_directive.html'),
             backdrop: true,
             size: 'lg',
             resolve: {},
             controller: [
-              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              '$scope', '$uibModalInstance', function(
+                  $scope, $uibModalInstance) {
                 $scope.question = question;
                 $scope.topicId = null;
                 $scope.questionStateData = $scope.question.getStateData();
@@ -234,8 +234,6 @@ oppia.controller('CreatorDashboard', [
                 break;
               }
             }
-            console.log(topicVersion)
-            console.log()
             $http.post('/generalsuggestionhandler/', {
               suggestion_type: 'add_question',
               target_type: 'topic',
@@ -249,7 +247,7 @@ oppia.controller('CreatorDashboard', [
               description: 'question title'
             });
           }, function() {
-            $log('Error while submitting question')
+            $log('Error while submitting question');
           });
         });
     };

@@ -39,7 +39,7 @@ oppia.factory('QuestionSuggestionObjectFactory', ['QuestionObjectFactory',
 
     Suggestion.createFromBackendDict = function(suggestionBackendDict) {
       question = QuestionObjectFactory.createFromBackendDict(
-        suggestionBackendDict.change.question_dict)
+        suggestionBackendDict.change.question_dict);
       return new Suggestion(
         suggestionBackendDict.suggestion_type,
         suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,

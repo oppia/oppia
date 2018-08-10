@@ -29,12 +29,12 @@ oppia.directive('questionsTab', [
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
-            $scope, $http, $uibModal, AlertsService, TopicEditorStateService,
-            QuestionCreationService, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionSuggestionObjectFactory,
-            SuggestionThreadObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            StateEditorService) {
+            $scope, $http, $uibModal, AlertsService,
+            TopicEditorStateService, QuestionCreationService,
+            EditableQuestionBackendApiService, EditableSkillBackendApiService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService) {
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -217,9 +217,10 @@ oppia.directive('questionsTab', [
                 action: 'accept',
                 skill_id: $scope.selectedSkillId,
                 commit_message: 'unused_commit_message'
-              }).then(function(){
-                $scope.clearQuestionUnderReview();
-              });
+              }
+            ).then(function() {
+              $scope.clearQuestionUnderReview();
+            });
           };
 
           $scope.rejectQuestion = function(suggestionId) {
@@ -229,9 +230,10 @@ oppia.directive('questionsTab', [
                 action: 'reject',
                 commit_message: 'unused_commit_message',
                 review_message: $scope.suggestionReviewMessage
-              }).then(function(){
-                $scope.clearQuestionUnderReview();
-              });
+              }
+            ).then(function(){
+              $scope.clearQuestionUnderReview();
+            });
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);

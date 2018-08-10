@@ -72,8 +72,8 @@ class ThreadListHandlerForTopics(base.BaseHandler):
         # the future.
         self.values.update({
             'suggestion_thread_dicts': (
-                    [t.to_dict() for t in feedback_services.get_all_threads(
-                        feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
+                [t.to_dict() for t in feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
             })
         self.render_json(self.values)
 
