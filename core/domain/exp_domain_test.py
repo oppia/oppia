@@ -4799,7 +4799,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             state_dict_with_image_caption)
 
         add_dimensions_to_noninteractive_image_tag = functools.partial(
-            html_cleaner.add_dimensions_to_noninteractive_image_tag,
+            html_validation_service.add_dimensions_to_noninteractive_image_tag,
             'eid')
 
         with self.swap(
