@@ -54,13 +54,10 @@ oppia.factory('PlaythroughService', [
      * This function extracts the old quit action out of the playthrough
      * actions list.
      */
-    var extractOldQuitAction = function() {
-      for (i = 0; i < playthrough.actions.length; i++) {
-        var action = playthrough.actions[i].actionType;
-        if (action === ACTION_TYPE_EXPLORATION_QUIT) {
-          playthrough.actions.splice(i, 1);
-        }
-      }
+    var removeOldQuitAction = function() {
+      playthrough.actions = playthrough.actions.filter(function(action) {
+        return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
+      });
     };
 
     var _determineIfPlayerIsInSamplePopulation = function() {
@@ -228,29 +225,21 @@ oppia.factory('PlaythroughService', [
             !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
+        var expStartLearnerAction = LearnerActionObjectFactory.createNew(
+          ACTION_TYPE_EXPLORATION_START,
+          {
+            state_name: {
+              value: initStateName
+            }
+          },
+          CURRENT_ACTION_SCHEMA_VERSION);
         // Sometimes, the answer submit action gets recorded before the start.
         // This happens when an answer is submitted very soon into an
         // exploration.
         if (playthrough.actions.length > 0) {
-          playthrough.actions.unshift(LearnerActionObjectFactory.createNew(
-            ACTION_TYPE_EXPLORATION_START,
-            {
-              state_name: {
-                value: initStateName
-              }
-            },
-            CURRENT_ACTION_SCHEMA_VERSION
-          ));
+          playthrough.actions.unshift(expStartLearnerAction);
         } else {
-          playthrough.actions.push(LearnerActionObjectFactory.createNew(
-            ACTION_TYPE_EXPLORATION_START,
-            {
-              state_name: {
-                value: initStateName
-              }
-            },
-            CURRENT_ACTION_SCHEMA_VERSION
-          ));
+          playthrough.actions.push(expStartLearnerAction);
         }
 
         createMultipleIncorrectIssueTracker(initStateName);
@@ -330,7 +319,7 @@ oppia.factory('PlaythroughService', [
         }
         if (playthrough.playthroughId) {
           // Playthrough ID exists, so issue has already been identified.
-          extractOldQuitAction();
+          removeOldQuitAction();
           if (playthrough.issueType === ISSUE_TYPE_EARLY_QUIT) {
             // If the existing issue is of type early quit, and some other issue
             // can be identified, update the issue since early quit has lower
