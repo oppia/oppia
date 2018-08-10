@@ -17,8 +17,10 @@
 """HTML sanitizing service."""
 
 import HTMLParser
+import itertools
 import json
 import logging
+import re
 import urlparse
 
 import bleach
@@ -29,6 +31,11 @@ from core.platform import models
 import feconf
 
 gae_image_services = models.Registry.import_gae_image_services()
+ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
+    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
+FILENAME_WITH_DIMENSIONS_REGEX = re.compile(
+    r'([^/]+)\_height\_([0-9]+)\_width\_([0-9]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + ')$')
 
 
 def filter_a(name, value):
@@ -814,14 +821,22 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
     print soup.findAll(name='oppia-noninteractive-image')
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
+
         print "BEFORE that 1 -1"
         print filename
         filename = filename[1:-1]
         print filename
-        image['filepath-with-value'] = escape_html(json.dumps(
-            get_fileinfo_of_object_image(filename, exp_id)))
-        x = x + 1
-        print "XXXXXXXXXXXX x is " + str(x)
+
+        if not FILENAME_WITH_DIMENSIONS_REGEX.match(filename):
+            image['filepath-with-value'] = escape_html(json.dumps(
+                get_fileinfo_of_object_image(filename, exp_id)))
+            x = x + 1
+            print "XXXXXXXXXXXX x is " + str(x)
+
+        # image['filepath-with-value'] = escape_html(json.dumps(
+        #     get_fileinfo_of_object_image(filename, exp_id)))
+        # x = x + 1
+        # print "XXXXXXXXXXXX x is " + str(x)
     return unicode(soup)
 
 
