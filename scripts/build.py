@@ -614,6 +614,7 @@ def build_files(source, target, file_hashes):
 def build_HTML_files(source, target, file_hashes):
     """Minifies HTML files and interpolates paths in HTML to include hashes in
     source directory and copies it to target.
+
     Args:
         source: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
@@ -641,14 +642,15 @@ def build_HTML_files(source, target, file_hashes):
 
 def rebuild_new_files(
         source_path, target_path, recently_changed_filenames, file_hashes):
-    """Minify list of recently changed files.
+    """Minify recently changed files.
 
     Args:
         source_path: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
         target_path: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
-        recently_changed_filenames: list(str). List of recently changed files.
+        recently_changed_filenames: list(str). List of filenames that were
+            recently changed.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
     for file_name in recently_changed_filenames:
@@ -659,28 +661,36 @@ def rebuild_new_files(
         minify_func(source_file_path, target_file_path, file_hashes, file_name)
 
 
-def get_new_files_from_directory(source, target):
-    """Compare current's hashed file and newly generated hash and return list of
-    expected new files.
+def get_recently_changed_filenames(dev_dir, out_dir):
+    """Compare hashes of DEV files and BUILD files. Return a list of filenames
+    that were recently changed.
 
     Args:
-        source: str. Path relative to /oppia where the DEV files are located.
-        target: str. Path relative to /oppia where the BUILD files are located.
+        dev_dir: str. Path relative to /oppia where DEV files are located.
+        out_dir: str. Path relative to /oppia where BUILD files are located.
 
     Returns:
-        array(str). List of files expected to be re-hashed.
+        list(str). List of filenames expected to be re-hashed.
     """
+    # Hashes are created based on files' contents and are inserted between
+    # the filenames and their extensions,
+    # e.g base.240933e7564bd72a4dde42ee23260c5f.html
+    # Should a file gets edited, a different MD5 hash is generated.
     file_hashes = dict()
-    file_hashes.update(get_file_hashes(source))
+    file_hashes.update(get_file_hashes(dev_dir))
     recently_changed_filenames = []
+    # Currently, we do not hash Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
+    print "Comparing file hashes of %s and %s" % (dev_dir, out_dir)
     for file_name, md5_hash in file_hashes.iteritems():
         # Ignore files with certain extensions.
         if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
         final_filepath = _insert_hash(
-            os.path.join(target, file_name), md5_hash)
+            os.path.join(out_dir, file_name), md5_hash)
         if not os.path.isfile(final_filepath):
+            # Filename with provided hash cannot be found, this file has been
+            # recently changed or created since last build.
             recently_changed_filenames.append(file_name)
     return recently_changed_filenames
 
@@ -725,18 +735,22 @@ def generate_build_directory():
 
     # Minify all template files copy them into build/templates/head.
     if not os.path.isdir(TEMPLATES_STAGING_DIR):
+        # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
         build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     else:
-        # Always rebuild HTML files.
+        # If there is an existing staging dir, rebuild HTML files.
         build_HTML_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
-        new_files_list = get_new_files_from_directory(
+        new_files_list = get_recently_changed_filenames(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
         if new_files_list:
-            print 'Changes detected, re-generating %s' % TEMPLATES_OUT_DIR
+            # Only re-build files that have changed since last build.
+            print ("Re-building recently changed files at %s"
+                   % TEMPLATES_DEV_DIR_CORE)
             rebuild_new_files(
                 TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, new_files_list,
                 hashes)
+    # Copy built files from staging dir to build dir.
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
