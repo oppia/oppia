@@ -68,7 +68,6 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.originalAuthorName).toEqual('author');
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.messageCount).toEqual(10);
-    expect(suggestionThread.stateName).toEqual('state 1');
     expect(suggestionThread.threadId).toEqual('exp1.thread1');
     expect(suggestionThread.suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
