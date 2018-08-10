@@ -233,16 +233,17 @@ oppia.factory('ImagePreloaderService', [
     var getDimensionsOfImage = function(filename) {
       var height_regex = RegExp('height_[0-9]+','g');
       var height_string = height_regex.exec(filename);
-      if(height_string) {
-      var height = height_string[0].substring(height_string[0].indexOf('_') + 1);
+      if (height_string) {
+      var height = height_string[0].substring(
+        height_string[0].indexOf('_') + 1);
       var width_regex = RegExp('width_[0-9]+','g');
       var width_string = width_regex.exec(filename);
-      var width = width_string[0].substring(width_string[0].indexOf('_') + 1);
+      var width = width_string[0].substring(
+        width_string[0].indexOf('_') + 1);
       dimensions = {
         'height': Number(height),
         'width': Number(width)
       };
-      
       return dimensions;
       }
     };

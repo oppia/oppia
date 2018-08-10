@@ -822,15 +822,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        fs.commit(self.owner_id, 'abc.png', raw_image, mimetype='image/png')
+        self.assertEqual(fs.isfile('abc.png'), True)
+
         for test_case in test_cases:
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.ExplorationFileSystem(self.EXP_ID))
-            fs.commit(self.owner_id, 'abc.png', raw_image, mimetype='image/png')
-            self.assertEqual(fs.isfile('abc.png'), True)
             self.assertEqual(
                 html_cleaner.add_dimensions_to_noninteractive_image_tag(
                     self.EXP_ID, test_case['html_content']),
                 test_case['expected_output'])
-            self.assertEqual(fs.isfile('abc.png'), False)
-            self.assertEqual(fs.isfile('abc_height_32_width_32.png'), True)
-            fs.delete('ADMIN', 'abc_height_32_width_32.png')

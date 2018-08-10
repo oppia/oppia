@@ -1781,8 +1781,6 @@ class State(object):
         """
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
-        print "SSSSSSSSSS  inside convert_html_fields_in_state state dict content html "
-        # print state_dict['content']['html']
         if state_dict['interaction']['default_outcome']:
             interaction_feedback_html = state_dict[
                 'interaction']['default_outcome']['feedback']['html']
@@ -3569,11 +3567,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        print "states_dict is "
-        print states_dict
         for key, state_dict in states_dict.iteritems():
-            print "key is " + str(key)
-            print state_dict
             add_dimensions_to_noninteractive_image_tag = functools.partial(
                 html_cleaner.add_dimensions_to_noninteractive_image_tag,
                 exp_id)
@@ -4353,7 +4347,6 @@ class Exploration(object):
 
         if exploration_schema_version == 29:
             exploration_dict['id'] = exp_id
-            print "CALL WAS MADE FROM EXP DOMAIN TO CHECK IN 29 and then call v29_to_v30"
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
                 exploration_dict)
             exploration_schema_version = 30
