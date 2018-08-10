@@ -381,8 +381,9 @@ def hash_should_be_inserted(filepath):
 
 
 def copy_files_source_to_target(source, target, file_hashes):
-    """Copies all files in source directory to target directory and renames
-    them to include hash in their name.
+    """Copies all files in source directory to target directory, renames
+    them to include hash in their name and remove files that are not in the hash
+    dict.
 
     Args:
         source: str. Path relative to /oppia directory of directory
@@ -413,7 +414,8 @@ def copy_files_source_to_target(source, target, file_hashes):
 
             target_path = source_path
             relative_path = os.path.relpath(source_path, source)
-            # Remove file that was deleted in DEV.
+            # Remove file found in staging dir but not in /DEV, i.e file not
+            # listed in hash dict.
             if relative_path not in file_hashes:
                 os.remove(source_path)
                 continue
@@ -571,7 +573,7 @@ def _execute_tasks(tasks, batch_size=24):
             task.start()
 
 
-def build_files(source, target, file_hashes):
+def build_files(source, target, file_hashes, file_formats):
     """Minifies all CSS and JS files, removes whitespace from HTML and
     interpolates paths in HTML to include hashes in source
     directory and copies it to target.
@@ -582,16 +584,21 @@ def build_files(source, target, file_hashes):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
+        file_formats: list(str). List of specific file formats to be built.
+            Use empty list to build all files.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     ensure_directory_exists(target)
-    shutil.rmtree(target)
+    if not file_formats:
+        print 'Deleting dir %s' % target
+        # Only delete BUILD directory when building all files.
+        shutil.rmtree(target)
 
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         tasks = []
         for directory in dirs:
-            print 'Building %s' % os.path.join(root, directory)
+            print 'Building directory %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
             if target in source_path:
@@ -600,44 +607,21 @@ def build_files(source, target, file_hashes):
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-
-            task = threading.Thread(
-                target=minify_func,
-                args=(source_path, target_path, file_hashes, filename))
+            task = threading.Thread()
+            if file_formats:
+                if any(filename.endswith(p) for p in file_formats):
+                    task = threading.Thread(
+                        target=minify_func,
+                        args=(source_path, target_path, file_hashes, filename))
+            else:
+                task = threading.Thread(
+                    target=minify_func,
+                    args=(source_path, target_path, file_hashes, filename))
             tasks.append(task)
         try:
             _execute_tasks(tasks)
         except Exception as e:
             print e
-
-
-def build_HTML_files(source, target, file_hashes):
-    """Minifies HTML files and interpolates paths in HTML to include hashes in
-    source directory and copies it to target.
-
-    Args:
-        source: str. Path relative to /oppia directory of directory
-            containing files and directories to be copied.
-        target: str. Path relative to /oppia directory of directory where
-            to copy the files and directories.
-        file_hashes: dict(str, str). Dictionary of file hashes.
-    """
-    print 'Processing %s' % os.path.join(os.getcwd(), source)
-    print 'Generating into %s' % os.path.join(os.getcwd(), target)
-    ensure_directory_exists(target)
-    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
-        for directory in dirs:
-            print 'Building %s' % os.path.join(root, directory)
-        for filename in files:
-            if filename.endswith('.html'):
-                source_path = os.path.join(root, filename)
-                if target in source_path:
-                    continue
-                if source not in source_path:
-                    continue
-                target_path = source_path.replace(source, target)
-                ensure_directory_exists(target_path)
-                process_html(source_path, target_path, file_hashes)
 
 
 def rebuild_new_files(
@@ -721,8 +705,10 @@ def generate_build_directory():
 
     # Minify extension static resources, create hashes for them and copy them
     # into build/extensions.
+    file_formats = []
     hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
-    build_files(EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
+    build_files(
+        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, file_formats)
     copy_files_source_to_target(
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
@@ -737,10 +723,15 @@ def generate_build_directory():
     if not os.path.isdir(TEMPLATES_STAGING_DIR):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
-        build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
+        file_formats = []
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
     else:
-        # If there is an existing staging dir, rebuild HTML files.
-        build_HTML_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
+        # If there is an existing staging dir, rebuild all HTML files.
+        file_formats = ['.html']
+        print 'Staging directory exists, re-building all HTML files'
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
         new_files_list = get_recently_changed_filenames(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
         if new_files_list:
