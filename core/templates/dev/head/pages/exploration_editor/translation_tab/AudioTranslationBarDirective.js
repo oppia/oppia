@@ -28,6 +28,33 @@ oppia.directive('audioTranslationBar', [
       },
       link: function(scope, elm) {
         scope.getRecorderController();
+
+        document.addEventListener("dragover", function(event){
+          event.preventDefault();
+          if(!scope.showDropArea) {
+            scope.showDropArea = true;
+            scope.$digest();
+          };
+        }, false);
+
+        document.addEventListener("dragleave", function(event){
+          if (event.pageX === 0 || event.pageY === 0) {
+            scope.showDropArea = false;
+            scope.$digest();
+            return false;
+          }
+        }, false);
+
+        document.body.addEventListener("drop", function(event){
+          event.preventDefault();
+          if(event.target.classList.contains('oppia-drop-area-message')) {
+            files = event.target.files ||
+              event.dataTransfer.files;
+            scope.openAddAudioTranslationModal(files);
+          }
+          scope.showDropArea = false;
+          scope.$digest();
+        }, false);
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
@@ -372,13 +399,16 @@ oppia.directive('audioTranslationBar', [
             });
           };
 
-          $scope.openAddAudioTranslationModal = function() {
+          $scope.openAddAudioTranslationModal = function(audioFile) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
                 'add_audio_translation_modal_directive.html'),
               backdrop: 'static',
               resolve: {
+                audioFile: function() {
+                  return audioFile;
+                },
                 generatedFilename: function() {
                   return generateNewFilename();
                 },
@@ -392,9 +422,11 @@ oppia.directive('audioTranslationBar', [
               controller: [
                 '$scope', '$uibModalInstance', 'AlertsService', 'languageCode',
                 'ContextService', 'generatedFilename', 'isAudioAvailable',
+                'audioFile',
                 function(
                     $scope, $uibModalInstance, AlertsService, languageCode,
-                    ContextService, generatedFilename, isAudioAvailable) {
+                    ContextService, generatedFilename, isAudioAvailable,
+                    audioFile) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -406,6 +438,7 @@ oppia.directive('audioTranslationBar', [
                   $scope.saveInProgress = false;
                   $scope.isAudioAvailable = isAudioAvailable;
                   var uploadedFile = null;
+                  $scope.dropedFile = audioFile;
 
                   $scope.isAudioTranslationValid = function() {
                     return (
