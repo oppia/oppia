@@ -415,5 +415,5 @@ describe('Image preloader service', function() {
       'sIOFeedback_height_50_width_50.png');
     expect(dimensions.width).toBe(50);
     expect(dimensions.height).toBe(50);
-    });
+  });
 });
