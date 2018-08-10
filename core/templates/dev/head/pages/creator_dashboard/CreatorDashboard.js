@@ -211,7 +211,7 @@ oppia.controller('CreatorDashboard', [
                 $scope.topicSummaries = topicSummaries;
 
                 $scope.isNotValidQuestion = function() {
-                  return !$scope.question.validate()
+                  return !$scope.question.validate();
                 };
 
                 $scope.dismissModal = function() {

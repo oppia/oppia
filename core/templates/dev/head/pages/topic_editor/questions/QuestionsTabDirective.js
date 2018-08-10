@@ -44,7 +44,7 @@ oppia.directive('questionsTab', [
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
-            $scope.questionSuggestionThreads = []
+            $scope.questionSuggestionThreads = [];
             $scope.getSuggestedQuestions();
             $scope.questionUnderReview = null;
             $scope.suggestionReviewMessage = null;
