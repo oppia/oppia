@@ -140,6 +140,22 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.MusicPhrase, mappings, invalid_values)
 
+    def test_list_of_tabs(self):
+        """Tests objects of type ListOfDict."""
+        mappings = [([
+            {'content': '<p>Hello</p>', 'title': 'Tabs'},
+            {'content': '<iframe src="site"></iframe>', 'title': u'¡Hola!'}
+        ], [
+            {'content': '<p>Hello</p>', 'title': u'Tabs'},
+            {'content': '', 'title': u'¡Hola!'}
+        ]), ([], [])]
+        invalid_values = [
+            '123', 3.0, None, [3, 'a'],
+            [{'content': '<p>abc</p>', 'url': 'xyx'}],
+            [{'content': '<p>abc</p>', 'title': 'xyz'}, [1, 2, 3]]]
+        self.check_normalization(
+            objects.ListOfTabs, mappings, invalid_values)
+
     def test_set_of_unicode_string_validation(self):
         """Tests objects of type SetOfUnicodeString."""
         mappings = [
@@ -442,7 +458,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 37)
+        self.assertEquals(count, 38)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

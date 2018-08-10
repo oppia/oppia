@@ -22,7 +22,7 @@ import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
@@ -4789,13 +4789,13 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.convert_to_textangular),
+                html_validation_service.convert_to_textangular),
             state_dict_in_textangular)
 
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_caption_attr_to_image),
+                html_validation_service.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
         add_dimensions_to_noninteractive_image_tag = functools.partial(
