@@ -822,21 +822,9 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
 
-        print "BEFORE that 1 -1"
-        print filename
         filename = filename[1:-1]
-        print filename
-
-        if not FILENAME_WITH_DIMENSIONS_REGEX.match(filename):
-            image['filepath-with-value'] = escape_html(json.dumps(
-                get_fileinfo_of_object_image(filename, exp_id)))
-            x = x + 1
-            print "XXXXXXXXXXXX x is " + str(x)
-
-        # image['filepath-with-value'] = escape_html(json.dumps(
-        #     get_fileinfo_of_object_image(filename, exp_id)))
-        # x = x + 1
-        # print "XXXXXXXXXXXX x is " + str(x)
+        image['filepath-with-value'] = escape_html(json.dumps(
+            get_fileinfo_of_object_image(filename, exp_id)))
     return unicode(soup)
 
 
@@ -855,32 +843,24 @@ def get_fileinfo_of_object_image(filename, exp_id):
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-    print  "EXPLORATION ID IS "
-    print exp_id
     filepath = (
         filename if feconf.DEV_MODE
         else ('image/%s' % filename))
-    print "FFFFFFFFFFFFF"
-    print filepath
     if fs.isfile(filepath):
-        print "THE FILE EXISTST"
-        content = fs.get(filepath)
+    content = fs.get(filepath)
+    height, width = gae_image_services.get_image_dimensions(content)
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+    renamed_filename = '%s_height_%s_width_%s.%s' % (
+        filename_wo_filetype, str(height), str(width), filetype)
+    renamed_filepath = (
+        renamed_filename if feconf.DEV_MODE
+        else ('image/%s' % renamed_filename))
+    # We have to delete the old instance we have and create a new one with
+    # the new name created.
+    fs.commit(
+        'ADMIN', renamed_filepath, content,
+        mimetype='image/%s' % filetype)
+    fs.delete('ADMIN', filepath)
 
-        height, width = gae_image_services.get_image_dimensions(content)
-        filename_wo_filetype = filename[:filename.rfind('.')]
-        filetype = filename[filename.rfind('.') + 1:]
-        renamed_filename = '%s_height_%s_width_%s.%s' % (
-            filename_wo_filetype, str(height), str(width), filetype)
-        renamed_filepath = (
-            renamed_filename if feconf.DEV_MODE
-            else ('image/%s' % renamed_filename))
-        # We have to delete the old instance we have and create a new one with
-        # the new name created.
-        fs.commit(
-            'ADMIN', renamed_filepath, content,
-            mimetype='image/%s' % filetype)
-        fs.delete('ADMIN', filepath)
-
-        return renamed_filename
-    print "EEEEEendlessly"
-    return ''
+    return renamed_filename
