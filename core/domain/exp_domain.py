@@ -3570,7 +3570,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             add_dimensions_to_noninteractive_image_tag = functools.partial(
-                html_cleaner.add_dimensions_to_noninteractive_image_tag,
+                html_validation_service.add_dimensions_to_noninteractive_image_tag, # pylint: disable=line-too-long
                 exp_id)
             states_dict[key] = State.convert_html_fields_in_state(
                 state_dict,
@@ -3580,7 +3580,7 @@ class Exploration(object):
                     'imageAndRegions']['value']['imagePath']
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
-                        html_cleaner.get_fileinfo_of_object_image(
+                        html_validation_service.get_fileinfo_of_object_image(
                             filename, exp_id))
 
         return states_dict

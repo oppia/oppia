@@ -4426,7 +4426,7 @@ title: Title
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
 
             exploration = exp_domain.Exploration.from_yaml(
@@ -4437,7 +4437,7 @@ title: Title
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
 
             exploration = exp_domain.Exploration.from_yaml(
@@ -4803,7 +4803,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             'eid')
 
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
 
             self.assertEqual(

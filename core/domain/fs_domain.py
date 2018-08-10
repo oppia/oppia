@@ -240,13 +240,8 @@ class ExplorationFileSystem(object):
             FileStreamWithMetadata or None. It returns FileStreamWithMetadata
                 domain object if the file exists. Otherwise, it returns None.
         """
-        print "entered the get function of the ExploratiohnFilesyste "
-        print filepath
         metadata = self._get_file_metadata(filepath, version)
-        print "metada tis "
-        print metadata
         if metadata:
-            print "inside if metadate"
             data = self._get_file_data(filepath, version)
             if data:
                 if version is None:

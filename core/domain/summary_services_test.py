@@ -22,7 +22,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -259,7 +259,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
                 filename, 490, 120)
 
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
 
             self.post_json(

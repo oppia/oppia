@@ -25,7 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -629,7 +629,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Verify the new exploration has been migrated by the job.
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
             updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
             self.assertEqual(
@@ -1192,7 +1192,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 updated_html, unicode(test_cases[index]['expected_output']))
 
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
             exp_services.save_new_exploration(
                 self.albert_id, updated_exploration)

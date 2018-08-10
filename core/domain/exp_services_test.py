@@ -25,7 +25,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -616,7 +616,7 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
                 filename, 490, 120)
 
         with self.swap(
-            html_cleaner, 'get_fileinfo_of_object_image',
+            html_validation_service, 'get_fileinfo_of_object_image',
             mock_get_fileinfo_of_object_image):
 
             for exp_id in demo_exploration_ids:
