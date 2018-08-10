@@ -584,8 +584,8 @@ def build_files(source, target, file_hashes, file_formats):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        file_formats: list(str). List of specific file formats to be built.
-            Use empty list to build all files.
+        file_formats: tuple(str). Tuple of specific file formats to be built.
+            Use empty tuple to build all files.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -705,7 +705,7 @@ def generate_build_directory():
 
     # Minify extension static resources, create hashes for them and copy them
     # into build/extensions.
-    file_formats = []
+    file_formats = ()
     hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
     build_files(
         EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, file_formats)
@@ -723,12 +723,12 @@ def generate_build_directory():
     if not os.path.isdir(TEMPLATES_STAGING_DIR):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
-        file_formats = []
+        file_formats = ()
         build_files(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
     else:
         # If there is an existing staging dir, rebuild all HTML files.
-        file_formats = ['.html']
+        file_formats = ('.html')
         print 'Staging directory exists, re-building all HTML files'
         build_files(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
