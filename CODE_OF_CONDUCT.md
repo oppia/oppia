@@ -14,13 +14,13 @@ appearance, race, religion, or sexual identity and orientation.
 Examples of behavior that contributes to creating a positive environment
 include:
 
-* Being available to help other other contributors.
+* Being available to help other contributors.
 * Being respectful of differing viewpoints and experiences.
 * Focusing on teaching-oriented communication so that each contributor gets a chance to learn and grow.
 * Focusing on what is best for the Oppia community.
 * Gracefully accepting constructive criticism.
 * Showing empathy towards other community members.
-* Using welcoming and inclusive language for all.
+* Using welcoming and inclusive language.
 
 Examples of unacceptable behavior by participants include:
 
@@ -50,7 +50,7 @@ threatening, offensive, or harmful.
 This Code of Conduct applies both within project spaces and in public spaces
 when an individual is representing the project or its community. Examples of
 representing a project or community include using an official project e-mail
-address, posting via an official social media account or acting as an appointed
+address, posting via an official social media account, or acting as an appointed
 representative at an online or offline event. Representation of a project may be
 further defined and clarified by project maintainers.
 
