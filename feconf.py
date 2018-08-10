@@ -325,7 +325,7 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
-CAN_SEND_EMAILS = False
+CAN_SEND_EMAILS = True
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
@@ -373,11 +373,11 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = True
+ENABLE_NEW_STRUCTURES = False
 
 # Determines whether to use the new feedback framework or the old one. To be
 # flipped after migrating existing feedback thread data to the new framework.
-ENABLE_GENERALIZED_FEEDBACK_THREADS = True
+ENABLE_GENERALIZED_FEEDBACK_THREADS = False
 
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
