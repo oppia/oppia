@@ -71,15 +71,6 @@ oppia.directive('sharingLinks', [
             HtmlEscaperService.unescapedStrToEscapedStr(
               $scope.getTwitterText()));
 
-          $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/gplus.png');
-
-          $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/fb.png');
-
-          $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/twitter.png');
-
           $scope.classroomUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/classroom.png');
         }

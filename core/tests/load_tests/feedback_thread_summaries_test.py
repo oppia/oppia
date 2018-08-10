@@ -79,5 +79,4 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
         # Fetch the summaries of all the threads.
         feedback_services.get_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
-        print "Time for fetching all the thread summaries -", elapsed_time
         self.assertLessEqual(elapsed_time, 1.7)

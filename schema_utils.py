@@ -78,7 +78,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
-        assert set(obj.keys()) == set(expected_dict_keys)
+        assert set(obj.keys()) == set(expected_dict_keys), (
+            'Missing keys: %s, Extra keys: %s' % (
+                list(set(expected_dict_keys) - set(obj.keys())),
+                list(set(obj.keys()) - set(expected_dict_keys))))
 
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
