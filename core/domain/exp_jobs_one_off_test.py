@@ -1498,3 +1498,100 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         ]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class InteractionCustomizationArgsValidationJobTest(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            InteractionCustomizationArgsValidationJobTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_customization_arg_validation_job(self):
+        """Validates customization args for rich text components."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        state3.update_content(content3_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start CustomizationArgsValidation job on sample exploration.
+        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
+
+        expected_output = [(
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
+            'png&amp;quot;"></oppia-noninteractive-image>\']]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
+            'https://\'; received htt://link.com", '
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
+            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
+            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+        )]
+
+        self.assertEqual(actual_output, expected_output)
