@@ -320,10 +320,7 @@ describe('Image preloader service', function() {
         exploration_id: '1',
         filename: 's6Hint1_height_60_width_60.png'
       });
-    
-    imageFileNames = [
-      'sIMChoice1_height_32_width_42.png', 'sIMChoice2_height_30_width_40.png',
-      'sIOFeedback_height_50_width_50.png', 's6Hint1_height_60_width_60.png']
+
     var exploration = eof.createFromBackendDict(explorationDict);
     ips.init(exploration);
     ips.kickOffImagePreloader(exploration.getInitialState().name);
@@ -413,9 +410,10 @@ describe('Image preloader service', function() {
         's6Hint1_height_60_width_60.png')).toBe(false);
     });
 
-    it('should calculate the dimensions of the image file', function() {
-      dimensions = ips.getDimensionsOfImage('sIOFeedback_height_50_width_50.png');
-      expect(dimensions.width).toBe(50);
-      expect(dimensions.height).toBe(50);
+  it('should calculate the dimensions of the image file', function() {
+    dimensions = ips.getDimensionsOfImage(
+      'sIOFeedback_height_50_width_50.png');
+    expect(dimensions.width).toBe(50);
+    expect(dimensions.height).toBe(50);
     });
 });

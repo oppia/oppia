@@ -649,7 +649,6 @@ class AbstractFileSystem(object):
         """
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
-        print "AAAAAAAAAAAAAAAAAAAAaaentered commit for the  AbstractFileSytefunctions"
         self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 
     def delete(self, user_id, filepath):
