@@ -822,7 +822,7 @@ class CreateVersionsOfImageJobTest(test_utils.GenericTestBase):
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to print something?</p></blockquote> Can do this by '
+                    'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
@@ -957,7 +957,7 @@ class ExplorationContentValidationJobForTextAngularTest(
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to print something?</p></blockquote> Can do this by '
+                    'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
@@ -988,7 +988,7 @@ class ExplorationContentValidationJobForTextAngularTest(
             (
                 '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
                 'like your <span>program </span>prints output</p>.<blockquote>'
-                '<p> Could you get it to print something?</p></blockquote> '
+                '<p> Could you get it to do something?</p></blockquote> '
                 'Can do this by using statement like prints. <br> You can '
                 'ask any if you have<oppia-noninteractive-link text-with-value'
                 '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
@@ -1052,7 +1052,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to print something?</p></blockquote> Can do this by '
+                    'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
