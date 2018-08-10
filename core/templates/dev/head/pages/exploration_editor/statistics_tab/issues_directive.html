@@ -11,29 +11,30 @@
       </div>
     </div>
     <div class="col-md-9 oppia-issues-border-gray">
-        <div ng-repeat="issue in issues">
-          <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
-            <div ng-if="issue.issueType == 'EarlyQuit'">
-              <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
-            <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
-              <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
-            <div ng-if="issue.issueType == 'CyclicStateTransitions'">
-              <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
+      <div ng-repeat="issue in issues">
+        <div ng-if="isIssueOnInitDisplay()" style="display: block;" id="issue<[getIssueIndex(issue)]>">
+          <div ng-if="issue.issueType == 'EarlyQuit'">
+            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
           </div>
-          <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
-            <div ng-if="issue.issueType == 'EarlyQuit'">
-              <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
-            <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
-              <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
-            <div ng-if="issue.issueType == 'CyclicStateTransitions'">
-              <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
-            </div>
+          <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
+            <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
           </div>
+          <div ng-if="issue.issueType == 'CyclicStateTransitions'">
+            <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+          </div>
+        </div>
+        <div ng-if="!isIssueOnInitDisplay()" style="display: none;" id="issue<[getIssueIndex(issue)]>">
+          <div ng-if="issue.issueType == 'EarlyQuit'">
+            <early-quit-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+          </div>
+          <div ng-if="issue.issueType == 'MultipleIncorrectSubmissions'">
+            <multiple-incorrect-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+          </div>
+          <div ng-if="issue.issueType == 'CyclicStateTransitions'">
+            <cyclic-transitions-issue-directive index="getIssueIndex(issue)" issue="issue"/>
+          </div>
+        </div>
       </div>
+    </div>
   </div>
 </div>

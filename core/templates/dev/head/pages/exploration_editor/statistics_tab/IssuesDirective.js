@@ -52,12 +52,12 @@ oppia.directive('issuesDirective', [
             if ($scope.isIssueDisplayed()) {
               document.getElementById(
                 'issue' + $scope.currentIssueIndex).style.display = 'none';
-                document.getElementById(
-                  'issueNav' + $scope.currentIssueIndex).classList.remove(
-                  'text-white');
-                document.getElementById(
-                  'issueNav' + $scope.currentIssueIndex).classList.remove(
-                    'bg-clr');
+              document.getElementById(
+                'issueNav' + $scope.currentIssueIndex).classList.remove(
+                'text-white');
+              document.getElementById(
+                'issueNav' + $scope.currentIssueIndex).classList.remove(
+                'bg-clr');
             }
             document.getElementById('issue' + nextIssueIndex).style.display =
               'block';
