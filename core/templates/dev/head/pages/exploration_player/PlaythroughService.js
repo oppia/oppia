@@ -50,6 +50,9 @@ oppia.factory('PlaythroughService', [
     var visitedStates = [];
 
     var removeOldQuitAction = function() {
+      // After the second quit action is recorded, the first quit is removed
+      // using this method. This ensures that there are only two quit actions
+      // in the playthrough actions list at a time.
       playthrough.actions = playthrough.actions.filter(function(action) {
         return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
       });
