@@ -29,15 +29,15 @@ oppia.directive('audioTranslationBar', [
       link: function(scope, elm) {
         scope.getRecorderController();
 
-        document.addEventListener("dragover", function(event){
+        document.addEventListener('dragover', function(event) {
           event.preventDefault();
-          if(!scope.showDropArea) {
+          if (!scope.showDropArea) {
             scope.showDropArea = true;
             scope.$digest();
-          };
+          }
         }, false);
 
-        document.addEventListener("dragleave", function(event){
+        document.addEventListener('dragleave', function(event) {
           if (event.pageX === 0 || event.pageY === 0) {
             scope.showDropArea = false;
             scope.$digest();
@@ -45,9 +45,9 @@ oppia.directive('audioTranslationBar', [
           }
         }, false);
 
-        document.body.addEventListener("drop", function(event){
+        document.body.addEventListener('drop', function(event) {
           event.preventDefault();
-          if(event.target.classList.contains('oppia-drop-area-message')) {
+          if (event.target.classList.contains('oppia-drop-area-message')) {
             files = event.target.files ||
               event.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);

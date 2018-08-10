@@ -81,10 +81,10 @@ oppia.directive('audioFileUploader', [
             scope.$apply();
           }
         );
-        if(scope.dropedFile) {
-          if(scope.dropedFile.length === 1) {
+        if (scope.dropedFile) {
+          if (scope.dropedFile.length === 1) {
             $timeout(function() {
-              $('.'+scope.inputFieldClassName)[0].files = scope.dropedFile;
+              $('.' + scope.inputFieldClassName)[0].files = scope.dropedFile;
             }, 100);
           } else {
             scope.errorMessage = 'Please drope one file at a time.';
