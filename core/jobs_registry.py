@@ -52,7 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor,
     exp_jobs_one_off.ImageDataMigrationJob,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
-    exp_jobs_one_off.CreateVersionsOfImageJob,
+    exp_jobs_one_off.CopyToNewDirectoryJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     feedback_jobs_one_off.FeedbackSubjectOneOffJob,
     feedback_jobs_one_off.SuggestionMigrationOneOffJob,

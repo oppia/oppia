@@ -535,17 +535,165 @@ class GcsFileSystem(object):
         raise NotImplementedError
 
     def listdir(self, dir_name):
+        """Lists all files in a directory.
+
+        Args:
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
+
+        Returns:
+            list(str). A lexicographically-sorted list of filenames.
+        """
+        # The trailing slash is necessary to prevent non-identical directory
+        # names with the same prefix from matching, e.g. /abcd/123.png should
+        # not match a query for files under /abc/.
+        prefix = '%s' % utils.vfs_construct_path(
+            '/', self._exploration_id, 'assets', dir_name)
+        if not prefix.endswith('/'):
+            prefix += '/'
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        path = '%s/%s' %(bucket_name, prefix)
+        stats = cloudstorage.listbucket(path)        
+        files_in_dir =[]
+        for stat in stats:
+            files_in_dir.append(stat.filename)
+        return files_in_dir
+
+
+class OldGcsFileSystem(object):
+    """Wrapper for a file system based on GCS.
+
+    This implementation ignores versioning.
+
+    Attributes:
+        exploration_id: str. The id of the exploration.
+    """
+
+    def __init__(self, exploration_id):
+        """Constructs a GcsFileSystem object.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
+        self._exploration_id = exploration_id
+
+    @property
+    def exploration_id(self):
+        """Returns the exploration id.
+
+        Returns:
+            str. The exploration id.
+        """
+        return self._exploration_id
+
+    def isfile(self, filepath):
+        """Checks if the file with the given filepath exists in the GCS.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Returns:
+            bool. Whether the file exists in GCS.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/<filepath>".
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        try:
+            return cloudstorage.stat(gcs_file_url, retry_params=None)
+        except cloudstorage.NotFoundError:
+            return False
+
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+        """Gets a file as an unencoded stream of raw bytes.
+
+        If `version` argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: str. Unused argument.
+            mode: str. Unused argument.
+
+        Returns:
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
+        """
+        if self.isfile(filepath):
+            bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+            gcs_file_url = (
+                '/%s/%s/assets/%s' % (
+                    bucket_name, self._exploration_id, filepath))
+            gcs_file = cloudstorage.open(gcs_file_url)
+            data = gcs_file.read()
+            gcs_file.close()
+            return FileStreamWithMetadata(data, None, None)
+        else:
+            return None
+
+    def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
+        """Args:
+            unused_user_id: str. Unused argument.
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: str. The content to be stored in the file.
+            mimetype: str. The content-type of the cloud file.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/<filepath>".
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        gcs_file = cloudstorage.open(
+            gcs_file_url, mode='w', content_type=mimetype)
+        gcs_file.write(raw_bytes)
+        gcs_file.close()
+
+    def delete(self, user_id, filepath):
         """Raises NotImplementedError if the method is not implemented in the
         derived classes.
 
         Args:
-            dir_name: str. The name of the directory.
+            user_id: str. The id of the user.
+            filepath: str. The path to the relevant file within the exploration.
 
         Raises:
             NotImplementedError. The method is not implemented in the derived
                 classes.
         """
         raise NotImplementedError
+
+    def listdir(self, dir_name):
+        """Lists all files in a directory.
+
+        Args:
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
+
+        Returns:
+            list(str). A lexicographically-sorted list of filenames.
+        """
+        # The trailing slash is necessary to prevent non-identical directory
+        # names with the same prefix from matching, e.g. /abcd/123.png should
+        # not match a query for files under /abc/.
+        prefix = '%s' % utils.vfs_construct_path(
+            '/', self._exploration_id, 'assets', dir_name)
+        if not prefix.endswith('/'):
+            prefix += '/'
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        path = '%s/%s' %(bucket_name, prefix)
+        stats = cloudstorage.listbucket(path)        
+        files_in_dir =[]
+        for stat in stats:
+            files_in_dir.append(stat.filename)
+        return files_in_dir
 
 
 class AbstractFileSystem(object):

@@ -778,7 +778,7 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
-class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
+class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating compressed versions of the images
     of the exploration in the GCS.
     """
@@ -788,28 +788,44 @@ class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        current_version = exp_model.version
-        version_numbers = range(1, current_version + 1)
-        list_of_exploration_models = (exp_model.get_multi_versions(
-            exp_model.id, version_numbers))
-        filenames = []
-        for exploration_model in list_of_exploration_models:
-            exploration = exp_services.get_exploration_from_model(
-                exploration_model)
-            filenames_in_version = (
-                exp_services.get_image_filenames_from_exploration(exploration))
-            filenames = list(set().union(filenames, filenames_in_version))
-        for filename in filenames:
-            file_system_class = (
-                fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-                else fs_domain.GcsFileSystem)
-            fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
-            filepath = (
-                filename if feconf.DEV_MODE else 'image/%s' % filename)
-            raw_data = fs.get(filepath)
-            exp_services.save_original_and_compressed_versions_of_image(
-                'ADMIN', filename, exp_model.id, raw_data)
-        yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
+        exp_id = exp_model.id
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exp_id))
+        prefix = '%s/assets' % exp_id
+        prefix_image = '%s/image' % prefix
+        prefix_audio = '%s/audio' % prefix
+        # we have to make sure we pass the dir name wo starting or ending with
+        # '/'
+        image_filenames = fs.listdir(prefix_image)
+        audio_filenames = fs.listdir(prefix_audio)
+
+        yield (exp_id, image_filenames + audio_filenames)
+        # # We have to handle them separately because there may be an image file
+        # # and an audio file with the same name.
+        # for image_filename in image_filenames:
+        #     file_system_class = (
+        #         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        #         else fs_domain.GcsFileSystem)
+        #     fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
+        #     filepath = (
+        #         image_filename if feconf.DEV_MODE else (
+        #             'image/%s' % image_filename))
+        #     raw_data = fs.get(filepath)
+        #     exp_services.save_original_and_compressed_versions_of_image(
+        #         'ADMIN', image_filename, exp_model.id, raw_data)
+
+        # for audio_filename in audio_filenames:
+        #     file_system_class = (
+        #         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        #         else fs_domain.GcsFileSystem)
+        #     fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
+        #     filepath = (
+        #         audio_filename if feconf.DEV_MODE else (
+        #             'image/%s' % audio_filename))
+        #     raw_data = fs.get(filepath)
+        #     exp_services.save_original_and_compressed_versions_of_image(
+        #         'ADMIN', audio_filename, exp_model.id, raw_data)
+
+        # yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
 
     @staticmethod
     def reduce(status, values):
