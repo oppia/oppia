@@ -29,27 +29,27 @@ oppia.directive('audioTranslationBar', [
       link: function(scope, elm) {
         scope.getRecorderController();
 
-        document.addEventListener('dragover', function(event) {
-          event.preventDefault();
+        document.addEventListener('dragover', function(evt) {
+          evt.preventDefault();
           if (!scope.showDropArea) {
             scope.showDropArea = true;
             scope.$digest();
           }
         }, false);
 
-        document.addEventListener('dragleave', function(event) {
-          if (event.pageX === 0 || event.pageY === 0) {
+        document.addEventListener('dragleave', function(evt) {
+          if (evt.pageX === 0 || evt.pageY === 0) {
             scope.showDropArea = false;
             scope.$digest();
             return false;
           }
         }, false);
 
-        document.body.addEventListener('drop', function(event) {
-          event.preventDefault();
-          if (event.target.classList.contains('oppia-drop-area-message')) {
-            files = event.target.files ||
-              event.dataTransfer.files;
+        document.body.addEventListener('drop', function(evt) {
+          evt.preventDefault();
+          if (evt.target.classList.contains('oppia-drop-area-message')) {
+            files = evt.target.files ||
+              evt.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
           scope.showDropArea = false;
@@ -438,7 +438,7 @@ oppia.directive('audioTranslationBar', [
                   $scope.saveInProgress = false;
                   $scope.isAudioAvailable = isAudioAvailable;
                   var uploadedFile = null;
-                  $scope.dropedFile = audioFile;
+                  $scope.droppedFile = audioFile;
 
                   $scope.isAudioTranslationValid = function() {
                     return (

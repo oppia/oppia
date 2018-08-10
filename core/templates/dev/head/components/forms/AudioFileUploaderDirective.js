@@ -17,12 +17,12 @@
  */
 
 oppia.directive('audioFileUploader', [
-  'UrlInterpolationService', 'IdGenerationService', '$timeout',
-  function(UrlInterpolationService, IdGenerationService, $timeout) {
+  '$timeout', 'UrlInterpolationService', 'IdGenerationService',
+  function($timeout, UrlInterpolationService, IdGenerationService) {
     return {
       restrict: 'E',
       scope: {
-        dropedFile: '=',
+        droppedFile: '=',
         onFileChanged: '=',
         onFileCleared: '=',
       },
@@ -81,13 +81,13 @@ oppia.directive('audioFileUploader', [
             scope.$apply();
           }
         );
-        if (scope.dropedFile) {
-          if (scope.dropedFile.length === 1) {
+        if (scope.droppedFile) {
+          if (scope.droppedFile.length === 1) {
             $timeout(function() {
-              $('.' + scope.inputFieldClassName)[0].files = scope.dropedFile;
+              $('.' + scope.inputFieldClassName)[0].files = scope.droppedFile;
             }, 100);
           } else {
-            scope.errorMessage = 'Please drope one file at a time.';
+            scope.errorMessage = 'Please drop one file at a time.';
           }
         }
       }
