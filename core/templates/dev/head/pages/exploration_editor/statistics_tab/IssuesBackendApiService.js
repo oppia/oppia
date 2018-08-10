@@ -77,7 +77,7 @@ oppia.factory('IssuesBackendApiService', [
       },
       resolveIssue: function(issue, expId, expVersion) {
         $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: ExplorationIssueObjectFactory.toBackendDict(issue),
+          exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
         });
       }
