@@ -54,6 +54,9 @@ describe('StateTopAnswersStatsService', function() {
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
+
+    spyOn($injector.get('ExplorationRightsService'), 'isPublic')
+      .and.returnValue(true);
   }));
 
   describe('.isInitialized', function() {
