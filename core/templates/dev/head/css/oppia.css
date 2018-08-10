@@ -101,7 +101,7 @@ md-input-group.md-default-theme label {
   padding: 6px 12px;
 }
 
-.md-button.oppia-learner-try-again-button {
+.md-button.oppia-learner-reload-image-button {
   background:#ffffff;
   border: 2px solid;
   border-color:#0D48A1;
@@ -109,8 +109,8 @@ md-input-group.md-default-theme label {
   padding: 3px 8px;
 }
 
-.md-button.md-default-theme.oppia-learner-try-again-button:focus,
-.md-button.md-default-theme.oppia-learner-try-again-button:hover {
+.md-button.md-default-theme.oppia-learner-reload-image-button:focus,
+.md-button.md-default-theme.oppia-learner-reload-image-button:hover {
   background-color: rgba(224,242,241,1);
   text-decoration: none;
 }
