@@ -34,7 +34,7 @@ import utils
 
 def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
     return exp_services.regenerate_image_filename_using_dimensions(
-      filename, 490, 120)
+        filename, 490, 120)
 
 
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):

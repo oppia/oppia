@@ -4160,7 +4160,7 @@ class Exploration(object):
         Adds dimensions to all oppia-noninteractive-image tags.
         """
         exploration_dict['schema_version'] = 30
-        
+
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
             exploration_dict['id'], exploration_dict['states'])
         exploration_dict['states_schema_version'] = 25

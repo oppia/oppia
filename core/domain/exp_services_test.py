@@ -653,7 +653,7 @@ class RegenerateImageFilenameUsingDimensions(test_utils.GenericTestBase):
     def test_regenerate_image_filename_using_dimensions(self):
         regenerated_name = (
             exp_services.regenerate_image_filename_using_dimensions(
-                self.FILENAME, self.HEIGHT, self.WIDTH)
+                self.FILENAME, self.HEIGHT, self.WIDTH))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
 
 
