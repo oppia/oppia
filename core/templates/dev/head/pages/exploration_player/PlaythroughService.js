@@ -49,11 +49,6 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
-    /**
-     * A quit action is recorded every time a MaybeQuit event is encountered.
-     * This function extracts the old quit action out of the playthrough
-     * actions list.
-     */
     var removeOldQuitAction = function() {
       playthrough.actions = playthrough.actions.filter(function(action) {
         return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
@@ -233,14 +228,8 @@ oppia.factory('PlaythroughService', [
             }
           },
           CURRENT_ACTION_SCHEMA_VERSION);
-        // Sometimes, the answer submit action gets recorded before the start.
-        // This happens when an answer is submitted very soon into an
-        // exploration.
-        if (playthrough.actions.length > 0) {
-          playthrough.actions.unshift(expStartLearnerAction);
-        } else {
-          playthrough.actions.push(expStartLearnerAction);
-        }
+
+        playthrough.actions.unshift(expStartLearnerAction);
 
         createMultipleIncorrectIssueTracker(initStateName);
 
