@@ -757,7 +757,7 @@ SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 # Whether state id mapping model should be generated and stored when exploration
 # is created or updated.
-ENABLE_STATE_ID_MAPPING = True
+ENABLE_STATE_ID_MAPPING = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
