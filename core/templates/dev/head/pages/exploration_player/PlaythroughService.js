@@ -49,9 +49,13 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
+    /**
+     * A quit action is recorded every time a MaybeQuit event is encountered.
+     * This function extracts the old quit action out of the playthrough
+     * actions list.
+     */
     var extractOldQuitAction = function() {
-      var i = 0;
-      for (i; i < playthrough.actions.length; i++) {
+      for (i = 0; i < playthrough.actions.length; i++) {
         var action = playthrough.actions[i].actionType;
         if (action === ACTION_TYPE_EXPLORATION_QUIT) {
           playthrough.actions.splice(i, 1);
@@ -228,7 +232,7 @@ oppia.factory('PlaythroughService', [
         // This happens when an answer is submitted very soon into an
         // exploration.
         if (playthrough.actions.length > 0) {
-          playthrough.actions.splice(0, 0, LearnerActionObjectFactory.createNew(
+          playthrough.actions.unshift(LearnerActionObjectFactory.createNew(
             ACTION_TYPE_EXPLORATION_START,
             {
               state_name: {

@@ -30,8 +30,8 @@ oppia.directive('multipleIncorrectIssueDirective', [
         '/pages/exploration_editor/statistics_tab/' +
         'multiple_incorrect_issue_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'IssuesService', 'AlertsService',
-        function($scope, $uibModal, IssuesService, AlertsService) {
+        '$scope', '$uibModal', 'AlertsService', 'IssuesService',
+        function($scope, $uibModal, AlertsService, IssuesService) {
           $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();

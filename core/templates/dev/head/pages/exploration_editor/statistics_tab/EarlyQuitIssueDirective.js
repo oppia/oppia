@@ -30,8 +30,8 @@ oppia.directive('earlyQuitIssueDirective', [
         '/pages/exploration_editor/statistics_tab/' +
         'early_quit_issue_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'IssuesService', 'AlertsService',
-        function($scope, $uibModal, IssuesService, AlertsService) {
+        '$scope', '$uibModal', 'AlertsService', 'IssuesService',
+        function($scope, $uibModal, AlertsService, IssuesService) {
           $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();
