@@ -22,6 +22,7 @@ from core.domain import acl_decorators
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -34,6 +35,8 @@ from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
 import utils
+
+import jinja2
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
@@ -112,8 +115,25 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
+    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
+
     @acl_decorators.can_access_creator_dashboard
     def get(self):
+
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
@@ -122,7 +142,11 @@ class CreatorDashboardPage(base.BaseHandler):
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_INTERACTION_CATEGORIES)
+                feconf.ALLOWED_INTERACTION_CATEGORIES),
+            'additional_angular_modules': additional_angular_modules,
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
         self.render_template(
             'pages/creator_dashboard/creator_dashboard.html',
