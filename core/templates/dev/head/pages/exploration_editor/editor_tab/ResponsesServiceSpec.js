@@ -114,7 +114,7 @@ describe('Responses Service', function() {
         }
       });
 
-      let state = ess.getState('Test');
+      const state = ess.getState('Test');
 
       rs.init({
         answerGroups: state.interaction.answerGroups,
@@ -230,6 +230,13 @@ describe('Responses Service', function() {
 
       rs.updateAnswerChoices(updates);
       expect(rs.getAnswerChoices()).toEqual(updates);
+    });
+
+    it('should get the answer groups', function() {
+      const state = ess.getState('Test');
+      const answerGroups = state.interaction.answerGroups;
+
+      expect(rs.getAnswerGroups()).toEqual(answerGroups);
     })
   })
 })
