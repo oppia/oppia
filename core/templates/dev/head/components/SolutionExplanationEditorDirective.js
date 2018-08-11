@@ -28,21 +28,15 @@ oppia.directive('solutionExplanationEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService', 'StateEditorService',
+        '$scope', '$uibModal', 'EditabilityService',
         'StateContentIdsToAudioTranslationsService', 'StateSolutionService',
-        'COMPONENT_NAME_SOLUTION',
-        function($scope, $uibModal, EditabilityService, StateEditorService,
-            StateContentIdsToAudioTranslationsService, StateSolutionService,
-            COMPONENT_NAME_SOLUTION) {
+        function($scope, $uibModal, EditabilityService,
+            StateContentIdsToAudioTranslationsService, StateSolutionService) {
           $scope.isEditable = EditabilityService.isEditable();
-          $scope.questionModeEnabled = StateEditorService.isInQuestionMode();
           $scope.editSolutionForm = {};
           $scope.explanationEditorIsOpen = false;
 
           $scope.StateSolutionService = StateSolutionService;
-          $scope.StateContentIdsToAudioTranslationsService =
-            StateContentIdsToAudioTranslationsService;
-          $scope.COMPONENT_NAME_SOLUTION = COMPONENT_NAME_SOLUTION;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
@@ -73,20 +67,6 @@ oppia.directive('solutionExplanationEditor', [
 
           $scope.cancelThisExplanationEdit = function() {
             $scope.explanationEditorIsOpen = false;
-          };
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.explanationEditorIsOpen) {
-              $scope.saveThisExplanation();
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-            $scope.onSaveContentIdsToAudioTranslations(
-              StateContentIdsToAudioTranslationsService.displayed);
           };
 
           $scope.$on('externalSave', function() {
