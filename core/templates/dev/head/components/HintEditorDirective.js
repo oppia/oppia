@@ -30,18 +30,13 @@ oppia.directive('hintEditor', [
         '/components/hint_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'StateHintsService',
-        'StateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_HINT',
-        'StateEditorService',
+        'StateContentIdsToAudioTranslationsService',
         function($scope, $uibModal, EditabilityService, StateHintsService,
-            StateContentIdsToAudioTranslationsService, COMPONENT_NAME_HINT,
-            StateEditorService) {
+            StateContentIdsToAudioTranslationsService) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.StateHintsService = StateHintsService;
-          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
-
-          $scope.COMPONENT_NAME_HINT = COMPONENT_NAME_HINT;
 
           $scope.HINT_FORM_SCHEMA = {
             type: 'html',
@@ -76,14 +71,6 @@ oppia.directive('hintEditor', [
             $scope.hint = angular.copy($scope.hintMemento);
             $scope.hintMemento = null;
             $scope.hintEditorIsOpen = false;
-          };
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.hintEditorIsOpen) {
-              $scope.saveThisHint();
-            }
           };
 
           $scope.$on('externalSave', function() {
