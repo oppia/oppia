@@ -119,9 +119,10 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
     """
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
-    dimensions = '_height_' + str(height) + '_width_' + str(width)
-    filename_reset = filename_wo_filetype + dimensions + '.' + filetype
-    return filename_reset
+    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
+    new_filename = '%s%s.%s' % (
+        filename_wo_filetype, dimensions_suffix, filetype)
+    return new_filename
 
 
 # Repository GET methods.

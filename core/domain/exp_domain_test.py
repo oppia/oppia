@@ -32,7 +32,7 @@ import utils
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
     return exp_services.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
 
@@ -4426,8 +4426,8 @@ title: Title
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
         with self.swap(
-            html_validation_service, 'get_fileinfo_of_object_image',
-            mock_get_fileinfo_of_object_image):
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
@@ -4437,8 +4437,8 @@ title: Title
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
         with self.swap(
-            html_validation_service, 'get_fileinfo_of_object_image',
-            mock_get_fileinfo_of_object_image):
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
@@ -4803,8 +4803,8 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             'eid')
 
         with self.swap(
-            html_validation_service, 'get_fileinfo_of_object_image',
-            mock_get_fileinfo_of_object_image):
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
 
             self.assertEqual(
                 exp_domain.State.convert_html_fields_in_state(

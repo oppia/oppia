@@ -772,11 +772,11 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
         filename = unescape_html(image['filepath-with-value'])
         filename = filename[1:-1]
         image['filepath-with-value'] = escape_html(json.dumps(
-            get_fileinfo_of_object_image(filename, exp_id)))
+            get_filename_with_dimensions(filename, exp_id)))
     return unicode(soup)
 
 
-def get_fileinfo_of_object_image(filename, exp_id):
+def get_filename_with_dimensions(filename, exp_id):
     """Gets the dimensions of the image file.
 
     Args:

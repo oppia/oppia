@@ -254,13 +254,13 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        def mock_get_fileinfo_of_object_image(filename, unused_exp_id):
+        def mock_get_filename_with_dimensions(filename, unused_exp_id):
             return exp_services.regenerate_image_filename_using_dimensions(
                 filename, 490, 120)
 
         with self.swap(
-            html_validation_service, 'get_fileinfo_of_object_image',
-            mock_get_fileinfo_of_object_image):
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
 
             self.post_json(
                 '/adminhandler', {

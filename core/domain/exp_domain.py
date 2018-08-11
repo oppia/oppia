@@ -3580,7 +3580,7 @@ class Exploration(object):
                     'imageAndRegions']['value']['imagePath']
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
-                        html_validation_service.get_fileinfo_of_object_image(
+                        html_validation_service.get_filename_with_dimensions(
                             filename, exp_id))
 
         return states_dict

@@ -231,18 +231,12 @@ oppia.factory('ImagePreloaderService', [
     *                           images should be extracted.
     */
     var getDimensionsOfImage = function(filename) {
-      var heightRegex = RegExp('height_[0-9]+', 'g');
-      var heightString = heightRegex.exec(filename);
-      if (heightString) {
-        var height = heightString[0].substring(
-          heightString[0].indexOf('_') + 1);
-        var widthRegex = RegExp('width_[0-9]+', 'g');
-        var widthString = widthRegex.exec(filename);
-        var width = widthString[0].substring(
-          widthString[0].indexOf('_') + 1);
+      var arr  = RegExp(
+        '[^/]+_height_([0-9]+)_width_([0-9]+)\.png$', 'g');
+      if (arr) {
         dimensions = {
-          height: Number(height),
-          width: Number(width)
+          height: Number(a[2]),
+          width: Number(a[3])
         };
         return dimensions;
       }
