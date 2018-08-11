@@ -760,7 +760,7 @@ class ImageUploadHandler(EditorHandler):
             fs_domain.ExplorationFileSystem if (
                 feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
             else fs_domain.GcsFileSystem)
-        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        fs = fs_domain.AbstractFileSystem(file_system_class('exploration/%s' % exploration_id))
         filepath = (
             filename if (
                 feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)

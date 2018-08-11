@@ -30,13 +30,13 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_get_and_save(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
 
     def test_delete(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
         self.assertFalse(fs.isfile('abc.png'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertTrue(fs.isfile('abc.png'))
@@ -51,7 +51,7 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_listdir(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         fs.commit(self.user_id, 'abcd.png', 'file_contents_2')
         fs.commit(self.user_id, 'abc/abcd.png', 'file_contents_3')
@@ -68,12 +68,12 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid2'))
+            fs_domain.ExplorationFileSystem('exploration/eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
         file_stream = fs.open('abc.png')
@@ -95,7 +95,7 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_independence_of_file_systems(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
 
@@ -125,7 +125,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid'))
+            fs_domain.ExplorationFileSystem('exploration/eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']

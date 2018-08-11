@@ -35,6 +35,7 @@ import utils
 
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
+gae_image_services = models.Registry.import_gae_image_services()
 
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
@@ -44,14 +45,22 @@ FILE_ALREADY_EXISTS = 'File already exists in GCS'
 FILE_FOUND_IN_GCS = 'File found in GCS'
 FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
 FILE_DELETED = 'File has been deleted'
+INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
     'Added compressed versions of images in exploration')
+ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
 FILE_MODEL_ID_REGEX = re.compile(
-    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+    r'^/(exploration/[^/]+)/assets/(([^/]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+GCS_AUDIO_ID_REGEX = re.compile(
+    r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
+        ALLOWED_AUDIO_EXTENSIONS) + '))$')
+GCS_IMAGE_ID_REGEX = re.compile(
+    r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 
 
@@ -677,7 +686,8 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     exploration_id = catched_groups.group(1)
                     content = file_model.content
                     fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(exploration_id))
+                        fs_domain.GcsFileSystem(
+                            'exploration/%s' % exploration_id))
                     if fs.isfile('image/%s' % filename):
                         yield (FILE_ALREADY_EXISTS, file_model.id)
                     else:
@@ -719,7 +729,8 @@ class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
                     filename = catched_groups.group(2)
                     exploration_id = catched_groups.group(1)
                     fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(exploration_id))
+                        fs_domain.GcsFileSystem(
+                            'exploration/%s' % exploration_id))
 
                     if not fs.isfile('image/%s' % filename):
                         yield (FILE_IS_NOT_IN_GCS, file_model.id)
@@ -778,9 +789,12 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
-class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for creating compressed versions of the images
-    of the exploration in the GCS.
+class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for copying the images/audio such that the url instead of
+    {{exp_id}}/assets/image/image.png is
+    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
+    the images as well as renaming the filenames so that they have dimensions
+    as a part of their name.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -788,44 +802,77 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        exp_id = exp_model.id
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exp_id))
-        prefix = '%s/assets' % exp_id
-        prefix_image = '%s/image' % prefix
-        prefix_audio = '%s/audio' % prefix
-        # we have to make sure we pass the dir name wo starting or ending with
-        # '/'
-        image_filenames = fs.listdir(prefix_image)
-        audio_filenames = fs.listdir(prefix_audio)
+        if not feconf.DEV_MODE:
+            exp_id = exp_model.id
+            fs_old = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls = fs_old.listdir('image')
+            audio_urls = fs_old.listdir('audio')
+            for url in image_urls:
+                catched_groups = GCS_IMAGE_ID_REGEX.match(url)
+                if not catched_groups:
+                    yield (INVALID_GCS_URL, url)
+            for url in audio_urls:
+                catched_groups = GCS_AUDIO_ID_REGEX.match(url)
+                if not catched_groups:
+                    yield (INVALID_GCS_URL, url)
 
-        yield (exp_id, image_filenames + audio_filenames)
-        # # We have to handle them separately because there may be an image file
-        # # and an audio file with the same name.
-        # for image_filename in image_filenames:
-        #     file_system_class = (
-        #         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-        #         else fs_domain.GcsFileSystem)
-        #     fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
-        #     filepath = (
-        #         image_filename if feconf.DEV_MODE else (
-        #             'image/%s' % image_filename))
-        #     raw_data = fs.get(filepath)
-        #     exp_services.save_original_and_compressed_versions_of_image(
-        #         'ADMIN', image_filename, exp_model.id, raw_data)
 
-        # for audio_filename in audio_filenames:
-        #     file_system_class = (
-        #         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-        #         else fs_domain.GcsFileSystem)
-        #     fs = fs_domain.AbstractFileSystem(file_system_class(exp_model.id))
-        #     filepath = (
-        #         audio_filename if feconf.DEV_MODE else (
-        #             'image/%s' % audio_filename))
-        #     raw_data = fs.get(filepath)
-        #     exp_services.save_original_and_compressed_versions_of_image(
-        #         'ADMIN', audio_filename, exp_model.id, raw_data)
+    @staticmethod
+    def reduce(status, values):
+        yield (status, values)
 
-        # yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_model.id)
+
+class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for copying the images/audio such that the url instead of
+    {{exp_id}}/assets/image/image.png is
+    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
+    the images as well as renaming the filenames so that they have dimensions
+    as a part of their name.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if not feconf.DEV_MODE:
+            exp_id = exp_model.id
+            fs_old = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls = fs_old.listdir('image')
+            audio_urls = fs_old.listdir('audio')
+
+            image_filenames = [
+                GCS_IMAGE_ID_REGEX.match(url).group(3) for url in image_urls]
+            audio_filenames = [
+                GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
+
+            for image_filename in image_filenames:
+                raw_image = fs_old.get('image/%s' % image_filename)
+                fs_old.delete('ADMIN', 'image/%s' % image_filename)
+                height, width = gae_image_services.get_image_dimensions(
+                    raw_image)
+                filename_with_dimensions = (
+                    exp_services.regenerate_image_filename_using_dimensions(
+                        image_filename, height, width))
+                exp_services.save_original_and_compressed_versions_of_image(
+                    'ADMIN', filename_with_dimensions, exp_id, raw_image)
+
+            for audio_filename in audio_filenames:
+                filetype = audio_filename[audio_filename.rfind('.') + 1:]
+                raw_data = fs_old.get('audio/%s' % audio_filename)
+                fs_old.delete('ADMIN', 'audio/%s' % audio_filename)
+                fs = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem('exploration/%s' % exp_id))
+                fs.commit(
+                    'Admin', 'audio/%s' % audio_filename,
+                    raw_data, mimetype='audio/%s' % filetype)
+            yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_id)
 
     @staticmethod
     def reduce(status, values):

@@ -60,7 +60,8 @@ class ImageHandler(base.BaseHandler):
                 'image/%s' % file_format)
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.ExplorationFileSystem(exploration_id))
+                fs_domain.ExplorationFileSystem(
+                    'exploration/%s' % exploration_id))
             raw = fs.get(filepath)
 
             self.response.cache_control.no_cache = None
@@ -93,7 +94,7 @@ class AudioHandler(base.BaseHandler):
             'audio/%s' % file_format)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
 
         try:
             raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filename))

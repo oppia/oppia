@@ -104,6 +104,25 @@ def _migrate_states_schema(versioned_exploration_states):
         states_schema_version += 1
 
 
+def regenerate_image_filename_using_dimensions(filename, height, width):
+    """Returns the name of the image file with dimensions in it.
+
+    Args:
+        filename: str. The name of the image file to be renamed.
+        height: int. Height of the image.
+        width: int. Width of the image.
+
+    Returns:
+        str. The name of the image file with its dimensions in it.
+    """
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
+    new_filename = '%s%s.%s' % (
+        filename_wo_filetype, dimensions_suffix, filetype)
+    return new_filename
+
+
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
     """Returns a memcache key for an exploration.
@@ -617,7 +636,7 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -1529,7 +1548,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
 
@@ -1694,7 +1713,8 @@ def save_original_and_compressed_versions_of_image(
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
 
     compressed_image_content = gae_image_services.compress_image(
         original_image_content, 0.8)
