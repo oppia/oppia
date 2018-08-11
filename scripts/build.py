@@ -732,15 +732,17 @@ def generate_build_directory():
         build_files(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes,
             file_formats=('.html',))
-        new_files_list = get_recently_changed_filenames(
+        recently_changed_filenames = get_recently_changed_filenames(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
-        if new_files_list:
+        if recently_changed_filenames:
             # Only re-build files that have changed since last build.
             print ("Re-building recently changed files at %s"
                    % TEMPLATES_DEV_DIR_CORE)
             rebuild_new_files(
-                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, new_files_list,
-                hashes)
+                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
+                recently_changed_filenames, hashes)
+        else:
+            print 'No changes detected. Using previously-built files.'
     # Copy built files from staging dir to build dir.
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
