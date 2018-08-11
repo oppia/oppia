@@ -380,6 +380,13 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
+oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
+  recorderServiceProvider.forceSwf(false);
+  recorderServiceProvider.withMp3Conversion(true, {
+    bitRate: 128
+  });
+}]);
+
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
