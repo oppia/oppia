@@ -358,7 +358,7 @@ states:
           param_changes: []
         rule_specs:
         - inputs:
-            x: '0'
+            x: 0
           rule_type: Equals
       - correct: false
         outcome:
@@ -369,7 +369,7 @@ states:
           param_changes: []
         rule_specs:
         - inputs:
-            x: '1'
+            x: 1
           rule_type: Equals
       - correct: false
         outcome:
@@ -379,7 +379,7 @@ states:
           param_changes: []
         rule_specs:
         - inputs:
-            x: '2'
+            x: 2
           rule_type: Equals
       confirmed_unclassified_answers: []
       customization_args:
