@@ -56,14 +56,8 @@ oppia.constant(
   'EXPLORATION_DATA_URL_TEMPLATE',
   '/explorehandler/init/<exploration_id>');
 oppia.constant(
-  'EXPLORATION_STORY_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?story_id=<story_id>');
-oppia.constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   '/explorehandler/init/<exploration_id>?v=<version>');
-oppia.constant(
-  'EXPLORATION_VERSION_STORY_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?v=<version>&story_id=<story_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');

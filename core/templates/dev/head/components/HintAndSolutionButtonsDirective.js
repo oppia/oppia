@@ -92,6 +92,8 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.displaySolutionModal = function() {
             $scope.solutionModalIsActive = true;
+            var inPretestMode =
+              PlayerTranscriptService.getLastCard().getInPretestMode();
             if (!_editorPreviewMode && !inPretestMode) {
               StatsReportingService.recordSolutionHit(
                 ExplorationEngineService.getCurrentStateName());

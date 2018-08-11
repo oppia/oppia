@@ -16,7 +16,12 @@
  * @fileoverview Service to retrieve read only information
  * about explorations from the backend.
  */
-
+oppia.constant(
+ 'EXPLORATION_STORY_DATA_URL_TEMPLATE',
+ '/explorehandler/init/<exploration_id>?story_id=<story_id>');
+oppia.constant(
+ 'EXPLORATION_VERSION_STORY_DATA_URL_TEMPLATE',
+ '/explorehandler/init/<exploration_id>?v=<version>&story_id=<story_id>');
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
   'EXPLORATION_STORY_DATA_URL_TEMPLATE',

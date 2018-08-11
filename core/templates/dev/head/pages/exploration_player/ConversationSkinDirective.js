@@ -312,7 +312,6 @@ oppia.directive('conversationSkin', [
           $scope.explorationId = ExplorationEngineService.getExplorationId();
           $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
           $scope.isIframed = UrlService.isIframed();
-          $scope.inPretestMode = false;
           $rootScope.loadingMessage = 'Loading';
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
@@ -937,7 +936,7 @@ oppia.directive('conversationSkin', [
 
             $timeout(function() {
               var newInteractionHtml =
-                currentEngineService.getCurrentInteractionHtml(
+                currentEngineService.getNextInteractionHtml(
                   _nextFocusLabel);
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
