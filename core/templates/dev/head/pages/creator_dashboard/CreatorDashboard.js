@@ -193,62 +193,59 @@ oppia.controller('CreatorDashboard', [
 
     $scope.showCreateQuestionModal = function() {
       var question = QuestionObjectFactory.createDefaultQuestion();
-      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-        function(response) {
-          var topicSummaries = response.data.topic_summary_dicts;
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/creator_dashboard/create_question_modal_directive.html'),
-            backdrop: true,
-            size: 'lg',
-            resolve: {},
-            controller: [
-              '$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.question = question;
-                $scope.topicId = null;
-                $scope.questionStateData = $scope.question.getStateData();
-                $scope.topicSummaries = topicSummaries;
+        var topicSummaries = $scope.topicSummaries;
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/creator_dashboard/create_question_modal_directive.html'),
+          backdrop: true,
+          size: 'lg',
+          resolve: {},
+          controller: [
+            '$scope', '$uibModalInstance', function(
+                $scope, $uibModalInstance) {
+              $scope.question = question;
+              $scope.topicId = null;
+              $scope.questionStateData = $scope.question.getStateData();
+              $scope.topicSummaries = topicSummaries;
 
-                $scope.isNotValidQuestion = function() {
-                  return !$scope.question.validate();
-                };
+              $scope.isNotValidQuestion = function() {
+                return !$scope.question.validate();
+              };
 
-                $scope.dismissModal = function() {
-                  $uibModalInstance.dismiss();
-                };
+              $scope.dismissModal = function() {
+                $uibModalInstance.dismiss();
+              };
 
-                $scope.createQuestion = function() {
-                  $uibModalInstance.close({
-                    question: question,
-                    topicId: $scope.topicId
-                  });
-                };
-              }
-            ]
-          }).result.then(function(result) {
-            var topicVersion = null;
-            for (var i = 0; i < topicSummaries.length; i++) {
-              if (topicSummaries[i].id === result.topicId) {
-                topicVersion = topicSummaries[i].version;
-                break;
-              }
+              $scope.createQuestion = function() {
+                $uibModalInstance.close({
+                  question: question,
+                  topicId: $scope.topicId
+                });
+              };
             }
-            $http.post('/generalsuggestionhandler/', {
-              suggestion_type: 'add_question',
-              target_type: 'topic',
-              target_id: result.topicId,
-              target_version_at_submission: topicVersion,
-              change: {
-                cmd: 'create_new_fully_specified_question',
-                question_dict: result.question.toBackendDict(true),
-                skill_id: null
-              },
-              description: 'question title'
-            });
-          }, function() {
-            $log('Error while submitting question');
+          ]
+        }).result.then(function(result) {
+          var topicVersion = null;
+          for (var i = 0; i < topicSummaries.length; i++) {
+            if (topicSummaries[i].id === result.topicId) {
+              topicVersion = topicSummaries[i].version;
+              break;
+            }
+          }
+          $http.post('/generalsuggestionhandler/', {
+            suggestion_type: 'add_question',
+            target_type: 'topic',
+            target_id: result.topicId,
+            target_version_at_submission: topicVersion,
+            change: {
+              cmd: 'create_new_fully_specified_question',
+              question_dict: result.question.toBackendDict(true),
+              skill_id: null
+            },
+            description: 'question title'
           });
+        }, function() {
+          $log.error('Error while submitting question');
         });
     };
 
@@ -271,6 +268,13 @@ oppia.controller('CreatorDashboard', [
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
         }
+
+        TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+          function(response) {
+            $scope.topicSummaries = response.data.topic_summary_dicts;
+          }
+        );
+
         if ($scope.explorationsList.length === 0 &&
           $scope.collectionsList.length > 0) {
           $scope.activeTab = 'myCollections';

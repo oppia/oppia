@@ -63,7 +63,7 @@
     </div>
     <div class="row">
       <div class="oppia-create-question pull-right" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
-        <button class="btn oppia-creator-dashboard-create-question-button" ng-click="showCreateQuestionModal()">
+        <button class="btn oppia-creator-dashboard-create-question-button" ng-click="showCreateQuestionModal()" ng-if="topicSummaries.length > 0">
           <b>CREATE QUESTION</b>
         </button>
       </div>
@@ -129,6 +129,12 @@
                     class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
                     ng-click="createNewExploration()"
                     translate="I18N_CREATE_EXPLORATION">
+            </button>
+            <button type="button"
+                    class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
+                    ng-click="showCreateQuestionModal()"
+                    ng-if="topicSummaries.length > 0">
+                    CREATE QUESTION
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">
