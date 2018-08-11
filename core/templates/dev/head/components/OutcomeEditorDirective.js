@@ -36,13 +36,11 @@ oppia.directive('outcomeEditor', [
       controller: [
         '$scope', '$uibModal', 'StateEditorService',
         'StateContentIdsToAudioTranslationsService',
-        'StateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
-        'INTERACTION_SPECS',
+        'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
             $scope, $uibModal, StateEditorService,
             StateContentIdsToAudioTranslationsService,
-            StateInteractionIdService, COMPONENT_NAME_FEEDBACK,
-            INTERACTION_SPECS) {
+            StateInteractionIdService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
@@ -52,9 +50,6 @@ oppia.directive('outcomeEditor', [
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
-          $scope.StateContentIdsToAudioTranslationsService =
-            StateContentIdsToAudioTranslationsService;
-          $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           $scope.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
@@ -217,15 +212,6 @@ oppia.directive('outcomeEditor', [
             $scope.outcome.missingPrerequisiteSkillId =
               $scope.savedOutcome.missingPrerequisiteSkillId;
             $scope.destinationEditorIsOpen = false;
-          };
-
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.feedbackEditorIsOpen) {
-              $scope.saveThisFeedback(false);
-            }
           };
         }
       ]

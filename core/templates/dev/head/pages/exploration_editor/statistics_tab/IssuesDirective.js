@@ -34,7 +34,7 @@ oppia.directive('issuesDirective', [
             return $scope.issues.indexOf(issue);
           };
 
-          $scope.currentIssueIndex = 0;
+          $scope.currentIssueIndex = -1;
 
           $scope.isIssueOnInitDisplay = function(issue) {
             return $scope.getIssueIndex(issue) === 0;
@@ -44,16 +44,23 @@ oppia.directive('issuesDirective', [
             return $scope.getIssueIndex(issue) + 1;
           };
 
+          $scope.isIssueDisplayed = function() {
+            return $scope.currentIssueIndex > -1;
+          };
+
           $scope.makeVisible = function(nextIssueIndex) {
-            document.getElementById(
-              'issue' + $scope.currentIssueIndex).style.display = 'none';
+            if ($scope.isIssueDisplayed()) {
+              document.getElementById(
+                'issue' + $scope.currentIssueIndex).style.display = 'none';
+              document.getElementById(
+                'issueNav' + $scope.currentIssueIndex).classList.remove(
+                'text-white');
+              document.getElementById(
+                'issueNav' + $scope.currentIssueIndex).classList.remove(
+                'bg-clr');
+            }
             document.getElementById('issue' + nextIssueIndex).style.display =
               'block';
-            document.getElementById(
-              'issueNav' + $scope.currentIssueIndex).classList.remove(
-              'text-white');
-            document.getElementById(
-              'issueNav' + $scope.currentIssueIndex).classList.remove('bg-clr');
             document.getElementById(
               'issueNav' + nextIssueIndex).classList.add('text-white');
             document.getElementById(
