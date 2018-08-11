@@ -22,6 +22,7 @@ describe('Responses Service', function() {
     let scope;
     let siis, ecs, rs, ess, rof, shtml;
     let mockExplorationData;
+    let state;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
@@ -114,7 +115,7 @@ describe('Responses Service', function() {
         }
       });
 
-      const state = ess.getState('Test');
+      state = ess.getState('Test');
 
       rs.init({
         answerGroups: state.interaction.answerGroups,
@@ -233,14 +234,12 @@ describe('Responses Service', function() {
     });
 
     it('should get the answer groups', function() {
-      const state = ess.getState('Test');
       const answerGroups = state.interaction.answerGroups;
 
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
     });
 
     it('should get the answer group', function() {
-      const state = ess.getState('Test');
       const answerGroup = state.interaction.answerGroups[0];
 
       expect(rs.getAnswerGroup(0)).toEqual(answerGroup);
@@ -251,14 +250,12 @@ describe('Responses Service', function() {
     });
 
     it('should get the default outcome', function() {
-      const state = ess.getState('Test');
       const defaultOutcome = state.interaction.defaultOutcome;
 
       expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
     });
 
     it('should get the confirmed unclassified answers', function() {
-      const state = ess.getState('Test');
       const confirmedUnclassifiedAnswers = (
         state.interaction.confirmedUnclassifiedAnswers);
 
