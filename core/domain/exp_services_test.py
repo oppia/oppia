@@ -20,6 +20,7 @@ import datetime
 import os
 import zipfile
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -3195,7 +3196,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.editor_id)
         self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
         self.initial_state_name = exploration.init_state_name
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 feedback_models.FeedbackThreadModel,
                 'generate_new_thread_id', self._generate_thread_id_1):
@@ -3210,7 +3211,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                     'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 exp_services, '_is_suggestion_valid',
                 self._return_true):
@@ -3228,7 +3229,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 exp_services, '_is_suggestion_valid',
                 self._return_false):
@@ -3244,7 +3245,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_empty_commit_message(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.assertRaisesRegexp(
                 Exception, 'Commit message cannot be empty.'):
                 exp_services.accept_suggestion(
@@ -3255,7 +3256,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 exp_services, '_is_suggestion_handled',
                 self._return_true):
@@ -3265,7 +3266,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                         self.COMMIT_MESSAGE, False)
 
     def test_reject_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             exp_services.reject_suggestion(self.editor_id, self.THREAD_ID2)
             thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID2)
         self.assertEqual(
@@ -3274,7 +3275,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def test_reject_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 exp_services, '_is_suggestion_handled',
                 self._return_true):

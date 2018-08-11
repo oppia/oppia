@@ -106,7 +106,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token,
             expect_errors=True, expected_status_int=401)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             thread_url = '%s/%s' % (
                 feconf.FEEDBACK_THREAD_URL_PREFIX,
                 'exploration.0.dummy_thread_id')
@@ -201,7 +201,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             # First, create a thread.
             self.post_json(
                 '%s/%s' % (
@@ -382,7 +382,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, thread_id):
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             feedback_thread_user_model = (
                 feedback_models.GeneralFeedbackThreadUserModel.get(
                     user_id, thread_id))
@@ -504,7 +504,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_feedback_threads_with_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             new_content = exp_domain.SubtitledHtml(
                 'content', 'new content html').to_dict()
             change_cmd = {
@@ -605,7 +605,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Create suggestions.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             self.post_json(
                 '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                     'exploration_version': 3,
@@ -662,7 +662,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             self.testapp.get('/create/%s' % self.EXP_ID))
 
         # Create a thread without suggestions.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
@@ -688,7 +688,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         thread_id = threads[0]['thread_id']
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', False):
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 response_dict = self.get_json(
                     '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
 
@@ -697,7 +697,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             response_dict['suggestion']['description'], threads[0]['subject'])
 
         # Get a list of all threads without suggestions.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all',
@@ -708,7 +708,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         # Test invalid list type in GET request. We are using testapp.get()
         # here because get_json() with expect_errors=True does not work as
         # expected. Please look at the doc string for get_json() for details.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.testapp.get(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'invalid',
@@ -717,7 +717,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict.status_int, 400)
 
         # Pass invalid value for has_suggestion.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.testapp.get(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
@@ -728,7 +728,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
     def _accept_suggestion(
             self, thread_id, audio_update_required, csrf_token,
             expect_errors=False, expected_status_int=200):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 exp_domain.Exploration, '_verify_all_states_reachable',
                 self._return_null):
@@ -750,7 +750,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
     def _reject_suggestion(
             self, thread_id, csrf_token,
             expect_errors=False, expected_status_int=200):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             return self.put_json(
                 '%s/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
@@ -762,7 +762,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/create/%s' % self.EXP_ID))
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all',
@@ -789,7 +789,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self._reject_suggestion(rejected_suggestion_thread_id, csrf_token)
 
         # Get a list of closed threads with suggestion.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
@@ -850,7 +850,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         # Get a list of all closed threads with suggestion.
         self.login(self.EDITOR_EMAIL)
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
@@ -859,7 +859,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(threads), 2)
 
         # Get a list of all open threads with suggestion.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'open',
@@ -871,7 +871,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/create/%s' % self.EXP_ID))
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all',
@@ -898,7 +898,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/create/%s' % self.EXP_ID))
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             response_dict = self.get_json(
                 '%s/%s?list_type=%s&has_suggestion=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all',

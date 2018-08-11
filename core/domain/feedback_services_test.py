@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 import json
 
+from core.constants import constants
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
@@ -37,7 +38,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     def test_feedback_ids(self):
         """Test various conventions for thread and message ids."""
         exp_id = '0'
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', exp_id, 'a_state_name', None, 'a subject',
                 'some text')
@@ -79,7 +80,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', exp_id, 'a_state_name', None, 'a subject',
                 'some text')
@@ -90,7 +91,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_exp_id_from_thread_id(self):
         thread_id = 'exp1.1234'
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             self.assertEqual(
                 feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
 
@@ -152,7 +153,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
 
     def test_create_and_get_suggestion(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(
                 feedback_models.FeedbackThreadModel,
                 'generate_new_thread_id', self._generate_thread_id):
@@ -174,21 +175,21 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
 
     def test_get_open_threads_with_suggestions(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_open_threads(
                 'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID1)
 
     def test_get_open_threads_without_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_open_threads(
                 'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID5)
 
     def test_get_closed_threads_with_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_closed_threads(
                 'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 2)
@@ -196,14 +197,14 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(thread_ids, [self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_closed_threads_without_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_closed_threads(
                 'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID4)
 
     def test_get_all_threads_with_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_all_threads(
                 'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 3)
@@ -212,7 +213,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             thread_ids, [self.THREAD_ID1, self.THREAD_ID2, self.THREAD_ID3])
 
     def test_get_all_threads_without_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             threads = feedback_services.get_all_threads(
                 'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 2)
@@ -264,7 +265,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             category='Architecture', language_code='fi')
 
     def _get_all_messages_read(self, user_id, thread_id):
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             feedback_thread_user_model = (
                 feedback_models.GeneralFeedbackThreadUserModel.get(
                     user_id, thread_id))
@@ -290,7 +291,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_get_threads_single_exploration(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             threads = feedback_services.get_threads(
                 'exploration', self.EXP_ID_1)
             self.assertEqual(len(threads), 0)
@@ -306,7 +307,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_threads(self):
         # Create an anonymous feedback thread.
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', None,
@@ -321,7 +322,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
             self.VIEWER_USERNAME)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             # Viewer creates feedback thread.
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
@@ -340,7 +341,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 0)
 
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', None,
@@ -356,7 +357,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_total_open_threads_for_single_exploration(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', None,
@@ -373,7 +374,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_total_open_threads_for_multiple_explorations(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', None,
@@ -398,7 +399,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         _close_thread(threads_exp_1[0].id)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             self.assertEqual(len(feedback_services.get_closed_threads(
                 'exploration', self.EXP_ID_1, False)), 1)
             self._run_computation()
@@ -409,7 +410,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_thread_summaries(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', self.user_id,
@@ -481,7 +482,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(number_of_unread_threads, 1)
 
     def test_update_messages_read_by_the_user(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 'state_name', self.user_id,
@@ -506,7 +507,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_only_exploration_threads_trigger_events(self):
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
 
@@ -597,7 +598,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_send_feedback_message_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'some text')
@@ -634,7 +636,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_add_new_feedback_message(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'some text')
@@ -687,7 +690,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.editor_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'some text')
@@ -708,7 +712,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             mute_feedback_notifications=True)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'some text')
@@ -725,7 +730,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_for_anonymous_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name', None,
                     'a subject', 'some text')
@@ -742,7 +748,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_sent_for_registered_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
 
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
@@ -774,7 +781,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
         with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'some text')
@@ -791,7 +799,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_for_thread_status_changes(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', '')
@@ -808,7 +817,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_email_are_not_sent_to_author_himself(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.editor_id, 'a subject', 'A message')
@@ -825,7 +835,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_email_is_sent_for_reply_on_feedback(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'A message')
@@ -856,7 +867,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'A message')
@@ -891,7 +903,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_email_is_sent_for_each_feedback_message(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'A message')
@@ -931,7 +944,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_reply_to_id_is_created(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.user_id_a, 'a subject', 'A message')
@@ -1016,7 +1030,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1079,7 +1094,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1109,7 +1125,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_if_already_seen(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1348,7 +1365,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1399,7 +1417,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1477,7 +1496,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
                     self.new_user_id, 'a subject', 'some text')
@@ -1511,7 +1531,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_to_anonymous_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 # Create thread as anonoymous user.
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',

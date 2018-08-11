@@ -18,6 +18,7 @@
 
 import collections
 
+from constants import constants
 from core import jobs_registry
 from core.domain import collection_services
 from core.domain import event_services
@@ -278,7 +279,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
         with self._get_test_context():
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
                 editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -336,7 +338,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
         with self._get_test_context():
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.signup(USER_A_EMAIL, USER_A_USERNAME)
                 user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
                 self.signup(USER_B_EMAIL, USER_B_USERNAME)
@@ -399,7 +402,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
         with self._get_test_context():
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.signup(USER_A_EMAIL, USER_A_USERNAME)
                 user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
                 self.signup(USER_B_EMAIL, USER_B_USERNAME)

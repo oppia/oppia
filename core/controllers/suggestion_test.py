@@ -86,7 +86,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.login(self.AUTHOR_EMAIL)
                 response = self.testapp.get('/explore/%s' % self.EXP_ID)
                 csrf_token = self.get_csrf_token_from_response(response)
@@ -159,7 +160,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_create_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.login(self.AUTHOR_EMAIL_2)
                 response = self.testapp.get('/explore/%s' % self.EXP_ID)
                 csrf_token = self.get_csrf_token_from_response(response)
@@ -191,7 +193,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
                 # Test editor can accept successfully.
@@ -355,7 +358,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STATES_SCHEMA_VERSION)
         }
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.login(self.AUTHOR_EMAIL)
                 response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
                 csrf_token = self.get_csrf_token_from_response(response)
@@ -399,7 +403,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     def test_accept_question_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_to_accept = self.get_json(
                     '%s?suggestion_type=%s' % (
                         feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,

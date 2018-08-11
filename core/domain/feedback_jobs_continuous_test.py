@@ -16,6 +16,7 @@
 
 """Tests for continuous computations relating to feedback analytics."""
 
+from constants import constants
 from core import jobs_registry
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
@@ -160,7 +161,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.exploration_id = exp_id
             thread.put()
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 1,
@@ -181,7 +182,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_2.put()
 
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 2,
@@ -210,7 +211,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_3.exploration_id = exp_id_3
             thread_3.put()
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self.process_and_flush_pending_tasks()
                 ModifiedFeedbackAnalyticsAggregator.start_computation()
                 self.assertEqual(
@@ -274,7 +275,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.put()
 
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 # Start job.
                 self._run_job_and_check_results(
                     exp_id, {
@@ -295,7 +296,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Restart job.
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 0,
@@ -314,7 +315,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.put()
 
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 # Start job.
                 self._run_job_and_check_results(
                     exp_id, {
@@ -334,7 +335,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.put()
 
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 # Restart job.
                 self._run_job_and_check_results(
                     exp_id, {
@@ -354,7 +355,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.put()
 
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 # Restart job.
                 self._run_job_and_check_results(
                     exp_id, {
@@ -375,7 +376,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Start job.
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 1,
@@ -395,7 +396,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Restart job.
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 0,
@@ -415,7 +416,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Restart job.
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 self._run_job_and_check_results(
                     exp_id, {
                         'num_open_threads': 0,

@@ -18,6 +18,7 @@
 
 import datetime
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
@@ -51,7 +52,7 @@ def get_exp_id_from_thread_id(thread_id):
     Returns:
         str. The exploration id part of the thread_id.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         return thread_id.split('.')[1]
     return thread_id.split('.')[0]
 
@@ -76,7 +77,7 @@ def _create_models_for_thread_and_first_message(
     Returns:
         The thread id we created.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_id = (
             feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
                 entity_type, entity_id))
@@ -151,7 +152,7 @@ def create_message(
     from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
     # in is valid.
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_model = feedback_models.GeneralFeedbackThreadModel
         message_model = feedback_models.GeneralFeedbackMessageModel
     else:
@@ -165,21 +166,21 @@ def create_message(
     msg.message_id = message_id
     msg.author_id = author_id
     if updated_status:
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             exploration_id = thread.entity_id
         else:
             exploration_id = thread.exploration_id
         if message_id == 0:
             # New thread.
             if not (
-                    feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS and
+                    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS and
                     thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION):
                 event_services.FeedbackThreadCreatedEventHandler.record(
                     exploration_id)
         else:
             # Thread status changed.
             if not (
-                    feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS and
+                    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS and
                     thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION):
                 event_services.FeedbackThreadStatusChangedEventHandler.record(
                     exploration_id, thread.status, updated_status)
@@ -213,7 +214,7 @@ def create_message(
     # the last_updated time changes to show that there is activity in the
     # thread.
     if thread.has_suggestion:
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             suggestion_id = thread_id
         else:
             suggestion_id = '%s.%s' % (
@@ -249,7 +250,7 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
         message_ids: list(int). The ids of the messages in the thread read by
             the user.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
@@ -279,7 +280,7 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
         user_id: str. The id of the user reading the messages,
         message_id: int. The id of the message.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
@@ -328,7 +329,7 @@ def get_messages(thread_id):
     Returns:
         list(FeedbackMessage). Contains all the messages in the thread.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         message_model = feedback_models.GeneralFeedbackMessageModel
     else:
         message_model = feedback_models.FeedbackMessageModel
@@ -347,7 +348,7 @@ def get_message(thread_id, message_id):
     Returns:
         FeedbackMessage. The fetched message.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         message_model = feedback_models.GeneralFeedbackMessageModel
     else:
         message_model = feedback_models.FeedbackMessageModel
@@ -374,7 +375,7 @@ def get_next_page_of_all_feedback_messages(
             more: bool. Whether there are more messages available to fetch after
                 this batch.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         message_model = feedback_models.GeneralFeedbackMessageModel
     else:
         message_model = feedback_models.FeedbackMessageModel
@@ -500,7 +501,7 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         message_model = feedback_models.GeneralFeedbackMessageModel
     else:
         message_model = feedback_models.FeedbackMessageModel
@@ -508,7 +509,7 @@ def _get_thread_from_model(thread_model):
         message_count = message_model.get_message_count(thread_model.id)
     else:
         message_count = thread_model.message_count
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         return feedback_domain.FeedbackThread(
             thread_model.id, thread_model.entity_type, thread_model.entity_id,
             None, thread_model.original_author_id,
@@ -557,7 +558,7 @@ def get_thread_summaries(user_id, thread_ids):
                 exploration belongs.
         int. The number of threads not read by the user.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_thread_user_model_ids = (
             [feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
                 user_id, thread_id) for thread_id in thread_ids])
@@ -597,7 +598,7 @@ def get_thread_summaries(user_id, thread_ids):
     for thread in threads:
         last_two_messages_ids += thread.get_last_two_message_ids()
 
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
             last_two_messages_ids)
     else:
@@ -648,7 +649,7 @@ def get_thread_summaries(user_id, thread_ids):
         # TODO(Arunabh): Remove else clause after each thread has a message
         # count.
         else:
-            if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
                 total_message_count = (
                     feedback_models.GeneralFeedbackMessageModel
                     .get_message_count(thread_ids[index]))
@@ -687,7 +688,7 @@ def get_most_recent_messages(entity_type, entity_id):
     Returns:
        A list of FeedbackMessage.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_models = (
             feedback_models.FeedbackThreadModel.get_threads(
                 entity_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
@@ -699,7 +700,7 @@ def get_most_recent_messages(entity_type, entity_id):
 
     message_models = []
     for thread_model in thread_models:
-        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             message_models.append(
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     thread_model.thread_id))
@@ -723,7 +724,7 @@ def get_threads(entity_type, entity_id):
     Returns:
         list of FeedbackThread. The corresponding Suggestion domain object.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_models = feedback_models.GeneralFeedbackThreadModel.get_threads(
             entity_type, entity_id)
     else:
@@ -741,7 +742,7 @@ def get_thread(thread_id):
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
     else:
         model = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
@@ -1149,7 +1150,7 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
         thread_id: str. The id of thread used to obtain
             FeedbackEmailReplyToIdModel for given user.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_email_id_models = (
             email_models.GeneralFeedbackEmailReplyToIdModel
             .get_multi_by_user_ids(user_ids, thread_id))
@@ -1162,7 +1163,7 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
     # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
-            if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
                 new_model = (
                     email_models.GeneralFeedbackEmailReplyToIdModel.create(
                         user_id, thread_id))
@@ -1188,14 +1189,14 @@ def _add_message_to_email_buffer(
         old_status: str. one of STATUS_CHOICES. Value of old thread status.
         new_status: str. one of STATUS_CHOICES. Value of new thread status.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         exploration_id = thread.entity_id
     else:
         thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
         exploration_id = thread.exploration_id
     has_suggestion = thread.has_suggestion
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_message_reference = feedback_domain.FeedbackMessageReference(
             thread.entity_type, thread.entity_id, thread_id, message_id)
     else:

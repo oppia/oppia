@@ -434,7 +434,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 subscription_services, 'subscribe_to_exploration', self._null_fn
             ):
             with self.swap(
-                feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 # User B starts a feedback thread.
                 feedback_services.create_thread(
                     'exploration', self.EXP_ID_1, None, self.user_b_id,
@@ -445,7 +445,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 feedback_services.create_message(
                     thread_id, self.user_c_id, None, None, 'more text')
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             self._run_one_off_job()
 
         # Both users are subscribed to the feedback thread.
