@@ -676,7 +676,9 @@ oppia.directive('conversationSkin', [
                 ReadOnlyExplorationBackendApiService.loadExploration(
                   explorationId, version, storyId).then(function(returnDict) {
                   expDict = returnDict;
-                  if (returnDict.pretest_question_dicts.length > 0 && !$scope.isFinalQuestion) {
+                  if (
+                    returnDict.pretest_question_dicts.length > 0 &&
+                    !$scope.isFinalQuestion) {
                     _initializePretestServices(returnDict);
                   } else {
                     _initializeExplorationServices(returnDict);
@@ -686,7 +688,9 @@ oppia.directive('conversationSkin', [
                 ReadOnlyExplorationBackendApiService.loadLatestExploration(
                   explorationId, storyId).then(function(returnDict) {
                   expDict = returnDict;
-                  if (returnDict.pretest_question_dicts.length > 0&& !$scope.isFinalQuestion) {
+                  if (
+                    returnDict.pretest_question_dicts.length > 0 &&
+                    !$scope.isFinalQuestion) {
                     _initializePretestServices(returnDict);
                   } else {
                     _initializeExplorationServices(returnDict);
