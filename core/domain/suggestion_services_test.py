@@ -24,7 +24,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([

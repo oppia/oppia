@@ -23,7 +23,6 @@ from core.domain import feedback_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
-import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 

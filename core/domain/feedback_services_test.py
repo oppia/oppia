@@ -15,7 +15,7 @@
 """Tests for feedback-related services."""
 import json
 
-from core.constants import constants
+from constants import constants
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
