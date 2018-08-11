@@ -242,5 +242,12 @@ describe('Responses Service', function() {
     it('should count the answer groups', function() {
       expect(rs.getAnswerGroupCount()).toEqual(1)
     });
+
+    it('should get the default outcome', function() {
+      const state = ess.getState('Test');
+      const defaultOutcome = state.interaction.defaultOutcome;
+
+      expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
+    });
   })
 })
