@@ -497,10 +497,10 @@
     "oppiaTools": {
       "yuiCompressor": {
         "version": "2.4.8",
-        "downloadFormat": "files",
-        "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8",
-        "files": ["yuicompressor-2.4.8.jar"],
-        "targetDirPrefix": "yuicompressor-"
+        "downloadFormat": "zip",
+        "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8/yuicompressor-2.4.8.zip",
+        "rootDir": "yuicompressor-2.4.8.jar",
+        "targetDir": "yuicompressor-2.4.8/yuicompressor-2.4.8.jar"
       },
       "browsermob-proxy": {
         "version": "2.1.1",
