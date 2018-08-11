@@ -18,59 +18,31 @@
 
 from core.domain import learner_progress_domain
 from core.tests import test_utils
-import feconf
+
+exploration_ids = ['exp_id1', 'exp_id2', 'exp_id3']
+collection_ids = ['collection_id1', 'collection_id2', 'collection_id3']
 
 
 class LearnerProgressDomainUnitTests(test_utils.GenericTestBase):
-    """Test the Learner Progress domain."""
-
-    def setUp(self):
-        super(LearnerProgressDomainUnitTests, self).setUp()
-        self.exploration_keys = []
-        self.collection_keys = []
-        # Preparing Learner Progress exploration & collection IDs.
-        # In case there are less DEMO dictionary members than needed,
-        # we need to reuse values to initiate Learner Progress.
-        self.num_of_demo_explorations = len(feconf.DEMO_EXPLORATIONS)
-        self.num_of_demo_collections = len(feconf.DEMO_COLLECTIONS)
-        exploration_keys_iter = feconf.DEMO_EXPLORATIONS.iterkeys()
-        collection_keys_iter = feconf.DEMO_COLLECTIONS.iterkeys()
-        for _ in xrange(0, self.num_of_demo_explorations):
-            self.exploration_keys.append(next(exploration_keys_iter))
-        for _ in xrange(0, self.num_of_demo_collections):
-            self.collection_keys.append(next(collection_keys_iter))
+    """Test the LearnerProgress domain object."""
 
     def test_init_learner_progress(self):
         learner_progress = learner_progress_domain.LearnerProgress(
-            feconf.DEMO_EXPLORATIONS[self.exploration_keys[0]],
-            feconf.DEMO_COLLECTIONS[self.collection_keys[0]],
-            feconf.DEMO_EXPLORATIONS[
-                self.exploration_keys[1 % self.num_of_demo_explorations]],
-            feconf.DEMO_COLLECTIONS[
-                self.collection_keys[1 % self.num_of_demo_collections]],
-            feconf.DEMO_EXPLORATIONS[
-                self.exploration_keys[2 % self.num_of_demo_explorations]],
-            feconf.DEMO_COLLECTIONS[
-                self.collection_keys[2 % self.num_of_demo_collections]])
+            exploration_ids[0], collection_ids[0],
+            exploration_ids[1], collection_ids[1],
+            exploration_ids[2], collection_ids[2])
         self.assertIsNotNone(learner_progress)
 
 
 class ActivityIdsInLearnerDashboardDomainTests(LearnerProgressDomainUnitTests):
-    """Test the ActivityIdsInLearnerDashboard domain."""
+    """Test the ActivityIdsInLearnerDashboard domain object."""
 
     def setUp(self):
         super(ActivityIdsInLearnerDashboardDomainTests, self).setUp()
         self.learner_values = [
-            feconf.DEMO_EXPLORATIONS[self.exploration_keys[0]],
-            feconf.DEMO_COLLECTIONS[self.collection_keys[0]],
-            feconf.DEMO_EXPLORATIONS[
-                self.exploration_keys[1 % self.num_of_demo_explorations]],
-            feconf.DEMO_COLLECTIONS[
-                self.collection_keys[1 % self.num_of_demo_collections]],
-            feconf.DEMO_EXPLORATIONS[
-                self.exploration_keys[2 % self.num_of_demo_explorations]],
-            feconf.DEMO_COLLECTIONS[
-                self.collection_keys[2 % self.num_of_demo_collections]]]
+            exploration_ids[0], collection_ids[0],
+            exploration_ids[1], collection_ids[1],
+            exploration_ids[2], collection_ids[2]]
         self.learner = learner_progress_domain.ActivityIdsInLearnerDashboard(
             self.learner_values[0], self.learner_values[1],
             self.learner_values[2], self.learner_values[3],
@@ -78,11 +50,11 @@ class ActivityIdsInLearnerDashboardDomainTests(LearnerProgressDomainUnitTests):
 
     def test_to_dict(self):
         learner_dict = self.learner.to_dict()
-        learner_tester_dict = {
+        expected_activity_ids_dict = {
             'completed_exploration_ids': self.learner_values[0],
             'completed_collection_ids': self.learner_values[1],
             'incomplete_exploration_ids': self.learner_values[2],
             'incomplete_collection_ids': self.learner_values[3],
             'exploration_playlist_ids': self.learner_values[4],
             'collection_playlist_ids': self.learner_values[5]}
-        self.assertEqual(learner_tester_dict, learner_dict)
+        self.assertEqual(expected_activity_ids_dict, learner_dict)
