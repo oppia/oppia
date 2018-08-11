@@ -237,6 +237,10 @@ describe('Responses Service', function() {
       const answerGroups = state.interaction.answerGroups;
 
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
-    })
+    });
+
+    it('should count the answer groups', function() {
+      expect(rs.getAnswerGroupCount()).toEqual(1)
+    });
   })
 })
