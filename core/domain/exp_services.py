@@ -898,10 +898,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exp_versions_diff)
 
     # Trigger exploration issues model updation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
+    stats_services.update_exp_issues_for_new_exp_version(
+        exploration, exp_versions_diff=exp_versions_diff,
+        revert_to_version=None)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -967,9 +966,8 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Trigger exploration issues model creation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version)
+    stats_services.create_exp_issues_for_new_exploration(
+        exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
@@ -1429,12 +1427,11 @@ def revert_exploration(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
 
-    if feconf.ENABLE_PLAYTHROUGHS:
-        current_exploration = get_exploration_by_id(
-            exploration_id, version=current_version)
-        stats_services.update_exp_issues_for_new_exp_version(
-            current_exploration, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
+    current_exploration = get_exploration_by_id(
+        exploration_id, version=current_version)
+    stats_services.update_exp_issues_for_new_exp_version(
+        current_exploration, exp_versions_diff=None,
+        revert_to_version=revert_to_version)
 
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(

@@ -518,10 +518,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         stats_services.create_exp_issues_for_new_exploration(
@@ -541,10 +540,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         exp_issues = stats_services.get_exp_issues(

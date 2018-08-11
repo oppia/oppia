@@ -25,14 +25,12 @@ oppia.controller('StatisticsTab', [
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
-  'ENABLE_PLAYTHROUGH_VIZ',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE,
-      ENABLE_PLAYTHROUGH_VIZ) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -54,8 +52,6 @@ oppia.controller('StatisticsTab', [
     };
     var _EXPLORATION_STATS_VERSION_ALL = 'all';
     $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
-
-    $scope.playthroughVizEnabled = ENABLE_PLAYTHROUGH_VIZ;
 
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(

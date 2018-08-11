@@ -77,8 +77,6 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
-oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
-oppia.constant('ENABLE_PLAYTHROUGH_VIZ', false);
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
 oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
