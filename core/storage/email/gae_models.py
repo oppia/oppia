@@ -450,6 +450,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     """
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    # TODO (nithesh): Overriding last_updated of base model for migrating
+    # instances from old model to the new one. To be removed after migration.
+    last_updated = ndb.DateTimeProperty()
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
