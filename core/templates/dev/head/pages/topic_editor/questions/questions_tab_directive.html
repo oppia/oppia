@@ -52,7 +52,7 @@
         <td> <[$index + 1]> </td>
         <td>
           <a class="list-summary">
-            <angular-html-bind html-data="questionSuggestionThread.suggestion.question.question_state_data.content"></angular-html-bind>
+            <angular-html-bind html-data="questionSuggestionThread.suggestion.question.getStateData().content.getHtml()"></angular-html-bind>
           </a>
         </td>
         <td>

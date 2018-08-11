@@ -21,6 +21,7 @@ oppia.directive('stateResponses', [
       restrict: 'E',
       scope: {
         addState: '=',
+        onResponsesInitialized: '=',
         onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
@@ -576,6 +577,12 @@ oppia.directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+
+
+          if (StateEditorService.isInQuestionMode()) {
+            $scope.onResponsesInitialized();
+          }
+
         }
       ]
     };
