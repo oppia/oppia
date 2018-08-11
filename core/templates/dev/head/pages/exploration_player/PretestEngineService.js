@@ -280,12 +280,13 @@ oppia.factory('PretestEngineService', [
           answerIsCorrect || this.isInteractionInline());
 
         nextIndex = currentIndex + 1;
+        var isFinalQuestion = (nextIndex === pretestQuestions.length);
         var onSameCard = !answerIsCorrect;
 
         successCallback(
           nextIndex, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, oldParams,
-          null, null, onSameCard, null, null);
+          null, null, onSameCard, null, null, isFinalQuestion);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

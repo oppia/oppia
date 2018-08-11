@@ -438,7 +438,7 @@ oppia.factory('ExplorationEngineService', [
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
           refresherExplorationId, missingPrerequisiteSkillId, onSameCard,
-          (oldStateName === exploration.initStateName), isFirstHit);
+          (oldStateName === exploration.initStateName), isFirstHit, false);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

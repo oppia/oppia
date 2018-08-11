@@ -51,6 +51,10 @@ oppia.directive('inputResponsePair', [
           };
 
           var refreshEngineService = function() {
+            if (PlayerPositionService.getActiveCardIndex() === null) {
+              _currentEngineService = ExplorationEngineService;
+              return;
+            }
             if (
               PlayerTranscriptService.getCard(
                 PlayerPositionService.getActiveCardIndex()

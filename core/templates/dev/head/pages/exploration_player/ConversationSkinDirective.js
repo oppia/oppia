@@ -577,6 +577,8 @@ oppia.directive('conversationSkin', [
           };
 
           var _initializeExplorationServices = function(returnDict) {
+            PlayerPositionService.init(_navigateToActiveCard);
+            PlayerTranscriptService.init();
             var version = GLOBALS.explorationVersion;
             var explorationId = ContextService.getExplorationId();
             $scope.inPretestMode = false;
@@ -648,7 +650,8 @@ oppia.directive('conversationSkin', [
               $rootScope.$broadcast(EVENT_NEW_CARD_OPENED);
             });
           };
-
+          var expDict = null;
+          $scope.isFinalQuestion = false;
           $scope.initializePage = function() {
             hasInteractedAtLeastOnce = false;
             $scope.recommendedExplorationSummaries = null;
@@ -672,7 +675,8 @@ oppia.directive('conversationSkin', [
               if (version) {
                 ReadOnlyExplorationBackendApiService.loadExploration(
                   explorationId, version, storyId).then(function(returnDict) {
-                  if (returnDict.pretest_question_dicts.length > 0) {
+                  expDict = returnDict;
+                  if (returnDict.pretest_question_dicts.length > 0 && !$scope.isFinalQuestion) {
                     _initializePretestServices(returnDict);
                   } else {
                     _initializeExplorationServices(returnDict);
@@ -681,7 +685,8 @@ oppia.directive('conversationSkin', [
               } else {
                 ReadOnlyExplorationBackendApiService.loadLatestExploration(
                   explorationId, storyId).then(function(returnDict) {
-                  if (returnDict.pretest_question_dicts.length > 0) {
+                  expDict = returnDict;
+                  if (returnDict.pretest_question_dicts.length > 0&& !$scope.isFinalQuestion) {
                     _initializePretestServices(returnDict);
                   } else {
                     _initializeExplorationServices(returnDict);
@@ -758,7 +763,8 @@ oppia.directive('conversationSkin', [
                   newStateName, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, contentHtml, newParams,
                   refresherExplorationId, missingPrerequisiteSkillId,
-                  remainOnCurrentCard, wasOldStateInitial, isFirstHit) {
+                  remainOnCurrentCard, wasOldStateInitial, isFirstHit,
+                  isFinalQuestion) {
                 if (!_editorPreviewMode && !$scope.inPretestMode) {
                   var oldStateName =
                     ExplorationEngineService.getCurrentStateName();
@@ -871,6 +877,12 @@ oppia.directive('conversationSkin', [
                     // There is a new card. If there is no feedback, move on
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
+                    if (isFinalQuestion) {
+                      $scope.inPretestMode = false;
+                      $scope.isFinalQuestion = true;
+                      _initializeExplorationServices(expDict);
+                      return;
+                    }
                     FatigueDetectionService.reset();
                     NumberAttemptsService.reset();
                     _nextFocusLabel = FocusManagerService.generateFocusLabel();
