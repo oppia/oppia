@@ -573,10 +573,10 @@ def _execute_tasks(tasks, batch_size=24):
             task.start()
 
 
-def build_files(source, target, file_hashes, file_formats):
-    """Minifies all CSS and JS files, removes whitespace from HTML and
-    interpolates paths in HTML to include hashes in source
-    directory and copies it to target.
+def build_files(source, target, file_hashes, file_formats=None):
+    """If no specific file formats is provided, minifies all CSS and JS files,
+    removes whitespace from HTML and interpolates paths in HTML to include
+    hashes in source directory and copies it to target.
 
     Args:
         source: str. Path relative to /oppia directory of directory
@@ -585,12 +585,12 @@ def build_files(source, target, file_hashes, file_formats):
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
         file_formats: tuple(str). Tuple of specific file formats to be built.
-            Use empty tuple to build all files.
+            (default is None)
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     ensure_directory_exists(target)
-    if not file_formats:
+    if file_formats is None:
         print 'Deleting dir %s' % target
         # Only delete BUILD directory when building all files.
         shutil.rmtree(target)
@@ -607,13 +607,15 @@ def build_files(source, target, file_hashes, file_formats):
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            task = threading.Thread()
             if file_formats:
                 if any(filename.endswith(p) for p in file_formats):
                     task = threading.Thread(
                         target=minify_func,
                         args=(source_path, target_path, file_hashes, filename))
-            else:
+                else:
+                    # Skip files that are not the specified format.
+                    continue
+            elif file_formats is None:
                 task = threading.Thread(
                     target=minify_func,
                     args=(source_path, target_path, file_hashes, filename))
@@ -659,7 +661,7 @@ def get_recently_changed_filenames(dev_dir, out_dir):
     # Hashes are created based on files' contents and are inserted between
     # the filenames and their extensions,
     # e.g base.240933e7564bd72a4dde42ee23260c5f.html
-    # Should a file gets edited, a different MD5 hash is generated.
+    # If a file gets edited, a different MD5 hash is generated.
     file_hashes = dict()
     file_hashes.update(get_file_hashes(dev_dir))
     recently_changed_filenames = []
@@ -705,10 +707,9 @@ def generate_build_directory():
 
     # Minify extension static resources, create hashes for them and copy them
     # into build/extensions.
-    file_formats = ()
     hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
     build_files(
-        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, file_formats)
+        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
     copy_files_source_to_target(
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
@@ -723,15 +724,14 @@ def generate_build_directory():
     if not os.path.isdir(TEMPLATES_STAGING_DIR):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
-        file_formats = ()
         build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
     else:
         # If there is an existing staging dir, rebuild all HTML files.
-        file_formats = ('.html')
         print 'Staging directory exists, re-building all HTML files'
         build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, file_formats)
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes,
+            file_formats=('.html',))
         new_files_list = get_recently_changed_filenames(
             TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
         if new_files_list:
