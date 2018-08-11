@@ -249,5 +249,14 @@ describe('Responses Service', function() {
 
       expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
     });
+
+    it('should get the confirmed unclassified answers', function() {
+      const state = ess.getState('Test');
+      const confirmedUnclassifiedAnswers = (
+        state.interaction.confirmedUnclassifiedAnswers);
+
+      expect(rs.getConfirmedUnclassifiedAnswers()).toEqual(
+        confirmedUnclassifiedAnswers);
+    });
   })
 })
