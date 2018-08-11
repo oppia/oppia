@@ -2200,7 +2200,7 @@ def discard_draft(exp_id, user_id):
 
 
 def get_state_id_mapping(exp_id, exp_version):
-    """Retrieve state id mapping model instance from the datastore.
+    """Retrieve a StateIdMapping object for a given exploration version.
 
     Args:
         exp_id: str. The exploration id.
@@ -2215,6 +2215,27 @@ def get_state_id_mapping(exp_id, exp_version):
         model.exploration_id, model.exploration_version,
         copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used)
     return state_id_mapping
+
+
+def get_multi_state_id_mappings(exp_id, exp_versions):
+    """Retrieve multiple StateIDMapping objects for a given exploration.
+
+    Args:
+        exp_id: str. The exploration id.
+        exp_versions: list(int). The exploration versions.
+
+    Returns:
+        list(StateIdMapping). Domain objects for state id mapping model
+            instances.
+    """
+    state_id_mapping_models = (
+        exp_models.StateIdMappingModel.get_multi_state_id_mapping_models(
+            exp_id, exp_versions))
+    state_id_mappings = [exp_domain.StateIdMapping(
+        model.exploration_id, model.exploration_version,
+        copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used
+    ) for model in state_id_mapping_models]
+    return state_id_mappings
 
 
 def _save_state_id_mapping(state_id_mapping):
