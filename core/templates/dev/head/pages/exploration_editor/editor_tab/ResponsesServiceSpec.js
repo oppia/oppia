@@ -239,6 +239,13 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
     });
 
+    it('should get the answer group', function() {
+      const state = ess.getState('Test');
+      const answerGroup = state.interaction.answerGroups[0];
+
+      expect(rs.getAnswerGroup(0)).toEqual(answerGroup);
+    });
+
     it('should count the answer groups', function() {
       expect(rs.getAnswerGroupCount()).toEqual(1)
     });
