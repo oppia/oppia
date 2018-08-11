@@ -4431,7 +4431,7 @@ title: Title
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
-            self.assertEqual(
+        self.assertEqual(
                 exploration.to_yaml(), self.YAML_CONTENT_V30_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
@@ -4442,7 +4442,7 @@ title: Title
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
-            self.assertEqual(
+        self.assertEqual(
                 exploration.to_yaml(), self.YAML_CONTENT_V30_WITH_IMAGE_CAPTION)
 
 
@@ -4798,8 +4798,8 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
                 html_validation_service.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
-        add_dimensions_to_noninteractive_image_tag = functools.partial(
-            html_validation_service.add_dimensions_to_noninteractive_image_tag,
+        add_dimensions_to_image_tags = functools.partial(
+            html_validation_service.add_dimensions_to_image_tags,
             'eid')
 
         with self.swap(
@@ -4808,7 +4808,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 exp_domain.State.convert_html_fields_in_state(
-                    state_dict, add_dimensions_to_noninteractive_image_tag),
+                    state_dict, add_dimensions_to_image_tags),
                 state_dict_with_image_dimensions)
 
 

@@ -755,12 +755,11 @@ def _validate_customization_args_in_tag(tag):
         yield str(e)
 
 
-def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
+def add_dimensions_to_image_tags(exp_id, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags.
 
     Args:
-        html_string: str. HTML string in which the dimensions is to be
-            added.
+        html_string: str. HTML string to modify.
         exp_id: str. Exploration id.
 
     Returns:
@@ -776,28 +775,28 @@ def add_dimensions_to_noninteractive_image_tag(exp_id, html_string):
     return unicode(soup)
 
 
-def get_filename_with_dimensions(filename, exp_id):
-    """Gets the dimensions of the image file.
+def get_filename_with_dimensions(old_filename, exp_id):
+    """Gets the filename with dimensions of the image file in it.
 
     Args:
-        filename: str. Name of the file whose dimensions need to be
+        old_filename: str. Name of the file whose dimensions need to be
             calculated.
         exp_id: str. Exploration id.
 
     Returns:
-        dict. A dict representing Fileinfo object of the image.
+        str. The new filename of the image file.
     """
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
     filepath = (
-        filename if feconf.DEV_MODE
-        else ('image/%s' % filename))
+        old_filename if feconf.DEV_MODE
+        else ('image/%s' % old_filename))
     content = fs.get(filepath)
     height, width = gae_image_services.get_image_dimensions(content)
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-    renamed_filename = '%s_height_%s_width_%s.%s' % (
+    filename_wo_filetype = old_filename[:old_filename.rfind('.')]
+    filetype = old_filename[old_filename.rfind('.') + 1:]
+    new_filename = '%s_height_%s_width_%s.%s' % (
         filename_wo_filetype, str(height), str(width), filetype)
-    return renamed_filename
+    return new_filename

@@ -979,17 +979,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_output, expected_output)
 
-    def test_add_dimensions_to_noninteractive_image_tag(self):
+    def test_add_dimensions_to_image_tags(self):
         test_cases = [{
             'html_content': (
                 '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
-                'abc.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                'abc1.png&amp;quot;"></oppia-noninteractive-image>Hello this'
                 ' is test case to check that dimensions are added to the oppia'
                 ' noninteractive image tags.</p>'
             ),
             'expected_output': (
                 u'<p><oppia-noninteractive-image filepath-with-value='
-                '"&amp;quot;abc_height_32_width_32.png&amp;'
+                '"&amp;quot;abc1_height_32_width_32.png&amp;'
                 'quot;"></oppia-noninteractive-image>Hello this is test case'
                 ' to check that dimensions are added to the oppia '
                 'noninteractive image tags.</p>'
@@ -997,16 +997,27 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
-                'abc.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                'abc2.png&amp;quot;"></oppia-noninteractive-image>Hello this'
                 ' is test case to check that dimensions are added to the oppia'
-                ' noninteractive image tags.</p>'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3.png&amp;quot;">'
+                '</oppia-noninteractive-image></p>'
             ),
             'expected_output': (
-                u'<p><oppia-noninteractive-image filepath-with-value='
-                '"&amp;quot;abc_height_32_width_32.png&amp;'
-                'quot;"></oppia-noninteractive-image>Hello this is test case'
-                ' to check that dimensions are added to the oppia '
-                'noninteractive image tags.</p>'
+                u'<p><oppia-noninteractive-image filepath-with-value="'
+                '&amp;quot;abc2_height_32_width_32.png&amp;quot;">'
+                '</oppia-noninteractive-image>Hello this is test case '
+                'to check that dimensions are added to the oppia'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3_height_32_width_32.png'
+                '&amp;quot;"></oppia-noninteractive-image></p>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hey</p>'
+            ),
+            'expected_output': (
+                u'<p>Hey</p>'
             )
         }]
 
@@ -1014,11 +1025,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
-        fs.commit(self.OWNER_ID, 'abc.png', raw_image, mimetype='image/png')
-        self.assertEqual(fs.isfile('abc.png'), True)
+        fs.commit(self.OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
+        fs.commit(self.OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
+        fs.commit(self.OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
-                html_validation_service.add_dimensions_to_noninteractive_image_tag( # pylint: disable=line-too-long
+                html_validation_service.add_dimensions_to_image_tags( # pylint: disable=line-too-long
                     self.EXP_ID, test_case['html_content']),
                 test_case['expected_output'])

@@ -628,13 +628,10 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-            updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-            self.assertEqual(
-                updated_exp.states_schema_version,
-                feconf.CURRENT_STATES_SCHEMA_VERSION)
+        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(

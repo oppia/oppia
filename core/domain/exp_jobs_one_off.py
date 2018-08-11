@@ -222,6 +222,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             return
+
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
         if (item.states_schema_version !=

@@ -615,33 +615,32 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             return exp_services.regenerate_image_filename_using_dimensions(
                 filename, 490, 120)
 
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
+        for exp_id in demo_exploration_ids:
+            start_time = datetime.datetime.utcnow()
 
-            for exp_id in demo_exploration_ids:
-                start_time = datetime.datetime.utcnow()
-
+            with self.swap(
+                html_validation_service, 'get_filename_with_dimensions',
+                mock_get_filename_with_dimensions):
                 exp_services.load_demo(exp_id)
                 exploration = exp_services.get_exploration_by_id(exp_id)
-                warnings = exploration.validate(strict=True)
-                if warnings:
-                    raise Exception(warnings)
+            warnings = exploration.validate(strict=True)
+            if warnings:
+                raise Exception(warnings)
 
-                duration = datetime.datetime.utcnow() - start_time
-                processing_time = duration.seconds + duration.microseconds / 1E6
-                self.log_line(
-                    'Loaded and validated exploration %s (%.2f seconds)' %
-                    (exploration.title.encode('utf-8'), processing_time))
+            duration = datetime.datetime.utcnow() - start_time
+            processing_time = duration.seconds + duration.microseconds / 1E6
+            self.log_line(
+                'Loaded and validated exploration %s (%.2f seconds)' %
+                (exploration.title.encode('utf-8'), processing_time))
 
-            self.assertEqual(
-                exp_models.ExplorationModel.get_exploration_count(),
-                len(demo_exploration_ids))
+        self.assertEqual(
+            exp_models.ExplorationModel.get_exploration_count(),
+            len(demo_exploration_ids))
 
-            for exp_id in demo_exploration_ids:
-                exp_services.delete_demo(exp_id)
-            self.assertEqual(
-                exp_models.ExplorationModel.get_exploration_count(), 0)
+        for exp_id in demo_exploration_ids:
+            exp_services.delete_demo(exp_id)
+        self.assertEqual(
+            exp_models.ExplorationModel.get_exploration_count(), 0)
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
@@ -881,7 +880,6 @@ title: Title
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
-    EXP_ID = 'eid'
     FILENAME = 'abc.png'
     HEIGHT = 45
     WIDTH = 45
