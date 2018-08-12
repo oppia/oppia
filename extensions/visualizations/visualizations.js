@@ -112,9 +112,9 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
         '$scope', '$attrs', 'HtmlEscaperService', 'StateTopAnswersStatsService',
         function(
             $scope, $attrs, HtmlEscaperService, StateTopAnswersStatsService) {
-          var stateName = $attrs.stateName;
-          $scope.rows = StateTopAnswersStatsService.hasStateStats(stateName) ?
-            StateTopAnswersStatsService.getStateStats(stateName) : [];
+          $scope.rows =
+            StateTopAnswersStatsService.hasStateStats($attrs.stateName) ?
+            StateTopAnswersStatsService.getStateStats($attrs.stateName) : [];
           $scope.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
           $scope.columnControllers = [
