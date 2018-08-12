@@ -4732,7 +4732,7 @@ class StateIdMapping(object):
                 new_exploration.states.keys()):
             unknown_state_names = ((
                 set(new_exploration.states.keys()) -
-                set(new_state_names_to_ids.keys())) + (
+                set(new_state_names_to_ids.keys())).union(
                     set(new_state_names_to_ids.keys()) -
                     set(new_exploration.states.keys())))
             raise Exception(
