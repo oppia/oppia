@@ -121,11 +121,10 @@ var AdminPage = function(){
       propertyName, objectType, editingInstructions) {
     this.get();
     configTab.click();
-    var anonymousFunc = function(x) {
+    configProperties.map(function(x) {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
-    };
-    configProperties.map(anonymousFunc).then(function(results) {
+    }).then(function(results) {
       var success = false;
       for (var i = 0; i < results.length; i++) {
         success = success || results[i];

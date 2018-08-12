@@ -200,24 +200,21 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(
-          newExplorationId, newExplorationVersion, playthroughProbability,
+          explorationId, explorationVersion, playthroughProbability,
           whitelistedExpIds) {
         isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
           playthroughProbability);
         explorationWhitelisted = this.isExplorationWhitelisted(
-          newExplorationId, whitelistedExpIds);
+          explorationId, whitelistedExpIds);
         playthrough = PlaythroughObjectFactory.createNew(
-          null, newExplorationId, newExplorationVersion, null, {}, []);
+          null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
       },
       isPlayerExcludedFromSamplePopulation: function() {
         return !isPlayerInSamplePopulation;
       },
       isExplorationWhitelisted: function(expId, whitelistedExpIds) {
-        if (whitelistedExpIds.indexOf(expId) !== -1) {
-          return true;
-        }
-        return false;
+        return whitelistedExpIds.indexOf(expId) !== -1;
       },
       getPlaythrough: function() {
         return playthrough;
