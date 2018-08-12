@@ -746,7 +746,7 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the images/audio such that the url instead of
+    """One-off job for copying the image/audio such that the url instead of
     {{exp_id}}/assets/image/image.png is
     exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
     the images as well as renaming the filenames so that they have dimensions
