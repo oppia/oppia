@@ -1113,7 +1113,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXPLORATION_ID))
+            fs_domain.ExplorationFileSystem(
+                'exploration/%s' % self.EXPLORATION_ID))
         self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
         self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
