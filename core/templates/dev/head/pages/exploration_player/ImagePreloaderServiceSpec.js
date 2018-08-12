@@ -411,9 +411,23 @@ describe('Image preloader service', function() {
     });
 
   it('should calculate the dimensions of the image file', function() {
-    dimensions = ips.getDimensionsOfImage(
+    dimensions1 = ips.getDimensionsOfImage(
       'sIOFeedback_height_50_width_50.png');
-    expect(dimensions.width).toBe(50);
-    expect(dimensions.height).toBe(50);
+    expect(dimensions1.width).toBe(50);
+    expect(dimensions1.height).toBe(50);
+    dimensions2 = ips.getDimensionsOfImage(
+      'sIOFeedback_height_30_width_45_height_56_width_56.png');
+    expect(dimensions2.width).toBe(56);
+    expect(dimensions2.height).toBe(56);
+    expect(function() {
+      ips.getDimensionsOfImage(
+        's6Hint1_height_width_60.png');
+    }).toThrowError(
+      /it does not contain dimensions/);
+    expect(function() {
+      ips.getDimensionsOfImage(
+        'sol_height_ds_width_60.png');
+    }).toThrowError(
+      /it does not contain dimensions/);
   });
 });

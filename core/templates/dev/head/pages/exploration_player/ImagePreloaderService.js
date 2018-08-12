@@ -231,14 +231,19 @@ oppia.factory('ImagePreloaderService', [
     *                           images should be extracted.
     */
     var getDimensionsOfImage = function(filename) {
-      var imageDimensions = RegExp(
+      var dimensionsRegex = RegExp(
         '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif)$', 'g');
+      imageDimensions = dimensionsRegex.exec(filename);
       if (imageDimensions) {
         dimensions = {
           height: Number(imageDimensions[1]),
           width: Number(imageDimensions[2])
         };
         return dimensions;
+      }
+      else {
+        throw new Error(
+          'The image name is invalid, it does not contain dimensions.');
       }
     };
 
