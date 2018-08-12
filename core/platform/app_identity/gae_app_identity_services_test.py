@@ -26,13 +26,13 @@ class GaeAppIdentityServicesTest(test_utils.GenericTestBase):
         self.application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
 
     def test_get_application_id(self):
-        self.assertEquals(gae_app_identity_services
-                          .get_application_id(),
-                          self.application_id)
+        self.assertEquals(
+            gae_app_identity_services.get_application_id(
+            ), self.application_id)
 
     def test_get_gcs_resource_bucket_name(self):
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
-            self.assertEquals(gae_app_identity_services
-                              .get_gcs_resource_bucket_name(),
-                              self.application_id + '-resources')
+            self.assertEquals(
+                gae_app_identity_services.get_gcs_resource_bucket_name(
+                ), self.application_id + '-resources')
