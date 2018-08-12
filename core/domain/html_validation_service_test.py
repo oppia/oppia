@@ -29,8 +29,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     strings to valid RTE format.
     """
     EXP_ID = 'eid'
+    FILENAME = 'abc.png'
+    HEIGHT = 45
     OWNER_ID = 'Admin'
-
+    WIDTH = 45
 
     def test_wrap_with_siblings(self):
         test_cases = [{
@@ -1034,3 +1036,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_dimensions_to_image_tags( # pylint: disable=line-too-long
                     self.EXP_ID, test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_regenerate_image_filename_using_dimensions(self):
+        regenerated_name = (
+            html_validation_service.regenerate_image_filename_using_dimensions(
+                self.FILENAME, self.HEIGHT, self.WIDTH))
+        self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')

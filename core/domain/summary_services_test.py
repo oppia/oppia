@@ -31,6 +31,10 @@ from core.tests import test_utils
 import feconf
 import utils
 
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
+
 
 class ExplorationDisplayableSummariesTest(
         exp_services_test.ExplorationServicesUnitTests):
@@ -253,10 +257,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-
-        def mock_get_filename_with_dimensions(filename, unused_exp_id):
-            return exp_services.regenerate_image_filename_using_dimensions(
-                filename, 490, 120)
 
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',

@@ -52,6 +52,10 @@ def _count_at_least_editable_exploration_summaries(user_id):
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
+
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
@@ -611,10 +615,6 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
 
-        def mock_get_filename_with_dimensions(filename, unused_exp_id):
-            return exp_services.regenerate_image_filename_using_dimensions(
-                filename, 490, 120)
-
         for exp_id in demo_exploration_ids:
             start_time = datetime.datetime.utcnow()
 
@@ -880,10 +880,6 @@ title: Title
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
-    FILENAME = 'abc.png'
-    HEIGHT = 45
-    WIDTH = 45
-
     def test_get_image_filenames_from_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
@@ -1109,13 +1105,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.assertEqual(len(filenames), len(expected_output))
         for filename in expected_output:
             self.assertIn(filename, filenames)
-
-    def test_regenerate_image_filename_using_dimensions(self):
-        regenerated_name = (
-            exp_services.regenerate_image_filename_using_dimensions(
-                self.FILENAME, self.HEIGHT, self.WIDTH))
-        self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
-
 
 
 class SaveOriginalAndCompressedVersionsOfImageTests(

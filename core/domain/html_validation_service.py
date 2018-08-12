@@ -755,6 +755,25 @@ def _validate_customization_args_in_tag(tag):
         yield str(e)
 
 
+def regenerate_image_filename_using_dimensions(filename, height, width):
+    """Returns the name of the image file with dimensions in it.
+
+    Args:
+        filename: str. The name of the image file to be renamed.
+        height: int. Height of the image.
+        width: int. Width of the image.
+
+    Returns:
+        str. The name of the image file with its dimensions in it.
+    """
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
+    new_filename = '%s%s.%s' % (
+        filename_wo_filetype, dimensions_suffix, filetype)
+    return new_filename
+
+
 def add_dimensions_to_image_tags(exp_id, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags.
 

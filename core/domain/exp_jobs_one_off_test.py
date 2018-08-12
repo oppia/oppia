@@ -39,7 +39,7 @@ search_services = models.Registry.import_search_services()
 
 
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return exp_services.regenerate_image_filename_using_dimensions(
+    return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
 
 
@@ -1204,6 +1204,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
+
             # Test that validation passes after migration.
         self.assertEqual(actual_output, [])
 

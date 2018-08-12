@@ -47,6 +47,10 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
 
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
+
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     """Test the answer object and type properties of an interaction object."""
@@ -480,10 +484,6 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
-        def mock_get_filename_with_dimensions(filename, unused_exp_id):
-            return exp_services.regenerate_image_filename_using_dimensions(
-                filename, 490, 120)
-
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions):
