@@ -115,7 +115,7 @@ def _get_exploration_player_data(
     interaction_ids = exploration.get_interaction_ids()
     for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
         if interaction_id not in interaction_ids:
-            interaction_ids.append(id)
+            interaction_ids.append(interaction_id)
 
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
