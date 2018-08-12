@@ -28,11 +28,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
     strings to valid RTE format.
     """
-    EXP_ID = 'eid'
-    FILENAME = 'abc.png'
-    HEIGHT = 45
-    OWNER_ID = 'Admin'
-    WIDTH = 45
 
     def test_wrap_with_siblings(self):
         test_cases = [{
@@ -1016,29 +1011,36 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': (
-                '<p>Hey</p>'
+                '<p>Hey this is a test case with no images.</p>'
             ),
             'expected_output': (
-                u'<p>Hey</p>'
+                u'<p>Hey this is a test case with no images.</p>'
             )
         }]
+
+        EXP_ID = 'eid'
+        OWNER_ID = 'Admin'
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
-        fs.commit(self.OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
-        fs.commit(self.OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
-        fs.commit(self.OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
+            fs_domain.ExplorationFileSystem(EXP_ID))
+        fs.commit(OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags( # pylint: disable=line-too-long
-                    self.EXP_ID, test_case['html_content']),
+                    EXP_ID, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):
+        FILENAME = 'abc.png'
+        HEIGHT = 45
+        WIDTH = 45
+
         regenerated_name = (
             html_validation_service.regenerate_image_filename_using_dimensions(
-                self.FILENAME, self.HEIGHT, self.WIDTH))
+                FILENAME, HEIGHT, WIDTH))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
