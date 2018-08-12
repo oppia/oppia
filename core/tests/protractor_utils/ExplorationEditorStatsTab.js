@@ -33,7 +33,7 @@ var ExplorationEditorStatsTab = function() {
 
   var _getInitIssueText = function() {
     return firstIssueElement.getText();
-  }
+  };
 
   this.expectNumPassersbyToBe = function(numPassersby) {
     expect(_getNumPassersby()).toMatch(numPassersby);
@@ -42,8 +42,7 @@ var ExplorationEditorStatsTab = function() {
 
   this.clickInitIssue = function() {
     expect(_getInitIssueText()).toMatch('Issue 1');
-
-  }
+  };
 };
 
 exports.ExplorationEditorStatsTab = ExplorationEditorStatsTab;
