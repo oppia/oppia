@@ -39,8 +39,8 @@ var ExplorationEditorStatsTab = function() {
     expect(_getNumPassersby()).toMatch(numPassersby);
   };
 
-  this.clickInitIssue = function() {
-    expect(_getInitIssueText()).toMatch('Issue 1');
+  this.clickInitIssue = function(expectedIssueText) {
+    expect(_getInitIssueText()).toMatch(expectedIssueText);
     firstIssueElement.click();
   };
 };

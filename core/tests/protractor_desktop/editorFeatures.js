@@ -34,8 +34,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
-var AdminPage =
-  require('../protractor_utils/AdminPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
@@ -668,7 +667,7 @@ describe('Issues visualization', function() {
     general.moveToEditor();
     explorationEditorPage.navigateToStatsTab();
 
-    explorationEditorStatsTab.clickInitIssue();
+    explorationEditorStatsTab.clickInitIssue('Issue 1');
   });
 });
 
