@@ -233,7 +233,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     suggestion.accept(commit_message)
     thread_id = suggestion.suggestion_id
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = thread_id[thread_id.find('.') + 1: ]
+        thread_id = thread_id[thread_id.find('.') + 1:]
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
@@ -261,7 +261,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
 
     thread_id = suggestion.suggestion_id
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = thread_id[thread_id.find('.') + 1: ]
+        thread_id = thread_id[thread_id.find('.') + 1:]
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)
