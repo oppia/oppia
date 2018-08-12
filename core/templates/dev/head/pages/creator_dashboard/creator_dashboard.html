@@ -382,8 +382,8 @@
       </ul>
     </div>
 
-    <md-card class="oppia-suggestion-table">
-      <div ng-if="activeTab === 'suggestions'">
+    <div ng-if="activeTab === 'suggestions'">
+      <md-card class="oppia-suggestion-table">
         <div ng-if="!activeThread">
           <div ng-if="mySuggestionsList.length > 0">
             <h2>Suggestions created</h2>
@@ -411,14 +411,6 @@
                 </button>
               </span>
               <span style="font-size: larger" ng-show="activeThread.isSuggestionThread()">Suggestion: <[activeThread.subject]></span>
-            </div>
-
-            <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
-              <div class="pull-right">
-                <span ng-class="getLabelClass(activeThread.status)">
-                  <[getHumanReadableStatus(activeThread.status)]>
-                </span>
-              </div>
             </div>
           </div>
 
@@ -466,8 +458,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </md-card>
+      </md-card>
+    </div>
   </div>
   <style>
     .oppia-creator-dashboard-main-content {

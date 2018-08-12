@@ -51,7 +51,7 @@ oppia.controller('CreatorDashboard', [
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
   'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -60,7 +60,7 @@ oppia.controller('CreatorDashboard', [
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       SuggestionObjectFactory, SuggestionThreadObjectFactory,
-      UrlInterpolationService, FATAL_ERROR_CODES,
+      ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -87,6 +87,8 @@ oppia.controller('CreatorDashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+    $scope.getHumanReadableStatus = (
+      ThreadStatusDisplayService.getHumanReadableStatus);
 
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
