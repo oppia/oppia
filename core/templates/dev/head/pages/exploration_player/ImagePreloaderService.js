@@ -240,8 +240,7 @@ oppia.factory('ImagePreloaderService', [
           width: Number(imageDimensions[2])
         };
         return dimensions;
-      }
-      else {
+      } else {
         throw new Error(
           'The image name is invalid, it does not contain dimensions.');
       }
