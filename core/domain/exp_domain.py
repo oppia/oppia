@@ -31,8 +31,8 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.platform import models
 import core.domain.state_domain as state_domain
+from core.platform import models
 import feconf
 import jinja_utils
 import schema_utils
