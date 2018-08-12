@@ -106,7 +106,10 @@ md-input-group.md-default-theme label {
   border: 2px solid;
   border-color:#0D48A1;
   color:  #0D48A1;
-  padding: 3px 8px;
+  padding-bottom: 12px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 12px;
 }
 
 .md-button.md-default-theme.oppia-learner-reload-image-button:focus,
@@ -453,9 +456,8 @@ textarea {
   Style for the oppia reload symbol in reload image button.
 */
 .oppia-reload-image-symbol {
-  margin-bottom: 10px;
-  margin-left: 3px;
-  margin-right: -2px;
+  padding-bottom: 10px;
+  padding-left: 16px;
   position: relative;
 }
 
