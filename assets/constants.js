@@ -474,6 +474,8 @@ var constants = {
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false,
 
+  "ENABLE_GENERALIZED_FEEDBACK_THREADS": false,
+
   "ENABLE_NEW_STRUCTURES": false,
 
   "NEW_STATE_TEMPLATE": {
@@ -506,5 +508,7 @@ var constants = {
           "content": {},
           "default_outcome": {}
       }
-  }
+  },
+
+  "CURRENT_STATES_SCHEMA_VERSION": 24
 };

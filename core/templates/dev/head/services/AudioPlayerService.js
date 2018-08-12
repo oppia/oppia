@@ -24,6 +24,7 @@ oppia.factory('AudioPlayerService', [
       ContextService, AudioTranslationManagerService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
+    var _currentTrackDuration = null;
 
     var _load = function(
         filename, successCallback, errorCallback) {
@@ -109,6 +110,20 @@ oppia.factory('AudioPlayerService', [
       },
       rewind: function(seconds) {
         _rewind(seconds);
+      },
+      getCurrentTime: function() {
+        if (_currentTrack) {
+          return Math.round(_currentTrack.currentTime);
+        } else {
+          return 0;
+        }
+      },
+      getAudioDuration: function() {
+        if (_currentTrack && _currentTrack.audio) {
+          return Math.round(_currentTrack.audio.duration);
+        } else {
+          return 0;
+        }
       },
       getProgress: function() {
         if (!_currentTrack) {

@@ -19,6 +19,9 @@
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_services
@@ -83,7 +86,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.login(self.AUTHOR_EMAIL)
                 response = self.testapp.get('/explore/%s' % self.EXP_ID)
                 csrf_token = self.get_csrf_token_from_response(response)
@@ -97,7 +101,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 1',
@@ -122,7 +126,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 2',
@@ -142,7 +146,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 3',
@@ -156,7 +160,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_create_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 self.login(self.AUTHOR_EMAIL_2)
                 response = self.testapp.get('/explore/%s' % self.EXP_ID)
                 csrf_token = self.get_csrf_token_from_response(response)
@@ -171,7 +176,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                             suggestion_models.TARGET_TYPE_EXPLORATION),
                         'target_id': 'exp1',
                         'target_version_at_submission': exploration.version,
-                        'change_cmd': {
+                        'change': {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                             'state_name': 'State 3',
@@ -188,7 +193,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
                 # Test editor can accept successfully.
@@ -221,8 +227,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 exploration = exp_services.get_exploration_by_id(self.EXP_ID)
                 self.assertEqual(
                     exploration.states[suggestion_to_accept[
-                        'change_cmd']['state_name']].content.html,
-                    suggestion_to_accept['change_cmd']['new_value']['html'])
+                        'change']['state_name']].content.html,
+                    suggestion_to_accept['change']['new_value']['html'])
                 self.logout()
 
                 # Testing user without permissions cannot accept.

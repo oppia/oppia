@@ -18,8 +18,8 @@
 
 import datetime
 
+from constants import constants
 from core.platform import models
-import feconf
 import utils
 
 (user_models,) = models.Registry.import_models([
@@ -42,7 +42,7 @@ def subscribe_to_thread(user_id, feedback_thread_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         if (feedback_thread_id not in
                 subscriptions_model.general_feedback_thread_ids):
             subscriptions_model.general_feedback_thread_ids.append(
@@ -144,7 +144,7 @@ def get_all_threads_subscribed_to(user_id):
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
 
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         return (
             subscriptions_model.general_feedback_thread_ids
             if subscriptions_model else [])

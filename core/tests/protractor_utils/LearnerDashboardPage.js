@@ -141,7 +141,7 @@ var LearnerDashboardPage = function() {
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
     waitFor.visibilityOf(
-      explorationTitle, 'Unable to find collection ' + title);
+      explorationTitle, 'Unable to find exploration ' + title);
     expect(explorationTitle.isDisplayed()).toBe(true);
   };
 
@@ -170,6 +170,34 @@ var LearnerDashboardPage = function() {
     waitFor.visibilityOf(
       feedbackMessage.first(), 'Feedback Message takes too long to appear');
     expect(feedbackMessage.first().getText()).toMatch(message);
+  };
+
+  this.checkIncompleteExplorationSection = function(explorationTitle) {
+    this.navigateToInCompleteSection();
+    this.navigateToIncompleteExplorationsSection();
+    this.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  this.checkCompleteExplorationSection = function(explorationTitle) {
+    this.navigateToCompletedSection();
+    this.navigateToCompletedExplorationsSection();
+    this.expectTitleOfExplorationSummaryTileToMatch(
+      explorationTitle);
+  };
+
+  this.checkIncompleteCollectionSection = function(collectionTitle) {
+    this.navigateToInCompleteSection();
+    this.navigateToIncompleteCollectionsSection();
+    this.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
+  };
+
+  this.checkCompleteCollectionSection = function(collectionTitle) {
+    this.navigateToCompletedSection();
+    this.navigateToCompletedCollectionsSection();
+    this.expectTitleOfCollectionSummaryTileToMatch(
+      collectionTitle);
   };
 };
 

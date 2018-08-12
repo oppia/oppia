@@ -23,15 +23,19 @@ oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translator_overview_directive.html'),
       controller: [
-        '$scope', '$window', 'SUPPORTED_AUDIO_LANGUAGES', 'LanguageUtilService',
-        'TranslationLanguageService', 'DEFAULT_AUDIO_LANGUAGE', function(
-            $scope, $window, SUPPORTED_AUDIO_LANGUAGES, LanguageUtilService,
-            TranslationLanguageService, DEFAULT_AUDIO_LANGUAGE) {
+        '$scope', '$rootScope', '$window', 'SUPPORTED_AUDIO_LANGUAGES',
+        'LanguageUtilService', 'TranslationLanguageService',
+        'DEFAULT_AUDIO_LANGUAGE', function(
+            $scope, $rootScope, $window, SUPPORTED_AUDIO_LANGUAGES,
+            LanguageUtilService, TranslationLanguageService,
+            DEFAULT_AUDIO_LANGUAGE) {
           var LAST_SELECTED_TRANSLATION_LANGUAGE = (
             'last_selected_translation_lang');
           var prevLanguageCode = $window.localStorage.getItem(
@@ -54,8 +58,15 @@ oppia.directive('translatorOverview', [
             }));
 
           $scope.changeTranslationLanguage = function() {
+            if ($scope.isTranslationTabBusy) {
+              $scope.languageCode = $window.localStorage.getItem(
+                LAST_SELECTED_TRANSLATION_LANGUAGE);
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
+            $rootScope.$broadcast('refreshAudioTranslationBar');
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };

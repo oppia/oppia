@@ -25,7 +25,7 @@ describe('Exploration editor tab controller', function() {
       scope = $rootScope.$new();
       rootScope = $injector.get('$rootScope');
       spyOn(rootScope, '$broadcast');
-      ecs = $injector.get('EditorStateService');
+      ecs = $injector.get('StateEditorService');
       ess = $injector.get('ExplorationStatesService');
       scs = $injector.get('StateContentService');
 
@@ -162,7 +162,8 @@ describe('Exploration editor tab controller', function() {
       });
     }));
 
-    it('should initialize the state name and related properties', function() {
+    it('should correctly broadcast the stateEditorInitialized flag with ' +
+       'the state data', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
       expect(
