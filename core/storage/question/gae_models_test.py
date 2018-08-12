@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from core.domain import exp_domain
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -23,7 +24,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
 
     def test_create_question(self):
-        state = exp_domain.State.create_default_state('ABC')
+        state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1

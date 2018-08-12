@@ -634,30 +634,6 @@ def export_to_zip_file(exploration_id, version=None):
     return memfile.getvalue()
 
 
-def convert_state_dict_to_yaml(state_dict, width):
-    """Converts the given state dict to yaml format.
-
-    Args:
-        state_dict: dict. A dict representing a state in an exploration.
-        width: int. The maximum number of characters in a line for the
-            returned YAML string.
-
-    Returns:
-        str. The YAML version of the state_dict.
-
-    Raises:
-        Exception: The state_dict does not represent a valid state.
-    """
-    try:
-        # Check if the state_dict can be converted to a State.
-        state = exp_domain.State.from_dict(state_dict)
-    except Exception:
-        logging.info('Bad state dict: %s' % str(state_dict))
-        raise Exception('Could not convert state dict to YAML.')
-
-    return utils.yaml_from_dict(state.to_dict(), width=width)
-
-
 def export_states_to_yaml(exploration_id, version=None, width=80):
     """Returns a dictionary of the exploration, whose keys are state
     names and values are yaml strings representing the state contents with

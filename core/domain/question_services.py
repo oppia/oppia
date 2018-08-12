@@ -18,6 +18,7 @@ import logging
 
 from core.domain import exp_domain
 from core.domain import question_domain
+from core.domain import state_domain
 from core.platform import models
 import feconf
 
@@ -149,7 +150,7 @@ def get_question_from_model(question_model):
     """
     return question_domain.Question(
         question_model.id,
-        exp_domain.State.from_dict(question_model.question_state_data),
+        state_domain.State.from_dict(question_model.question_state_data),
         question_model.question_state_schema_version,
         question_model.language_code, question_model.version,
         question_model.created_on, question_model.last_updated)

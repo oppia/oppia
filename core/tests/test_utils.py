@@ -35,6 +35,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -1276,7 +1277,7 @@ class AppEngineTestBase(TestBase):
         Returns:
             dict. The default question_data dict.
         """
-        state = exp_domain.State.create_default_state(
+        state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
         solution_explanation = exp_domain.SubtitledHtml(
             'solution', 'Solution explanation')

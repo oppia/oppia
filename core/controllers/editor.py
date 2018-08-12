@@ -34,6 +34,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
@@ -498,7 +499,7 @@ class StateYamlHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+            'yaml': state_services.convert_state_dict_to_yaml(state_dict, width),
         })
 
 

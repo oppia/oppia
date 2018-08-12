@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import interaction_registry
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import utils
@@ -159,7 +160,7 @@ class Question(object):
         Returns:
             State. The corresponding State domain object.
         """
-        return exp_domain.State.create_default_state(
+        return state_domain.State.create_default_state(
             None, is_initial_state=True)
 
     def partial_validate(self):
@@ -249,7 +250,7 @@ class Question(object):
         """
         question = cls(
             question_dict['id'],
-            exp_domain.State.from_dict(question_dict['question_state_data']),
+            state_domain.State.from_dict(question_dict['question_state_data']),
             question_dict['question_state_schema_version'],
             question_dict['language_code'], question_dict['version'])
 
@@ -288,7 +289,7 @@ class Question(object):
             question_state_data_dict: dict. A dict representing the question
                 state data.
         """
-        self.question_state_data = exp_domain.State.from_dict(
+        self.question_state_data = state_domain.State.from_dict(
             question_state_data_dict)
 
 

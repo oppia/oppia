@@ -23,6 +23,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -393,7 +394,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected change to contain question_dict')
 
         question = question_domain.Question(
-            None, exp_domain.State.from_dict(
+            None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_schema_version'],
             self.change.question_dict['language_code'], None)

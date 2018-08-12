@@ -23,6 +23,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import param_domain
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -190,12 +191,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Note: If '/' ever becomes a valid state name, ensure that the rule
         # editor frontend tenplate is fixed -- it currently uses '/' as a
         # sentinel for an invalid state name.
-        bad_state = exp_domain.State.create_default_state('/')
+        bad_state = state_domain.State.create_default_state('/')
         exploration.states = {'/': bad_state}
         self._assert_validation_error(
             exploration, 'Invalid character / in a state name')
 
-        new_state = exp_domain.State.create_default_state('ABC')
+        new_state = state_domain.State.create_default_state('ABC')
         new_state.update_interaction_id('TextInput')
 
         # The 'states' property must be a non-empty dict of states.
@@ -463,7 +464,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' answer group.')
 
         exploration.states = {
-            exploration.init_state_name: exp_domain.State.create_default_state(
+            exploration.init_state_name: state_domain.State.create_default_state(
                 exploration.init_state_name)
         }
         exploration.states[exploration.init_state_name].update_interaction_id(
@@ -4629,13 +4630,13 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            exp_domain.State.convert_html_fields_in_state(
+            state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_textangular),
             state_dict_in_textangular)
 
         self.assertEqual(
-            exp_domain.State.convert_html_fields_in_state(
+            state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_caption_attr_to_image),
             state_dict_with_image_caption)
