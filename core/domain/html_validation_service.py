@@ -790,7 +790,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
         filename = json.loads(unescape_html(image['filepath-with-value']))
         image['filepath-with-value'] = escape_html(json.dumps(
             get_filename_with_dimensions(filename, exp_id)))
-    return unicode(soup)
+    return unicode(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):

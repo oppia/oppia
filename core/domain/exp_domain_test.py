@@ -4114,8 +4114,8 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br/>for MultipleChoice</p>
-          - <p>This is value2 for <br/>MultipleChoice</p>
+          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - <p>This is value2 for <br>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
