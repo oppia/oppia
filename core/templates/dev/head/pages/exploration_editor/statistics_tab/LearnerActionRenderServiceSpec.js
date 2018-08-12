@@ -61,7 +61,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName2'
               },
-              time_spent_state_in_msecs: {
+              time_spent_in_state_in_msecs: {
                 value: 120
               }
             }, 1
@@ -126,7 +126,7 @@ describe('Learner Action Render Service', function() {
                 state_name: {
                   value: 'stateName1'
                 },
-                time_spent_state_in_msecs: {
+                time_spent_in_state_in_msecs: {
                   value: 120
                 }
               }, 1
@@ -254,7 +254,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName1'
               },
-              time_spent_state_in_msecs: {
+              time_spent_in_state_in_msecs: {
                 value: 120
               }
             }, 1

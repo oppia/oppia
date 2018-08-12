@@ -65,5 +65,18 @@ oppia.factory('ExplorationIssueObjectFactory', [function() {
       explorationIssueBackendDict.is_valid);
   };
 
+  /**
+   * @returns {ExplorationIssueBackendDict}
+   */
+  ExplorationIssue.prototype.toBackendDict = function() {
+    return {
+      issue_type: this.issueType,
+      issue_customization_args: this.issueCustomizationArgs,
+      playthrough_ids: this.playthroughIds,
+      schema_version: this.schemaVersion,
+      is_valid: this.isValid
+    };
+  };
+
   return ExplorationIssue;
 }]);
