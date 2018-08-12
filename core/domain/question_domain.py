@@ -82,7 +82,8 @@ class QuestionChange(object):
 
         if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
             self.question_dict = change_dict['question_dict']
-            self.skill_id = change_dict['skill_id']
+            if 'skill_id' in change_dict:
+                self.skill_id = change_dict['skill_id']
 
     def to_dict(self):
         """Returns a dict representing QuestionChange domain object.

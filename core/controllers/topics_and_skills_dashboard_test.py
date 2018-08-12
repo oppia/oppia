@@ -58,7 +58,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
                 expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+            self.assertEqual(response.status_int, 200)
             self.logout()
 
             # Check that admins can access the topics and skills dashboard data.

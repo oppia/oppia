@@ -408,13 +408,13 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question state schema version to be between 1 and '
                 '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
 
-        if not self.change.skill_id:
-            raise utils.ValidationError('Expected change to contain skill_id')
-
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
+
+        if not self.change.skill_id:
+            raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict
         self.validate()
         if (

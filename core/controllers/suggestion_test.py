@@ -372,7 +372,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                                 question_domain
                                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                             'question_dict': self.question_dict,
-                            'skill_id': self.SKILL_ID
                         },
                         'description': 'Add new question to skill'
                     }, csrf_token=csrf_token)
@@ -416,7 +415,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         suggestion_to_accept['suggestion_id']), {
                             'action': u'accept',
                             'commit_message': u'commit message',
-                            'review_message': u'This looks good!'
+                            'review_message': u'This looks good!',
+                            'skill_id': self.SKILL_ID
                         }, csrf_token=csrf_token)
 
                 suggestion_post_accept = self.get_json(
