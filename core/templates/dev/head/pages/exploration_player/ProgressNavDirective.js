@@ -34,15 +34,14 @@ oppia.directive('progressNav', [
         'PlayerTranscriptService', 'ExplorationEngineService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
-        'PretestEngineService',
+        'ExplorationPlayerStateService',
         function($scope, $rootScope, PlayerPositionService, UrlService,
             PlayerTranscriptService, ExplorationEngineService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
-            PretestEngineService) {
+            ExplorationPlayerStateService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
-          var currentEngineService = null;
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
@@ -51,22 +50,23 @@ oppia.directive('progressNav', [
             $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(
               $scope.activeCardIndex);
-            if ($scope.activeCard.getInPretestMode()) {
-              currentEngineService = PretestEngineService;
-            } else {
-              currentEngineService = ExplorationEngineService;
-            }
-            currentEngineService.setCurrentStateIndex($scope.activeCardIndex);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-            $scope.conceptCardIsBeingShown =
-              currentEngineService.isStateShowingConceptCard();
-            if (!$scope.conceptCardIsBeingShown) {
+            $scope.conceptCardIsBeingShown = (
+              $scope.activeCard.getStateName() === null &&
+              !ExplorationPlayerStateService.isInPretestMode());
+            if ($scope.hasNext) {
+              var interaction = $scope.activeCard.getInteraction();
+            } else {
               var interaction =
-                currentEngineService.getCurrentInteraction();
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  getCurrentInteraction();
+            }
+            if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
-                currentEngineService.isInteractionInline());
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  isInteractionInline());
               $scope.interactionCustomizationArgs =
                 interaction.customizationArgs;
               $scope.interactionId = interaction.id;

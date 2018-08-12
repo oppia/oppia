@@ -74,7 +74,6 @@ describe('Player transcript service', function() {
       a: 'b'
     });
     expect(firstCard.getContentHtml()).toEqual('Content HTML');
-    expect(pts.isPretestQuestion(0)).toEqual(false);
     expect(firstCard.getInteractionHtml()).toEqual(
       '<oppia-text-input-html></oppia-text-input-html>');
     expect(firstCard.getInputResponsePairs()).toEqual([]);

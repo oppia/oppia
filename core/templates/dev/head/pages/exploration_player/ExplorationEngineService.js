@@ -223,8 +223,8 @@ oppia.factory('ExplorationEngineService', [
           _loadInitialState(successCallback);
         }
       },
-      setCurrentStateIndex: function(index) {
-        currentStateName = angular.copy(visitedStateNames[index]);
+      continueToExploration: function(successCallback) {
+        _loadInitialState(successCallback);
       },
       getCurrentStateName: function() {
         return currentStateName;
@@ -278,6 +278,9 @@ oppia.factory('ExplorationEngineService', [
           exploration.getInteractionCustomizationArgs(nextStateName),
           true,
           labelForFocusTarget);
+      },
+      getNextInteraction: function() {
+        return exploration.getInteraction(nextStateName);
       },
       getCurrentInteraction: function() {
         return exploration.getInteraction(currentStateName);

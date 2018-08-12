@@ -119,11 +119,11 @@ oppia.factory('PretestEngineService', [
         }
         _loadInitialQuestion(successCallback);
       },
-      setCurrentStateIndex: function(index) {
-        currentIndex = index;
-      },
       recordNewCardAdded: function() {
         currentIndex = nextIndex;
+      },
+      getPretestQuestionCount: function() {
+        return pretestQuestions.length;
       },
       getExplorationId: function() {
         return _explorationId;
@@ -187,6 +187,9 @@ oppia.factory('PretestEngineService', [
         var interactionId = _getNextStateData().interaction.id;
         return (
           interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
+      },
+      getNextInteraction: function() {
+        return _getNextStateData().interaction;
       },
       isCurrentStateTerminal: function() {
         var interactionId = _getCurrentStateData().interaction.id;

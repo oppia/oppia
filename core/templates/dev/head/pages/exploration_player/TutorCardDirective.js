@@ -59,7 +59,8 @@ oppia.directive('tutorCard', [
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE', 'UserService',
         'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
-        'DEFAULT_PROFILE_IMAGE_PATH', 'PretestEngineService',
+        'DEFAULT_PROFILE_IMAGE_PATH', 'ExplorationPlayerStateService',
+        'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
         function(
             $scope, $timeout, $rootScope, $anchorScroll, $location,
             ExplorationEngineService, PlayerPositionService, UrlService,
@@ -70,9 +71,9 @@ oppia.directive('tutorCard', [
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_NEW_CARD_AVAILABLE, UserService,
             COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS,
-            DEFAULT_PROFILE_IMAGE_PATH, PretestEngineService) {
+            DEFAULT_PROFILE_IMAGE_PATH, ExplorationPlayerStateService,
+            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-          var currentEngineService = null;
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -81,13 +82,9 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            if ($scope.activeCard.getInPretestMode()) {
-              currentEngineService = PretestEngineService;
-            } else {
-              currentEngineService = ExplorationEngineService;
-            }
-            $scope.conceptCardIsBeingShown =
-              currentEngineService.isStateShowingConceptCard();
+            $scope.conceptCardIsBeingShown = (
+              $scope.activeCard.getStateName() === null &&
+              !ExplorationPlayerStateService.isInPretestMode());
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
@@ -95,11 +92,13 @@ oppia.directive('tutorCard', [
             });
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
-            if (!$scope.conceptCardIsBeingShown) {
+            if (!$scope.conceptCardIsBeingShown && $scope.interactionIsActive) {
               $scope.interactionInstructions = (
-                currentEngineService.getCurrentInteractionInstructions());
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  getCurrentInteractionInstructions());
               $scope.contentAudioTranslations = (
-                currentEngineService.getStateContentAudioTranslations());
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  getStateContentAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
@@ -114,8 +113,17 @@ oppia.directive('tutorCard', [
           $scope.isInteractionInline = function() {
             if ($scope.conceptCardIsBeingShown) {
               return true;
-            } else {
-              return currentEngineService.isInteractionInline();
+            }
+            if ($scope.interactionIsActive) {
+              return (
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  isInteractionInline());
+            }
+
+            if ($scope.activeCard) {
+              return (
+                INTERACTION_SPECS[$scope.activeCard.getInteraction().id].
+                  display_mode === INTERACTION_DISPLAY_MODE_INLINE);
             }
           };
 
@@ -185,7 +193,8 @@ oppia.directive('tutorCard', [
               answerValidity: answerValidity
             });
             if (
-              currentEngineService.getCurrentInteraction().id === 'CodeRepl') {
+              ExplorationPlayerStateService.getCurrentEngineService().
+                getCurrentInteraction().id === 'CodeRepl') {
               $scope.onChangeInteractionAnswerValidity({
                 answerValidity: true
               });
@@ -197,7 +206,8 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              currentEngineService.isContentAudioTranslationAvailable());
+              ExplorationPlayerStateService.getCurrentEngineService().
+                isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -206,8 +216,14 @@ oppia.directive('tutorCard', [
           };
 
           $scope.isOnTerminalCard = function() {
-            return $scope.activeCard &&
-              currentEngineService.isCurrentStateTerminal();
+            if ($scope.interactionIsActive) {
+              return (
+                ExplorationPlayerStateService.getCurrentEngineService().
+                  isCurrentStateTerminal());
+            }
+            return (
+              INTERACTION_SPECS[$scope.activeCard.getInteraction().id].
+                is_terminal);
           };
 
           $scope.getInputResponsePairId = function(index) {
