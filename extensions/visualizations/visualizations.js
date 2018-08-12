@@ -62,6 +62,31 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   };
 }]);
 
+// TODO(brianrodri): These controllers may benefit from being reused
+// by future visualizations. If we end up using them a lot, consider
+// moving them into a service.
+var answerColumnController = {
+  headerHtml: 'Answer',
+  widthCss: '75%',
+  makeCellHtmlForRow: function(row) {
+    return row.answer;
+  },
+};
+var frequencyColumnController = {
+  headerHtml: 'Count',
+  widthCss: '10%',
+  makeCellHtmlForRow: function(row) {
+    return row.frequency;
+  },
+};
+var addressedInfoColumnController = {
+  headerHtml: 'Addressed specifically?',
+  widthCss: '15%',
+  makeCellHtmlForRow: function(row) {
+    return row.is_addressed ? 'Yes' : 'No';
+  },
+};
+
 oppia.directive('oppiaVisualizationFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -73,31 +98,6 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
         '$scope', '$attrs', 'HtmlEscaperService', 'StateTopAnswersStatsService',
         function(
             $scope, $attrs, HtmlEscaperService, StateTopAnswersStatsService) {
-          // TODO(brianrodri): These controllers may benefit from being reused
-          // by future visualizations. If we end up using them a lot, consider
-          // moving them into a service.
-          var answerColumnController = {
-            headerHtml: 'Answer',
-            widthCss: '75%',
-            makeCellHtmlForRow: function(row) {
-              return row.answer;
-            },
-          };
-          var frequencyColumnController = {
-            headerHtml: 'Count',
-            widthCss: '10%',
-            makeCellHtmlForRow: function(row) {
-              return row.frequency;
-            },
-          };
-          var addressedInfoColumnController = {
-            headerHtml: 'Addressed specifically?',
-            widthCss: '15%',
-            makeCellHtmlForRow: function(row) {
-              return row.is_addressed ? 'Yes' : 'No';
-            },
-          };
-
           var stateName = $attrs.stateName;
           $scope.rows = StateTopAnswersStatsService.hasStateStats(stateName) ?
             StateTopAnswersStatsService.getStateStats(stateName) : [];
