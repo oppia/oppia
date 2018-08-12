@@ -378,6 +378,14 @@ ENABLE_NEW_STRUCTURES = False
 # flipped after migrating existing feedback thread data to the new framework.
 ENABLE_GENERALIZED_FEEDBACK_THREADS = False
 
+# Flag to disable sending emails related to reviews for suggestions. To be
+# flipped after deciding (and implementing) whether a user should be scored
+# only for curated lessons.
+SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
+# To prevent recording scores for users until details like whether to score
+# users for only curated lessons is confirmed.
+ENABLE_RECORDING_OF_SCORES = False
+
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
 

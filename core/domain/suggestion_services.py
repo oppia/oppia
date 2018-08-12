@@ -16,6 +16,7 @@
 suggestions.
 """
 
+from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
@@ -258,15 +259,23 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         suggestion.suggestion_id, reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
-    increment_score_for_user(
-        suggestion.author_id, suggestion.score_category,
-        suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
-    if (
-            get_all_scores_of_user(
-                suggestion.author_id)[suggestion.score_category] >=
-            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-        # Send email if not sent already.
-        return
+    if feconf.ENABLE_RECORDING_OF_SCORES:
+        increment_score_for_user(
+            suggestion.author_id, suggestion.score_category,
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+    if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
+        scores = get_all_scores_of_user(suggestion.author_id)
+        if (
+                suggestion.score_category in scores and
+                scores[suggestion.score_category] >=
+                feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+            if check_if_email_has_been_sent_to_user(
+                suggestion.author_id, suggestion.score_category):
+                email_manager.send_mail_to_onboard_new_reviewers(
+                    suggestion.author_id, suggestion.score_category)
+                mark_email_has_been_sent_to_user(
+                    suggestion.author_id, suggestion.score_category)
+
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
@@ -283,7 +292,8 @@ def get_user_contribution_scoring_from_model(userContributionScoringModel):
     return user_domain.UserContributionScoring(
         userContributionScoringModel.user_id,
         userContributionScoringModel.score_category,
-        userContributionScoringModel.score)
+        userContributionScoringModel.score,
+        userContributionScoringModel.has_email_been_sent)
 
 
 def get_all_scores_of_user(user_id):
@@ -324,6 +334,40 @@ def check_user_can_review_in_category(user_id, score_category):
     if not score:
         return False
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+
+def check_if_email_has_been_sent_to_user(user_id, score_category):
+    """Checks if user has already recieved an email.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The score category.
+
+    Returns:
+        bool. Whether the email has already been sent to the user.
+    """
+    score = (
+        user_models.UserContributionScoringModel.get_score_of_user_for_category(
+            user_id, score_category))
+    if not score:
+        return False
+    return score.has_email_been_sent
+
+
+def mark_email_has_been_sent_to_user(user_id, score_category):
+    """Marks that the user has already recieved an email.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The score category.
+    """
+    score = (
+        user_models.UserContributionScoringModel.get_score_of_user_for_category(
+            user_id, score_category))
+    if not score:
+        raise Exception('Expected user scoring model to exist for user')
+    score.has_email_been_sent = True
+    score.put()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):

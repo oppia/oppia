@@ -214,13 +214,14 @@ class CronMailReviewersInRotationHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles get requests."""
-        score_categories = suggestion_models.get_all_score_categories()
-        for score_category in score_categories:
-            suggestions = suggestion_services.query_suggestions(
-                [('score_category', score_category),
-                 ('status', suggestion_models.STATUS_ACCEPTED)])
-            if len(suggestions) > 0:
-                reviewer_id = suggestion_services.get_next_user_in_rotation(
-                    score_category)
-                print reviewer_id
-                # Email reviewer_id.
+        if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
+            score_categories = suggestion_models.get_all_score_categories()
+            for score_category in score_categories:
+                suggestions = suggestion_services.query_suggestions(
+                    [('score_category', score_category),
+                     ('status', suggestion_models.STATUS_ACCEPTED)])
+                if len(suggestions) > 0:
+                    reviewer_id = suggestion_services.get_next_user_in_rotation(
+                        score_category)
+                    email_manager.send_mail_to_notify_users_to_review(
+                        reviewer_id, score_category)
