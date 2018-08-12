@@ -29,32 +29,34 @@ oppia.directive('audioTranslationBar', [
       link: function(scope, elm) {
         scope.getRecorderController();
 
-        document.addEventListener('dragover', function(evt) {
+        $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
           if (!scope.showDropArea) {
             scope.showDropArea = true;
             scope.$digest();
           }
-        }, false);
+          return false;
+        });
 
-        document.addEventListener('dragleave', function(evt) {
+        $('.oppia-main-body').on('dragleave', function(evt) {
+          evt.preventDefault();
           if (evt.pageX === 0 || evt.pageY === 0) {
             scope.showDropArea = false;
             scope.$digest();
-            return false;
           }
-        }, false);
+          return false;
+        });
 
-        document.body.addEventListener('drop', function(evt) {
+        $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
           if (evt.target.classList.contains('oppia-drop-area-message')) {
-            files = evt.target.files ||
-              evt.dataTransfer.files;
+            files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
           scope.showDropArea = false;
           scope.$digest();
-        }, false);
+          return true;
+        });
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +

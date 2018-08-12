@@ -83,9 +83,9 @@ oppia.directive('audioFileUploader', [
         );
         if (scope.droppedFile) {
           if (scope.droppedFile.length === 1) {
-            $timeout(function() {
+            angular.element(document).ready(function() {
               $('.' + scope.inputFieldClassName)[0].files = scope.droppedFile;
-            }, 100);
+            });
           } else {
             scope.errorMessage = 'Please drop one file at a time.';
           }
