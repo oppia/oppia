@@ -775,7 +775,6 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
                 if not catched_groups:
                     yield (INVALID_GCS_URL, url)
 
-
     @staticmethod
     def reduce(status, values):
         yield (status, values)

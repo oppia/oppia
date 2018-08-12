@@ -524,7 +524,7 @@ class GcsFileSystem(object):
     def delete(self, user_id, filepath):  # pylint: disable=unused-argument
         """Deletes a file and the metadata associated with it.
 
-        If `user_id` argument is unused. It is included so that this method
+        `user_id` argument is unused. It is included so that this method
         signature matches that of other file systems.
 
         Args:
