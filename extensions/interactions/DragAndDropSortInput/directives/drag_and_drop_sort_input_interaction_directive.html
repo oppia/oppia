@@ -53,7 +53,10 @@
 
   .conversation-skin-interaction-container {
     /* This CSS class is essential for auto-scrolling in Drag and Drop Sort
-       interaction to work correctly.
+       interaction to work correctly. We need to set specific CSS rules just for this
+       interaction so that auto-scrolling works correctly. These CSS rules are
+       intentionally defined here so that they do not affect any other interaction.
+       If this class is removed, the auto-scrolling in Drag and drop interaction will break.
     */
     margin: auto;
     max-height: 400px;
