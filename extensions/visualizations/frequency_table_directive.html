@@ -6,7 +6,7 @@
   <tr>
     <th ng-repeat="columnController in columnControllers" ng-bind-html="columnController.getHeaderHtml()"></th>
   </tr>
-  <tr ng-repeat="row in rows track by $index">
+  <tr ng-repeat="row in rows">
     <td ng-repeat="columnController in columnControllers" ng-bind-html="columnController.makeCellHtmlForRow(row)"></td>
   </tr>
 </table>
