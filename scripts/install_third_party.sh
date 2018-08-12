@@ -179,6 +179,11 @@ if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
   pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+
+  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
+    echo "  PIL install failed. See troubleshooting instructions at:"
+    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
+  fi
 fi
 
 # install pre-push script
