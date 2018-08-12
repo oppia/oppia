@@ -259,7 +259,7 @@ class ReviewerRotationTrackingModel(base_models.BaseModel):
         """
         instance = cls.get_by_id(score_category)
 
-        if not instance:
+        if instance is None:
             cls.create(score_category, user_id)
         else:
             instance.current_position_in_rotation = user_id
