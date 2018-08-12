@@ -2,28 +2,28 @@
   <div class="translation-nav md-tab">
     <ul class="oppia-translation-tabs">
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CONTENT)}">
-        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text protractor-test-content-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Content
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}">
-        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text protractor-test-feedback-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Feedback
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}">
-        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text">
+        <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text protractor-test-hints-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Hints
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}">
-        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" class="oppia-translation-tabs-text" ng-style="tabStatusColorStyle(TAB_ID_SOLUTION)">
+        <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" ng-style="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text protractor-test-solution-tab" >
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Solution
@@ -33,7 +33,7 @@
   </div>
 
   <div class="translation-state-contents">
-    <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content">
+    <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content protractor-test-content-text">
       <span>
         <angular-html-bind html-data="stateContent.getHtml()" class="oppia-rte-editor">
         </angular-html-bind>

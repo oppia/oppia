@@ -119,6 +119,10 @@ exports.config = {
       'protractor/subscriptionsFlow.js'
     ],
 
+    translatorFeatures: [
+      'protractor_desktop/translatorFeatures.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],

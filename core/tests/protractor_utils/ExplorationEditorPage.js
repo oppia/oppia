@@ -30,6 +30,8 @@ var ExplorationEditorSettingsTab = require(
   '../protractor_utils/ExplorationEditorSettingsTab.js');
 var ExplorationEditorStatsTab = require(
   '../protractor_utils/ExplorationEditorStatsTab.js');
+var ExplorationEditorTranslationTab = require(
+  '../protractor_utils/ExplorationEditorTranslationTab.js');
 
 var ExplorationEditorPage = function() {
   /*
@@ -49,6 +51,10 @@ var ExplorationEditorPage = function() {
   };
   this.getStatsTab = function() {
     return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
+  };
+  this.getTranslationTab = function() {
+    return new ExplorationEditorTranslationTab
+      .ExplorationEditorTranslationTab();
   };
 
   /*
@@ -76,6 +82,8 @@ var ExplorationEditorPage = function() {
   var navigateToSettingsTabButton = element(
     by.css('.protractor-test-settings-tab'));
   var navigateToStatsTabButton = element(by.css('.protractor-test-stats-tab'));
+  var navigateToTranslationTabButton = element(
+    by.css('.protractor-test-translation-tab'));
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
@@ -158,6 +166,12 @@ var ExplorationEditorPage = function() {
     waitFor.elementToBeClickable(
       navigateToStatsTabButton, 'Stats tab is not clickable');
     navigateToStatsTabButton.click();
+  };
+  this.navigateToTranslationTab = function() {
+    waitFor.elementToBeClickable(
+      navigateToTranslationTabButton, 'Translation tab is not clickable');
+    navigateToTranslationTabButton.click();
+    waitFor.pageToFullyLoad();
   };
 };
 
