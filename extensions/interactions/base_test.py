@@ -47,6 +47,7 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
 
+
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
     return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)

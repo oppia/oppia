@@ -1188,9 +1188,8 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 updated_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
-            # Start validation job on updated exploration.
+        exp_services.save_new_exploration(self.albert_id, updated_exploration)
+        # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
         exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
@@ -1205,7 +1204,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
 
-            # Test that validation passes after migration.
+        # Test that validation passes after migration.
         self.assertEqual(actual_output, [])
 
 

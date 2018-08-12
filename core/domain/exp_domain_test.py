@@ -4432,7 +4432,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-                exploration.to_yaml(), self.YAML_CONTENT_V30_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V30_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -4443,7 +4443,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-                exploration.to_yaml(), self.YAML_CONTENT_V30_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V30_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):

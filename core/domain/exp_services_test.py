@@ -52,6 +52,7 @@ def _count_at_least_editable_exploration_summaries(user_id):
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
+
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
     return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
