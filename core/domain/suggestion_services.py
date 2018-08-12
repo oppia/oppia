@@ -236,18 +236,22 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         suggestion.suggestion_id, reviewer_id,
         feedback_models.STATUS_CHOICES_FIXED, None, review_message)
 
-    if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-        scores = get_all_scores_of_user(suggestion.author_id)
-        if (
-                suggestion.score_category in scores and
-                scores[suggestion.score_category] >=
-                feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-            if check_if_email_has_been_sent_to_user(
-                    suggestion.author_id, suggestion.score_category):
-                email_manager.send_mail_to_onboard_new_reviewers(
-                    suggestion.author_id, suggestion.score_category)
-                mark_email_has_been_sent_to_user(
-                    suggestion.author_id, suggestion.score_category)
+    if feconf.ENABLE_RECORDING_OF_SCORES:
+        increment_score_for_user(
+            suggestion.author_id, suggestion.score_category,
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
+            scores = get_all_scores_of_user(suggestion.author_id)
+            if (
+                    suggestion.score_category in scores and
+                    scores[suggestion.score_category] >=
+                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                if check_if_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category):
+                    email_manager.send_mail_to_onboard_new_reviewers(
+                        suggestion.author_id, suggestion.score_category)
+                    mark_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category)
 
 
 def reject_suggestion(suggestion, reviewer_id, review_message):
@@ -272,10 +276,6 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         suggestion.suggestion_id, reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
-    if feconf.ENABLE_RECORDING_OF_SCORES:
-        increment_score_for_user(
-            suggestion.author_id, suggestion.score_category,
-            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
