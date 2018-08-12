@@ -34,6 +34,8 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var AdminPage =
+  require('../protractor_utils/AdminPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
@@ -600,6 +602,73 @@ describe('ExplorationFeedback', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Issues visualization', function() {
+  var EXPLORATION_TITLE = 'Welcome to Oppia!';
+  var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorStatsTab = null;
+  var explorationPlayerPage = null;
+  var adminPage = null;
+  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+
+  beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorStatsTab = explorationEditorPage.getStatsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    adminPage = new AdminPage.AdminPage();
+  });
+
+  beforeEach(function() {
+    users.createAndLoginAdminUser(
+      'user1@ExplorationIssues.com',
+      'authorExplorationIssues');
+    adminPage.reloadExploration('welcome.yaml');
+    adminPage.editConfigProperty(
+      'The set of exploration IDs for recording issues and playthroughs',
+      'List',
+      function(elem) {
+        elem.addItem('Unicode').setValue('0');
+      });
+    adminPage.editConfigProperty(
+      'The probability of recording playthroughs', 'Real',
+      function(elem) {
+        elem.setValue(1.0);
+      });
+  });
+
+  it('records early quit issue.', function() {
+    users.createAndLoginUser(
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput',
+      'It\'s translated from a different language.');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickInitIssue();
   });
 });
 

@@ -322,8 +322,7 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
-            'whitelisted_exploration_ids_for_saving_playthroughs': (
-                whitelisted_exp_ids),
+            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids,
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
         })

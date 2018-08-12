@@ -22,6 +22,7 @@ var ExplorationEditorStatsTab = function() {
      * Interactive elements
      */
   var numPassersby = element(by.css('.protractor-test-num-passersby'));
+  var firstIssueElement = element(by.css('.protractor-test-init-issue'));
 
   /**
      * Workflows
@@ -30,9 +31,19 @@ var ExplorationEditorStatsTab = function() {
     return numPassersby.getText();
   };
 
+  var _getInitIssueText = function() {
+    return firstIssueElement.getText();
+  }
+
   this.expectNumPassersbyToBe = function(numPassersby) {
     expect(_getNumPassersby()).toMatch(numPassersby);
+    firstIssueElement.click();
   };
+
+  this.clickInitIssue = function() {
+    expect(_getInitIssueText()).toMatch('Issue 1');
+
+  }
 };
 
 exports.ExplorationEditorStatsTab = ExplorationEditorStatsTab;
