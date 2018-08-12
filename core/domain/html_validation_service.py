@@ -815,8 +815,4 @@ def get_filename_with_dimensions(old_filename, exp_id):
     height, width = gae_image_services.get_image_dimensions(content)
     new_filename = regenerate_image_filename_using_dimensions(
         old_filename, height, width)
-    # filename_wo_filetype = old_filename[:old_filename.rfind('.')]
-    # filetype = old_filename[old_filename.rfind('.') + 1:]
-    # new_filename = '%s_height_%s_width_%s.%s' % (
-    #     filename_wo_filetype, str(height), str(width), filetype)
     return new_filename
