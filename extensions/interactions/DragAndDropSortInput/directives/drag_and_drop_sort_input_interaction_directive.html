@@ -47,15 +47,18 @@
     position: relative;
   }
 
+  .drag-and-drop-sort-container img {
+    max-height: 200px;
+  }
+
   .conversation-skin-interaction-container {
+    /* This CSS class is essential for auto-scrolling in Drag and Drop Sort
+       interaction to work correctly.
+    */
     margin: auto;
     max-height: 400px;
     overflow: scroll;
     padding: 10px;
-  }
-
-  .drag-and-drop-sort-form-container img {
-    max-height: 200px;
   }
 </style>
 
