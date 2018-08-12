@@ -270,7 +270,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
                 scores[suggestion.score_category] >=
                 feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
             if check_if_email_has_been_sent_to_user(
-                suggestion.author_id, suggestion.score_category):
+                    suggestion.author_id, suggestion.score_category):
                 email_manager.send_mail_to_onboard_new_reviewers(
                     suggestion.author_id, suggestion.score_category)
                 mark_email_has_been_sent_to_user(
