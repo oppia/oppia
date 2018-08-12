@@ -571,6 +571,8 @@ def build_files(source, target, file_hashes, file_formats=None):
     """If no specific file formats is provided, minifies all CSS and JS files,
     removes whitespace from HTML and interpolates paths in HTML to include
     hashes in source directory and copies it to target.
+    If specific file formats is provided, only files pertaining to the provided
+    formats will be minified.
 
     Args:
         source: str. Path relative to /oppia directory of directory
@@ -578,8 +580,9 @@ def build_files(source, target, file_hashes, file_formats=None):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        file_formats: tuple(str). Tuple of specific file formats to be built.
-            (default is None)
+        file_formats: tuple(str) or None. Tuple of specific file formats to be
+            built. If None then all files within the source directory will be
+            built.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -601,7 +604,7 @@ def build_files(source, target, file_hashes, file_formats=None):
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            if file_formats:
+            if file_formats is None:
                 if any(filename.endswith(p) for p in file_formats):
                     task = threading.Thread(
                         target=minify_func,
@@ -609,7 +612,7 @@ def build_files(source, target, file_hashes, file_formats=None):
                 else:
                     # Skip files that are not the specified format.
                     continue
-            elif file_formats is None:
+            else:
                 task = threading.Thread(
                     target=minify_func,
                     args=(source_path, target_path, file_hashes, filename))
