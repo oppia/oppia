@@ -130,6 +130,10 @@ oppia.directive('oppiaResponseNumberWithUnits', [
         'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        // This check is added because for this specific interaction, it was
+        // found that at some points when this was loaded for the first time,
+        // the answer object was not in the right format. So, until it becomes
+        // the right format, this is ignored.
         if (!answer.type) {
           $scope.answer = null;
         } else {
