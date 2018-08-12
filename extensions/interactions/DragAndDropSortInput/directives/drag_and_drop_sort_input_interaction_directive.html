@@ -47,7 +47,7 @@
     position: relative;
   }
 
-  .interaction-container {
+  .conversation-skin-interaction-container {
     margin: auto;
     max-height: 400px;
     overflow: scroll;
@@ -63,12 +63,12 @@
 <form ng-submit="submitAnswer()">
   <div ui-tree="treeOptions" class="drag-and-drop-sort-container" data-max-depth="2">
     <ol ui-tree-nodes="" ng-model="list">
-      <li ng-repeat="item in list" ui-tree-node data-scroll-container=".interaction-container">
+      <li ng-repeat="item in list" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
         <div ui-tree-handle class="drag-and-drop-item">
           <angular-html-bind html-data="item.title"></angular-html-bind>
         </div>
         <ol ui-tree-nodes="" ng-model="item.items">
-          <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".interaction-container">
+          <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
             <div ui-tree-handle class="drag-and-drop-subitem">
               <angular-html-bind html-data="subItem.title"></angular-html-bind>
             </div>
