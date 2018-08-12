@@ -1,10 +1,10 @@
 <strong><[options.title]></strong>
 <table class="table">
   <colgroup>
-    <col ng-repeat="columnController in columnControllers" style="width: <[columnController.widthCss]>;">
+    <col ng-repeat="columnController in columnControllers" style="width: <[columnController.getWidthCss()]>;">
   </colgroup>
   <tr>
-    <th ng-repeat="columnController in columnControllers" ng-bind-html="columnController.headerHtml"></th>
+    <th ng-repeat="columnController in columnControllers" ng-bind-html="columnController.getHeaderHtml()"></th>
   </tr>
   <tr ng-repeat="row in rows track by $index">
     <td ng-repeat="columnController in columnControllers" ng-bind-html="columnController.makeCellHtmlForRow(row)"></td>

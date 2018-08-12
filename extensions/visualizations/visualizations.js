@@ -66,22 +66,36 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
 // by future visualizations. If we end up using them a lot, consider
 // moving them into a service.
 var answersColumnController = {
-  headerHtml: 'Answer',
-  widthCss: '75%',
+  getHeaderHtml: function() {
+    return 'Answer';
+  },
+  getWidthCss: function() {
+    return '75%';
+  },
   makeCellHtmlForRow: function(row) {
     return row.answer;
   },
 };
+
 var frequenciesColumnController = {
-  headerHtml: 'Count',
-  widthCss: '10%',
+  getHeaderHtml: function() {
+    return 'Count';
+  },
+  getWidthCss: function() {
+    return '10%';
+  },
   makeCellHtmlForRow: function(row) {
     return row.frequency;
   },
 };
+
 var addressedInfoColumnController = {
-  headerHtml: 'Addressed specifically?',
-  widthCss: '15%',
+  getHeaderHtml: function() {
+    return 'Addressed specifically?';
+  },
+  getWidthCss: function() {
+    return '15%';
+  },
   makeCellHtmlForRow: function(row) {
     return row.is_addressed ? 'Yes' : 'No';
   },
