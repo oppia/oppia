@@ -464,8 +464,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' answer group.')
 
         exploration.states = {
-            exploration.init_state_name: state_domain.State.create_default_state(
-                exploration.init_state_name)
+            exploration.init_state_name: (
+                state_domain.State.create_default_state(
+                    exploration.init_state_name))
         }
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
