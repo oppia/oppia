@@ -117,6 +117,10 @@ oppia.factory('IssuesService', [
         } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
           return renderCyclicTransitionsIssueSuggestions(issue);
         }
+      },
+      resolveIssue: function(issue) {
+        IssuesBackendApiService.resolveIssue(
+          issue, explorationId, explorationVersion);
       }
     };
   }]);

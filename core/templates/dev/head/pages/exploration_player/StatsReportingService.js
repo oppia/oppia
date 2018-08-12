@@ -328,6 +328,8 @@ oppia.factory('StatsReportingService', [
         postStatsToBackend();
 
         if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordExplorationQuitAction(
+            stateName, stateStopwatch.getTimeInSecs());
           PlaythroughService.recordPlaythrough();
         }
       },
