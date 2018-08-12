@@ -2,10 +2,10 @@
   <div class="row oppia-issues-content oppia-issues-row-eq-height">
     <div class="col-md-2 oppia-issues-border-gray oppia-ft-14">
       <div ng-repeat="issue in issues" class="row">
-        <div ng-if="isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
+        <div ng-if="isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2 oppia-issues-bg-clr oppia-issues-text-white protractor-test-init-issue" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
           Issue <[createIssueNavId(issue)]>
         </div>
-        <div ng-if="!isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
+        <div ng-if="!isIssueOnInitDisplay()" class="issueNav text-center col-md oppia-issues-bor-btm oppia-issues-clr-green oppia-pt2 oppia-pb2 protractor-test-init-issue" ng-click="makeVisible(getIssueIndex(issue))" id="issueNav<[getIssueIndex(issue)]>">
           Issue <[createIssueNavId(issue)]>
         </div>
       </div>
