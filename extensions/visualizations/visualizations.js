@@ -65,14 +65,14 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
 // TODO(brianrodri): These controllers may benefit from being reused
 // by future visualizations. If we end up using them a lot, consider
 // moving them into a service.
-var answerColumnController = {
+var answersColumnController = {
   headerHtml: 'Answer',
   widthCss: '75%',
   makeCellHtmlForRow: function(row) {
     return row.answer;
   },
 };
-var frequencyColumnController = {
+var frequenciesColumnController = {
   headerHtml: 'Count',
   widthCss: '10%',
   makeCellHtmlForRow: function(row) {
@@ -104,8 +104,8 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
           $scope.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
           $scope.columnControllers = [
-            answerColumnController,
-            frequencyColumnController,
+            answersColumnController,
+            frequenciesColumnController,
           ];
           if ($attrs.addressedInfoIsSupported) {
             $scope.columnControllers.push(addressedInfoColumnController);
