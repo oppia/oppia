@@ -604,18 +604,14 @@ def build_files(source, target, file_hashes, file_formats=None):
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            if file_formats is None:
-                if any(filename.endswith(p) for p in file_formats):
-                    task = threading.Thread(
-                        target=minify_func,
-                        args=(source_path, target_path, file_hashes, filename))
-                else:
-                    # Skip files that are not the specified format.
-                    continue
-            else:
+            if file_formats is None or any(
+                    filename.endswith(p) for p in file_formats):
                 task = threading.Thread(
                     target=minify_func,
                     args=(source_path, target_path, file_hashes, filename))
+            else:
+                # Skip files that are not the specified format.
+                continue
             tasks.append(task)
         try:
             _execute_tasks(tasks)
