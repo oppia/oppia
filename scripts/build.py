@@ -414,11 +414,6 @@ def copy_files_source_to_target(source, target, file_hashes):
 
             target_path = source_path
             relative_path = os.path.relpath(source_path, source)
-            # Remove file found in staging dir but not in /DEV, i.e file not
-            # listed in hash dict.
-            if relative_path not in file_hashes:
-                os.remove(source_path)
-                continue
             if hash_should_be_inserted(source + relative_path):
                 relative_path = (
                     _insert_hash(relative_path, file_hashes[relative_path]))
@@ -647,6 +642,35 @@ def rebuild_new_files(
         minify_func(source_file_path, target_file_path, file_hashes, file_name)
 
 
+def remove_deleted_files(dev_directory, staging_directory):
+    """Walk the staging directory and remove files that have since been removed
+    from the DEV directory.
+
+    Args:
+        dev_directory: str. Path relative to /oppia where DEV files are located.
+        staging_directory: str. Path relative to /oppia directory of directory
+            containing files and directories to be walked.
+    """
+    file_hashes = get_file_hashes(dev_directory)
+    print 'Scanning directory %s to remove deleted file' % staging_directory
+    for root, dirs, files in os.walk(
+            os.path.join(os.getcwd(), staging_directory)):
+        for directory in dirs:
+            print 'Scanning %s' % os.path.join(root, directory)
+        for filename in files:
+            target_path = os.path.join(root, filename)
+            # Ignore files with certain extensions.
+            if any(target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
+            relative_path = os.path.relpath(target_path, staging_directory)
+            # Remove file found in staging dir but not in /DEV, i.e.
+            # file not listed in hash dict.
+            if relative_path not in file_hashes:
+                print ('Unable to find %s in file hashes, deleting file'
+                       % relative_path)
+                os.remove(target_path)
+
+
 def get_recently_changed_filenames(dev_dir, out_dir):
     """Compare hashes of DEV files and BUILD files. Return a list of filenames
     that were recently changed.
@@ -662,8 +686,7 @@ def get_recently_changed_filenames(dev_dir, out_dir):
     # the filenames and their extensions,
     # e.g base.240933e7564bd72a4dde42ee23260c5f.html
     # If a file gets edited, a different MD5 hash is generated.
-    file_hashes = dict()
-    file_hashes.update(get_file_hashes(dev_dir))
+    file_hashes = get_file_hashes(dev_dir)
     recently_changed_filenames = []
     # Currently, we do not hash Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
@@ -678,6 +701,8 @@ def get_recently_changed_filenames(dev_dir, out_dir):
             # Filename with provided hash cannot be found, this file has been
             # recently changed or created since last build.
             recently_changed_filenames.append(file_name)
+    print ('The following files will be rebuilt due to recent changes: %s' %
+           recently_changed_filenames)
     return recently_changed_filenames
 
 
@@ -741,8 +766,10 @@ def generate_build_directory():
             rebuild_new_files(
                 TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
                 recently_changed_filenames, hashes)
+            # Clean up files in staging dir that have been removed in DEV dir.
+            remove_deleted_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR)
         else:
-            print 'No changes detected. Using previously-built files.'
+            print 'No changes detected. Using previously built files.'
     # Copy built files from staging dir to build dir.
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
