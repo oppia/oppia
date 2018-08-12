@@ -768,8 +768,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        filename = unescape_html(image['filepath-with-value'])
-        filename = filename[1:-1]
+        filename = json.loads(unescape_html(image['filepath-with-value']))
         image['filepath-with-value'] = escape_html(json.dumps(
             get_filename_with_dimensions(filename, exp_id)))
     return unicode(soup)

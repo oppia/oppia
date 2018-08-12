@@ -3560,10 +3560,10 @@ class Exploration(object):
         images in the oppia-noninteractive-image tags.
 
         Args:
+            exp_id: str. ID of the exploration.
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            exp_id: str. ID of the exploration.
 
         Returns:
             dict. The converted states_dict.
@@ -4155,7 +4155,7 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _convert_v29_dict_to_v30_dict(cls, exploration_dict):
+    def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
         """Converts a v29 exploration dict into a v30 exploration dict.
 
         Adds dimensions to all oppia-noninteractive-image tags.
@@ -4163,7 +4163,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 30
 
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
-            exploration_dict['id'], exploration_dict['states'])
+            exp_id, exploration_dict['states'])
         exploration_dict['states_schema_version'] = 25
 
         return exploration_dict
@@ -4347,9 +4347,8 @@ class Exploration(object):
             exploration_schema_version = 29
 
         if exploration_schema_version == 29:
-            exploration_dict['id'] = exp_id
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
-                exploration_dict)
+                exp_id, exploration_dict)
             exploration_schema_version = 30
 
         return (exploration_dict, initial_schema_version)
