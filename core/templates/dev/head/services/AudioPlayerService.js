@@ -37,7 +37,8 @@ oppia.factory('AudioPlayerService', [
             _currentTrackFilename = filename;
 
             // ngAudio doesn't seem to provide any way of detecting
-            // when native audio object has finished loading. It seems
+            // when native audio object has finished loading -- see
+            // https://github.com/danielstern/ngAudio/issues/139. It seems
             // that after creating an ngAudio object, the native audio
             // object is asynchronously loaded. So we use a timeout
             // to grab native audio.

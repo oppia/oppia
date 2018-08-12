@@ -69,8 +69,7 @@ oppia.factory('StatsReportingService', [
     var explorationActuallyStarted = false;
     var explorationIsComplete = false;
 
-    var _editorPreviewMode = (
-      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
+    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
@@ -329,6 +328,8 @@ oppia.factory('StatsReportingService', [
         postStatsToBackend();
 
         if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordExplorationQuitAction(
+            stateName, stateStopwatch.getTimeInSecs());
           PlaythroughService.recordPlaythrough();
         }
       },

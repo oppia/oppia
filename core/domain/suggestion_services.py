@@ -258,7 +258,6 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
 
-
     thread_id = suggestion.suggestion_id
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_id = thread_id[thread_id.find('.') + 1:]
