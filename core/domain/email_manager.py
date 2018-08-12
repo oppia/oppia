@@ -163,6 +163,10 @@ SENDER_VALIDATORS = {
         user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
@@ -935,3 +939,94 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
     _send_email(
         tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)
+
+
+def send_mail_to_onboard_new_reviewers(user_id, category):
+    """Sends an email to users who have crossed the threshold score.
+
+    Args:
+        user_id: str. The ID of the user who is being offered to become a
+            reviewer.
+        category: str. The category that the user is being offered to review.
+    """
+
+    email_subject = 'Invitation to review suggestions'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Thank you for actively contributing high-quality suggestions for '
+        'Oppia\'s lessons in %s, and for helping to make these lessons better '
+        'for students around the world!<br><br>'
+        'In recognition of your contributions, we would like to invite you to '
+        'become one of Oppia\'s reviewers. As a reviewer, you will be able to '
+        'review suggestions in %s, and contribute to helping ensure that any '
+        'edits made to lessons preserve the lessons\' quality and are '
+        'beneficial for students.<br><br>'
+        'If you\'d like to help out as a reviewer, please visit your '
+        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
+        'and set your review preferences accordingly. Note that, if you accept,'
+        'you will receive occasional emails inviting you to review incoming '
+        'suggestions by others.<br><br>'
+        'Again, thank you for your contributions to the Oppia community!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    if can_user_receive_email:
+        # Send email only if recipient wants to receive.
+        email_body = email_body_template % (
+            recipient_user_settings.username, category, category,
+            EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_mail_to_notify_users_to_review(user_id, category):
+    """Sends an email to users to review suggestions in categories they have
+    agreed to review for.
+
+    Args:
+        user_id: str. The id of the user who is being pinged to review
+            suggestions.
+        category: str. The category of the suggestions to review.
+    """
+
+    email_subject = 'Notification to review suggestions'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Just a heads-up that there are new suggestions to '
+        'review in %s, which you are registered as a reviewer for.'
+        '<br><br>Please take a look at and accept/reject these suggestions at'
+        ' your earliest convenience. You can visit your '
+        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+        'to view the list of suggestions that need a review.<br><br>'
+        'Thank you for helping improve Oppia\'s lessons!'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    if can_user_receive_email:
+        # Send email only if recipient wants to receive.
+        email_body = email_body_template % (
+            recipient_user_settings.username, category, EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

@@ -69,13 +69,13 @@ describe('Playthrough service', function() {
             interaction_id: {
               value: 'TextInput'
             },
-            answer: {
+            submitted_answer: {
               value: 'Hello'
             },
             feedback: {
               value: 'Try again'
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: 30
             }
           }, 1
@@ -92,7 +92,7 @@ describe('Playthrough service', function() {
             state_name: {
               value: 'stateName1'
             },
-            time_spent_in_state_secs: {
+            time_spent_in_state_in_msecs: {
               value: 120
             }
           }, 1

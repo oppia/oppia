@@ -239,8 +239,11 @@ oppia.filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
+          } else if (varType === 'DragAndDropPositiveInt') {
+            replacementText = inputs[varName] + '';
           } else {
-            // The following case is for MultipleChoiceInput
+            // The following case is for MultipleChoiceInput and
+            // DragAndDropHtmlString.
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =
@@ -523,5 +526,17 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
       return ' [' + replaceString + '] ';
     });
     return formattedOutput.trim();
+  };
+}]);
+
+oppia.filter('formatTimer', [function() {
+  return function(input) {
+    var formatNum = function(n) {
+      return (n < 10 ? '0' : '') + n;
+    };
+
+    var seconds = input % 60;
+    var minutes = Math.floor(input / 60);
+    return (formatNum(minutes) + ':' + formatNum(seconds));
   };
 }]);

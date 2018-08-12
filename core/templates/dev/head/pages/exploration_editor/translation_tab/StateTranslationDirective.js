@@ -20,22 +20,36 @@ oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
+        '$scope', '$filter', '$rootScope', 'StateEditorService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
+        'ExplorationCorrectnessFeedbackService', 'RouterService',
+        'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
+        'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+        'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $scope, $filter, $timeout, $rootScope, EditorStateService,
-            ExplorationStatesService, ExplorationInitStateNameService) {
+            $scope, $filter, $rootScope, StateEditorService,
+            ExplorationStatesService, ExplorationInitStateNameService,
+            ExplorationCorrectnessFeedbackService, RouterService,
+            TranslationStatusService, COMPONENT_NAME_CONTENT,
+            COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+            COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           // Define tab constants.
-          $scope.TAB_ID_CONTENT = 'content';
-          $scope.TAB_ID_FEEDBACK = 'feedback';
-          $scope.TAB_ID_HINTS = 'hints';
-          $scope.TAB_ID_SOLUTION = 'solution';
-          $rootScope.loadingMessage = 'Loading';
+          $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
+          $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+          $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
+          $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
+
+          $scope.ExplorationCorrectnessFeedbackService =
+            ExplorationCorrectnessFeedbackService;
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -48,20 +62,120 @@ oppia.directive('stateTranslation', [
           $scope.stateDefaultOutcome = null;
           $scope.stateHints = [];
           $scope.stateSolution = null;
+          $scope.activeContentId = null;
+          $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
+            'text. Please record new audio.';
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
           };
 
+          $scope.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
+          };
+
           $scope.onTabClick = function(tabId) {
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            if (tabId === $scope.TAB_ID_CONTENT) {
+              $scope.activeContentId = $scope.stateContent.getContentId();
+            } else if (tabId === $scope.TAB_ID_FEEDBACK) {
+              $scope.activeAnswerGroupIndex = 0;
+              if ($scope.stateAnswerGroups.length > 0) {
+                $scope.activeContentId = $scope.stateAnswerGroups[0]
+                  .outcome.feedback.getContentId();
+              } else {
+                $scope.activeContentId = $scope.stateDefaultOutcome
+                  .feedback.getContentId();
+              }
+            } else if (tabId === $scope.TAB_ID_HINTS) {
+              $scope.activeHintIndex = 0;
+              $scope.activeContentId = $scope.stateHints[0]
+                .hintContent.getContentId();
+            } else if (tabId === $scope.TAB_ID_SOLUTION) {
+              $scope.activeContentId = $scope.stateSolution.explanation
+                .getContentId();
+            }
             $scope.activatedTabId = tabId;
-            $scope.activeHintIndex = null;
-            $scope.activeAnswerGroupIndex = null;
+          };
+
+          $scope.summarizeDefaultOutcome = function(
+              defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+            if (!defaultOutcome) {
+              return '';
+            }
+
+            var summary = '';
+            var hasFeedback = defaultOutcome.hasNonemptyFeedback();
+
+            if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+              summary =
+                INTERACTION_SPECS[interactionId].default_outcome_heading;
+            } else if (answerGroupCount > 0) {
+              summary = 'All other answers';
+            } else {
+              summary = 'All answers';
+            }
+
+            if (hasFeedback && shortenRule) {
+              summary = $filter('wrapTextWithEllipsis')(
+                summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+            }
+            summary = '[' + summary + '] ';
+
+            if (hasFeedback) {
+              summary +=
+                $filter(
+                  'convertToPlainText'
+                )(defaultOutcome.feedback.getHtml());
+            }
+            return summary;
+          };
+
+          $scope.summarizeAnswerGroup = function(
+              answerGroup, interactionId, answerChoices, shortenRule) {
+            var summary = '';
+            var outcome = answerGroup.outcome;
+            var hasFeedback = outcome.hasNonemptyFeedback();
+
+            if (answerGroup.rules) {
+              var firstRule = $filter('convertToPlainText')(
+                $filter('parameterizeRuleDescription')(
+                  answerGroup.rules[0], interactionId, answerChoices));
+              summary = 'Answer ' + firstRule;
+
+              if (hasFeedback && shortenRule) {
+                summary = $filter('wrapTextWithEllipsis')(
+                  summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+              }
+              summary = '[' + summary + '] ';
+            }
+
+            if (hasFeedback) {
+              summary += (
+                shortenRule ?
+                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
+                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            }
+            return summary;
           };
 
           $scope.isDisabled = function(tabId) {
-            if (tabId === $scope.TAB_ID_FEEDBACK) {
-              if (!$scope.stateDefaultOutcome || !$scope.stateInteractionId) {
+            if (tabId === $scope.TAB_ID_CONTENT) {
+              return false;
+            }
+            // This is used to prevent users from adding unwanted audio for
+            // default_outcome and hints in Continue and EndExploration
+            // interaction.
+            if (!$scope.stateInteractionId ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_linear ||
+              INTERACTION_SPECS[$scope.stateInteractionId].is_terminal
+            ) {
+              return true;
+            } else if (tabId === $scope.TAB_ID_FEEDBACK) {
+              if (!$scope.stateDefaultOutcome) {
                 return true;
               } else {
                 return false;
@@ -72,7 +186,7 @@ oppia.directive('stateTranslation', [
               } else {
                 return false;
               }
-            } else {
+            } else if (tabId === $scope.TAB_ID_SOLUTION) {
               if (!$scope.stateSolution) {
                 return true;
               } else {
@@ -82,23 +196,59 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.changeActiveHintIndex = function(newIndex) {
-            // If the current hint is being clicked on again, close it.
-            if (newIndex === $scope.activeHintIndex) {
-              $scope.activeHintIndex = null;
-            } else {
-              $scope.activeHintIndex = newIndex;
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
             }
+            if ($scope.activeHintIndex === newIndex) {
+              return;
+            }
+            $scope.activeHintIndex = newIndex;
+            $scope.activeContentId = $scope.stateHints[newIndex]
+              .hintContent.getContentId();
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-            // If the current answer group is being clicked on again, close it.
-            if (newIndex === $scope.activeAnswerGroupIndex) {
-              $scope.activeAnswerGroupIndex = null;
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            if ($scope.activeAnswerGroupIndex === newIndex) {
+              return;
+            }
+            $scope.activeAnswerGroupIndex = newIndex;
+            if (newIndex === $scope.stateAnswerGroups.length) {
+              $scope.activeContentId = $scope.stateDefaultOutcome
+                .feedback.getContentId();
             } else {
-              $scope.activeAnswerGroupIndex = newIndex;
+              $scope.activeContentId = $scope.stateAnswerGroups[newIndex]
+                .outcome.feedback.getContentId();
             }
           };
 
+          $scope.tabStatusColorStyle = function(tabId) {
+            if (!$scope.isDisabled(tabId)) {
+              var color = TranslationStatusService
+                .getActiveStateComponentStatusColor(tabId);
+              return {'border-top-color': color};
+            }
+          };
+
+          $scope.tabNeedUpdatesStatus = function(tabId) {
+            if (!$scope.isDisabled(tabId)) {
+              return TranslationStatusService
+                .getActiveStateComponentNeedsUpdateStatus(tabId);
+            }
+          };
+          $scope.contentIdNeedUpdates = function(contentId) {
+            return TranslationStatusService
+              .getActiveStateContentIdNeedsUpdateStatus(contentId);
+          };
+          $scope.contentIdStatusColorStyle = function(contentId) {
+            var color = TranslationStatusService
+              .getActiveStateContentIdStatusColor(contentId);
+            return {'border-left': '3px solid ' + color};
+          };
 
           $scope.getHtmlSummary = function(subtitledHtml) {
             var htmlAsPlainText = $filter(
@@ -113,12 +263,12 @@ oppia.directive('stateTranslation', [
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
-            if (!EditorStateService.getActiveStateName()) {
-              EditorStateService.setActiveStateName(
+            if (!StateEditorService.getActiveStateName()) {
+              StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.displayed);
             }
 
-            var stateName = EditorStateService.getActiveStateName();
+            var stateName = StateEditorService.getActiveStateName();
 
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);
@@ -134,7 +284,8 @@ oppia.directive('stateTranslation', [
               .getInteractionIdMemento(stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
-            $rootScope.loadingMessage = '';
+
+            $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 
           // TODO(DubeySandeep): We need to call initStateTranslation() here in
@@ -144,6 +295,7 @@ oppia.directive('stateTranslation', [
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }
+          $rootScope.loadingMessage = '';
         }
       ]
     };

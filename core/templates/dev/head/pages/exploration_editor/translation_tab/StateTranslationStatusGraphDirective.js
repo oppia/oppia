@@ -20,20 +20,39 @@ oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        isTranslationTabBusy: '='
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_status_graph_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'GraphDataService', 'EditorStateService',
-        function($scope, $rootScope, GraphDataService, EditorStateService) {
+        '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
+        'StateEditorService', 'StateContentIdsToAudioTranslationsService',
+        'TranslationStatusService', function(
+            $scope, $rootScope, ExplorationStatesService, GraphDataService,
+            StateEditorService, StateContentIdsToAudioTranslationsService,
+            TranslationStatusService) {
           $scope.getGraphData = GraphDataService.getGraphData;
+          $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
           $scope.getActiveStateName = function() {
-            return EditorStateService.getActiveStateName();
+            return StateEditorService.getActiveStateName();
           };
           $scope.onClickStateInMap = function(newStateName) {
-            EditorStateService.setActiveStateName(newStateName);
-            $rootScope.$broadcast('refreshStateTranslation');
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            StateEditorService.setActiveStateName(newStateName);
+            var stateName = StateEditorService.getActiveStateName();
+            var stateData = ExplorationStatesService.getState(stateName);
+            if (stateName && stateData) {
+              StateContentIdsToAudioTranslationsService.init(
+                StateEditorService.getActiveStateName(),
+                stateData.contentIdsToAudioTranslations);
+              $rootScope.$broadcast('refreshStateTranslation');
+              $rootScope.$broadcast('refreshAudioTranslationBar');
+            }
           };
         }
       ]

@@ -21,7 +21,7 @@ import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
@@ -1011,7 +1011,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     def test_correct_states_schema_conversion_methods_exist(self):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         for version_num in range(current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
@@ -4631,13 +4631,13 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.convert_to_textangular),
+                html_validation_service.convert_to_textangular),
             state_dict_in_textangular)
 
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_caption_attr_to_image),
+                html_validation_service.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
 

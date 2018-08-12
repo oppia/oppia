@@ -17,6 +17,7 @@
 """Tests for feedback-related jobs."""
 
 import ast
+import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -27,9 +28,12 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, email_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.email,
+        models.NAMES.user]))
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -84,50 +88,51 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
     def test_message_count(self):
         """Test if the job returns the correct message count."""
-        feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-            'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-            'not used here')
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1,
+                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_2,
+                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
-        thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
+            thread_ids = subscription_services.get_all_threads_subscribed_to(
+                self.user_id)
 
-        self._run_one_off_job()
+            self._run_one_off_job()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+            thread_summaries, _ = feedback_services.get_thread_summaries(
+                self.user_id, thread_ids)
 
-        # Check that the first message has only one message.
-        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        # Check that the second message has only one message.
-        self.assertEqual(thread_summaries[1]['total_message_count'], 1)
+            # Check that the first message has only one message.
+            self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+            # Check that the second message has only one message.
+            self.assertEqual(thread_summaries[1]['total_message_count'], 1)
 
-        feedback_services.create_message(
-            thread_ids[0], self.user_id, None, None, 'editor message')
+            feedback_services.create_message(
+                thread_ids[0], self.user_id, None, None, 'editor message')
 
-        self._run_one_off_job()
+            self._run_one_off_job()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+            thread_summaries, _ = feedback_services.get_thread_summaries(
+                self.user_id, thread_ids)
 
-        # Check that the first message has two messages.
-        self.assertEqual(thread_summaries[0]['total_message_count'], 2)
+            # Check that the first message has two messages.
+            self.assertEqual(thread_summaries[0]['total_message_count'], 2)
 
-        # Get the first message so that we can delete it and check the error
-        # case.
-        first_message_model = (
-            feedback_models.FeedbackMessageModel.get(thread_ids[0], 0))
+            # Get the first message so that we can delete it and check the error
+            # case.
+            first_message_model = (
+                feedback_models.FeedbackMessageModel.get(thread_ids[0], 0))
 
-        first_message_model.delete()
+            first_message_model.delete()
 
-        output = self._run_one_off_job()
-        # Check if the quantities have the correct values.
-        self.assertEqual(output[0][1]['message_count'], 1)
-        self.assertEqual(output[0][1]['next_message_id'], 2)
+            output = self._run_one_off_job()
+            # Check if the quantities have the correct values.
+            self.assertEqual(output[0][1]['message_count'], 1)
+            self.assertEqual(output[0][1]['next_message_id'], 2)
 
 
 class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
@@ -202,54 +207,58 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT1['subject'],
-            self.EXPECTED_THREAD_DICT1['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT2['subject'],
-            self.EXPECTED_THREAD_DICT2['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT3['subject'],
-            self.EXPECTED_THREAD_DICT3['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT4['subject'],
-            self.EXPECTED_THREAD_DICT4['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT5['subject'],
-            self.EXPECTED_THREAD_DICT5['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT6['subject'],
-            self.EXPECTED_THREAD_DICT6['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT7['subject'],
-            self.EXPECTED_THREAD_DICT7['text'])
-        threads_old = feedback_services.get_threads(self.EXP_ID_1)
 
-        self._run_one_off_job()
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
+                self.EXPECTED_THREAD_DICT1['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
+                self.EXPECTED_THREAD_DICT2['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT3['subject'],
+                self.EXPECTED_THREAD_DICT3['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT4['subject'],
+                self.EXPECTED_THREAD_DICT4['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT5['subject'],
+                self.EXPECTED_THREAD_DICT5['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT6['subject'],
+                self.EXPECTED_THREAD_DICT6['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT7['subject'],
+                self.EXPECTED_THREAD_DICT7['text'])
+            threads_old = feedback_services.get_threads(
+                'exploration', self.EXP_ID_1)
 
-        threads = feedback_services.get_threads(self.EXP_ID_1)
+            self._run_one_off_job()
 
-        self.assertEqual(threads[0].subject, u'a small summary')
-        self.assertEqual(threads[1].subject, u'Some subject')
+            threads = feedback_services.get_threads(
+                'exploration', self.EXP_ID_1)
+
+        self.assertEqual(threads[6].subject, u'a small summary')
+        self.assertEqual(threads[5].subject, u'Some subject')
         self.assertEqual(
-            threads[2].subject,
+            threads[4].subject,
             u'It has to convert to a substring as it exceeds...')
         self.assertEqual(
             threads[3].subject,
             u'ItisjustaverylongsinglewordfortestinggetAbbreviate...')
-        self.assertEqual(threads[4].subject, u'(Feedback from a learner)')
+        self.assertEqual(threads[2].subject, u'(Feedback from a learner)')
         self.assertEqual(
-            threads[5].subject,
+            threads[1].subject,
             u'Itisjustaverylongsinglewordfortesting')
         self.assertEqual(
-            threads[6].subject,
+            threads[0].subject,
             u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...')
 
         self.assertEqual(threads[0].last_updated, threads_old[0].last_updated)
@@ -388,3 +397,100 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         output = self._run_validation_job()
         self.assertEqual(output[0][1], output[1][1])
         self.assertEqual(output[0][1], 10)
+
+
+class FeedbackThreadIdMigrationOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for FeedbackThreadIdMigrationOneOffJob class."""
+    def setUp(self):
+        super(FeedbackThreadIdMigrationOneOffJobTest, self).setUp()
+        feedback_models.FeedbackThreadModel(
+            id='exp1.thread1', exploration_id='exp1', state_name='state1',
+            original_author_id='author',
+            status=feedback_models.STATUS_CHOICES_OPEN,
+            subject='subject', summary='summary', has_suggestion=False,
+            last_updated=datetime.datetime.utcnow()).put()
+        feedback_models.FeedbackMessageModel(
+            id='exp1.thread1.1', thread_id='exp1.thread1', message_id=1,
+            author_id='author', text='message text').put()
+        feedback_models.FeedbackThreadUserModel(
+            id='author.exp1.thread1', message_ids_read_by_user=[1]).put()
+        email_models.FeedbackEmailReplyToIdModel(
+            id='author.exp1.thread1', reply_to_id='1234').put()
+        user_models.UserSubscriptionsModel(
+            id='author', feedback_thread_ids=['exp1.thread1', 'exp2.thread2']
+        ).put()
+
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off
+            .FeedbackThreadIdMigrationOneOffJob.create_new())
+        feedback_jobs_one_off.FeedbackThreadIdMigrationOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_function(self):
+        self._run_one_off_job()
+        new_thread_model = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            'exploration.exp1.thread1')
+        old_thread_model = feedback_models.FeedbackThreadModel.get_by_id(
+            'exp1.thread1')
+        self.assertEqual(new_thread_model.entity_type, 'exploration')
+        self.assertEqual(new_thread_model.entity_id, 'exp1')
+        self.assertEqual(new_thread_model.original_author_id, 'author')
+        self.assertEqual(
+            new_thread_model.status, feedback_models.STATUS_CHOICES_OPEN)
+        self.assertEqual(new_thread_model.subject, 'subject')
+        self.assertEqual(new_thread_model.summary, 'summary')
+        self.assertEqual(new_thread_model.has_suggestion, False)
+        self.assertEqual(
+            new_thread_model.last_updated, old_thread_model.last_updated)
+
+        new_message_model = (
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                'exploration.exp1.thread1.1'))
+        old_message_model = feedback_models.FeedbackMessageModel.get_by_id(
+            'exp1.thread1.1')
+        self.assertEqual(
+            new_message_model.thread_id, 'exploration.exp1.thread1')
+        self.assertEqual(new_message_model.message_id, 1)
+        self.assertEqual(new_message_model.author_id, 'author')
+        self.assertEqual(new_message_model.text, 'message text')
+        self.assertEqual(
+            new_message_model.last_updated, old_message_model.last_updated)
+
+        new_thread_user_model = (
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                'author.exploration.exp1.thread1'))
+        old_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get_by_id(
+                'author.exp1.thread1'))
+        self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
+        self.assertEqual(
+            new_thread_user_model.last_updated,
+            old_thread_user_model.last_updated)
+
+        new_reply_to_id_model = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
+                'author.exploration.exp1.thread1'))
+        old_reply_to_id_model = (
+            email_models.FeedbackEmailReplyToIdModel.get_by_id(
+                'author.exp1.thread1'))
+        self.assertEqual(new_reply_to_id_model.reply_to_id, '1234')
+        self.assertEqual(
+            new_reply_to_id_model.last_updated,
+            old_reply_to_id_model.last_updated)
+
+        new_user_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('author'))
+
+        self.assertEqual(
+            new_user_subscription_model.feedback_thread_ids,
+            ['exp1.thread1', 'exp2.thread2'])
+        self.assertEqual(
+            new_user_subscription_model.general_feedback_thread_ids,
+            ['exploration.exp1.thread1', 'exploration.exp2.thread2'])

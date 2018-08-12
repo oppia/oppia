@@ -15,34 +15,132 @@
 /**
  * @fileoverview Controller for the questions editor directive.
  */
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');
+
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        getQuestionId: '&questionId'
+        getQuestionId: '&questionId',
+        getMisconceptions: '&misconceptions',
+        canEditQuestion: '&',
+        questionStateData: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
-        '$scope', 'AlertsService', 'QuestionCreationService',
-        'EditableQuestionBackendApiService', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        '$scope', '$rootScope', 'AlertsService', 'QuestionCreationService',
+        'EditabilityService', 'EditableQuestionBackendApiService',
+        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'StateContentService', 'StateContentIdsToAudioTranslationsService',
+        'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
+        'SolutionValidityService',
         function(
-            $scope, AlertsService, QuestionCreationService,
-            EditableQuestionBackendApiService, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED) {
-          $scope.question = null;
-          if ($scope.getQuestionId() === null) {
-            // TODO (aks681): Add the necessary steps to be done when creating
-            // question here.
-          } else {
-            EditableQuestionBackendApiService.fetchQuestion(
-              $scope.getQuestionId()).then(function(questionBackendDict) {
-              $scope.question = QuestionObjectFactory.createFromBackendDict(
-                questionBackendDict);
-            });
+            $scope, $rootScope, AlertsService, QuestionCreationService,
+            EditabilityService, EditableQuestionBackendApiService,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            StateContentService, StateContentIdsToAudioTranslationsService,
+            INTERACTION_SPECS, StateEditorService, ResponsesService,
+            SolutionValidityService) {
+          if ($scope.canEditQuestion()) {
+            EditabilityService.markEditable();
           }
+          StateEditorService.setActiveStateName('question');
+          StateEditorService.setMisconceptions($scope.getMisconceptions());
+          $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_avatar_100px.svg');
+
+          $scope.interactionIsShown = false;
+
+          $scope.getStateContentPlaceholder = function() {
+            return (
+              'You can speak to the learner here, then ask them a question.');
+          };
+
+          $scope.navigateToState = function() {
+            return;
+          };
+
+          $scope.addState = function() {
+            return;
+          };
+
+          $scope.recomputeGraph = function() {
+            return;
+          };
+
+          $scope.refreshWarnings = function() {
+            return;
+          };
+
+          var _init = function() {
+            StateEditorService.setStateNames([]);
+            StateEditorService.setCorrectnessFeedbackEnabled(true);
+            StateEditorService.setInQuestionMode(true);
+            SolutionValidityService.init(['question']);
+            var stateData = $scope.questionStateData;
+            stateData.interaction.defaultOutcome.setDestination(null);
+            if (stateData) {
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
+
+              if (stateData.content.getHtml() || stateData.interaction.id) {
+                $scope.interactionIsShown = true;
+              }
+
+              $rootScope.loadingMessage = '';
+            }
+          };
+
+          $scope.saveStateContent = function(displayedValue) {
+            // Show the interaction when the text content is saved, even if no
+            // content is entered.
+            $scope.questionStateData.content = angular.copy(displayedValue);
+            $scope.interactionIsShown = true;
+          };
+
+          $scope.saveInteractionId = function(displayedValue) {
+            StateEditorService.setInteractionId(angular.copy(displayedValue));
+          };
+
+          $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
+            StateEditorService.setInteractionAnswerGroups(
+              angular.copy(newAnswerGroups));
+          };
+
+          $scope.saveInteractionDefaultOutcome = function(newOutcome) {
+            StateEditorService.setInteractionDefaultOutcome(
+              angular.copy(newOutcome));
+          };
+
+          $scope.saveInteractionCustomizationArgs = function(displayedValue) {
+            StateEditorService.setInteractionCustomizationArgs(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveSolution = function(displayedValue) {
+            StateEditorService.setInteractionSolution(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveHints = function(displayedValue) {
+            StateEditorService.setInteractionHints(
+              angular.copy(displayedValue));
+          };
+
+          $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
+            $scope.questionStateData.contentIdsToAudioTranslations =
+              angular.copy(displayedValue);
+          };
+
+          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            _init();
+          });
+
+          $scope.$on('onInteractionIdChanged', function(evt) {
+            _init();
+          });
         }
       ]
     };

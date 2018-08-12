@@ -31,11 +31,13 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -246,6 +248,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.request.get('v')
+        story_id = self.request.get('story_id')
         version = int(version) if version else None
 
         try:
@@ -281,12 +284,34 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
+        pretest_question_dicts = []
+        next_cursor = None
+        if story_id:
+            story = story_services.get_story_by_id(story_id, strict=False)
+            if story is None:
+                raise self.InvalidInputException
+
+            if not story.has_exploration(exploration_id):
+                raise self.InvalidInputException
+
+            pretest_questions, next_cursor = (
+                question_services.get_questions_by_skill_ids(
+                    feconf.NUM_PRETEST_QUESTIONS,
+                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
+                    '')
+            )
+            pretest_question_dicts = [
+                question.to_dict() for question in pretest_questions
+            ]
+
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
+            'pretest_question_dicts': pretest_question_dicts,
+            'next_cursor_for_pretests': next_cursor,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
@@ -295,6 +320,38 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
+        })
+        self.render_json(self.values)
+
+
+class PretestHandler(base.BaseHandler):
+    """Provides subsequent pretest questions after initial batch."""
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id):
+        """Handles GET request."""
+        start_cursor = self.request.get('cursor')
+        story_id = self.request.get('story_id')
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise self.InvalidInputException
+
+        if not story.has_exploration(exploration_id):
+            raise self.InvalidInputException
+
+        pretest_questions, next_start_cursor = (
+            question_services.get_questions_by_skill_ids(
+                feconf.NUM_PRETEST_QUESTIONS,
+                story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
+                start_cursor)
+        )
+        pretest_question_dicts = [
+            question.to_dict() for question in pretest_questions
+        ]
+
+        self.values.update({
+            'pretest_question_dicts': pretest_question_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
@@ -525,6 +582,9 @@ class StatsEventsHandler(base.BaseHandler):
     def post(self, exploration_id):
         aggregated_stats = self.payload.get('aggregated_stats')
         exp_version = self.payload.get('exp_version')
+        if exp_version is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Stats aggregation')
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
@@ -553,6 +613,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         params = self.payload.get('params', {})
         # The version of the exploration.
         version = self.payload.get('version')
+        if version is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Answer Submit')
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
             'client_time_spent_in_secs')
@@ -596,6 +659,9 @@ class StateHitEventHandler(base.BaseHandler):
         """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
+        if exploration_version is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: State hit')
         session_id = self.payload.get('session_id')
         # TODO(sll): why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
@@ -622,6 +688,9 @@ class StateCompleteEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exp_version') is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -663,6 +732,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
         include_author = self.payload.get('include_author')
 
         feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
             exploration_id,
             state_name,
             self.user_id if include_author else None,
@@ -683,6 +753,9 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
+        if self.payload.get('version') is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
             self.payload.get('state_name'),
@@ -702,6 +775,9 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exploration_version') is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'))
@@ -716,6 +792,9 @@ class SolutionHitEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        if self.payload.get('exploration_version') is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Solution hit')
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
@@ -744,6 +823,9 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         collection_id = self.payload.get('collection_id')
         user_id = self.user_id
 
+        if self.payload.get('version') is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Exploration complete')
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -790,6 +872,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.payload.get('version')
+        if version is None:
+            raise self.InvalidInputException(
+                'NONE EXP VERSION: Maybe quit')
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')

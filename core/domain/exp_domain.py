@@ -28,6 +28,7 @@ import string
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
@@ -875,7 +876,7 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: str or None. The id of the tagged
+            tagged_misconception_id: int or None. The id of the tagged
                 misconception for the answer group, when a state is part of a
                 Question object that tests a particular skill.
         """
@@ -909,9 +910,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, basestring):
+            if not isinstance(self.tagged_misconception_id, int):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be a string, '
+                    'Expected tagged misconception id to be an int, '
                     'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
@@ -1308,26 +1309,6 @@ class InteractionInstance(object):
 
 class State(object):
     """Domain object for a state."""
-
-    NULL_INTERACTION_DICT = {
-        'id': None,
-        'customization_args': {},
-        'answer_groups': [],
-        'default_outcome': {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': {
-                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
-                'html': ''
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        },
-        'confirmed_unclassified_answers': [],
-        'hints': [],
-        'solution': None,
-    }
 
     def __init__(
             self, content, param_changes, interaction,
@@ -2012,7 +1993,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
@@ -2163,8 +2144,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
         # TODO(sll): Remove this check once App Engine supports 3-letter
@@ -3535,7 +3515,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_textangular)
+                state_dict, html_validation_service.convert_to_textangular)
         return states_dict
 
     @classmethod
@@ -3552,7 +3532,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.add_caption_attr_to_image)
+                state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
@@ -3570,7 +3550,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor)
         return states_dict
 
     @classmethod

@@ -26,6 +26,8 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
+      'third_party/static/angular-recorder-1.4.1/dist' +
+      '/angular-audio-recorder.min.js',
       generatedJs,
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
@@ -117,7 +119,14 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      prependPrefix: '/'
+      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // the key that we use for that cache needs to be exactly the same as
+      // the templateUrl in directive JS. The stripPrefix and prependPrefix are
+      // used for modifying the $templateCache keys.
+      // If the key starts with core/ we need to get rid of that.
+      stripPrefix: 'core/',
+      // Every key must start with /.
+      prependPrefix: '/',
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'

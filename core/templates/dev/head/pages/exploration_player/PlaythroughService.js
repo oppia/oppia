@@ -49,6 +49,15 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
+    var removeOldQuitAction = function() {
+      // After the second quit action is recorded, the first quit is removed
+      // using this method. This ensures that there are only two quit actions
+      // in the playthrough actions list at a time.
+      playthrough.actions = playthrough.actions.filter(function(action) {
+        return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
+      });
+    };
+
     var _determineIfPlayerIsInSamplePopulation = function() {
       return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
     };
@@ -214,15 +223,16 @@ oppia.factory('PlaythroughService', [
             !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
-        playthrough.actions.push(LearnerActionObjectFactory.createNew(
+        var expStartLearnerAction = LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_START,
           {
             state_name: {
               value: initStateName
             }
           },
-          CURRENT_ACTION_SCHEMA_VERSION
-        ));
+          CURRENT_ACTION_SCHEMA_VERSION);
+
+        playthrough.actions.unshift(expStartLearnerAction);
 
         createMultipleIncorrectIssueTracker(initStateName);
 
@@ -249,13 +259,13 @@ oppia.factory('PlaythroughService', [
             interaction_id: {
               value: interactionId
             },
-            answer: {
+            submitted_answer: {
               value: answer
             },
             feedback: {
               value: feedback
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -283,7 +293,7 @@ oppia.factory('PlaythroughService', [
             state_name: {
               value: stateName
             },
-            time_spent_in_state_secs: {
+            time_spent_in_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -301,6 +311,7 @@ oppia.factory('PlaythroughService', [
         }
         if (playthrough.playthroughId) {
           // Playthrough ID exists, so issue has already been identified.
+          removeOldQuitAction();
           if (playthrough.issueType === ISSUE_TYPE_EARLY_QUIT) {
             // If the existing issue is of type early quit, and some other issue
             // can be identified, update the issue since early quit has lower
