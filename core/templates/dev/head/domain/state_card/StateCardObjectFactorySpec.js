@@ -26,7 +26,8 @@ describe('State card object factory', function() {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
 
     _sampleCard = StateCardObjectFactory.createNewCard(
-      'State 1', {}, '<p>Content</p>', '<interaction></interaction>', false);
+      'State 1', {}, '<p>Content</p>', '<interaction></interaction>', {},
+      false);
   }));
 
   it('should be able to get the various fields', function() {
