@@ -782,7 +782,7 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the images/audio such that the url instead of
+    """One-off job for copying the image/audio such that the url instead of
     {{exp_id}}/assets/image/image.png is
     exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
     the images as well as renaming the filenames so that they have dimensions
@@ -813,7 +813,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                 height, width = gae_image_services.get_image_dimensions(
                     raw_image)
                 filename_with_dimensions = (
-                    exp_services.regenerate_image_filename_using_dimensions(
+                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
                         image_filename, height, width))
                 exp_services.save_original_and_compressed_versions_of_image(
                     'ADMIN', filename_with_dimensions, exp_id, raw_image)

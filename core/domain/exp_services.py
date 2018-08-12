@@ -104,25 +104,6 @@ def _migrate_states_schema(versioned_exploration_states):
         states_schema_version += 1
 
 
-def regenerate_image_filename_using_dimensions(filename, height, width):
-    """Returns the name of the image file with dimensions in it.
-
-    Args:
-        filename: str. The name of the image file to be renamed.
-        height: int. Height of the image.
-        width: int. Width of the image.
-
-    Returns:
-        str. The name of the image file with its dimensions in it.
-    """
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
-    new_filename = '%s%s.%s' % (
-        filename_wo_filetype, dimensions_suffix, filetype)
-    return new_filename
-
-
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
     """Returns a memcache key for an exploration.

@@ -296,17 +296,12 @@ class ExplorationFileSystem(object):
         metadata = self._get_file_metadata(filepath, None)
         return bool(metadata)
 
-    def listdir(self, dir_name, delimiter=None):  # pylint: disable=unused-argument
+    def listdir(self, dir_name):
         """Lists all files in a directory.
-
-        If `delimiter` argument is unused. It is included so that this method
-        signature matches that of other file systems.
 
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
-            delimiter: str. It is used to restrict the results to only the
-               files in the given folder.
 
         Returns:
             list(str). A lexicographically-sorted list of filenames,
@@ -416,17 +411,12 @@ class DiskBackedFileSystem(object):
         """
         raise NotImplementedError
 
-    def listdir(self, dir_name, delimiter=None):  # pylint: disable=unused-argument
+    def listdir(self, dir_name):
         """Raises NotImplementedError if the method is not implemented in the
         derived classes.
 
-        If `delimiter` argument is unused. It is included so that this method
-        signature matches that of other file systems.
-
         Args:
             dir_name: str. The name of the directory.
-            delimiter: str. It is used to restrict the results to only the
-               files in the given folder.
 
         Raises:
             NotImplementedError. The method is not implemented in the derived
@@ -552,25 +542,12 @@ class GcsFileSystem(object):
             raise IOError('Image does not exist: %s' % filepath)
 
 
-    def listdir(self, dir_name, delimiter=None):  # pylint: disable=unused-argument
+    def listdir(self, dir_name):
         """Lists all files in a directory.
-
-        The delimiter argument can be used to restrict the results to only the
-        files in the given folder. Without the delimiter, the entire tree
-        under the prefix is returned. For example, given these blobs:
-        /a/1.txt
-        /a/b/2.txt
-        If you just specify prefix = '/a', you'll get back:
-        /a/1.txt
-        /a/b/2.txt
-        However, if you specify prefix='/a' and delimiter='/', you'll get back:
-        /a/1.txt
 
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
-            delimiter: str. It is used to restrict the results to only the
-               files in the given folder.
 
         Returns:
             list(str). A lexicographically-sorted list of filenames.
@@ -707,18 +684,16 @@ class AbstractFileSystem(object):
         self._check_filepath(filepath)
         self._impl.delete(user_id, filepath)
 
-    def listdir(self, dir_name, delimiter=None):
+    def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...).
 
         Args:
             dir_name: str. The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
-            delimiter: str. It is used to restrict the results to only the
-               files in the given folder.
 
         Returns:
             list(str). A lexicographically-sorted list of filenames,
             each of which is prefixed with dir_name.
         """
         self._check_filepath(dir_name)
-        return self._impl.listdir(dir_name, delimiter=delimiter)
+        return self._impl.listdir(dir_name)
