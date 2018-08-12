@@ -70,12 +70,46 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/visualizations/frequency_table_directive.html'),
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+        '$scope', '$attrs', 'HtmlEscaperService', 'StateTopAnswersStatsService',
+        function(
+            $scope, $attrs, HtmlEscaperService, StateTopAnswersStatsService) {
+          // TODO(brianrodri): These controllers may benefit from being reused
+          // by future visualizations. If we end up using them a lot, consider
+          // moving them into a service.
+          var answerColumnController = {
+            headerHtml: 'Answer',
+            widthCss: '75%',
+            makeCellHtmlForRow: function(row) {
+              return row.answer;
+            },
+          };
+          var frequencyColumnController = {
+            headerHtml: 'Count',
+            widthCss: '10%',
+            makeCellHtmlForRow: function(row) {
+              return row.frequency;
+            },
+          };
+          var addressedInfoColumnController = {
+            headerHtml: 'Addressed specifically?',
+            widthCss: '15%',
+            makeCellHtmlForRow: function(row) {
+              return row.is_addressed ? 'Yes' : 'No';
+            },
+          };
+
+          var stateName = $attrs.stateName;
+          $scope.rows = StateTopAnswersStatsService.hasStateStats(stateName) ?
+            StateTopAnswersStatsService.getStateStats(stateName) : [];
           $scope.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          $scope.columnControllers = [
+            answerColumnController,
+            frequencyColumnController,
+          ];
+          if ($attrs.addressedInfoIsSupported) {
+            $scope.columnControllers.push(addressedInfoColumnController);
+          }
         }
       ]
     };
