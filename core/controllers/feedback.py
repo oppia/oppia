@@ -65,11 +65,9 @@ class ThreadListHandler(base.BaseHandler):
 
 
 class ThreadListHandlerForTopics(base.BaseHandler):
-    """Handles listing of feedback threads linked to topics."""
+    """Handles listing of suggestions threads linked to topics."""
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        # TODO (nithesh): Add non-suggestion feedback threads when required in
-        # the future.
         self.values.update({
             'suggestion_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(

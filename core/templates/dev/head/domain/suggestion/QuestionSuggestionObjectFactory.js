@@ -17,8 +17,8 @@
    suggestion domain objects.
  */
 
-oppia.factory('QuestionSuggestionObjectFactory', ['QuestionObjectFactory',
-  function(QuestionObjectFactory) {
+oppia.factory('QuestionSuggestionObjectFactory', [
+  'QuestionObjectFactory', function(QuestionObjectFactory) {
     var Suggestion = function(
         suggestionType, suggestionId, targetType, targetId, status, authorName,
         lastUpdated, question, skillId) {
@@ -33,8 +33,8 @@ oppia.factory('QuestionSuggestionObjectFactory', ['QuestionObjectFactory',
       this.skillId = skillId;
     };
 
-    Suggestion.prototype.threadId = function() {
-      return this.suggestionId.slice(this.suggestionId.indexOf('.') + 1);
+    Suggestion.prototype.getThreadId = function() {
+      return this.suggestionId;
     };
 
     Suggestion.createFromBackendDict = function(suggestionBackendDict) {

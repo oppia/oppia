@@ -93,7 +93,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 class SuggestionToTopicActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to topics."""
 
-
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
@@ -127,8 +126,7 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
                 # The skill_id is passed only at the time of accepting the
                 # suggestion.
                 skill_id = self.payload.get('skill_id')
-                suggestion_services.update_skill_id_for_question_suggestion(
-                    suggestion, skill_id)
+                suggestion.change.skill_id = skill_id
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

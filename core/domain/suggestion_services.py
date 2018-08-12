@@ -166,22 +166,6 @@ def _update_suggestion(suggestion):
     suggestion_model.put()
 
 
-def update_skill_id_for_question_suggestion(suggestion, skill_id):
-    """Updates the skill_id present in the change parameter in a question
-    suggestion.
-
-    Args:
-        suggestion: Suggestion. The suggestion to be updated.
-        skill_id: str. The id of the skill to be linked to the question.
-    """
-    if not isinstance(suggestion, suggestion_registry.SuggestionAddQuestion):
-        raise Exception(
-            'Can only update skill ids for suggestions that add new questions')
-
-    suggestion.change.skill_id = skill_id
-    _update_suggestion(suggestion)
-
-
 def mark_review_completed(suggestion, status, reviewer_id):
     """Marks that a review has been completed.
 

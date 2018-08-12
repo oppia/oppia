@@ -56,8 +56,8 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window, DateTimeFormatService,
-      AlertsService, CreatorDashboardBackendApiService,
+      $scope, $rootScope, $http, $uibModal, $window,
+      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       QuestionObjectFactory, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, FATAL_ERROR_CODES,
@@ -208,8 +208,8 @@ oppia.controller('CreatorDashboard', [
             $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
 
-            $scope.isNotValidQuestion = function() {
-              return ($scope.question.validate([]) !== false);
+            $scope.isValidQuestion = function() {
+              return ($scope.question.validate([]) === false);
             };
 
             $scope.dismissModal = function() {
@@ -217,10 +217,18 @@ oppia.controller('CreatorDashboard', [
             };
 
             $scope.createQuestion = function() {
-              $uibModalInstance.close({
-                question: question,
-                topicId: $scope.topicId
-              });
+              var errorMessage = question.validate([]);
+              if (!topicId) {
+                AlertsService.addWarning(
+                  'Please choose a topic before submitting');
+              } else if (errorMessage === false) {
+                $uibModalInstance.close({
+                  question: question,
+                  topicId: $scope.topicId
+                });
+              } else {
+                AlertsService.addWarning(errorMessage);
+              }
             };
           }
         ]
@@ -231,6 +239,9 @@ oppia.controller('CreatorDashboard', [
             topicVersion = topicSummaries[i].version;
             break;
           }
+        }
+        if (!topicVersion) {
+          $log.error('Unable to match topic id selected with topic choices.');
         }
         $http.post('/generalsuggestionhandler/', {
           suggestion_type: 'add_question',
