@@ -304,6 +304,8 @@ class ExplorationHandler(base.BaseHandler):
                 question.to_dict() for question in pretest_questions
             ]
 
+        whitelisted_exp_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -320,6 +322,10 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
+            'whitelisted_exploration_ids_for_saving_playthroughs': (
+                whitelisted_exp_ids),
+            'record_playthrough_probability': (
+                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
         })
         self.render_json(self.values)
 

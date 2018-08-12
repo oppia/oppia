@@ -29,7 +29,7 @@ oppia.factory('PlaythroughService', [
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
-  'PAGE_CONTEXT', 'RECORD_PLAYTHROUGH_PROBABILITY', 'STORE_PLAYTHROUGH_URL',
+  'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
   function(
       $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
       StopwatchObjectFactory, UrlInterpolationService,
@@ -39,10 +39,11 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      PAGE_CONTEXT, RECORD_PLAYTHROUGH_PROBABILITY, STORE_PLAYTHROUGH_URL) {
+      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
+    var explorationWhitelisted = null;
 
     var multipleIncorrectStateName = {};
 
@@ -58,8 +59,8 @@ oppia.factory('PlaythroughService', [
       });
     };
 
-    var _determineIfPlayerIsInSamplePopulation = function() {
-      return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
+    var _determineIfPlayerIsInSamplePopulation = function(probability) {
+      return Math.random() < probability;
     };
 
     var createMultipleIncorrectIssueTracker = function(initStateName) {
@@ -198,8 +199,13 @@ oppia.factory('PlaythroughService', [
     };
 
     return {
-      initSession: function(newExplorationId, newExplorationVersion) {
-        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation();
+      initSession: function(
+          newExplorationId, newExplorationVersion, playthroughProbability,
+          whitelistedExpIds) {
+        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
+          playthroughProbability);
+        explorationWhitelisted = this.isExplorationWhitelisted(
+          newExplorationId, whitelistedExpIds);
         playthrough = PlaythroughObjectFactory.createNew(
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
@@ -207,10 +213,8 @@ oppia.factory('PlaythroughService', [
       isPlayerExcludedFromSamplePopulation: function() {
         return !isPlayerInSamplePopulation;
       },
-      isExplorationWhitelisted: function(expId) {
-        var whiteListedExpIds =
-          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS;
-        if (whiteListedExpIds.indexOf(expId) !== -1) {
+      isExplorationWhitelisted: function(expId, whitelistedExpIds) {
+        if (whitelistedExpIds.indexOf(expId) !== -1) {
           return true;
         }
         return false;
@@ -220,7 +224,7 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationStartAction: function(initStateName) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.expId)) {
+            !explorationWhitelisted) {
           return;
         }
         var expStartLearnerAction = LearnerActionObjectFactory.createNew(
@@ -244,7 +248,7 @@ oppia.factory('PlaythroughService', [
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.expId)) {
+            !explorationWhitelisted) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -284,7 +288,7 @@ oppia.factory('PlaythroughService', [
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.expId)) {
+            !explorationWhitelisted) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -302,7 +306,7 @@ oppia.factory('PlaythroughService', [
       },
       recordPlaythrough: function(isExplorationComplete) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.expId)) {
+            !explorationWhitelisted) {
           return;
         }
         if (isExplorationComplete) {

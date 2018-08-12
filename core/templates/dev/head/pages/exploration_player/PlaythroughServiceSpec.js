@@ -24,11 +24,8 @@ describe('Playthrough service', function() {
       this.expId = 'expId1';
       this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
-      spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
-        false);
-      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(true);
       this.laof = $injector.get('LearnerActionObjectFactory');
-      this.ps.initSession(this.expId, this.expVersion);
+      this.ps.initSession(this.expId, this.expVersion, 1.0, [this.expId]);
     }));
 
     it('should initialize a session with correct values.', function() {
@@ -248,18 +245,17 @@ describe('Playthrough service', function() {
       this.expId = 'expId1';
       this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
-      spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
-        false);
       this.laof = $injector.get('LearnerActionObjectFactory');
-      this.ps.initSession(this.expId, this.expVersion);
+      this.ps.initSession(this.expId, this.expVersion, 1.0, [this.expId]);
     }));
 
     it('should test whitelisting of explorations.', function() {
-      expect(this.ps.isExplorationWhitelisted(this.expId)).toEqual(false);
+      expect(this.ps.isExplorationWhitelisted(
+        this.expId, [this.expId])).toEqual(true);
     });
 
     it('should not record learner actions for blacklisted exps', function() {
-      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(false);
+      this.ps.initSession(this.expId, this.expVersion, 1.0, []);
 
       this.ps.recordExplorationStartAction('initStateName1');
       var playthrough = this.ps.getPlaythrough();

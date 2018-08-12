@@ -569,7 +569,9 @@ oppia.directive('conversationSkin', [
             StatsReportingService.initSession(
               explorationId, returnDict.exploration.title,
               version, returnDict.session_id, GLOBALS.collectionId);
-            PlaythroughService.initSession(explorationId, version);
+            PlaythroughService.initSession(
+              explorationId, version, returnDict.record_playthrough_probability,
+              returnDict.whitelisted_exploration_ids_for_playthroughs);
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             ExplorationEngineService.init(

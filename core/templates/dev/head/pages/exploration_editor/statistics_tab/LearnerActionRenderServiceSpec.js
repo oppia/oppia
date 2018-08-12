@@ -26,11 +26,8 @@ describe('Learner Action Render Service', function() {
     beforeEach(inject(function($injector) {
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps = $injector.get('PlaythroughService');
-      spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
-        false);
-      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(true);
       this.lars = $injector.get('LearnerActionRenderService');
-      this.ps.initSession('expId1', 1);
+      this.ps.initSession('expId1', 1, 1.0, ['expId1']);
       this.sce = $injector.get('$sce');
     }));
 
