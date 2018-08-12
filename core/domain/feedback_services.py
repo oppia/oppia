@@ -501,7 +501,7 @@ def get_multiple_threads(thread_ids):
     Returns:
         list(FeedbackThread). The list of feedback threads.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+    if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         return [_get_thread_from_model(t)
                 for t in feedback_models.GeneralFeedbackThreadModel.get_multi(
                     thread_ids)]

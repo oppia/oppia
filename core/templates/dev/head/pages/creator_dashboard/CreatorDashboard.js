@@ -354,7 +354,7 @@ oppia.controller('CreatorDashboard', [
               responseData.created_suggestions_list[j]);
             var threadDict = (
               responseData.threads_for_created_suggestions_list[i]);
-            if (threadDict.thread_id === suggestion.threadId()) {
+            if (threadDict.thread_id === suggestion.getThreadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   threadDict, responseData.created_suggestions_list[j]));
@@ -374,7 +374,7 @@ oppia.controller('CreatorDashboard', [
               responseData.created_suggestions_list[j]);
             var threadDict = (
               responseData.threads_for_created_suggestions_list[i]);
-            if (threadDict.thread_id === suggestion.threadId()) {
+            if (threadDict.thread_id === suggestion.getThreadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   threadDict, responseData.created_suggestions_list[j]));
