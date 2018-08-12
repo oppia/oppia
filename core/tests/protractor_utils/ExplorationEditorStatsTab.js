@@ -23,6 +23,7 @@ var ExplorationEditorStatsTab = function() {
      */
   var numPassersby = element(by.css('.protractor-test-num-passersby'));
   var firstIssueElement = element(by.css('.protractor-test-init-issue'));
+  var issueTitle = element(by.css('.protractor-test-issue-title'));
 
   /**
      * Workflows
@@ -35,6 +36,10 @@ var ExplorationEditorStatsTab = function() {
     return firstIssueElement.getText();
   };
 
+  var _getIssueTitle = function() {
+    return issueTitle.getText();
+  };
+
   this.expectNumPassersbyToBe = function(numPassersby) {
     expect(_getNumPassersby()).toMatch(numPassersby);
   };
@@ -42,6 +47,10 @@ var ExplorationEditorStatsTab = function() {
   this.clickInitIssue = function(expectedIssueText) {
     expect(_getInitIssueText()).toMatch(expectedIssueText);
     firstIssueElement.click();
+  };
+
+  this.expectIssueTitleToBe = function(issueTitle) {
+    expect(_getIssueTitle()).toMatch(issueTitle);
   };
 };
 

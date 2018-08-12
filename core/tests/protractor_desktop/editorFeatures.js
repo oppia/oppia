@@ -668,6 +668,94 @@ describe('Issues visualization', function() {
     explorationEditorPage.navigateToStatsTab();
 
     explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners exited the exploration in less than a minute.');
+  });
+
+  it('records multiple incorrect issue.', function() {
+    users.createAndLoginUser(
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput',
+      'It\'s translated from a different language.');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer1');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer2');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer3');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer4');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer5');
+    browser.sleep(3000);
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners submitted answers to card "Welcome!" several ' +
+      'times, then gave up and quit.');
+  });
+
+  it('records cyclic transitions issue.', function() {
+    users.createAndLoginUser(
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput',
+      'It\'s translated from a different language.');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners ended up in a cyclic loop revisiting card ' +
+      '"Numeric input" many times.');
   });
 });
 
