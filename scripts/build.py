@@ -382,8 +382,7 @@ def hash_should_be_inserted(filepath):
 
 def copy_files_source_to_target(source, target, file_hashes):
     """Copies all files in source directory to target directory, renames
-    them to include hash in their name and remove files that are not in the hash
-    dict.
+    them to include hash in their name.
 
     Args:
         source: str. Path relative to /oppia directory of directory
