@@ -28,6 +28,7 @@ import string
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
@@ -2143,8 +2144,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
         # TODO(sll): Remove this check once App Engine supports 3-letter
@@ -3515,7 +3515,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_textangular)
+                state_dict, html_validation_service.convert_to_textangular)
         return states_dict
 
     @classmethod
@@ -3532,7 +3532,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.add_caption_attr_to_image)
+                state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
@@ -3550,7 +3550,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor)
         return states_dict
 
     @classmethod

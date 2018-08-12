@@ -329,6 +329,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
+        reader.PretestHandler),
+    get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
     get_redirect_route(
@@ -473,6 +476,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
+    get_redirect_route(
+        r'%s/topic/<target_id>/<suggestion_id>' %
+        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
         r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),

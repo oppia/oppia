@@ -138,32 +138,8 @@ var richTextComponents = {
       "name": "tab_contents",
       "description": "The tab titles and contents.",
       "schema": {
-        "type": "list",
-        "items": {
-          "type": "dict",
-          "properties": [{
-            "name": "title",
-            "description": "Tab title",
-            "schema": {
-              "type": "unicode",
-              "validators": [{
-                "id": "is_nonempty"
-              }]
-            }
-          }, {
-            "name": "content",
-            "description": "Tab content",
-            "schema": {
-              "type": "html",
-              "ui_config": {
-                "hide_complex_extensions": true
-              }
-            }
-          }]
-        },
-        "ui_config": {
-          "add_element_text": "Add new tab"
-        }
+        "type": "custom",
+        "obj_type": "ListOfTabs"
       },
       "default_value": [{
         "title": "Hint introduction",

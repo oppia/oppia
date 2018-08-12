@@ -85,6 +85,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
+    def test_get_prerequisite_skill_ids(self):
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
+        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
+        self.assertEqual(
+            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id'),
+            ['skill_1'])
+        self.assertIsNone(
+            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id_2'))
+
+    def test_has_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
+        self.assertTrue(self.story.has_exploration('exp_id'))
+        self.assertFalse(self.story.has_exploration('exp_id_2'))
+
     def test_title_validation(self):
         self.story.title = 1
         self._assert_validation_error(

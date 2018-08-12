@@ -21,11 +21,15 @@ oppia.directive('translationTab', [
     return {
       restrict: 'E',
       scope: {},
+      link: function(scope) {
+        scope.$broadcast('refreshTranslationTab');
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', function($scope, $rootScope) {
         $rootScope.loadingMessage = 'Loading';
+        $scope.isTranslationTabBusy = false;
         $scope.$on('refreshTranslationTab', function() {
           $scope.$broadcast('refreshStateTranslation');
         });

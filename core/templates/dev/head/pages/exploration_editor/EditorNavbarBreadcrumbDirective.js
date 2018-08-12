@@ -47,6 +47,7 @@ oppia.directive('editorNavbarBreadcrumb', [
 
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
             main: 'Edit',
+            translation: 'Translation',
             preview: 'Preview',
             settings: 'Settings',
             stats: 'Statistics',
