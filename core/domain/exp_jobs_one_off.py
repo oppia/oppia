@@ -778,7 +778,6 @@ class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
->>>>>>> origin/develop
 class CreateVersionsOfImageJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating compressed versions of the images
     of the exploration in the GCS.
@@ -859,4 +858,3 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
->>>>>>> origin/develop

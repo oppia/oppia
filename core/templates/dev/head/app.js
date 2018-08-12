@@ -25,7 +25,6 @@ var oppia = angular.module(
     'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
     'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
     'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
->>>>>>> origin/develop
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
