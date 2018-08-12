@@ -43,7 +43,6 @@ oppia.controller('FeedbackTab', [
       status: null,
       text: ''
     };
-    $scope.useNewSuggestionsFramework = constants.USE_NEW_SUGGESTION_FRAMEWORK;
     var _resetTmpMessageFields = function() {
       $scope.tmpMessage.status = $scope.activeThread ?
         $scope.activeThread.status : null;
@@ -97,21 +96,12 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionHandled = function() {
-      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-        return $scope.activeThread.isSuggestionHandled();
-      }
-      return !($scope.activeThread.suggestion.status === 'review' ||
-        $scope.activeThread.status === 'open');
+      return $scope.activeThread.isSuggestionHandled();
     };
 
     var _isSuggestionValid = function() {
-      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-        return ExplorationStatesService.hasState(
-          $scope.activeThread.getSuggestionStateName());
-      } else {
-        return ExplorationStatesService.hasState(
-          $scope.activeThread.stateName);
-      }
+      return ExplorationStatesService.hasState(
+        $scope.activeThread.getSuggestionStateName());
     };
 
     var _hasUnsavedChanges = function() {
@@ -142,34 +132,18 @@ oppia.controller('FeedbackTab', [
             return _hasUnsavedChanges();
           },
           suggestionStatus: function() {
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.getSuggestionStatus();
-            } else {
-              return $scope.activeThread.status;
-            }
+            return $scope.activeThread.getSuggestionStatus();
           },
           description: function() {
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.description;
-            } else {
-              return $scope.activeThread.suggestion.description;
-            }
+            return $scope.activeThread.description;
           },
           currentContent: function() {
-            var stateName;
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              stateName = $scope.activeThread.getSuggestionStateName();
-            } else {
-              stateName = $scope.activeThread.stateName;
-            }
+            var stateName = $scope.activeThread.getSuggestionStateName();
             var state = ExplorationStatesService.getState(stateName);
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.getReplacementHtmlFromSuggestion();
-            }
-            return $scope.activeThread.suggestion.suggestion_html;
+            return $scope.activeThread.getReplacementHtmlFromSuggestion();
           }
         },
         controller: [
@@ -251,21 +225,13 @@ oppia.controller('FeedbackTab', [
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion;
-              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                suggestion = $scope.activeThread.getSuggestion();
-              } else {
-                suggestion = $scope.activeThread;
-              }
+              suggestion = $scope.activeThread.getSuggestion();
               var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                state.content.setHtml(
-                  $scope.activeThread.getReplacementHtmlFromSuggestion());
-              } else {
-                state.content.setHtml(suggestion.suggestion.suggestion_html);
-              }
+              state.content.setHtml(
+                $scope.activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {
                 state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
                   state.content.getContentId());
