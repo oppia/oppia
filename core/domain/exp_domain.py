@@ -32,10 +32,10 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
+import core.domain.state_domain as state_domain
 import feconf
 import jinja_utils
 import schema_utils
-import state_domain
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])

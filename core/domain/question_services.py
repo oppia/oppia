@@ -16,7 +16,6 @@
 
 import logging
 
-from core.domain import exp_domain
 from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models

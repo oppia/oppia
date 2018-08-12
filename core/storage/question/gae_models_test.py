@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import exp_domain
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils

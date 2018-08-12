@@ -499,7 +499,8 @@ class StateYamlHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'yaml': state_services.convert_state_dict_to_yaml(state_dict, width),
+            'yaml': state_services.convert_state_dict_to_yaml(
+                state_dict, width),
         })
 
 
