@@ -55,7 +55,7 @@ oppia.directive('audioTranslationBar', [
           }
           scope.showDropArea = false;
           scope.$digest();
-          return true;
+          return false;
         });
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

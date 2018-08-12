@@ -17,8 +17,8 @@
  */
 
 oppia.directive('audioFileUploader', [
-  '$timeout', 'UrlInterpolationService', 'IdGenerationService',
-  function($timeout, UrlInterpolationService, IdGenerationService) {
+  'UrlInterpolationService', 'IdGenerationService',
+  function(UrlInterpolationService, IdGenerationService) {
     return {
       restrict: 'E',
       scope: {
