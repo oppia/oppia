@@ -680,6 +680,7 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
@@ -705,6 +706,7 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();
@@ -721,6 +723,7 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
@@ -750,6 +753,7 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();
