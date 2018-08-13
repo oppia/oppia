@@ -11,5 +11,5 @@
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="dismissModal()">Cancel</button>
-  <button class="btn btn-success" ng-click="createQuestion()" ng-disabled="isValidQuestion()">Submit</button>
+  <button class="btn btn-success" ng-click="createQuestion()" ng-disabled="!isValidQuestion()">Submit</button>
 </div>

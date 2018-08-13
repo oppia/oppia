@@ -23,13 +23,13 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', '$http', '$uibModal', 'AlertsService',
+        '$scope', '$http', '$q', '$uibModal', 'AlertsService',
         'TopicEditorStateService', 'QuestionCreationService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
-            $scope, $http, $uibModal, AlertsService,
+            $scope, $http, $q, $uibModal, AlertsService,
             TopicEditorStateService, QuestionCreationService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
@@ -44,10 +44,11 @@ oppia.directive('questionsTab', [
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
+            $scope.emptyMisconceptionsList = [];
             $scope.questionSuggestionThreads = [];
-            $scope.getSuggestedQuestions();
-            $scope.questionUnderReview = null;
+            $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
+            console.log($scope.topic.getId())
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -58,8 +59,7 @@ oppia.directive('questionsTab', [
               return;
             }
             EditableQuestionBackendApiService.createQuestion(
-              $scope.skillId, $scope.question.toBackendDict(
-                true)
+              $scope.skillId, $scope.question.toBackendDict(true)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
                 $scope.topic.getId(), function() {
@@ -125,53 +125,63 @@ oppia.directive('questionsTab', [
             });
           };
 
-          $scope.getSuggestedQuestions = function() {
+          loadSuggestedQuestionsAsync = function() {
+            console.log($scope.topic.getId());
             $scope.questionSuggestionThreads = [];
-            $http.get('/generalsuggestionlisthandler', {
-              params: {
-                target_type: 'topic',
-                target_id: $scope.topic.getId(),
-                suggestion_type: 'add_question'
+            var suggestionsPromise = $http.get(
+              '/generalsuggestionlisthandler', {
+                params: {
+                  target_type: 'topic',
+                  target_id: $scope.topic.getId(),
+                  suggestion_type: 'add_question'
+                }
               }
-            }).then(function(suggestionsResponse) {
-              $http.get(
-                '/threadlisthandlerfortopic/' + $scope.topic.getId()).then(
-                function(threadsResponse) {
-                  var suggestionThreads = (
-                    threadsResponse.data.suggestion_thread_dicts);
-                  var suggestions = suggestionsResponse.data.suggestions;
-                  if (suggestionThreads.length !== suggestions.length) {
-                    $log.error(
-                      'Number of suggestion threads doesn\'t match number of' +
-                       'suggestion objects');
+            );
+            console.trace()
+            var threadsPromise = $http.get(
+              UrlInterpolationService.interpolateUrl(
+                '/threadlisthandlerfortopic/<topic_id>', {
+                  topic_id: $scope.topic.getId()
+                }));
+            $q.all([suggestionsPromise, threadsPromise]).then(function(res) {
+              var suggestionThreads = res[1].data.suggestion_thread_dicts;
+              var suggestions = res[0].data.suggestions;
+              if (suggestionThreads.length !== suggestions.length) {
+                $log.error(
+                  'Number of suggestion threads doesn\'t match number of ' +
+                  'suggestion objects');
+              }
+              for (var i = 0; i < suggestionThreads.length; i++) {
+                for (var j = 0; j < suggestions.length; j++) {
+                  if (suggestionThreads[i].thread_id ===
+                      suggestions[j].suggestion_id) {
+                    var suggestionThread = (
+                      SuggestionThreadObjectFactory.createFromBackendDicts(
+                        suggestionThreads[i], suggestions[j]));
+                    $scope.questionSuggestionThreads.push(suggestionThread);
+                    break;
                   }
-                  for (var i = 0; i < suggestionThreads.length; i++) {
-                    for (var j = 0; j < suggestions.length; j++) {
-                      if (suggestionThreads[i].thread_id ===
-                          suggestions[j].suggestion_id) {
-                        var suggestionThread = (
-                          SuggestionThreadObjectFactory.createFromBackendDicts(
-                            suggestionThreads[i], suggestions[j]));
-                        $scope.questionSuggestionThreads.push(suggestionThread);
-                        break;
-                      }
-                    }
-                  }
-                });
+                }
+              }
+              console.log($scope.questionSuggestionThreads)
             });
           };
 
-          $scope.setQuestionUnderReview = function(questionSuggestionThread) {
-            $scope.questionUnderReview = (
-              questionSuggestionThread.suggestion.question);
-            $scope.idOfSuggestionUnderReview = (
-              questionSuggestionThread.suggestion.suggestionId);
+          $scope.setActiveQuestion = function(questionSuggestionThread) {
+            if (
+                questionSuggestionThread.getSuggestionStatus() ===
+                'in_review') {
+              $scope.activeQuestion = (
+                questionSuggestionThread.suggestion.question);
+              $scope.idOfActiveSuggestion = (
+                questionSuggestionThread.suggestion.suggestionId);
+            }
           };
 
-          $scope.clearQuestionUnderReview = function() {
-            $scope.questionUnderReview = null;
+          $scope.clearActiveQuestion = function() {
+            $scope.activeQuestion = null;
+            $scope.idOfActiveSuggestion = null;
             $scope.suggestionReviewMessage = null;
-            $scope.idOfSuggestionUnderReview = null;
           };
 
           $scope.showSelectSkillModal = function() {
@@ -199,7 +209,9 @@ oppia.directive('questionsTab', [
                   };
 
                   $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedSkillId);
+                    $uibModalInstance.close({
+                      skillId: $scope.selectedSkillId
+                    });
                   };
 
                   $scope.cancel = function() {
@@ -207,38 +219,50 @@ oppia.directive('questionsTab', [
                   };
                 }
               ]
+            }).result.then(function(res) {
+              $scope.selectedSkillId = res.skillId;
             });
           };
 
-          $scope.acceptQuestion = function(suggestionId) {
-            $http.put(
-              '/generalsuggestionactionhandler/topic/' + $scope.topic.getId() +
-              '/' + suggestionId, {
-                action: 'accept',
-                skill_id: $scope.selectedSkillId,
-                commit_message: 'unused_commit_message'
-              }
-            ).then(function() {
-              $scope.clearQuestionUnderReview();
+          $scope.acceptQuestion = function(suggestionId, reviewMessage) {
+            var suggestionActionHandlerUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/generalsuggestionactionhandler/topic/<topic_id>/' +
+                '<suggestion_id>',{
+                  topic_id: $scope.topic.getId(),
+                  suggestion_id: suggestionId
+                }));
+            $http.put(suggestionActionHandlerUrl, {
+              action: 'accept',
+              skill_id: $scope.selectedSkillId,
+              commit_message: 'unused_commit_message',
+              review_message: reviewMessage
+            }).then(function() {
+              $scope.clearActiveQuestion();
             });
           };
 
-          $scope.rejectQuestion = function(suggestionId) {
-            $http.put(
-              '/generalsuggestionactionhandler/topic/' + $scope.topic.getId() +
-              '/' + suggestionId, {
-                action: 'reject',
-                commit_message: 'unused_commit_message',
-                review_message: $scope.suggestionReviewMessage
-              }
-            ).then(function(){
-              $scope.clearQuestionUnderReview();
+          $scope.rejectQuestion = function(suggestionId, reviewMessage) {
+            var suggestionActionHandlerUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/generalsuggestionactionhandler/topic/<topic_id>/' +
+                '<suggestion_id>',{
+                  topic_id: $scope.topic.getId(),
+                  suggestion_id: suggestionId
+                }));
+            $http.put(suggestionActionHandlerUrl, {
+              action: 'reject',
+              commit_message: 'unused_commit_message',
+              review_message: reviewMessage
+            }).then(function(){
+              $scope.clearActiveQuestion();
             });
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);
 
           _initTab();
+          loadSuggestedQuestionsAsync();
         }
       ]
     };

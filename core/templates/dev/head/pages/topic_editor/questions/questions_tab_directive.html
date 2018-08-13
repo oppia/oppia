@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !questionUnderReview">
+<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !activeQuestion">
   <div class="questions">
     <h3 class="form-heading"> Questions included in this topic </h3>
     <button class="btn btn-default"
@@ -48,7 +48,7 @@
           <p> Question Content </p>
         </th>
       </tr>
-      <tr ng-repeat="questionSuggestionThread in questionSuggestionThreads" ng-click="setQuestionUnderReview(questionSuggestionThread)" class="list-item">
+      <tr ng-repeat="questionSuggestionThread in questionSuggestionThreads" ng-click="setActiveQuestion(questionSuggestionThread)" class="list-item">
         <td> <[$index + 1]> </td>
         <td>
           <a class="list-summary">
@@ -82,18 +82,18 @@
   </question-editor>
 </div>
 
-<div ng-if="questionUnderReview">
+<div ng-if="activeQuestion">
 
-  <question-editor question-id="questionUnderReview.getId()"
-                   misconceptions="[]"
-                   question-state-data="questionUnderReview.getStateData()"
+  <question-editor question-id="activeQuestion.getId()"
+                   misconceptions="emptyMisconceptionsList"
+                   question-state-data="activeQuestion.getStateData()"
                    can-edit-question="false">
   </question-editor>
 
   <textarea ng-model="suggestionReviewMessage"></textarea><br>
   <button class="btn btn-default" ng-click="showSelectSkillModal()">Select skill</button>
-  <button class="btn btn-success" ng-click="acceptQuestion(idOfSuggestionUnderReview)">Approve</button>
-  <button class="btn btn-danger" ng-click="rejectQuestion(idOfSuggestionUnderReview)">Reject</button>
+  <button class="btn btn-success" ng-click="acceptQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Approve</button>
+  <button class="btn btn-danger" ng-click="rejectQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Reject</button>
 </div>
 
 <style>

@@ -47,7 +47,7 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window',
+  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
   'QuestionObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
@@ -56,7 +56,7 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window,
+      $scope, $rootScope, $http, $uibModal, $window, $log,
       DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       QuestionObjectFactory, TopicsAndSkillsDashboardBackendApiService,
@@ -197,7 +197,8 @@ oppia.controller('CreatorDashboard', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/create_question_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
+        keyboard: false,
         size: 'lg',
         resolve: {},
         controller: [
@@ -207,6 +208,7 @@ oppia.controller('CreatorDashboard', [
             $scope.topicId = null;
             $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
+            $scope.misconceptions = [];
 
             $scope.isValidQuestion = function() {
               return ($scope.question.validate([]) === false);
@@ -218,7 +220,7 @@ oppia.controller('CreatorDashboard', [
 
             $scope.createQuestion = function() {
               var errorMessage = question.validate([]);
-              if (!topicId) {
+              if (!$scope.topicId) {
                 AlertsService.addWarning(
                   'Please choose a topic before submitting');
               } else if (errorMessage === false) {
