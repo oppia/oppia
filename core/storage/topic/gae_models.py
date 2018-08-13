@@ -104,17 +104,15 @@ class TopicModel(base_models.VersionedModel):
 
     @classmethod
     def get_by_name(cls, topic_name):
-        """Gets TopicModel by topic_name.
-
-        Note: For the query made, a list with one element is returned or
-        an empty list is returned if topic with given topic name is not
-        found.
+        """Gets TopicModel by topic_name. Returns none if the topic with
+        name topic_name doesn't exist.
 
         Args:
             topic_name: str. The name of the topic.
 
         Returns:
-            TopicModel. The summary model of the question.
+            TopicModel|None. The topic model of the topic or None if not
+            found.
         """
         return TopicModel.query().filter(cls.name == topic_name).get()
 

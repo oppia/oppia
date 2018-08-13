@@ -968,3 +968,15 @@ class StorySummary(object):
             'story_model_last_updated': utils.get_time_in_millisecs(
                 self.story_model_last_updated)
         }
+
+    def to_human_readable_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this StorySummary object.
+        """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description
+        }
