@@ -130,7 +130,8 @@ class AudioUploadHandler(base.BaseHandler):
         file_system_class = (
             fs_domain.ExplorationFileSystem if feconf.DEV_MODE
             else fs_domain.GcsFileSystem)
-        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            'exploration/%s' % exploration_id))
         fs.commit(
             self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
