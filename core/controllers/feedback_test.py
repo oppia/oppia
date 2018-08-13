@@ -517,32 +517,31 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
                 self.user_id, change_cmd, 'sample description', None)
-            with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-                response = self.get_json(
-                    '%s/%s' % (
-                        feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-                self.assertEquals(response['feedback_thread_dicts'], [])
-                expected_thread_dict = {
-                    'original_author_username': self.USER_USERNAME,
-                    'status': feedback_models.STATUS_CHOICES_OPEN,
-                    'subject': 'sample description'
-                }
-                self.assertDictContainsSubset(
-                    expected_thread_dict,
-                    response['suggestion_thread_dicts'][0])
+            response = self.get_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+            self.assertEquals(response['feedback_thread_dicts'], [])
+            expected_thread_dict = {
+                'original_author_username': self.USER_USERNAME,
+                'status': feedback_models.STATUS_CHOICES_OPEN,
+                'subject': 'sample description'
+            }
+            self.assertDictContainsSubset(
+                expected_thread_dict,
+                response['suggestion_thread_dicts'][0])
 
-                thread_id = (
-                    response['suggestion_thread_dicts'][0]['thread_id'])
+            thread_id = (
+                response['suggestion_thread_dicts'][0]['thread_id'])
 
-                response = self.get_json(
-                    '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
-                expected_suggestion_dict = {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': self.EXP_ID,
-                    'status': suggestion_models.STATUS_IN_REVIEW,
-                    'author_name': self.USER_USERNAME
-                }
-                self.assertDictContainsSubset(
-                    expected_suggestion_dict, response['suggestion'])
+            response = self.get_json(
+                '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
+            expected_suggestion_dict = {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'status': suggestion_models.STATUS_IN_REVIEW,
+                'author_name': self.USER_USERNAME
+            }
+            self.assertDictContainsSubset(
+                expected_suggestion_dict, response['suggestion'])
