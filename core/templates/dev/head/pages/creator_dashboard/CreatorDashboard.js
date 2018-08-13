@@ -47,7 +47,7 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
+  '$scope', '$rootScope', '$http', '$uibModal', '$log',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
   'QuestionObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
@@ -56,7 +56,7 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window, $log,
+      $scope, $rootScope, $http, $uibModal, $log,
       DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       QuestionObjectFactory, TopicsAndSkillsDashboardBackendApiService,
