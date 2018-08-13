@@ -732,13 +732,10 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput',
-      'It\'s translated from a different language.');
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer1');
     browser.sleep(3000);
@@ -766,8 +763,8 @@ describe('Issues visualization', function() {
 
     explorationEditorStatsTab.clickInitIssue('Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners submitted answers to card "Welcome!" several ' +
-      'times, then gave up and quit.');
+      'Several learners submitted answers to card "Two" several times, ' +
+      'then gave up and quit.');
   });
 
   it('records cyclic transitions issue.', function() {
@@ -775,27 +772,34 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput',
-      'It\'s translated from a different language.');
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('NumericInput', 100);
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToNotBeOver();
 
@@ -814,7 +818,7 @@ describe('Issues visualization', function() {
     explorationEditorStatsTab.clickInitIssue('Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners ended up in a cyclic loop revisiting card ' +
-      '"Numeric input" many times.');
+      '"Two" many times.');
   });
 });
 
