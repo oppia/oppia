@@ -142,6 +142,13 @@ def download_and_unzip_files(
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
+        # yuicompressor-2.4.8.zip extracts directly to yuicompressor-2.4.8.jar.
+        # We need to place the .jar file in a directory yuicompressor-2.4.8.
+        # Therefore, we need to create one such directory before we rename
+        # the paths.
+        if zip_root_name.startswith('yuicompressor-'):
+            os.mkdir(os.path.join(target_parent_dir, 'yuicompressor-2.4.8'))
+
         # Rename the target directory.
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
