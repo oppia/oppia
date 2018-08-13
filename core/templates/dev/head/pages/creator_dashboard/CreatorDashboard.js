@@ -209,8 +209,18 @@ oppia.controller('CreatorDashboard', [
             $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
             $scope.misconceptions = [];
+            $scope.errorMessage = null;
 
             $scope.isValidQuestion = function() {
+              var errorMessage = $scope.question.validate([]);
+              if (!$scope.topicId) {
+                  $scope.errorMessage = (
+                  'Please choose a topic before submitting');
+              } else if (errorMessage === false) {
+                $scope.errorMessage = null;
+              } else {
+                $scope.errorMessage = errorMessage;
+              }
               return ($scope.question.validate([]) === false);
             };
 
@@ -221,15 +231,16 @@ oppia.controller('CreatorDashboard', [
             $scope.createQuestion = function() {
               var errorMessage = question.validate([]);
               if (!$scope.topicId) {
-                AlertsService.addWarning(
+                  $scope.errorMessage = (
                   'Please choose a topic before submitting');
               } else if (errorMessage === false) {
+                $scope.errorMessage = null;
                 $uibModalInstance.close({
                   question: question,
                   topicId: $scope.topicId
                 });
               } else {
-                AlertsService.addWarning(errorMessage);
+                $scope.errorMessage = errorMessage;
               }
             };
           }
