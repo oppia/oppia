@@ -334,7 +334,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'exploration', self.EXP_ID_1, False)
         self.assertEqual(2, len(threads))
         self.assertDictContainsSubset(
-            self.EXPECTED_THREAD_DICT_VIEWER, threads[1].to_dict())
+            self.EXPECTED_THREAD_DICT_VIEWER, threads[0].to_dict())
 
     def test_get_total_open_threads_before_job_run(self):
         self.assertEqual(feedback_services.get_total_open_threads(
