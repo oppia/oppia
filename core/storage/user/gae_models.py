@@ -693,6 +693,23 @@ class UserContributionScoringModel(base_models.BaseModel):
     score = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
+    def get_all_categories_where_user_can_review(cls, user_id):
+        """Gets all the score categories where the user has a score above the
+        threshold.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            list(str). A list of score_categories where the user has score above
+                the threshold.
+        """
+        scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
+            cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        return (
+            [scoring_model.score_category for scoring_model in scoring_models])
+
+    @classmethod
     def get_all_scores_of_user(cls, user_id):
         """Gets all scores for a given user.
 

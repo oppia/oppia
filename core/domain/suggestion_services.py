@@ -277,11 +277,9 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
         list(Suggestion). A list of suggestions which the given user is allowed
             to review.
     """
-    scores = get_all_scores_of_user(user_id)
-    score_categories = []
-    for score_category, score in scores.items():
-        if score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW:
-            score_categories.append(score_category)
+    score_categories = (
+        user_models.UserContributionScoringModel
+        .get_all_categories_where_user_can_review(user_id))
 
     if len(score_categories) == 0:
         return []
