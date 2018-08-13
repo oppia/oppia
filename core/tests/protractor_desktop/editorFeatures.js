@@ -738,11 +738,12 @@ describe('Exploration translation', function() {
       'This is solution.');
     explorationEditorTranslationTab.expectHintsTabContentsToMatch(
       ['This is hint1.', 'This is hint2.']);
+    users.logout();
   });
 
   it('should change translation language correctly', function() {
-    users.createUser('user@translationTab.com', 'userTranslationTab');
-    users.login('user@translationTab.com');
+    users.createUser('user@translationTabLang.com', 'userTranslationTabLang');
+    users.login('user@translationTabLang.com');
     workflow.createExploration();
 
     explorationEditorMainTab.setStateName('first');
