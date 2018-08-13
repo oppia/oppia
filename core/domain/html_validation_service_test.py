@@ -26,6 +26,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
     strings to valid RTE format.
     """
+    FILENAME = 'abc.png'
+    HEIGHT = 45
+    WIDTH = 45
 
     def test_wrap_with_siblings(self):
         test_cases = [{
@@ -973,3 +976,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     soup.find(name=tag_name))))
 
         self.assertEqual(actual_output, expected_output)
+
+    def test_regenerate_image_filename_using_dimensions(self):
+        regenerated_name = (
+            html_validation_service.regenerate_image_filename_using_dimensions(
+                self.FILENAME, self.HEIGHT, self.WIDTH))
+        self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
