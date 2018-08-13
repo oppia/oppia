@@ -27,7 +27,6 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
@@ -608,10 +607,15 @@ describe('ExplorationFeedback', function() {
 
 describe('Issues visualization', function() {
   var EXPLORATION_TITLE = 'Welcome to Oppia!';
+  var EXPLORATION_OBJECTIVE = 'To explore something';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
   var explorationEditorStatsTab = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var adminPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
@@ -619,6 +623,8 @@ describe('Issues visualization', function() {
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorStatsTab = explorationEditorPage.getStatsTab();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -629,12 +635,62 @@ describe('Issues visualization', function() {
     users.createAndLoginAdminUser(
       'user1@ExplorationIssues.com',
       'authorExplorationIssues');
-    adminPage.reloadExploration('welcome.yaml');
+
+    workflow.createExplorationAsAdmin();
+    explorationEditorMainTab.exitTutorial();
+
+    var expId = browser.getCurrentUrl().split('/')[4];
+
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('One');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 1 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+      'One');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Two');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 2 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 3 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Three');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Try 2 again'), 'Two', true, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+
     adminPage.editConfigProperty(
       'The set of exploration IDs for recording issues and playthroughs',
       'List',
       function(elem) {
-        elem.addItem('Unicode').setValue('0');
+        elem.addItem('Unicode').setValue(expId);
       });
     adminPage.editConfigProperty(
       'The probability of recording playthroughs', 'Real',
@@ -648,13 +704,10 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput',
-      'It\'s translated from a different language.');
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToNotBeOver();
 
@@ -664,7 +717,6 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();
