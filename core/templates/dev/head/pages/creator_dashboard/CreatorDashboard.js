@@ -214,8 +214,7 @@ oppia.controller('CreatorDashboard', [
             $scope.isValidQuestion = function() {
               var errorMessage = $scope.question.validate([]);
               if (!$scope.topicId) {
-                  $scope.errorMessage = (
-                  'Please choose a topic before submitting');
+                $scope.errorMessage = 'Please choose a topic before submitting';
               } else if (errorMessage === false) {
                 $scope.errorMessage = null;
               } else {
@@ -231,8 +230,7 @@ oppia.controller('CreatorDashboard', [
             $scope.createQuestion = function() {
               var errorMessage = question.validate([]);
               if (!$scope.topicId) {
-                  $scope.errorMessage = (
-                  'Please choose a topic before submitting');
+                $scope.errorMessage = 'Please choose a topic before submitting';
               } else if (errorMessage === false) {
                 $scope.errorMessage = null;
                 $uibModalInstance.close({
