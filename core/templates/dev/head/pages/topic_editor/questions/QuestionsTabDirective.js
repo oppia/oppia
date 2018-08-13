@@ -165,9 +165,7 @@ oppia.directive('questionsTab', [
           };
 
           $scope.setActiveQuestion = function(questionSuggestionThread) {
-            if (
-              questionSuggestionThread.getSuggestionStatus() ===
-              'in_review') {
+            if (questionSuggestionThread.getSuggestionStatus() === 'review') {
               $scope.activeQuestion = (
                 questionSuggestionThread.suggestion.question);
               $scope.idOfActiveSuggestion = (
