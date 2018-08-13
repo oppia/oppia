@@ -249,11 +249,6 @@ describe('Playthrough service', function() {
       this.ps.initSession(this.expId, this.expVersion, 1.0, [this.expId]);
     }));
 
-    it('should test whitelisting of explorations.', function() {
-      expect(this.ps.isExplorationWhitelisted(
-        this.expId, [this.expId])).toEqual(true);
-    });
-
     it('should not record learner actions for blacklisted exps', function() {
       this.ps.initSession(this.expId, this.expVersion, 1.0, []);
 
