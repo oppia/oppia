@@ -1,3 +1,4 @@
+
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +49,6 @@ oppia.directive('questionsTab', [
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
-            console.log($scope.topic.getId())
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -126,7 +126,6 @@ oppia.directive('questionsTab', [
           };
 
           loadSuggestedQuestionsAsync = function() {
-            console.log($scope.topic.getId());
             $scope.questionSuggestionThreads = [];
             var suggestionsPromise = $http.get(
               '/generalsuggestionlisthandler', {
@@ -137,7 +136,6 @@ oppia.directive('questionsTab', [
                 }
               }
             );
-            console.trace()
             var threadsPromise = $http.get(
               UrlInterpolationService.interpolateUrl(
                 '/threadlisthandlerfortopic/<topic_id>', {
@@ -163,14 +161,13 @@ oppia.directive('questionsTab', [
                   }
                 }
               }
-              console.log($scope.questionSuggestionThreads)
             });
           };
 
           $scope.setActiveQuestion = function(questionSuggestionThread) {
             if (
-                questionSuggestionThread.getSuggestionStatus() ===
-                'in_review') {
+              questionSuggestionThread.getSuggestionStatus() ===
+              'in_review') {
               $scope.activeQuestion = (
                 questionSuggestionThread.suggestion.question);
               $scope.idOfActiveSuggestion = (
@@ -228,7 +225,7 @@ oppia.directive('questionsTab', [
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
                 '/generalsuggestionactionhandler/topic/<topic_id>/' +
-                '<suggestion_id>',{
+                '<suggestion_id>', {
                   topic_id: $scope.topic.getId(),
                   suggestion_id: suggestionId
                 }));
@@ -246,7 +243,7 @@ oppia.directive('questionsTab', [
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
                 '/generalsuggestionactionhandler/topic/<topic_id>/' +
-                '<suggestion_id>',{
+                '<suggestion_id>', {
                   topic_id: $scope.topic.getId(),
                   suggestion_id: suggestionId
                 }));
@@ -254,7 +251,7 @@ oppia.directive('questionsTab', [
               action: 'reject',
               commit_message: 'unused_commit_message',
               review_message: reviewMessage
-            }).then(function(){
+            }).then(function() {
               $scope.clearActiveQuestion();
             });
           };
