@@ -372,6 +372,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                                 question_domain
                                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                             'question_dict': self.question_dict,
+                            'skill_id': None
                         },
                         'description': 'Add new question to skill'
                     }, csrf_token=csrf_token)

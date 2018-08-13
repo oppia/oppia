@@ -413,7 +413,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         before accepting the suggestion.
         """
 
-        if not self.change.skill_id:
+        if self.change.skill_id is None:
             raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict
         self.validate()

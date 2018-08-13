@@ -115,7 +115,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
+    ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
@@ -128,7 +128,7 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
         dependencies_html, additional_angular_modules = (
             dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+                interaction_dependency_ids + self.ADDITIONAL_DEPENDENCY_IDS))
 
         interaction_templates = (
             interaction_registry.Registry.get_interaction_html(

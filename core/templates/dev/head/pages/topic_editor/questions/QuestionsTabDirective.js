@@ -24,13 +24,13 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', 'AlertsService',
+        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
         'TopicEditorStateService', 'QuestionCreationService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
-            $scope, $http, $q, $uibModal, AlertsService,
+            $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
