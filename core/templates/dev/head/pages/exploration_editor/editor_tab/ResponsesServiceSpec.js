@@ -30,7 +30,7 @@ describe('Responses Service', () => {
       module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
-      module(($ =>provide) {
+      module(($provide) => {
         $provide.constant('INTERACTION_SPECS', {
           TextInput: {
             display_mode: 'inline',
@@ -43,14 +43,14 @@ describe('Responses Service', () => {
         autosaveChangeList: () => {}
       };
 
-      module(($ =>provide) {
+      module(($provide) => {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
 
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(($ =>injector, $rootScope) {
+    beforeEach(inject(($injector, $rootScope) => {
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
       siis = $injector.get('stateInteractionIdService');
@@ -126,6 +126,8 @@ describe('Responses Service', () => {
 
       ecs.setActiveStateName('Test');
     }));
+
+    //onInteractionIdChanged
 
     it('should return -1 if no answer group is active', () => {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
