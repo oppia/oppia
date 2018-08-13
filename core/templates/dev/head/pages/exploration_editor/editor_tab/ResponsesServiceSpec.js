@@ -267,24 +267,17 @@ describe('Responses Service', () => {
         confirmedUnclassifiedAnswers);
     });
 
-    it('should save the answer groups and default outcome', () => {
-      const rule = [rof.createNew('Equals', {x: 'New answer'})];
-      const outcome = {
-        dest: 'Test',
-        feedback: {
-          content_id: 'feedback_1',
-          html: 'Feedback'
-        },
-        labelled_as_correct: false,
-        param_changes: [],
-        refresher_exploration_id: null,
-        missing_prerequisite_skill_id: null
-      };
+    it('should save the answer groups and the default outcome', () => {
+      const rules = [rof.createNew('Equals', {x: 'New answer'})];
+      const outcome = oof.createNew('Test', 'feedback_1', 'New feedback', []);
 
       const answerGroups = [aof.createNew(rules, outcome, [], null)];
+      const defaultOutcome = oof.createNew(
+        'Test', 'default_outcome', 'New default outcome', []);
 
-      rs.save(answerGroups, 'some');
+      rs.save(answerGroups, defaultOutcome);
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
+      expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
     });
   })
 })
