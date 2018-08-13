@@ -1036,11 +1036,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):
-        FILENAME = 'abc.png'
-        HEIGHT = 45
-        WIDTH = 45
-
         regenerated_name = (
             html_validation_service.regenerate_image_filename_using_dimensions(
-                FILENAME, HEIGHT, WIDTH))
+                'abc.png', 45, 45))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
