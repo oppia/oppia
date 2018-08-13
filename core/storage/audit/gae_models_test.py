@@ -33,19 +33,17 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     [user_id].[timestamp_in_sec].[intent].[random_number]
     """
 
-    def setUp(self):
-        super(RoleQueryAuditModelUnitTests, self).setUp()
-
     def test_create_and_get_model(self):
         audit_models.RoleQueryAuditModel(
             id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
             role='c', username='d').put()
         am = audit_models.RoleQueryAuditModel.get_all()
         i = 0
+        a = None
         for a in am:
             logging.debug(a.id)
             i += 1
-            pass
+
         logging.debug(i)
         self.assertEqual(a.id, 'a')
         b = audit_models.RoleQueryAuditModel.get(a.id)
