@@ -242,7 +242,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         init_state.interaction.answer_groups.append(
-            exp_domain.AnswerGroup.from_dict({
+            state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': exploration.init_state_name,
                     'feedback': {
@@ -331,7 +331,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = exp_domain.SubtitledHtml('feedback_1', {})
+        outcome.feedback = state_domain.SubtitledHtml('feedback_1', {})
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'
@@ -532,16 +532,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
 
         init_state.interaction.solution = (
-            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint.
-        init_state.add_hint(exp_domain.SubtitledHtml('hint_2', 'new hint'))
+        init_state.add_hint(state_domain.SubtitledHtml('hint_2', 'new hint'))
         self.assertEquals(
             init_state.interaction.hints[1].hint_content.html,
             'new hint')
         init_state.add_hint(
-            exp_domain.SubtitledHtml('hint_3', 'hint three'))
+            state_domain.SubtitledHtml('hint_3', 'hint three'))
         init_state.delete_hint(1)
         init_state.update_content_ids_to_audio_translations({
             'content': {},
@@ -564,7 +565,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEquals(init_state.interaction.solution, None)
 
-        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
+        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
@@ -577,7 +578,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Object type of answer must match that of correct_answer.
         with self.assertRaises(AssertionError):
             init_state.interaction.solution = (
-                exp_domain.Solution.from_dict(
+                state_domain.Solution.from_dict(
                     init_state.interaction.id, solution))
 
         solution = {
@@ -589,7 +590,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         init_state.interaction.solution = (
-            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution))
         init_state.update_content_ids_to_audio_translations({
             'content': {},
             'default_outcome': {},
@@ -677,7 +679,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_audio_translation_validation(self):
         """Test validation of audio translations."""
-        audio_translation = exp_domain.AudioTranslation('a.mp3', 20, True)
+        audio_translation = state_domain.AudioTranslation('a.mp3', 20, True)
         audio_translation.validate()
 
         with self.assertRaisesRegexp(
@@ -726,13 +728,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
+        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
         self._assert_validation_error(
             exploration,
             r'Expected state content_ids_to_audio_translations to have all '
             r'of the listed content ids \[\'content\', \'default_outcome\', '
             r'\'hint_1\'\]')
-        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
+        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
         self._assert_validation_error(
             exploration, 'Found a duplicate content id hint_1')
 
@@ -743,7 +745,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtitled_html_validation(self):
         """Test validation of subtitled HTML."""
-        subtitled_html = exp_domain.SubtitledHtml('content_id', 'some html')
+        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
         subtitled_html.validate()
 
         with self.assertRaisesRegexp(
