@@ -629,9 +629,7 @@ describe('Issues visualization', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     adminPage = new AdminPage.AdminPage();
-  });
 
-  beforeEach(function() {
     users.createAndLoginAdminUser(
       'user1@ExplorationIssues.com',
       'authorExplorationIssues');
@@ -639,7 +637,10 @@ describe('Issues visualization', function() {
     workflow.createExplorationAsAdmin();
     explorationEditorMainTab.exitTutorial();
 
-    var expId = browser.getCurrentUrl().split('/')[4];
+    var expId;
+    browser.getCurrentUrl().then(function(url) {
+      expId = url.split('/')[4].slice(0, -1);
+    });
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
