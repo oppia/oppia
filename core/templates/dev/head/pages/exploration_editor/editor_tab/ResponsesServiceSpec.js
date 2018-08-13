@@ -20,7 +20,7 @@ describe('Responses Service', () => {
   describe('ResponsesService', () => {
     let $httpBackend;
     let scope;
-    let siis, ecs, rs, ess, rof, shtml;
+    let siis, ecs, rs, ess, rof, shtml, aof;
     let mockExplorationData;
     let state;
 
@@ -59,6 +59,7 @@ describe('Responses Service', () => {
       rs = $injector.get('ResponsesService');
       rof = $injector.get('RuleObjectFactory');
       shtml = $injector.get('SubtitledHtmlObjectFactory');
+      aof = $injector.get('AnswerGroupObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
