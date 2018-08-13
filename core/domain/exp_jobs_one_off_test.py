@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -35,6 +36,11 @@ import utils
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -1182,15 +1188,17 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 updated_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
-
+        exp_services.save_new_exploration(self.albert_id, updated_exploration)
         # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
             job_id)
-        self.process_and_flush_pending_tasks()
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+            self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
@@ -1427,7 +1435,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
@@ -1466,10 +1474,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
-
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;random.png&amp;quot;">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
                 )
             },
             'labelled_as_correct': False,
