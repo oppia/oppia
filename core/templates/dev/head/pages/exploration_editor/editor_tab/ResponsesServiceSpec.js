@@ -20,7 +20,7 @@ describe('Responses Service', () => {
   describe('ResponsesService', () => {
     let $httpBackend;
     let scope;
-    let siis, ecs, rs, ess, rof, shtml, aof;
+    let siis, ecs, rs, ess, rof, shtml, aof, oof;
     let mockExplorationData;
     let state;
 
@@ -60,6 +60,7 @@ describe('Responses Service', () => {
       rof = $injector.get('RuleObjectFactory');
       shtml = $injector.get('SubtitledHtmlObjectFactory');
       aof = $injector.get('AnswerGroupObjectFactory');
+      oof = $injector.get('OutcomeObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -267,7 +268,23 @@ describe('Responses Service', () => {
     });
 
     it('should save the answer groups and default outcome', () => {
-      rs.save()
+      const rule = [rof.createNew('Equals', {x: 'New answer'})];
+      const outcome = {
+        dest: 'Test',
+        feedback: {
+          content_id: 'feedback_1',
+          html: 'Feedback'
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      };
+
+      const answerGroups = [aof.createNew(rules, outcome, [], null)];
+
+      rs.save(answerGroups, 'some');
+      expect(rs.getAnswerGroups()).toEqual(answerGroups);
     });
   })
 })
