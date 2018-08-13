@@ -358,6 +358,41 @@ class MusicPhrase(BaseObject):
     }
 
 
+class ListOfTabs(BaseObject):
+    """Class for tab contents."""
+
+    description = 'Tab content that contains list of tabs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'title',
+                'description': 'Tab title',
+                'schema': {
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
+            }, {
+                'name': 'content',
+                'description': 'Tab content',
+                'schema': {
+                    'type': 'html',
+                    'ui_config': {
+                        'hide_complex_extensions': True
+                    }
+                }
+            }]
+        },
+        'ui_config': {
+            'add_element_text': 'Add new tab'
+        }
+    }
+
+
 class Filepath(BaseObject):
     """A string representing a filepath.
 

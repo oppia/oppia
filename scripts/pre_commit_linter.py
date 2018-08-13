@@ -181,7 +181,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r'print \'',
+        'regexp': r'print ',
         'message': "Please do not use print statement.",
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -785,6 +785,8 @@ def _check_bad_pattern_in_file(filename, content, pattern):
             or filename in pattern['excluded_files']):
         bad_pattern_count = 0
         for line_num, line in enumerate(content.split('\n'), 1):
+            if line.endswith('disable-bad-pattern-check'):
+                continue
             if re.search(regexp, line):
                 print '%s --> Line %s: %s' % (
                     filename, line_num, pattern['message'])

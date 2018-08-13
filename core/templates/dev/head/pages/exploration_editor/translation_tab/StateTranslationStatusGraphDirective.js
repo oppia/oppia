@@ -29,10 +29,12 @@ oppia.directive('stateTranslationStatusGraph', [
       controller: [
         '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
         'StateEditorService', 'StateContentIdsToAudioTranslationsService',
-        function(
+        'TranslationStatusService', function(
             $scope, $rootScope, ExplorationStatesService, GraphDataService,
-            StateEditorService, StateContentIdsToAudioTranslationsService) {
+            StateEditorService, StateContentIdsToAudioTranslationsService,
+            TranslationStatusService) {
           $scope.getGraphData = GraphDataService.getGraphData;
+          $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
           $scope.getActiveStateName = function() {
             return StateEditorService.getActiveStateName();
           };

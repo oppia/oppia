@@ -51,7 +51,7 @@ oppia.directive('stateGraphViz', [
         // Object which maps linkProperty to a style
         linkPropertyMapping: '=',
         // Object whose keys are node ids and whose values are node colors
-        nodeColors: '=',
+        getNodeColors: '&nodeColors',
         // A value which is the color of all nodes
         nodeFill: '@',
         // Object whose keys are node ids with secondary labels and whose
@@ -66,7 +66,8 @@ oppia.directive('stateGraphViz', [
         // Object whose keys are ids of nodes, and whose values are the
         // corresponding node opacities.
         opacityMap: '=',
-        showWarningSign: '@'
+        showWarningSign: '@',
+        showTranslationWarnings: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
@@ -74,11 +75,13 @@ oppia.directive('stateGraphViz', [
       controller: [
         '$element', '$filter', '$scope', '$timeout',
         'ExplorationWarningsService', 'StateGraphLayoutService',
-        'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+        'TranslationStatusService', 'MAX_NODES_PER_ROW',
+        'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
             ExplorationWarningsService, StateGraphLayoutService,
-            MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+            TranslationStatusService, MAX_NODES_PER_ROW,
+            MAX_NODE_LABEL_LENGTH) {
           var redrawGraph = function() {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
@@ -100,6 +103,7 @@ oppia.directive('stateGraphViz', [
 
           $scope.$watch('graphData()', redrawGraph, true);
           $scope.$watch('currentStateId()', redrawGraph);
+          $scope.$watch('getNodeColors()', redrawGraph, true);
           // If statistics for a different version of the exploration are
           // loaded, this may change the opacities of the nodes.
           $scope.$watch('opacityMap', redrawGraph);
@@ -242,9 +246,10 @@ oppia.directive('stateGraphViz', [
               }
 
               // Color nodes
-              if ($scope.nodeColors) {
+              var nodeColors = $scope.getNodeColors();
+              if (nodeColors) {
                 nodeData[nodeId].style += (
-                  'fill: ' + $scope.nodeColors[nodeId] + '; ');
+                  'fill: ' + nodeColors[nodeId] + '; ');
               }
 
               // Add secondary label if it exists
@@ -272,8 +277,14 @@ oppia.directive('stateGraphViz', [
             }
 
             $scope.getNodeErrorMessage = function(nodeLabel) {
-              var warnings =
-                ExplorationWarningsService.getAllStateRelatedWarnings();
+              var warnings = null;
+              if ($scope.showTranslationWarnings) {
+                warnings =
+                  TranslationStatusService.getAllStatesNeedUpdatewarning();
+              } else {
+                warnings =
+                  ExplorationWarningsService.getAllStateRelatedWarnings();
+              }
               if (warnings.hasOwnProperty(nodeLabel)) {
                 return warnings[nodeLabel][0].toString();
               }
