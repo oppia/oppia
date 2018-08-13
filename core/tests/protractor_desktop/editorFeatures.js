@@ -27,6 +27,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
@@ -647,6 +648,7 @@ describe('Issues visualization', function() {
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
@@ -662,6 +664,7 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
+    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();

@@ -198,6 +198,19 @@ oppia.factory('PlaythroughService', [
         });
     };
 
+    var isPlayerExcludedFromSamplePopulation = function() {
+      return !isPlayerInSamplePopulation;
+    };
+
+    var isExplorationWhitelisted = function() {
+      return whitelistedExpIds.indexOf(playthrough.expId) !== -1;
+    };
+
+    var isPlaythroughDiscarded = function() {
+      return (
+        isPlayerExcludedFromSamplePopulation() || !isExplorationWhitelisted());
+    };
+
     return {
       initSession: function(
           explorationId, explorationVersion, playthroughProbability,
@@ -209,19 +222,11 @@ oppia.factory('PlaythroughService', [
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
       },
-      isPlayerExcludedFromSamplePopulation: function() {
-        return !isPlayerInSamplePopulation;
-      },
-      isExplorationWhitelisted: function(expId, whitelistedExpIds) {
-        return whitelistedExpIds.indexOf(expId) !== -1;
-      },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(
-              playthrough.expId, whitelistedExpIds)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         var expStartLearnerAction = LearnerActionObjectFactory.createNew(
@@ -244,9 +249,7 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(
-              playthrough.expId, whitelistedExpIds)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -285,9 +288,7 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(
-              playthrough.expId, whitelistedExpIds)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -304,9 +305,7 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(
-              playthrough.expId, whitelistedExpIds)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         if (isExplorationComplete) {
