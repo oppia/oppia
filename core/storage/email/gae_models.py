@@ -59,6 +59,8 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+        feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+        feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
         feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
@@ -450,6 +452,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     """
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    # TODO (nithesh): Overriding last_updated of base model for migrating
+    # instances from old model to the new one. To be removed after migration.
+    last_updated = ndb.DateTimeProperty()
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

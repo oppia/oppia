@@ -470,8 +470,6 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
-
   "USE_NEW_SUGGESTION_FRAMEWORK": false,
 
   "ENABLE_GENERALIZED_FEEDBACK_THREADS": false,
