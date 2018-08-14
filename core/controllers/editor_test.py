@@ -1853,6 +1853,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'status_code': 400,
+                       'error_page_title': 'I18N_ERROR_PAGE_TITLE_400',
                        'error': 'Expected title to be a string, received 1'})
 
     def test_draft_updated_version_valid(self):

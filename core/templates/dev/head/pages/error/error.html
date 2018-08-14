@@ -4,15 +4,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block maintitle %}
-  {% if status_code == 400 %}
-    I18N_ERROR_PAGE_TITLE_400
-  {% elif status_code == 401 %}
-    I18N_ERROR_PAGE_TITLE_401
-  {% elif status_code == 404 %}
-    I18N_ERROR_PAGE_TITLE_404
-  {% elif status_code == 500 %}
-    I18N_ERROR_PAGE_TITLE_500
-  {% endif %}
+  {{ error_page_title }}
 {% endblock maintitle %}
 
 

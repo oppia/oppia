@@ -414,6 +414,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
+        values['error_page_title'] = 'I18N_ERROR_PAGE_TITLE_' + str(error_code)
 
         # This checks if the response should be JSON or HTML.
         # For GET requests, there is no payload, so we check against
