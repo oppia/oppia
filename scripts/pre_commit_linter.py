@@ -988,7 +988,7 @@ def _check_docstrings(all_files):
 
                 # Check for single line docstring starting with a space
 
-                if line.startswith(' """'):
+                if line.startswith('""" '):
                     failed = True
                     print'%s --> Line %s: %s' % (
                         filename, line_num + 1, extra_space_message)
