@@ -66,7 +66,7 @@ describe('Player transcript service', function() {
     pts.addNewCard('First state', {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
-    false);
+    false, false);
 
     var firstCard = pts.getCard(0);
     expect(firstCard.getStateName()).toEqual('First state');

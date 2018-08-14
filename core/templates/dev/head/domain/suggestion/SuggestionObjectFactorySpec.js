@@ -17,7 +17,10 @@
 */
 
 describe('Suggestion object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(function() {
+    module('oppia');
+  });
+
   var SuggestionObjectFactory = null;
 
   beforeEach(inject(function($injector) {
@@ -33,7 +36,7 @@ describe('Suggestion object factory', function() {
       target_version_at_submission: 1,
       status: 'accepted',
       author_name: 'author',
-      change_cmd: {
+      change: {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
@@ -42,7 +45,7 @@ describe('Suggestion object factory', function() {
       },
       last_updated: 1000
     };
-
+    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = true;
     suggestion = SuggestionObjectFactory.createFromBackendDict(
       suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
@@ -55,6 +58,7 @@ describe('Suggestion object factory', function() {
     expect(suggestion.newValue).toEqual('new suggestion content');
     expect(suggestion.oldValue).toEqual('old suggestion content');
     expect(suggestion.lastUpdated).toEqual(1000);
-    expect(suggestion.threadId()).toEqual('exp1.thread1');
+    expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
+    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = false;
   });
 });

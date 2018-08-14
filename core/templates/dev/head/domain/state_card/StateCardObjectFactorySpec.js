@@ -18,21 +18,48 @@
 
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
+  var InteractionObjectFactory = null;
   var _sampleCard = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
+    InteractionObjectFactory = $injector.get('InteractionObjectFactory');
 
+    var interactionDict = {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {
+          value: 1
+        },
+        placeholder: {
+          value: 'Type your answer here.'
+        }
+      },
+      default_outcome: {
+        dest: '(untitled state)',
+        feedback: {
+          content_id: 'default_outcome',
+          html: ''
+        },
+        param_changes: []
+      },
+      hints: [],
+      id: 'TextInput'
+    };
     _sampleCard = StateCardObjectFactory.createNewCard(
-      'State 1', {}, '<p>Content</p>', '<interaction></interaction>', false);
+      'State 1', {}, '<p>Content</p>', '<interaction></interaction>',
+      InteractionObjectFactory.createFromBackendDict(interactionDict),
+      false);
   }));
 
   it('should be able to get the various fields', function() {
     expect(_sampleCard.getStateName()).toEqual('State 1');
     expect(_sampleCard.getCurrentParams()).toEqual({});
     expect(_sampleCard.getContentHtml()).toEqual('<p>Content</p>');
+    expect(_sampleCard.getInteraction().id).toEqual('TextInput');
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction></interaction>');
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);

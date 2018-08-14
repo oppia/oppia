@@ -4,7 +4,7 @@
       Issue <[currentIssueIdentifier]>
     </div>
   </div>
-  <div class="col-md-9 oppia-issues-bor-left text-center d-flex justify-content-center oppia-issues-bor-btm oppia-pt2 oppia-pb2">
+  <div class="col-md-9 oppia-issues-bor-left text-center d-flex justify-content-center oppia-issues-bor-btm oppia-pt2 oppia-pb2 protractor-test-issue-title">
     <[issueStatement]>
   </div>
 </div>
@@ -29,6 +29,13 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="oppia-pt4 oppia-pb2">
+      <button type="button" ng-click="resolveIssue()" class="oppia-issues-bg-clr oppia-issues-text-white oppia-ft-14 oppia-issues-btn-resolve protractor-test-issue-resolve">
+          Mark as Resolved
+      </button>
     </div>
   </div>
 </div>

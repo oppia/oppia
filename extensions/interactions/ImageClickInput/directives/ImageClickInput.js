@@ -211,9 +211,17 @@ oppia.directive('oppiaResponseImageClickInput', [
         function($scope, $attrs, HtmlEscaperService) {
           var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-          $scope.clickRegionLabel = '(Clicks on ' + (
-            _answer.clickedRegions.length > 0 ?
-              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          // Sometimes, it was found that in the time it takes for this
+          // interaction to load, it used the learner input for the previous
+          // interaction which threw a console error. Though, this doesn't
+          // affect user experience as, as soon as the new card was recorded in
+          // the transcript, this starts taking the right value. this is a
+          // temporary fix until the issue is resolved.
+          if (_answer.clickedRegions) {
+            $scope.clickRegionLabel = '(Clicks on ' + (
+              _answer.clickedRegions.length > 0 ?
+                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          }
         }
       ]
     };
