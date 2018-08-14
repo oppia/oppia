@@ -22,15 +22,17 @@ oppia.factory('ExplorationPlayerStateService', [
   'ContextService', 'UrlService', 'StateClassifierMappingService',
   'StatsReportingService', 'ENABLE_PLAYTHROUGH_RECORDING',
   'PlaythroughService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService',
+  'PlayerTranscriptService', 'EditableExplorationBackendApiService',
   'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
+  'NumberAttemptsService',
   function(
       $log, $q, ExplorationEngineService, PretestEngineService,
       ContextService, UrlService, StateClassifierMappingService,
       StatsReportingService, ENABLE_PLAYTHROUGH_RECORDING,
       PlaythroughService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService,
-      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService) {
+      PlayerTranscriptService, EditableExplorationBackendApiService,
+      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
+      NumberAttemptsService) {
     var _currentEngineService = null;
     var _inPretestMode = false;
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -149,9 +151,9 @@ oppia.factory('ExplorationPlayerStateService', [
         if (_editorPreviewMode) {
           _setExplorationMode();
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            explorationId).then(function(returnDict) {
+            _explorationId).then(function(returnDict) {
             ExplorationEngineService.init(
-              returnDict, null, null, null, _initializeDirectiveComponents);
+              returnDict, null, null, null, callback);
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             NumberAttemptsService.reset();
