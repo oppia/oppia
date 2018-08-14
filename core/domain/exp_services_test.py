@@ -774,8 +774,9 @@ title: Title
         exp_services.load_demo(self.DEMO_EXP_ID)
 
         # Override the demo exploration using the import method.
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.SAMPLE_YAML_CONTENT, self.DEMO_EXP_ID, [])
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                self.owner_id, self.SAMPLE_YAML_CONTENT, self.DEMO_EXP_ID, [])
 
         # The demo exploration should not have been overwritten.
         exp = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)

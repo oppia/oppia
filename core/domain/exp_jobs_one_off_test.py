@@ -1041,7 +1041,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertGreater(len(actual_output), 0)
+        self.assertEqual(len(actual_output), 16)
 
         exploration_dict = exploration.to_dict()
         updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
@@ -1076,7 +1076,9 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation passes after migration.
-        self.assertEqual(actual_output, [])
+        # There should be no validation errors in new updated exploration.
+        # There are 16 validation errors of 1st exploration.
+        self.assertEqual(len(actual_output), 16)
 
 
 class ExplorationContentValidationJobForCKEditorTest(
