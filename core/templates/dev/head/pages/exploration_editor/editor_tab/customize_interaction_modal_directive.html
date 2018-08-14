@@ -30,6 +30,9 @@
   <form ng-if="StateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="interaction-editor-form protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
+      <h5 ng-if="StateInteractionIdService.displayed == 'DragAndDropSortInput'">
+        <b>Note:</b> Please enter at least two choices.
+      </h5>
       <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
