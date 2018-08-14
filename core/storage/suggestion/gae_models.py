@@ -227,7 +227,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 given user.
         """
         if len(score_categories) == 0:
-            raise Exception('Recieved empty list of score categories')
+            raise Exception('Received empty list of score categories')
 
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.score_category.IN(score_categories)).filter(

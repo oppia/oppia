@@ -269,7 +269,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestions()), 0)
 
-    def test_get_by_score_categories(self):
+    def test_get_in_review_suggestions_in_score_categories(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -331,13 +331,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             .get_in_review_suggestions_in_score_categories(
                 ['category1', 'category_invalid'], 'author_2')), 1)
         with self.assertRaisesRegexp(
-            Exception, 'Recieved empty list of score categories'):
+            Exception, 'Received empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_in_review_suggestions_in_score_categories(
                     [], 'author_1')), 0)
 
-    def test_get_all_score_catrgories(self):
+    def test_get_all_score_categories(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
