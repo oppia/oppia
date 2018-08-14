@@ -199,30 +199,61 @@ class BuildTests(test_utils.GenericTestBase):
             incorrectFileCount.exception)
 
     def test_match_directory_with_hashes(self):
-        """Test _match_directory_with_hashes to raise exception when there is
-        a filename that contains a hash not in hash dict.
+        """Test _match_directory_with_hashes to raise exception:
+            1)when there is an empty hash dict.
+            2)When there is a hash in filename that cannot be found in
+                hash dict.
         """
-        file_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        about_source_dir = os.path.join(
+            build.TEMPLATES_DEV_DIR_CORE, 'pages', 'about')
+        about_staging_dir = os.path.join(
+            build.TEMPLATES_STAGING_DIR, 'pages', 'about')
+        # Get hash dict for /DEV/.../about folder.
+        file_hashes = build.get_file_hashes(about_source_dir)
+        # pylint: disable=protected-access
+        # Get final filename of about.html (about.[hash].html)
+        about_filepath_with_hash = build._insert_hash(
+            'about.html', file_hashes['about.html'])
+        # pylint: enable=protected-access
+        # Build staging dir for /about (/backend_prod_files/.../about.html).
+        build_tasks = collections.deque()
+        build.build_files(
+            about_source_dir, about_staging_dir, file_hashes, build_tasks,
+            file_formats=('.html,'))
+        # pylint: disable=protected-access
+        build._execute_tasks(build_tasks)
+        # pylint: enable=protected-access
+        #Copy staging about.html to /build/templates/about.[hash].html.
         copy_tasks = collections.deque()
         build.copy_files_source_to_target(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, file_hashes, copy_tasks)
+            about_staging_dir, build.TEMPLATES_OUT_DIR, file_hashes, copy_tasks)
         # pylint: disable=protected-access
         build._execute_tasks(copy_tasks)
         # pylint: enable=protected-access
 
+        # Assert for empty file hash exception.
         file_hashes.clear()
-        file_hashes = build.get_file_hashes(build.TEMPLATES_DEV_DIR_CORE)
+        with self.assertRaises(Exception) as emptyFileHash:
+            # pylint: disable=protected-access
+            build._match_directory_with_hashes(about_staging_dir, file_hashes)
+        # pylint: enable=protected-access
+        self.assertTrue('Hash dict is empty' in emptyFileHash.exception)
+
+        # Assert for mismatched hash by using /donate folder's hash dict.
+        donate_source_dir = os.path.join(
+            build.TEMPLATES_DEV_DIR_CORE, 'pages', 'donate')
+        file_hashes.update(build.get_file_hashes(donate_source_dir))
         with self.assertRaises(Exception) as incorrectFileHash:
             # pylint: disable=protected-access
             build._match_directory_with_hashes(
-                build.ASSETS_OUT_DIR, file_hashes)
+                build.TEMPLATES_OUT_DIR, file_hashes)
         # pylint: enable=protected-access
-        hashed_file_name = 'constants.f614a2f78312c02f0324433451612757.js'
         self.assertTrue(
-            'Hashed file %s does not match hash dict keys' % hashed_file_name in
-            incorrectFileHash.exception)
-        # Clean up /build/assets.
-        shutil.rmtree(build.ASSETS_OUT_DIR)
+            'Hashed file %s does not match hash dict keys'
+            % about_filepath_with_hash in incorrectFileHash.exception)
+        # Clean up directories.
+        shutil.rmtree(build.TEMPLATES_STAGING_DIR)
+        shutil.rmtree(build.TEMPLATES_OUT_DIR)
 
     def test_process_html(self):
         base_source_path = os.path.join(

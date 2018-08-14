@@ -250,7 +250,7 @@ def _match_directory_with_hashes(directory_path, file_hashes):
         Exception: Raised if hash dict is empty.
         Exception: Raised if filename's hash does not match hash dict entries.
     """
-    # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html
+    # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise Exception('Hash dict is empty')
     #pylint: disable=unused-variable
