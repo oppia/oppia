@@ -22,8 +22,9 @@ var ExplorationEditorStatsTab = function() {
      * Interactive elements
      */
   var numPassersby = element(by.css('.protractor-test-num-passersby'));
-  var firstIssueElement = element(by.css('.protractor-test-init-issue'));
+  var issueElementStr = '.protractor-test-issue';
   var issueTitle = element(by.css('.protractor-test-issue-title'));
+  var resolveBtn = element(by.css('.protractor-test-issue-resolve'));
 
   /**
      * Workflows
@@ -32,25 +33,33 @@ var ExplorationEditorStatsTab = function() {
     return numPassersby.getText();
   };
 
-  var _getInitIssueText = function() {
-    return firstIssueElement.getText();
+  var _getIssueText = function(issueIndex) {
+    return _getIssueElement(issueIndex).getText();
   };
 
   var _getIssueTitle = function() {
     return issueTitle.getText();
   };
 
+  var _getIssueElement = function(issueIndex) {
+    return element(by.css(issueElementStr + issueIndex.toString()));
+  };
+
   this.expectNumPassersbyToBe = function(numPassersby) {
     expect(_getNumPassersby()).toMatch(numPassersby);
   };
 
-  this.clickInitIssue = function(expectedIssueText) {
-    expect(_getInitIssueText()).toMatch(expectedIssueText);
-    firstIssueElement.click();
+  this.clickIssue = function(issueIndex, expectedIssueText) {
+    expect(_getIssueText(issueIndex)).toMatch(expectedIssueText);
+    _getIssueElement(issueIndex).click();
   };
 
   this.expectIssueTitleToBe = function(issueTitle) {
     expect(_getIssueTitle()).toMatch(issueTitle);
+  };
+
+  this.markResolved = function() {
+    resolveBtn.click();
   };
 };
 

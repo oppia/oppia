@@ -620,7 +620,7 @@ describe('Issues visualization', function() {
   var adminPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-  beforeEach(function() {
+  beforeAll(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorStatsTab = explorationEditorPage.getStatsTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -630,6 +630,9 @@ describe('Issues visualization', function() {
     libraryPage = new LibraryPage.LibraryPage();
     adminPage = new AdminPage.AdminPage();
 
+    users.createUser(
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
     users.createAndLoginAdminUser(
       'user1@ExplorationIssues.com',
       'authorExplorationIssues');
@@ -701,9 +704,7 @@ describe('Issues visualization', function() {
   });
 
   it('records early quit issue.', function() {
-    users.createAndLoginUser(
-      'user2@ExplorationIssues.com',
-      'learnerExplorationIssues');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -723,15 +724,15 @@ describe('Issues visualization', function() {
     general.moveToEditor();
     explorationEditorPage.navigateToStatsTab();
 
-    explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners exited the exploration in less than a minute.');
+    explorationEditorStatsTab.markResolved();
+    users.logout();
   });
 
   it('records multiple incorrect issue.', function() {
-    users.createAndLoginUser(
-      'user2@ExplorationIssues.com',
-      'learnerExplorationIssues');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -761,18 +762,16 @@ describe('Issues visualization', function() {
     general.moveToEditor();
     explorationEditorPage.navigateToStatsTab();
 
-    explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners submitted answers to card "Two" several times, ' +
       'then gave up and quit.');
-
+    explorationEditorStatsTab.markResolved();
     users.logout();
   });
 
   it('records cyclic transitions issue.', function() {
-    users.createAndLoginUser(
-      'user2@ExplorationIssues.com',
-      'learnerExplorationIssues');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -816,11 +815,11 @@ describe('Issues visualization', function() {
     general.moveToEditor();
     explorationEditorPage.navigateToStatsTab();
 
-    explorationEditorStatsTab.clickInitIssue('Issue 1');
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners ended up in a cyclic loop revisiting card ' +
       '"Two" many times.');
-
+    explorationEditorStatsTab.markResolved();
     users.logout();
   });
 });
