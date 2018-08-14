@@ -146,8 +146,10 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-6 oppia-fractions-landing-image-div">
-              <img ng-src="<[getStaticImageUrl('/fractions_landing/teachers/video_tutorial.png')]>" class="oppia-fractions-landing-image oppia-fractions-landing-image-desktop" alt="">
-              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/video_tutorial.svg')]>" class="oppia-fractions-landing-image oppia-fractions-landing-image-mobile" alt="">
+              <video controls autoplay="autoplay" type="video/mp4" ng-src="<[getStaticAssetUrl('/videos/fractions_landing/teachers/Fractions_video.mp4')]>" class="oppia-fractions-landing-image
+              oppia-fractions-landing-image-desktop">Sorry, your browser doesn't support embedded videos.</video>
+              <video controls type="video/mp4" ng-src="<[getStaticAssetUrl('/videos/fractions_landing/teachers/Fractions_video.mp4')]>" class="oppia-fractions-landing-image
+              oppia-fractions-landing-image-mobile">Sorry, your browser doesn't support embedded videos.</video>
             </div>
             <div class="col-sm-6">
               <h1 class="oppia-fractions-landing-h1" style="color: #FFFFFF; text-align: right; padding-right: 80px; white-space: nowrap;">Easy-to-follow lessons</h1>

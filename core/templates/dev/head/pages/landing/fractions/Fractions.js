@@ -23,6 +23,8 @@ oppia.controller('Fractions', [
       siteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
+    $scope.getStaticAssetUrl = UrlInterpolationService.getStaticAssetUrl;
+
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
         subjectName + '.svg');
