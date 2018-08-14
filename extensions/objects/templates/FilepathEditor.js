@@ -673,8 +673,8 @@ oppia.directive('filepathEditor', [
               ('0' + date.getSeconds()).slice(-2) +
               '_' +
               Math.random().toString(36).substr(2, 10) +
-              '_height' + height +
-              '_width' + width +
+              '_height_' + height +
+              '_width_' + width +
               '.' + OUTPUT_IMAGE_FORMAT;
         };
 
