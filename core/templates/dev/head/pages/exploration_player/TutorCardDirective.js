@@ -82,9 +82,8 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            $scope.conceptCardIsBeingShown = (
-              $scope.activeCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode());
+            $scope.conceptCardIsBeingShown = !Boolean(
+              $scope.activeCard.getInteraction());
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
@@ -94,10 +93,10 @@ oppia.directive('tutorCard', [
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             if (!$scope.conceptCardIsBeingShown && $scope.interactionIsActive) {
               $scope.interactionInstructions = (
-                ExplorationPlayerStateService.getCurrentEngineService().
+                ExplorationPlayerStateService.
                   getCurrentInteractionInstructions());
               $scope.contentAudioTranslations = (
-                ExplorationPlayerStateService.getCurrentEngineService().
+                ExplorationPlayerStateService.
                   getStateContentAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
@@ -116,8 +115,7 @@ oppia.directive('tutorCard', [
             }
             if ($scope.interactionIsActive) {
               return (
-                ExplorationPlayerStateService.getCurrentEngineService().
-                  isInteractionInline());
+                ExplorationPlayerStateService.isInteractionInline());
             }
 
             if ($scope.activeCard) {
@@ -193,8 +191,8 @@ oppia.directive('tutorCard', [
               answerValidity: answerValidity
             });
             if (
-              ExplorationPlayerStateService.getCurrentEngineService().
-                getCurrentInteraction().id === 'CodeRepl') {
+              ExplorationPlayerStateService.getCurrentInteraction().id ===
+              'CodeRepl') {
               $scope.onChangeInteractionAnswerValidity({
                 answerValidity: true
               });
@@ -206,7 +204,7 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              ExplorationPlayerStateService.getCurrentEngineService().
+              ExplorationPlayerStateService.
                 isContentAudioTranslationAvailable());
           };
 
@@ -218,8 +216,7 @@ oppia.directive('tutorCard', [
           $scope.isOnTerminalCard = function() {
             if ($scope.interactionIsActive) {
               return (
-                ExplorationPlayerStateService.getCurrentEngineService().
-                  isCurrentStateTerminal());
+                ExplorationPlayerStateService.isCurrentStateTerminal());
             }
             return (
               INTERACTION_SPECS[$scope.activeCard.getInteraction().id].

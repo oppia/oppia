@@ -130,10 +130,12 @@ oppia.directive('oppiaResponseNumberWithUnits', [
         'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // This check is added because for this specific interaction, it was
-        // found that at some points when this was loaded for the first time,
-        // the answer object was not in the right format. So, until it becomes
-        // the right format, this is ignored.
+        // Sometimes, it was found that in the time it takes for this
+        // interaction to load, it used the learner input for the previous
+        // interaction which threw a console error. Though, this doesn't
+        // affect user experience as, as soon as the new card was recorded in
+        // the transcript, this starts taking the right value. this is a
+        // temporary fix until the issue is resolved.
         if (!answer.type) {
           $scope.answer = null;
         } else {

@@ -105,6 +105,19 @@ oppia.factory('StateCardObjectFactory', [function() {
     this._leadsToConceptCard = leadsToConceptCard;
   };
 
+  /**
+   * @param {string} stateName - The state name for the current card.
+   * @param {object} params - The set of parameters for the learner associated
+   *        with a card.
+   * @param {string} contentHtml - The HTML string for the content displayed on
+   *        the content card.
+   * @param {string} interactionHtml - The HTML that calls the interaction
+   *        directive for the current card.
+   * @param {Interaction} interaction - An interaction object that stores all
+   *        the properties of the card's interaction.
+   * @param {bool} leadsToConceptCard - Whether the current card leads to a
+   *        concept card in the exploration.
+   */
   StateCard.createNewCard = function(
       stateName, params, contentHtml, interactionHtml, interaction,
       leadsToConceptCard) {

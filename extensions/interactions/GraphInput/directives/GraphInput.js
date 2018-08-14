@@ -191,6 +191,12 @@ oppia.directive('oppiaResponseGraphInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
+        // Sometimes, it was found that in the time it takes for this
+        // interaction to load, it used the learner input for the previous
+        // interaction which threw a console error. Though, this doesn't affect
+        // user experience as, as soon as the new card was recorded in the
+        // transcript, this starts taking the right value. this is a temporary
+        // fix until the issue is resolved.
         if ($scope.graph.edges) {
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;

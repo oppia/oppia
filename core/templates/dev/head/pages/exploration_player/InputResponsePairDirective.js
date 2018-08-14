@@ -54,8 +54,7 @@ oppia.directive('inputResponsePair', [
               PlayerPositionService.getActiveCardIndex());
             if ($scope.isCurrentCardAtEndOfTranscript()) {
               var interaction =
-                ExplorationPlayerStateService.getCurrentEngineService().
-                  getCurrentInteraction();
+                ExplorationPlayerStateService.getCurrentInteraction();
             } else {
               var interaction = activeCard.getInteraction();
             }
@@ -73,8 +72,7 @@ oppia.directive('inputResponsePair', [
               PlayerPositionService.getActiveCardIndex());
             if ($scope.isCurrentCardAtEndOfTranscript()) {
               var interaction =
-                ExplorationPlayerStateService.getCurrentEngineService().
-                  getCurrentInteraction();
+                ExplorationPlayerStateService.getCurrentInteraction();
             } else {
               var interaction = activeCard.getInteraction();
             }

@@ -255,30 +255,30 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, SKILL_ID)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
-            exploration_dict = self.get_json(
-                '%s/%s?story_id=%s' % (
-                    feconf.EXPLORATION_INIT_URL_PREFIX, exp_id, STORY_ID))
-            next_cursor = exploration_dict['next_cursor_for_pretests']
+            json_response_1 = self.get_json(
+                '%s/%s?story_id=%s&cursor=' % (
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID))
+            next_cursor = json_response_1['next_start_cursor']
 
-            self.assertEqual(len(exploration_dict['pretest_question_dicts']), 1)
-            json_response = self.get_json(
+            self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
+            json_response_2 = self.get_json(
                 '%s/%s?story_id=%s&cursor=%s' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
                     next_cursor))
-            self.assertEqual(len(json_response['pretest_question_dicts']), 1)
+            self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
             self.assertNotEqual(
-                json_response['pretest_question_dicts'][0]['id'],
-                exploration_dict['pretest_question_dicts'][0]['id'])
+                json_response_1['pretest_question_dicts'][0]['id'],
+                json_response_2['pretest_question_dicts'][0]['id'])
 
         response = self.testapp.get(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, STORY_ID),
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, STORY_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 400)
 
         response = self.testapp.get(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_INIT_URL_PREFIX, exp_id_2, 'story'),
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
             expect_errors=True)
         self.assertEqual(response.status_int, 400)
 

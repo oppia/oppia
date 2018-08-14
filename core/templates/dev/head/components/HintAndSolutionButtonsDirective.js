@@ -56,8 +56,7 @@ oppia.directive('hintAndSolutionButtons', [
           $scope.isHintButtonVisible = function(index) {
             return (
               HintsAndSolutionManagerService.isHintViewable(index) &&
-              ExplorationPlayerStateService.getCurrentEngineService().
-                doesInteractionSupportHints());
+              ExplorationPlayerStateService.doesInteractionSupportHints());
           };
 
           $scope.isSolutionButtonVisible = function() {
@@ -93,8 +92,7 @@ oppia.directive('hintAndSolutionButtons', [
             var inPretestMode = ExplorationPlayerStateService.isInPretestMode();
             if (!_editorPreviewMode && !inPretestMode) {
               StatsReportingService.recordSolutionHit(
-                ExplorationPlayerStateService.getCurrentEngineService()
-                  .getCurrentStateName());
+                ExplorationPlayerStateService.getCurrentStateName());
             }
             var promise = HintAndSolutionModalService.displaySolutionModal();
             promise.result.then(null, function() {
@@ -104,10 +102,8 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.$on(EVENT_NEW_CARD_OPENED, function(evt) {
             HintsAndSolutionManagerService.reset(
-              ExplorationPlayerStateService.getCurrentEngineService().
-                getHints(),
-              ExplorationPlayerStateService.getCurrentEngineService().
-                getSolution()
+              ExplorationPlayerStateService.getHints(),
+              ExplorationPlayerStateService.getSolution()
             );
             resetLocalHintsArray();
           });

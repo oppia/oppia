@@ -87,6 +87,63 @@ oppia.factory('ExplorationPlayerStateService', [
         _setExplorationMode();
         ExplorationEngineService.moveToExploration(callback);
       },
+      doesInteractionSupportHints: function() {
+        return _currentEngineService.doesInteractionSupportHints();
+      },
+      getCurrentStateName: function() {
+        return _currentEngineService.getCurrentStateName();
+      },
+      getCurrentInteraction: function() {
+        return _currentEngineService.getCurrentInteraction();
+      },
+      getNextInteraction: function() {
+        return _currentEngineService.getNextInteraction();
+      },
+      getCurrentInteractionHtml: function(nextFocusLabel) {
+        return _currentEngineService.getCurrentInteractionHtml(nextFocusLabel);
+      },
+      getNextInteractionHtml: function(nextFocusLabel) {
+        return _currentEngineService.getNextInteractionHtml(nextFocusLabel);
+      },
+      getLanguageCode: function() {
+        return _currentEngineService.getLanguageCode();
+      },
+      getCurrentInteractionInstructions: function() {
+        return _currentEngineService.getCurrentInteractionInstructions();
+      },
+      getNextInteractionInstructions: function() {
+        return _currentEngineService.getNextInteractionInstructions();
+      },
+      isInteractionInline: function() {
+        return _currentEngineService.isInteractionInline();
+      },
+      isNextInteractionInline: function() {
+        return _currentEngineService.isNextInteractionInline();
+      },
+      isContentAudioTranslationAvailable: function() {
+        return _currentEngineService.isContentAudioTranslationAvailable();
+      },
+      isCurrentStateTerminal: function() {
+        return _currentEngineService.isCurrentStateTerminal();
+      },
+      isStateShowingConceptCard: function() {
+        return _currentEngineService.isStateShowingConceptCard();
+      },
+      getContentIdsToAudioTranslations: function() {
+        return _currentEngineService.getContentIdsToAudioTranslations();
+      },
+      recordNewCardAdded: function() {
+        return _currentEngineService.recordNewCardAdded();
+      },
+      getStateContentAudioTranslations: function() {
+        return _currentEngineService.getStateContentAudioTranslations();
+      },
+      getHints: function() {
+        return _currentEngineService.getHints();
+      },
+      getSolution: function() {
+        return _currentEngineService.getSolution();
+      },
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();
         if (_editorPreviewMode) {
@@ -103,7 +160,7 @@ oppia.factory('ExplorationPlayerStateService', [
           if (_version) {
             $q.all([
               ReadOnlyExplorationBackendApiService.loadExploration(
-                _explorationId, _version, _storyId),
+                _explorationId, _version),
               PretestQuestionBackendApiService.fetchPretestQuestions(
                 _explorationId, _storyId
               )]).then(function(returnValues) {
@@ -120,8 +177,8 @@ oppia.factory('ExplorationPlayerStateService', [
             });
           } else {
             $q.all([
-              ReadOnlyExplorationBackendApiService.loadExploration(
-                _explorationId, _storyId),
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                _explorationId),
               PretestQuestionBackendApiService.fetchPretestQuestions(
                 _explorationId, _storyId
               )]).then(function(returnValues) {
