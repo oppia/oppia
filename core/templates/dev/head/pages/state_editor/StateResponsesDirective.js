@@ -578,7 +578,6 @@ oppia.directive('stateResponses', [
             return outcome && (outcome.dest === activeStateName);
           };
 
-
           if (StateEditorService.isInQuestionMode()) {
             $scope.onResponsesInitialized();
           }
