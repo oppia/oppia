@@ -964,6 +964,8 @@ def _check_docstrings(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
+    extra_space_message = (
+        'There should be no space after """ in single line       docstring.')    
     missing_period_message = (
         'There should be a period at the end of the docstring.')
     multiline_docstring_message = (
@@ -984,15 +986,23 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
+                #Check for single line docstring starting with a space
+
+                if line.startswith(' """'):
+                    failed = True
+                    print
+
                 # Check for single line docstring.
                 if line.startswith('"""') and line.endswith('"""'):
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
+
                     if (len(line) > 6) and (
                             line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
+
 
                 # Check if single line docstring span two lines.
                 elif line == '"""' and prev_line.startswith('"""'):
