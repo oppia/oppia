@@ -809,3 +809,75 @@ describe('Suggestions on Explorations', function() {
     general.checkForConsoleErrors([]);
   });
 });
+
+describe('Exploration translation', function() {
+  var explorationEditorPage = null;
+  var explorationPlayerPage = null;
+  var explorationEditorHistoryTab = null;
+  var explorationEditorMainTab = null;
+  beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
+  });
+
+  it('should have all the state contents', function() {
+    users.createUser('user@translationTab.com', 'userTranslationTab');
+    users.login('user@translationTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'second', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is second card.'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorPage.saveChanges();
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.expectContentTabContentToMatch(
+      'This is first card.');
+    explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
+      ['This is feedback1.', 'This is default_outcome.']);
+    explorationEditorTranslationTab.expectSolutionTabContentToMatch(
+      'This is solution.');
+    explorationEditorTranslationTab.expectHintsTabContentsToMatch(
+      ['This is hint1.', 'This is hint2.']);
+    users.logout();
+  });
+
+  it('should change translation language correctly', function() {
+    users.createUser('user@translationTabLang.com', 'userTranslationTabLang');
+    users.login('user@translationTabLang.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'this is card 1'));
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});

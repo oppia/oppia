@@ -25,7 +25,6 @@ import re
 import shutil
 import subprocess
 import threading
-import time
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -382,7 +381,7 @@ def hash_should_be_inserted(filepath):
 
 
 def copy_files_source_to_target(source, target, file_hashes):
-    """Copies all files in source directory to target directory and renames
+    """Copies all files in source directory to target directory, renames
     them to include hash in their name.
 
     Args:
@@ -399,7 +398,7 @@ def copy_files_source_to_target(source, target, file_hashes):
     shutil.rmtree(target)
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
-            print 'Processing %s' % os.path.join(root, directory)
+            print 'Copying %s' % os.path.join(root, directory)
 
         for filename in files:
             source_path = os.path.join(root, filename)
@@ -566,13 +565,14 @@ def _execute_tasks(tasks, batch_size=24):
             task = remaining_tasks.pop()
             currently_running_tasks.append(task)
             task.start()
-        time.sleep(1)
 
 
-def build_files(source, target, file_hashes):
-    """Minifies all CSS and JS files, removes whitespace from HTML and
-    interpolates paths in HTML to include hashes in source
-    directory and copies it to target.
+def build_files(source, target, file_hashes, file_formats=None):
+    """If no specific file formats is provided, minifies all CSS and JS files,
+    removes whitespace from HTML and interpolates paths in HTML to include
+    hashes in source directory and copies it to target.
+    If specific file formats is provided, only files pertaining to the provided
+    formats will be minified.
 
     Args:
         source: str. Path relative to /oppia directory of directory
@@ -580,16 +580,22 @@ def build_files(source, target, file_hashes):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
+        file_formats: tuple(str) or None. Tuple of specific file formats to be
+            built. If None then all files within the source directory will be
+            built.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     ensure_directory_exists(target)
-    shutil.rmtree(target)
+    if file_formats is None:
+        print 'Deleting dir %s' % target
+        # Only delete BUILD directory when building all files.
+        shutil.rmtree(target)
 
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         tasks = []
         for directory in dirs:
-            print 'Processing %s' % os.path.join(root, directory)
+            print 'Building directory %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
             if target in source_path:
@@ -598,15 +604,104 @@ def build_files(source, target, file_hashes):
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-
-            task = threading.Thread(
-                target=minify_func,
-                args=(source_path, target_path, file_hashes, filename))
+            if file_formats is None or any(
+                    filename.endswith(p) for p in file_formats):
+                task = threading.Thread(
+                    target=minify_func,
+                    args=(source_path, target_path, file_hashes, filename))
+            else:
+                # Skip files that are not the specified format.
+                continue
             tasks.append(task)
         try:
             _execute_tasks(tasks)
         except Exception as e:
             print e
+
+
+def rebuild_new_files(
+        source_path, target_path, recently_changed_filenames, file_hashes):
+    """Minify recently changed files.
+
+    Args:
+        source_path: str. Path relative to /oppia directory of directory
+            containing files and directories to be copied.
+        target_path: str. Path relative to /oppia directory of directory where
+            to copy the files and directories.
+        recently_changed_filenames: list(str). List of filenames that were
+            recently changed.
+        file_hashes: dict(str, str). Dictionary of file hashes.
+    """
+    for file_name in recently_changed_filenames:
+        print 'Minifying %s' % file_name
+        source_file_path = os.path.join(source_path, file_name)
+        target_file_path = os.path.join(target_path, file_name)
+        ensure_directory_exists(target_file_path)
+        minify_func(source_file_path, target_file_path, file_hashes, file_name)
+
+
+def remove_deleted_files(dev_directory, staging_directory):
+    """Walk the staging directory and remove files that have since been removed
+    from the DEV directory.
+
+    Args:
+        dev_directory: str. Path relative to /oppia where DEV files are located.
+        staging_directory: str. Path relative to /oppia directory of directory
+            containing files and directories to be walked.
+    """
+    file_hashes = get_file_hashes(dev_directory)
+    print 'Scanning directory %s to remove deleted file' % staging_directory
+    for root, dirs, files in os.walk(
+            os.path.join(os.getcwd(), staging_directory)):
+        for directory in dirs:
+            print 'Scanning %s' % os.path.join(root, directory)
+        for filename in files:
+            target_path = os.path.join(root, filename)
+            # Ignore files with certain extensions.
+            if any(target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
+            relative_path = os.path.relpath(target_path, staging_directory)
+            # Remove file found in staging dir but not in /DEV, i.e.
+            # file not listed in hash dict.
+            if relative_path not in file_hashes:
+                print ('Unable to find %s in file hashes, deleting file'
+                       % relative_path)
+                os.remove(target_path)
+
+
+def get_recently_changed_filenames(dev_dir, out_dir):
+    """Compare hashes of DEV files and BUILD files. Return a list of filenames
+    that were recently changed.
+
+    Args:
+        dev_dir: str. Path relative to /oppia where DEV files are located.
+        out_dir: str. Path relative to /oppia where BUILD files are located.
+
+    Returns:
+        list(str). List of filenames expected to be re-hashed.
+    """
+    # Hashes are created based on files' contents and are inserted between
+    # the filenames and their extensions,
+    # e.g base.240933e7564bd72a4dde42ee23260c5f.html
+    # If a file gets edited, a different MD5 hash is generated.
+    file_hashes = get_file_hashes(dev_dir)
+    recently_changed_filenames = []
+    # Currently, we do not hash Python files and HTML files are always re-built.
+    FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
+    print "Comparing file hashes of %s and %s" % (dev_dir, out_dir)
+    for file_name, md5_hash in file_hashes.iteritems():
+        # Ignore files with certain extensions.
+        if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
+            continue
+        final_filepath = _insert_hash(
+            os.path.join(out_dir, file_name), md5_hash)
+        if not os.path.isfile(final_filepath):
+            # Filename with provided hash cannot be found, this file has been
+            # recently changed or created since last build.
+            recently_changed_filenames.append(file_name)
+    print ('The following files will be rebuilt due to recent changes: %s' %
+           recently_changed_filenames)
+    return recently_changed_filenames
 
 
 def generate_build_directory():
@@ -636,7 +731,8 @@ def generate_build_directory():
     # Minify extension static resources, create hashes for them and copy them
     # into build/extensions.
     hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
-    build_files(EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
+    build_files(
+        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
     copy_files_source_to_target(
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
@@ -648,7 +744,31 @@ def generate_build_directory():
     save_hashes_as_json(HASHES_JSON, hashes)
 
     # Minify all template files copy them into build/templates/head.
-    build_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
+    if not os.path.isdir(TEMPLATES_STAGING_DIR):
+        # If there is no staging dir, perform build process on all files.
+        print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes)
+    else:
+        # If there is an existing staging dir, rebuild all HTML files.
+        print 'Staging directory exists, re-building all HTML files'
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes,
+            file_formats=('.html',))
+        recently_changed_filenames = get_recently_changed_filenames(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
+        if recently_changed_filenames:
+            # Only re-build files that have changed since last build.
+            print ("Re-building recently changed files at %s"
+                   % TEMPLATES_DEV_DIR_CORE)
+            rebuild_new_files(
+                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
+                recently_changed_filenames, hashes)
+            # Clean up files in staging dir that have been removed in DEV dir.
+            remove_deleted_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR)
+        else:
+            print 'No changes detected. Using previously built files.'
+    # Copy built files from staging dir to build dir.
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 

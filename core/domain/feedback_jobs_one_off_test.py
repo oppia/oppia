@@ -466,12 +466,24 @@ class FeedbackThreadIdMigrationOneOffJobTest(test_utils.GenericTestBase):
         new_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 'author.exploration.exp1.thread1'))
+        old_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get_by_id(
+                'author.exp1.thread1'))
         self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
+        self.assertEqual(
+            new_thread_user_model.last_updated,
+            old_thread_user_model.last_updated)
 
         new_reply_to_id_model = (
             email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
                 'author.exploration.exp1.thread1'))
+        old_reply_to_id_model = (
+            email_models.FeedbackEmailReplyToIdModel.get_by_id(
+                'author.exp1.thread1'))
         self.assertEqual(new_reply_to_id_model.reply_to_id, '1234')
+        self.assertEqual(
+            new_reply_to_id_model.last_updated,
+            old_reply_to_id_model.last_updated)
 
         new_user_subscription_model = (
             user_models.UserSubscriptionsModel.get_by_id('author'))

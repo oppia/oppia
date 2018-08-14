@@ -269,3 +269,60 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestions()), 0)
+
+    def test_get_all_score_catrgories(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category_1',
+            'exploration.exp1.thread_6')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category_2',
+            'exploration.exp1.thread_7')
+        score_categories = (
+            suggestion_models.GeneralSuggestionModel.get_all_score_categories())
+        self.assertIn(self.score_category, score_categories)
+        self.assertIn('category_1', score_categories)
+        self.assertIn('category_2', score_categories)
+
+
+class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
+
+    def test_create_and_update_model(self):
+        suggestion_models.ReviewerRotationTrackingModel.create(
+            'category1', 'user1')
+        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+            'category1')
+        self.assertEqual(instance.id, 'category1')
+        self.assertEqual(instance.current_position_in_rotation, 'user1')
+        (
+            suggestion_models.ReviewerRotationTrackingModel
+            .update_position_in_rotation('category1', 'user2'))
+        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+            'category1')
+        self.assertEqual(instance.id, 'category1')
+        self.assertEqual(instance.current_position_in_rotation, 'user2')
+
+    def test_id_collision_create_failure(self):
+        suggestion_models.ReviewerRotationTrackingModel.create(
+            'category1', 'user1')
+        with self.assertRaisesRegexp(
+            Exception, 'There already exists an instance with the given id: '
+                       'category1'):
+            suggestion_models.ReviewerRotationTrackingModel.create(
+                'category1', 'user1')
+
+    def test_update_without_create_should_create_instance(self):
+        (
+            suggestion_models.ReviewerRotationTrackingModel
+            .update_position_in_rotation('category1', 'user1'))
+        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+            'category1')
+        self.assertEqual(instance.id, 'category1')
+        self.assertEqual(instance.current_position_in_rotation, 'user1')
