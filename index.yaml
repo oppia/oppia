@@ -137,6 +137,13 @@ indexes:
 - kind: GeneralSuggestionModel
   properties:
   - name: deleted
+  - name: score_category
+  - name: status
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
   - name: status
   - name: last_updated
 

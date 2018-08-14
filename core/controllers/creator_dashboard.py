@@ -116,6 +116,7 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,

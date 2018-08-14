@@ -281,6 +281,7 @@ oppia.controller('CreatorDashboard', [
             $scope.rejectSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION,
+                commitMessage: null,
                 reviewMessage: $scope.reviewMessage
               });
             };
@@ -297,10 +298,18 @@ oppia.controller('CreatorDashboard', [
           $scope.activeThread.suggestion.targetId + '/' +
           $scope.activeThread.suggestion.suggestionId, {
             action: result.action,
-            commitMessage: result.commitMessage,
-            reviewMessage: result.reviewMessage
+            commit_message: result.commitMessage,
+            review_message: result.reviewMessage
           }
-        ).then(null, function() {
+        ).then(function() {
+          for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
+            if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
+              $scope.suggestionsToReviewList.splice(i, 1);
+              break;
+            }
+          }
+          $scope.clearActiveThread();
+        }, function() {
           $log.error('Error resolving suggestion');
         });
       });
@@ -368,20 +377,20 @@ oppia.controller('CreatorDashboard', [
         }
         $scope.suggestionsToReviewList = [];
         for (var i = 0; i < numberOfSuggestionsToReview; i++) {
-          if (responseData.created_suggestions_list.length !==
+          if (responseData.suggestions_to_review_list.length !==
               numberOfSuggestionsToReview) {
             $log.error('Number of suggestions does not match number of ' +
                        'suggestion threads');
           }
           for (var j = 0; j < numberOfSuggestionsToReview; j++) {
             var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              responseData.created_suggestions_list[j]);
+              responseData.suggestions_to_review_list[j]);
             var threadDict = (
-              responseData.threads_for_created_suggestions_list[i]);
+              responseData.threads_for_suggestions_to_review_list[i]);
             if (threadDict.thread_id === suggestion.getThreadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
-                  threadDict, responseData.created_suggestions_list[j]));
+                  threadDict, responseData.suggestions_to_review_list[j]));
               $scope.suggestionsToReviewList.push(suggestionThread);
             }
           }
