@@ -289,7 +289,6 @@ oppia.controller('CreatorDashboard', [
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
         $scope.topicSummaries = responseData.topic_summary_dicts;
-        console.log($scope.topicSummaries)
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
