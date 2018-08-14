@@ -807,12 +807,17 @@ def get_filename_with_dimensions(old_filename, exp_id):
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE
         else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
     filepath = (
         old_filename if feconf.DEV_MODE
         else ('image/%s' % old_filename))
-    content = fs.get(filepath)
-    height, width = gae_image_services.get_image_dimensions(content)
+    try:
+        content = fs.get(filepath)
+        height, width = gae_image_services.get_image_dimensions(content)
+    except IOError:
+        height = 120
+        width = 120
     new_filename = regenerate_image_filename_using_dimensions(
         old_filename, height, width)
     return new_filename
