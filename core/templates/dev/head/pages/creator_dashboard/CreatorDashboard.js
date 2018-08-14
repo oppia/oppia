@@ -267,7 +267,7 @@ oppia.controller('CreatorDashboard', [
             question_dict: result.question.toBackendDict(true),
             skill_id: null
           },
-          description: 'question title'
+          description: null
         });
       }, function() {
         $log.error('Error while submitting question');
