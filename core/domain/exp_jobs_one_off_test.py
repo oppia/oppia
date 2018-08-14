@@ -1255,7 +1255,7 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
         """Checks that images get deleted from the GAE after running the job.
         """
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
         imageData = ''
         mimetype = 'image/png'
         fs.commit(
