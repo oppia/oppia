@@ -58,6 +58,6 @@ oppia.factory('PretestQuestionBackendApiService', [
           _fetchPretestQuestions(explorationId, storyId, resolve, reject);
         });
       }
-    }
+    };
   }
 ]);
