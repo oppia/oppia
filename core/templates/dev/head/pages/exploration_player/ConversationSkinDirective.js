@@ -420,10 +420,15 @@ oppia.directive('conversationSkin', [
                 PlayerPositionService.getActiveCardIndex())) {
               return !ExplorationPlayerStateService.isInteractionInline();
             }
-            return (
-              INTERACTION_SPECS[card.getInteraction().id].display_mode !==
-                INTERACTION_DISPLAY_MODE_INLINE
-            );
+            var interactionId = card.getInteraction().id;
+            if (interactionId) {
+              return (
+                INTERACTION_SPECS[interactionId].display_mode !==
+                  INTERACTION_DISPLAY_MODE_INLINE
+              );
+            } else {
+              return false;
+            }
           };
 
           $scope.isCurrentSupplementalCardNonempty = function() {
