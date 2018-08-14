@@ -36,8 +36,7 @@ oppia.factory('ExplorationEngineService', [
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService', 'UserService',
   'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
-  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT',
-  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService,
@@ -50,8 +49,7 @@ oppia.factory('ExplorationEngineService', [
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UserService,
       WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
-      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
@@ -374,11 +372,9 @@ oppia.factory('ExplorationEngineService', [
             classificationResult.classificationCategorization,
             feedbackIsUseful);
 
-          if (ENABLE_PLAYTHROUGH_RECORDING) {
-            StatsReportingService.recordAnswerSubmitAction(
-              oldStateName, newStateName, oldState.interaction.id, answer,
-              outcome.feedback);
-          }
+          StatsReportingService.recordAnswerSubmitAction(
+            oldStateName, newStateName, oldState.interaction.id, answer,
+            outcome.feedback);
         }
 
         var refresherExplorationId = outcome.refresherExplorationId;
