@@ -1003,7 +1003,6 @@ def _check_docstrings(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
 
-
                 # Check if single line docstring span two lines.
                 elif line == '"""' and prev_line.startswith('"""'):
                     failed = True
