@@ -10,7 +10,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   * [User Documentation](https://oppia.github.io/)
   * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
   * [Developer mailing list](http://groups.google.com/group/oppia-dev)
-  * [File an issue](https://github.com/DubeySandeep/oppia/issues/new/choose)
+  * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank">
@@ -49,7 +49,7 @@ You can help with Oppia's development in many ways, including art, coding, desig
 
 ## Support
 
-If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/DubeySandeep/oppia/issues/new/choose).
+If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/oppia/oppia/issues/new/choose).
 
 Please report security issues directly to admin@oppia.org.
 
