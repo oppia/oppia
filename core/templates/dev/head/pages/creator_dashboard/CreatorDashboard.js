@@ -288,17 +288,13 @@ oppia.controller('CreatorDashboard', [
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
+        $scope.topicSummaries = responseData.topic_summary_dicts;
+        console.log($scope.topicSummaries)
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
         }
-
-        TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-          function(response) {
-            $scope.topicSummaries = response.data.topic_summary_dicts;
-          }
-        );
 
         if ($scope.explorationsList.length === 0 &&
           $scope.collectionsList.length > 0) {

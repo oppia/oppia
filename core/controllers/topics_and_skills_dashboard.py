@@ -48,8 +48,6 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # As anyone should be able to see the topics and skills list when creating
-    # questions, this handler has open access.
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
         """Handles GET requests."""
