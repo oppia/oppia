@@ -24,6 +24,15 @@ from core.tests import test_utils
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
+# These are tests for the old suggestions framework. The services tested here
+# add suggestions, list them and perform actions on them (like accepting and
+# rejecting). The old suggestion framework is incompatible with the new feedback
+# thread framework as the new models have ids of the form
+# entity_type.entity_id.string. The old suggestion framework uses
+# exploration_id.string as its id and also expects the id to match the thread
+# linked to it, which is not possible in the new feedback framework. So these
+# tests are deprecated, and can be deleted after successful migration to the new
+# feedback framework.
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
     EXP_ID1 = 'exp_id1'

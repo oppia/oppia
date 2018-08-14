@@ -95,6 +95,14 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
                 feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
 
 
+# These are tests for the old suggestions framework. The services tested here
+# add suggestions, and list them. The old suggestion framework is incompatible
+# with the new feedback thread framework as the new models have ids of the form
+# entity_type.entity_id.string. The old suggestion framework uses
+# exploration_id.string as its id and also expects the id to match the thread
+# linked to it, which is not possible in the new feedback framework. So these
+# tests are deprecated, and can be deleted after successful migration to the new
+# feedback framework.
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion query functions in feedback_services."""
 
