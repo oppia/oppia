@@ -20,7 +20,6 @@ import datetime
 import os
 import zipfile
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
