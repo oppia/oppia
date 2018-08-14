@@ -25,6 +25,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -50,6 +51,11 @@ def _count_at_least_editable_exploration_summaries(user_id):
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
@@ -613,8 +619,11 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
         for exp_id in demo_exploration_ids:
             start_time = datetime.datetime.utcnow()
 
-            exp_services.load_demo(exp_id)
-            exploration = exp_services.get_exploration_by_id(exp_id)
+            with self.swap(
+                html_validation_service, 'get_filename_with_dimensions',
+                mock_get_filename_with_dimensions):
+                exp_services.load_demo(exp_id)
+                exploration = exp_services.get_exploration_by_id(exp_id)
             warnings = exploration.validate(strict=True)
             if warnings:
                 raise Exception(warnings)
@@ -803,7 +812,7 @@ title: Title
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
+            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
         self.assertEqual(fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
     def test_can_load_yaml_with_audio_translations(self):
@@ -1113,7 +1122,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
+            fs_domain.ExplorationFileSystem(
+                'exploration/%s' % self.EXPLORATION_ID))
         self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
         self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
@@ -1321,7 +1331,7 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
+            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -1353,7 +1363,7 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
+            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -1523,7 +1533,7 @@ param_changes: []
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
+            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
