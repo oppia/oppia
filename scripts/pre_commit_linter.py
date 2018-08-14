@@ -997,7 +997,6 @@ def _check_docstrings(all_files):
                 if line.startswith('"""') and line.endswith('"""'):
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
-
                     if (len(line) > 6) and (
                             line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                         failed = True
