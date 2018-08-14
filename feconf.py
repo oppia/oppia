@@ -161,7 +161,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 24
+CURRENT_STATES_SCHEMA_VERSION = 25
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -373,6 +373,14 @@ ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
+
+# Flag to disable sending emails related to reviews for suggestions. To be
+# flipped after deciding (and implementing) whether a user should be scored
+# only for curated lessons.
+SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
+# To prevent recording scores for users until details like whether to score
+# users for only curated lessons is confirmed.
+ENABLE_RECORDING_OF_SCORES = False
 
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
