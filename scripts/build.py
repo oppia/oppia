@@ -247,9 +247,12 @@ def _match_directory_with_hashes(directory_path, file_hashes):
        file_hashes: dict(str, str). Dictionary of file hashes.
 
     Raises:
+        Exception: Raised if hash dict is empty.
         Exception: Raised if filename's hash does not match hash dict entries.
     """
     # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html
+    if not file_hashes:
+        raise Exception('Hash dict is empty')
     #pylint: disable=unused-variable
     for root, dirs, files in os.walk(directory_path):
         #pylint: enable=unused-variable
