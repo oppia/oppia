@@ -20,35 +20,14 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.factory('PretestEngineService', [
   '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
-  'AudioPreloaderService', 'AudioTranslationLanguageService',
-  'EditableExplorationBackendApiService', 'ContextService',
-  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-  'ExpressionInterpolationService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService',
-  'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughService', 'INTERACTION_SPECS',
-  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
-  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'QuestionObjectFactory',
-  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-  'INTERACTION_DISPLAY_MODE_INLINE',
+  'ContextService', 'ExplorationHtmlFormatterService',
+  'ExpressionInterpolationService', 'INTERACTION_SPECS',
+  'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
-      AudioPreloaderService, AudioTranslationLanguageService,
-      EditableExplorationBackendApiService, ContextService,
-      ExplorationHtmlFormatterService, ExplorationObjectFactory,
-      ExpressionInterpolationService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService,
-      NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughService, INTERACTION_SPECS,
-      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
-      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, QuestionObjectFactory,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-      INTERACTION_DISPLAY_MODE_INLINE) {
-    var _isLoggedIn = GLOBALS.userIsLoggedIn;
+      ContextService, ExplorationHtmlFormatterService,
+      ExpressionInterpolationService, INTERACTION_SPECS,
+      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE) {
     var _explorationId = ContextService.getExplorationId();
 
     var version = GLOBALS.explorationVersion;
@@ -221,9 +200,6 @@ oppia.factory('PretestEngineService', [
       },
       getContentIdsToAudioTranslations: function() {
         return _getCurrentStateData().contentIdsToAudioTranslations;
-      },
-      isLoggedIn: function() {
-        return _isLoggedIn;
       },
       isInPreviewMode: function() {
         return false;

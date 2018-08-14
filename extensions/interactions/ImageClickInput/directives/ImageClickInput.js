@@ -211,9 +211,11 @@ oppia.directive('oppiaResponseImageClickInput', [
         function($scope, $attrs, HtmlEscaperService) {
           var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-          $scope.clickRegionLabel = '(Clicks on ' + (
-            _answer.clickedRegions.length > 0 ?
-              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          if (_answer.clickedRegions) {
+            $scope.clickRegionLabel = '(Clicks on ' + (
+              _answer.clickedRegions.length > 0 ?
+                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          }
         }
       ]
     };

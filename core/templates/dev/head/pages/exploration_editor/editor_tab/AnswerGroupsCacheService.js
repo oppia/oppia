@@ -29,7 +29,9 @@ oppia.factory('AnswerGroupsCacheService', [function() {
       return _cache.hasOwnProperty(interactionId);
     },
     set: function(interactionId, answerGroups) {
-      _cache[interactionId] = angular.copy(answerGroups);
+      if (interactionId) {
+        _cache[interactionId] = angular.copy(answerGroups);
+      }
     },
     get: function(interactionId) {
       if (!_cache.hasOwnProperty(interactionId)) {

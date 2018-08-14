@@ -252,7 +252,6 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.request.get('v')
-        story_id = self.request.get('story_id')
         version = int(version) if version else None
 
         try:
@@ -288,34 +287,12 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
-        pretest_question_dicts = []
-        next_cursor = None
-        if story_id:
-            story = story_services.get_story_by_id(story_id, strict=False)
-            if story is None:
-                raise self.InvalidInputException
-
-            if not story.has_exploration(exploration_id):
-                raise self.InvalidInputException
-
-            pretest_questions, next_cursor = (
-                question_services.get_questions_by_skill_ids(
-                    feconf.NUM_PRETEST_QUESTIONS,
-                    story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
-                    '')
-            )
-            pretest_question_dicts = [
-                question.to_dict() for question in pretest_questions
-            ]
-
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
-            'pretest_question_dicts': pretest_question_dicts,
-            'next_cursor_for_pretests': next_cursor,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,

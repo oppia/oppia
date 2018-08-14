@@ -136,6 +136,9 @@ oppia.factory('PlayerTranscriptService', [
       getLastCard: function() {
         return this.getCard(transcript.length - 1);
       },
+      setCurrentCardLeadsToConceptCard: function() {
+        this.getLastCard().setLeadsToConceptCard(true);
+      },
       getNumSubmitsForLastCard: function() {
         return numAnswersSubmitted;
       },

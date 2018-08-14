@@ -54,7 +54,6 @@ oppia.factory('ExplorationEngineService', [
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-    var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
     var exploration = null;
@@ -223,7 +222,7 @@ oppia.factory('ExplorationEngineService', [
           _loadInitialState(successCallback);
         }
       },
-      continueToExploration: function(successCallback) {
+      moveToExploration: function(successCallback) {
         _loadInitialState(successCallback);
       },
       getCurrentStateName: function() {
@@ -334,9 +333,6 @@ oppia.factory('ExplorationEngineService', [
       getContentIdsToAudioTranslations: function() {
         return (
           exploration.getState(currentStateName).contentIdsToAudioTranslations);
-      },
-      isLoggedIn: function() {
-        return _isLoggedIn;
       },
       isInPreviewMode: function() {
         return !!_editorPreviewMode;

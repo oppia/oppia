@@ -18,11 +18,60 @@
  */
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', 'ExplorationEngineService', 'PretestEngineService',
+  '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
+  'ContextService', 'UrlService', 'StateClassifierMappingService',
+  'StatsReportingService', 'ENABLE_PLAYTHROUGH_RECORDING',
+  'PlaythroughService', 'PlayerCorrectnessFeedbackEnabledService',
+  'PlayerTranscriptService',
+  'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
   function(
-      $log, ExplorationEngineService, PretestEngineService) {
+      $log, $q, ExplorationEngineService, PretestEngineService,
+      ContextService, UrlService, StateClassifierMappingService,
+      StatsReportingService, ENABLE_PLAYTHROUGH_RECORDING,
+      PlaythroughService, PlayerCorrectnessFeedbackEnabledService,
+      PlayerTranscriptService,
+      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService) {
     var _currentEngineService = null;
     var _inPretestMode = false;
+    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _explorationId = ContextService.getExplorationId();
+    var _version = GLOBALS.explorationVersion;
+    var _storyId = UrlService.getStoryIdInPlayer();
+
+    var _initializeExplorationServices = function(
+        returnDict, arePretestsAvailable, callback) {
+      StateClassifierMappingService.init(
+        returnDict.state_classifier_mapping);
+      StatsReportingService.initSession(
+        _explorationId, returnDict.exploration.title,
+        _version, returnDict.session_id, GLOBALS.collectionId);
+      if (ENABLE_PLAYTHROUGH_RECORDING) {
+        PlaythroughService.initSession(explorationId, version);
+      }
+      PlayerCorrectnessFeedbackEnabledService.init(
+        returnDict.correctness_feedback_enabled);
+      ExplorationEngineService.init(
+        returnDict.exploration, returnDict.version,
+        returnDict.preferred_audio_language_code,
+        returnDict.auto_tts_enabled,
+        arePretestsAvailable ?
+        function() {} : callback);
+    };
+
+    var _initializePretestServices = function(pretestQuestionDicts, callback) {
+      PlayerCorrectnessFeedbackEnabledService.init(true);
+      PretestEngineService.init(pretestQuestionDicts, callback);
+    };
+
+    var _setExplorationMode = function() {
+      _inPretestMode = false;
+      _currentEngineService = ExplorationEngineService;
+    };
+
+    var _setPretestMode = function() {
+      _inPretestMode = true;
+      _currentEngineService = PretestEngineService;
+    };
 
     return {
       getCurrentEngineService: function() {
@@ -34,13 +83,61 @@ oppia.factory('ExplorationPlayerStateService', [
       getPretestQuestionCount: function() {
         return PretestEngineService.getPretestQuestionCount();
       },
-      setExplorationMode: function() {
-        _inPretestMode = false;
-        _currentEngineService = ExplorationEngineService;
+      moveToExploration: function(callback) {
+        _setExplorationMode();
+        ExplorationEngineService.moveToExploration(callback);
       },
-      setPretestMode: function() {
-        _inPretestMode = true;
-        _currentEngineService = PretestEngineService;
+      initializePlayer: function(callback) {
+        PlayerTranscriptService.init();
+        if (_editorPreviewMode) {
+          ExplorationPlayerStateService.setExplorationMode();
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            explorationId).then(function(returnDict) {
+            ExplorationEngineService.init(
+              returnDict, null, null, null, _initializeDirectiveComponents);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              returnDict.correctness_feedback_enabled);
+            NumberAttemptsService.reset();
+          });
+        } else {
+          if (_version) {
+            $q.all([
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, _version, _storyId),
+              PretestQuestionBackendApiService.fetchPretestQuestions(
+                _explorationId, _storyId
+              )]).then(function(returnValues) {
+              if (returnValues[1].length > 0) {
+                _setPretestMode();
+                _initializeExplorationServices(
+                  returnValues[0], true, callback);
+                _initializePretestServices(returnValues[1], callback);
+              } else {
+                _setExplorationMode();
+                _initializeExplorationServices(
+                  returnValues[0], false, callback);
+              }
+            });
+          } else {
+            $q.all([
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, _storyId),
+              PretestQuestionBackendApiService.fetchPretestQuestions(
+                _explorationId, _storyId
+              )]).then(function(returnValues) {
+              if (returnValues[1].length > 0) {
+                _setPretestMode();
+                _initializeExplorationServices(
+                  returnValues[0], true, callback);
+                _initializePretestServices(returnValues[1], callback);
+              } else {
+                _setExplorationMode();
+                _initializeExplorationServices(
+                  returnValues[0], false, callback);
+              }
+            });
+          }
+        }
       }
     };
   }]);

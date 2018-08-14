@@ -191,18 +191,20 @@ oppia.directive('oppiaResponseGraphInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-        $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
-        $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
-        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
+        if ($scope.graph.edges) {
+          $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
+          $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+          $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
-        $scope.getDirectedEdgeArrowPoints = function(index) {
-          return graphDetailService.getDirectedEdgeArrowPoints(
-            $scope.graph, index);
-        };
+          $scope.getDirectedEdgeArrowPoints = function(index) {
+            return graphDetailService.getDirectedEdgeArrowPoints(
+              $scope.graph, index);
+          };
 
-        $scope.getEdgeCentre = function(index) {
-          return graphDetailService.getEdgeCentre($scope.graph, index);
-        };
+          $scope.getEdgeCentre = function(index) {
+            return graphDetailService.getEdgeCentre($scope.graph, index);
+          };
+        }
       }]
     };
   }
