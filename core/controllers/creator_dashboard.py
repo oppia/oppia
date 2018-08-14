@@ -30,18 +30,14 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import role_services
 from core.domain import subscription_services
-from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
-from core.platform import models
 import feconf
 import utils
 
 import jinja2
-
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
@@ -124,17 +120,14 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
-
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
         dependencies_html, additional_angular_modules = (
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids + self.ADDITIONAL_DEPENDENCY_IDS))
-
         interaction_templates = (
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
@@ -279,57 +272,13 @@ class CreatorDashboardHandler(base.BaseHandler):
         creator_dashboard_display_pref = (
             user_settings.creator_dashboard_display_pref)
 
-        suggestions_created_by_user = suggestion_services.query_suggestions(
-            [('author_id', self.user_id)])
-        suggestions_which_can_be_reviewed = (
-            suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
-
-        for s in suggestions_created_by_user:
-            s.populate_old_value_of_change()
-
-        for s in suggestions_which_can_be_reviewed:
-            s.populate_old_value_of_change()
-
-        suggestion_dicts_created_by_user = (
-            [s.to_dict() for s in suggestions_created_by_user])
-        suggestion_dicts_which_can_be_reviewed = (
-            [s.to_dict() for s in suggestions_which_can_be_reviewed])
-
-        ids_of_suggestions_created_by_user = (
-            [s['suggestion_id'] for s in suggestion_dicts_created_by_user])
-        ids_of_suggestions_which_can_be_reviewed = (
-            [s['suggestion_id']
-             for s in suggestion_dicts_which_can_be_reviewed])
-
-        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            ids_of_suggestions_created_by_user = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_created_by_user])
-            ids_of_suggestions_which_can_be_reviewed = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_which_can_be_reviewed])
-
-        threads_linked_to_suggestions_by_user = (
-            [t.to_dict() for t in feedback_services.get_multiple_threads(
-                ids_of_suggestions_created_by_user)])
-        threads_linked_to_suggestions_which_can_be_reviewed = (
-            [t.to_dict() for t in feedback_services.get_multiple_threads(
-                ids_of_suggestions_which_can_be_reviewed)])
-
         self.values.update({
             'explorations_list': exp_summary_dicts,
             'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list,
-            'display_preference': creator_dashboard_display_pref,
-            'threads_for_created_suggestions_list': (
-                threads_linked_to_suggestions_by_user),
-            'threads_for_suggestions_to_review_list': (
-                threads_linked_to_suggestions_which_can_be_reviewed),
-            'created_suggestions_list': suggestion_dicts_created_by_user,
-            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
+            'display_preference': creator_dashboard_display_pref
         })
         if feconf.ENABLE_NEW_STRUCTURES:
             self.values.update({

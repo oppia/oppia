@@ -55,10 +55,11 @@ def create_suggestion(
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
-
+    if description is None:
+        description = DEFAULT_SUGGESTION_THREAD_SUBJECT
     thread_id = feedback_services.create_thread(
         target_type, target_id, None, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
