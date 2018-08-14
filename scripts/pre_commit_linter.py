@@ -986,7 +986,7 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
-                #Check for single line docstring starting with a space
+                # Check for single line docstring starting with a space
 
                 if line.startswith(' """'):
                     failed = True
