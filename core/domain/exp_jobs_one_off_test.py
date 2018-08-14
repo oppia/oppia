@@ -1254,6 +1254,10 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
     def test_for_deletion_job(self):
         """Checks that images get deleted from the GAE after running the job.
         """
+        # This job is for deleting the images from the datastore that were
+        # stored in old format --- exp_id/assets/image.png . It should not be
+        # run on the current develop branch because we now store the images
+        # as exploration/exp_id/assets/image.png .
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
         imageData = ''
