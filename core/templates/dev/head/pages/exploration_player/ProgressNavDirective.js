@@ -34,13 +34,14 @@ oppia.directive('progressNav', [
         'PlayerTranscriptService', 'ExplorationEngineService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
+        'ExplorationPlayerStateService',
         function($scope, $rootScope, PlayerPositionService, UrlService,
             PlayerTranscriptService, ExplorationEngineService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
-            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
+            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
+            ExplorationPlayerStateService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
-
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
@@ -49,18 +50,21 @@ oppia.directive('progressNav', [
             $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(
               $scope.activeCardIndex);
-            ExplorationEngineService.setCurrentStateIndex(
-              $scope.activeCardIndex);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-            $scope.conceptCardIsBeingShown =
-              ExplorationEngineService.isStateShowingConceptCard();
-            if (!$scope.conceptCardIsBeingShown) {
+            $scope.conceptCardIsBeingShown = (
+              $scope.activeCard.getStateName() === null &&
+              !ExplorationPlayerStateService.isInPretestMode());
+            if ($scope.hasNext) {
+              var interaction = $scope.activeCard.getInteraction();
+            } else {
               var interaction =
-                ExplorationEngineService.getCurrentInteraction();
+                ExplorationPlayerStateService.getCurrentInteraction();
+            }
+            if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
-                ExplorationEngineService.isInteractionInline());
+                ExplorationPlayerStateService.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 interaction.customizationArgs;
               $scope.interactionId = interaction.id;

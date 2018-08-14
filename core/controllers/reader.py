@@ -113,6 +113,10 @@ def _get_exploration_player_data(
 
     # TODO(sll): Cache these computations.
     interaction_ids = exploration.get_interaction_ids()
+    for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
+        if interaction_id not in interaction_ids:
+            interaction_ids.append(interaction_id)
+
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
             interaction_ids))
@@ -248,7 +252,6 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.request.get('v')
-        story_id = self.request.get('story_id')
         version = int(version) if version else None
 
         try:
@@ -312,8 +315,6 @@ class ExplorationHandler(base.BaseHandler):
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
-            'pretest_question_dicts': pretest_question_dicts,
-            'next_cursor_for_pretests': next_cursor,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,

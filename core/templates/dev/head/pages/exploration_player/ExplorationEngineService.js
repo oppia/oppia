@@ -52,7 +52,6 @@ oppia.factory('ExplorationEngineService', [
       PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-    var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
     var exploration = null;
@@ -136,7 +135,7 @@ oppia.factory('ExplorationEngineService', [
       currentStateName = exploration.initStateName;
       nextStateName = exploration.initStateName;
       $rootScope.$broadcast('playerStateChange', initialState.name);
-      successCallback(exploration, questionHtml, newParams);
+      successCallback(currentStateName, questionHtml, newParams);
     };
 
     // Initialize the parameters in the exploration as specified in the
@@ -221,11 +220,14 @@ oppia.factory('ExplorationEngineService', [
           _loadInitialState(successCallback);
         }
       },
-      setCurrentStateIndex: function(index) {
-        currentStateName = angular.copy(visitedStateNames[index]);
+      moveToExploration: function(successCallback) {
+        _loadInitialState(successCallback);
       },
       getCurrentStateName: function() {
         return currentStateName;
+      },
+      isCurrentStateInitial: function() {
+        return currentStateName === exploration.initStateName;
       },
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
@@ -238,9 +240,6 @@ oppia.factory('ExplorationEngineService', [
       },
       getExplorationVersion: function() {
         return version;
-      },
-      getExplorationLanguageCode: function() {
-        return exploration.languageCode;
       },
       getStateContentHtml: function() {
         return exploration.getUninterpolatedContentHtml(currentStateName);
@@ -276,6 +275,9 @@ oppia.factory('ExplorationEngineService', [
           exploration.getInteractionCustomizationArgs(nextStateName),
           true,
           labelForFocusTarget);
+      },
+      getNextInteraction: function() {
+        return exploration.getInteraction(nextStateName);
       },
       getCurrentInteraction: function() {
         return exploration.getInteraction(currentStateName);
@@ -329,9 +331,6 @@ oppia.factory('ExplorationEngineService', [
       getContentIdsToAudioTranslations: function() {
         return (
           exploration.getState(currentStateName).contentIdsToAudioTranslations);
-      },
-      isLoggedIn: function() {
-        return _isLoggedIn;
       },
       isInPreviewMode: function() {
         return !!_editorPreviewMode;
@@ -434,7 +433,7 @@ oppia.factory('ExplorationEngineService', [
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
           refresherExplorationId, missingPrerequisiteSkillId, onSameCard,
-          (oldStateName === exploration.initStateName), isFirstHit);
+          (oldStateName === exploration.initStateName), isFirstHit, false);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
