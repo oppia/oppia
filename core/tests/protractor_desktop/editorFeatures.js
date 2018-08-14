@@ -680,7 +680,7 @@ describe('Issues visualization', function() {
       'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
       'Three');
     explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Try 2 again'), 'Two', true, 'Equals',
+      'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
       'Two');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('Try again'));
@@ -821,6 +821,10 @@ describe('Issues visualization', function() {
       '"Two" many times.');
     explorationEditorStatsTab.markResolved();
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });
 
