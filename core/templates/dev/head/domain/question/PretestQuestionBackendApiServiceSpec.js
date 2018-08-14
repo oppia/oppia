@@ -91,10 +91,9 @@ describe('Pretest question backend API service', function() {
 
       $httpBackend.expect(
         'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-          sampleDataResults);
+        sampleDataResults);
       PretestQuestionBackendApiService.fetchPretestQuestions(
-        'expId', 'storyId').then(
-          successHandler, failHandler);
+        'expId', 'storyId').then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
@@ -110,10 +109,9 @@ describe('Pretest question backend API service', function() {
 
       $httpBackend.expect(
         'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-          500, 'Error loading pretest questions.');
-        PretestQuestionBackendApiService.fetchPretestQuestions(
-          'expId', 'storyId').then(
-            successHandler, failHandler);
+        500, 'Error loading pretest questions.');
+      PretestQuestionBackendApiService.fetchPretestQuestions(
+        'expId', 'storyId').then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
