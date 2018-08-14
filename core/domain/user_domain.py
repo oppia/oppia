@@ -271,7 +271,8 @@ class LearnerPlaylist(object):
 class UserContributionScoring(object):
     """Domain object for UserContributionScoringModel."""
 
-    def __init__(self, user_id, score_category, score):
+    def __init__(self, user_id, score_category, score, has_email_been_sent):
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
+        self.has_email_been_sent = has_email_been_sent
