@@ -195,6 +195,74 @@ def _ensure_fonts_exist(filepaths):
         _ensure_files_exist(font_paths)
 
 
+def get_file_count(directory_path):
+    """Count total number of file directory, subtracting ignored files.
+
+    Args:
+        directory_path: str. Directory to be walked.
+
+    Returns:
+        total_file_count: int. Total number of files minus ignored files.
+    """
+    total_file_count = 0
+    #pylint: disable=unused-variable
+    for root, dirs, files in os.walk(directory_path):
+        #pylint: enable=unused-variable
+        total_file_count += len(files)
+        for filename in files:
+            # Ignore files with certain extensions.
+            if any(filename.endswith(p)
+                   for p in FILE_EXTENSIONS_TO_IGNORE):
+                total_file_count -= 1
+    if directory_path == ASSETS_DEV_DIR:
+        # Add 1 to account for the added hashes.js.
+        total_file_count += 1
+    return total_file_count
+
+
+def _compare_file_count(source_path, target_path):
+    """Ensure that two dir's file counts matches.
+
+    Args:
+       source_path: str. Source of staging files.
+       target_path: str. Final filepath of built files.
+           the processed file.
+
+    Raises:
+        Exception: Raised if both dir do not have the same file count.
+    """
+    source_dir_file_count = get_file_count(source_path)
+    target_dir_file_count = get_file_count(target_path)
+    if source_dir_file_count != target_dir_file_count:
+        raise Exception(
+            '%s files in source dir != %s files in target dir.' % (
+                source_dir_file_count, target_dir_file_count))
+
+
+def _match_directory_with_hashes(directory_path, file_hashes):
+    """Ensure that filepaths are hashed correctly.
+
+    Args:
+       directory_path: str. Directory to be walked.
+       file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Raises:
+        Exception: Raised if filename's hash does not match hash dict entries.
+    """
+    # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html
+    #pylint: disable=unused-variable
+    for root, dirs, files in os.walk(directory_path):
+        #pylint: enable=unused-variable
+        for filename in files:
+            file_hash = re.findall(r"([a-fA-F\d]{32})", filename)
+            if len(file_hash) == 0:
+                # There are filename that do not contain hashes.
+                continue # pragma: no cover
+            if file_hash[0] not in file_hashes.values():
+                raise Exception(
+                    'Hashed file %s does not match hash dict keys' %
+                    filename)
+
 def process_html(source_path, target_path, file_hashes):
     """Copies contents of HTML file, while removing whitespace and
     replacing paths inside the file with paths with hashes.
@@ -552,6 +620,7 @@ def save_hashes_as_json(target_filepath, file_hashes):
         target_filepath, os.path.join(os.path.curdir, 'build', 'assets'))
     filepath_with_hash = _insert_hash(target_filepath, file_hash)
     os.rename(target_filepath, filepath_with_hash)
+    print 'Saving %s as %s' % (relative_filepath, filepath_with_hash)
     file_hashes[relative_filepath] = file_hash
 
 
@@ -663,6 +732,44 @@ def rebuild_new_files(
         build_tasks.append(task)
 
 
+def build_template_directory(file_hashes, build_tasks): # pragma: no cover
+    """Build all files in TEMPLATES_DEV_DIR_CORE if there is no existing staging
+    dir. Otherwise, selectively build recently changed files in
+    TEMPLATES_DEV_DIR_CORE and copy to staging dir.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary of file hashes.
+        build_tasks: Deque(obj). A deque that contains all build tasks queued
+            to be processed.
+    """
+    if not os.path.isdir(TEMPLATES_STAGING_DIR):
+        # If there is no staging dir, perform build process on all files.
+        print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
+            file_hashes, build_tasks)
+    else:
+        # If there is an existing staging dir, rebuild all HTML files.
+        print 'Staging directory exists, re-building all HTML files'
+        build_files(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, file_hashes,
+            build_tasks,
+            file_formats=('.html',))
+        recently_changed_filenames = get_recently_changed_filenames(
+            TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
+        if recently_changed_filenames:
+            # Only re-build files that have changed since last build.
+            print ("Re-building recently changed files at %s"
+                   % TEMPLATES_DEV_DIR_CORE)
+            rebuild_new_files(
+                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
+                recently_changed_filenames, file_hashes, build_tasks)
+            # Clean up files in staging dir that have been removed in DEV dir.
+            remove_deleted_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR)
+        else:
+            print 'No changes detected. Using previously built files.'
+
+
 def remove_deleted_files(dev_directory, staging_directory):
     """Walk the staging directory and remove files that have since been removed
     from the DEV directory.
@@ -741,72 +848,59 @@ def generate_build_directory(): # pragma: no cover
     hashes = dict()
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
-    # Create hashes for assets, copy directories and files to build/assets.
-    hashes.update(get_file_hashes(ASSETS_DEV_DIR))
-    copy_files_source_to_target(
-        ASSETS_DEV_DIR, ASSETS_OUT_DIR, hashes, copy_tasks)
+    # Process third_party resources, and copy them into staging directory.
+    # build_minified_third_party_libs()
 
-    # Minify extension static resources, create hashes for them and copy them
-    # into build/extensions.
-    hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
-    build_files(
-        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, build_tasks)
-    copy_files_source_to_target(
-        EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes, copy_tasks)
-
-    # Create hashes for all template files.
-    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR_CORE))
-
+    # Create hashes for all directories and files.
+    HASH_DIRS = [
+        ASSETS_DEV_DIR, EXTENSIONS_DEV_DIR, TEMPLATES_DEV_DIR_CORE,
+        THIRD_PARTY_GENERATED_STAGING_DIR]
+    for HASH_DIR in HASH_DIRS:
+        hashes.update(get_file_hashes(HASH_DIR))
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
     save_hashes_as_json(HASHES_JSON, hashes)
 
+    # Build files in /extensions and copy them into staging directory.
+    build_files(
+        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, build_tasks)
     # Minify all template files copy them into build/templates/head.
-    if not os.path.isdir(TEMPLATES_STAGING_DIR):
-        # If there is no staging dir, perform build process on all files.
-        print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
-        build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, build_tasks)
-    else:
-        # If there is an existing staging dir, rebuild all HTML files.
-        print 'Staging directory exists, re-building all HTML files'
-        build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, hashes, build_tasks,
-            file_formats=('.html',))
-        recently_changed_filenames = get_recently_changed_filenames(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
-        if recently_changed_filenames:
-            # Only re-build files that have changed since last build.
-            print ("Re-building recently changed files at %s"
-                   % TEMPLATES_DEV_DIR_CORE)
-            rebuild_new_files(
-                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
-                recently_changed_filenames, hashes, build_tasks)
-            # Clean up files in staging dir that have been removed in DEV dir.
-            remove_deleted_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR)
-        else:
-            print 'No changes detected. Using previously built files.'
-    # Copy built files from staging dir to build dir.
-    copy_files_source_to_target(
-        TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes, copy_tasks)
-
-    # Process third_party resources, create hashes for them and copy them into
-    # build/third_party/generated.
-    build_minified_third_party_libs()
-    hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_STAGING_DIR))
-    copy_files_source_to_target(
-        THIRD_PARTY_GENERATED_STAGING_DIR, THIRD_PARTY_GENERATED_OUT_DIR,
-        hashes, copy_tasks)
-
+    build_template_directory(hashes, build_tasks)
+    # Execute all build tasks.
     try:
         _execute_tasks(build_tasks)
     except Exception as e:
         print e
 
+    # Copy alls files from staging directory to production directory (/build).
+    COPY_INPUT_DIRS = [
+        ASSETS_DEV_DIR, EXTENSIONS_STAGING_DIR, TEMPLATES_STAGING_DIR,
+        THIRD_PARTY_GENERATED_STAGING_DIR]
+    COPY_OUTPUT_DIRS = [
+        ASSETS_OUT_DIR, EXTENSIONS_OUT_DIR, TEMPLATES_OUT_DIR,
+        THIRD_PARTY_GENERATED_OUT_DIR]
+    assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
+    for i in xrange(len(COPY_INPUT_DIRS)):
+        copy_files_source_to_target(
+            COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes, copy_tasks)
+    # Execute all copy tasks.
     try:
         _execute_tasks(copy_tasks)
     except Exception as e:
         print e
+
+    # Save hashes as JSON again due to deletion by copy functions.
+    save_hashes_as_json(HASHES_JSON, hashes)
+
+    for i in xrange(len(COPY_INPUT_DIRS)):
+        # Make sure that all files in /DEV and staging dir are accounted for.
+        _compare_file_count(COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i])
+         # Make sure that hashed file name matches with current hash dict.
+        _match_directory_with_hashes(COPY_OUTPUT_DIRS[i], hashes)
+
+    # Make sure hashes.js is available.
+    hash_final_file_path = _insert_hash(HASHES_JSON, hashes['hashes.js'])
+    _ensure_files_exist([hash_final_file_path])
 
     print 'Build completed.'
 
