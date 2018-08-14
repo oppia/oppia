@@ -374,6 +374,23 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# The interactions permissible for a question.
+ALLOWED_QUESTION_INTERACTION_IDS = [
+    'TextInput', 'MultipleChoiceInput', 'NumericInput']
+
+ALLOWED_QUESTION_INTERACTION_CATEGORIES = [{
+    'name': 'General',
+    'interaction_ids': [
+        'MultipleChoiceInput',
+        'TextInput'
+    ],
+}, {
+    'name': 'Math',
+    'interaction_ids': [
+        'NumericInput'
+    ]
+}]
+
 # Flag to disable sending emails related to reviews for suggestions. To be
 # flipped after deciding (and implementing) whether a user should be scored
 # only for curated lessons.

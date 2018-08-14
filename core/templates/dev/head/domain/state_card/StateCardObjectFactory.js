@@ -19,7 +19,7 @@
 
 oppia.factory('StateCardObjectFactory', [function() {
   var StateCard = function(
-      stateName, currentParams, contentHtml, interactionHtml,
+      stateName, currentParams, contentHtml, interactionHtml, interaction,
       leadsToConceptCard, destStateName, inputResponsePairs) {
     this._stateName = stateName;
     this._currentParams = currentParams;
@@ -28,6 +28,7 @@ oppia.factory('StateCardObjectFactory', [function() {
     this._leadsToConceptCard = leadsToConceptCard;
     this._destStateName = destStateName;
     this._inputResponsePairs = inputResponsePairs;
+    this._interaction = interaction;
   };
 
   StateCard.prototype.getDestStateName = function() {
@@ -36,6 +37,10 @@ oppia.factory('StateCardObjectFactory', [function() {
 
   StateCard.prototype.getStateName = function() {
     return this._stateName;
+  };
+
+  StateCard.prototype.getInteraction = function() {
+    return this._interaction;
   };
 
   StateCard.prototype.getCurrentParams = function() {
@@ -100,10 +105,24 @@ oppia.factory('StateCardObjectFactory', [function() {
     this._leadsToConceptCard = leadsToConceptCard;
   };
 
+  /**
+   * @param {string} stateName - The state name for the current card.
+   * @param {object} params - The set of parameters for the learner associated
+   *        with a card.
+   * @param {string} contentHtml - The HTML string for the content displayed on
+   *        the content card.
+   * @param {string} interactionHtml - The HTML that calls the interaction
+   *        directive for the current card.
+   * @param {Interaction} interaction - An interaction object that stores all
+   *        the properties of the card's interaction.
+   * @param {bool} leadsToConceptCard - Whether the current card leads to a
+   *        concept card in the exploration.
+   */
   StateCard.createNewCard = function(
-      stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
+      stateName, params, contentHtml, interactionHtml, interaction,
+      leadsToConceptCard) {
     return new StateCard(
-      stateName, params, contentHtml, interactionHtml,
+      stateName, params, contentHtml, interactionHtml, interaction,
       leadsToConceptCard, null, []);
   };
 

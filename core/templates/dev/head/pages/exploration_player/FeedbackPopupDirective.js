@@ -46,7 +46,7 @@ oppia.directive('feedbackPopup', [
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = ExplorationEngineService.isLoggedIn();
+          $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.
