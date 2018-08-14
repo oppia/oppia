@@ -19,9 +19,8 @@
 
 oppia.factory('StateCardObjectFactory', [function() {
   var StateCard = function(
-      stateName, currentParams, contentHtml, interactionHtml,
-      leadsToConceptCard, destStateName, inputResponsePairs,
-      interaction) {
+      stateName, currentParams, contentHtml, interactionHtml, interaction,
+      leadsToConceptCard, destStateName, inputResponsePairs) {
     this._stateName = stateName;
     this._currentParams = currentParams;
     this._contentHtml = contentHtml;
@@ -110,8 +109,8 @@ oppia.factory('StateCardObjectFactory', [function() {
       stateName, params, contentHtml, interactionHtml, interaction,
       leadsToConceptCard) {
     return new StateCard(
-      stateName, params, contentHtml, interactionHtml,
-      leadsToConceptCard, null, [], interaction);
+      stateName, params, contentHtml, interactionHtml, interaction,
+      leadsToConceptCard, null, []);
   };
 
   return StateCard;
