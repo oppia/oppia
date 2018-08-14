@@ -304,9 +304,9 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
     return (
         [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-        .get_in_review_suggestions_in_score_categories(
-            score_categories, user_id)])
+         for s in suggestion_models.GeneralSuggestionModel
+         .get_in_review_suggestions_in_score_categories(
+             score_categories, user_id)])
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
