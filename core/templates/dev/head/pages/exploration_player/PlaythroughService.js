@@ -50,13 +50,18 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
+    var misTracker = false;
+    var cstTracker = false;
+
     var removeOldQuitAction = function() {
+      var quitAction = playthrough.actions[playthrough.actions.length - 1];
       // After the second quit action is recorded, the first quit is removed
       // using this method. This ensures that there are only two quit actions
       // in the playthrough actions list at a time.
       playthrough.actions = playthrough.actions.filter(function(action) {
         return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
       });
+      playthrough.actions.push(quitAction);
     };
 
     var _determineIfPlayerIsInSamplePopulation = function(probability) {
@@ -64,19 +69,26 @@ oppia.factory('PlaythroughService', [
     };
 
     var createMultipleIncorrectIssueTracker = function(initStateName) {
+      if (misTracker) {
+        return;
+      }
       multipleIncorrectStateName = {
         state_name: initStateName,
         num_times_incorrect: 0
       };
+      misTracker = true;
     };
 
     var createCyclicIssueTracker = function(initStateName) {
+      if (cstTracker) {
+        return;
+      }
       cycleIdentifier = {
         cycle: '',
         num_cycles: 0
       };
-
-      visitedStates.push(initStateName);
+      visitedStates.unshift(initStateName);
+      cstTracker = true;
     };
 
     var incrementIncorrectAnswerInMultipleIncorrectIssueTracker = function() {
@@ -251,6 +263,12 @@ oppia.factory('PlaythroughService', [
           timeSpentInStateSecs) {
         if (isPlaythroughDiscarded()) {
           return;
+        }
+        if (!cstTracker) {
+          createCyclicIssueTracker(stateName);
+        }
+        if (!misTracker) {
+          createMultipleIncorrectIssueTracker(stateName);
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_ANSWER_SUBMIT,

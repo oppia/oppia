@@ -756,7 +756,6 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();
@@ -766,6 +765,8 @@ describe('Issues visualization', function() {
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners submitted answers to card "Two" several times, ' +
       'then gave up and quit.');
+
+    users.logout();
   });
 
   it('records cyclic transitions issue.', function() {
@@ -810,7 +811,6 @@ describe('Issues visualization', function() {
 
     users.login('user1@ExplorationIssues.com');
     libraryPage.get();
-    waitfor.pageToFullyLoad();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     general.moveToEditor();
@@ -820,6 +820,8 @@ describe('Issues visualization', function() {
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners ended up in a cyclic loop revisiting card ' +
       '"Two" many times.');
+
+    users.logout();
   });
 });
 
