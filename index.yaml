@@ -171,6 +171,12 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: UserContributionScoringModel
+  properties:
+  - name: deleted
+  - name: user_id
+  - name: score
+
 - kind: UserImpactRealtimeModel
   properties:
   - name: realtime_layer

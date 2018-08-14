@@ -198,11 +198,13 @@ oppia.controller('CreatorDashboard', [
           break;
         }
       }
-      for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
-        if ($scope.suggestionsToReviewList[i].threadId === threadId) {
-          $scope.activeThread = $scope.suggestionsToReviewList[i];
-          $scope.canReviewActiveThread = true;
-          break;
+      if (!$scope.activeThread) {
+        for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
+          if ($scope.suggestionsToReviewList[i].threadId === threadId) {
+            $scope.activeThread = $scope.suggestionsToReviewList[i];
+            $scope.canReviewActiveThread = true;
+            break;
+          }
         }
       }
     };

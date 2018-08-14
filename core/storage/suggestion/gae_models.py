@@ -210,23 +210,29 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.last_updated < threshold_time).fetch()
 
     @classmethod
-    def get_in_review_suggestions_in_score_categories(cls, score_categories):
+    def get_in_review_suggestions_in_score_categories(
+            cls, score_categories, user_id):
         """Gets all suggestions which are in review in the given
         score_categories.
 
         Args:
-            score_categories: list(str): list of score categories to query for.
+            score_categories: list(str). list of score categories to query for.
+            user_id: list(str). The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
 
         Returns:
             list(SuggestionModel). A list of suggestions that are in the given
-                score categories.
+                score categories, which are in review, but not created by the
+                given user.
         """
         if len(score_categories) == 0:
             raise Exception('Recieved empty list of score categories')
 
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-            cls.score_category.IN(score_categories)).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
+            cls.score_category.IN(score_categories)).filter(
+                cls.author_id != user_id).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls):

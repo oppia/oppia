@@ -274,28 +274,28 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, 'category_1',
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
             'exploration.exp1.thread_6')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            suggestion_models.STATUS_IN_REVIEW, 'author_2',
             'reviewer_2', self.change_cmd, 'category2',
             'exploration.exp1.thread_7')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            suggestion_models.STATUS_IN_REVIEW, 'author_2',
             'reviewer_2', self.change_cmd, 'category3',
             'exploration.exp1.thread_8')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_3',
+            suggestion_models.STATUS_REJECTED, 'author_2',
             'reviewer_2', self.change_cmd, 'category1',
             'exploration.exp1.thread_9')
         suggestion_models.GeneralSuggestionModel.create(
@@ -308,27 +308,34 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_in_score_categories(['category1'])), 1)
-        self.assertEqual(len(
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_in_score_categories(['category2'])), 2)
+            .get_in_review_suggestions_in_score_categories(
+                ['category1'], 'author_3')), 0)
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
-                ['category1', 'category2'])), 3)
+                ['category1'], 'author_2')), 1)
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
-                ['category1', 'category2', 'category3'])), 4)
+                ['category2'], 'author_2')), 1)
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
-                ['category1', 'category_invalid'])), 1)
+                ['category1', 'category2'], 'author_3')), 1)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(
+                ['category1', 'category2', 'category3'], 'author_1')), 4)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_in_score_categories(
+                ['category1', 'category_invalid'], 'author_2')), 1)
         with self.assertRaisesRegexp(
             Exception, 'Recieved empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
-                .get_in_review_suggestions_in_score_categories([])), 0)
+                .get_in_review_suggestions_in_score_categories(
+                    [], 'author_1')), 0)
 
     def test_get_all_score_catrgories(self):
         suggestion_models.GeneralSuggestionModel.create(
@@ -343,13 +350,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, 'category_2',
+            'reviewer_2', self.change_cmd, 'category2',
             'exploration.exp1.thread_12')
         score_categories = (
             suggestion_models.GeneralSuggestionModel.get_all_score_categories())
         self.assertIn(self.score_category, score_categories)
-        self.assertIn('category_1', score_categories)
-        self.assertIn('category_2', score_categories)
+        self.assertIn('category1', score_categories)
+        self.assertIn('category2', score_categories)
 
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
