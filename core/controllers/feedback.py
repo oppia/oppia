@@ -68,6 +68,11 @@ class ThreadListHandlerForTopics(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
+        if (
+                not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS or
+                not feconf.ENABLE_NEW_STRUCTURES):
+            raise self.PageNotFoundException
+
         self.values.update({
             'suggestion_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(

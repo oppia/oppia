@@ -45,7 +45,7 @@ oppia.directive('questionsTab', [
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
-            $scope.emptyMisconceptionsList = [];
+            $scope.misconceptions = [];
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
@@ -216,6 +216,16 @@ oppia.directive('questionsTab', [
               ]
             }).result.then(function(res) {
               $scope.selectedSkillId = res.skillId;
+              EditableSkillBackendApiService.fetchSkill(res.skillId).then(
+                function(skillDict) {
+                  $scope.misconceptions = skillDict.misconceptions.map(function(
+                      misconceptionsBackendDict) {
+                    return MisconceptionObjectFactory.createFromBackendDict(
+                      misconceptionsBackendDict);
+                  });
+                }, function(error) {
+                  AlertsService.addWarning();
+                });
             });
           };
 
@@ -234,6 +244,7 @@ oppia.directive('questionsTab', [
               review_message: reviewMessage
             }).then(function() {
               $scope.clearActiveQuestion();
+              $window.location.reload();
             });
           };
 
@@ -251,6 +262,7 @@ oppia.directive('questionsTab', [
               review_message: reviewMessage
             }).then(function() {
               $scope.clearActiveQuestion();
+              $window.location.reload();
             });
           };
 

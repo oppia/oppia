@@ -31,6 +31,7 @@ from core.domain import obj_services
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
+from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -208,6 +209,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
+        if feconf.ENABLE_NEW_STRUCTURES:
+            topic_summaries = topic_services.get_all_topic_summaries()
+            topic_summary_dicts = [
+                summary.to_dict() for summary in topic_summaries]
+
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
@@ -277,6 +283,10 @@ class CreatorDashboardHandler(base.BaseHandler):
             'subscribers_list': subscribers_list,
             'display_preference': creator_dashboard_display_pref,
         })
+        if feconf.ENABLE_NEW_STRUCTURES
+            self.values.update({
+                'topic_summary_dicts': topic_summary_dicts
+            })
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard

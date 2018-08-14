@@ -82,6 +82,8 @@ class QuestionChange(object):
 
         if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
             self.question_dict = change_dict['question_dict']
+            # Note that change_dict['skill_id'] may be None if this change is
+            # being done in the context of a suggestion.
             self.skill_id = change_dict['skill_id']
 
     def to_dict(self):

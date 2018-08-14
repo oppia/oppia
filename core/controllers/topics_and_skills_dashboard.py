@@ -50,7 +50,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
     # As anyone should be able to see the topics and skills list when creating
     # questions, this handler has open access.
-    @acl_decorators.open_access
+    @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
         """Handles GET requests."""
 
