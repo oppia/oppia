@@ -777,7 +777,7 @@ oppia.directive('conversationSkin', [
                         FocusManagerService.generateFocusLabel();
                       PlayerTranscriptService.updateLatestInteractionHtml(
                         ExplorationPlayerStateService.getCurrentInteractionHtml(
-                            _nextFocusLabel) + _getRandomSuffix());
+                          _nextFocusLabel) + _getRandomSuffix());
                     }
 
                     $scope.redirectToRefresherExplorationConfirmed = false;
@@ -860,7 +860,7 @@ oppia.directive('conversationSkin', [
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!ExplorationPlayerStateService.
-                          isInteractionInline()) {
+                        isInteractionInline()) {
                         $scope.$broadcast('helpCardAvailable', {
                           helpCardHtml: feedbackHtml,
                           hasContinueButton: true

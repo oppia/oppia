@@ -219,7 +219,7 @@ oppia.factory('ResponsesService', [
         _saveDefaultOutcome(_defaultOutcome);
         _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
         if (newInteractionId) {
-          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);          
+          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
         }
 
         _answerGroupsMemento = angular.copy(_answerGroups);

@@ -82,8 +82,8 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            $scope.conceptCardIsBeingShown = !Boolean(
-              $scope.activeCard.getInteraction());
+            $scope.conceptCardIsBeingShown = Boolean(
+              !$scope.activeCard.getInteraction());
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
