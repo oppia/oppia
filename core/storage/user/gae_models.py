@@ -691,6 +691,8 @@ class UserContributionScoringModel(base_models.BaseModel):
     score_category = ndb.StringProperty(required=True, indexed=True)
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
+    # Flag to check if email to onboard reviewer has been sent for the category.
+    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
 
     @classmethod
     def get_all_scores_of_user(cls, user_id):
