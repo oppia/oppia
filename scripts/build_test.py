@@ -160,6 +160,70 @@ class BuildTests(test_utils.GenericTestBase):
             ('File %s does not exist.') % random_fontpaths[0] in
             fileNotExist.exception)
 
+    def test_get_file_count(self):
+        """Test get_file_count to return the correct number of files, minus
+        ignored files.
+        """
+        all_inclusive_file_count = 0
+        #pylint: disable=unused-variable
+        for root, dirs, files in os.walk(build.EXTENSIONS_DEV_DIR):
+            #pylint: enable=unused-variable
+            all_inclusive_file_count += len(files)
+        ignored_file_count = 0
+        #pylint: disable=unused-variable
+        for root, dirs, files in os.walk(build.EXTENSIONS_DEV_DIR):
+            for filename in files:
+                if any(filename.endswith(p)
+                       for p in build.FILE_EXTENSIONS_TO_IGNORE):
+                    ignored_file_count += 1
+        self.assertEqual(
+            all_inclusive_file_count - ignored_file_count,
+            build.get_file_count(build.EXTENSIONS_DEV_DIR))
+
+    def test_compare_file_count(self):
+        """Test _compare_file_count to raise exception when there is a
+        mismatched file count between 2 dirs.
+        """
+        with self.assertRaises(Exception) as incorrectFileCount:
+            # pylint: disable=protected-access
+            build._compare_file_count(
+                build.EXTENSIONS_DEV_DIR, build.TEMPLATES_DEV_DIR_CORE)
+        # pylint: enable=protected-access
+        print incorrectFileCount.exception
+        source_dir_file_count = build.get_file_count(build.EXTENSIONS_DEV_DIR)
+        target_dir_file_count = build.get_file_count(
+            build.TEMPLATES_DEV_DIR_CORE)
+        self.assertTrue(
+            ('%s files in source dir != %s files in target dir.') % (
+                source_dir_file_count, target_dir_file_count) in
+            incorrectFileCount.exception)
+
+    def test_match_directory_with_hashes(self):
+        """Test _match_directory_with_hashes to raise exception when there is
+        a filename that contains a hash not in hash dict.
+        """
+        file_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        copy_tasks = collections.deque()
+        build.copy_files_source_to_target(
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, file_hashes, copy_tasks)
+        # pylint: disable=protected-access
+        build._execute_tasks(copy_tasks)
+        # pylint: enable=protected-access
+
+        file_hashes.clear()
+        file_hashes = build.get_file_hashes(build.TEMPLATES_DEV_DIR_CORE)
+        with self.assertRaises(Exception) as incorrectFileHash:
+            # pylint: disable=protected-access
+            build._match_directory_with_hashes(
+                build.ASSETS_OUT_DIR, file_hashes)
+        # pylint: enable=protected-access
+        hashed_file_name = 'constants.f614a2f78312c02f0324433451612757.js'
+        self.assertTrue(
+            'Hashed file %s does not match hash dict keys' % hashed_file_name in
+            incorrectFileHash.exception)
+        # Clean up /build/assets.
+        shutil.rmtree(build.ASSETS_OUT_DIR)
+
     def test_process_html(self):
         base_source_path = os.path.join(
             build.TEMPLATES_DEV_DIR_CORE, 'pages', 'base.html')
@@ -207,16 +271,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.copy_files_source_to_target(
             build.EXTENSIONS_DEV_DIR, build.EXTENSIONS_OUT_DIR,
             extensions_hashes, copy_tasks)
-        total_file_count = 0
-        #pylint: disable=unused-variable
-        for root, dirs, files in os.walk(build.EXTENSIONS_DEV_DIR):
-            #pylint: enable=unused-variable
-            total_file_count += len(files)
-            for filename in files:
-                # Ignore files with certain extensions.
-                if any(filename.endswith(p)
-                       for p in build.FILE_EXTENSIONS_TO_IGNORE):
-                    total_file_count -= 1
+        total_file_count = build.get_file_count(build.EXTENSIONS_DEV_DIR)
         self.assertEquals(len(copy_tasks), total_file_count)
         # Clean up /build dir.
         shutil.rmtree(build.EXTENSIONS_OUT_DIR)
@@ -382,12 +437,9 @@ class BuildTests(test_utils.GenericTestBase):
         build.build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks)
-        total_file_count = 0
-        #pylint: disable=unused-variable
-        for root, dirs, files in os.walk(build.ASSETS_DEV_DIR):
-            #pylint: enable=unused-variable
-            total_file_count += len(files)
-        self.assertEqual(total_file_count, len(build_tasks))
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
+        # Minus 1 to adjust for hashes.js.
+        self.assertEqual(total_file_count - 1, len(build_tasks))
         build_tasks.clear()
 
         # Only build HTML files.

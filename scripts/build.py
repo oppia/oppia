@@ -260,8 +260,8 @@ def _match_directory_with_hashes(directory_path, file_hashes):
                 continue # pragma: no cover
             if file_hash[0] not in file_hashes.values():
                 raise Exception(
-                    'Hashed file %s does not match hash dict keys' %
-                    filename)
+                    'Hashed file %s does not match hash dict keys' % filename)
+
 
 def process_html(source_path, target_path, file_hashes):
     """Copies contents of HTML file, while removing whitespace and
@@ -849,7 +849,7 @@ def generate_build_directory(): # pragma: no cover
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
     # Process third_party resources, and copy them into staging directory.
-    # build_minified_third_party_libs()
+    build_minified_third_party_libs()
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -895,7 +895,7 @@ def generate_build_directory(): # pragma: no cover
     for i in xrange(len(COPY_INPUT_DIRS)):
         # Make sure that all files in /DEV and staging dir are accounted for.
         _compare_file_count(COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i])
-         # Make sure that hashed file name matches with current hash dict.
+        # Make sure that hashed file name matches with current hash dict.
         _match_directory_with_hashes(COPY_OUTPUT_DIRS[i], hashes)
 
     # Make sure hashes.js is available.
