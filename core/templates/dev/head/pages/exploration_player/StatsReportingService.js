@@ -49,14 +49,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'siteAnalyticsService', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'STATS_EVENT_TYPES',
-  'STATS_REPORTING_URLS',
+  'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
       PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
       UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
-      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, STATS_EVENT_TYPES,
-      STATS_REPORTING_URLS) {
+      PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -186,9 +184,7 @@ oppia.factory('StatsReportingService', [
           session_id: sessionId
         });
 
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          PlaythroughService.recordExplorationStartAction(stateName);
-        }
+        PlaythroughService.recordExplorationStartAction(stateName);
         explorationActuallyStarted = true;
       },
       recordSolutionHit: function(stateName) {
@@ -284,12 +280,10 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerFinishExploration();
 
         postStatsToBackend();
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          PlaythroughService.recordExplorationQuitAction(
-            stateName, stateStopwatch.getTimeInSecs());
+        PlaythroughService.recordExplorationQuitAction(
+          stateName, stateStopwatch.getTimeInSecs());
 
-          PlaythroughService.recordPlaythrough(true);
-        }
+        PlaythroughService.recordPlaythrough(true);
         explorationIsComplete = true;
       },
       recordAnswerSubmitted: function(
@@ -327,19 +321,15 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          PlaythroughService.recordExplorationQuitAction(
-            stateName, stateStopwatch.getTimeInSecs());
-          PlaythroughService.recordPlaythrough();
-        }
+        PlaythroughService.recordExplorationQuitAction(
+          stateName, stateStopwatch.getTimeInSecs());
+        PlaythroughService.recordPlaythrough();
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback) {
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          PlaythroughService.recordAnswerSubmitAction(
-            stateName, destStateName, interactionId, answer, feedback,
-            stateStopwatch.getTimeInSecs());
-        }
+        PlaythroughService.recordAnswerSubmitAction(
+          stateName, destStateName, interactionId, answer, feedback,
+          stateStopwatch.getTimeInSecs());
       }
     };
   }
