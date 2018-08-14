@@ -89,13 +89,16 @@ oppia.directive('earlyQuitIssueDirective', [
                     $scope.displayBlocks =
                       LearnerActionRenderService.getDisplayBlocks(
                         playthrough.actions);
+                    $scope.reversedDisplayBlocks =
+                      $scope.displayBlocks.slice().reverse();
 
                     var blockActionIndexMapping = {};
                     $scope.displayBlocks.reduce(
                       function(runningTotal, displayBlock, i) {
-                        blockActionIndexMapping[i] = runningTotal;
-                        return runningTotal + displayBlock.length;
-                      }, 1);
+                        blockActionIndexMapping[i] =
+                          runningTotal - displayBlock.length;
+                        return runningTotal - displayBlock.length;
+                      }, playthrough.actions.length + 1);
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
 
@@ -130,37 +133,37 @@ oppia.directive('earlyQuitIssueDirective', [
                      * the final display block is shown. Else, the following
                      * display block is displayed.
                      */
-                    $scope.showRemainingActions = function(pIdx) {
-                      // If there is only one display block left to be shown,
-                      // the arrow is not required.
-                      if ($scope.maxHidden === 1) {
-                        getRemainingActionsElements(
-                          pIdx, $scope.maxHidden).style.display = 'block';
-                        document.getElementById('arrowDiv').style.display =
-                          'none';
-                      } else {
-                        var currentShown = 0, i;
-                        for (i = $scope.maxHidden; i > 0; i--) {
-                          if (getRemainingActionsElements(
-                            pIdx, i).style.display === 'block') {
-                            currentShown = i;
-                            break;
-                          }
-                        }
-                        if (currentShown === 0) {
-                          getRemainingActionsElements(
-                            pIdx, $scope.maxHidden).style.display = 'block';
-                        } else if (currentShown === $scope.maxHidden - 1) {
-                          getRemainingActionsElements(
-                            pIdx, 1).style.display = 'block';
-                          document.getElementById(
-                            'arrowDiv').style.display = 'none';
-                        } else {
-                          getRemainingActionsElements(
-                            pIdx, currentShown - 1).style.display = 'block';
-                        }
-                      }
-                    };
+                     $scope.showRemainingActions = function(pIdx) {
+                       // If there is only one display block left to be shown,
+                       // the arrow is not required.
+                       if ($scope.maxHidden === 1) {
+                         getRemainingActionsElements(
+                           pIdx, $scope.maxHidden).style.display = 'block';
+                         document.getElementById('arrowDiv').style.display =
+                           'none';
+                       } else {
+                         var currentShown = 0, i;
+                         for (i = $scope.maxHidden; i > 0; i--) {
+                           if (getRemainingActionsElements(
+                             pIdx, i).style.display === 'block') {
+                             currentShown = i;
+                             break;
+                           }
+                         }
+                         if (currentShown === 0) {
+                           getRemainingActionsElements(
+                             pIdx, currentShown + 1).style.display = 'block';
+                         } else if (currentShown === $scope.maxHidden - 1) {
+                           getRemainingActionsElements(
+                             pIdx, $scope.maxHidden).style.display = 'block';
+                           document.getElementById(
+                             'arrowDiv').style.display = 'none';
+                         } else {
+                           getRemainingActionsElements(
+                             pIdx, currentShown + 1).style.display = 'block';
+                         }
+                       }
+                     };
 
                     $scope.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
