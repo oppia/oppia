@@ -15,8 +15,10 @@
 # limitations under the License.
 
 """Tests for the HTML validation."""
+import os
 
 import bs4
+from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
@@ -26,9 +28,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
     strings to valid RTE format.
     """
-    FILENAME = 'abc.png'
-    HEIGHT = 45
-    WIDTH = 45
 
     def test_wrap_with_siblings(self):
         test_cases = [{
@@ -977,8 +976,67 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_output, expected_output)
 
+    def test_add_dimensions_to_image_tags(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'abc1.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                ' is test case to check that dimensions are added to the oppia'
+                ' noninteractive image tags.</p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;abc1_height_32_width_32.png&amp;'
+                'quot;"></oppia-noninteractive-image>Hello this is test case'
+                ' to check that dimensions are added to the oppia '
+                'noninteractive image tags.</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'abc2.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                ' is test case to check that dimensions are added to the oppia'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3.png&amp;quot;">'
+                '</oppia-noninteractive-image></p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image filepath-with-value="'
+                '&amp;quot;abc2_height_32_width_32.png&amp;quot;">'
+                '</oppia-noninteractive-image>Hello this is test case '
+                'to check that dimensions are added to the oppia'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3_height_32_width_32.png'
+                '&amp;quot;"></oppia-noninteractive-image></p>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hey this is a test case with no images.</p>'
+            ),
+            'expected_output': (
+                u'<p>Hey this is a test case with no images.</p>'
+            )
+        }]
+
+        EXP_ID = 'eid'
+        OWNER_ID = 'Admin'
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(EXP_ID))
+        fs.commit(OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.add_dimensions_to_image_tags( # pylint: disable=line-too-long
+                    EXP_ID, test_case['html_content']),
+                test_case['expected_output'])
+
     def test_regenerate_image_filename_using_dimensions(self):
         regenerated_name = (
             html_validation_service.regenerate_image_filename_using_dimensions(
-                self.FILENAME, self.HEIGHT, self.WIDTH))
+                'abc.png', 45, 45))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')

@@ -25,6 +25,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -50,6 +51,11 @@ def _count_at_least_editable_exploration_summaries(user_id):
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
@@ -613,8 +619,11 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
         for exp_id in demo_exploration_ids:
             start_time = datetime.datetime.utcnow()
 
-            exp_services.load_demo(exp_id)
-            exploration = exp_services.get_exploration_by_id(exp_id)
+            with self.swap(
+                html_validation_service, 'get_filename_with_dimensions',
+                mock_get_filename_with_dimensions):
+                exp_services.load_demo(exp_id)
+                exploration = exp_services.get_exploration_by_id(exp_id)
             warnings = exploration.validate(strict=True)
             if warnings:
                 raise Exception(warnings)
