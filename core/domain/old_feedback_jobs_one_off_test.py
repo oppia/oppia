@@ -19,6 +19,7 @@
 import ast
 import datetime
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
@@ -28,7 +29,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (suggestion_models, feedback_models, email_models, user_models) = (
     models.Registry.import_models([
@@ -88,7 +88,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
     def test_message_count(self):
         """Test if the job returns the correct message count."""
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
@@ -208,7 +208,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1, 'unused_state_name',
                 self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
@@ -466,12 +466,24 @@ class FeedbackThreadIdMigrationOneOffJobTest(test_utils.GenericTestBase):
         new_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 'author.exploration.exp1.thread1'))
+        old_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get_by_id(
+                'author.exp1.thread1'))
         self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
+        self.assertEqual(
+            new_thread_user_model.last_updated,
+            old_thread_user_model.last_updated)
 
         new_reply_to_id_model = (
             email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
                 'author.exploration.exp1.thread1'))
+        old_reply_to_id_model = (
+            email_models.FeedbackEmailReplyToIdModel.get_by_id(
+                'author.exp1.thread1'))
         self.assertEqual(new_reply_to_id_model.reply_to_id, '1234')
+        self.assertEqual(
+            new_reply_to_id_model.last_updated,
+            old_reply_to_id_model.last_updated)
 
         new_user_subscription_model = (
             user_models.UserSubscriptionsModel.get_by_id('author'))

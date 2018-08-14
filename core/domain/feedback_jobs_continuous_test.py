@@ -16,12 +16,14 @@
 
 """Tests for continuous computations relating to feedback analytics."""
 
+from constants import constants
 from core import jobs_registry
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -153,67 +155,91 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     def test_single_thread_single_exp(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            thread_id = 'eid.tid'
+            thread_id = 'exploration.eid.tid'
             self.save_new_valid_exploration(exp_id, 'owner')
-            thread = feedback_models.FeedbackThreadModel.create(thread_id)
-            thread.exploration_id = exp_id
+            thread = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id)
+            thread.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread.entity_id = exp_id
+            thread.subject = 'subject'
             thread.put()
-
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 1,
+                        'num_total_threads': 1,
+                    })
 
     def test_multiple_threads_single_exp(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            thread_id_1 = 'eid.tid1'
-            thread_id_2 = 'eid.tid2'
+            thread_id_1 = 'exploration.eid.tid1'
+            thread_id_2 = 'exploration.eid.tid2'
             self.save_new_valid_exploration(exp_id, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
-            thread_1.exploration_id = exp_id
+            thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_1)
+            thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_1.entity_id = exp_id
+            thread_1.subject = 'subject'
             thread_1.put()
-            thread_2 = feedback_models.FeedbackThreadModel.create(thread_id_2)
-            thread_2.exploration_id = exp_id
+            thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_2)
+            thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_2.entity_id = exp_id
+            thread_2.subject = 'subject'
             thread_2.put()
 
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 2,
-                    'num_total_threads': 2,
-                })
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 2,
+                        'num_total_threads': 2,
+                    })
 
     def test_multiple_threads_multiple_exp(self):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
             exp_id_3 = 'eid3'
-            thread_id_1 = 'eid1.tid1'
-            thread_id_2 = 'eid2.tid2'
-            thread_id_3 = 'eid3.tid3'
+            thread_id_1 = 'exploration.eid1.tid1'
+            thread_id_2 = 'exploration.eid1.tid2'
+            thread_id_3 = 'exploration.eid3.tid3'
             self.save_new_valid_exploration(exp_id_1, 'owner')
             self.save_new_valid_exploration(exp_id_2, 'owner')
             self.save_new_valid_exploration(exp_id_3, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
-            thread_1.exploration_id = exp_id_1
+
+            thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_1)
+            thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_1.entity_id = exp_id_1
+            thread_1.subject = 'subject'
             thread_1.put()
-            thread_2 = feedback_models.FeedbackThreadModel.create(thread_id_2)
-            thread_2.exploration_id = exp_id_1
+            thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_2)
+            thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_2.entity_id = exp_id_1
+            thread_2.subject = 'subject'
             thread_2.put()
-            thread_3 = feedback_models.FeedbackThreadModel.create(thread_id_3)
-            thread_3.exploration_id = exp_id_3
+            thread_3 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_3)
+            thread_3.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_3.entity_id = exp_id_3
+            thread_3.subject = 'subject'
             thread_3.put()
-            self.process_and_flush_pending_tasks()
-            ModifiedFeedbackAnalyticsAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
-            # Do a multi call for all explorations and check for stats.
-            feedback_analytics_multi = (
-                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
-                    [exp_id_1, exp_id_2, exp_id_3]))
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.process_and_flush_pending_tasks()
+                ModifiedFeedbackAnalyticsAggregator.start_computation()
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+                self.process_and_flush_pending_tasks()
+                # Do a multi call for all explorations and check for stats.
+                feedback_analytics_multi = (
+                    ModifiedFeedbackAnalyticsAggregator
+                    .get_thread_analytics_multi([exp_id_1, exp_id_2, exp_id_3]))
             self.assertEqual(
                 feedback_analytics_multi[0].to_dict(),
                 {
@@ -260,144 +286,163 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = 'eid.tid1'
+            thread_id_1 = 'exploration.eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
-            thread_1.exploration_id = exp_id
+            thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_1)
+            thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_1.entity_id = exp_id
+            thread_1.subject = 'subject'
             thread_1.put()
 
-            # Start job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                # Start job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 1,
+                        'num_total_threads': 1,
+                    })
 
-            # Stop job.
-            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+                # Stop job.
+                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            # Close thread.
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id_1)
-            thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.put()
+                # Close thread.
+                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                    thread_id_1)
+                thread.status = feedback_models.STATUS_CHOICES_FIXED
+                thread.put()
 
-            # Restart job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 1,
-                })
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 0,
+                        'num_total_threads': 1,
+                    })
 
     def test_thread_closed_reopened_again(self):
         with self._get_swap_context():
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = 'eid.tid1'
+            thread_id_1 = 'exploration.eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
-            thread_1.exploration_id = exp_id
+            thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_1)
+            thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_1.entity_id = exp_id
+            thread_1.subject = 'subject'
             thread_1.put()
 
-            # Start job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                # Start job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 1,
+                        'num_total_threads': 1,
+                    })
 
-            # Stop job.
-            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+                # Stop job.
+                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            # Close thread.
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id_1)
-            thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.put()
+                # Close thread.
+                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                    thread_id_1)
+                thread.status = feedback_models.STATUS_CHOICES_FIXED
+                thread.put()
 
-            # Restart job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 1,
-                })
+                # Restart job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 0,
+                        'num_total_threads': 1,
+                    })
 
-            # Stop job.
-            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+                # Stop job.
+                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            # Reopen thread.
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id_1)
-            thread.status = feedback_models.STATUS_CHOICES_OPEN
-            thread.put()
+                # Reopen thread.
+                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                    thread_id_1)
+                thread.status = feedback_models.STATUS_CHOICES_OPEN
+                thread.put()
 
-            # Restart job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+                # Restart job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 1,
+                        'num_total_threads': 1,
+                    })
 
     def test_thread_closed_status_changed(self):
         with self._get_swap_context():
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = 'eid.tid1'
+            thread_id_1 = 'exploration.eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
-            thread_1.exploration_id = exp_id
+            thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
+                thread_id_1)
+            thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+            thread_1.entity_id = exp_id
+            thread_1.subject = 'subject'
             thread_1.put()
 
             # Start job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 1,
+                        'num_total_threads': 1,
+                    })
 
-            # Stop job.
-            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+                # Stop job.
+                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            # Close thread.
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id_1)
-            thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.put()
+                # Close thread.
+                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                    thread_id_1)
+                thread.status = feedback_models.STATUS_CHOICES_FIXED
+                thread.put()
 
-            # Restart job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 1,
-                })
+                # Restart job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 0,
+                        'num_total_threads': 1,
+                    })
 
-            # Stop job.
-            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+                # Stop job.
+                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            # Change thread status.
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id_1)
-            thread.status = feedback_models.STATUS_CHOICES_IGNORED
-            thread.put()
+                # Change thread status.
+                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                    thread_id_1)
+                thread.status = feedback_models.STATUS_CHOICES_IGNORED
+                thread.put()
 
-            # Restart job.
-            self._run_job_and_check_results(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 1,
-                })
+                # Restart job.
+                self._run_job_and_check_results(
+                    exp_id, {
+                        'num_open_threads': 0,
+                        'num_total_threads': 1,
+                    })
 
 
 class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):

@@ -30,8 +30,8 @@ oppia.directive('multipleIncorrectIssueDirective', [
         '/pages/exploration_editor/statistics_tab/' +
         'multiple_incorrect_issue_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'IssuesService',
-        function($scope, $uibModal, IssuesService) {
+        '$scope', '$uibModal', 'AlertsService', 'IssuesService',
+        function($scope, $uibModal, AlertsService, IssuesService) {
           $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();
@@ -45,6 +45,20 @@ oppia.directive('multipleIncorrectIssueDirective', [
 
           $scope.createPlaythroughNavId = function(playthroughId) {
             return getPlaythroughIndex(playthroughId) + 1;
+          };
+
+          var issueResolved = false;
+          $scope.resolveIssue = function() {
+            if (!issueResolved) {
+              IssuesService.resolveIssue(issue);
+              AlertsService.addSuccessMessage(
+                'Issue resolved. Refresh the page to view changes.');
+              issueResolved = true;
+            } else {
+              AlertsService.addSuccessMessage(
+                'Issue has already been resolved. No need to resolve again. ' +
+                'Refresh the page to view changes.');
+            }
           };
 
           $scope.showPlaythrough = function(playthroughId) {
