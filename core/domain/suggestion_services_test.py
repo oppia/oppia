@@ -14,6 +14,7 @@
 
 """Tests for suggestion related services."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -23,7 +24,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -115,7 +115,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -144,7 +144,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -168,7 +168,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         'get_change_list_for_accepting_suggestion',
                         self.null_function):
                         with self.swap(
-                            feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS',
+                            constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS',
                             True):
                             suggestion_services.accept_suggestion(
                                 suggestion, self.reviewer_id,
@@ -179,7 +179,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion.status, suggestion_models.STATUS_ACCEPTED)
             self.assertEqual(
                 suggestion.final_reviewer_id, self.reviewer_id)
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 thread_messages = feedback_services.get_messages(self.THREAD_ID)
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
@@ -193,7 +194,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -209,7 +210,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.accept_suggestion(
                     suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -223,7 +225,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.accept_suggestion(
                     suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -239,7 +242,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -255,7 +258,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
                 suggestion_services.accept_suggestion(
                     suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
@@ -271,7 +275,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -283,7 +287,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Commit message cannot be empty.'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.accept_suggestion(
                     suggestion, self.reviewer_id, self.EMPTY_COMMIT_MESSAGE,
                     None)
@@ -296,7 +301,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -305,7 +310,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(
+            constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -314,7 +320,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_REJECTED)
         self.assertEqual(
             suggestion.final_reviewer_id, self.reviewer_id)
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'reject review message')
@@ -327,7 +333,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_services, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 with self.swap(
-                    feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                    constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                     suggestion_services.create_suggestion(
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                         suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -342,7 +348,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.reject_suggestion(
                     suggestion, self.reviewer_id, 'reject review message')
 
@@ -357,7 +364,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.reject_suggestion(
                     suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -426,7 +434,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             exp_services, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
 
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -596,7 +605,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -606,7 +616,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(
+            constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
@@ -622,7 +633,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -632,7 +644,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(
+            constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'Reject message')
 
@@ -651,7 +664,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -661,7 +675,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(
+            constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
                 'Accept message')
@@ -689,6 +704,13 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             'user1', 'category2', 0)
         suggestion_services.create_new_user_contribution_scoring_model(
             'user2', 'category1', 0)
+
+        self.signup('user_a@example.com', 'userA')
+        self.signup('user_b@example.com', 'userB')
+        self.signup('user_c@example.com', 'userC')
+        self.user_a_id = self.get_user_id_from_email('user_a@example.com')
+        self.user_b_id = self.get_user_id_from_email('user_b@example.com')
+        self.user_c_id = self.get_user_id_from_email('user_c@example.com')
 
     def test_update_score_for_user(self):
         suggestion_services.increment_score_for_user('user1', 'category1', 1)
@@ -736,3 +758,53 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 suggestion_services.check_user_can_review_in_category(
                     'invalid_user', 'category1'))
+
+    def test_check_if_email_has_been_sent_to_user(self):
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_a_id, 'category_a', 15)
+        self.assertFalse(
+            suggestion_services.check_if_email_has_been_sent_to_user(
+                self.user_a_id, 'category_a'))
+        suggestion_services.mark_email_has_been_sent_to_user(
+            self.user_a_id, 'category_a')
+        self.assertTrue(
+            suggestion_services.check_if_email_has_been_sent_to_user(
+                self.user_a_id, 'category_a'))
+
+    def test_get_next_user_in_rotation(self):
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_a_id, 'category_a', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_b_id, 'category_a', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.user_c_id, 'category_a', 15)
+
+        user_ids = [self.user_a_id, self.user_b_id, self.user_c_id]
+        user_ids.sort()
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), user_ids[0])
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, user_ids[0])
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), user_ids[1])
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, user_ids[1])
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), user_ids[2])
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, user_ids[2])
+
+        # Rotates back.
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_a'), user_ids[0])
+        self.assertEqual(
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                'category_a').current_position_in_rotation, user_ids[0])
+
+        self.assertEqual(suggestion_services.get_next_user_in_rotation(
+            'category_invalid'), None)

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the incoming email handler."""
+"""Old tests for the incoming email handler."""
 
 from constants import constants
 from core.domain import feedback_services
@@ -51,7 +51,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Create thread.
             with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                     'a_state_name', self.user_id_a, 'a subject', 'some text')
@@ -72,7 +72,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 self.assertFalse(messages[0].received_via_email)
 
                 # Get reply_to id for user A.
-                model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                model = email_models.FeedbackEmailReplyToIdModel.get(
                     self.user_id_a, thread_id)
 
                 recipient_email = 'reply+%s@%s' % (
@@ -91,12 +91,3 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 self.assertEqual(msg.text, 'New reply')
                 self.assertEqual(msg.author_id, self.user_id_a)
                 self.assertTrue(msg.received_via_email)
-
-    def test_that_assertion_is_raised_for_fake_reply_to_id(self):
-        # Generate reply email.
-        recipient_email = 'reply+%s@%s' % (
-            'fake_id', feconf.INCOMING_EMAILS_DOMAIN_NAME)
-        # Send email to Oppia.
-        self.post_email(
-            recipient_email, self.USER_A_EMAIL, 'feedback email reply',
-            'New reply', expect_errors=True, expected_status_int=404)

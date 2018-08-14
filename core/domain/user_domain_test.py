@@ -395,11 +395,9 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
     def test_initialization(self):
         """Testing init method."""
         user_contribution_scoring = (user_domain.UserContributionScoring(
-            'user_id0', 'category0', 5))
+            'user_id0', 'category0', 5, True))
 
-        self.assertEqual(
-            user_contribution_scoring.user_id, 'user_id0')
-        self.assertEqual(
-            user_contribution_scoring.score_category, 'category0')
-        self.assertEqual(
-            user_contribution_scoring.score, 5)
+        self.assertEqual(user_contribution_scoring.user_id, 'user_id0')
+        self.assertEqual(user_contribution_scoring.score_category, 'category0')
+        self.assertEqual(user_contribution_scoring.score, 5)
+        self.assertEqual(user_contribution_scoring.has_email_been_sent, True)

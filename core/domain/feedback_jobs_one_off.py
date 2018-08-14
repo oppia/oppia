@@ -233,7 +233,9 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                  old_id_parts[1], old_id_parts[2]])
             feedback_models.GeneralFeedbackThreadUserModel(
                 id=new_id,
-                message_ids_read_by_user=item.message_ids_read_by_user
+                message_ids_read_by_user=item.message_ids_read_by_user,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted
             ).put()
             yield ('GeneralFeedbackThreadUserModel', 1)
         elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
@@ -242,7 +244,9 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 [old_id_parts[0], feconf.ENTITY_TYPE_EXPLORATION,
                  old_id_parts[1], old_id_parts[2]])
             email_models.GeneralFeedbackEmailReplyToIdModel(
-                id=new_id, reply_to_id=item.reply_to_id).put()
+                id=new_id, reply_to_id=item.reply_to_id,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted).put()
             yield ('GeneralFeedbackEmailReplyToIdModel', 1)
         elif isinstance(item, user_models.UserSubscriptionsModel):
             new_thread_ids = (
