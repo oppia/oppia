@@ -104,6 +104,8 @@ class BuildTests(test_utils.GenericTestBase):
         shutil.rmtree(build.THIRD_PARTY_GENERATED_STAGING_DIR)
 
     def test_insert_hash(self):
+        """Test _insert_hash to return correct filenames with provided hashes.
+        """
         # pylint: disable=protected-access
         self.assertEquals(build._insert_hash('file.js', '123456'),
                           'file.123456.js')
@@ -196,8 +198,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_match_directory_with_hashes(self):
         """Test _match_directory_with_hashes to raise exception:
-            1)when there is an empty hash dict.
-            2)When there is a hash in filename that cannot be found in
+            1) When there is an empty hash dict.
+            2) When there is a hash in filename that cannot be found in
                 hash dict.
         """
         about_filename = 'about.html'
@@ -270,6 +272,7 @@ class BuildTests(test_utils.GenericTestBase):
         shutil.rmtree(about_build_dir)
 
     def test_process_html(self):
+        """Test process_html to remove all whitespaces."""
         base_source_path = os.path.join(
             build.TEMPLATES_DEV_DIR_CORE, 'pages', 'base.html')
         base_staging_path = os.path.join(
@@ -290,6 +293,9 @@ class BuildTests(test_utils.GenericTestBase):
             msg="Detected white spaces in file")
 
     def test_hash_should_be_inserted(self):
+        """Test hash_should_be_inserted to return the correct boolean value
+        for filepath that should be hashed.
+        """
         with self.swap(
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 'path/to/fonts/*', 'path/to/third_party.min.js.map',
@@ -321,6 +327,9 @@ class BuildTests(test_utils.GenericTestBase):
         shutil.rmtree(build.EXTENSIONS_OUT_DIR)
 
     def test_is_file_hash_provided_to_frontend(self):
+        """Test is_file_hash_provided_to_frontend to return the correct boolean
+        value for filepath that should be provided to frontend.
+        """
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/file.js', 'path/to/file.html', 'file.js')):
@@ -345,6 +354,7 @@ class BuildTests(test_utils.GenericTestBase):
                 build.is_file_hash_provided_to_frontend('bad_end.css'))
 
     def test_filter_hashes(self):
+        """Test filter_hashes to filter the provided hash correctly."""
         # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456',
@@ -373,6 +383,9 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(filtered_hashes.has_key('/file.html'))
 
     def test_get_hashes_json_file_contents(self):
+        """Test get_hashes_json_file_contents to parse provided hash dict
+        correctly to JSON format.
+        """
         # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/file.js': '123456'}
