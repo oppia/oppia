@@ -207,6 +207,12 @@ class BaseSuggestion(object):
             'Subclasses of BaseSuggestion should implement '
             'pre_accept_validate.')
 
+    def populate_old_value_of_change(self):
+        """Populates the old_value field of the change."""
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'populate_old_value_of_change.')
+
     @property
     def is_handled(self):
         """Returns if the suggestion has either been accepted or rejected.
@@ -307,6 +313,14 @@ class SuggestionEditStateContent(BaseSuggestion):
         change.new_value['content_id'] = old_content['content_id']
 
         return [change]
+
+    def populate_old_value_of_change(self):
+        """Populates old value of the change."""
+        exploration = exp_services.get_exploration_by_id(self.target_id)
+        old_content = (
+            exploration.states[self.change.state_name].content.to_dict())
+
+        self.change.old_value = old_content
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -409,13 +423,13 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question state schema version to be between 1 and '
                 '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
 
-        if not self.change.skill_id:
-            raise utils.ValidationError('Expected change to contain skill_id')
-
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
+
+        if self.change.skill_id is None:
+            raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict
         self.validate()
         if (
@@ -451,6 +465,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_services.add_question(self.author_id, question)
         question_services.create_new_question_skill_link(
             question_dict['id'], self.change.skill_id)
+
+    def populate_old_value_of_change(self):
+        """Populates old value of the change."""
+        pass
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {

@@ -14,11 +14,11 @@
 
 """Controllers for incoming email handlers."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import feedback_services
 from core.platform import models
-import feconf
 
 from google.appengine.api import mail
 
@@ -31,7 +31,7 @@ class IncomingReplyEmailHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             model = (
                 email_models.GeneralFeedbackEmailReplyToIdModel
                 .get_by_reply_to_id(reply_to_id))

@@ -17,3 +17,6 @@ cron:
 - description: accept all stale suggestions every week
   url: /cron/suggestions/accept_stale_suggestions
   schedule: every thursday 9:00
+- description: notify reviewers about suggestions requiring review
+  url: /cron/suggestions/notify_reviewers
+  schedule: every day 9:00
