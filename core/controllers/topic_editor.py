@@ -142,8 +142,7 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -167,7 +166,7 @@ class TopicEditorPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_INTERACTION_CATEGORIES)
+                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
         self.render_template(

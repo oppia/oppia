@@ -48,10 +48,12 @@ oppia.factory('PlayerTranscriptService', [
         return result;
       },
       addNewCard: function(
-          stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
+          stateName, params, contentHtml, interactionHtml,
+          interaction, leadsToConceptCard) {
         transcript.push(
           StateCardObjectFactory.createNewCard(
-            stateName, params, contentHtml, interactionHtml, leadsToConceptCard
+            stateName, params, contentHtml, interactionHtml,
+            interaction, leadsToConceptCard
           )
         );
         numAnswersSubmitted = 0;
@@ -133,6 +135,9 @@ oppia.factory('PlayerTranscriptService', [
       },
       getLastCard: function() {
         return this.getCard(transcript.length - 1);
+      },
+      setCurrentCardLeadsToConceptCard: function() {
+        this.getLastCard().setLeadsToConceptCard(true);
       },
       getNumSubmitsForLastCard: function() {
         return numAnswersSubmitted;

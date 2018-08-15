@@ -125,6 +125,17 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
+  it('should expect at least two choices', function() {
+    customizationArgs.choices.value = ['1'];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please enter at least two choices.'
+    }]);
+  });
+
   it('should expect all choices to be nonempty', function() {
     // Set the first choice to empty.
     customizationArgs.choices.value[0] = '';
