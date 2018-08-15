@@ -36,16 +36,17 @@ THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', '')
 
-EXTENSIONS_DEV_DIR = os.path.join('extensions', '')
-EXTENSIONS_STAGING_DIR = (
-    os.path.join('backend_prod_files', 'extensions', ''))
-EXTENSIONS_OUT_DIR = os.path.join('build', 'extensions', '')
-
+EXTENSIONS_DIR = {
+    'dev_dir': os.path.join('extensions', ''),
+    'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
+    'out_dir': os.path.join('build', 'extensions', '')
+}
 TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
-TEMPLATES_DEV_DIR_CORE = os.path.join('core', 'templates', 'dev', 'head', '')
-TEMPLATES_STAGING_DIR = (
-    os.path.join('backend_prod_files', 'templates', 'head', ''))
-TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
+TEMPLATES_CORE_DIR = {
+    'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
+    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
+    'out_dir': os.path.join('build', 'templates', 'head', '')
+}
 
 HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
@@ -289,13 +290,13 @@ def process_html(source_path, target_path, file_hashes):
         filepath_with_hash = _insert_hash(filepath, file_hash)
         content = content.replace(
             '%s%s' % (TEMPLATES_DEV_DIR, filepath),
-            '%s%s' % (TEMPLATES_OUT_DIR, filepath_with_hash))
+            '%s%s' % (TEMPLATES_CORE_DIR.get('out_dir'), filepath_with_hash))
         content = content.replace(
             '%s%s' % (ASSETS_DEV_DIR, filepath),
             '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
         content = content.replace(
-            '%s%s' % (EXTENSIONS_DEV_DIR, filepath),
-            '%s%s' % (EXTENSIONS_OUT_DIR, filepath_with_hash))
+            '%s%s' % (EXTENSIONS_DIR.get('dev_dir'), filepath),
+            '%s%s' % (EXTENSIONS_DIR.get('out_dir'), filepath_with_hash))
         content = content.replace(
             '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
             '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
@@ -737,40 +738,44 @@ def rebuild_new_files(
         build_tasks.append(task)
 
 
-def build_template_directory(file_hashes, build_tasks): # pragma: no cover
-    """Build all files in TEMPLATES_DEV_DIR_CORE if there is no existing staging
+def build_directory(source_dir, file_hashes, build_tasks):  # pragma: no cover
+    """Build all files in provided DEV directory if there is no existing staging
     dir. Otherwise, selectively build recently changed files in
-    TEMPLATES_DEV_DIR_CORE and copy to staging dir.
+    said DEV directory and copy to staging dir.
 
     Args:
+        source_dir: dict(str, str). Directory dict containing directory paths
+        to /DEV dir, staging dir and /build dir .
         file_hashes: dict(str, str). Dictionary of file hashes.
         build_tasks: Deque(obj). A deque that contains all build tasks queued
             to be processed.
     """
-    if not os.path.isdir(TEMPLATES_STAGING_DIR):
+    dev_dir = source_dir.get('dev_dir')
+    staging_dir = source_dir.get('staging_dir')
+    out_dir = source_dir.get('out_dir')
+    if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
-        print 'Creating new %s folder' % TEMPLATES_STAGING_DIR
-        build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
-            file_hashes, build_tasks)
+        print 'Creating new %s folder' % staging_dir
+        build_files(dev_dir, staging_dir, file_hashes, build_tasks)
     else:
-        # If there is an existing staging dir, rebuild all HTML files.
-        print 'Staging directory exists, re-building all HTML files'
+        # If staging dir exists, rebuild all HTML and Python files.
+        mandatory_file_formats = ('.html', '.py')
+        print (
+            'Staging dir exists, re-building all %s files'
+            % str(mandatory_file_formats))
         build_files(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR, file_hashes,
-            build_tasks,
-            file_formats=('.html',))
+            dev_dir, staging_dir, file_hashes, build_tasks,
+            file_formats=mandatory_file_formats)
         recently_changed_filenames = get_recently_changed_filenames(
-            TEMPLATES_DEV_DIR_CORE, TEMPLATES_OUT_DIR)
+            dev_dir, out_dir)
         if recently_changed_filenames:
             # Only re-build files that have changed since last build.
-            print ("Re-building recently changed files at %s"
-                   % TEMPLATES_DEV_DIR_CORE)
+            print "Re-building recently changed files at %s" % dev_dir
             rebuild_new_files(
-                TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR,
-                recently_changed_filenames, file_hashes, build_tasks)
+                dev_dir, staging_dir, recently_changed_filenames, file_hashes,
+                build_tasks)
             # Clean up files in staging dir that have been removed in DEV dir.
-            remove_deleted_files(TEMPLATES_DEV_DIR_CORE, TEMPLATES_STAGING_DIR)
+            remove_deleted_files(dev_dir, staging_dir)
         else:
             print 'No changes detected. Using previously built files.'
 
@@ -858,8 +863,8 @@ def generate_build_directory(): # pragma: no cover
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
-        ASSETS_DEV_DIR, EXTENSIONS_DEV_DIR, TEMPLATES_DEV_DIR_CORE,
-        THIRD_PARTY_GENERATED_STAGING_DIR]
+        ASSETS_DEV_DIR, EXTENSIONS_DIR.get('dev_dir'),
+        TEMPLATES_CORE_DIR.get('dev_dir'), THIRD_PARTY_GENERATED_STAGING_DIR]
     for HASH_DIR in HASH_DIRS:
         hashes.update(get_file_hashes(HASH_DIR))
     # Save hashes as JSON and write the JSON into JS file
@@ -867,10 +872,9 @@ def generate_build_directory(): # pragma: no cover
     save_hashes_as_json(HASHES_JSON, hashes)
 
     # Build files in /extensions and copy them into staging directory.
-    build_files(
-        EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes, build_tasks)
+    build_directory(EXTENSIONS_DIR, hashes, build_tasks)
     # Minify all template files copy them into build/templates/head.
-    build_template_directory(hashes, build_tasks)
+    build_directory(TEMPLATES_CORE_DIR, hashes, build_tasks)
     # Execute all build tasks.
     try:
         _execute_tasks(build_tasks)
@@ -879,11 +883,12 @@ def generate_build_directory(): # pragma: no cover
 
     # Copy alls files from staging directory to production directory (/build).
     COPY_INPUT_DIRS = [
-        ASSETS_DEV_DIR, EXTENSIONS_STAGING_DIR, TEMPLATES_STAGING_DIR,
+        ASSETS_DEV_DIR, EXTENSIONS_DIR.get('staging_dir'),
+        TEMPLATES_CORE_DIR.get('staging_dir'),
         THIRD_PARTY_GENERATED_STAGING_DIR]
     COPY_OUTPUT_DIRS = [
-        ASSETS_OUT_DIR, EXTENSIONS_OUT_DIR, TEMPLATES_OUT_DIR,
-        THIRD_PARTY_GENERATED_OUT_DIR]
+        ASSETS_OUT_DIR, EXTENSIONS_DIR.get('out_dir'),
+        TEMPLATES_CORE_DIR.get('out_dir'), THIRD_PARTY_GENERATED_OUT_DIR]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
     for i in xrange(len(COPY_INPUT_DIRS)):
         copy_files_source_to_target(
