@@ -56,8 +56,8 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $window, $uibModal, DateTimeFormatService,
-      AlertsService, CreatorDashboardBackendApiService,
+      $scope, $rootScope, $http, $window, $uibModal,
+      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       SuggestionObjectFactory, SuggestionThreadObjectFactory,
       ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
