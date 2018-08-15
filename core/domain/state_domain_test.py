@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,17 @@
 
 """Tests for state domain objects and methods defined on them."""
 
-import copy
 import functools
 import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import html_validation_service
-from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
-
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
