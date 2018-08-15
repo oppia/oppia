@@ -47,19 +47,21 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$window', '$uibModal',
+  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
+  'QuestionObjectFactory', 'SuggestionObjectFactory',
+  'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
   'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $window, $uibModal, DateTimeFormatService,
-      AlertsService, CreatorDashboardBackendApiService,
+      $scope, $rootScope, $http, $uibModal, $window, $log,
+      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      SuggestionObjectFactory, SuggestionThreadObjectFactory,
+      QuestionObjectFactory, SuggestionObjectFactory,
+      SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
       ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
@@ -87,6 +89,9 @@ oppia.controller('CreatorDashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+    $scope.enableQuestionSuggestions = (
+      constants.ENABLE_GENERALIZED_FEEDBACK_THREADS &&
+      constants.ENABLE_NEW_STRUCTURES);
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
 
@@ -337,6 +342,86 @@ oppia.controller('CreatorDashboard', [
       return UrlInterpolationService.getStaticImageUrl(iconUrl);
     };
 
+    $scope.showCreateQuestionModal = function() {
+      var question = QuestionObjectFactory.createDefaultQuestion();
+      var topicSummaries = $scope.topicSummaries;
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/creator_dashboard/create_question_modal_directive.html'),
+        backdrop: 'static',
+        keyboard: false,
+        size: 'lg',
+        resolve: {},
+        controller: [
+          '$scope', '$uibModalInstance', function(
+              $scope, $uibModalInstance) {
+            $scope.question = question;
+            $scope.topicId = null;
+            $scope.questionStateData = $scope.question.getStateData();
+            $scope.topicSummaries = topicSummaries;
+            $scope.misconceptions = [];
+            $scope.errorMessage = null;
+
+            $scope.isValidQuestion = function() {
+              var errorMessage = $scope.question.validate([]);
+              if (!$scope.topicId) {
+                $scope.errorMessage = 'Please choose a topic before submitting';
+              } else if (errorMessage === false) {
+                $scope.errorMessage = null;
+              } else {
+                $scope.errorMessage = errorMessage;
+              }
+              return ($scope.question.validate([]) === false);
+            };
+
+            $scope.dismissModal = function() {
+              $uibModalInstance.dismiss();
+            };
+
+            $scope.createQuestion = function() {
+              var errorMessage = question.validate([]);
+              if (!$scope.topicId) {
+                $scope.errorMessage = 'Please choose a topic before submitting';
+              } else if (errorMessage === false) {
+                $scope.errorMessage = null;
+                $uibModalInstance.close({
+                  question: question,
+                  topicId: $scope.topicId
+                });
+              } else {
+                $scope.errorMessage = errorMessage;
+              }
+            };
+          }
+        ]
+      }).result.then(function(result) {
+        var topicVersion = null;
+        for (var i = 0; i < topicSummaries.length; i++) {
+          if (topicSummaries[i].id === result.topicId) {
+            topicVersion = topicSummaries[i].version;
+            break;
+          }
+        }
+        if (!topicVersion) {
+          $log.error('Unable to match topic id selected with topic choices.');
+        }
+        $http.post('/generalsuggestionhandler/', {
+          suggestion_type: 'add_question',
+          target_type: 'topic',
+          target_id: result.topicId,
+          target_version_at_submission: topicVersion,
+          change: {
+            cmd: 'create_new_fully_specified_question',
+            question_dict: result.question.toBackendDict(true),
+            skill_id: null
+          },
+          description: null
+        });
+      }, function() {
+        $log.error('Error while submitting question');
+      });
+    };
+
     $rootScope.loadingMessage = 'Loading';
     CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
@@ -351,6 +436,7 @@ oppia.controller('CreatorDashboard', [
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
+        $scope.topicSummaries = responseData.topic_summary_dicts;
         var numberOfCreatedSuggestions = (
           responseData.threads_for_created_suggestions_list.length);
         var numberOfSuggestionsToReview = (
@@ -401,6 +487,7 @@ oppia.controller('CreatorDashboard', [
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
         }
+
         if ($scope.explorationsList.length === 0 &&
           $scope.collectionsList.length > 0) {
           $scope.activeTab = 'myCollections';
