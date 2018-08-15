@@ -135,7 +135,7 @@ class BuildTests(test_utils.GenericTestBase):
         random_filepaths = [
             os.path.join(build.THIRD_PARTY_GENERATED_DEV_DIR, 'random1.js')]
         # pylint: disable=protected-access
-        with self.assertRaises(Exception) as fileNotExist:
+        with self.assertRaises(ValueError) as fileNotExist:
             build._ensure_files_exist(random_filepaths)
         # pylint: enable=protected-access
         # Exception will be raised at first file determined to be non-existent.
@@ -151,7 +151,7 @@ class BuildTests(test_utils.GenericTestBase):
             os.path.join(
                 build.THIRD_PARTY_GENERATED_DEV_DIR, 'fontunimpressive.txt')]
 
-        with self.assertRaises(Exception) as fileNotExist:
+        with self.assertRaises(ValueError) as fileNotExist:
             # pylint: disable=protected-access
             build._ensure_files_exist(random_fontpaths)
             # pylint: enable=protected-access
@@ -165,13 +165,10 @@ class BuildTests(test_utils.GenericTestBase):
         ignored files.
         """
         all_inclusive_file_count = 0
-        #pylint: disable=unused-variable
-        for root, dirs, files in os.walk(build.EXTENSIONS_DEV_DIR):
-            #pylint: enable=unused-variable
+        for _, _, files in os.walk(build.EXTENSIONS_DEV_DIR):
             all_inclusive_file_count += len(files)
         ignored_file_count = 0
-        #pylint: disable=unused-variable
-        for root, dirs, files in os.walk(build.EXTENSIONS_DEV_DIR):
+        for _, _, files in os.walk(build.EXTENSIONS_DEV_DIR):
             for filename in files:
                 if any(filename.endswith(p)
                        for p in build.FILE_EXTENSIONS_TO_IGNORE):
@@ -184,12 +181,11 @@ class BuildTests(test_utils.GenericTestBase):
         """Test _compare_file_count to raise exception when there is a
         mismatched file count between 2 dirs.
         """
-        with self.assertRaises(Exception) as incorrectFileCount:
+        with self.assertRaises(ValueError) as incorrectFileCount:
             # pylint: disable=protected-access
             build._compare_file_count(
                 build.EXTENSIONS_DEV_DIR, build.TEMPLATES_DEV_DIR_CORE)
         # pylint: enable=protected-access
-        print incorrectFileCount.exception
         source_dir_file_count = build.get_file_count(build.EXTENSIONS_DEV_DIR)
         target_dir_file_count = build.get_file_count(
             build.TEMPLATES_DEV_DIR_CORE)
@@ -204,17 +200,21 @@ class BuildTests(test_utils.GenericTestBase):
             2)When there is a hash in filename that cannot be found in
                 hash dict.
         """
+        about_filename = 'about.html'
         about_source_dir = os.path.join(
             build.TEMPLATES_DEV_DIR_CORE, 'pages', 'about')
         about_staging_dir = os.path.join(
             build.TEMPLATES_STAGING_DIR, 'pages', 'about')
+        about_build_dir = os.path.join(
+            build.TEMPLATES_OUT_DIR, 'pages', 'about')
+        about_staging_filepath = os.path.join(about_staging_dir, about_filename)
+        about_final_filepath = os.path.join(about_build_dir, about_filename)
+        # Create staging parent directory (/backend_prod_files/.../pages/about/)
+        build.ensure_directory_exists(about_staging_filepath)
+        # Create build parent directory (/build/.../pages/about/)
+        build.ensure_directory_exists(about_final_filepath)
         # Get hash dict for /DEV/.../about folder.
         file_hashes = build.get_file_hashes(about_source_dir)
-        # pylint: disable=protected-access
-        # Get final filename of about.html (about.[hash].html)
-        about_filepath_with_hash = build._insert_hash(
-            'about.html', file_hashes['about.html'])
-        # pylint: enable=protected-access
         # Build staging dir for /about (/backend_prod_files/.../about.html).
         build_tasks = collections.deque()
         build.build_files(
@@ -226,34 +226,48 @@ class BuildTests(test_utils.GenericTestBase):
         #Copy staging about.html to /build/templates/about.[hash].html.
         copy_tasks = collections.deque()
         build.copy_files_source_to_target(
-            about_staging_dir, build.TEMPLATES_OUT_DIR, file_hashes, copy_tasks)
+            about_staging_dir, about_build_dir, file_hashes, copy_tasks)
         # pylint: disable=protected-access
         build._execute_tasks(copy_tasks)
         # pylint: enable=protected-access
 
+        # Assert for filepath not containing hash but is supposed to.
+        with self.assertRaises(ValueError) as unhashedFilepath:
+            # pylint: disable=protected-access
+            build._match_directory_with_hashes(
+                about_source_dir, file_hashes)
+        # pylint: enable=protected-access
+        # The first file in the provided dir should be raised as an exception.
+        print unhashedFilepath.exception
+        self.assertTrue(
+            '%s is expected to contain hash' % os.listdir(about_source_dir)[0]
+            in unhashedFilepath.exception)
+
         # Assert for empty file hash exception.
         file_hashes.clear()
-        with self.assertRaises(Exception) as emptyFileHash:
+        with self.assertRaises(ValueError) as emptyFileHash:
             # pylint: disable=protected-access
             build._match_directory_with_hashes(about_staging_dir, file_hashes)
         # pylint: enable=protected-access
+        print emptyFileHash.exception
         self.assertTrue('Hash dict is empty' in emptyFileHash.exception)
 
         # Assert for mismatched hash by using /donate folder's hash dict.
         donate_source_dir = os.path.join(
             build.TEMPLATES_DEV_DIR_CORE, 'pages', 'donate')
         file_hashes.update(build.get_file_hashes(donate_source_dir))
-        with self.assertRaises(Exception) as incorrectFileHash:
+        with self.assertRaises(KeyError) as incorrectFileHash:
             # pylint: disable=protected-access
             build._match_directory_with_hashes(
-                build.TEMPLATES_OUT_DIR, file_hashes)
+                about_build_dir, file_hashes)
         # pylint: enable=protected-access
+        print incorrectFileHash.exception
         self.assertTrue(
             'Hashed file %s does not match hash dict keys'
-            % about_filepath_with_hash in incorrectFileHash.exception)
+            % os.listdir(about_build_dir)[0] in incorrectFileHash.exception)
         # Clean up directories.
-        shutil.rmtree(build.TEMPLATES_STAGING_DIR)
-        shutil.rmtree(build.TEMPLATES_OUT_DIR)
+        shutil.rmtree(about_staging_dir)
+        shutil.rmtree(about_build_dir)
 
     def test_process_html(self):
         base_source_path = os.path.join(
@@ -280,7 +294,6 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 'path/to/fonts/*', 'path/to/third_party.min.js.map',
                 'path/to/third_party.min.css.map')):
-            print build.FILEPATHS_NOT_TO_RENAME
             self.assertFalse(build.hash_should_be_inserted(
                 'path/to/fonts/fontawesome-webfont.svg'))
             self.assertFalse(build.hash_should_be_inserted(
@@ -395,9 +408,7 @@ class BuildTests(test_utils.GenericTestBase):
         html_file_processed = False
         js_file_minified = False
         css_file_minified = False
-        #pylint: disable=unused-variable
-        for filepath, file_hash in file_hashes.iteritems():
-            #pylint: enable=unused-variable
+        for filepath, _ in file_hashes.iteritems():
             if (html_file_processed and js_file_minified and css_file_minified):
                 # Only test for these 3 file types using hash dict.
                 break
@@ -478,9 +489,7 @@ class BuildTests(test_utils.GenericTestBase):
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks, file_formats=('.html',))
         total_html_file_count = 0
-        #pylint: disable=unused-variable
-        for root, dirs, files in os.walk(build.ASSETS_DEV_DIR):
-            #pylint: enable=unused-variable
+        for _, _, files in os.walk(build.ASSETS_DEV_DIR):
             for filename in files:
                 if filename.endswith('.html'):
                     total_html_file_count += 1
