@@ -41,7 +41,8 @@ import utils
 
 import jinja2
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.suggestion])
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
@@ -277,7 +278,10 @@ class CreatorDashboardHandler(base.BaseHandler):
             user_settings.creator_dashboard_display_pref)
 
         suggestions_created_by_user = suggestion_services.query_suggestions(
-            [('author_id', self.user_id)])
+            [('author_id', self.user_id),
+             (
+                 'suggestion_type',
+                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
         suggestions_which_can_be_reviewed = (
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
