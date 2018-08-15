@@ -2068,7 +2068,7 @@ class Exploration(object):
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
                 exp_id)
-            states_dict[key] = State.convert_html_fields_in_state(
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
             if state_dict['interaction']['id'] == 'ImageClickInput':
