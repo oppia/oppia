@@ -30,9 +30,13 @@ class GaeAppIdentityServicesTest(test_utils.GenericTestBase):
             gae_app_identity_services.get_application_id(
             ), self.application_id)
 
-    def test_get_gcs_resource_bucket_name(self):
+    def test_get_gcs_resource_bucket_name_prod(self):
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
             self.assertEquals(
                 gae_app_identity_services.get_gcs_resource_bucket_name(
                 ), self.application_id + '-resources')
+
+    def test_get_gcs_resource_bucket_name_dev(self):
+        self.assertIsNone(
+            gae_app_identity_services.get_gcs_resource_bucket_name())
