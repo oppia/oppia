@@ -537,7 +537,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.entity_id == entity_id).order(cls.last_updated).fetch(limit)
+            cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
 
 
 class GeneralFeedbackMessageModel(base_models.BaseModel):

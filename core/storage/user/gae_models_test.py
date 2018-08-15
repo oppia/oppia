@@ -332,3 +332,16 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             'category2.user1'), score_models)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category3.user1'), score_models)
+
+    def test_get_categories_where_user_can_review(self):
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', 15)
+        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category3', 15)
+        score_categories = (
+            user_models.UserContributionScoringModel
+            .get_all_categories_where_user_can_review('user1'))
+        self.assertIn('category1', score_categories)
+        self.assertIn('category3', score_categories)
+        self.assertNotIn('category2', score_categories)

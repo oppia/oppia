@@ -34,6 +34,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
@@ -595,6 +596,230 @@ describe('ExplorationFeedback', function() {
       });
     explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.sendResponseToLatestFeedback(feedbackResponse);
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Issues visualization', function() {
+  var EXPLORATION_TITLE = 'Welcome to Oppia!';
+  var EXPLORATION_OBJECTIVE = 'To explore something';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorStatsTab = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var adminPage = null;
+  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+
+  beforeAll(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorStatsTab = explorationEditorPage.getStatsTab();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    adminPage = new AdminPage.AdminPage();
+
+    users.createUser(
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
+    users.createAndLoginAdminUser(
+      'user1@ExplorationIssues.com',
+      'authorExplorationIssues');
+
+    workflow.createExplorationAsAdmin();
+    explorationEditorMainTab.exitTutorial();
+
+    var expId;
+    browser.getCurrentUrl().then(function(url) {
+      expId = url.split('/')[4].slice(0, -1);
+    });
+
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('One');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 1 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+      'One');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Two');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 2 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 3 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Three');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
+      'Two');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+
+    adminPage.editConfigProperty(
+      'The set of exploration IDs for recording issues and playthroughs',
+      'List',
+      function(elem) {
+        elem.addItem('Unicode').setValue(expId);
+      });
+    adminPage.editConfigProperty(
+      'The probability of recording playthroughs', 'Real',
+      function(elem) {
+        elem.setValue(1.0);
+      });
+  });
+
+  it('records early quit issue.', function() {
+    users.login('user2@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners exited the exploration in less than a minute.');
+    explorationEditorStatsTab.markResolved();
+    users.logout();
+  });
+
+  it('records multiple incorrect issue.', function() {
+    users.login('user2@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer1');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer2');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer3');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer4');
+    browser.sleep(3000);
+    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer5');
+    browser.sleep(3000);
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners submitted answers to card "Two" several times, ' +
+      'then gave up and quit.');
+    explorationEditorStatsTab.markResolved();
+    users.logout();
+  });
+
+  it('records cyclic transitions issue.', function() {
+    users.login('user2@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 2 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please write 3 in words.'));
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+
+    users.login('user1@ExplorationIssues.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    general.moveToEditor();
+    explorationEditorPage.navigateToStatsTab();
+
+    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
+    explorationEditorStatsTab.expectIssueTitleToBe(
+      'Several learners ended up in a cyclic loop revisiting card ' +
+      '"Two" many times.');
+    explorationEditorStatsTab.markResolved();
     users.logout();
   });
 

@@ -517,6 +517,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
                 self.user_id, change_cmd, 'sample description', None)
+
             response = self.get_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))

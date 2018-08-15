@@ -1016,6 +1016,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'expected_output': (
                 u'<p>Hey this is a test case with no images.</p>'
             )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'does_not_exist.png&amp;quot;"></oppia-noninteractive-image>'
+                'Hello this is test case to check that default dimensions '
+                '(120, 120) are added in case the image does not exist.</p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image filepath-with-value="&amp;'
+                'quot;does_not_exist_height_120_width_120.png&amp;quot;">'
+                '</oppia-noninteractive-image>Hello this is test case'
+                ' to check that default dimensions (120, 120) '
+                'are added in case the image does not exist.</p>'
+            )
         }]
 
         EXP_ID = 'eid'
@@ -1024,7 +1038,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(EXP_ID))
+            fs_domain.ExplorationFileSystem('exploration/%s' % EXP_ID))
         fs.commit(OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
         fs.commit(OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
         fs.commit(OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')

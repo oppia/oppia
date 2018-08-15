@@ -405,7 +405,6 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                         'num_open_threads': 1,
                         'num_total_threads': 1,
                     })
-
                 # Stop job.
                 ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
                 self.assertEqual(

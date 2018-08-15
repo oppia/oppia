@@ -171,8 +171,10 @@ oppia.factory('ResponsesService', [
         _defaultOutcome = angular.copy(data.defaultOutcome);
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(
-          StateInteractionIdService.savedMemento, _answerGroups);
+        if (StateInteractionIdService.savedMemento !== null) {
+          AnswerGroupsCacheService.set(
+            StateInteractionIdService.savedMemento, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -216,7 +218,9 @@ oppia.factory('ResponsesService', [
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);
         _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        if (newInteractionId) {
+          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
