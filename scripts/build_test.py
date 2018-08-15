@@ -167,17 +167,17 @@ class BuildTests(test_utils.GenericTestBase):
         ignored files.
         """
         all_inclusive_file_count = 0
-        for _, _, files in os.walk(build.EXTENSIONS_DEV_DIR):
+        for _, _, files in os.walk(build.EXTENSIONS_DIR.get('dev_dir')):
             all_inclusive_file_count += len(files)
         ignored_file_count = 0
-        for _, _, files in os.walk(build.EXTENSIONS_DEV_DIR):
+        for _, _, files in os.walk(build.EXTENSIONS_DIR.get('dev_dir')):
             for filename in files:
                 if any(filename.endswith(p)
                        for p in build.FILE_EXTENSIONS_TO_IGNORE):
                     ignored_file_count += 1
         self.assertEqual(
             all_inclusive_file_count - ignored_file_count,
-            build.get_file_count(build.EXTENSIONS_DEV_DIR))
+            build.get_file_count(build.EXTENSIONS_DIR.get('dev_dir')))
 
     def test_compare_file_count(self):
         """Test _compare_file_count to raise exception when there is a
@@ -186,11 +186,13 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaises(ValueError) as incorrectFileCount:
             # pylint: disable=protected-access
             build._compare_file_count(
-                build.EXTENSIONS_DEV_DIR, build.TEMPLATES_DEV_DIR_CORE)
+                build.EXTENSIONS_DIR.get('dev_dir'),
+                build.TEMPLATES_CORE_DIR.get('dev_dir'))
         # pylint: enable=protected-access
-        source_dir_file_count = build.get_file_count(build.EXTENSIONS_DEV_DIR)
+        source_dir_file_count = build.get_file_count(
+            build.EXTENSIONS_DIR.get('dev_dir'))
         target_dir_file_count = build.get_file_count(
-            build.TEMPLATES_DEV_DIR_CORE)
+            build.TEMPLATES_CORE_DIR.get('dev_dir'))
         self.assertTrue(
             ('%s files in source dir != %s files in target dir.') % (
                 source_dir_file_count, target_dir_file_count) in
@@ -204,11 +206,11 @@ class BuildTests(test_utils.GenericTestBase):
         """
         about_filename = 'about.html'
         about_source_dir = os.path.join(
-            build.TEMPLATES_DEV_DIR_CORE, 'pages', 'about')
+            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'about')
         about_staging_dir = os.path.join(
-            build.TEMPLATES_STAGING_DIR, 'pages', 'about')
+            build.TEMPLATES_CORE_DIR.get('staging_dir'), 'pages', 'about')
         about_build_dir = os.path.join(
-            build.TEMPLATES_OUT_DIR, 'pages', 'about')
+            build.TEMPLATES_CORE_DIR.get('out_dir'), 'pages', 'about')
         about_staging_filepath = os.path.join(about_staging_dir, about_filename)
         about_final_filepath = os.path.join(about_build_dir, about_filename)
         # Create staging parent directory (/backend_prod_files/.../pages/about/)
@@ -256,7 +258,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Assert for mismatched hash by using /donate folder's hash dict.
         donate_source_dir = os.path.join(
-            build.TEMPLATES_DEV_DIR_CORE, 'pages', 'donate')
+            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'donate')
         file_hashes.update(build.get_file_hashes(donate_source_dir))
         with self.assertRaises(KeyError) as incorrectFileHash:
             # pylint: disable=protected-access
@@ -274,11 +276,12 @@ class BuildTests(test_utils.GenericTestBase):
     def test_process_html(self):
         """Test process_html to remove all whitespaces."""
         base_source_path = os.path.join(
-            build.TEMPLATES_DEV_DIR_CORE, 'pages', 'base.html')
+            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'base.html')
         base_staging_path = os.path.join(
-            build.TEMPLATES_STAGING_DIR, 'pages', 'base.html')
+            build.TEMPLATES_CORE_DIR.get('staging_dir'), 'pages', 'base.html')
         build.ensure_directory_exists(base_staging_path)
-        file_hashes = build.get_file_hashes(build.TEMPLATES_DEV_DIR_CORE)
+        file_hashes = build.get_file_hashes(
+            build.TEMPLATES_CORE_DIR.get('dev_dir'))
         # pylint: disable=protected-access
         build._ensure_files_exist([base_source_path])
         # pylint: enable=protected-access
@@ -286,7 +289,7 @@ class BuildTests(test_utils.GenericTestBase):
         minified_base_file = open(base_staging_path, 'r')
         minified_base_file_content = minified_base_file.read()
         # Clean up staging dir.
-        shutil.rmtree(build.TEMPLATES_STAGING_DIR)
+        shutil.rmtree(build.TEMPLATES_CORE_DIR.get('staging_dir'))
         # Assert that all empty lines are removed.
         self.assertNotRegexpMatches(
             minified_base_file_content, r'\s{2,}',
@@ -316,15 +319,17 @@ class BuildTests(test_utils.GenericTestBase):
         tasks.
         """
         copy_tasks = collections.deque()
-        extensions_hashes = build.get_file_hashes(build.EXTENSIONS_DEV_DIR)
-        build.ensure_directory_exists(build.EXTENSIONS_OUT_DIR)
+        extensions_hashes = build.get_file_hashes(
+            build.EXTENSIONS_DIR.get('dev_dir'))
+        build.ensure_directory_exists(build.EXTENSIONS_DIR.get('out_dir'))
         build.copy_files_source_to_target(
-            build.EXTENSIONS_DEV_DIR, build.EXTENSIONS_OUT_DIR,
-            extensions_hashes, copy_tasks)
-        total_file_count = build.get_file_count(build.EXTENSIONS_DEV_DIR)
+            build.EXTENSIONS_DIR.get('dev_dir'),
+            build.EXTENSIONS_DIR.get('out_dir'), extensions_hashes, copy_tasks)
+        total_file_count = build.get_file_count(
+            build.EXTENSIONS_DIR.get('dev_dir'))
         self.assertEquals(len(copy_tasks), total_file_count)
         # Clean up /build dir.
-        shutil.rmtree(build.EXTENSIONS_OUT_DIR)
+        shutil.rmtree(build.EXTENSIONS_DIR.get('out_dir'))
 
     def test_is_file_hash_provided_to_frontend(self):
         """Test is_file_hash_provided_to_frontend to return the correct boolean
@@ -417,7 +422,8 @@ class BuildTests(test_utils.GenericTestBase):
         """Test minify_func to branch into the correct function call with the
         given file format from hash dict.
         """
-        file_hashes = build.get_file_hashes(build.TEMPLATES_DEV_DIR_CORE)
+        file_hashes = build.get_file_hashes(
+            build.TEMPLATES_CORE_DIR.get('dev_dir'))
         html_file_processed = False
         js_file_minified = False
         css_file_minified = False
@@ -427,9 +433,9 @@ class BuildTests(test_utils.GenericTestBase):
                 break
             filename = os.path.basename(filepath)
             source_path = os.path.join(
-                build.TEMPLATES_DEV_DIR_CORE, filepath)
+                build.TEMPLATES_CORE_DIR.get('dev_dir'), filepath)
             staging_path = os.path.join(
-                build.TEMPLATES_STAGING_DIR, filepath)
+                build.TEMPLATES_CORE_DIR.get('staging_dir'), filepath)
             build.ensure_directory_exists(staging_path)
             capturedOutput = StringIO.StringIO()
             sys.stdout = capturedOutput
