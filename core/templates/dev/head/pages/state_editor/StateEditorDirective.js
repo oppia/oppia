@@ -63,11 +63,16 @@ oppia.directive('stateEditor', [
                 newInteractionId].is_terminal);
           };
 
+          $scope.reinitializeEditor = function() {
+            $rootScope.$broadcast('stateEditorInitialized', $scope.stateData);
+          };
+
           $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
             updateInteractionVisibility(newInteractionId);
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            $scope.stateData = stateData;
             $scope.stateName = StateEditorService.getActiveStateName();
             StateEditorService.setInteraction(stateData.interaction);
             StateContentService.init(
