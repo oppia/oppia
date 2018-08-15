@@ -314,7 +314,8 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   font-style: italic;
 }
 
-table.oppia-issues-learner-action-table td, th {
+.oppia-issues-learner-action-table td,
+.oppia-issues-learner-action-table th {
   border: 1px solid black;
 }
 
