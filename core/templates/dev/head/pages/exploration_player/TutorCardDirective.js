@@ -91,7 +91,7 @@ oppia.directive('tutorCard', [
             });
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
-            if (!$scope.conceptCardIsBeingShown && $scope.interactionIsActive) {
+            if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
                 ExplorationPlayerStateService.
                   getCurrentInteractionInstructions());
@@ -214,13 +214,8 @@ oppia.directive('tutorCard', [
           };
 
           $scope.isOnTerminalCard = function() {
-            if ($scope.interactionIsActive) {
-              return (
-                ExplorationPlayerStateService.isCurrentStateTerminal());
-            }
             return (
-              INTERACTION_SPECS[$scope.activeCard.getInteraction().id].
-                is_terminal);
+              ExplorationPlayerStateService.isCurrentStateTerminal());
           };
 
           $scope.getInputResponsePairId = function(index) {

@@ -22,10 +22,10 @@ oppia.constant(
 oppia.controller('LearnerLocalNav', [
   '$scope', '$uibModal', '$http', 'ExplorationEngineService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
-  'FLAG_EXPLORATION_URL_TEMPLATE', function(
+  'FLAG_EXPLORATION_URL_TEMPLATE', 'ExplorationPlayerStateService', function(
       $scope, $uibModal, $http, ExplorationEngineService, AlertsService,
       FocusManagerService, UrlInterpolationService,
-      FLAG_EXPLORATION_URL_TEMPLATE) {
+      FLAG_EXPLORATION_URL_TEMPLATE, ExplorationPlayerStateService) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = GLOBALS.username;
@@ -44,7 +44,7 @@ oppia.controller('LearnerLocalNav', [
               ExplorationEngineService) {
             var stateName = PlayerPositionService.getCurrentStateName();
             $scope.originalHtml =
-              ExplorationEngineService.getStateContentHtml();
+              ExplorationPlayerStateService.getStateContentHtml();
             $scope.description = '';
             // ng-model needs to bind to a property of an object on
             // the scope (the property cannot sit directly on the scope)

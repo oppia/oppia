@@ -52,12 +52,8 @@ oppia.directive('inputResponsePair', [
           $scope.getAnswerHtml = function() {
             var activeCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getActiveCardIndex());
-            if ($scope.isCurrentCardAtEndOfTranscript()) {
-              var interaction =
-                ExplorationPlayerStateService.getCurrentInteraction();
-            } else {
-              var interaction = activeCard.getInteraction();
-            }
+            var interaction =
+              ExplorationPlayerStateService.getCurrentInteraction();
             if ($scope.data) {
               return ExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.data.learnerInput, interaction.id,
@@ -70,12 +66,8 @@ oppia.directive('inputResponsePair', [
           $scope.getShortAnswerHtml = function() {
             var activeCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getActiveCardIndex());
-            if ($scope.isCurrentCardAtEndOfTranscript()) {
-              var interaction =
-                ExplorationPlayerStateService.getCurrentInteraction();
-            } else {
-              var interaction = activeCard.getInteraction();
-            }
+            var interaction =
+              ExplorationPlayerStateService.getCurrentInteraction();
             var shortAnswerHtml = '';
             if ($scope.data && interaction.id &&
                 INTERACTION_SPECS[interaction.id].needs_summary) {

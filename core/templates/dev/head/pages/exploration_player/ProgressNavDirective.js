@@ -56,21 +56,20 @@ oppia.directive('progressNav', [
             $scope.conceptCardIsBeingShown = (
               $scope.activeCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInPretestMode());
-            if ($scope.hasNext) {
-              var interaction = $scope.activeCard.getInteraction();
-            } else {
-              var interaction =
-                ExplorationPlayerStateService.getCurrentInteraction();
-            }
+            var interaction =
+              ExplorationPlayerStateService.getCurrentInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
                 ExplorationPlayerStateService.isInteractionInline());
               $scope.interactionCustomizationArgs =
-                interaction.customizationArgs;
-              $scope.interactionId = interaction.id;
-              interactionHasNavSubmitButton = (
-                Boolean(interaction.id) &&
-                INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+                $scope.activeCard.getInteractionCustomizationArgs();
+              $scope.interactionId = $scope.activeCard.getInteractionId();
+              if ($scope.interactionId) {
+                interactionHasNavSubmitButton = (
+                  Boolean($scope.interactionId) &&
+                  INTERACTION_SPECS[$scope.interactionId].
+                    show_generic_submit_button);
+              }
             }
 
             $scope.helpCardHasContinueButton = false;

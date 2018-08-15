@@ -23,11 +23,13 @@ oppia.factory('PretestEngineService', [
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'INTERACTION_SPECS',
   'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'FocusManagerService',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, INTERACTION_SPECS,
-      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE) {
+      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
+      FocusManagerService) {
     var _explorationId = ContextService.getExplorationId();
 
     var version = GLOBALS.explorationVersion;
@@ -66,7 +68,21 @@ oppia.factory('PretestEngineService', [
 
       currentIndex = 0;
       nextIndex = 0;
-      successCallback(null, questionHtml);
+
+      var interaction = initialState.interaction;
+      var nextFocusLabel = FocusManagerService.generateFocusLabel();
+
+      var interactionId = interaction.id;
+      var interactionHtml = null;
+
+      if (interactionId) {
+        interactionHtml = ExplorationHtmlFormatterService.getInteractionHtml(
+          interactionId,
+          interaction.customizationArgs,
+          true, nextFocusLabel);
+        FocusManagerService.setFocusIfOnDesktop(nextFocusLabel);
+      }
+      successCallback(null, questionHtml, {}, interaction, interactionHtml);
     };
 
     var _getCurrentStateData = function() {
@@ -110,27 +126,6 @@ oppia.factory('PretestEngineService', [
       getExplorationVersion: function() {
         return version;
       },
-      getStateContentHtml: function() {
-        return _getCurrentStateData().content.getHtml();
-      },
-      getStateContentAudioTranslations: function() {
-        return null;
-      },
-      isContentAudioTranslationAvailable: function() {
-        return false;
-      },
-      getCurrentInteractionHtml: function(labelForFocusTarget) {
-        var interactionId = _getCurrentStateData().interaction.id;
-        if (!interactionId) {
-          return null;
-        }
-
-        return ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          _getCurrentStateData().interaction.customizationArgs,
-          true,
-          labelForFocusTarget);
-      },
       getNextInteractionHtml: function(labelForFocusTarget) {
         var interactionId = _getNextStateData().interaction.id;
 
@@ -140,27 +135,12 @@ oppia.factory('PretestEngineService', [
           true,
           labelForFocusTarget);
       },
-      getCurrentInteraction: function() {
-        return _getCurrentStateData().interaction;
-      },
-      isInteractionInline: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          !interactionId ||
-          INTERACTION_SPECS[interactionId].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-      },
       isNextInteractionInline: function() {
         var interactionId = _getNextStateData().interaction.id;
         return (
           !interactionId ||
           INTERACTION_SPECS[interactionId].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);
-      },
-      getCurrentInteractionInstructions: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
       },
       getNextInteractionInstructions: function() {
         var interactionId = _getNextStateData().interaction.id;
@@ -170,36 +150,19 @@ oppia.factory('PretestEngineService', [
       getNextInteraction: function() {
         return _getNextStateData().interaction;
       },
-      isCurrentStateTerminal: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          interactionId && INTERACTION_SPECS[interactionId].is_terminal);
-      },
       isNextStateTerminal: function() {
         var interactionId = _getNextStateData().interaction.id;
         return (
           interactionId && INTERACTION_SPECS[interactionId].is_terminal);
       },
-      isStateShowingConceptCard: function() {
-        return false;
-      },
       getLanguageCode: function() {
         return pretestQuestions[currentIndex].getLanguageCode();
       },
-      getHints: function() {
-        return _getCurrentStateData().interaction.hints;
+      getNextContentIdsToAudioTranslations: function() {
+        return _getNextStateData().contentIdsToAudioTranslations;
       },
-      doesInteractionSupportHints: function() {
-        return (
-          !INTERACTION_SPECS[
-            _getCurrentStateData().interaction.id].is_terminal &&
-          !INTERACTION_SPECS[_getCurrentStateData().interaction.id].is_linear);
-      },
-      getSolution: function() {
-        return _getCurrentStateData().interaction.solution;
-      },
-      getContentIdsToAudioTranslations: function() {
-        return _getCurrentStateData().contentIdsToAudioTranslations;
+      getNextContentId: function() {
+        return _getNextStateData().content.getContentId();
       },
       isInPreviewMode: function() {
         return false;
@@ -255,8 +218,13 @@ oppia.factory('PretestEngineService', [
         }
         answerIsBeingProcessed = false;
 
+        var interactionId = oldState.interaction.id;
+        var interactionIsInline = (
+          !interactionId ||
+          INTERACTION_SPECS[interactionId].display_mode ===
+            INTERACTION_DISPLAY_MODE_INLINE);
         var refreshInteraction = (
-          answerIsCorrect || this.isInteractionInline());
+          answerIsCorrect || interactionIsInline);
 
         nextIndex = currentIndex + 1;
         var isFinalQuestion = (nextIndex === pretestQuestions.length);

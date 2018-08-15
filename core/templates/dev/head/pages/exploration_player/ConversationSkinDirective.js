@@ -420,10 +420,10 @@ oppia.directive('conversationSkin', [
                 PlayerPositionService.getActiveCardIndex())) {
               return !ExplorationPlayerStateService.isInteractionInline();
             }
-            var interactionId = card.getInteraction().id;
-            if (interactionId) {
+            var interaction = card.getInteraction();
+            if (interaction) {
               return (
-                INTERACTION_SPECS[interactionId].display_mode !==
+                INTERACTION_SPECS[interaction.id].display_mode !==
                   INTERACTION_DISPLAY_MODE_INLINE
               );
             } else {
@@ -461,6 +461,8 @@ oppia.directive('conversationSkin', [
           var _navigateToActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
+
+            ExplorationPlayerStateService.updateActiveCard();
             $rootScope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             /* A hash value is added to URL for scrolling to Oppia feedback
@@ -515,10 +517,10 @@ oppia.directive('conversationSkin', [
           };
           var _addNewCard = function(
               stateName, newParams, contentHtml, interactionHtml,
-              interaction) {
+              interaction, contentIdsToAudioTranslations, contentId) {
             PlayerTranscriptService.addNewCard(
               stateName, newParams, contentHtml, interactionHtml,
-              interaction, false);
+              interaction, false, contentIdsToAudioTranslations, contentId);
 
             if (newParams) {
               LearnerParamsService.init(newParams);
@@ -599,19 +601,12 @@ oppia.directive('conversationSkin', [
           };
 
           var _initializeDirectiveComponents = function(
-              initialStateName, initHtml, newParams) {
+              initialStateName, initHtml, newParams, interaction,
+              interactionHtml, contentIdsToAudioTranslations, contentId) {
             $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
-
-            _nextFocusLabel = FocusManagerService.generateFocusLabel();
-
             _addNewCard(
-              initialStateName,
-              newParams,
-              initHtml,
-              ExplorationPlayerStateService.getCurrentInteractionHtml(
-                _nextFocusLabel),
-              ExplorationPlayerStateService.getCurrentInteraction()
-            );
+              initialStateName, newParams, initHtml, interactionHtml,
+              interaction, contentIdsToAudioTranslations, contentId);
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
 
@@ -633,7 +628,6 @@ oppia.directive('conversationSkin', [
             }
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
-            FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
 
             // The timeout is needed in order to give the recipient of the
             // broadcast sufficient time to load.
@@ -924,12 +918,16 @@ oppia.directive('conversationSkin', [
                 ExplorationPlayerStateService.getNextInteraction();
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
-                newInteractionHtml +=
-                  _getRandomSuffix();
+                newInteractionHtml += _getRandomSuffix();
               }
+              var newContentIdsToAudioTranslations =
+                ExplorationPlayerStateService.
+                  getNextContentIdsToAudioTranslations();
+              var newContentId =
+                ExplorationPlayerStateService.getNextContentId();
               _addNewCard(
                 newStateName, newParams, newContentHtml, newInteractionHtml,
-                newInteraction);
+                newInteraction, newContentIdsToAudioTranslations, newContentId);
 
               $scope.upcomingStateName = null;
               $scope.upcomingParams = null;
@@ -966,7 +964,8 @@ oppia.directive('conversationSkin', [
             if ($scope.activeCard.getLeadsToConceptCard()) {
               ExplorationPlayerStateService.recordNewCardAdded();
               _addNewCard(
-                null, null, $scope.conceptCard.getExplanation(), null, null);
+                null, null, $scope.conceptCard.getExplanation(), null, null,
+                null, null);
               return;
             }
             /* This is for the following situation:

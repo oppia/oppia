@@ -49,11 +49,13 @@ oppia.factory('PlayerTranscriptService', [
       },
       addNewCard: function(
           stateName, params, contentHtml, interactionHtml,
-          interaction, leadsToConceptCard) {
+          interaction, leadsToConceptCard, contentIdsToAudioTranslations,
+          contentId) {
         transcript.push(
           StateCardObjectFactory.createNewCard(
             stateName, params, contentHtml, interactionHtml,
-            interaction, leadsToConceptCard
+            interaction, leadsToConceptCard, contentIdsToAudioTranslations,
+            contentId
           )
         );
         numAnswersSubmitted = 0;
