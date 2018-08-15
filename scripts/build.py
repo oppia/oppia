@@ -174,11 +174,11 @@ def _ensure_files_exist(filepaths):
         filepaths: list(str). Paths to files that we want to ensure exist.
 
     Raises:
-        Exception: Raised if one or more of the files does not exist.
+        ValueError: If one of the files does not exist.
     """
     for filepath in filepaths:
         if not os.path.isfile(filepath):
-            raise Exception('File %s does not exist.' % filepath)
+            raise ValueError('File %s does not exist.' % filepath)
 
 
 def _ensure_fonts_exist(filepaths):
@@ -188,7 +188,7 @@ def _ensure_fonts_exist(filepaths):
         filepaths: list(str). Wildcard paths to fonts.
 
     Raises:
-        Exception: Raised if one or more of the files does not exist.
+        ValueError: If one of the fonts does not exist.
     """
     for font_wildcard in filepaths:
         font_paths = glob.glob(font_wildcard)
@@ -202,12 +202,10 @@ def get_file_count(directory_path):
         directory_path: str. Directory to be walked.
 
     Returns:
-        total_file_count: int. Total number of files minus ignored files.
+        int. Total number of files minus ignored files.
     """
     total_file_count = 0
-    #pylint: disable=unused-variable
-    for root, dirs, files in os.walk(directory_path):
-        #pylint: enable=unused-variable
+    for _, _, files in os.walk(directory_path):
         total_file_count += len(files)
         for filename in files:
             # Ignore files with certain extensions.
@@ -221,20 +219,19 @@ def get_file_count(directory_path):
 
 
 def _compare_file_count(source_path, target_path):
-    """Ensure that two dir's file counts matches.
+    """Ensure that two dir's file counts match.
 
     Args:
        source_path: str. Source of staging files.
-       target_path: str. Final filepath of built files.
-           the processed file.
+       target_path: str. Final filepath or built file's directory.
 
     Raises:
-        Exception: Raised if both dir do not have the same file count.
+        ValueError: Raised if both dir do not have the same file count.
     """
     source_dir_file_count = get_file_count(source_path)
     target_dir_file_count = get_file_count(target_path)
     if source_dir_file_count != target_dir_file_count:
-        raise Exception(
+        raise ValueError(
             '%s files in source dir != %s files in target dir.' % (
                 source_dir_file_count, target_dir_file_count))
 
@@ -247,22 +244,27 @@ def _match_directory_with_hashes(directory_path, file_hashes):
        file_hashes: dict(str, str). Dictionary of file hashes.
 
     Raises:
-        Exception: Raised if hash dict is empty.
-        Exception: Raised if filename's hash does not match hash dict entries.
+        ValueError: Raised if hash dict is empty.
+        ValueError: Raised if filename does not contain hash unexpectedly.
+        KeyError: Raised if filename's hash does not match hash dict entries.
     """
     # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
-        raise Exception('Hash dict is empty')
-    #pylint: disable=unused-variable
-    for root, dirs, files in os.walk(directory_path):
-        #pylint: enable=unused-variable
+        raise ValueError('Hash dict is empty')
+    for root, _, files in os.walk(directory_path):
         for filename in files:
             file_hash = re.findall(r"([a-fA-F\d]{32})", filename)
-            if len(file_hash) == 0:
-                # There are filename that do not contain hashes.
+            parent_dir = os.path.basename(root)
+            # Convert current /build path to /backend_prod_files path.
+            converted_filepath = os.path.join(
+                THIRD_PARTY_GENERATED_STAGING_DIR, parent_dir, filename)
+            if not hash_should_be_inserted(converted_filepath):
+                # These filenames do not contain hashes.
                 continue # pragma: no cover
+            if not file_hash:
+                raise ValueError('%s is expected to contain hash' % filename)
             if file_hash[0] not in file_hashes.values():
-                raise Exception(
+                raise KeyError(
                     'Hashed file %s does not match hash dict keys' % filename)
 
 
@@ -816,7 +818,7 @@ def get_recently_changed_filenames(dev_dir, out_dir):
     # Hashes are created based on files' contents and are inserted between
     # the filenames and their extensions,
     # e.g base.240933e7564bd72a4dde42ee23260c5f.html
-    # Should a file gets edited, a different MD5 hash is generated.
+    # If a file gets edited, a different MD5 hash is generated.
     file_hashes = get_file_hashes(dev_dir)
     recently_changed_filenames = []
     # Currently, we do not hash Python files and HTML files are always re-built.
