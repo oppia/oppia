@@ -175,6 +175,7 @@ def get_question_by_id(question_id, strict=True):
     else:
         return None
 
+
 def get_question_skill_links_of_skill(skill_id):
     """Returns a list of QuestionSkillLink domain objects of
        a particular skill ID.
