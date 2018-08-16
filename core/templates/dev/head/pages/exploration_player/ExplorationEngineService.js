@@ -273,8 +273,21 @@ oppia.factory('ExplorationEngineService', [
           true,
           labelForFocusTarget);
       },
+      doesInteractionSupportHints: function() {
+        var interactionId = exploration.getInteractionId(currentStateName);
+        return (
+          !INTERACTION_SPECS[interactionId].is_terminal &&
+        !INTERACTION_SPECS[interactionId].is_linear);
+      },
       getNextInteraction: function() {
         return exploration.getInteraction(nextStateName);
+      },
+      getCurrentInteraction: function() {
+        return exploration.getInteraction(currentStateName);
+      },
+      getContentIdsToAudioTranslations: function() {
+        return (
+          exploration.getState(currentStateName).contentIdsToAudioTranslations);
       },
       isNextInteractionInline: function() {
         return exploration.isInteractionInline(nextStateName);

@@ -56,11 +56,10 @@ oppia.directive('progressNav', [
             $scope.conceptCardIsBeingShown = (
               $scope.activeCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInPretestMode());
-            var interaction =
-              ExplorationPlayerStateService.getCurrentInteraction();
+            var interaction = $scope.activeCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
-                ExplorationPlayerStateService.isInteractionInline());
+                $scope.activeCard.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 $scope.activeCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.activeCard.getInteractionId();

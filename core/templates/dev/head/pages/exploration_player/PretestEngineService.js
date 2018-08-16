@@ -167,6 +167,18 @@ oppia.factory('PretestEngineService', [
       getLanguageCode: function() {
         return pretestQuestions[currentIndex].getLanguageCode();
       },
+      getCurrentInteraction: function() {
+        return _getCurrentStateData().interaction;
+      },
+      getContentIdsToAudioTranslations: function() {
+        return _getCurrentStateData().contentIdsToAudioTranslations;
+      },
+      doesInteractionSupportHints: function() {
+        var interactionId = _getCurrentStateData().interaction.id;
+        return (
+          !INTERACTION_SPECS[interactionId].is_terminal &&
+        !INTERACTION_SPECS[interactionId].is_linear);
+      },
       getNextContentIdsToAudioTranslations: function() {
         return _getNextStateData().contentIdsToAudioTranslations;
       },

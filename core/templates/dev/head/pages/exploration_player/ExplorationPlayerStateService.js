@@ -35,7 +35,6 @@ oppia.factory('ExplorationPlayerStateService', [
       NumberAttemptsService) {
     var _currentEngineService = null;
     var _inPretestMode = false;
-    var _activeCard = null;
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _explorationId = ContextService.getExplorationId();
     var _version = GLOBALS.explorationVersion;
@@ -80,10 +79,6 @@ oppia.factory('ExplorationPlayerStateService', [
       getCurrentEngineService: function() {
         return _currentEngineService;
       },
-      updateActiveCard: function() {
-        _activeCard = PlayerTranscriptService.getCard(
-          PlayerPositionService.getActiveCardIndex());
-      },
       isInPretestMode: function() {
         return _inPretestMode;
       },
@@ -95,19 +90,13 @@ oppia.factory('ExplorationPlayerStateService', [
         ExplorationEngineService.moveToExploration(callback);
       },
       doesInteractionSupportHints: function() {
-        return _activeCard.doesInteractionSupportHints();
+        return _currentEngineService.doesInteractionSupportHints();
       },
       getCurrentStateName: function() {
         return _currentEngineService.getCurrentStateName();
       },
-      getCurrentInteraction: function() {
-        return _activeCard.getInteraction();
-      },
       getNextInteraction: function() {
         return _currentEngineService.getNextInteraction();
-      },
-      getCurrentInteractionHtml: function(nextFocusLabel) {
-        return _activeCard.getInteractionHtml(nextFocusLabel);
       },
       getNextInteractionHtml: function(nextFocusLabel) {
         return _currentEngineService.getNextInteractionHtml(nextFocusLabel);
@@ -115,32 +104,17 @@ oppia.factory('ExplorationPlayerStateService', [
       getLanguageCode: function() {
         return _currentEngineService.getLanguageCode();
       },
-      getCurrentInteractionInstructions: function() {
-        return _activeCard.getInteractionInstructions();
+      getCurrentInteraction: function() {
+        return _currentEngineService.getCurrentInteraction();
       },
       getNextInteractionInstructions: function() {
         return _currentEngineService.getNextInteractionInstructions();
       },
-      isInteractionInline: function() {
-        if (_activeCard === null || _activeCard.getInteraction() === null) {
-          return true;
-        }
-        return _activeCard.isInteractionInline();
-      },
       isNextInteractionInline: function() {
         return _currentEngineService.isNextInteractionInline();
       },
-      isContentAudioTranslationAvailable: function() {
-        if (_inPretestMode) {
-          return false;
-        }
-        return _activeCard.isContentAudioTranslationAvailable();
-      },
       getNextContentId: function() {
         return _currentEngineService.getNextContentId();
-      },
-      isCurrentStateTerminal: function() {
-        return _activeCard.isCardTerminal();
       },
       isStateShowingConceptCard: function() {
         if (_inPretestMode) {
@@ -152,7 +126,7 @@ oppia.factory('ExplorationPlayerStateService', [
         return false;
       },
       getContentIdsToAudioTranslations: function() {
-        return _activeCard.getContentIdsToAudioTranslations();
+        return _currentEngineService.getContentIdsToAudioTranslations();
       },
       getNextContentIdsToAudioTranslations: function() {
         return _currentEngineService.getNextContentIdsToAudioTranslations();
@@ -160,20 +134,11 @@ oppia.factory('ExplorationPlayerStateService', [
       recordNewCardAdded: function() {
         return _currentEngineService.recordNewCardAdded();
       },
-      getStateContentAudioTranslations: function() {
-        if (_inPretestMode) {
-          return null;
-        }
-        return _activeCard.getAudioTranslations();
-      },
       getHints: function() {
         return _currentEngineService.getHints();
       },
       getSolution: function() {
         return _currentEngineService.getSolution();
-      },
-      getStateContentHtml: function() {
-        return _activeCard.getContentHtml();
       },
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();

@@ -38,13 +38,14 @@ oppia.controller('LearnerLocalNav', [
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationEngineService',
+          'ExplorationEngineService', 'PlayerTranscriptService',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationEngineService) {
+              ExplorationEngineService, PlayerTranscriptService) {
             var stateName = PlayerPositionService.getCurrentStateName();
-            $scope.originalHtml =
-              ExplorationPlayerStateService.getStateContentHtml();
+            var activeCard = PlayerTranscriptService.getCard(
+              PlayerPositionService.getActiveCardIndex());
+            $scope.originalHtml = activeCard.getContentHtml();
             $scope.description = '';
             // ng-model needs to bind to a property of an object on
             // the scope (the property cannot sit directly on the scope)

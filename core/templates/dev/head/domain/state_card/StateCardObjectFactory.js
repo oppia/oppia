@@ -90,13 +90,6 @@ oppia.factory('StateCardObjectFactory', [
         interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
     };
 
-    StateCard.prototype.doesInteractionSupportHints = function() {
-      var interactionId = this.getInteractionId();
-      return (
-        !INTERACTION_SPECS[interactionId].is_terminal &&
-      !INTERACTION_SPECS[interactionId].is_linear);
-    };
-
     StateCard.prototype.getInteractionCustomizationArgs = function() {
       var interaction = this.getInteraction();
       if (!interaction) {

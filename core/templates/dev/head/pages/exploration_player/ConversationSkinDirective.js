@@ -334,8 +334,7 @@ oppia.directive('conversationSkin', [
             if (conceptCardIsBeingShown) {
               return false;
             }
-            var interaction =
-              ExplorationPlayerStateService.getCurrentInteraction();
+            var interaction = $scope.activeCard.getInteraction();
             if (INTERACTION_SPECS[interaction.id].is_linear) {
               return false;
             }
@@ -410,12 +409,11 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isOnTerminalCard = function() {
-            return $scope.activeCard &&
-              ExplorationPlayerStateService.isCurrentStateTerminal();
+            return $scope.activeCard && $scope.activeCard.isCardTerminal();
           };
 
           var isSupplementalCardNonempty = function(card) {
-            return !ExplorationPlayerStateService.isInteractionInline();
+            return !card.isInteractionInline();
           };
 
           $scope.isCurrentSupplementalCardNonempty = function() {
@@ -427,8 +425,7 @@ oppia.directive('conversationSkin', [
             if (ExplorationPlayerStateService.isStateShowingConceptCard()) {
               return false;
             }
-            var interaction =
-              ExplorationPlayerStateService.getCurrentInteraction();
+            var interaction = $scope.activeCard.getInteraction();
             return (
               Boolean(interaction.id) &&
               INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
@@ -449,7 +446,6 @@ oppia.directive('conversationSkin', [
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
 
-            ExplorationPlayerStateService.updateActiveCard();
             $rootScope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             /* A hash value is added to URL for scrolling to Oppia feedback
@@ -541,7 +537,7 @@ oppia.directive('conversationSkin', [
               PlayerPositionService.setActiveCardIndex(totalNumCards - 1);
             }
 
-            if (ExplorationPlayerStateService.isCurrentStateTerminal()) {
+            if ($scope.activeCard.isCardTerminal()) {
               $scope.isRefresherExploration = false;
               $scope.parentExplorationIds =
                 UrlService.getQueryFieldValuesAsList('parent');
@@ -726,7 +722,7 @@ oppia.directive('conversationSkin', [
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
-                  !ExplorationPlayerStateService.isInteractionInline() ? 1.0 :
+                  !$scope.activeCard.isInteractionInline() ? 1.0 :
                   Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
                     new Date().getTime() - timeAtServerCall),
                   1.0));
@@ -749,7 +745,7 @@ oppia.directive('conversationSkin', [
                     PlayerTranscriptService.addNewResponse(feedbackHtml);
                     var helpCardAvailable = false;
                     if (feedbackHtml &&
-                        !ExplorationPlayerStateService.isInteractionInline()) {
+                        !$scope.activeCard.isInteractionInline()) {
                       helpCardAvailable = true;
                     }
 
@@ -781,7 +777,7 @@ oppia.directive('conversationSkin', [
                       _nextFocusLabel =
                         FocusManagerService.generateFocusLabel();
                       PlayerTranscriptService.updateLatestInteractionHtml(
-                        ExplorationPlayerStateService.getCurrentInteractionHtml(
+                        $scope.activeCard.getInteractionHtml(
                           _nextFocusLabel) + _getRandomSuffix());
                     }
 
@@ -819,8 +815,7 @@ oppia.directive('conversationSkin', [
                       if (feedbackHtml) {
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
                         if (
-                          !ExplorationPlayerStateService.
-                            isInteractionInline()) {
+                          !$scope.activeCard.isInteractionInline()) {
                           $scope.$broadcast('helpCardAvailable', {
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
@@ -864,8 +859,7 @@ oppia.directive('conversationSkin', [
                         $scope.pendingCardWasSeenBefore = true;
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
-                      if (!ExplorationPlayerStateService.
-                        isInteractionInline()) {
+                      if (!$scope.activeCard.isInteractionInline()) {
                         $scope.$broadcast('helpCardAvailable', {
                           helpCardHtml: feedbackHtml,
                           hasContinueButton: true
@@ -1021,7 +1015,7 @@ oppia.directive('conversationSkin', [
               return;
             }
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
-                !ExplorationPlayerStateService.isCurrentStateTerminal()) {
+                !$scope.activeCard.isCardTerminal()) {
               StatsReportingService.recordMaybeLeaveEvent(
                 PlayerTranscriptService.getLastStateName(),
                 LearnerParamsService.getAllParams());
