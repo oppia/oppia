@@ -774,9 +774,9 @@ title: Title
         exp_services.load_demo(self.DEMO_EXP_ID)
 
         # Override the demo exploration using the import method.
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                self.owner_id, self.SAMPLE_YAML_CONTENT, self.DEMO_EXP_ID, [])
+        #with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_YAML_CONTENT, self.DEMO_EXP_ID, [])
 
         # The demo exploration should not have been overwritten.
         exp = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
@@ -1270,9 +1270,18 @@ title: A title
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'state_name': 'New state',
+                'new_value': 'TextInput'
+            })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
@@ -1288,9 +1297,18 @@ title: A title
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'state_name': 'New state',
+                'new_value': 'TextInput'
+            })], 'Add state name')
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
@@ -1467,9 +1485,18 @@ param_changes: []
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'state_name': 'New state',
+                'new_value': 'TextInput'
+            })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
@@ -1742,9 +1769,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.add_states(['State 2'])
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State 2',
+            })] +  _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'TextInput'),
+            'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.interaction_default_outcome['dest'] = 'State 2'
@@ -1772,9 +1806,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of interaction_answer_groups."""
         # We create a second state to use as a rule destination.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.add_states(['State 2'])
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State 2',
+            })] +  _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'TextInput'),
+            'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.interaction_default_outcome['dest'] = 'State 2'
