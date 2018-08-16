@@ -51,6 +51,7 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+gae_image_services = models.Registry.import_gae_image_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -63,23 +64,24 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 MAX_ITERATIONS = 10
 
 
-def _migrate_states_schema(versioned_exploration_states):
+def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
     found in exp_domain.py and, in fact, many of the conversion functions for
     states are also used in the YAML conversion pipeline. If the current
     exploration states schema version changes
-    (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
+    (feconf.CURRENT_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
 
     Args:
-        versioned_exploration_states: A dict with two keys:
+        versioned_exploration_states: dict. A dict with two keys:
             states_schema_version: int. the states schema version for the
                 exploration.
             states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
+        exploration_id: str. ID of the exploration.
 
     Raises:
         Exception: The given states_schema_version is invalid.
@@ -90,16 +92,17 @@ def _migrate_states_schema(versioned_exploration_states):
         states_schema_version = 0
 
     if not (0 <= states_schema_version
-            <= feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     while (states_schema_version <
-           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+           feconf.CURRENT_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version)
+            versioned_exploration_states, states_schema_version,
+            exploration_id)
         states_schema_version += 1
 
 
@@ -155,8 +158,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states)
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
+        _migrate_states_schema(
+            versioned_exploration_states, exploration_model.id)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -616,7 +620,7 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -897,10 +901,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exp_versions_diff)
 
     # Trigger exploration issues model updation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
+    stats_services.update_exp_issues_for_new_exp_version(
+        exploration, exp_versions_diff=exp_versions_diff,
+        revert_to_version=None)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -966,9 +969,8 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Trigger exploration issues model creation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version)
+    stats_services.create_exp_issues_for_new_exploration(
+        exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
@@ -1428,12 +1430,11 @@ def revert_exploration(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
 
-    if feconf.ENABLE_PLAYTHROUGHS:
-        current_exploration = get_exploration_by_id(
-            exploration_id, version=current_version)
-        stats_services.update_exp_issues_for_new_exp_version(
-            current_exploration, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
+    current_exploration = get_exploration_by_id(
+        exploration_id, version=current_version)
+    stats_services.update_exp_issues_for_new_exp_version(
+        current_exploration, exp_versions_diff=None,
+        revert_to_version=revert_to_version)
 
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(
@@ -1497,6 +1498,15 @@ def save_new_exploration_from_yaml_and_assets(
         raise Exception('Invalid YAML file: missing schema version')
     exp_schema_version = yaml_dict['schema_version']
 
+    # The assets are committed before the exploration is created because the
+    # migrating to state schema version 25 involves adding dimensions to
+    # images. So we need to have images in the datastore before we could
+    # perform the migration.
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+        fs.commit(committer_id, asset_filename, asset_content)
+
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
@@ -1525,11 +1535,6 @@ def save_new_exploration_from_yaml_and_assets(
                 'title': exploration.title,
                 'category': exploration.category,
             })])
-
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
 
 
 def delete_demo(exploration_id):
@@ -1660,6 +1665,65 @@ def get_image_filenames_from_exploration(exploration):
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
+
+
+def save_original_and_compressed_versions_of_image(
+        user_id, filename, exp_id, original_image_content):
+    """Saves the three versions of the image file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        filename: str. The name of the image file.
+        original_image_content: str. The content of the original image.
+        user_id: str. The id of the user who wants to upload the image.
+    """
+    filepath = (
+        filename if feconf.DEV_MODE else 'image/%s' % filename)
+
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+
+    compressed_image_filename = '%s_compressed.%s' % (
+        filename_wo_filetype, filetype)
+    compressed_image_filepath = (
+        compressed_image_filename if feconf.DEV_MODE
+        else 'image/%s' % compressed_image_filename)
+
+    micro_image_filename = '%s_micro.%s' % (
+        filename_wo_filetype, filetype)
+    micro_image_filepath = (
+        micro_image_filename if feconf.DEV_MODE
+        else 'image/%s' % micro_image_filename)
+
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
+
+    compressed_image_content = gae_image_services.compress_image(
+        original_image_content, 0.8)
+    micro_image_content = gae_image_services.compress_image(
+        original_image_content, 0.7)
+
+    # Because in case of CreateVersionsOfImageJob, the original image is
+    # already there. Also, even if the compressed, micro versions for some
+    # image exists, then this would prevent from creating another copy of
+    # the same.
+    if not fs.isfile(filepath):
+        fs.commit(
+            user_id, filepath, original_image_content,
+            mimetype='image/%s' % filetype)
+
+    if not fs.isfile(compressed_image_filepath):
+        fs.commit(
+            user_id, compressed_image_filepath,
+            compressed_image_content, mimetype='image/%s' % filetype)
+
+    if not fs.isfile(micro_image_filepath):
+        fs.commit(
+            user_id, micro_image_filepath,
+            micro_image_content, mimetype='image/%s' % filetype)
 
 
 def get_number_of_ratings(ratings):

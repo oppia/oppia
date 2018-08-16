@@ -62,7 +62,7 @@ oppia.factory('StateTopAnswersStatsService', [
       allAnswersCacheEntry.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            explorationId, stateName, state, answerStats.answer,
+            stateName, state, answerStats.answer,
             interactionRulesService);
         if (!answerStats.isAddressed) {
           unresolvedAnswersCacheEntry.push(answerStats);
@@ -132,8 +132,12 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       hasStateStats: function(stateName) {
         return isInitialized &&
-          stateTopAnswersStatsCache.hasOwnProperty(stateName) &&
-          stateTopAnswersStatsCache[stateName].allAnswers.length > 0;
+          stateTopAnswersStatsCache.hasOwnProperty(stateName);
+      },
+
+      /** @returns {string[]} - list of state names with recorded stats. */
+      getStateNamesWithStats: function() {
+        return Object.keys(stateTopAnswersStatsCache);
       },
 
       /**

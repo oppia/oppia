@@ -31,6 +31,10 @@ oppia.factory('OutcomeObjectFactory', [
       this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
     };
 
+    Outcome.prototype.setDestination = function(newValue) {
+      this.dest = newValue;
+    };
+
     Outcome.prototype.toBackendDict = function() {
       return {
         dest: this.dest,

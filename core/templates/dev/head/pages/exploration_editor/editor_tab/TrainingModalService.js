@@ -37,22 +37,24 @@ oppia.factory('TrainingModalService', [
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance',
-            'ExplorationStatesService', 'EditorStateService',
+            'ExplorationStatesService', 'StateEditorService',
             'AnswerClassificationService', 'ContextService',
-            'stateInteractionIdService', 'AngularNameService',
+            'StateInteractionIdService', 'AngularNameService',
             'ResponsesService', 'TrainingDataService',
-            'stateContentIdsToAudioTranslationsService',
-            'AnswerGroupObjectFactory',
+            'StateContentIdsToAudioTranslationsService',
+            'AnswerGroupObjectFactory', 'GraphDataService',
+            'ExplorationWarningsService',
             function($scope, $injector, $uibModalInstance,
-                ExplorationStatesService, EditorStateService,
+                ExplorationStatesService, StateEditorService,
                 AnswerClassificationService, ContextService,
-                stateInteractionIdService, AngularNameService,
+                StateInteractionIdService, AngularNameService,
                 ResponsesService, TrainingDataService,
-                stateContentIdsToAudioTranslationsService,
-                AnswerGroupObjectFactory) {
+                StateContentIdsToAudioTranslationsService,
+                AnswerGroupObjectFactory, GraphDataService,
+                ExplorationWarningsService) {
               $scope.trainingDataAnswer = '';
 
-              // See the training panel directive in StateEditor for an
+              // See the training panel directive in ExplorationEditorTab for an
               // explanation on the structure of this object.
               $scope.classification = {
                 answerGroupIndex: 0,
@@ -63,13 +65,28 @@ oppia.factory('TrainingModalService', [
               var _saveNewAnswerGroup = function(newAnswerGroup) {
                 var answerGroups = ResponsesService.getAnswerGroups();
                 var translationService = (
-                  stateContentIdsToAudioTranslationsService);
+                  StateContentIdsToAudioTranslationsService);
                 answerGroups.push(newAnswerGroup);
                 ResponsesService.save(
-                  answerGroups, ResponsesService.getDefaultOutcome());
+                  answerGroups, ResponsesService.getDefaultOutcome(),
+                  function(newAnswerGroups, newDefaultOutcome) {
+                    ExplorationStatesService.saveInteractionAnswerGroups(
+                      StateEditorService.getActiveStateName(),
+                      angular.copy(newAnswerGroups));
+
+                    ExplorationStatesService.saveInteractionDefaultOutcome(
+                      StateEditorService.getActiveStateName(),
+                      angular.copy(newDefaultOutcome));
+
+                    GraphDataService.recompute();
+                    ExplorationWarningsService.updateWarnings();
+                  });
                 translationService.displayed.addContentId(
                   newAnswerGroup.outcome.feedback.getContentId());
                 translationService.saveDisplayedValue();
+                ExplorationStatesService.saveContentIdsToAudioTranslations(
+                  translationService.stateName,
+                  angular.copy(translationService.displayed));
               };
 
               $scope.exitTrainer = function() {
@@ -102,11 +119,11 @@ oppia.factory('TrainingModalService', [
                 var explorationId =
                   ContextService.getExplorationId();
                 var currentStateName =
-                  EditorStateService.getActiveStateName();
+                  StateEditorService.getActiveStateName();
                 var state = ExplorationStatesService.getState(currentStateName);
 
                 // Retrieve the interaction ID.
-                var interactionId = stateInteractionIdService.savedMemento;
+                var interactionId = StateInteractionIdService.savedMemento;
 
                 var rulesServiceName =
                   AngularNameService.getNameOfInteractionRulesService(
@@ -117,7 +134,7 @@ oppia.factory('TrainingModalService', [
 
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
-                    explorationId, currentStateName, state, unhandledAnswer,
+                    currentStateName, state.interaction, unhandledAnswer,
                     rulesService));
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;

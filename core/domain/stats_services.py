@@ -104,7 +104,6 @@ def get_exploration_stats(exp_id, exp_version):
         ExplorationStats. The exploration stats domain object.
     """
     exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
-
     if exploration_stats is None:
         exploration_stats = stats_domain.ExplorationStats.create_default(
             exp_id, exp_version, {})

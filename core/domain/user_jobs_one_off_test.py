@@ -433,16 +433,20 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_exploration', self._null_fn
             ):
-            # User B starts a feedback thread.
-            feedback_services.create_thread(
-                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
-            # User C adds to that thread.
-            thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0].id
-            feedback_services.create_message(
-                thread_id, self.user_c_id, None, None, 'more text')
+            with self.swap(
+                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                # User B starts a feedback thread.
+                feedback_services.create_thread(
+                    'exploration', self.EXP_ID_1, None, self.user_b_id,
+                    'subject', 'text')
+                # User C adds to that thread.
+                thread_id = feedback_services.get_all_threads(
+                    'exploration', self.EXP_ID_1, False)[0].id
+                feedback_services.create_message(
+                    thread_id, self.user_c_id, None, None, 'more text')
 
-        self._run_one_off_job()
+        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            self._run_one_off_job()
 
         # Both users are subscribed to the feedback thread.
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -453,9 +457,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
         self.assertEqual(
-            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_b_subscriptions_model.general_feedback_thread_ids, [thread_id])
         self.assertEqual(
-            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_c_subscriptions_model.general_feedback_thread_ids, [thread_id])
 
     def test_exploration_subscription(self):
         with self.swap(

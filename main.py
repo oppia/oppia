@@ -219,7 +219,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_QUESTION_URL,
+        r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
@@ -329,6 +329,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
+        reader.PretestHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
@@ -453,6 +456,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler),
     get_redirect_route(
+        r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+        feedback.ThreadListHandlerForTopics),
+    get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
     get_redirect_route(
@@ -474,6 +480,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
+    get_redirect_route(
+        r'%s/topic/<target_id>/<suggestion_id>' %
+        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
         r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),

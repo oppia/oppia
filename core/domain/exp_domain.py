@@ -22,12 +22,14 @@ should therefore be independent of the specific storage models used.
 """
 
 import copy
+import functools
 import logging
 import re
 import string
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
@@ -875,7 +877,7 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: str or None. The id of the tagged
+            tagged_misconception_id: int or None. The id of the tagged
                 misconception for the answer group, when a state is part of a
                 Question object that tests a particular skill.
         """
@@ -909,9 +911,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, basestring):
+            if not isinstance(self.tagged_misconception_id, int):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be a string, '
+                    'Expected tagged misconception id to be an int, '
                     'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
@@ -1308,26 +1310,6 @@ class InteractionInstance(object):
 
 class State(object):
     """Domain object for a state."""
-
-    NULL_INTERACTION_DICT = {
-        'id': None,
-        'customization_args': {},
-        'answer_groups': [],
-        'default_outcome': {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': {
-                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
-                'html': ''
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        },
-        'confirmed_unclassified_answers': [],
-        'hints': [],
-        'solution': None,
-    }
 
     def __init__(
             self, content, param_changes, interaction,
@@ -2012,7 +1994,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
@@ -2163,8 +2145,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
         # TODO(sll): Remove this check once App Engine supports 3-letter
@@ -3535,7 +3516,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_textangular)
+                state_dict, html_validation_service.convert_to_textangular)
         return states_dict
 
     @classmethod
@@ -3552,7 +3533,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.add_caption_attr_to_image)
+                state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
@@ -3570,12 +3551,44 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v24_dict_to_v25_dict(cls, exp_id, states_dict):
+        """Converts from version 24 to 25. Version 25 adds the dimensions of
+        images in the oppia-noninteractive-image tags.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            add_dimensions_to_image_tags = functools.partial(
+                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
+                exp_id)
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict,
+                add_dimensions_to_image_tags)
+            if state_dict['interaction']['id'] == 'ImageClickInput':
+                filename = state_dict['interaction']['customization_args'][
+                    'imageAndRegions']['value']['imagePath']
+                state_dict['interaction']['customization_args'][
+                    'imageAndRegions']['value']['imagePath'] = (
+                        html_validation_service.get_filename_with_dimensions(
+                            filename, exp_id))
+
         return states_dict
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states, current_states_schema_version,
+            exploration_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -3591,12 +3604,15 @@ class Exploration(object):
                     initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
+            exploration_id: str. ID of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
+        if current_states_schema_version == 24:
+            conversion_fn = functools.partial(conversion_fn, exploration_id)
         versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'])
 
@@ -3604,7 +3620,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 29
+    CURRENT_EXP_SCHEMA_VERSION = 30
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4139,13 +4155,28 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
+        """Converts a v29 exploration dict into a v30 exploration dict.
+
+        Adds dimensions to all oppia-noninteractive-image tags.
+        """
+        exploration_dict['schema_version'] = 30
+
+        exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
+            exp_id, exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 25
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
-            cls, yaml_content, title=None, category=None):
+            cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
+            exp_id: str. ID of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
 
@@ -4315,6 +4346,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 29
 
+        if exploration_schema_version == 29:
+            exploration_dict = cls._convert_v29_dict_to_v30_dict(
+                exp_id, exploration_dict)
+            exploration_schema_version = 30
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4333,7 +4369,8 @@ class Exploration(object):
             Exception: The initial schema version of exploration is less than
                 or equal to 9.
         """
-        migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
@@ -4365,7 +4402,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title=title, category=category)
+            yaml_content, exploration_id, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

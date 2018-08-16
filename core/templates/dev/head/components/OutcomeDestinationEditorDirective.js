@@ -22,17 +22,18 @@ oppia.directive('outcomeDestinationEditor', [
       restrict: 'E',
       scope: {
         outcomeHasFeedback: '=',
-        outcome: '='
+        outcome: '=',
+        addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_destination_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
+        '$scope', 'StateEditorService',
         'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
         'FocusManagerService', 'EditorFirstTimeEventsService',
         'EXPLORATION_AND_SKILL_ID_PATTERN',
         function(
-            $scope, EditorStateService, ExplorationStatesService,
+            $scope, StateEditorService,
             StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
             FocusManagerService, EditorFirstTimeEventsService,
             EXPLORATION_AND_SKILL_ID_PATTERN) {
@@ -49,7 +50,7 @@ oppia.directive('outcomeDestinationEditor', [
               $scope.outcome.dest = newStateName;
               delete $scope.outcome.newStateName;
 
-              ExplorationStatesService.addState(newStateName, null);
+              $scope.addState(newStateName);
             }
           });
 
@@ -77,14 +78,15 @@ oppia.directive('outcomeDestinationEditor', [
 
           $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
           $scope.destChoices = [];
-          $scope.$watch(ExplorationStatesService.getStates, function() {
-            currentStateName = EditorStateService.getActiveStateName();
+          $scope.$watch(StateEditorService.getStateNames, function() {
+            currentStateName = StateEditorService.getActiveStateName();
 
+            var questionModeEnabled = StateEditorService.isInQuestionMode();
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a
             // new state.
             $scope.destChoices = [{
-              id: currentStateName,
+              id: (questionModeEnabled ? null : currentStateName),
               text: '(try again)'
             }];
 
@@ -92,7 +94,7 @@ oppia.directive('outcomeDestinationEditor', [
             // graph.
             var lastComputedArrangement = (
               StateGraphLayoutService.getLastComputedArrangement());
-            var allStateNames = ExplorationStatesService.getStateNames();
+            var allStateNames = StateEditorService.getStateNames();
 
             // It is possible that lastComputedArrangement is null if the graph
             // has never been rendered at the time this computation is being
@@ -141,10 +143,12 @@ oppia.directive('outcomeDestinationEditor', [
               }
             }
 
-            $scope.destChoices.push({
-              id: PLACEHOLDER_OUTCOME_DEST,
-              text: 'A New Card Called...'
-            });
+            if (!questionModeEnabled) {
+              $scope.destChoices.push({
+                id: PLACEHOLDER_OUTCOME_DEST,
+                text: 'A New Card Called...'
+              });
+            }
           }, true);
         }
       ]

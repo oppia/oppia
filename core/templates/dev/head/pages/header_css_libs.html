@@ -2,10 +2,10 @@
       href="https://fonts.googleapis.com/css?family=Capriola|Rubik|Roboto|Material+Icons|Open+Sans:400,600">
 {% if not DEV_MODE %}
   <link rel="stylesheet" type="text/css" media="screen"
-        href="{{get_static_resource_url('/third_party/generated/css/third_party.min.css')}}">
+        href="/third_party/generated/css/third_party.min.css">
 {% else %}
   <link rel="stylesheet" type="text/css" media="screen"
-        href="{{get_static_resource_url('/third_party/generated/css/third_party.css')}}">
+        href="/third_party/generated/css/third_party.css">
 {% endif %}
 <link rel="stylesheet" type="text/css" media="screen"
-      href="{{TEMPLATE_DIR_PREFIX}}/css/oppia.css">
+      href="/templates/dev/head/css/oppia.css">

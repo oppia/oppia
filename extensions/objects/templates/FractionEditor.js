@@ -16,7 +16,8 @@
 oppia.directive('fractionEditor', [
   'FractionObjectFactory', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',
-  function(FractionObjectFactory, UrlInterpolationService,
+  function(
+      FractionObjectFactory, UrlInterpolationService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
@@ -29,18 +30,16 @@ oppia.directive('fractionEditor', [
         var errorMessage = '';
         var fractionString = '0';
         if ($scope.value !== null) {
-          var defaultFraction =
-            FractionObjectFactory.fromDict($scope.value);
-          defaultFractionString = defaultFraction.toString();
+          var defaultFraction = FractionObjectFactory.fromDict($scope.value);
+          fractionString = defaultFraction.toString();
         }
         $scope.localValue = {
-          label: defaultFractionString
+          label: fractionString
         };
 
         $scope.$watch('localValue.label', function(newValue) {
           try {
-            var fraction = FractionObjectFactory.fromRawInputString(newValue);
-            $scope.value = fraction;
+            $scope.value = FractionObjectFactory.fromRawInputString(newValue);
             errorMessage = '';
           } catch (parsingError) {
             errorMessage = parsingError.message;

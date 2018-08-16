@@ -24,6 +24,8 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -34,6 +36,11 @@ import utils
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -591,7 +598,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         yaml_before_migration = exploration.to_yaml()
 
         # Start migration job on sample exploration.
@@ -603,7 +610,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         after_converted_yaml = updated_exp.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
 
@@ -624,7 +631,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(
@@ -835,7 +842,7 @@ class ExplorationContentValidationJobForTextAngularTest(
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to print something?</p></blockquote> Can do this by '
+                    'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
@@ -866,7 +873,7 @@ class ExplorationContentValidationJobForTextAngularTest(
             (
                 '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
                 'like your <span>program </span>prints output</p>.<blockquote>'
-                '<p> Could you get it to print something?</p></blockquote> '
+                '<p> Could you get it to do something?</p></blockquote> '
                 'Can do this by using statement like prints. <br> You can '
                 'ask any if you have<oppia-noninteractive-link text-with-value'
                 '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
@@ -930,7 +937,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to print something?</p></blockquote> Can do this by '
+                    'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
@@ -1060,15 +1067,17 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 updated_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
-
+        exp_services.save_new_exploration(self.albert_id, updated_exploration)
         # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
             job_id)
-        self.process_and_flush_pending_tasks()
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+            self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
@@ -1231,6 +1240,47 @@ class ExplorationContentValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
+class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
+
+    COMMITER_ID = 'ADMIN'
+    COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
+    EXP_ID = 'eid'
+    FILENAME = 'imageFile.png'
+
+    def setUp(self):
+        super(DeleteImagesFromGAEJobTest, self).setUp()
+        self.process_and_flush_pending_tasks()
+
+    def test_for_deletion_job(self):
+        """Checks that images get deleted from the GAE after running the job.
+        """
+        # This job is for deleting the images from the datastore that were
+        # stored in old format --- exp_id/assets/image.png . It should not be
+        # run on the current develop branch because we now store the images
+        # as exploration/exp_id/assets/image.png .
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        imageData = ''
+        mimetype = 'image/png'
+        fs.commit(
+            self.COMMITER_ID, self.FILENAME, imageData,
+            mimetype=mimetype)
+        self.assertEqual(fs.isfile(self.FILENAME), True)
+
+        job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
+        exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
+        expected_output = [
+            u"[u'Number of files that got deleted', 1]"
+        ]
+
+        self.assertEqual(fs.isfile(self.FILENAME), False)
+        self.assertEqual(actual_output, expected_output)
+
+
 class ExplorationMigrationValidationJobForCKEditorTest(
         test_utils.GenericTestBase):
 
@@ -1307,10 +1357,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
-
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;random.png&amp;quot;">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
                 )
             },
             'labelled_as_correct': False,
@@ -1337,5 +1386,102 @@ class ExplorationMigrationValidationJobForCKEditorTest(
             "[u'strings', [u'<p>Lorem <span>ipsum </span>"
             "</p> Hello this is <code>oppia </code>']]"
         ]
+
+        self.assertEqual(actual_output, expected_output)
+
+
+class InteractionCustomizationArgsValidationJobTest(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            InteractionCustomizationArgsValidationJobTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_customization_arg_validation_job(self):
+        """Validates customization args for rich text components."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        state3.update_content(content3_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start CustomizationArgsValidation job on sample exploration.
+        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
+
+        expected_output = [(
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
+            'png&amp;quot;"></oppia-noninteractive-image>\']]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
+            'https://\'; received htt://link.com", '
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
+            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
+            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+        )]
 
         self.assertEqual(actual_output, expected_output)

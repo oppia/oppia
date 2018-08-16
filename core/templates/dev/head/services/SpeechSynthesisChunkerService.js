@@ -102,7 +102,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // fixes ordering and onend issues.
       // eslint-disable-next-line no-console
       console.log(newUtterance);
-      $timeout(function () {
+      $timeout(function() {
         speechSynthesis.speak(newUtterance);
       }, 0);
     };

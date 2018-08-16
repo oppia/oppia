@@ -634,29 +634,8 @@ var CodeMirrorChecker = function(elem) {
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       for (var i = 0; i < textArray.length; i += 2) {
-        // CKEditor prettifies html and adds new lines.
-        // Due to this there are extra lines in the output.
-        // This creates a deviation from the usual case where--
-        // (2i)th line contains a line number and the
-        // (2i+1)th line contains the text on that line.
-        // In this case both the (2i)th and (2i+1)th lines
-        // contain line numbers since the html text spans
-        // multiple lines.
-        // This block checks whether (2i+1)th contains a line
-        // number or text for (2i)th line.
-
-        // Spaces are trimmed from line numbers since extra spaces
-        // span multiple lines due to html being prettified by CKEditor.
-        var lineNumber = textArray[i].replace(/^\s+/g, '');
+        var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
-        var copy = lineText;
-        var lineTextWithoutStartSpaces = copy.replace(/^\s+/g, '');
-        // Checks if the line only contains a single digit.
-        if ((lineTextWithoutStartSpaces.length === 1) && (
-          lineTextWithoutStartSpaces.match(/[0-9]/i))) {
-          lineText = '';
-          i -= 1;
-        }
         if (!compareDict.hasOwnProperty(lineNumber)) {
           throw Error('Line ' + lineNumber + ' not found in CodeMirror');
         }

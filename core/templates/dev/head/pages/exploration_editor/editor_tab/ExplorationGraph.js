@@ -17,11 +17,11 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$uibModal', 'EditorStateService', 'AlertsService',
+  '$scope', '$uibModal', 'StateEditorService', 'AlertsService',
   'ExplorationStatesService', 'EditabilityService', 'RouterService',
   'GraphDataService', 'UrlInterpolationService',
   function(
-      $scope, $uibModal, EditorStateService, AlertsService,
+      $scope, $uibModal, StateEditorService, AlertsService,
       ExplorationStatesService, EditabilityService, RouterService,
       GraphDataService, UrlInterpolationService) {
     $scope.getGraphData = GraphDataService.getGraphData;
@@ -43,7 +43,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.getActiveStateName = function() {
-      return EditorStateService.getActiveStateName();
+      return StateEditorService.getActiveStateName();
     };
 
     $scope.openStateGraphModal = function() {
@@ -61,11 +61,11 @@ oppia.controller('ExplorationGraph', [
         },
         windowClass: 'oppia-large-modal-window',
         controller: [
-          '$scope', '$uibModalInstance', 'EditorStateService',
+          '$scope', '$uibModalInstance', 'StateEditorService',
           'GraphDataService', 'isEditable',
-          function($scope, $uibModalInstance, EditorStateService,
+          function($scope, $uibModalInstance, StateEditorService,
               GraphDataService, isEditable) {
-            $scope.currentStateName = EditorStateService.getActiveStateName();
+            $scope.currentStateName = StateEditorService.getActiveStateName();
             $scope.graphData = GraphDataService.getGraphData();
             $scope.isEditable = isEditable;
 

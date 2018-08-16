@@ -44,8 +44,8 @@ var LibraryPage = function(){
   var languageSelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-language-selector'))
   );
-  var searchInput = element.all(
-    by.css('.protractor-test-search-input')).first();
+  var searchInputs = element.all(
+    by.css('.protractor-test-search-input'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -57,6 +57,20 @@ var LibraryPage = function(){
           });
       }
     );
+  };
+
+  var _submitSearchQuery = function(searchQuery) {
+    // The library page has two search bar input elements.
+    // The first search bar input element is visible only in a desktop
+    // browser and is invisible in case of a mobile browser.
+    // The second search bar input element is visible when the library
+    // page is rendered for mobile device.
+
+    // get function is a zero-based index.
+    var searchInput = (
+      browser.isMobile ? searchInputs.get(1) : searchInputs.first());
+    searchInput.clear();
+    searchInput.sendKeys(searchQuery);
   };
 
   this.get = function() {
@@ -150,14 +164,12 @@ var LibraryPage = function(){
 
   this.findExploration = function(explorationTitle) {
     waitFor.pageToFullyLoad();
-    searchInput.clear();
-    searchInput.sendKeys(explorationTitle);
+    _submitSearchQuery(explorationTitle);
   };
 
   this.findCollection = function(collectionTitle) {
     waitFor.pageToFullyLoad();
-    searchInput.clear();
-    searchInput.sendKeys(collectionTitle);
+    _submitSearchQuery(collectionTitle);
   };
 };
 
