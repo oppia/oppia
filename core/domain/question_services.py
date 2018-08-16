@@ -175,8 +175,6 @@ def get_question_by_id(question_id, strict=True):
     else:
         return None
 
-
-<<<<<<< HEAD
 def get_question_skill_links_of_skill(skill_id):
     """Returns a list of QuestionSkillLink domain objects of
        a particular skill ID.
@@ -221,11 +219,8 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
             question_skill_link.question_id, question_skill_link.skill_id)
 
 
-def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
-=======
 def get_question_summaries_linked_to_skills(
         question_count, skill_ids, start_cursor):
->>>>>>> develop
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
 
