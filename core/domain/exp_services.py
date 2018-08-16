@@ -42,6 +42,7 @@ from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -1896,7 +1897,7 @@ def _create_change_list_from_suggestion(
             audio_translations_dict = {}
             for lang_code, audio_translation in audio_translations.iteritems():
                 audio_translations_dict[lang_code] = (
-                    exp_domain.AudioTranslation.to_dict(audio_translation))
+                    state_domain.AudioTranslation.to_dict(audio_translation))
             content_ids_to_audio_translations_dict[content_id] = (
                 audio_translations_dict)
 

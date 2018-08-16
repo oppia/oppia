@@ -181,7 +181,7 @@ class Question(object):
                 'Expected schema version to be an integer, received %s' %
                 self.question_state_schema_version)
 
-        if not isinstance(self.question_state_data, exp_domain.State):
+        if not isinstance(self.question_state_data, state_domain.State):
             raise utils.ValidationError(
                 'Expected question state data to be a State object, '
                 'received %s' % self.question_state_data)

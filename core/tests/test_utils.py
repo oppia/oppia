@@ -1279,12 +1279,12 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        solution_explanation = exp_domain.SubtitledHtml(
+        solution_explanation = state_domain.SubtitledHtml(
             'solution', 'Solution explanation')
-        solution = exp_domain.Solution(
+        solution = state_domain.Solution(
             'TextInput', False, 'Solution', solution_explanation)
-        hint_content = exp_domain.SubtitledHtml('hint_1', 'Hint 1')
-        hint = exp_domain.Hint(hint_content)
+        hint_content = state_domain.SubtitledHtml('hint_1', 'Hint 1')
+        hint = state_domain.Hint(hint_content)
         state.interaction.id = 'TextInput'
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',
