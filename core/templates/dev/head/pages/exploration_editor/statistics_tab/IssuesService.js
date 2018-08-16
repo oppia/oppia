@@ -19,11 +19,11 @@
 oppia.factory('IssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'NUM_INCORRECT_ANSWERS_THRESHOLD',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   function(
       $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, NUM_INCORRECT_ANSWERS_THRESHOLD) {
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -36,8 +36,7 @@ oppia.factory('IssuesService', [
     var renderMultipleIncorrectIssueStatement = function(stateName) {
       var statement =
         'Several learners submitted answers to card "' + stateName +
-        '" ' + NUM_INCORRECT_ANSWERS_THRESHOLD + ' times, ' +
-        'then gave up and quit.';
+        '" several times, then gave up and quit.';
       return statement;
     };
 

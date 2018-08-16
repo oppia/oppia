@@ -759,7 +759,7 @@ describe('Issues visualization', function() {
     explorationEditorPage.navigateToStatsTab();
     explorationEditorStatsTab.clickIssue(0, 'Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners submitted answers to card "One" 3 times, ' +
+      'Several learners submitted answers to card "One" several times, ' +
       'then gave up and quit.');
     explorationEditorStatsTab.markResolved();
     users.logout();
