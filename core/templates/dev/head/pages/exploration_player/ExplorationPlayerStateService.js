@@ -122,7 +122,7 @@ oppia.factory('ExplorationPlayerStateService', [
         return _currentEngineService.getNextInteractionInstructions();
       },
       isInteractionInline: function() {
-        if (_activeCard.getInteraction() === null) {
+        if (_activeCard === null || _activeCard.getInteraction() === null) {
           return true;
         }
         return _activeCard.isInteractionInline();
@@ -167,10 +167,10 @@ oppia.factory('ExplorationPlayerStateService', [
         return _activeCard.getAudioTranslations();
       },
       getHints: function() {
-        return _activeCard.getHints();
+        return _currentEngineService.getHints();
       },
       getSolution: function() {
-        return _activeCard.getSolution();
+        return _currentEngineService.getSolution();
       },
       getStateContentHtml: function() {
         return _activeCard.getContentHtml();

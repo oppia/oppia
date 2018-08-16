@@ -415,20 +415,7 @@ oppia.directive('conversationSkin', [
           };
 
           var isSupplementalCardNonempty = function(card) {
-            if (
-              PlayerTranscriptService.isLastCard(
-                PlayerPositionService.getActiveCardIndex())) {
-              return !ExplorationPlayerStateService.isInteractionInline();
-            }
-            var interaction = card.getInteraction();
-            if (interaction) {
-              return (
-                INTERACTION_SPECS[interaction.id].display_mode !==
-                  INTERACTION_DISPLAY_MODE_INLINE
-              );
-            } else {
-              return false;
-            }
+            return !ExplorationPlayerStateService.isInteractionInline();
           };
 
           $scope.isCurrentSupplementalCardNonempty = function() {

@@ -125,20 +125,6 @@ oppia.factory('StateCardObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
-    StateCard.prototype.getHints = function() {
-      if (this.getInteraction()) {
-        return this.getInteraction().hints;
-      }
-      return [];
-    };
-
-    StateCard.prototype.getSolution = function() {
-      if (this.getInteraction()) {
-        return this.getInteraction().solution;
-      }
-      return null;
-    };
-
     StateCard.prototype.getCurrentParams = function() {
       return this._currentParams;
     };

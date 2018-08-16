@@ -155,6 +155,12 @@ oppia.factory('PretestEngineService', [
         return (
           interactionId && INTERACTION_SPECS[interactionId].is_terminal);
       },
+      getHints: function() {
+        return _getCurrentStateData().interaction.hints;
+      },
+      getSolution: function() {
+        return _getCurrentStateData().interaction.solution;
+      },
       getLanguageCode: function() {
         return pretestQuestions[currentIndex].getLanguageCode();
       },

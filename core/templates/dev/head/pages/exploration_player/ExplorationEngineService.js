@@ -298,6 +298,12 @@ oppia.factory('ExplorationEngineService', [
       getNextContentId: function() {
         return exploration.getState(nextStateName).content.getContentId();
       },
+      getHints: function() {
+        return exploration.getInteraction(currentStateName).hints;
+      },
+      getSolution: function() {
+        return exploration.getInteraction(currentStateName).solution;
+      },
       isInPreviewMode: function() {
         return !!_editorPreviewMode;
       },
