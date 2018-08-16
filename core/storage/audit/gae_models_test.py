@@ -37,14 +37,10 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         audit_models.RoleQueryAuditModel(
             id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
             role='c', username='d').put()
-        am = audit_models.RoleQueryAuditModel.get_all()
-        i = 0
-        a = None
-        for a in am:
-            logging.debug(a.id)
-            i += 1
+        a = audit_models.RoleQueryAuditModel.get('a')
 
-        logging.debug(i)
         self.assertEqual(a.id, 'a')
-        b = audit_models.RoleQueryAuditModel.get(a.id)
-        self.assertEqual(b.id, 'a')
+        self.assertEqual(a.intent, feconf.ROLE_ACTION_UPDATE)
+        self.assertEqual(a.user_id, 'b')
+        self.assertEqual(a.role, 'c')
+        self.assertEqual(a.username, 'd')
