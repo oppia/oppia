@@ -21,6 +21,7 @@ oppia.directive('stateResponses', [
       restrict: 'E',
       scope: {
         addState: '=',
+        onResponsesInitialized: '=',
         onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
@@ -272,7 +273,7 @@ oppia.directive('stateResponses', [
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
-            var stateName = $scope.stateName;
+            var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -301,13 +302,9 @@ oppia.directive('stateResponses', [
                   var feedbackContentId = GenerateContentIdService.getNextId(
                     COMPONENT_NAME_FEEDBACK);
 
-                  if ($scope.questionModeEnabled) {
-                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                      null, feedbackContentId, '', []);
-                  } else {
-                    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                      stateName, feedbackContentId, '', []);
-                  }
+                  $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+                    $scope.questionModeEnabled ? null : stateName,
+                    feedbackContentId, '', []);
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (
@@ -580,6 +577,10 @@ oppia.directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+
+          if (StateEditorService.isInQuestionMode()) {
+            $scope.onResponsesInitialized();
+          }
         }
       ]
     };

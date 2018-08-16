@@ -691,6 +691,25 @@ class UserContributionScoringModel(base_models.BaseModel):
     score_category = ndb.StringProperty(required=True, indexed=True)
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
+    # Flag to check if email to onboard reviewer has been sent for the category.
+    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+
+    @classmethod
+    def get_all_categories_where_user_can_review(cls, user_id):
+        """Gets all the score categories where the user has a score above the
+        threshold.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            list(str). A list of score_categories where the user has score above
+                the threshold.
+        """
+        scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
+            cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        return (
+            [scoring_model.score_category for scoring_model in scoring_models])
 
     @classmethod
     def get_all_scores_of_user(cls, user_id):

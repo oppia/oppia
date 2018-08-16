@@ -23,8 +23,8 @@ oppia.factory('ResponsesService', [
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'SolutionValidityService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
@@ -32,8 +32,8 @@ oppia.factory('ResponsesService', [
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID,
+      SolutionValidityService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -129,7 +129,7 @@ oppia.factory('ResponsesService', [
       callback(_answerGroupsMemento);
     };
 
-    var _updateAnswerGroupsAudioTranslation = function () {
+    var _updateAnswerGroupsAudioTranslation = function() {
       StateContentIdsToAudioTranslationsService.displayed.
         deleteAllFeedbackContentId();
       for (var i = 0; i < _answerGroups.length; i++) {
@@ -171,8 +171,10 @@ oppia.factory('ResponsesService', [
         _defaultOutcome = angular.copy(data.defaultOutcome);
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(
-          StateInteractionIdService.savedMemento, _answerGroups);
+        if (StateInteractionIdService.savedMemento !== null) {
+          AnswerGroupsCacheService.set(
+            StateInteractionIdService.savedMemento, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -208,7 +210,7 @@ oppia.factory('ResponsesService', [
             StateContentIdsToAudioTranslationsService.displayed.addContentId(
               COMPONENT_NAME_DEFAULT_OUTCOME);
           }
-          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          _updateAnswerGroupsAudioTranslation();
         }
 
         _confirmedUnclassifiedAnswers = [];
@@ -216,7 +218,9 @@ oppia.factory('ResponsesService', [
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);
         _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        if (newInteractionId) {
+          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);

@@ -17,7 +17,6 @@
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
-import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -194,10 +193,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_ids_linked_to_skill_ids(cls, skill_ids, start_cursor):
+    def get_question_ids_linked_to_skill_ids(
+            cls, question_count, skill_ids, start_cursor):
         """Fetches the list of question ids linked to the skill in batches.
 
         Args:
+            question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
             start_cursor: str. The starting point from which the batch of
@@ -213,14 +214,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NUM_QUESTIONS_PER_PAGE,
+                question_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NUM_QUESTIONS_PER_PAGE
+                question_count
             )
         question_ids = [
             model.question_id for model in question_skill_link_models

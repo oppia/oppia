@@ -240,3 +240,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json1_deepcopy),
                 utils.get_hashable_value(json2_deepcopy),
             })
+
+    def test_is_valid_language_code(self):
+        self.assertTrue(utils.is_valid_language_code('en'))
+        self.assertFalse(utils.is_valid_language_code('unknown'))

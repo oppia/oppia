@@ -153,6 +153,10 @@ oppia.factory('ContextService', [
         return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
             this.getEditorTabContext() === (
               EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+      },
+
+      isInExplorationEditorPage: function() {
+        return this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR;
       }
     };
   }
