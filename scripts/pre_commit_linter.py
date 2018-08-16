@@ -1105,7 +1105,7 @@ def _check_html_directive_name(all_files):
 
 
 def _validate_and_parse_js_file(filename, content):
-    """This function validates a Javascript file and returns the parsed contents
+    """This function validates a JavaScript file and returns the parsed contents
     as a Python dictionary.
     """
     # Use Pyjsparser to parse a JS file as a Python dictionary.
