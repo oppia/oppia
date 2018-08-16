@@ -113,6 +113,12 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(browser.sleep)\(',
+        'message': "In tests, please do not use browser.sleep().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'\b(browser.waitForAngular)\(',
         'message': "In tests, please do not use browser.waitForAngular().",
         'excluded_files': (),
