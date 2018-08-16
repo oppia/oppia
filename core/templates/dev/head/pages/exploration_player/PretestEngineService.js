@@ -82,7 +82,10 @@ oppia.factory('PretestEngineService', [
           true, nextFocusLabel);
         FocusManagerService.setFocusIfOnDesktop(nextFocusLabel);
       }
-      successCallback(null, questionHtml, {}, interaction, interactionHtml);
+      successCallback(
+        null, questionHtml, {}, interaction, interactionHtml,
+        initialState.contentIdsToAudioTranslations,
+        initialState.content.getContentId());
     };
 
     var _getCurrentStateData = function() {
