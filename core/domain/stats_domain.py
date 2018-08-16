@@ -23,8 +23,8 @@ from core.domain import action_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import issue_registry
-from core.platform import models
 from core.domain import state_domain
+from core.platform import models
 import feconf
 import utils
 
