@@ -98,18 +98,6 @@ oppia.factory('StateCardObjectFactory', [
       return interaction.customizationArgs;
     };
 
-    StateCard.prototype.getInteractionHtml = function(labelForFocusTarget) {
-      var interactionId = this.getInteractionId();
-      if (!interactionId) {
-        return null;
-      }
-
-      return ExplorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
-        this.getInteractionCustomizationArgs(),
-        true, labelForFocusTarget);
-    };
-
     StateCard.prototype.isInteractionInline = function() {
       var interactionId = this.getInteractionId();
       return (

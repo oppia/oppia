@@ -74,32 +74,32 @@ oppia.directive('tutorCard', [
             DEFAULT_PROFILE_IMAGE_PATH, ExplorationPlayerStateService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-          var updateActiveCard = function() {
-            var index = PlayerPositionService.getActiveCardIndex();
+          var updateDisplayedCard = function() {
+            var index = PlayerPositionService.getDisplayedCardIndex();
             if (index === null) {
               return;
             }
 
             $scope.arePreviousResponsesShown = false;
-            $scope.activeCard = PlayerTranscriptService.getCard(index);
+            $scope.displayedCard = PlayerTranscriptService.getCard(index);
             $scope.conceptCardIsBeingShown = Boolean(
-              !$scope.activeCard.getInteraction());
+              !$scope.displayedCard.getInteraction());
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
               $scope.interactionIsActive = false;
             });
             $scope.lastAnswer =
-              PlayerTranscriptService.getLastAnswerOnActiveCard(index);
+              PlayerTranscriptService.getLastAnswerOnDisplayedCard(index);
             if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
-                $scope.activeCard.getInteractionInstructions());
+                $scope.displayedCard.getInteractionInstructions());
               $scope.contentAudioTranslations = (
-                $scope.activeCard.getAudioTranslations());
+                $scope.displayedCard.getAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
-                $scope.activeCard.getContentHtml(),
+                $scope.displayedCard.getContentHtml(),
                 COMPONENT_NAME_CONTENT);
               AudioPlayerService.stop();
               AudioPreloaderService.clearMostRecentlyRequestedAudioFilename();
@@ -111,7 +111,7 @@ oppia.directive('tutorCard', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
-            return $scope.activeCard.isInteractionInline();
+            return $scope.displayedCard.isInteractionInline();
           };
 
           $scope.getContentAudioHighlightClass = function() {
@@ -199,17 +199,17 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              $scope.activeCard.isContentAudioTranslationAvailable());
+              $scope.displayedCard.isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
-              PlayerPositionService.getActiveCardIndex());
+              PlayerPositionService.getDisplayedCardIndex());
           };
 
           $scope.isOnTerminalCard = function() {
             return (
-              $scope.activeCard.isCardTerminal());
+              $scope.displayedCard.isCardTerminal());
           };
 
           $scope.getInputResponsePairId = function(index) {
@@ -217,7 +217,7 @@ oppia.directive('tutorCard', [
           };
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
-            updateActiveCard();
+            updateDisplayedCard();
           });
 
           $scope.$on('oppiaFeedbackAvailable', function() {
@@ -225,10 +225,10 @@ oppia.directive('tutorCard', [
 
             // Auto scroll to the new feedback on mobile device.
             if (DeviceInfoService.isMobileDevice()) {
-              var index = PlayerPositionService.getActiveCardIndex();
-              var activeCard = PlayerTranscriptService.getCard(index);
+              var index = PlayerPositionService.getDisplayedCardIndex();
+              var displayedCard = PlayerTranscriptService.getCard(index);
               var latestFeedbackIndex = (
-                activeCard.getInputResponsePairs().length - 1);
+                displayedCard.getInputResponsePairs().length - 1);
               /* Reference: https://stackoverflow.com/questions/40134381
                  $anchorScroll() without changing actual hash value of url works
                  only when written inside a timeout of 0 ms. */
@@ -239,7 +239,7 @@ oppia.directive('tutorCard', [
             }
           });
 
-          updateActiveCard();
+          updateDisplayedCard();
         }
       ]
     };

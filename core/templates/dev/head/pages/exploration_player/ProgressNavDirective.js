@@ -45,24 +45,25 @@ oppia.directive('progressNav', [
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
-          var updateActiveCardInfo = function() {
+          var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
-            $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
-            $scope.activeCard = PlayerTranscriptService.getCard(
-              $scope.activeCardIndex);
-            $scope.hasPrevious = $scope.activeCardIndex > 0;
+            $scope.displayedCardIndex =
+              PlayerPositionService.getDisplayedCardIndex();
+            $scope.displayedCard = PlayerTranscriptService.getCard(
+              $scope.displayedCardIndex);
+            $scope.hasPrevious = $scope.displayedCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
-              $scope.activeCardIndex);
+              $scope.displayedCardIndex);
             $scope.conceptCardIsBeingShown = (
-              $scope.activeCard.getStateName() === null &&
+              $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInPretestMode());
-            var interaction = $scope.activeCard.getInteraction();
+            var interaction = $scope.displayedCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
-                $scope.activeCard.isInteractionInline());
+                $scope.displayedCard.isInteractionInline());
               $scope.interactionCustomizationArgs =
-                $scope.activeCard.getInteractionCustomizationArgs();
-              $scope.interactionId = $scope.activeCard.getInteractionId();
+                $scope.displayedCard.getInteractionCustomizationArgs();
+              $scope.interactionId = $scope.displayedCard.getInteractionId();
               if ($scope.interactionId) {
                 interactionHasNavSubmitButton = (
                   Boolean($scope.interactionId) &&
@@ -75,8 +76,8 @@ oppia.directive('progressNav', [
           };
 
           $scope.$watch(function() {
-            return PlayerPositionService.getActiveCardIndex();
-          }, updateActiveCardInfo);
+            return PlayerPositionService.getDisplayedCardIndex();
+          }, updateDisplayedCardInfo);
 
           $scope.$on('helpCardAvailable', function(evt, helpCard) {
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
@@ -85,7 +86,7 @@ oppia.directive('progressNav', [
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
-              PlayerPositionService.setActiveCardIndex(index);
+              PlayerPositionService.setDisplayedCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
             } else {
@@ -118,9 +119,9 @@ oppia.directive('progressNav', [
             }
             return Boolean(
               interactionIsInline &&
-              ($scope.activeCard.getDestStateName() ||
-              $scope.activeCard.getLeadsToConceptCard()) &&
-              $scope.activeCard.getLastOppiaResponse());
+              ($scope.displayedCard.getDestStateName() ||
+              $scope.displayedCard.getLeadsToConceptCard()) &&
+              $scope.displayedCard.getLastOppiaResponse());
           };
         }
       ]

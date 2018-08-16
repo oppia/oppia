@@ -121,14 +121,14 @@ oppia.factory('PlayerTranscriptService', [
         }
         return transcript[index];
       },
-      getLastAnswerOnActiveCard: function(activeCardIndex) {
+      getLastAnswerOnDisplayedCard: function(displayedCardIndex) {
         if (
-          this.isLastCard(activeCardIndex) ||
-          transcript[activeCardIndex].getStateName() === null ||
-          transcript[activeCardIndex].getInputResponsePairs().length === 0) {
+          this.isLastCard(displayedCardIndex) ||
+          transcript[displayedCardIndex].getStateName() === null ||
+          transcript[displayedCardIndex].getInputResponsePairs().length === 0) {
           return null;
         } else {
-          return transcript[activeCardIndex].
+          return transcript[displayedCardIndex].
             getInputResponsePairs().slice(-1)[0].learnerInput;
         }
       },

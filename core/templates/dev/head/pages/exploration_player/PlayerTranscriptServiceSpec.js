@@ -103,7 +103,7 @@ describe('Player transcript service', function() {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
     false);
-    var lastAnswer = pts.getLastAnswerOnActiveCard(0);
+    var lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual(null);
 
     pts.addNewInput('first answer', false);
@@ -111,7 +111,7 @@ describe('Player transcript service', function() {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
     false);
-    lastAnswer = pts.getLastAnswerOnActiveCard(0);
+    lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual('first answer');
 
     pts.addNewCard('Third state', {
@@ -120,7 +120,7 @@ describe('Player transcript service', function() {
     false);
     // lastAnswer should be null as no answers were provided in the second
     // state.
-    lastAnswer = pts.getLastAnswerOnActiveCard(1);
+    lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
     expect(lastAnswer).toEqual(null);
   });
 

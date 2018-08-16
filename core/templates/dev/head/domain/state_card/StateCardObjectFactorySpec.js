@@ -19,6 +19,7 @@
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;
+  var ContentIdsToAudioTranslations = null;
   var _sampleCard = null;
 
   beforeEach(module('oppia'));
@@ -26,6 +27,10 @@ describe('State card object factory', function() {
   beforeEach(inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
+    ContentIdsToAudioTranslationsObjectFactory =
+      $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+    AudioTranslationObjectFactory =
+      $injector.get('AudioTranslationObjectFactory');
 
     var interactionDict = {
       answer_groups: [],
@@ -52,7 +57,22 @@ describe('State card object factory', function() {
     _sampleCard = StateCardObjectFactory.createNewCard(
       'State 1', {}, '<p>Content</p>', '<interaction></interaction>',
       InteractionObjectFactory.createFromBackendDict(interactionDict),
-      false);
+      false,
+      ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict({
+        content: {
+          en: {
+            filename: 'filename1.mp3',
+            file_size_bytes: 100000,
+            needs_update: false
+          },
+          hi: {
+            filename: 'filename2.mp3',
+            file_size_bytes: 11000,
+            needs_update: false
+          }
+        }
+      }),
+      'content');
   }));
 
   it('should be able to get the various fields', function() {
@@ -67,6 +87,48 @@ describe('State card object factory', function() {
     expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
     expect(_sampleCard.getDestStateName()).toEqual(null);
     expect(_sampleCard.getLeadsToConceptCard()).toEqual(false);
+    expect(
+      _sampleCard.getContentIdsToAudioTranslations().
+        getBindableAudioTranslations('content')).toEqual({
+      en: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename1.mp3',
+        file_size_bytes: 100000,
+        needs_update: false
+      }),
+      hi: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: false
+      })
+    });
+    expect(_sampleCard.getAudioTranslations()).toEqual({
+      en: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename1.mp3',
+        file_size_bytes: 100000,
+        needs_update: false
+      }),
+      hi: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: false
+      })
+    });
+
+    expect(_sampleCard.getInteractionId()).toEqual('TextInput');
+    expect(_sampleCard.isCardTerminal()).toEqual(false);
+    expect(_sampleCard.isInteractionInline()).toEqual(true);
+    expect(_sampleCard.getInteractionInstructions()).toEqual(null);
+    expect(_sampleCard.getInteractionCustomizationArgs()).toEqual({
+      rows: {
+        value: 1
+      },
+      placeholder: {
+        value: 'Type your answer here.'
+      }
+    });
+    expect(_sampleCard.getInteractionHtml()).toEqual(
+      '<interaction></interaction>'
+    );
 
     _sampleCard.addInputResponsePair({
       oppiaResponse: 'response'
