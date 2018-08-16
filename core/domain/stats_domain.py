@@ -666,7 +666,7 @@ class ExplorationIssue(object):
                 state_domain.get_full_customization_args(
                     self.issue_customization_args,
                     issue_registry.Registry.get_issue_by_type(
-                        self.issue_type).customization_arg_specs),
+                        self.issue_type).customization_arg_specs)),
             'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
             'is_valid': self.is_valid
@@ -807,7 +807,7 @@ class LearnerAction(object):
                 state_domain.get_full_customization_args(
                     self.action_customization_args,
                     action_registry.Registry.get_action_by_type(
-                        self.action_type).customization_arg_specs),
+                        self.action_type).customization_arg_specs)),
             'schema_version': self.schema_version
         }
 
