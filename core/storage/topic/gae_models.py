@@ -104,7 +104,7 @@ class TopicModel(base_models.VersionedModel):
 
     @classmethod
     def get_by_name(cls, topic_name):
-        """Gets TopicModel by topic_name. Returns none if the topic with
+        """Gets TopicModel by topic_name. Returns None if the topic with
         name topic_name doesn't exist.
 
         Args:
