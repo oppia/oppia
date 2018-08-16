@@ -42,8 +42,6 @@ ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
-FILE_FOUND_IN_GCS = 'File found in GCS'
-FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
 FILE_DELETED = 'File has been deleted'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
@@ -658,47 +656,6 @@ class ExplorationMigrationValidationJobForCKEditor(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
-
-
-class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for checking that all the images in the GAE are there in
-    the GCS or not.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
-
-    @staticmethod
-    def map(file_model):
-        # This job is allowed to run only in Production environment since it
-        # uses GcsFileSystem which can't be used in Development environment.
-        if not feconf.DEV_MODE:
-            instance_id = file_model.id
-            filetype = instance_id[instance_id.rfind('.') + 1:]
-            # To separate the image entries from the audio entries we get from
-            # the FileSnapshotContentModel.
-            if filetype in ALLOWED_IMAGE_EXTENSIONS:
-                catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
-                if not catched_groups:
-                    yield (WRONG_INSTANCE_ID, instance_id)
-                else:
-                    filename = catched_groups.group(2)
-                    exploration_id = catched_groups.group(1)
-                    fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(
-                            'exploration/%s' % exploration_id))
-
-                    if not fs.isfile('image/%s' % filename):
-                        yield (FILE_IS_NOT_IN_GCS, file_model.id)
-                    else:
-                        yield (FILE_FOUND_IN_GCS, 1)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_FOUND_IN_GCS:
-            yield (status, len(values))
-        else:
-            yield (status, values)
 
 
 class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
