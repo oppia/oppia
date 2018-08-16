@@ -17,7 +17,6 @@
 """Domain objects relating to questions."""
 
 from constants import constants
-from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import state_domain
