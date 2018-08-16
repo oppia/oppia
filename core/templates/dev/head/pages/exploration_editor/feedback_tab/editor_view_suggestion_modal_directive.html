@@ -20,9 +20,11 @@
       </div>
     </div>
   </section>
-  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+  <div ng-show="canAccept" style="margin-top: 20px; margin-left: 10px;">
     Review message (required if rejecting):
     <input type="text" ng-model="reviewMessage" style="width: 100%">
+  </div>
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
     Brief Description of Changes (required if accepting):
     <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
   </div>

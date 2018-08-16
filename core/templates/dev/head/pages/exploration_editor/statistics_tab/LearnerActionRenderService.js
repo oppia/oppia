@@ -107,7 +107,9 @@ oppia.factory('LearnerActionRenderService', [
         }
         var answer =
           finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback = finalBlock[i].actionCustomizationArgs.feedback.value;
+        var feedback =
+          finalBlock[i].actionCustomizationArgs.feedback.value._html;
+        feedback = feedback.replace('{{answer}}', answer);
         tableHTML +=
           '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
       }
@@ -129,8 +131,8 @@ oppia.factory('LearnerActionRenderService', [
           custArgs.state_name.value, actionIndex);
       } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
         return renderExplorationQuitActionHTML(
-          custArgs.state_name.value, custArgs.time_spent_state_in_msecs.value,
-          actionIndex);
+          custArgs.state_name.value,
+          custArgs.time_spent_in_state_in_msecs.value, actionIndex);
       } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
         interactionId = custArgs.interaction_id.value;
         if (interactionId === 'Continue') {

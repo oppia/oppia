@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,45 +13,190 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that maintains state of the current exploration.
+ * @fileoverview A service that maintains a record of the state of the player,
+ *  like engine service.
  */
 
-oppia.factory('ExplorationPlayerStateService', [function() {
-  var exploration = null;
-  return {
-    setExploration: function(newExploration) {
-      exploration = newExploration;
-    },
+oppia.factory('ExplorationPlayerStateService', [
+  '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
+  'ContextService', 'UrlService', 'StateClassifierMappingService',
+  'StatsReportingService', 'PlaythroughService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
+  'EditableExplorationBackendApiService',
+  'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
+  'NumberAttemptsService',
+  function(
+      $log, $q, ExplorationEngineService, PretestEngineService,
+      ContextService, UrlService, StateClassifierMappingService,
+      StatsReportingService, PlaythroughService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
+      EditableExplorationBackendApiService,
+      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
+      NumberAttemptsService) {
+    var _currentEngineService = null;
+    var _inPretestMode = false;
+    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _explorationId = ContextService.getExplorationId();
+    var _version = GLOBALS.explorationVersion;
+    var _storyId = UrlService.getStoryIdInPlayer();
 
-    getExploration: function() {
-      return exploration;
-    },
+    var _initializeExplorationServices = function(
+        returnDict, arePretestsAvailable, callback) {
+      StateClassifierMappingService.init(
+        returnDict.state_classifier_mapping);
+      StatsReportingService.initSession(
+        _explorationId, returnDict.exploration.title,
+        _version, returnDict.session_id, GLOBALS.collectionId);
+      PlaythroughService.initSession(
+        _explorationId, _version, returnDict.record_playthrough_probability,
+        returnDict.whitelisted_exploration_ids_for_playthroughs);
+      PlayerCorrectnessFeedbackEnabledService.init(
+        returnDict.correctness_feedback_enabled);
+      ExplorationEngineService.init(
+        returnDict.exploration, returnDict.version,
+        returnDict.preferred_audio_language_code,
+        returnDict.auto_tts_enabled,
+        arePretestsAvailable ?
+        function() {} : callback);
+    };
 
-    isInteractionInline: function(stateName) {
-      return exploration.isInteractionInline(stateName);
-    },
+    var _initializePretestServices = function(pretestQuestionDicts, callback) {
+      PlayerCorrectnessFeedbackEnabledService.init(true);
+      PretestEngineService.init(pretestQuestionDicts, callback);
+    };
 
-    getInteractionInstructions: function(stateName) {
-      return exploration.getInteractionInstructions(stateName);
-    },
+    var _setExplorationMode = function() {
+      _inPretestMode = false;
+      _currentEngineService = ExplorationEngineService;
+    };
 
-    isStateTerminal: function(stateName) {
-      return exploration.isStateTerminal(stateName);
-    },
+    var _setPretestMode = function() {
+      _inPretestMode = true;
+      _currentEngineService = PretestEngineService;
+    };
 
-    isStateShowingConceptCard: function(stateName) {
-      if (stateName === null) {
-        return true;
+    return {
+      getCurrentEngineService: function() {
+        return _currentEngineService;
+      },
+      isInPretestMode: function() {
+        return _inPretestMode;
+      },
+      getPretestQuestionCount: function() {
+        return PretestEngineService.getPretestQuestionCount();
+      },
+      moveToExploration: function(callback) {
+        _setExplorationMode();
+        ExplorationEngineService.moveToExploration(callback);
+      },
+      doesInteractionSupportHints: function() {
+        return _currentEngineService.doesInteractionSupportHints();
+      },
+      getCurrentStateName: function() {
+        return _currentEngineService.getCurrentStateName();
+      },
+      getCurrentInteraction: function() {
+        return _currentEngineService.getCurrentInteraction();
+      },
+      getNextInteraction: function() {
+        return _currentEngineService.getNextInteraction();
+      },
+      getCurrentInteractionHtml: function(nextFocusLabel) {
+        return _currentEngineService.getCurrentInteractionHtml(nextFocusLabel);
+      },
+      getNextInteractionHtml: function(nextFocusLabel) {
+        return _currentEngineService.getNextInteractionHtml(nextFocusLabel);
+      },
+      getLanguageCode: function() {
+        return _currentEngineService.getLanguageCode();
+      },
+      getCurrentInteractionInstructions: function() {
+        return _currentEngineService.getCurrentInteractionInstructions();
+      },
+      getNextInteractionInstructions: function() {
+        return _currentEngineService.getNextInteractionInstructions();
+      },
+      isInteractionInline: function() {
+        return _currentEngineService.isInteractionInline();
+      },
+      isNextInteractionInline: function() {
+        return _currentEngineService.isNextInteractionInline();
+      },
+      isContentAudioTranslationAvailable: function() {
+        return _currentEngineService.isContentAudioTranslationAvailable();
+      },
+      isCurrentStateTerminal: function() {
+        return _currentEngineService.isCurrentStateTerminal();
+      },
+      isStateShowingConceptCard: function() {
+        return _currentEngineService.isStateShowingConceptCard();
+      },
+      getContentIdsToAudioTranslations: function() {
+        return _currentEngineService.getContentIdsToAudioTranslations();
+      },
+      recordNewCardAdded: function() {
+        return _currentEngineService.recordNewCardAdded();
+      },
+      getStateContentAudioTranslations: function() {
+        return _currentEngineService.getStateContentAudioTranslations();
+      },
+      getHints: function() {
+        return _currentEngineService.getHints();
+      },
+      getSolution: function() {
+        return _currentEngineService.getSolution();
+      },
+      initializePlayer: function(callback) {
+        PlayerTranscriptService.init();
+        if (_editorPreviewMode) {
+          _setExplorationMode();
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            _explorationId).then(function(returnDict) {
+            ExplorationEngineService.init(
+              returnDict, null, null, null, callback);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              returnDict.correctness_feedback_enabled);
+            NumberAttemptsService.reset();
+          });
+        } else {
+          if (_version) {
+            $q.all([
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, _version),
+              PretestQuestionBackendApiService.fetchPretestQuestions(
+                _explorationId, _storyId
+              )]).then(function(returnValues) {
+              if (returnValues[1].length > 0) {
+                _setPretestMode();
+                _initializeExplorationServices(
+                  returnValues[0], true, callback);
+                _initializePretestServices(returnValues[1], callback);
+              } else {
+                _setExplorationMode();
+                _initializeExplorationServices(
+                  returnValues[0], false, callback);
+              }
+            });
+          } else {
+            $q.all([
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                _explorationId),
+              PretestQuestionBackendApiService.fetchPretestQuestions(
+                _explorationId, _storyId
+              )]).then(function(returnValues) {
+              if (returnValues[1].length > 0) {
+                _setPretestMode();
+                _initializeExplorationServices(
+                  returnValues[0], true, callback);
+                _initializePretestServices(returnValues[1], callback);
+              } else {
+                _setExplorationMode();
+                _initializeExplorationServices(
+                  returnValues[0], false, callback);
+              }
+            });
+          }
+        }
       }
-      return false;
-    },
-
-    getAuthorRecommendedExpIds: function(stateName) {
-      return exploration.getAuthorRecommendedExpIds(stateName);
-    },
-
-    getLanguageCode: function() {
-      return exploration.getLanguageCode();
-    },
-  };
-}]);
+    };
+  }]);

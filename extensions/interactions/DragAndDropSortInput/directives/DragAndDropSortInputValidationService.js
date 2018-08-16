@@ -31,6 +31,13 @@ oppia.factory('DragAndDropSortInputValidationService', [
         var seenChoices = [];
         var numChoices = customizationArgs.choices.value.length;
 
+        if (numChoices < 2) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: 'Please enter at least two choices.'
+          });
+        }
+
         for (var i = 0; i < numChoices; i++) {
           var choice = customizationArgs.choices.value[i];
           if (choice.trim().length === 0) {
