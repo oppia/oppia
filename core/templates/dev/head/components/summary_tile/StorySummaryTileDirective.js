@@ -34,7 +34,7 @@ oppia.directive('storySummaryTile', [
               '/story', $scope.getStoryId());
           };
 
-          $scope.getStaticImageUrl = function (url) {
+          $scope.getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
         }
