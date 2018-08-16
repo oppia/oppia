@@ -145,6 +145,7 @@ var ensurePageHasNoTranslationIds = function() {
 var acceptAlert = function() {
   waitFor.alertToBePresent();
   browser.switchTo().alert().accept();
+  waitFor.pageToFullyLoad();
 };
 
 var _getUniqueLogMessages = function(logs) {
