@@ -168,6 +168,17 @@ oppia.factory('StateCardObjectFactory', [
       this._leadsToConceptCard = leadsToConceptCard;
     };
 
+    StateCard.prototype.addRandomSuffixToContentHtml = function(randomSuffix) {
+      this._contentHtml = this._contentHtml + randomSuffix;
+    };
+
+    StateCard.prototype.addRandomSuffixToInteractionHtml =
+      function(randomSuffix) {
+        if (this._interactionHtml) {
+          this._interactionHtml = this._interactionHtml + randomSuffix;
+        }
+      };
+
     /**
      * @param {string} stateName - The state name for the current card.
      * @param {object} params - The set of parameters for the learner associated

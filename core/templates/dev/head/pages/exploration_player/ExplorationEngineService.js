@@ -37,7 +37,7 @@ oppia.factory('ExplorationEngineService', [
   'StatsReportingService', 'UrlInterpolationService', 'UserService',
   'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
   'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-  'FocusManagerService',
+  'FocusManagerService', 'StateCardObjectFactory',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService,
@@ -51,7 +51,7 @@ oppia.factory('ExplorationEngineService', [
       StatsReportingService, UrlInterpolationService, UserService,
       WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
       PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-      FocusManagerService) {
+      FocusManagerService, StateCardObjectFactory) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
@@ -152,10 +152,13 @@ oppia.factory('ExplorationEngineService', [
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
-      successCallback(
-        currentStateName, questionHtml, newParams, interaction,
-        interactionHtml, initialState.contentIdsToAudioTranslations,
-        initialState.content.getContentId());
+      var initialCard =
+        StateCardObjectFactory.createNewCard(
+          currentStateName, newParams, questionHtml, interactionHtml,
+          interaction, false,
+          initialState.contentIdsToAudioTranslations,
+          initialState.content.getContentId());
+      successCallback(initialCard);
     };
 
     // Initialize the parameters in the exploration as specified in the
@@ -173,6 +176,16 @@ oppia.factory('ExplorationEngineService', [
         [baseParams]);
 
       LearnerParamsService.init(startingParams);
+    };
+
+    var _getNextInteractionHtml = function(labelForFocusTarget) {
+      var interactionId = exploration.getInteractionId(nextStateName);
+
+      return ExplorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        exploration.getInteractionCustomizationArgs(nextStateName),
+        true,
+        labelForFocusTarget);
     };
 
     return {
@@ -264,23 +277,11 @@ oppia.factory('ExplorationEngineService', [
       getStateContentAudioTranslation: function(stateName, languageCode) {
         return exploration.getAudioTranslation(stateName, languageCode);
       },
-      getNextInteractionHtml: function(labelForFocusTarget) {
-        var interactionId = exploration.getInteractionId(nextStateName);
-
-        return ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          exploration.getInteractionCustomizationArgs(nextStateName),
-          true,
-          labelForFocusTarget);
-      },
       doesInteractionSupportHints: function() {
         var interactionId = exploration.getInteractionId(currentStateName);
         return (
           !INTERACTION_SPECS[interactionId].is_terminal &&
         !INTERACTION_SPECS[interactionId].is_linear);
-      },
-      getNextInteraction: function() {
-        return exploration.getInteraction(nextStateName);
       },
       getCurrentInteraction: function() {
         return exploration.getInteraction(currentStateName);
@@ -303,13 +304,6 @@ oppia.factory('ExplorationEngineService', [
       },
       getLanguageCode: function() {
         return exploration.getLanguageCode();
-      },
-      getNextContentIdsToAudioTranslations: function() {
-        return (
-          exploration.getState(nextStateName).contentIdsToAudioTranslations);
-      },
-      getNextContentId: function() {
-        return exploration.getState(nextStateName).content.getContentId();
       },
       getHints: function() {
         return exploration.getInteraction(currentStateName).hints;
@@ -414,11 +408,23 @@ oppia.factory('ExplorationEngineService', [
         var onSameCard = (oldStateName === newStateName);
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
+
+        var _nextFocusLabel = FocusManagerService.generateFocusLabel();
+        var nextInteractionHtml = null;
+        if (exploration.getInteraction(nextStateName).id) {
+          nextInteractionHtml = _getNextInteractionHtml(_nextFocusLabel);
+        }
+        var nextCard = StateCardObjectFactory.createNewCard(
+          nextStateName, newParams, questionHtml, nextInteractionHtml,
+          exploration.getInteraction(nextStateName), false,
+          exploration.getState(nextStateName).contentIdsToAudioTranslations,
+          exploration.getState(nextStateName).content.getContentId());
         successCallback(
-          newStateName, refreshInteraction, feedbackHtml,
-          feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId, missingPrerequisiteSkillId, onSameCard,
-          (oldStateName === exploration.initStateName), isFirstHit, false);
+          nextCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, refresherExplorationId,
+          missingPrerequisiteSkillId, onSameCard,
+          (oldStateName === exploration.initStateName), isFirstHit, false,
+          _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

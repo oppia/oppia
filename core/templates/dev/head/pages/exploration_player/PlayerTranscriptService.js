@@ -47,17 +47,8 @@ oppia.factory('PlayerTranscriptService', [
         });
         return result;
       },
-      addNewCard: function(
-          stateName, params, contentHtml, interactionHtml,
-          interaction, leadsToConceptCard, contentIdsToAudioTranslations,
-          contentId) {
-        transcript.push(
-          StateCardObjectFactory.createNewCard(
-            stateName, params, contentHtml, interactionHtml,
-            interaction, leadsToConceptCard, contentIdsToAudioTranslations,
-            contentId
-          )
-        );
+      addNewCard: function(newCard) {
+        transcript.push(newCard);
         numAnswersSubmitted = 0;
       },
       addPreviousCard: function() {

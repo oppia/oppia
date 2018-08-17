@@ -23,13 +23,13 @@ oppia.factory('PretestEngineService', [
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'INTERACTION_SPECS',
   'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'FocusManagerService',
+  'FocusManagerService', 'StateCardObjectFactory',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, INTERACTION_SPECS,
       QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
-      FocusManagerService) {
+      FocusManagerService, StateCardObjectFactory) {
     var _explorationId = ContextService.getExplorationId();
 
     var version = GLOBALS.explorationVersion;
@@ -82,10 +82,12 @@ oppia.factory('PretestEngineService', [
           true, nextFocusLabel);
         FocusManagerService.setFocusIfOnDesktop(nextFocusLabel);
       }
-      successCallback(
-        null, questionHtml, {}, interaction, interactionHtml,
-        initialState.contentIdsToAudioTranslations,
-        initialState.content.getContentId());
+      var initialCard =
+        StateCardObjectFactory.createNewCard(
+          null, {}, questionHtml, interactionHtml, interaction, false,
+          initialState.contentIdsToAudioTranslations,
+          initialState.content.getContentId());
+      successCallback(initialCard);
     };
 
     var _getCurrentStateData = function() {
@@ -94,6 +96,16 @@ oppia.factory('PretestEngineService', [
 
     var _getNextStateData = function() {
       return pretestQuestions[nextIndex].getStateData();
+    };
+
+    var _getNextInteractionHtml = function(labelForFocusTarget) {
+      var interactionId = _getNextStateData().interaction.id;
+
+      return ExplorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        _getNextStateData().interaction.customizationArgs,
+        true,
+        labelForFocusTarget);
     };
 
     return {
@@ -129,15 +141,6 @@ oppia.factory('PretestEngineService', [
       getExplorationVersion: function() {
         return version;
       },
-      getNextInteractionHtml: function(labelForFocusTarget) {
-        var interactionId = _getNextStateData().interaction.id;
-
-        return ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          _getNextStateData().interaction.customizationArgs,
-          true,
-          labelForFocusTarget);
-      },
       isNextInteractionInline: function() {
         var interactionId = _getNextStateData().interaction.id;
         return (
@@ -149,9 +152,6 @@ oppia.factory('PretestEngineService', [
         var interactionId = _getNextStateData().interaction.id;
         return (
           interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
-      },
-      getNextInteraction: function() {
-        return _getNextStateData().interaction;
       },
       isNextStateTerminal: function() {
         var interactionId = _getNextStateData().interaction.id;
@@ -178,12 +178,6 @@ oppia.factory('PretestEngineService', [
         return (
           !INTERACTION_SPECS[interactionId].is_terminal &&
         !INTERACTION_SPECS[interactionId].is_linear);
-      },
-      getNextContentIdsToAudioTranslations: function() {
-        return _getNextStateData().contentIdsToAudioTranslations;
-      },
-      getNextContentId: function() {
-        return _getNextStateData().content.getContentId();
       },
       isInPreviewMode: function() {
         return false;
@@ -251,10 +245,21 @@ oppia.factory('PretestEngineService', [
         var isFinalQuestion = (nextIndex === pretestQuestions.length);
         var onSameCard = !answerIsCorrect;
 
+        var _nextFocusLabel = FocusManagerService.generateFocusLabel();
+        var nextCard = null;
+        if (!isFinalQuestion) {
+          var nextInteractionHtml = _getNextInteractionHtml(_nextFocusLabel);
+          nextCard = StateCardObjectFactory.createNewCard(
+            true, oldParams, questionHtml, nextInteractionHtml,
+            _getNextStateData().interaction, false,
+            _getNextStateData().contentIdsToAudioTranslations,
+            _getNextStateData().content.getContentId()
+          );
+        }
         successCallback(
-          nextIndex, refreshInteraction, feedbackHtml,
-          feedbackAudioTranslations, questionHtml, oldParams,
-          null, null, onSameCard, null, null, isFinalQuestion);
+          nextCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations,
+          null, null, onSameCard, null, null, isFinalQuestion, _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

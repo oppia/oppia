@@ -317,6 +317,7 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
+          $scope.nextCard = null;
           $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
@@ -367,8 +368,6 @@ oppia.directive('conversationSkin', [
           $scope.displayedCard = null;
           var explorationActuallyStarted = false;
 
-          $scope.upcomingStateName = null;
-          $scope.upcomingContentHtml = null;
           $scope.upcomingInlineInteractionHtml = null;
 
           $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
@@ -499,15 +498,11 @@ oppia.directive('conversationSkin', [
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
           };
-          var _addNewCard = function(
-              stateName, newParams, contentHtml, interactionHtml,
-              interaction, contentIdsToAudioTranslations, contentId) {
-            PlayerTranscriptService.addNewCard(
-              stateName, newParams, contentHtml, interactionHtml,
-              interaction, false, contentIdsToAudioTranslations, contentId);
+          var _addNewCard = function(newCard) {
+            PlayerTranscriptService.addNewCard(newCard);
 
-            if (newParams) {
-              LearnerParamsService.init(newParams);
+            if (newCard.getCurrentParams()) {
+              LearnerParamsService.init(newCard.getCurrentParams());
             }
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
@@ -584,13 +579,9 @@ oppia.directive('conversationSkin', [
               returnDict.auto_tts_enabled, _initializeDirectiveComponents);
           };
 
-          var _initializeDirectiveComponents = function(
-              initialStateName, initHtml, newParams, interaction,
-              interactionHtml, contentIdsToAudioTranslations, contentId) {
+          var _initializeDirectiveComponents = function(initialCard) {
             $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
-            _addNewCard(
-              initialStateName, newParams, initHtml, interactionHtml,
-              interaction, contentIdsToAudioTranslations, contentId);
+            _addNewCard(initialCard);
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
 
@@ -692,24 +683,24 @@ oppia.directive('conversationSkin', [
               ExplorationPlayerStateService.getCurrentEngineService();
             $scope.answerIsCorrect = currentEngineService.submitAnswer(
               answer, interactionRulesService, function(
-                  newStateName, refreshInteraction, feedbackHtml,
-                  feedbackAudioTranslations, contentHtml, newParams,
-                  refresherExplorationId, missingPrerequisiteSkillId,
-                  remainOnCurrentCard, wasOldStateInitial, isFirstHit,
-                  isFinalQuestion) {
+                  nextCard, refreshInteraction, feedbackHtml,
+                  feedbackAudioTranslations, refresherExplorationId,
+                  missingPrerequisiteSkillId, remainOnCurrentCard,
+                  wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInPretestMode()) {
                   var oldStateName =
                     ExplorationEngineService.getCurrentStateName();
                   if (!remainOnCurrentCard) {
                     StatsReportingService.recordStateTransition(
-                      oldStateName, newStateName, answer,
+                      oldStateName, nextCard.getStateName(), answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
 
                     StatsReportingService.recordStateCompleted(oldStateName);
                   }
                   if (ExplorationEngineService.isNextStateTerminal()) {
-                    StatsReportingService.recordStateCompleted(newStateName);
+                    StatsReportingService.recordStateCompleted(
+                      nextCard.getStateName());
                   }
                   if (wasOldStateInitial && !explorationActuallyStarted) {
                     StatsReportingService.recordExplorationActuallyStarted(
@@ -718,7 +709,8 @@ oppia.directive('conversationSkin', [
                   }
                 }
                 if (!ExplorationPlayerStateService.isInPretestMode()) {
-                  $rootScope.$broadcast('playerStateChange', newStateName);
+                  $rootScope.$broadcast(
+                    'playerStateChange', nextCard.getStateName());
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -830,24 +822,24 @@ oppia.directive('conversationSkin', [
                     }
                     FatigueDetectionService.reset();
                     NumberAttemptsService.reset();
-                    _nextFocusLabel = FocusManagerService.generateFocusLabel();
+                    _nextFocusLabel = focusLabel;
 
-                    PlayerTranscriptService.setDestination(newStateName);
+                    PlayerTranscriptService.setDestination(
+                      nextCard.getStateName());
 
                     // These are used to compute the dimensions for the
                     // next card.
-                    $scope.upcomingStateName = newStateName;
-                    $scope.upcomingParams = newParams;
-                    $scope.upcomingContentHtml = (
-                      contentHtml + _getRandomSuffix());
+                    $scope.nextCard = nextCard;
+                    $scope.nextCard.addRandomSuffixToContentHtml(
+                      _getRandomSuffix());
+                    $scope.nextCard.addRandomSuffixToInteractionHtml(
+                      _getRandomSuffix());
 
                     var _isNextInteractionInline = (
                       ExplorationPlayerStateService.isNextInteractionInline());
                     $scope.upcomingInlineInteractionHtml = (
                       _isNextInteractionInline ?
-                        ExplorationPlayerStateService.getNextInteractionHtml(
-                          _nextFocusLabel
-                        ) + _getRandomSuffix() : '');
+                        $scope.nextCard.getInteractionHtml() : '');
                     $scope.upcomingInteractionInstructions = (
                       ExplorationPlayerStateService.
                         getNextInteractionInstructions()
@@ -856,7 +848,8 @@ oppia.directive('conversationSkin', [
                     if (feedbackHtml) {
                       var stateHistory =
                         PlayerTranscriptService.getStateHistory();
-                      if (stateHistory.indexOf(newStateName) !== -1) {
+                      if (
+                        stateHistory.indexOf(nextCard.getStateName()) !== -1) {
                         $scope.pendingCardWasSeenBefore = true;
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
@@ -876,9 +869,7 @@ oppia.directive('conversationSkin', [
                       // to next card. Therefore $scope.answerIsCorrect needs
                       // to be set to false before it proceeds to next card.
                       $scope.answerIsCorrect = false;
-                      $scope.showPendingCard(
-                        newStateName, newParams,
-                        contentHtml + _getRandomSuffix());
+                      $scope.showPendingCard();
                     }
                   }
                   $scope.answerIsBeingProcessed = false;
@@ -887,33 +878,13 @@ oppia.directive('conversationSkin', [
             );
           };
           $scope.startCardChangeAnimation = false;
-          $scope.showPendingCard = function(
-              newStateName, newParams, newContentHtml) {
+          $scope.showPendingCard = function() {
             $scope.startCardChangeAnimation = true;
             ExplorationPlayerStateService.recordNewCardAdded();
 
             $timeout(function() {
-              var newInteractionHtml =
-                ExplorationPlayerStateService.getNextInteractionHtml(
-                  _nextFocusLabel);
-              var newInteraction =
-                ExplorationPlayerStateService.getNextInteraction();
-              // Note that newInteractionHtml may be null.
-              if (newInteractionHtml) {
-                newInteractionHtml += _getRandomSuffix();
-              }
-              var newContentIdsToAudioTranslations =
-                ExplorationPlayerStateService.
-                  getNextContentIdsToAudioTranslations();
-              var newContentId =
-                ExplorationPlayerStateService.getNextContentId();
-              _addNewCard(
-                newStateName, newParams, newContentHtml, newInteractionHtml,
-                newInteraction, newContentIdsToAudioTranslations, newContentId);
+              _addNewCard($scope.nextCard);
 
-              $scope.upcomingStateName = null;
-              $scope.upcomingParams = null;
-              $scope.upcomingContentHtml = null;
               $scope.upcomingInlineInteractionHtml = null;
               $scope.upcomingInteractionInstructions = null;
             }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
@@ -946,8 +917,9 @@ oppia.directive('conversationSkin', [
             if ($scope.displayedCard.getLeadsToConceptCard()) {
               ExplorationPlayerStateService.recordNewCardAdded();
               _addNewCard(
-                null, null, $scope.conceptCard.getExplanation(), null, null,
-                null, null);
+                StateCardObjectFactory.createNewCard(
+                  null, null, $scope.conceptCard.getExplanation(), null, null,
+                  false, null, null));
               return;
             }
             /* This is for the following situation:
@@ -969,9 +941,7 @@ oppia.directive('conversationSkin', [
                 _initializeDirectiveComponents);
               return;
             }
-            $scope.showPendingCard(
-              $scope.upcomingStateName, $scope.upcomingParams,
-              $scope.upcomingContentHtml);
+            $scope.showPendingCard();
           };
 
           var scrollToBottom = function() {
