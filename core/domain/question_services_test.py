@@ -122,6 +122,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, 'skill_1')
 
     def test_get_question_skill_links_of_skill(self):
+        question_skill_links = (
+            question_services.get_question_skill_links_of_skill(
+                'skill_1'))
+        self.assertEqual(len(question_skill_links), 0)
+
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, self.editor_id,
@@ -242,7 +247,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_question_skill_links_of_skill(
                 'skill_3'))
 
-        self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
         self.assertItemsEqual(
