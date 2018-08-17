@@ -92,7 +92,7 @@ def _minify(source_path, target_path):
     subprocess.check_call(cmd, shell=True)
 
 
-def write_to_file_stream(file_stream, content):
+def write_to_file_stream(file_stream, content): # pragma: no cover
     """Write to a file object using provided content.
 
     Args:
@@ -102,16 +102,16 @@ def write_to_file_stream(file_stream, content):
     file_stream.write(content)
 
 
-def _join_files(source_paths, target_file_path):
+def _join_files(source_paths, target_file_stream):
     """Writes multiple files into one file.
 
     Args:
         source_paths: list(str). Paths to files to join together.
-        target_file_path: str. Path to location of the joined file.
+        target_file_stream: file. A stream object of joined file.
     """
     for source_path in source_paths:
         with open(source_path, 'r') as source_file:
-            write_to_file_stream(target_file_path, source_file.read())
+            write_to_file_stream(target_file_stream, source_file.read())
 
 
 def _minify_and_create_sourcemap(source_paths, target_file_path):
@@ -254,40 +254,40 @@ def _match_filename_with_hashes(filename, file_hashes):
             'Hashed file %s does not match hash dict keys' % filename)
 
 
-def process_html(source_path, target_path, file_hashes):
+def process_html(source_path, minified_html_file_stream, file_hashes):
     """Copies contents of HTML file, while removing whitespace and
     replacing paths inside the file with paths with hashes.
 
     Args:
-        source_path: str. Absolute path to file to be processed.
-        target_path: str. Absolute path to location where to copy
-            the processed file.
+        source_path: str. Absolute path to HTML file to be processed.
+        minified_html_file_stream: file. A stream object of the minified HTML
+            file.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
-    f = open(source_path, 'r')
-    content = f.read()
-    for filepath, file_hash in file_hashes.iteritems():
-        # We are adding hash in all file paths except for html paths.
-        # This is because html paths are used by backend and we work with paths
-        # without hash part in backend.
-        if filepath.endswith('.html'):
-            continue
-        filepath_with_hash = _insert_hash(filepath, file_hash)
-        content = content.replace(
-            '%s%s' % (TEMPLATES_DEV_DIR, filepath),
-            '%s%s' % (TEMPLATES_CORE_DIR.get('out_dir'), filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (ASSETS_DEV_DIR, filepath),
-            '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (EXTENSIONS_DIR.get('dev_dir'), filepath),
-            '%s%s' % (EXTENSIONS_DIR.get('out_dir'), filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
-            '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
-    content = REMOVE_WS(' ', content)
-    d = open(target_path, 'w+')
-    d.write(content)
+    with open(source_path, 'r') as source_html_file:
+        content = source_html_file.read()
+        for filepath, file_hash in file_hashes.iteritems():
+            # We are adding hash in all file paths except for html paths.
+            # This is because html paths are used by backend and we work with
+            # paths without hash part in backend.
+            if filepath.endswith('.html'):
+                continue
+            filepath_with_hash = _insert_hash(filepath, file_hash)
+            content = content.replace(
+                '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+                '%s%s' % (
+                    TEMPLATES_CORE_DIR.get('out_dir'), filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (ASSETS_DEV_DIR, filepath),
+                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (EXTENSIONS_DIR.get('dev_dir'), filepath),
+                '%s%s' % (EXTENSIONS_DIR.get('out_dir'), filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
+                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
+        content = REMOVE_WS(' ', content)
+        write_to_file_stream(minified_html_file_stream, content)
 
 
 def get_dependency_directory(dependency):
@@ -647,7 +647,8 @@ def save_hashes_as_json(target_filepath, file_hashes):
 def minify_func(source_path, target_path, file_hashes, filename):
     if filename.endswith('.html'):
         print 'Building %s' % source_path
-        process_html(source_path, target_path, file_hashes)
+        with open(target_path, 'w+') as minified_html_file:
+            process_html(source_path, minified_html_file, file_hashes)
     elif filename.endswith('.css'):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)

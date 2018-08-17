@@ -218,12 +218,12 @@ class BuildTests(test_utils.GenericTestBase):
         """Test process_html to remove all whitespaces."""
         base_source_path = os.path.join(
             build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'base.html')
-        base_staging_path = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('staging_dir'), 'pages', 'base.html')
-        build.ensure_directory_exists(base_staging_path)
+        # Prepare a file_stream object from StringIO.
+        minified_html_file_stream = StringIO.StringIO()
         file_hashes = build.get_file_hashes(
             build.TEMPLATES_CORE_DIR.get('dev_dir'))
         # pylint: disable=protected-access
+        # Reading from actual base.html file and not simply a dummy file.
         build._ensure_files_exist([base_source_path])
         # pylint: enable=protected-access
         # Assert that /DEV's base.html has white spaces.
@@ -231,18 +231,17 @@ class BuildTests(test_utils.GenericTestBase):
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
-                msg="No white spaces detected in file unexpectedly")
+                msg="No white spaces detected in %s unexpectedly"
+                % base_source_path)
 
-        build.process_html(base_source_path, base_staging_path, file_hashes)
+        build.process_html(
+            base_source_path, minified_html_file_stream, file_hashes)
 
         # Assert that all empty lines are removed.
-        with open(base_staging_path, 'r') as minified_base_file:
-            minified_base_file_content = minified_base_file.read()
-            self.assertNotRegexpMatches(
-                minified_base_file_content, r'\s{2,}',
-                msg="Detected white spaces in file")
-        # Clean up staging dir.
-        # shutil.rmtree(build.TEMPLATES_CORE_DIR.get('staging_dir'))
+        minified_html_file_content = minified_html_file_stream.read()
+        self.assertNotRegexpMatches(
+            minified_html_file_content, r'\s{2,}',
+            msg="All white spaces must be removed from %s" % base_source_path)
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted to return the correct boolean value
