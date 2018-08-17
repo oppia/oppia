@@ -23,6 +23,7 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
@@ -67,7 +68,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
 
-        self.old_content = exp_domain.SubtitledHtml(
+        self.old_content = state_domain.SubtitledHtml(
             'content', 'old content html').to_dict()
 
         exploration.states['State 1'].update_content(self.old_content)
@@ -80,7 +81,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
-        self.new_content = exp_domain.SubtitledHtml(
+        self.new_content = state_domain.SubtitledHtml(
             'content', 'new content html').to_dict()
 
         self.logout()
