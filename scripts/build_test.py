@@ -18,6 +18,7 @@ import StringIO
 import collections
 import os
 import random
+import re
 import shutil
 import subprocess
 import threading
@@ -219,6 +220,10 @@ class BuildTests(test_utils.GenericTestBase):
             build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'base.html')
         # Prepare a file_stream object from StringIO.
         minified_html_file_stream = StringIO.StringIO()
+        # Obtain actual file hashes of /templates to add hash to all filepaths
+        # within the HTML file. The end result will look like:
+        # E.g <script ... app.js></script>
+        # --> <script ... app.[hash].js></script>.
         file_hashes = build.get_file_hashes(
             build.TEMPLATES_CORE_DIR.get('dev_dir'))
         # pylint: disable=protected-access
@@ -232,15 +237,28 @@ class BuildTests(test_utils.GenericTestBase):
                 source_base_file_content, r'\s{2,}',
                 msg="No white spaces detected in %s unexpectedly"
                 % base_source_path)
-
+            # Create a list of un-hashed filenames in base.html.
+            base_file_unhashed_filenames = []
+            for filepath, _ in file_hashes.iteritems():
+                # Not hashing HTML files.
+                if filepath.endswith('.html'):
+                    continue
+                result = re.findall(filepath, source_base_file_content)
+                if result:
+                    base_file_unhashed_filenames.append(result[0])
+        print base_file_unhashed_filenames
         build.process_html(
             base_source_path, minified_html_file_stream, file_hashes)
 
         # Assert that all empty lines are removed.
-        minified_html_file_content = minified_html_file_stream.read()
+        minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
             msg="All white spaces must be removed from %s" % base_source_path)
+        # Assert that all filenames are hashed in base.html.
+        for unhashed_filename in base_file_unhashed_filenames:
+            result = re.findall(unhashed_filename, minified_html_file_content)
+            self.assertEqual(len(result), 0)
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted to return the correct boolean value
