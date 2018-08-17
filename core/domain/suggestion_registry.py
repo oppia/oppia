@@ -23,6 +23,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -407,7 +408,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected change to contain question_dict')
 
         question = question_domain.Question(
-            None, exp_domain.State.from_dict(
+            None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_schema_version'],
             self.change.question_dict['language_code'], None)
@@ -422,13 +423,13 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question state schema version to be between 1 and '
                 '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
 
-        if not self.change.skill_id:
-            raise utils.ValidationError('Expected change to contain skill_id')
-
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
+
+        if self.change.skill_id is None:
+            raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict
         self.validate()
         if (

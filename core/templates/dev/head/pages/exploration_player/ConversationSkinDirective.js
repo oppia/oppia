@@ -560,25 +560,6 @@ oppia.directive('conversationSkin', [
             }
           };
 
-          var _initializeExplorationServices = function(returnDict) {
-            var version = GLOBALS.explorationVersion;
-            var explorationId = ContextService.getExplorationId();
-            StateClassifierMappingService.init(
-              returnDict.state_classifier_mapping);
-            StatsReportingService.initSession(
-              explorationId, returnDict.exploration.title,
-              version, returnDict.session_id, GLOBALS.collectionId);
-            PlaythroughService.initSession(
-              explorationId, version, returnDict.record_playthrough_probability,
-              returnDict.whitelisted_exploration_ids_for_playthroughs);
-            PlayerCorrectnessFeedbackEnabledService.init(
-              returnDict.correctness_feedback_enabled);
-            ExplorationEngineService.init(
-              returnDict.exploration, returnDict.version,
-              returnDict.preferred_audio_language_code,
-              returnDict.auto_tts_enabled, _initializeDirectiveComponents);
-          };
-
           var _initializeDirectiveComponents = function(initialCard) {
             $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
             _addNewCard(initialCard);

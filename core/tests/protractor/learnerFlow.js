@@ -210,8 +210,6 @@ describe('Learner dashboard functionality', function() {
     // User clicks on Oppia logo to leave exploration.
     oppiaLogo.click();
     general.acceptAlert();
-    // Wait for /learner_dashboard to load.
-    waitFor.pageToFullyLoad();
 
     // Go to 'Test Exploration'.
     libraryPage.get();
@@ -350,8 +348,6 @@ describe('Learner dashboard functionality', function() {
     // User clicks on Oppia logo to leave collection.
     oppiaLogo.click();
     general.acceptAlert();
-    // Wait for /learner_dashboard to load.
-    waitFor.pageToFullyLoad();
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.

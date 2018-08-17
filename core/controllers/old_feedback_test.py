@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
@@ -379,7 +380,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_feedback_threads_with_suggestions(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            new_content = exp_domain.SubtitledHtml(
+            new_content = state_domain.SubtitledHtml(
                 'content', 'new content html').to_dict()
             change_cmd = {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
