@@ -349,10 +349,11 @@ class BuildTests(test_utils.GenericTestBase):
                 ('var hashes = JSON.parse(\'{"/file.min.js": "654321", '
                  '"/file.js": "123456"}\');'))
 
-    def test_execute_tasks(self, thread_count=1):
+    def test_execute_tasks(self):
         """Test _execute_tasks to fire corresponding number of threads."""
         build_tasks = collections.deque()
-        count = thread_count
+        THREAD_COUNT = 1
+        count = THREAD_COUNT
         while count:
             task = threading.Thread(
                 # pylint: disable=protected-access
@@ -364,7 +365,7 @@ class BuildTests(test_utils.GenericTestBase):
         # pylint: disable=protected-access
         build._execute_tasks(build_tasks)
         # pylint: enable=protected-access
-        self.assertEqual(threading.active_count(), thread_count)
+        self.assertEqual(threading.active_count(), THREAD_COUNT)
 
     def test_build_files(self):
         """Test build_files to queue up correct number of build tasks."""
