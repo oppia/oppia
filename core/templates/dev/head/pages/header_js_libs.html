@@ -1,6 +1,8 @@
 <script src="/assets/rich_text_components_definitions.js"></script>
 <script src="/assets/constants.js"></script>
-<script ng-if="!DEV_MODE" script src="assets/hashes.js"></script>
+<foobar ng-if="!DEV_MODE">
+<script ng-src="/assets/hashes.js"></script>
+</foobar>
 <!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
 they need to be at the header. Including bundled js at the header will block
 rendering.-->
