@@ -47,7 +47,8 @@ TEMPLATES_CORE_DIR = {
     'out_dir': os.path.join('build', 'templates', 'head', '')
 }
 
-HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
+HASHES_JS_FILENAME = 'hashes.js'
+HASHES_JSON = os.path.join('build', 'assets', HASHES_JS_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -621,30 +622,11 @@ def get_hashes_json_file_contents(file_hashes):
     return 'var hashes = JSON.parse(\'%s\');' % (hashes_json)
 
 
-def save_hashes_as_json(target_filepath, file_hashes):
-    """Save hashes in JS file containing JSON for files that
-    are to be interpolated in the frontend.
-
-    Args:
-        target_filepath: str. Path relative to /oppia directory defining
-            location where to save the JS file with hashes. The final location
-            path would also contain hash.
-        file_hashes: dict(str, str). Dictionary of file hashes.
+def minify_func(
+        source_path, target_path, file_hashes, filename): # pragma: no cover
+    """Call the appropriate functions to handle different types of file
+    formats.
     """
-    ensure_directory_exists(HASHES_JSON)
-    with open(target_filepath, 'w') as f:
-        f.write(get_hashes_json_file_contents(file_hashes))
-
-    file_hash = generate_md5_hash(target_filepath)
-    relative_filepath = os.path.relpath(
-        target_filepath, os.path.join(os.path.curdir, 'build', 'assets'))
-    filepath_with_hash = _insert_hash(target_filepath, file_hash)
-    os.rename(target_filepath, filepath_with_hash)
-    print 'Saving %s as %s' % (relative_filepath, filepath_with_hash)
-    file_hashes[relative_filepath] = file_hash
-
-
-def minify_func(source_path, target_path, file_hashes, filename):
     if filename.endswith('.html'):
         print 'Building %s' % source_path
         with open(target_path, 'w+') as minified_html_file:
@@ -768,6 +750,7 @@ def build_directory(source_dir, file_hashes, build_tasks):  # pragma: no cover
     dev_dir = source_dir.get('dev_dir')
     staging_dir = source_dir.get('staging_dir')
     out_dir = source_dir.get('out_dir')
+    delete_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % staging_dir
@@ -781,8 +764,11 @@ def build_directory(source_dir, file_hashes, build_tasks):  # pragma: no cover
         build_files(
             dev_dir, staging_dir, file_hashes, build_tasks,
             file_formats=mandatory_file_formats)
+        # Compare /DEV with /build dir using file hashes.
+        dev_dir_hashes = get_file_hashes(dev_dir)
+        print "Comparing file hashes of %s and %s" % (dev_dir, out_dir)
         recently_changed_filenames = get_recently_changed_filenames(
-            dev_dir, out_dir)
+            dev_dir_hashes, out_dir)
         if recently_changed_filenames:
             # Only re-build files that have changed since last build.
             print "Re-building recently changed files at %s" % dev_dir
@@ -790,21 +776,26 @@ def build_directory(source_dir, file_hashes, build_tasks):  # pragma: no cover
                 dev_dir, staging_dir, recently_changed_filenames, file_hashes,
                 build_tasks)
             # Clean up files in staging dir that have been removed in DEV dir.
-            remove_deleted_files(dev_dir, staging_dir)
+            print 'Scanning directory %s to remove deleted file' % staging_dir
+            remove_deleted_files(dev_dir_hashes, staging_dir, delete_tasks)
+            try:
+                _execute_tasks(delete_tasks)
+            except Exception as e:
+                print e
         else:
             print 'No changes detected. Using previously built files.'
 
 
-def remove_deleted_files(dev_directory, staging_directory):
-    """Walk the staging directory and remove files that have since been removed
-    from the DEV directory.
-
+def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
+    """Walk the staging directory and remove files that are not in the hash dict
+    i.e. remaining files in staging dir that have since been deleted from /DEV.
     Args:
-        dev_directory: str. Path relative to /oppia where DEV files are located.
+        dev_dir_hashes: dict(str, str). Dictionary of file hashes.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
+        delete_tasks: Deque(obj). A deque that contains all delete tasks queued
+            to be processed.
     """
-    file_hashes = get_file_hashes(dev_directory)
     print 'Scanning directory %s to remove deleted file' % staging_directory
     for root, dirs, files in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
@@ -818,18 +809,19 @@ def remove_deleted_files(dev_directory, staging_directory):
             relative_path = os.path.relpath(target_path, staging_directory)
             # Remove file found in staging dir but not in /DEV, i.e.
             # file not listed in hash dict.
-            if relative_path not in file_hashes:
+            if relative_path not in dev_dir_hashes:
                 print ('Unable to find %s in file hashes, deleting file'
                        % relative_path)
-                os.remove(target_path)
+                task = threading.Thread(target=os.remove, args=(target_path))
+                delete_tasks.append(task)
 
 
-def get_recently_changed_filenames(dev_dir, out_dir):
+def get_recently_changed_filenames(dev_dir_hashes, out_dir):
     """Compare hashes of DEV files and BUILD files. Return a list of filenames
     that were recently changed.
 
     Args:
-        dev_dir: str. Path relative to /oppia where DEV files are located.
+        dev_dir_hashes: str. dict(str, str). Dictionary of /DEV's file hashes.
         out_dir: str. Path relative to /oppia where BUILD files are located.
 
     Returns:
@@ -839,12 +831,10 @@ def get_recently_changed_filenames(dev_dir, out_dir):
     # the filenames and their extensions,
     # e.g base.240933e7564bd72a4dde42ee23260c5f.html
     # If a file gets edited, a different MD5 hash is generated.
-    file_hashes = get_file_hashes(dev_dir)
     recently_changed_filenames = []
     # Currently, we do not hash Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
-    print "Comparing file hashes of %s and %s" % (dev_dir, out_dir)
-    for file_name, md5_hash in file_hashes.iteritems():
+    for file_name, md5_hash in dev_dir_hashes.iteritems():
         # Ignore files with certain extensions.
         if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue # pragma: no cover
@@ -884,7 +874,14 @@ def generate_build_directory(): # pragma: no cover
         hashes.update(get_file_hashes(HASH_DIR))
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
-    save_hashes_as_json(HASHES_JSON, hashes)
+    ensure_directory_exists(HASHES_JSON)
+    with open(HASHES_JSON, 'w+') as hashes_js_file:
+        write_to_file_stream(
+            hashes_js_file, get_hashes_json_file_contents(hashes))
+    # Update hash dict with newly created hashes.js.
+    hashes.update({HASHES_JS_FILENAME: generate_md5_hash(HASHES_JSON)})
+    # Make sure hashes.js is available to the frontend.
+    _ensure_files_exist([HASHES_JSON])
 
     # Build files in /extensions and copy them into staging directory.
     build_directory(EXTENSIONS_DIR, hashes, build_tasks)
@@ -914,8 +911,12 @@ def generate_build_directory(): # pragma: no cover
     except Exception as e:
         print e
 
-    # Save hashes as JSON again due to deletion by copy functions.
-    save_hashes_as_json(HASHES_JSON, hashes)
+    # Rewrite hashes.js as JSON again due to deletion by copy functions.
+    # Add hash to filename from hash dict.
+    hash_final_file_path = _insert_hash(HASHES_JSON, hashes[HASHES_JS_FILENAME])
+    with open(hash_final_file_path, 'w+') as hashes_js_file:
+        write_to_file_stream(
+            hashes_js_file, get_hashes_json_file_contents(hashes))
 
     for i in xrange(len(COPY_INPUT_DIRS)):
         # Make sure that all files in /DEV and staging dir are accounted for.
@@ -931,8 +932,7 @@ def generate_build_directory(): # pragma: no cover
                     # These filenames do not contain hashes.
                     continue
                 _match_filename_with_hashes(filename, hashes)
-    # Make sure hashes.js is available.
-    hash_final_file_path = _insert_hash(HASHES_JSON, hashes['hashes.js'])
+    # Make sure hashes.[HASH].js is available.
     _ensure_files_exist([hash_final_file_path])
 
     print 'Build completed.'

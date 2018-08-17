@@ -20,7 +20,6 @@ import os
 import random
 import shutil
 import subprocess
-import sys
 import threading
 
 # pylint: disable=relative-import
@@ -119,7 +118,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.ensure_directory_exists(random_filepath)
         # Asserting ../oppia/random exists.
         self.assertTrue(os.path.isdir(SANDBOX_DIR))
-        # Clean up sandbox directory that has just been created.
+        # Clean up empty sandbox directory that has just been created.
         shutil.rmtree(SANDBOX_DIR)
 
     def test_ensure_files_exist(self):
@@ -267,13 +266,12 @@ class BuildTests(test_utils.GenericTestBase):
         tasks.
         """
         copy_tasks = collections.deque()
-        extensions_hashes = build.get_file_hashes(
-            build.EXTENSIONS_DIR.get('dev_dir'))
+        assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         build.copy_files_source_to_target(
-            build.EXTENSIONS_DIR.get('dev_dir'),
-            build.EXTENSIONS_DIR.get('out_dir'), extensions_hashes, copy_tasks)
-        total_file_count = build.get_file_count(
-            build.EXTENSIONS_DIR.get('dev_dir'))
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes,
+            copy_tasks)
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
+        # Minus 1 to account for added hashes.js.
         # Asserting that total file counts in the provided directory matches
         # with the total number of copy tasks queued.
         self.assertEquals(len(copy_tasks), total_file_count)
@@ -351,75 +349,6 @@ class BuildTests(test_utils.GenericTestBase):
                 ('var hashes = JSON.parse(\'{"/file.min.js": "654321", '
                  '"/file.js": "123456"}\');'))
 
-    def test_save_hashes_as_json(self):
-        """Test save_hashes_as_json to save hashes.js with the correct path."""
-        asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
-        build.save_hashes_as_json(build.HASHES_JSON, asset_hashes)
-        hash_filename = os.path.basename(build.HASHES_JSON)
-        for filepath, file_hash in asset_hashes.iteritems():
-            if filepath == hash_filename:
-                # pylint: disable=protected-access
-                hashed_filename = build._insert_hash(filepath, file_hash)
-                # pylint: enable=protected-access
-        final_filepath = os.path.join(build.ASSETS_OUT_DIR, hashed_filename)
-        self.assertTrue(os.path.isfile(final_filepath))
-        # shutil.rmtree(build.ASSETS_OUT_DIR)
-
-    def test_minify_func(self):
-        """Test minify_func to branch into the correct function call with the
-        given file format from hash dict.
-        """
-        file_hashes = build.get_file_hashes(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'))
-        html_file_processed = False
-        js_file_minified = False
-        css_file_minified = False
-        for filepath, _ in file_hashes.iteritems():
-            if (html_file_processed and js_file_minified and css_file_minified):
-                # Only test for these 3 file types using hash dict.
-                break
-            filename = os.path.basename(filepath)
-            source_path = os.path.join(
-                build.TEMPLATES_CORE_DIR.get('dev_dir'), filepath)
-            staging_path = os.path.join(
-                build.TEMPLATES_CORE_DIR.get('staging_dir'), filepath)
-            build.ensure_directory_exists(staging_path)
-            capturedOutput = StringIO.StringIO()
-            sys.stdout = capturedOutput
-            if filename.endswith('.html') and not html_file_processed:
-                build.minify_func(
-                    source_path, staging_path, file_hashes, filename)
-                html_file_processed = True
-                self.assertEquals(
-                    capturedOutput.getvalue(), 'Building %s\n' % source_path)
-            elif (filename.endswith('.js') and not js_file_minified):
-                build.minify_func(
-                    source_path, staging_path, file_hashes, filename)
-                js_file_minified = True
-                self.assertEquals(
-                    capturedOutput.getvalue(), 'Minifying %s\n' % source_path)
-            elif filename.endswith('.css') and not css_file_minified:
-                build.minify_func(
-                    source_path, staging_path, file_hashes, filename)
-                css_file_minified = True
-                self.assertEquals(
-                    capturedOutput.getvalue(), 'Minifying %s\n' % source_path)
-            else:
-                continue # pragma: no cover
-            sys.stdout = sys.__stdout__
-        # Asserting other file formats.
-        build_source_path = os.path.join('scripts', 'build.py')
-        build_staging_path = os.path.join('backend_prod_files', 'build.py')
-        build_file_hash = build.get_file_hashes(build_source_path)
-        capturedOutput = StringIO.StringIO()
-        sys.stdout = capturedOutput
-        build.minify_func(
-            build_source_path, build_staging_path, build_file_hash, 'build.py')
-        sys.stdout = sys.__stdout__
-        os.remove(build_staging_path)
-        self.assertEquals(
-            capturedOutput.getvalue(), 'Copying %s\n' % build_source_path)
-
     def test_execute_tasks(self, thread_count=1):
         """Test _execute_tasks to fire corresponding number of threads."""
         build_tasks = collections.deque()
@@ -477,63 +406,36 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames to detect file recently added."""
-        # Prepare /build/assets for production build.
-        copy_tasks = collections.deque()
-        asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
-        build.copy_files_source_to_target(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            copy_tasks)
-        # pylint: disable=protected-access
-        build._execute_tasks(copy_tasks)
-        # pylint: enable=protected-access
-        # Copy manifest.json into /assets/i18n.
-        new_file_name = os.path.join('manifest.json')
-        new_file_dev_filepath = os.path.join(
-            build.ASSETS_DEV_DIR, 'i18n', new_file_name)
-        shutil.copyfile(new_file_name, new_file_dev_filepath)
+        # Obtain hashes from DEV's /assets.
+        assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        # Create an empty sandbox folder, to simulate an empty /build folder.
+        SANDBOX_DIR = os.path.join(build.PARENT_DIR, 'sandbox')
+        build.ensure_directory_exists(SANDBOX_DIR)
+        recently_changed_filenames = []
+        # Assert that list is init to 0.
+        self.assertEqual(len(recently_changed_filenames), 0)
         recently_changed_filenames = build.get_recently_changed_filenames(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR)
-        # Clean up new file.
-        os.remove(new_file_dev_filepath)
-        # Assert that manifest.json was recently added into /assets.
-        self.assertEqual(
-            recently_changed_filenames, [os.path.join('i18n', new_file_name)])
+            assets_hashes, SANDBOX_DIR)
+        # Since all HTML and Python files are already built, they are ignored.
+        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html', '.py',)):
+            self.assertEqual(
+                len(recently_changed_filenames), build.get_file_count(
+                    build.ASSETS_DEV_DIR) - 1)
+        # Minus 1 from ASSETS_DEV_DIR to account for added hashes.js.
 
     def test_remove_deleted_files(self):
-        """Test remove_deleted_files to clean up file from BUILD directory that
-        was removed from DEV directory.
+        """Test remove_deleted_files to queue up the correct number of deletion
+        task.
         """
-        # Copy manifest.json into /assets/i18n.
-        new_file_name = os.path.join('manifest.json')
-        new_file_dev_filepath = os.path.join(
-            build.ASSETS_DEV_DIR, 'i18n', new_file_name)
-        shutil.copyfile(new_file_name, new_file_dev_filepath)
-        # Assert that manifest.json is copied into /build/assets.
-        self.assertTrue(os.path.isfile(new_file_dev_filepath))
-        # Prepare /build/assets for production build.
-        copy_tasks = collections.deque()
-        asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
-        build.copy_files_source_to_target(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            copy_tasks)
-        # pylint: disable=protected-access
-        build._execute_tasks(copy_tasks)
-        # pylint: enable=protected-access
-        unhashed_filepath = os.path.join('i18n', new_file_name)
-        # Get final filepath by getting hash from hash dict and add to filename.
-        for filepath, file_hash in asset_hashes.iteritems():
-            if filepath == unhashed_filepath:
-                # pylint: disable=protected-access
-                filepath_with_hash = build._insert_hash(filepath, file_hash)
-                # pylint: enable=protected-access
-                new_file_final_filepath = os.path.join(
-                    build.ASSETS_OUT_DIR, filepath_with_hash)
-        # Assert that /build/manifest.json is copied over.
-        self.assertIsNotNone(new_file_final_filepath)
-        self.assertTrue(os.path.isfile(new_file_final_filepath))
-        # Delete /assets/manifest.json.
-        os.remove(new_file_dev_filepath)
-        self.assertFalse(os.path.isfile(new_file_dev_filepath))
-        build.remove_deleted_files(build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR)
-        # Assert that /assets/i18n/manifest.[hash].json is now removed too.
-        self.assertFalse(os.path.isfile(new_file_final_filepath))
+        delete_tasks = collections.deque()
+        # Using empty dict, indicating an empty directory,
+        # which means that all files should be removed.
+        file_hashes = dict()
+        # Assert that queue is init to 0.
+        self.assertEqual(len(delete_tasks), 0)
+        build.remove_deleted_files(
+            file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR, delete_tasks)
+        # Assert that all files from /assets should be queued up for deletion.
+        self.assertEquals(
+            len(delete_tasks), build.get_file_count(
+                build.THIRD_PARTY_GENERATED_DEV_DIR))
