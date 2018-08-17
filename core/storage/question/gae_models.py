@@ -236,11 +236,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
-            skill_id: str. ID of the skill
+            skill_id: str. ID of the skill.
 
         Returns:
             list(QuestionSkillLinkModel)|None. The list of question skill link
-            domains that are linked to the skill ID. None if it doesn't exist.
+            domains that are linked to the skill ID. None if the skill
+            ID doesn't exist.
         """
         return cls.query(cls.skill_id == skill_id)
 
