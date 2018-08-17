@@ -1051,6 +1051,11 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(actual_output), 16)
 
         exploration_dict = exploration.to_dict()
+        # We need to create a brand-new exploration here in addition to the old
+        # one (rather than just overwriting the old one), because state id
+        # mapping model is generated when each (exp, version) is saved for
+        # first time. Hence when an exisiting exploration is overwritten
+        # state id mapping model throws an error that mapping already exists.
         new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
         # This is done to ensure that exploration is not passed through CKEditor

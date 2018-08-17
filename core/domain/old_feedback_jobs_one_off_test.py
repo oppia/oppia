@@ -331,14 +331,20 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['State 1'])
-
         self.old_content = exp_domain.SubtitledHtml(
             'content', 'old content').to_dict()
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State 1',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State 1',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': self.old_content
+            })], 'Add state name')
 
-        # Create content in State A with a single audio subtitle.
-        exploration.states['State 1'].update_content(self.old_content)
-        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id,
