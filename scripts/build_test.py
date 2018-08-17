@@ -16,8 +16,8 @@
 
 import StringIO
 import collections
-import glob
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -38,70 +38,60 @@ class BuildTests(test_utils.GenericTestBase):
         # pylint: disable=protected-access
         with self.assertRaises(subprocess.CalledProcessError) as calledProcess:
             build._minify(
-                'path/to/input.js', 'path/to/output.js')
+                'invalid/path/to/input.js', 'invalid/path/to/output.js')
         # pylint: enable=protected-access
         calledProcessException = calledProcess.exception
         # returncode is the exit status of the child process.
         self.assertEqual(calledProcessException.returncode, 1)
 
-    def test_join_files(self, file_count=10):
+    def test_join_files(self):
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
-        third_party_js = os.path.join(
-            build.THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
+        # Prepare a file_stream object from StringIO.
+        third_party_js_stream = StringIO.StringIO()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
-        # Join all JS files in /third_party/static.
+        # Join and write all JS files in /third_party/static to file_stream.
         # pylint: disable=protected-access
-        build._join_files(dependency_filepaths['js'], third_party_js)
+        build._join_files(dependency_filepaths['js'], third_party_js_stream)
         # pylint: enable=protected-access
-        with open(third_party_js, 'r') as joined_js_file:
-            # Open third_party.js.
-            joined_js_file_content = joined_js_file.read()
-            counter = 0
-            for js_filepaths in dependency_filepaths['js']:
-                # Open first 10 JS files.
-                if counter == file_count:
-                    break
-                with open(js_filepaths, 'r') as js_file:
-                    # Assert that each line is copied over to third_party.js.
-                    for line in js_file:
-                        self.assertIn(line, joined_js_file_content)
-                counter += 1
-        os.remove(third_party_js)
+        counter = 0
+        # Only checking first 10 files.
+        JS_FILE_COUNT = 10
+        for js_filepath in dependency_filepaths['js']:
+            if counter == JS_FILE_COUNT:
+                break
+            with open(js_filepath, 'r') as js_file:
+                # Assert that each line is copied over to file_stream object.
+                for line in js_file:
+                    self.assertIn(line, third_party_js_stream.getvalue())
+            counter += 1
 
     def test_minify_and_create_sourcemap(self):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
         # pylint: disable=protected-access
         with self.assertRaises(subprocess.CalledProcessError) as calledProcess:
             build._minify_and_create_sourcemap(
-                'path/to/input.js', 'path/to/output.js')
+                'invalid/path/to/input.js', 'invalid/path/to/output.js')
         # pylint: enable=protected-access
         calledProcessException = calledProcess.exception
         # returncode is the exit status of the child process.
         self.assertEqual(calledProcessException.returncode, 1)
 
     def test_copy_fonts(self):
-        """Test _copy_fonts to ensure that all fonts are copied over."""
+        """Test _copy_fonts to ensure that all fonts files are copied over."""
+        copy_tasks = collections.deque()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
-        fonts_dir = os.path.join(
-            build.THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts', '')
+        # Setup a sandbox folder for copying fonts.
+        target_fonts_dir = os.path.join('target', 'fonts', '')
         # pylint: disable=protected-access
-        build._copy_fonts(dependency_filepaths['fonts'], fonts_dir)
+        build._copy_fonts(
+            dependency_filepaths['fonts'], target_fonts_dir, copy_tasks)
         # pylint: enable=protected-access
-        for fonts_file in dependency_filepaths['fonts']:
-            # Convert wildcard syntax to valid paths.
-            font_paths = glob.glob(fonts_file)
-            for font_path in font_paths:
-                font_name = os.path.basename(font_path)
-                # Assert each font file is copied from /third_party/static
-                # to /backend_prod_files.
-                self.assertTrue(
-                    os.path.isfile(os.path.join(fonts_dir, font_name)))
-        # Clean up /font dir.
-        shutil.rmtree(build.THIRD_PARTY_GENERATED_STAGING_DIR)
+        # Asserting the same number of copy tasks and number of font files.
+        self.assertEquals(len(dependency_filepaths['fonts']), len(copy_tasks))
 
     def test_insert_hash(self):
         """Test _insert_hash to return correct filenames with provided hashes.
@@ -121,14 +111,16 @@ class BuildTests(test_utils.GenericTestBase):
         """Test ensure_directory_exists to make sure non-existent parent
         directory of random.js must be created after calling function.
         """
-        random_filepath = os.path.join(
-            build.PARENT_DIR, 'random/random.js')
+        # Setup a sandbox folder to assert for non-existence.
+        SANDBOX_DIR = os.path.join(build.PARENT_DIR, 'sandbox')
+        random_filepath = os.path.join(SANDBOX_DIR, 'random.js')
+        # Asserting ../oppia/random does not exist.
+        self.assertFalse(os.path.isdir(SANDBOX_DIR))
         build.ensure_directory_exists(random_filepath)
-        random_directory = os.path.dirname(random_filepath)
         # Asserting ../oppia/random exists.
-        self.assertTrue(os.path.isdir(random_directory))
-        # Clean up directory.
-        shutil.rmtree(random_directory)
+        self.assertTrue(os.path.isdir(SANDBOX_DIR))
+        # Clean up sandbox directory that has just been created.
+        shutil.rmtree(SANDBOX_DIR)
 
     def test_ensure_files_exist(self):
         """Test _ensure_files_exist raises exception with a non-existent
@@ -143,23 +135,6 @@ class BuildTests(test_utils.GenericTestBase):
         # Exception will be raised at first file determined to be non-existent.
         self.assertTrue(
             ('File %s does not exist.') % random_filepaths[0] in
-            fileNotExist.exception)
-
-    def test_ensure_fonts_exist(self):
-        """Test _ensure_fonts_exist raises exception with a non-existent
-        font filepath.
-        """
-        random_fontpaths = [
-            os.path.join(
-                build.THIRD_PARTY_GENERATED_DEV_DIR, 'fontunimpressive.txt')]
-
-        with self.assertRaises(ValueError) as fileNotExist:
-            # pylint: disable=protected-access
-            build._ensure_files_exist(random_fontpaths)
-            # pylint: enable=protected-access
-        # Exception will be raised at first file determined to be non-existent.
-        self.assertTrue(
-            ('File %s does not exist.') % random_fontpaths[0] in
             fileNotExist.exception)
 
     def test_get_file_count(self):
@@ -198,80 +173,46 @@ class BuildTests(test_utils.GenericTestBase):
                 source_dir_file_count, target_dir_file_count) in
             incorrectFileCount.exception)
 
-    def test_match_directory_with_hashes(self):
-        """Test _match_directory_with_hashes to raise exception:
+    def test_match_filename_with_hashes(self):
+        """Test _match_filename_with_hashes to raise exception:
             1) When there is an empty hash dict.
-            2) When there is a hash in filename that cannot be found in
+            2) When a filename is expected to contain hash but does not.
+            3) When there is a hash in filename that cannot be found in
                 hash dict.
         """
-        about_filename = 'about.html'
-        about_source_dir = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'about')
-        about_staging_dir = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('staging_dir'), 'pages', 'about')
-        about_build_dir = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('out_dir'), 'pages', 'about')
-        about_staging_filepath = os.path.join(about_staging_dir, about_filename)
-        about_final_filepath = os.path.join(about_build_dir, about_filename)
-        # Create staging parent directory (/backend_prod_files/.../pages/about/)
-        build.ensure_directory_exists(about_staging_filepath)
-        # Create build parent directory (/build/.../pages/about/)
-        build.ensure_directory_exists(about_final_filepath)
-        # Get hash dict for /DEV/.../about folder.
-        file_hashes = build.get_file_hashes(about_source_dir)
-        # Build staging dir for /about (/backend_prod_files/.../about.html).
-        build_tasks = collections.deque()
-        build.build_files(
-            about_source_dir, about_staging_dir, file_hashes, build_tasks,
-            file_formats=('.html,'))
-        # pylint: disable=protected-access
-        build._execute_tasks(build_tasks)
-        # pylint: enable=protected-access
-        #Copy staging about.html to /build/templates/about.[hash].html.
-        copy_tasks = collections.deque()
-        build.copy_files_source_to_target(
-            about_staging_dir, about_build_dir, file_hashes, copy_tasks)
-        # pylint: disable=protected-access
-        build._execute_tasks(copy_tasks)
-        # pylint: enable=protected-access
-
-        # Assert for filepath not containing hash but is supposed to.
-        with self.assertRaises(ValueError) as unhashedFilepath:
+        # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
+        file_hashes = dict()
+        base_filename = 'base.html'
+        with self.assertRaises(ValueError) as emptyHashDict:
             # pylint: disable=protected-access
-            build._match_directory_with_hashes(
-                about_source_dir, file_hashes)
-        # pylint: enable=protected-access
-        # The first file in the provided dir should be raised as an exception.
-        print unhashedFilepath.exception
+            build._match_filename_with_hashes(base_filename, file_hashes)
+            # pylint: enable=protected-access
+        print emptyHashDict.exception
+        self.assertTrue('Hash dict is empty' in emptyHashDict.exception)
+
+        file_hashes = {base_filename: random.getrandbits(128)}
+        with self.assertRaises(ValueError) as noHashInFilename:
+            # pylint: disable=protected-access
+            build._match_filename_with_hashes(base_filename, file_hashes)
+            # pylint: enable=protected-access
+        # Generate a random hash dict for base.html.
+        print noHashInFilename.exception
         self.assertTrue(
-            '%s is expected to contain hash' % os.listdir(about_source_dir)[0]
-            in unhashedFilepath.exception)
+            '%s is expected to contain hash' % base_filename
+            in noHashInFilename.exception)
 
-        # Assert for empty file hash exception.
-        file_hashes.clear()
-        with self.assertRaises(ValueError) as emptyFileHash:
-            # pylint: disable=protected-access
-            build._match_directory_with_hashes(about_staging_dir, file_hashes)
+        # pylint: disable=protected-access
+        hashed_base_filename = build._insert_hash(
+            base_filename, random.getrandbits(128))
         # pylint: enable=protected-access
-        print emptyFileHash.exception
-        self.assertTrue('Hash dict is empty' in emptyFileHash.exception)
-
-        # Assert for mismatched hash by using /donate folder's hash dict.
-        donate_source_dir = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'donate')
-        file_hashes.update(build.get_file_hashes(donate_source_dir))
-        with self.assertRaises(KeyError) as incorrectFileHash:
+        with self.assertRaises(KeyError) as incorrectHashInFilename:
             # pylint: disable=protected-access
-            build._match_directory_with_hashes(
-                about_build_dir, file_hashes)
-        # pylint: enable=protected-access
-        print incorrectFileHash.exception
+            build._match_filename_with_hashes(hashed_base_filename, file_hashes)
+            # pylint: enable=protected-access
+        print incorrectHashInFilename.exception
         self.assertTrue(
             'Hashed file %s does not match hash dict keys'
-            % os.listdir(about_build_dir)[0] in incorrectFileHash.exception)
-        # Clean up directories.
-        shutil.rmtree(about_staging_dir)
-        shutil.rmtree(about_build_dir)
+            % hashed_base_filename in incorrectHashInFilename.exception)
 
     def test_process_html(self):
         """Test process_html to remove all whitespaces."""
@@ -285,15 +226,23 @@ class BuildTests(test_utils.GenericTestBase):
         # pylint: disable=protected-access
         build._ensure_files_exist([base_source_path])
         # pylint: enable=protected-access
+        # Assert that /DEV's base.html has white spaces.
+        with open(base_source_path, 'r') as source_base_file:
+            source_base_file_content = source_base_file.read()
+            self.assertRegexpMatches(
+                source_base_file_content, r'\s{2,}',
+                msg="No white spaces detected in file unexpectedly")
+
         build.process_html(base_source_path, base_staging_path, file_hashes)
-        minified_base_file = open(base_staging_path, 'r')
-        minified_base_file_content = minified_base_file.read()
-        # Clean up staging dir.
-        shutil.rmtree(build.TEMPLATES_CORE_DIR.get('staging_dir'))
+
         # Assert that all empty lines are removed.
-        self.assertNotRegexpMatches(
-            minified_base_file_content, r'\s{2,}',
-            msg="Detected white spaces in file")
+        with open(base_staging_path, 'r') as minified_base_file:
+            minified_base_file_content = minified_base_file.read()
+            self.assertNotRegexpMatches(
+                minified_base_file_content, r'\s{2,}',
+                msg="Detected white spaces in file")
+        # Clean up staging dir.
+        # shutil.rmtree(build.TEMPLATES_CORE_DIR.get('staging_dir'))
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted to return the correct boolean value
@@ -321,15 +270,14 @@ class BuildTests(test_utils.GenericTestBase):
         copy_tasks = collections.deque()
         extensions_hashes = build.get_file_hashes(
             build.EXTENSIONS_DIR.get('dev_dir'))
-        build.ensure_directory_exists(build.EXTENSIONS_DIR.get('out_dir'))
         build.copy_files_source_to_target(
             build.EXTENSIONS_DIR.get('dev_dir'),
             build.EXTENSIONS_DIR.get('out_dir'), extensions_hashes, copy_tasks)
         total_file_count = build.get_file_count(
             build.EXTENSIONS_DIR.get('dev_dir'))
+        # Asserting that total file counts in the provided directory matches
+        # with the total number of copy tasks queued.
         self.assertEquals(len(copy_tasks), total_file_count)
-        # Clean up /build dir.
-        shutil.rmtree(build.EXTENSIONS_DIR.get('out_dir'))
 
     def test_is_file_hash_provided_to_frontend(self):
         """Test is_file_hash_provided_to_frontend to return the correct boolean
@@ -416,7 +364,7 @@ class BuildTests(test_utils.GenericTestBase):
                 # pylint: enable=protected-access
         final_filepath = os.path.join(build.ASSETS_OUT_DIR, hashed_filename)
         self.assertTrue(os.path.isfile(final_filepath))
-        shutil.rmtree(build.ASSETS_OUT_DIR)
+        # shutil.rmtree(build.ASSETS_OUT_DIR)
 
     def test_minify_func(self):
         """Test minify_func to branch into the correct function call with the

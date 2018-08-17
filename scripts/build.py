@@ -16,7 +16,6 @@
 
 import collections
 import fnmatch
-import glob
 import hashlib
 import json
 import optparse
@@ -60,8 +59,6 @@ NODE_FILE = os.path.join(
 UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
-FONT_EXTENSIONS = ('*.eot', '*.woff2', '*.ttf', '*.woff', '*.eof', '*.svg')
-
 # Files with this extension shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py',)
 
@@ -95,6 +92,16 @@ def _minify(source_path, target_path):
     subprocess.check_call(cmd, shell=True)
 
 
+def write_to_file_stream(file_stream, content):
+    """Write to a file object using provided content.
+
+    Args:
+        file_stream: file. A stream handling object to do write operation on.
+        content: str. String content to write to file object.
+    """
+    file_stream.write(content)
+
+
 def _join_files(source_paths, target_file_path):
     """Writes multiple files into one file.
 
@@ -102,11 +109,9 @@ def _join_files(source_paths, target_file_path):
         source_paths: list(str). Paths to files to join together.
         target_file_path: str. Path to location of the joined file.
     """
-    ensure_directory_exists(target_file_path)
-    with open(target_file_path, 'w+') as target_file:
-        for source_path in source_paths:
-            with open(source_path, 'r') as source_file:
-                target_file.write(source_file.read())
+    for source_path in source_paths:
+        with open(source_path, 'r') as source_file:
+            write_to_file_stream(target_file_path, source_file.read())
 
 
 def _minify_and_create_sourcemap(source_paths, target_file_path):
@@ -127,19 +132,20 @@ def _minify_and_create_sourcemap(source_paths, target_file_path):
     subprocess.check_call(cmd, shell=True)
 
 
-def _copy_fonts(source_paths, target_path):
+def _copy_fonts(source_paths, target_path, copy_tasks):
     """Copies fonts at source paths to target path.
 
     Args:
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
+        copy_tasks: deque(obj). A deque that contains all copy tasks queued to
+            be processed.
     """
-    ensure_directory_exists(target_path)
-
-    for font_wildcard in source_paths:
-        font_paths = glob.glob(font_wildcard)
-        for font_path in font_paths:
-            shutil.copy(font_path, target_path)
+    for font_path in source_paths:
+        copy_task = threading.Thread(
+            target=shutil.copy,
+            args=(font_path, target_path))
+        copy_tasks.append(copy_task)
 
 
 def _insert_hash(filepath, file_hash):
@@ -182,20 +188,6 @@ def _ensure_files_exist(filepaths):
             raise ValueError('File %s does not exist.' % filepath)
 
 
-def _ensure_fonts_exist(filepaths):
-    """Ensures that fonts exists at the given filepaths.
-
-    Args:
-        filepaths: list(str). Wildcard paths to fonts.
-
-    Raises:
-        ValueError: If one of the fonts does not exist.
-    """
-    for font_wildcard in filepaths:
-        font_paths = glob.glob(font_wildcard)
-        _ensure_files_exist(font_paths)
-
-
 def get_file_count(directory_path):
     """Count total number of file directory, subtracting ignored files.
 
@@ -232,41 +224,34 @@ def _compare_file_count(source_path, target_path):
     source_dir_file_count = get_file_count(source_path)
     target_dir_file_count = get_file_count(target_path)
     if source_dir_file_count != target_dir_file_count:
+        print 'Comparing %s vs %s' % (source_path, target_path)
         raise ValueError(
             '%s files in source dir != %s files in target dir.' % (
                 source_dir_file_count, target_dir_file_count))
 
 
-def _match_directory_with_hashes(directory_path, file_hashes):
-    """Ensure that filepaths are hashed correctly.
+def _match_filename_with_hashes(filename, file_hashes):
+    """Ensure that filepath is hashed correctly.
 
     Args:
-       directory_path: str. Directory to be walked.
-       file_hashes: dict(str, str). Dictionary of file hashes.
+        filename: str. Filepath to be matched.
+        file_hashes: dict(str, str). Dictionary of file hashes.
 
     Raises:
         ValueError: Raised if hash dict is empty.
-        ValueError: Raised if filename does not contain hash unexpectedly.
+        ValueError: Raised if filename does not contain hash.
         KeyError: Raised if filename's hash does not match hash dict entries.
     """
     # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
-    for root, _, files in os.walk(directory_path):
-        for filename in files:
-            file_hash = re.findall(r"([a-fA-F\d]{32})", filename)
-            parent_dir = os.path.basename(root)
-            # Convert current /build path to /backend_prod_files path.
-            converted_filepath = os.path.join(
-                THIRD_PARTY_GENERATED_STAGING_DIR, parent_dir, filename)
-            if not hash_should_be_inserted(converted_filepath):
-                # These filenames do not contain hashes.
-                continue # pragma: no cover
-            if not file_hash:
-                raise ValueError('%s is expected to contain hash' % filename)
-            if file_hash[0] not in file_hashes.values():
-                raise KeyError(
-                    'Hashed file %s does not match hash dict keys' % filename)
+    file_hash = re.findall(r"([a-fA-F\d]{32})", filename)
+    # Convert current /build path to /backend_prod_files path.
+    if not file_hash:
+        raise ValueError('%s is expected to contain hash' % filename)
+    if file_hash[0] not in file_hashes.values():
+        raise KeyError(
+            'Hashed file %s does not match hash dict keys' % filename)
 
 
 def process_html(source_path, target_path, file_hashes):
@@ -373,10 +358,19 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         list(str). List of paths to font files that need to be copied.
     """
     if 'fontsPath' not in dependency_bundle:
+        # Skipping dependency bundle in manifest.json that does not have
+        # fontsPath property.
         return []
     fonts_path = dependency_bundle['fontsPath']
-    return [os.path.join(dependency_dir, fonts_path, extension)
-            for extension in FONT_EXTENSIONS]
+    # Obtain directory path to /font inside dependency folder.
+    font_dir = os.path.join(dependency_dir, fonts_path)
+    # E.g. third_party/static/bootstrap-3.3.4/fonts/.
+    font_filepaths = []
+    # Walk the directory and add all fonts file to list.
+    for root, _, files in os.walk(font_dir):
+        for font_file in files:
+            font_filepaths.append(os.path.join(root, font_file))
+    return font_filepaths
 
 
 def get_dependencies_filepaths():
@@ -410,7 +404,7 @@ def get_dependencies_filepaths():
 
     _ensure_files_exist(filepaths['js'])
     _ensure_files_exist(filepaths['css'])
-    _ensure_fonts_exist(filepaths['fonts'])
+    _ensure_files_exist(filepaths['fonts'])
     return filepaths
 
 
@@ -430,9 +424,19 @@ def build_minified_third_party_libs(): # pragma: no cover
 
     dependency_filepaths = get_dependencies_filepaths()
     _minify_and_create_sourcemap(dependency_filepaths['js'], third_party_js)
-    _join_files(dependency_filepaths['css'], third_party_css)
+    # Create parent dir for minified CSS file.
+    ensure_directory_exists(third_party_css)
+    with open(third_party_css, 'w+') as minified_third_party_css_file:
+        _join_files(dependency_filepaths['css'], minified_third_party_css_file)
     _minify(third_party_css, third_party_css)
-    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
+    ensure_directory_exists(fonts_dir)
+    copy_tasks = collections.deque()
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir, copy_tasks)
+    try:
+        # Copying all fonts to staging dir.
+        _execute_tasks(copy_tasks)
+    except Exception as e:
+        print e
 
 
 def build_third_party_libs(): # pragma: no cover
@@ -449,9 +453,19 @@ def build_third_party_libs(): # pragma: no cover
     fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts', '')
 
     dependency_filepaths = get_dependencies_filepaths()
-    _join_files(dependency_filepaths['js'], third_party_js)
-    _join_files(dependency_filepaths['css'], third_party_css)
-    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
+    ensure_directory_exists(third_party_js)
+    with open(third_party_js, 'w+') as third_party_js_file:
+        _join_files(dependency_filepaths['js'], third_party_js_file)
+    ensure_directory_exists(third_party_css)
+    with open(third_party_css, 'w+') as third_party_css_file:
+        _join_files(dependency_filepaths['css'], third_party_css_file)
+    ensure_directory_exists(fonts_dir)
+    copy_tasks = collections.deque()
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir, copy_tasks)
+    try:
+        _execute_tasks(copy_tasks)
+    except Exception as e:
+        print e
 
 
 def hash_should_be_inserted(filepath):
@@ -905,9 +919,17 @@ def generate_build_directory(): # pragma: no cover
     for i in xrange(len(COPY_INPUT_DIRS)):
         # Make sure that all files in /DEV and staging dir are accounted for.
         _compare_file_count(COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i])
-        # Make sure that hashed file name matches with current hash dict.
-        _match_directory_with_hashes(COPY_OUTPUT_DIRS[i], hashes)
-
+    # Make sure that hashed file name matches with current hash dict.
+    for built_dir in COPY_OUTPUT_DIRS:
+        for root, _, files in os.walk(built_dir):
+            for filename in files:
+                parent_dir = os.path.basename(root)
+                converted_filepath = os.path.join(
+                    THIRD_PARTY_GENERATED_STAGING_DIR, parent_dir, filename)
+                if not hash_should_be_inserted(converted_filepath):
+                    # These filenames do not contain hashes.
+                    continue
+                _match_filename_with_hashes(filename, hashes)
     # Make sure hashes.js is available.
     hash_final_file_path = _insert_hash(HASHES_JSON, hashes['hashes.js'])
     _ensure_files_exist([hash_final_file_path])
@@ -925,6 +947,7 @@ def build(): # pragma: no cover
         generate_build_directory()
     else:
         build_third_party_libs()
+    # Execute all copy tasks.
 
 
 if __name__ == '__main__':
