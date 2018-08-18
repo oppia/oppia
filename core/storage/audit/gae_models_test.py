@@ -14,13 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test for audit models"""
+"""Test for audit models."""
 
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import logging
-logging.basicConfig(filename='debug_logs', level=logging.DEBUG)
 
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
