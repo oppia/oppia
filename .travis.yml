@@ -130,3 +130,4 @@ cache:
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
   - find third_party -name "*.pyc" -print -delete
+  - find backend_prod_files/extensions/ -name "*.pyc" -print -delete

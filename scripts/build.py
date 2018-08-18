@@ -61,7 +61,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with this extension shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py',)
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc',)
 
 # Files with this paths should be moved to build directory but shouldn't be
 # renamed (i.e. the filepath shouldn't contain hash)
@@ -824,6 +824,7 @@ def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
             if relative_path not in dev_dir_hashes:
                 print ('Unable to find %s in file hashes, deleting file'
                        % relative_path)
+                _ensure_files_exist([target_path])
                 task = threading.Thread(target=os.remove, args=(target_path))
                 delete_tasks.append(task)
 
