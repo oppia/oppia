@@ -24,21 +24,16 @@ import feconf
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
-    """Records the data for query made to the role structure using admin
-    interface.
-
-    Instances of this class are keyed by a custom Id.
-    [user_id].[timestamp_in_sec].[intent].[random_number]
-    """
+    """Unit tests for the RoleQueryAuditModel class."""
 
     def test_create_and_get_model(self):
         audit_models.RoleQueryAuditModel(
             id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
             role='c', username='d').put()
-        a = audit_models.RoleQueryAuditModel.get('a')
+        audit_model = audit_models.RoleQueryAuditModel.get('a')
 
-        self.assertEqual(a.id, 'a')
-        self.assertEqual(a.intent, feconf.ROLE_ACTION_UPDATE)
-        self.assertEqual(a.user_id, 'b')
-        self.assertEqual(a.role, 'c')
-        self.assertEqual(a.username, 'd')
+        self.assertEqual(audit_model.id, 'a')
+        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
+        self.assertEqual(audit_model.user_id, 'b')
+        self.assertEqual(audit_model.role, 'c')
+        self.assertEqual(audit_model.username, 'd')
