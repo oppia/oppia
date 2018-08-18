@@ -569,15 +569,9 @@ oppia.directive('conversationSkin', [
             StatsReportingService.initSession(
               explorationId, returnDict.exploration.title,
               version, returnDict.session_id, GLOBALS.collectionId);
-<<<<<<< HEAD
-            if (ENABLE_PLAYTHROUGH_RECORDING) {
-              PlaythroughService.initSession(explorationId, version);
-            }
-=======
             PlaythroughService.initSession(
               explorationId, version, returnDict.record_playthrough_probability,
               returnDict.whitelisted_exploration_ids_for_playthroughs);
->>>>>>> 81d9528... Playthrough Visualisation: Milestone 3.3 (Part 2) (#5511)
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             ExplorationEngineService.init(
@@ -585,13 +579,6 @@ oppia.directive('conversationSkin', [
               returnDict.preferred_audio_language_code,
               returnDict.auto_tts_enabled, _initializeDirectiveComponents);
           };
-<<<<<<< HEAD
-=======
-
-          var _initializeDirectiveComponents = function(
-              initialStateName, initHtml, newParams) {
-            $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
->>>>>>> 81d9528... Playthrough Visualisation: Milestone 3.3 (Part 2) (#5511)
 
           var _initializeDirectiveComponents = function(
               exploration, initHtml, newParams) {
