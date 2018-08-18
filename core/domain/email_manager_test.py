@@ -190,6 +190,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<ul>'
             '<li>Change the exploration permissions</li><br>'
             '<li>Edit the exploration</li><br>'
+            '<li>Translate the exploration</li><br>'
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
@@ -212,6 +213,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'This allows you to:\n'
             '- Change the exploration permissions\n'
             '- Edit the exploration\n'
+            '- Translate the exploration\n'
             '- View and playtest the exploration\n'
             'You can find the exploration here.\n'
             '\n'
@@ -250,6 +252,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'This allows you to:<br>'
             '<ul>'
             '<li>Edit the exploration</li><br>'
+            '<li>Translate the exploration</li><br>'
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
@@ -271,6 +274,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '\n'
             'This allows you to:\n'
             '- Edit the exploration\n'
+            '- Translate the exploration\n'
             '- View and playtest the exploration\n'
             'You can find the exploration here.\n'
             '\n'
@@ -286,6 +290,66 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
                 self.exploration.id, self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_correct_rights_are_written_in_translator_role_email_body(self):
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            '<b>editor</b> has granted you translator rights to their '
+            'exploration, '
+            '"<a href="https://www.oppia.org/create/A">Title</a>"'
+            ', on Oppia.org.<br>'
+            '<br>'
+            'This allows you to:<br>'
+            '<ul>'
+            '<li>Translate the exploration</li><br>'
+            '<li>View and playtest the exploration</li><br>'
+            '</ul>'
+            'You can find the exploration '
+            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
+            '<br>'
+            'Thanks, and happy collaborating!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has granted you translator rights to their '
+            'exploration, "Title", on Oppia.org.\n'
+            '\n'
+            'This allows you to:\n'
+            '- Translate the exploration\n'
+            '- View and playtest the exploration\n'
+            'You can find the exploration here.\n'
+            '\n'
+            'Thanks, and happy collaborating!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that correct email content is sent for Translator.
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id,
+                rights_manager.ROLE_TRANSLATOR, self.exploration.id,
+                self.exploration.title)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)

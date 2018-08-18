@@ -101,17 +101,20 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
 
 EXPLORATION_ROLE_MANAGER = 'manager rights'
 EXPLORATION_ROLE_EDITOR = 'editor rights'
+EXPLORATION_ROLE_TRANSLATOR = 'translator rights'
 EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
 
 EDITOR_ROLE_EMAIL_HTML_ROLES = {
     rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
     rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
+    rights_manager.ROLE_TRANSLATOR: EXPLORATION_ROLE_TRANSLATOR,
     rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
 }
 
 _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
     'can_manage': '<li>Change the exploration permissions</li><br>',
     'can_edit': '<li>Edit the exploration</li><br>',
+    'can_translate': '<li>Translate the exploration</li><br>',
     'can_play': '<li>View and playtest the exploration</li><br>'
 }
 
@@ -119,9 +122,14 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_MANAGER: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_EDITOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_TRANSLATOR: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
