@@ -844,3 +844,17 @@ def get_multi_skill_mastery(user_id, skill_ids):
         degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
 
     return degrees_of_mastery
+
+
+def skill_has_associated_questions(skill_id):
+    """Returns whether or not any question has this skill attached.
+
+    Args:
+        skill_id: str. The skill ID of the user.
+
+    Returns:
+        bool. Whether any question has this skill attached.
+    """
+    question_ids = (
+        question_models.QuestionSkillModel.get_all_question_ids_linked_to_skill_id(skill_id))
+    return (len(question_ids) > 0)
