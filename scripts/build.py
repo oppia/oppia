@@ -108,7 +108,7 @@ def _join_files(source_paths, target_file_stream):
 
     Args:
         source_paths: list(str). Paths to files to join together.
-        target_file_stream: file. A stream object of joined file.
+        target_file_stream: file. A stream object of target file.
     """
     for source_path in source_paths:
         with open(source_path, 'r') as source_file:
@@ -140,8 +140,8 @@ def _copy_fonts(source_paths, target_path, copy_tasks):
     Args:
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
-        copy_tasks: deque(obj). A deque that contains all copy tasks queued to
-            be processed.
+        copy_tasks: deque(thread). A deque that contains all copy tasks queued
+            to be processed.
     """
     for font_path in source_paths:
         copy_task = threading.Thread(
@@ -501,8 +501,8 @@ def copy_files_source_to_target(source, target, file_hashes, copy_tasks):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        copy_tasks: deque(obj). A deque that contains all copy tasks queued to
-            be processed.
+        copy_tasks: deque(thread). A deque that contains all copy tasks queued
+            to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Copying into %s' % os.path.join(os.getcwd(), target)
@@ -683,7 +683,7 @@ def build_files(source, target, file_hashes, build_tasks, file_formats=None):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: Deque(obj). A deque that contains all build tasks queued
+        build_tasks: deque(thread). A deque that contains all build tasks queued
             to be processed.
         file_formats: tuple(str) or None. Tuple of specific file formats to be
             built. If None then all files within the source directory will be
@@ -734,7 +734,7 @@ def rebuild_new_files(
         recently_changed_filenames: list(str). List of filenames that were
             recently changed.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: Deque(obj). A deque that contains all build tasks queued
+        build_tasks: deque(thread). A deque that contains all build tasks queued
             to be processed.
     """
     for file_name in recently_changed_filenames:
@@ -756,7 +756,7 @@ def build_directory(source_dir, file_hashes, build_tasks):
         source_dir: dict(str, str). Directory dict containing directory paths
         to /DEV dir, staging dir and /build dir .
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: Deque(obj). A deque that contains all build tasks queued
+        build_tasks: deque(thread). A deque that contains all build tasks queued
             to be processed.
     """
     dev_dir = source_dir.get('dev_dir')
@@ -805,8 +805,8 @@ def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
         dev_dir_hashes: dict(str, str). Dictionary of file hashes.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
-        delete_tasks: Deque(obj). A deque that contains all delete tasks queued
-            to be processed.
+        delete_tasks: deque(thread). A deque that contains all delete tasks
+            queued to be processed.
     """
     print 'Scanning directory %s to remove deleted file' % staging_directory
     for root, dirs, files in os.walk(
