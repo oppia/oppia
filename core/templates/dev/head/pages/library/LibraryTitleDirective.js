@@ -26,7 +26,7 @@ oppia.directive('libraryTitle', [function() {
         'Find explorations to learn from - Oppia' : 'I18N_LIBRARY_PAGE_TITLE';
         $window.document.title = 'Find explorations to learn from - Oppia';
         $window.document.getElementsByTagName('title')[0]
-        .setAttribute('translate', $scope.pageTranslate);
+          .setAttribute('translate', $scope.pageTranslate);
       }
     ]
   };
