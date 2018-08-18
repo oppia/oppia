@@ -19,7 +19,6 @@ import collections
 import os
 import random
 import re
-import shutil
 import subprocess
 import threading
 
@@ -87,40 +86,40 @@ class BuildTests(test_utils.GenericTestBase):
         # Setup a sandbox folder for copying fonts.
         target_fonts_dir = os.path.join('target', 'fonts', '')
         # pylint: disable=protected-access
+
+        self.assertEqual(len(copy_tasks), 0)
         build._copy_fonts(
             dependency_filepaths['fonts'], target_fonts_dir, copy_tasks)
         # pylint: enable=protected-access
         # Asserting the same number of copy tasks and number of font files.
-        self.assertEquals(len(dependency_filepaths['fonts']), len(copy_tasks))
+        self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
         """Test _insert_hash to return correct filenames with provided hashes.
         """
         # pylint: disable=protected-access
-        self.assertEquals(build._insert_hash('file.js', '123456'),
-                          'file.123456.js')
-        self.assertEquals(build._insert_hash('path/to/file.js', '654321'),
-                          'path/to/file.654321.js')
-        self.assertEquals(build._insert_hash('file.min.js', 'abcdef'),
-                          'file.min.abcdef.js')
-        self.assertEquals(build._insert_hash('path/to/file.min.js', 'fedcba'),
-                          'path/to/file.min.fedcba.js')
+        self.assertEqual(
+            build._insert_hash('file.js', '123456'), 'file.123456.js')
+        self.assertEqual(
+            build._insert_hash(
+                'path/to/file.js', '654321'), 'path/to/file.654321.js')
+        self.assertEqual(
+            build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js')
+        self.assertEqual(
+            build._insert_hash(
+                'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
         # pylint: enable=protected-access
 
-    def test_ensure_directory_exists(self):
-        """Test ensure_directory_exists to make sure non-existent parent
-        directory of random.js must be created after calling function.
+    def test_does_directory_exist(self):
+        """Test does_directory_exist to return whether directory tree of file
+        exists.
         """
-        # Setup a sandbox folder to assert for non-existence.
-        SANDBOX_DIR = os.path.join(build.PARENT_DIR, 'sandbox')
-        random_filepath = os.path.join(SANDBOX_DIR, 'random.js')
-        # Asserting ../oppia/random does not exist.
-        self.assertFalse(os.path.isdir(SANDBOX_DIR))
-        build.ensure_directory_exists(random_filepath)
-        # Asserting ../oppia/random exists.
-        self.assertTrue(os.path.isdir(SANDBOX_DIR))
-        # Clean up empty sandbox directory that has just been created.
-        shutil.rmtree(SANDBOX_DIR)
+        self.assertTrue(build.does_directory_tree_exist(build.ASSETS_DEV_DIR))
+        self.assertTrue(build.does_directory_tree_exist(
+            build.THIRD_PARTY_GENERATED_DEV_DIR))
+        self.assertFalse(
+            build.does_directory_tree_exist(os.path.join('random')))
+        self.assertFalse(build.does_directory_tree_exist(os.path.join('*.txt')))
 
     def test_ensure_files_exist(self):
         """Test _ensure_files_exist raises exception with a non-existent
@@ -129,7 +128,7 @@ class BuildTests(test_utils.GenericTestBase):
         random_filepaths = [
             os.path.join(build.THIRD_PARTY_GENERATED_DEV_DIR, 'random1.js')]
         # pylint: disable=protected-access
-        with self.assertRaises(ValueError) as fileNotExist:
+        with self.assertRaises(OSError) as fileNotExist:
             build._ensure_files_exist(random_filepaths)
         # pylint: enable=protected-access
         # Exception will be raised at first file determined to be non-existent.
@@ -196,7 +195,6 @@ class BuildTests(test_utils.GenericTestBase):
             build._match_filename_with_hashes(base_filename, file_hashes)
             # pylint: enable=protected-access
         # Generate a random hash dict for base.html.
-        print noHashInFilename.exception
         self.assertTrue(
             '%s is expected to contain hash' % base_filename
             in noHashInFilename.exception)
@@ -209,13 +207,12 @@ class BuildTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             build._match_filename_with_hashes(hashed_base_filename, file_hashes)
             # pylint: enable=protected-access
-        print incorrectHashInFilename.exception
         self.assertTrue(
             'Hashed file %s does not match hash dict keys'
             % hashed_base_filename in incorrectHashInFilename.exception)
 
     def test_process_html(self):
-        """Test process_html to remove all whitespaces."""
+        """Test process_html to remove whitespaces and hash filepaths."""
         base_source_path = os.path.join(
             build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'base.html')
         # Prepare a file_stream object from StringIO.
@@ -231,6 +228,7 @@ class BuildTests(test_utils.GenericTestBase):
         build._ensure_files_exist([base_source_path])
         # pylint: enable=protected-access
         # Assert that /DEV's base.html has white spaces.
+
         with open(base_source_path, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
@@ -246,16 +244,14 @@ class BuildTests(test_utils.GenericTestBase):
                 result = re.findall(filepath, source_base_file_content)
                 if result:
                     base_file_unhashed_filenames.append(result[0])
-        print base_file_unhashed_filenames
+        self.assertGreater(len(base_file_unhashed_filenames), 0)
         build.process_html(
             base_source_path, minified_html_file_stream, file_hashes)
-
-        # Assert that all empty lines are removed.
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
             msg="All white spaces must be removed from %s" % base_source_path)
-        # Assert that all filenames are hashed in base.html.
+        # Assert that all filenames must be hashed.
         for unhashed_filename in base_file_unhashed_filenames:
             result = re.findall(unhashed_filename, minified_html_file_content)
             self.assertEqual(len(result), 0)
@@ -283,16 +279,16 @@ class BuildTests(test_utils.GenericTestBase):
         """Test copy_files_source_to_target to queue up correct number of copy
         tasks.
         """
-        copy_tasks = collections.deque()
         assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
+        copy_tasks = collections.deque()
+
+        self.assertEqual(len(copy_tasks), 0)
         build.copy_files_source_to_target(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes,
             copy_tasks)
-        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
         # Minus 1 to account for added hashes.js.
-        # Asserting that total file counts in the provided directory matches
-        # with the total number of copy tasks queued.
-        self.assertEquals(len(copy_tasks), total_file_count)
+        self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self):
         """Test is_file_hash_provided_to_frontend to return the correct boolean
@@ -328,10 +324,10 @@ class BuildTests(test_utils.GenericTestBase):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/to/file.js'],
                 hashes['path/to/file.js'])
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/file.min.js'],
                 hashes['path/file.min.js'])
 
@@ -368,10 +364,10 @@ class BuildTests(test_utils.GenericTestBase):
                  '"/file.js": "123456"}\');'))
 
     def test_execute_tasks(self):
-        """Test _execute_tasks to fire corresponding number of threads."""
+        """Test _execute_tasks to join all threads after executing all tasks."""
         build_tasks = collections.deque()
-        THREAD_COUNT = 1
-        count = THREAD_COUNT
+        TASK_COUNT = 5
+        count = TASK_COUNT
         while count:
             task = threading.Thread(
                 # pylint: disable=protected-access
@@ -380,44 +376,52 @@ class BuildTests(test_utils.GenericTestBase):
             # pylint: enable=protected-access
             build_tasks.append(task)
             count -= 1
+
+        self.assertEqual(threading.active_count(), 1)
         # pylint: disable=protected-access
         build._execute_tasks(build_tasks)
         # pylint: enable=protected-access
-        self.assertEqual(threading.active_count(), THREAD_COUNT)
+        self.assertEqual(threading.active_count(), 1)
 
     def test_build_files(self):
         """Test build_files to queue up correct number of build tasks."""
-        build_tasks = collections.deque()
         asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        build_tasks = collections.deque()
+
+        self.assertEqual(len(build_tasks), 0)
         # Build all files.
         build.build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks)
-        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
         # Minus 1 to adjust for hashes.js.
-        self.assertEqual(total_file_count - 1, len(build_tasks))
-        build_tasks.clear()
+        self.assertEqual(len(build_tasks), total_file_count)
 
         # Only build HTML files.
-        build.build_files(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            build_tasks, file_formats=('.html',))
+        build_tasks.clear()
         total_html_file_count = 0
         for _, _, files in os.walk(build.ASSETS_DEV_DIR):
             for filename in files:
                 if filename.endswith('.html'):
                     total_html_file_count += 1
-        self.assertEqual(total_html_file_count, len(build_tasks))
+
+        self.assertEqual(len(build_tasks), 0)
+        build.build_files(
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
+            build_tasks, file_formats=('.html',))
+        self.assertEqual(len(build_tasks), total_html_file_count)
 
     def test_rebuild_new_files(self):
         """Test rebuid_new_files queue up a corresponding number of build tasks
         to the number of file changes.
         """
-        build_tasks = collections.deque()
         new_file_name = 'manifest.json'
         recently_changed_filenames = [
             os.path.join(build.ASSETS_DEV_DIR, 'i18n', new_file_name)]
         asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
+        build_tasks = collections.deque()
+
+        self.assertEqual(len(build_tasks), 0)
         build.rebuild_new_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR,
             recently_changed_filenames, asset_hashes, build_tasks)
@@ -425,13 +429,11 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames to detect file recently added."""
-        # Obtain hashes from DEV's /assets.
         assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         # Create an empty sandbox folder, to simulate an empty /build folder.
         SANDBOX_DIR = os.path.join(build.PARENT_DIR, 'sandbox')
-        build.ensure_directory_exists(SANDBOX_DIR)
         recently_changed_filenames = []
-        # Assert that list is init to 0.
+
         self.assertEqual(len(recently_changed_filenames), 0)
         recently_changed_filenames = build.get_recently_changed_filenames(
             assets_hashes, SANDBOX_DIR)
@@ -447,14 +449,12 @@ class BuildTests(test_utils.GenericTestBase):
         task.
         """
         delete_tasks = collections.deque()
-        # Using empty dict, indicating an empty directory,
-        # which means that all files should be removed.
+        # The empty dict means that all files should be removed.
         file_hashes = dict()
-        # Assert that queue is init to 0.
+
         self.assertEqual(len(delete_tasks), 0)
         build.remove_deleted_files(
             file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR, delete_tasks)
-        # Assert that all files from /assets should be queued up for deletion.
-        self.assertEquals(
+        self.assertEqual(
             len(delete_tasks), build.get_file_count(
                 build.THIRD_PARTY_GENERATED_DEV_DIR))
