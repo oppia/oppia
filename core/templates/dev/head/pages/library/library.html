@@ -1,11 +1,6 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}
-  {% if page_mode in ['group', 'search'] %}
-    Find explorations to learn from - Oppia
-  {% else %}
-    I18N_LIBRARY_PAGE_TITLE
-  {% endif %}
 {% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
@@ -21,6 +16,7 @@
 
 {% block header_js %}
   {{ super() }}
+  <library-title></library-title>
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
@@ -374,4 +370,5 @@
   <script src="/templates/dev/head/pages/library/ActivityTilesInfinityGridDirective.js"></script>
   <script src="/templates/dev/head/pages/library/SearchBarDirective.js"></script>
   <script src="/templates/dev/head/pages/library/SearchResultsDirective.js"></script>
+  <script src="/templates/dev/head/pages/library/LibraryTitleDirective.js"></script>
 {% endblock footer_js %}
