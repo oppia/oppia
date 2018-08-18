@@ -118,15 +118,15 @@ _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
     'can_play': '<li>View and playtest the exploration</li><br>'
 }
 
+# We don't include "can_translate" for managers and editors, since this is
+# implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_MANAGER: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_EDITOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_TRANSLATOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
