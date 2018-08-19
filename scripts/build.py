@@ -150,7 +150,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path, copy_tasks):
     Args:
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
-        copy_tasks: deque(thread). A deque that contains all copy tasks queued
+        copy_tasks: deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
     for font_path in source_paths:
@@ -201,7 +201,8 @@ def _ensure_files_exist(filepaths):
 
 
 def get_file_count(directory_path):
-    """Count total number of file directory, subtracting ignored files.
+    """Count total number of file directory, ignoring any files with extensions
+    in FILE_EXTENSIONS_TO_IGNORE.
 
     Args:
         directory_path: str. Directory to be walked.
@@ -242,7 +243,8 @@ def _compare_file_count(source_path, target_path):
 
 
 def _match_filename_with_hashes(filename, file_hashes):
-    """Ensure that filepath is hashed correctly.
+    """Ensure that hashes in filenames match with the hash entries in hash
+    dict.
 
     Args:
         filename: str. Filepath to be matched.
@@ -266,8 +268,8 @@ def _match_filename_with_hashes(filename, file_hashes):
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
-    """Copies contents of HTML file, while removing whitespace and
-    replacing paths inside the file with paths with hashes.
+    """Remove whitespaces and replace filepath with paths with hashes in the
+    HTML file stream object.
 
     Args:
         source_file_stream: file. A stream object of the HTML file to be
@@ -497,7 +499,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        copy_tasks: deque(thread). A deque that contains all copy tasks queued
+        copy_tasks: deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
@@ -681,7 +683,7 @@ def build_files(source, target, file_hashes, build_tasks, file_formats=None):
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: deque(thread). A deque that contains all build tasks queued
+        build_tasks: deque(Thread). A deque that contains all build tasks queued
             to be processed.
         file_formats: tuple(str) or None. Tuple of specific file formats to be
             built. If None then all files within the source directory will be
@@ -730,7 +732,7 @@ def rebuild_new_files(
         recently_changed_filenames: list(str). List of filenames that were
             recently changed.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: deque(thread). A deque that contains all build tasks queued
+        build_tasks: deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     for file_name in recently_changed_filenames:
@@ -752,7 +754,7 @@ def build_directory(dirnames_dict, file_hashes, build_tasks):
             the directory containing source files to be built, the staging
             directory and the final directory containing built files.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: deque(thread). A deque that contains all build tasks queued
+        build_tasks: deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
@@ -799,7 +801,7 @@ def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
         dev_dir_hashes: dict(str, str). Dictionary of file hashes.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
-        delete_tasks: deque(thread). A deque that contains all delete tasks
+        delete_tasks: deque(Thread). A deque that contains all delete tasks
             queued to be processed.
     """
     print 'Scanning directory %s to remove deleted file' % staging_directory
