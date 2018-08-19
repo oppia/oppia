@@ -201,7 +201,7 @@ class BuildTests(test_utils.GenericTestBase):
             build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
         # Reading from actual base.html file and not simply a dummy file.
         build._ensure_files_exist([base_source_path])
-        # Assert that /DEV's base.html has white spaces.
+        # Assert that base.html has white spaces.
 
         with open(base_source_path, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
@@ -420,7 +420,6 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(
                 len(recently_changed_filenames), build.get_file_count(
                     build.ASSETS_DEV_DIR))
-        # Minus 1 from ASSETS_DEV_DIR to account for added hashes.js.
 
     def test_remove_deleted_files(self):
         """Test remove_deleted_files to queue up the correct number of deletion
