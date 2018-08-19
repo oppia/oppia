@@ -23,9 +23,7 @@ from core.tests import test_utils
 class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
     """Test ConfigPropertyModel class."""
 
-    def test_create_and_get_model(self):
-        config_models.ConfigPropertyModel(
-            id='a', value='b')
-        config_model = config_models.ConfigPropertyModel.get('a')
-        self.assertEqual(config_model.id, 'a')
+    def test_create_model(self):
+        config_model = config_models.ConfigPropertyModel(
+            value='b')
         self.assertEqual(config_model.value, 'b')
