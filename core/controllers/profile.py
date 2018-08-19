@@ -220,7 +220,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
 
 class ProfilePictureHandlerByUsername(base.BaseHandler):
-    """ Provides the dataURI of the profile picture of the specified user,
+    """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
