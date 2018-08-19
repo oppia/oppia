@@ -28,17 +28,19 @@ from core.tests import test_utils
 
 # pylint: enable=relative-import
 
+# Override Pylint's protected access rule due to multiple private functions in
+# the file.
+# pylint: disable=protected-access
+
 
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
     def test_minify(self):
         """Tests _minify with an invalid filepath."""
-        # pylint: disable=protected-access
         with self.assertRaises(subprocess.CalledProcessError) as calledProcess:
             build._minify(
                 'invalid/path/to/input.js', 'invalid/path/to/output.js')
-        # pylint: enable=protected-access
         calledProcessException = calledProcess.exception
         # returncode is the exit status of the child process.
         self.assertEqual(calledProcessException.returncode, 1)
@@ -52,9 +54,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
-        # pylint: disable=protected-access
         build._join_files(dependency_filepaths['js'], third_party_js_stream)
-        # pylint: enable=protected-access
         counter = 0
         # Only checking first 10 files.
         JS_FILE_COUNT = 10
@@ -69,11 +69,9 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap(self):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        # pylint: disable=protected-access
         with self.assertRaises(subprocess.CalledProcessError) as calledProcess:
             build._minify_and_create_sourcemap(
                 'invalid/path/to/input.js', 'invalid/path/to/output.js')
-        # pylint: enable=protected-access
         calledProcessException = calledProcess.exception
         # returncode is the exit status of the child process.
         self.assertEqual(calledProcessException.returncode, 1)
@@ -87,19 +85,16 @@ class BuildTests(test_utils.GenericTestBase):
         dependency_filepaths = build.get_dependencies_filepaths()
         # Setup a sandbox folder for copying fonts.
         target_fonts_dir = os.path.join('target', 'fonts', '')
-        # pylint: disable=protected-access
 
         self.assertEqual(len(copy_tasks), 0)
         build._generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], target_fonts_dir, copy_tasks)
-        # pylint: enable=protected-access
         # Asserting the same number of copy tasks and number of font files.
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
         """Test _insert_hash to return correct filenames with provided hashes.
         """
-        # pylint: disable=protected-access
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')
         self.assertEqual(
@@ -110,7 +105,6 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             build._insert_hash(
                 'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
-        # pylint: enable=protected-access
 
     def test_ensure_files_exist(self):
         """Test _ensure_files_exist raises exception with a non-existent
@@ -118,10 +112,8 @@ class BuildTests(test_utils.GenericTestBase):
         """
         random_filepaths = [
             os.path.join(build.THIRD_PARTY_GENERATED_DEV_DIR, 'random1.js')]
-        # pylint: disable=protected-access
         with self.assertRaises(OSError) as fileNotExist:
             build._ensure_files_exist(random_filepaths)
-        # pylint: enable=protected-access
         # Exception will be raised at first file determined to be non-existent.
         self.assertTrue(
             ('File %s does not exist.') % random_filepaths[0] in
@@ -152,11 +144,9 @@ class BuildTests(test_utils.GenericTestBase):
         mismatched file count between 2 dirs.
         """
         with self.assertRaises(ValueError) as incorrectFileCount:
-            # pylint: disable=protected-access
             build._compare_file_count(
                 build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
                 build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
-        # pylint: enable=protected-access
         source_dir_file_count = build.get_file_count(
             build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'])
         target_dir_file_count = build.get_file_count(
@@ -177,29 +167,21 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = dict()
         base_filename = 'base.html'
         with self.assertRaises(ValueError) as emptyHashDict:
-            # pylint: disable=protected-access
             build._match_filename_with_hashes(base_filename, file_hashes)
-            # pylint: enable=protected-access
         self.assertTrue('Hash dict is empty' in emptyHashDict.exception)
 
         file_hashes = {base_filename: random.getrandbits(128)}
         with self.assertRaises(ValueError) as noHashInFilename:
-            # pylint: disable=protected-access
             build._match_filename_with_hashes(base_filename, file_hashes)
-            # pylint: enable=protected-access
         # Generate a random hash dict for base.html.
         self.assertTrue(
             '%s is expected to contain hash' % base_filename
             in noHashInFilename.exception)
 
-        # pylint: disable=protected-access
         hashed_base_filename = build._insert_hash(
             base_filename, random.getrandbits(128))
-        # pylint: enable=protected-access
         with self.assertRaises(KeyError) as incorrectHashInFilename:
-            # pylint: disable=protected-access
             build._match_filename_with_hashes(hashed_base_filename, file_hashes)
-            # pylint: enable=protected-access
         self.assertTrue(
             'Hashed file %s does not match hash dict keys'
             % hashed_base_filename in incorrectHashInFilename.exception)
@@ -217,10 +199,8 @@ class BuildTests(test_utils.GenericTestBase):
         # --> <script ... app.[hash].js></script>.
         file_hashes = build.get_file_hashes(
             build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
-        # pylint: disable=protected-access
         # Reading from actual base.html file and not simply a dummy file.
         build._ensure_files_exist([base_source_path])
-        # pylint: enable=protected-access
         # Assert that /DEV's base.html has white spaces.
 
         with open(base_source_path, 'r') as source_base_file:
@@ -368,19 +348,15 @@ class BuildTests(test_utils.GenericTestBase):
         count = TASK_COUNT
         while count:
             task = threading.Thread(
-                # pylint: disable=protected-access
                 target=build._minify,
                 args=('path/to/input.js', 'path/to/output.js'))
-            # pylint: enable=protected-access
             build_tasks.append(task)
             count -= 1
 
         self.assertEqual(threading.active_count(), 1)
-        # pylint: disable=protected-access
         build._execute_tasks(build_tasks)
         with self.assertRaises(OSError) as threadAlreadyStarted:
             build._execute_tasks(build_tasks)
-        # pylint: enable=protected-access
         self.assertTrue(
             'threads can only be started once' in
             threadAlreadyStarted.exception)
@@ -462,3 +438,5 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(delete_tasks), build.get_file_count(
                 build.THIRD_PARTY_GENERATED_DEV_DIR))
+
+# pylint: enable=protected-access
