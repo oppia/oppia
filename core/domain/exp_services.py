@@ -42,6 +42,7 @@ from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -635,30 +636,6 @@ def export_to_zip_file(exploration_id, version=None):
             zfile.writestr(unicode_filepath, file_contents)
 
     return memfile.getvalue()
-
-
-def convert_state_dict_to_yaml(state_dict, width):
-    """Converts the given state dict to yaml format.
-
-    Args:
-        state_dict: dict. A dict representing a state in an exploration.
-        width: int. The maximum number of characters in a line for the
-            returned YAML string.
-
-    Returns:
-        str. The YAML version of the state_dict.
-
-    Raises:
-        Exception: The state_dict does not represent a valid state.
-    """
-    try:
-        # Check if the state_dict can be converted to a State.
-        state = exp_domain.State.from_dict(state_dict)
-    except Exception:
-        logging.info('Bad state dict: %s' % str(state_dict))
-        raise Exception('Could not convert state dict to YAML.')
-
-    return utils.yaml_from_dict(state.to_dict(), width=width)
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -1920,7 +1897,7 @@ def _create_change_list_from_suggestion(
             audio_translations_dict = {}
             for lang_code, audio_translation in audio_translations.iteritems():
                 audio_translations_dict[lang_code] = (
-                    exp_domain.AudioTranslation.to_dict(audio_translation))
+                    state_domain.AudioTranslation.to_dict(audio_translation))
             content_ids_to_audio_translations_dict[content_id] = (
                 audio_translations_dict)
 

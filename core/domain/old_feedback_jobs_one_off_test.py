@@ -25,6 +25,7 @@ from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -331,7 +332,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        self.old_content = exp_domain.SubtitledHtml(
+        self.old_content = state_domain.SubtitledHtml(
             'content', 'old content').to_dict()
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID,
