@@ -38,12 +38,12 @@ oppia.directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'INTERACTION_SPECS', 'EditorStateService',
+        '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
         'StateContentIdsToAudioTranslationsService',
         'StateInteractionIdService', 'StateCustomizationArgsService',
         function(
-            $scope, $rootScope, INTERACTION_SPECS, EditorStateService,
+            $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
             StateContentService, StateHintsService, StateSolutionService,
             StateContentIdsToAudioTranslationsService,
             StateInteractionIdService, StateCustomizationArgsService) {
@@ -52,7 +52,7 @@ oppia.directive('stateEditor', [
           $scope.currentStateIsTerminal = false;
           $scope.interactionIdIsSet = false;
           $scope.servicesInitialized = false;
-          $scope.stateName = EditorStateService.getActiveStateName();
+          $scope.stateName = StateEditorService.getActiveStateName();
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
             $scope.currentInteractionCanHaveSolution = Boolean(
@@ -63,13 +63,18 @@ oppia.directive('stateEditor', [
                 newInteractionId].is_terminal);
           };
 
+          $scope.reinitializeEditor = function() {
+            $rootScope.$broadcast('stateEditorInitialized', $scope.stateData);
+          };
+
           $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
             updateInteractionVisibility(newInteractionId);
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            $scope.stateName = EditorStateService.getActiveStateName();
-            EditorStateService.setInteraction(stateData.interaction);
+            $scope.stateData = stateData;
+            $scope.stateName = StateEditorService.getActiveStateName();
+            StateEditorService.setInteraction(stateData.interaction);
             StateContentService.init(
               $scope.stateName, stateData.content);
             StateContentIdsToAudioTranslationsService.init(

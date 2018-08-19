@@ -31,16 +31,17 @@ oppia.directive('progressNav', [
         '/pages/exploration_player/progress_nav_directive.html'),
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
-        'PlayerTranscriptService', 'ExplorationPlayerService',
-        'ExplorationPlayerStateService', 'WindowDimensionsService',
+        'PlayerTranscriptService', 'ExplorationEngineService',
+        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
+        'ExplorationPlayerStateService',
         function($scope, $rootScope, PlayerPositionService, UrlService,
-            PlayerTranscriptService, ExplorationPlayerService,
-            ExplorationPlayerStateService, WindowDimensionsService,
-            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
+            PlayerTranscriptService, ExplorationEngineService,
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
+            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
+            ExplorationPlayerStateService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
-
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
@@ -52,15 +53,18 @@ oppia.directive('progressNav', [
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-            $scope.conceptCardIsBeingShown =
-              ExplorationPlayerStateService.isStateShowingConceptCard(
-                $scope.activeCard.stateName);
+            $scope.conceptCardIsBeingShown = (
+              $scope.activeCard.getStateName() === null &&
+              !ExplorationPlayerStateService.isInPretestMode());
+            if ($scope.hasNext) {
+              var interaction = $scope.activeCard.getInteraction();
+            } else {
+              var interaction =
+                ExplorationPlayerStateService.getCurrentInteraction();
+            }
             if (!$scope.conceptCardIsBeingShown) {
-              var interaction = ExplorationPlayerService.getInteraction(
-                $scope.activeCard.stateName);
               interactionIsInline = (
-                ExplorationPlayerStateService.isInteractionInline(
-                  $scope.activeCard.stateName));
+                ExplorationPlayerStateService.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 interaction.customizationArgs;
               $scope.interactionId = interaction.id;
@@ -91,6 +95,12 @@ oppia.directive('progressNav', [
             }
           };
 
+          // Returns whether the screen is wide enough to fit two
+          // cards (e.g., the tutor and supplemental cards) side-by-side.
+          $scope.canWindowShowTwoCards = function() {
+            return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
+          };
+
           $scope.shouldGenericSubmitButtonBeShown = function() {
             if ($scope.interactionId === 'ItemSelectionInput' &&
                 $scope.interactionCustomizationArgs
@@ -100,7 +110,7 @@ oppia.directive('progressNav', [
 
             return (interactionHasNavSubmitButton && (
               interactionIsInline ||
-              !ExplorationPlayerService.canWindowShowTwoCards()
+              !$scope.canWindowShowTwoCards()
             ));
           };
 
@@ -108,13 +118,11 @@ oppia.directive('progressNav', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
-            var lastPair = $scope.activeCard.inputResponsePairs[
-              $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(
               interactionIsInline &&
-              ($scope.activeCard.destStateName ||
-              $scope.activeCard.leadsToConceptCard) &&
-              lastPair.oppiaResponse);
+              ($scope.activeCard.getDestStateName() ||
+              $scope.activeCard.getLeadsToConceptCard()) &&
+              $scope.activeCard.getLastOppiaResponse());
           };
         }
       ]

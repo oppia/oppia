@@ -16,8 +16,8 @@
 
 import logging
 
-from core.domain import exp_domain
 from core.domain import question_domain
+from core.domain import state_domain
 from core.platform import models
 import feconf
 
@@ -75,6 +75,29 @@ def delete_question_skill_link(question_id, skill_id):
     question_skill_link_model.delete()
 
 
+def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
+    """Returns the questions linked to the given skill ids.
+
+    Args:
+        question_count: int. The number of questions to return.
+        skill_ids: list(str). The ID of the skills to which the questions are
+            linked.
+        start_cursor: str. The starting point from which the batch of
+            questions are to be returned. This value should be urlsafe.
+
+    Returns:
+        list(Question), str. The list of questions which are linked to the given
+            skill ids and the next cursor value to be used for the next
+            batch of questions (or None if no more pages are left). The returned
+            next cursor value is urlsafe.
+    """
+    question_ids, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
+            question_count, skill_ids, start_cursor))
+
+    return get_questions_by_ids(question_ids), next_cursor
+
+
 def get_new_question_id():
     """Returns a new question id.
 
@@ -126,7 +149,7 @@ def get_question_from_model(question_model):
     """
     return question_domain.Question(
         question_model.id,
-        exp_domain.State.from_dict(question_model.question_state_data),
+        state_domain.State.from_dict(question_model.question_state_data),
         question_model.question_state_schema_version,
         question_model.language_code, question_model.version,
         question_model.created_on, question_model.last_updated)
@@ -153,11 +176,13 @@ def get_question_by_id(question_id, strict=True):
         return None
 
 
-def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
+def get_question_summaries_linked_to_skills(
+        question_count, skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
 
     Args:
+        question_count: int. The number of question summaries to return.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
         start_cursor: str. The starting point from which the batch of
@@ -168,10 +193,10 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), str. The list of question summaries linked to the
-            given skill_ids and the next cursor value to be used for the next
-            page (or None if no more pages are left). The returned next cursor
-            value is urlsafe.
+        list(QuestionSummary), str|None. The list of question summaries linked
+            to the given skill_ids and the next cursor value to be used for the
+            next page (or None if no more pages are left). The returned next
+            cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], None
@@ -182,7 +207,7 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
             'time is not supported currently.')
     question_ids, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            skill_ids, start_cursor)
+            question_count, skill_ids, start_cursor)
     )
 
     question_summaries = get_question_summaries_by_ids(question_ids)

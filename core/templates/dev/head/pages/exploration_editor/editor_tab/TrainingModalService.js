@@ -37,7 +37,7 @@ oppia.factory('TrainingModalService', [
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance',
-            'ExplorationStatesService', 'EditorStateService',
+            'ExplorationStatesService', 'StateEditorService',
             'AnswerClassificationService', 'ContextService',
             'StateInteractionIdService', 'AngularNameService',
             'ResponsesService', 'TrainingDataService',
@@ -45,7 +45,7 @@ oppia.factory('TrainingModalService', [
             'AnswerGroupObjectFactory', 'GraphDataService',
             'ExplorationWarningsService',
             function($scope, $injector, $uibModalInstance,
-                ExplorationStatesService, EditorStateService,
+                ExplorationStatesService, StateEditorService,
                 AnswerClassificationService, ContextService,
                 StateInteractionIdService, AngularNameService,
                 ResponsesService, TrainingDataService,
@@ -71,11 +71,11 @@ oppia.factory('TrainingModalService', [
                   answerGroups, ResponsesService.getDefaultOutcome(),
                   function(newAnswerGroups, newDefaultOutcome) {
                     ExplorationStatesService.saveInteractionAnswerGroups(
-                      EditorStateService.getActiveStateName(),
+                      StateEditorService.getActiveStateName(),
                       angular.copy(newAnswerGroups));
 
                     ExplorationStatesService.saveInteractionDefaultOutcome(
-                      EditorStateService.getActiveStateName(),
+                      StateEditorService.getActiveStateName(),
                       angular.copy(newDefaultOutcome));
 
                     GraphDataService.recompute();
@@ -119,7 +119,7 @@ oppia.factory('TrainingModalService', [
                 var explorationId =
                   ContextService.getExplorationId();
                 var currentStateName =
-                  EditorStateService.getActiveStateName();
+                  StateEditorService.getActiveStateName();
                 var state = ExplorationStatesService.getState(currentStateName);
 
                 // Retrieve the interaction ID.

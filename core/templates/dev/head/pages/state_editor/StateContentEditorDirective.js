@@ -36,11 +36,11 @@ oppia.directive('stateContentEditor', [
         '/pages/state_editor/state_content_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'StateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'COMPONENT_NAME_CONTENT',
+        'EditorFirstTimeEventsService',
         'StateContentIdsToAudioTranslationsService',
         function(
             $scope, $uibModal, StateContentService, EditabilityService,
-            EditorFirstTimeEventsService, COMPONENT_NAME_CONTENT,
+            EditorFirstTimeEventsService,
             StateContentIdsToAudioTranslationsService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
@@ -51,11 +51,8 @@ oppia.directive('stateContentEditor', [
             $scope.contentId = StateContentService.displayed.getContentId();
           }
 
-          $scope.StateContentIdsToAudioTranslationsService =
-            StateContentIdsToAudioTranslationsService;
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
-          $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
             StateContentService.saveDisplayedValue();
@@ -112,21 +109,6 @@ oppia.directive('stateContentEditor', [
           $scope.cancelEdit = function() {
             StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
-          };
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.contentEditorIsOpen) {
-              saveContent();
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-            $scope.onSaveContentIdsToAudioTranslations(
-              StateContentIdsToAudioTranslationsService.displayed
-            );
           };
         }
       ]

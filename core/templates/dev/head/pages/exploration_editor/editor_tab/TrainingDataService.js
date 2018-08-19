@@ -20,10 +20,10 @@
 
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
-  'ExplorationStatesService', 'EditorStateService', 'GraphDataService',
+  'ExplorationStatesService', 'StateEditorService', 'GraphDataService',
   function(
       $rootScope, $http, ResponsesService, RuleObjectFactory,
-      ExplorationStatesService, EditorStateService, GraphDataService) {
+      ExplorationStatesService, StateEditorService, GraphDataService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -77,11 +77,11 @@ oppia.factory('TrainingDataService', [
           answerGroups, ResponsesService.getDefaultOutcome(),
           function(newAnswerGroups, newDefaultOutcome) {
             ExplorationStatesService.saveInteractionAnswerGroups(
-              EditorStateService.getActiveStateName(),
+              StateEditorService.getActiveStateName(),
               angular.copy(newAnswerGroups));
 
             ExplorationStatesService.saveInteractionDefaultOutcome(
-              EditorStateService.getActiveStateName(),
+              StateEditorService.getActiveStateName(),
               angular.copy(newDefaultOutcome));
 
             GraphDataService.recompute();
@@ -92,7 +92,7 @@ oppia.factory('TrainingDataService', [
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
         ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
-          EditorStateService.getActiveStateName(),
+          StateEditorService.getActiveStateName(),
           angular.copy(confirmedUnclassifiedAnswers));
       }
     };
@@ -146,7 +146,7 @@ oppia.factory('TrainingDataService', [
           trainingData: answerGroup.trainingData
         }, function(newAnswerGroups) {
           ExplorationStatesService.saveInteractionAnswerGroups(
-            EditorStateService.getActiveStateName(),
+            StateEditorService.getActiveStateName(),
             angular.copy(newAnswerGroups));
 
           GraphDataService.recompute();
@@ -164,7 +164,7 @@ oppia.factory('TrainingDataService', [
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
         ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
-          EditorStateService.getActiveStateName(),
+          StateEditorService.getActiveStateName(),
           angular.copy(confirmedUnclassifiedAnswers));
       },
 
@@ -186,7 +186,7 @@ oppia.factory('TrainingDataService', [
           trainingData: trainingData
         }, function(newAnswerGroups) {
           ExplorationStatesService.saveInteractionAnswerGroups(
-            EditorStateService.getActiveStateName(),
+            StateEditorService.getActiveStateName(),
             angular.copy(newAnswerGroups));
 
           GraphDataService.recompute();

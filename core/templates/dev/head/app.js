@@ -21,10 +21,10 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'infinite-scroll', 'ngJoyRide',
-    'ngImgCrop', 'ui.validate', 'pascalprecht.translate', 'ngCookies', 'toastr',
-    'headroom', 'dndLists'
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
+    'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
+    'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
+    'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -77,17 +77,12 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
-oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
-oppia.constant('ENABLE_PLAYTHROUGH_VIZ', false);
-// Enables visualization of issues on the stats tab.
-oppia.constant('ENABLE_ISSUES', false);
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
 oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 5);
+oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
 oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
 oppia.constant('MAX_PLAYTHROUGHS_FOR_ISSUE', 5);
-oppia.constant('RECORD_PLAYTHROUGH_PROBABILITY', 0.2);
 
 oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
 oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
@@ -379,6 +374,13 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     progressBar: false,
     tapToDismiss: true,
     titleClass: 'toast-title'
+  });
+}]);
+
+oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
+  recorderServiceProvider.forceSwf(false);
+  recorderServiceProvider.withMp3Conversion(true, {
+    bitRate: 128
   });
 }]);
 

@@ -57,6 +57,7 @@ describe('Solution Verification Service', function() {
     scas = $injector.get('StateCustomizationArgsService');
     idc = $injector.get('InteractionDetailsCacheService');
     sof = $injector.get('SolutionObjectFactory');
+    see = $injector.get('StateEditorService');
     svs = $injector.get('SolutionVerificationService');
     IS = $injector.get('INTERACTION_SPECS');
     rootScope = $injector.get('$rootScope');
@@ -168,6 +169,14 @@ describe('Solution Verification Service', function() {
       siis.savedMemento = 'TextInput';
       ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
+      expect(
+        svs.verifySolution('First State', state.interaction,
+          ess.getState('First State').interaction.solution.correctAnswer)
+      ).toBe(true);
+
+      see.setInQuestionMode(true);
+      state.interaction.answerGroups[0].outcome.dest = 'First State';
+      state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
       expect(
         svs.verifySolution('First State', state.interaction,
           ess.getState('First State').interaction.solution.correctAnswer)

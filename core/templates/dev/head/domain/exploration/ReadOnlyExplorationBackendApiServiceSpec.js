@@ -84,8 +84,8 @@ describe('Read only exploration backend API service', function() {
 
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         sampleDataResults);
-      ReadOnlyExplorationBackendApiService.fetchExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.fetchExploration(
+        '0', null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
@@ -101,16 +101,16 @@ describe('Read only exploration backend API service', function() {
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         sampleDataResults);
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a exploration the second time should not fetch it.
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null).then(successHandler, failHandler);
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
@@ -125,8 +125,8 @@ describe('Read only exploration backend API service', function() {
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         500, 'Error loading exploration 0.');
-      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-        successHandler, failHandler);
+      ReadOnlyExplorationBackendApiService.loadExploration(
+        '0', null).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();

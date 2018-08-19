@@ -1,6 +1,7 @@
 <div class="navbar-header protractor-test-navbar-header pull-left">
   <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
-     class="navbar-brand oppia-navbar-menu oppia-transition-200" tabindex="0">
+     class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
+     tabindex="0">
     <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
     <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
   </a>
@@ -112,13 +113,13 @@
         <hr class="oppia-top-right-menu-item-separator">
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/creator_dashboard"
-             class="protractor-test-dashboard-link">
+             class="protractor-test-dashboard-link protractor-test-creator-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </a>
         </li>
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/learner_dashboard"
-             class="protractor-test-dashboard-link">
+             class="protractor-test-dashboard-link protractor-test-learner-dashboard-link">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
@@ -161,7 +162,7 @@
 
     <li uib-dropdown ng-if="!username" class="oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
-        <button class="btn oppia-navbar-button"
+        <button class="btn oppia-navbar-button protractor-mobile-test-login"
                 ng-click="onLoginButtonClicked()">
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
           <span class="caret"></span>

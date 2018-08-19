@@ -30,7 +30,7 @@ describe('URL Interpolation Service', function() {
     GLOBALS.DEV_MODE = true;
   });
 
-  it('should add hash to url if hash is set', function () {
+  it('should add hash to url if hash is set', function() {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
       '/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
@@ -42,7 +42,7 @@ describe('URL Interpolation Service', function() {
     );
   });
 
-  it('should build complete URL with prefixes and hash', function () {
+  it('should build complete URL with prefixes and hash', function() {
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.html')).toBe(
       '/build/test_folder/hash_test.' + hashes['/hash_test.html'] + '.html'
     );

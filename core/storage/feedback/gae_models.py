@@ -537,7 +537,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.entity_id == entity_id).order(cls.last_updated).fetch(limit)
+            cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
 
 
 class GeneralFeedbackMessageModel(base_models.BaseModel):
@@ -736,6 +736,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     Instances of this class have keys of the form [user_id].[thread_id]
     """
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
+    # TODO (nithesh): Overriding last_updated of base model for migrating
+    # instances from old model to the new one. To be removed after migration.
+    last_updated = ndb.DateTimeProperty()
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):

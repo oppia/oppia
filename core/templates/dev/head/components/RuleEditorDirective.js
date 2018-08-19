@@ -35,11 +35,11 @@ oppia.directive('ruleEditor', [
         '/components/' +
         'rule_editor_directive.html'),
       controller: [
-        '$scope', '$timeout', 'EditorStateService',
+        '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
         'ResponsesService', 'StateInteractionIdService',
         function(
-            $scope, $timeout, EditorStateService,
+            $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;

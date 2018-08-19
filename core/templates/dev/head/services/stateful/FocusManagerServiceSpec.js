@@ -45,7 +45,7 @@ describe('Focus Manager Service', function() {
 
   it('should set focus label and broadcast it', function() {
     FocusManagerService.setFocus(focusLabel);
-    $timeout(function () {
+    $timeout(function() {
       expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', focusLabel);
     });
     $timeout.flush();
@@ -61,7 +61,7 @@ describe('Focus Manager Service', function() {
 
   it('should set label to clear focus and broadcast it', function() {
     FocusManagerService.clearFocus();
-    $timeout(function () {
+    $timeout(function() {
       expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', clearLabel);
     });
     $timeout.flush();
@@ -70,7 +70,7 @@ describe('Focus Manager Service', function() {
   it('should set focus label if on desktop and broadcast it', function() {
     FocusManagerService.setFocusIfOnDesktop(focusLabel);
     if (!DeviceInfoService.isMobileDevice()) {
-      $timeout(function () {
+      $timeout(function() {
         expect(rootScope.$broadcast).toHaveBeenCalledWith(
           'focusOn', focusLabel);
       });

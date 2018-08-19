@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationEditorTab', [
-  '$scope', '$rootScope', 'EditorStateService', 'ExplorationStatesService',
+  '$scope', '$rootScope', 'StateEditorService', 'ExplorationStatesService',
   'ExplorationAdvancedFeaturesService', 'UrlInterpolationService',
   'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
   'ExplorationCorrectnessFeedbackService', 'AlertsService',
   'ContextService', 'ExplorationWarningsService',
   function(
-      $scope, $rootScope, EditorStateService, ExplorationStatesService,
+      $scope, $rootScope, StateEditorService, ExplorationStatesService,
       ExplorationAdvancedFeaturesService, UrlInterpolationService,
       ExplorationInitStateNameService, GraphDataService, RouterService,
       ExplorationCorrectnessFeedbackService, AlertsService,
@@ -39,14 +39,14 @@ oppia.controller('ExplorationEditorTab', [
 
     $scope.$watch(ExplorationStatesService.getStates, function() {
       if (ExplorationStatesService.getStates()) {
-        EditorStateService.setStateNames(
+        StateEditorService.setStateNames(
           ExplorationStatesService.getStateNames());
       }
     }, true);
 
     $scope.getStateContentPlaceholder = function() {
       if (
-        EditorStateService.getActiveStateName() ===
+        StateEditorService.getActiveStateName() ===
         ExplorationInitStateNameService.savedMemento) {
         return (
           'This is the first card of your exploration. Use this space to ' +
@@ -67,12 +67,12 @@ oppia.controller('ExplorationEditorTab', [
     };
 
     $scope.initStateEditor = function() {
-      $scope.stateName = EditorStateService.getActiveStateName();
-      EditorStateService.setStateNames(
+      $scope.stateName = StateEditorService.getActiveStateName();
+      StateEditorService.setStateNames(
         ExplorationStatesService.getStateNames());
-      EditorStateService.setCorrectnessFeedbackEnabled(
+      StateEditorService.setCorrectnessFeedbackEnabled(
         ExplorationCorrectnessFeedbackService.isEnabled());
-      EditorStateService.setInQuestionMode(false);
+      StateEditorService.setInQuestionMode(false);
       var stateData = ExplorationStatesService.getState($scope.stateName);
       if ($scope.stateName && stateData) {
         $rootScope.$broadcast('stateEditorInitialized', stateData);
@@ -102,14 +102,14 @@ oppia.controller('ExplorationEditorTab', [
     $scope.saveInteractionId = function(displayedValue) {
       ExplorationStatesService.saveInteractionId(
         $scope.stateName, angular.copy(displayedValue));
-      EditorStateService.setInteractionId(angular.copy(displayedValue));
+      StateEditorService.setInteractionId(angular.copy(displayedValue));
     };
 
     $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
       ExplorationStatesService.saveInteractionAnswerGroups(
         $scope.stateName, angular.copy(newAnswerGroups));
 
-      EditorStateService.setInteractionAnswerGroups(
+      StateEditorService.setInteractionAnswerGroups(
         angular.copy(newAnswerGroups));
       $scope.recomputeGraph();
     };
@@ -118,7 +118,7 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveInteractionDefaultOutcome(
         $scope.stateName, angular.copy(newOutcome));
 
-      EditorStateService.setInteractionDefaultOutcome(
+      StateEditorService.setInteractionDefaultOutcome(
         angular.copy(newOutcome));
       $scope.recomputeGraph();
     };
@@ -127,7 +127,7 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveInteractionCustomizationArgs(
         $scope.stateName, angular.copy(displayedValue));
 
-      EditorStateService.setInteractionCustomizationArgs(
+      StateEditorService.setInteractionCustomizationArgs(
         angular.copy(displayedValue));
     };
 
@@ -135,7 +135,7 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveSolution(
         $scope.stateName, angular.copy(displayedValue));
 
-      EditorStateService.setInteractionSolution(
+      StateEditorService.setInteractionSolution(
         angular.copy(displayedValue));
     };
 
@@ -143,7 +143,7 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationStatesService.saveHints(
         $scope.stateName, angular.copy(displayedValue));
 
-      EditorStateService.setInteractionHints(
+      StateEditorService.setInteractionHints(
         angular.copy(displayedValue));
     };
 
@@ -184,7 +184,7 @@ oppia.directive('trainingPanel', [
         'training_answer_modal_directive.html'),
       controller: [
         '$scope', 'ExplorationHtmlFormatterService',
-        'EditorStateService', 'ExplorationStatesService',
+        'StateEditorService', 'ExplorationStatesService',
         'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
         'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
@@ -192,7 +192,7 @@ oppia.directive('trainingPanel', [
         'StateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
-            EditorStateService, ExplorationStatesService,
+            StateEditorService, ExplorationStatesService,
             TrainingDataService, ResponsesService, StateInteractionIdService,
             StateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
@@ -200,7 +200,7 @@ oppia.directive('trainingPanel', [
             StateContentIdsToAudioTranslationsService) {
           $scope.addingNewResponse = false;
 
-          var _stateName = EditorStateService.getActiveStateName();
+          var _stateName = StateEditorService.getActiveStateName();
           var _state = ExplorationStatesService.getState(_stateName);
           $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
             _state);
@@ -218,14 +218,14 @@ oppia.directive('trainingPanel', [
             $scope.classification.answerGroupIndex);
 
           $scope.getCurrentStateName = function() {
-            return EditorStateService.getActiveStateName();
+            return StateEditorService.getActiveStateName();
           };
 
           $scope.beginAddingNewResponse = function() {
             var contentId = GenerateContentIdService.getNextId(
               COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), contentId, '', []);
+              StateEditorService.getActiveStateName(), contentId, '', []);
             $scope.addingNewResponse = true;
           };
 

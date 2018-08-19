@@ -61,11 +61,18 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
     """Tests returning of new question ids and creating questions.
     """
 
+    def setUp(self):
+        """Completes the setup for QuestionSkillLinkHandlerTest."""
+        super(QuestionCreationHandlerTest, self).setUp()
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+
     def test_post(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.post(
-                '%s' % feconf.NEW_QUESTION_URL, expect_errors=True)
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id),
+                expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
@@ -73,9 +80,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
-            del question_dict['id']
+            question_dict['id'] = None
             self.post_json(
-                '%s' % feconf.NEW_QUESTION_URL, {
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
                     'question_dict': question_dict
                 }, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
@@ -91,9 +98,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
-            del question_dict['id']
+            question_dict['id'] = None
             self.post_json(
-                '%s' % feconf.NEW_QUESTION_URL, {
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
                     'question_dict': question_dict
                 }, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
@@ -143,8 +150,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                 ), {}, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id)
             self.logout()
@@ -159,8 +166,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                 ), {}, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
             question_ids = [summary.id for summary in question_summaries]
             self.assertItemsEqual(
@@ -189,8 +196,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                     self.skill_id
                 ), expect_errors=False)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id_2)
             self.logout()
@@ -202,8 +209,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                     self.skill_id
                 ), expect_errors=False)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 0)
             self.logout()
 

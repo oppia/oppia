@@ -28,7 +28,7 @@ oppia.directive('stateSolutionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_solution_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+        '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',
         'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',
         'SolutionVerificationService', 'SolutionValidityService',
         'ExplorationHtmlFormatterService', 'StateInteractionIdService',
@@ -37,7 +37,7 @@ oppia.directive('stateSolutionEditor', [
         'EditabilityService', 'StateContentIdsToAudioTranslationsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID',
         function(
-            $scope, $rootScope, $uibModal, $filter, EditorStateService,
+            $scope, $rootScope, $uibModal, $filter, StateEditorService,
             AlertsService, INTERACTION_SPECS, StateSolutionService,
             SolutionVerificationService, SolutionValidityService,
             ExplorationHtmlFormatterService, StateInteractionIdService,
@@ -59,7 +59,7 @@ oppia.directive('stateSolutionEditor', [
           $scope.refreshWarnings()();
 
           $scope.isSolutionValid = function() {
-            return EditorStateService.isCurrentSolutionValid();
+            return StateEditorService.isCurrentSolutionValid();
           };
 
           $scope.correctAnswerEditorHtml = (
@@ -199,13 +199,13 @@ oppia.directive('stateSolutionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               var solutionIsValid = SolutionVerificationService.verifySolution(
-                EditorStateService.getActiveStateName(),
-                EditorStateService.getInteraction(),
+                StateEditorService.getActiveStateName(),
+                StateEditorService.getInteraction(),
                 StateSolutionService.savedMemento.correctAnswer
               );
 
               SolutionValidityService.updateValidity(
-                EditorStateService.getActiveStateName(), solutionIsValid);
+                StateEditorService.getActiveStateName(), solutionIsValid);
               $scope.refreshWarnings()();
               if (!solutionIsValid) {
                 AlertsService.addInfoMessage(
@@ -248,7 +248,7 @@ oppia.directive('stateSolutionEditor', [
               $scope.onSaveContentIdsToAudioTranslations(
                 StateContentIdsToAudioTranslationsService.displayed
               );
-              EditorStateService.deleteCurrentSolutionValidity();
+              StateEditorService.deleteCurrentSolutionValidity();
             });
           };
         }

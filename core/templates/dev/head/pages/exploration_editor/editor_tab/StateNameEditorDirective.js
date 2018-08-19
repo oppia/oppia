@@ -33,11 +33,11 @@ oppia.directive('stateNameEditor', [
         'state_name_editor_directive.html'),
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
-        'EditorStateService', 'FocusManagerService', 'ExplorationStatesService',
+        'StateEditorService', 'FocusManagerService', 'ExplorationStatesService',
         'RouterService',
         function(
             $scope, $filter, $rootScope, EditabilityService,
-            EditorStateService, FocusManagerService, ExplorationStatesService,
+            StateEditorService, FocusManagerService, ExplorationStatesService,
             RouterService) {
           $scope.EditabilityService = EditabilityService;
           var _stateNameMemento = null;
@@ -49,7 +49,7 @@ oppia.directive('stateNameEditor', [
           $scope.initStateNameEditor = function() {
             _stateNameMemento = null;
             $scope.stateNameEditorIsShown = false;
-            $scope.stateName = EditorStateService.getActiveStateName();
+            $scope.stateName = StateEditorService.getActiveStateName();
           };
 
           $scope.openStateNameEditor = function() {
@@ -71,7 +71,7 @@ oppia.directive('stateNameEditor', [
               return false;
             } else {
               ExplorationStatesService.renameState(
-                EditorStateService.getActiveStateName(), normalizedNewName);
+                StateEditorService.getActiveStateName(), normalizedNewName);
               $scope.stateNameEditorIsShown = false;
               // Save the contents of other open fields.
               $rootScope.$broadcast('externalSave');
@@ -91,7 +91,7 @@ oppia.directive('stateNameEditor', [
           };
 
           var _isNewStateNameValid = function(stateName) {
-            if (stateName === EditorStateService.getActiveStateName()) {
+            if (stateName === StateEditorService.getActiveStateName()) {
               return true;
             }
             return ExplorationStatesService.isNewStateNameValid(

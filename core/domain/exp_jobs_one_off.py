@@ -27,7 +27,7 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -35,13 +35,31 @@ import utils
 
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
+gae_image_services = models.Registry.import_gae_image_services()
 
+
+ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
+FILE_DELETED = 'File has been deleted'
+INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
+NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
+ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
+    'Added compressed versions of images in exploration')
+ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
+FILE_MODEL_ID_REGEX = re.compile(
+    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+GCS_AUDIO_ID_REGEX = re.compile(
+    r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
+        ALLOWED_AUDIO_EXTENSIONS) + '))$')
+GCS_IMAGE_ID_REGEX = re.compile(
+    r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + '))$')
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -215,7 +233,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
         if (item.states_schema_version !=
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+                feconf.CURRENT_STATES_SCHEMA_VERSION):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
@@ -223,13 +241,13 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
-                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+                    feconf.CURRENT_STATES_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
-                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+                    feconf.CURRENT_STATES_SCHEMA_VERSION))
 
     @staticmethod
     def reduce(key, values):
@@ -513,12 +531,12 @@ class ExplorationContentValidationJobForTextAngular(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_TEXTANGULAR)
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -547,12 +565,12 @@ class ExplorationMigrationValidationJobForTextAngular(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True)
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -581,12 +599,12 @@ class ExplorationContentValidationJobForCKEditor(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(
+        err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_CKEDITOR)
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -615,22 +633,22 @@ class ExplorationMigrationValidationJobForCKEditor(
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield('Error %s in exploration' % str(e), [item.id])
+            yield ('Error %s when loading exploration' % str(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
         try:
-            err_dict = html_cleaner.validate_rte_format(
+            err_dict = html_validation_service.validate_rte_format(
                 html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
         except Exception as e:
-            yield(
-                'Error in exploration %s' % item.id,
+            yield (
+                'Error in validating rte format for exploration %s' % item.id,
                 [traceback.format_exc()])
             return
 
         for key in err_dict:
             if err_dict[key]:
-                yield(key, err_dict[key])
+                yield (key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -640,9 +658,9 @@ class ExplorationMigrationValidationJobForCKEditor(
         yield (key, list(set().union(*final_values)))
 
 
-class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for migrating the images in the exploration
-    from the GAE to GCS.
+class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for deleting the images in the exploration
+    from the GAE.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -650,38 +668,166 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(file_model):
-        # This job is allowed to run only in Production environment since it
-        # uses GcsFileSystem which can't be used in Development environment.
-        if not feconf.DEV_MODE:
-            instance_id = file_model.id
-            filetype = instance_id[instance_id.rfind('.') + 1:]
-            # To separate the image entries from the audio entries we get from
-            # the FileSnapshotContentModel.
-            if filetype in ALLOWED_IMAGE_EXTENSIONS:
-                pattern = re.compile(
-                    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
-                        ALLOWED_IMAGE_EXTENSIONS) + '))$')
-                catched_groups = pattern.match(instance_id)
-                if not catched_groups:
-                    yield (WRONG_INSTANCE_ID, instance_id)
-                else:
-                    filename = catched_groups.group(2)
-                    exploration_id = catched_groups.group(1)
-                    content = file_model.content
-                    fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(exploration_id))
-                    if fs.isfile('image/%s' % filename):
-                        yield (FILE_ALREADY_EXISTS, file_model.id)
-                    else:
-                        fs.commit(
-                            'ADMIN', 'image/%s' % filename,
-                            content, mimetype='image/%s' % filetype)
-                        yield (FILE_COPIED, 1)
+        instance_id = file_model.id
+        filetype = instance_id[instance_id.rfind('.') + 1:]
+        # To separate the image entries from the audio entries we get from
+        # the FileSnapshotContentModel.
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
+            if not catched_groups:
+                yield (WRONG_INSTANCE_ID, instance_id)
+            else:
+                filename = catched_groups.group(2)
+                filepath = 'assets/' + filename
+                exploration_id = catched_groups.group(1)
+                filemetadata_model = (
+                    file_models.FileMetadataModel.get_model(
+                        exploration_id, filepath, False))
 
+                file_model.delete(
+                    'ADMIN',
+                    'Deleting file_model for image from GAE',
+                    force_deletion=True)
+                filemetadata_model.delete(
+                    'ADMIN',
+                    'Deleting filemetamodel for image from GAE',
+                    force_deletion=True)
+                yield (FILE_DELETED, 1)
 
     @staticmethod
     def reduce(status, values):
-        if status == FILE_COPIED:
-            yield (status, len(values))
+        if status == FILE_DELETED:
+            yield (NUMBER_OF_FILES_DELETED, len(values))
         else:
             yield (status, values)
+
+
+class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for copying the image/audio such that the url instead of
+    {{exp_id}}/assets/image/image.png is
+    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
+    the images as well as renaming the filenames so that they have dimensions
+    as a part of their name.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if not feconf.DEV_MODE:
+            exp_id = exp_model.id
+            fs_old = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls = fs_old.listdir('image')
+            audio_urls = fs_old.listdir('audio')
+            for url in image_urls:
+                catched_groups = GCS_IMAGE_ID_REGEX.match(url)
+                if not catched_groups:
+                    yield (INVALID_GCS_URL, url)
+            for url in audio_urls:
+                catched_groups = GCS_AUDIO_ID_REGEX.match(url)
+                if not catched_groups:
+                    yield (INVALID_GCS_URL, url)
+
+    @staticmethod
+    def reduce(status, values):
+        yield (status, values)
+
+
+class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for copying the image/audio such that the url instead of
+    {{exp_id}}/assets/image/image.png is
+    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
+    the images as well as renaming the filenames so that they have dimensions
+    as a part of their name.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if not feconf.DEV_MODE:
+            exp_id = exp_model.id
+            fs_old = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls = fs_old.listdir('image')
+            audio_urls = fs_old.listdir('audio')
+
+            image_filenames = [
+                GCS_IMAGE_ID_REGEX.match(url).group(3) for url in image_urls]
+            audio_filenames = [
+                GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
+
+            for image_filename in image_filenames:
+                raw_image = fs_old.get('image/%s' % image_filename)
+                height, width = gae_image_services.get_image_dimensions(
+                    raw_image)
+                filename_with_dimensions = (
+                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
+                        image_filename, height, width))
+                exp_services.save_original_and_compressed_versions_of_image(
+                    'ADMIN', filename_with_dimensions, exp_id, raw_image)
+
+            for audio_filename in audio_filenames:
+                filetype = audio_filename[audio_filename.rfind('.') + 1:]
+                raw_data = fs_old.get('audio/%s' % audio_filename)
+                fs = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem('exploration/%s' % exp_id))
+                fs.commit(
+                    'Admin', 'audio/%s' % audio_filename,
+                    raw_data, mimetype='audio/%s' % filetype)
+            yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_id)
+
+    @staticmethod
+    def reduce(status, values):
+        yield (status, values)
+
+
+class InteractionCustomizationArgsValidationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for validating all the customizations arguments of
+    Rich Text Components.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        err_dict = {}
+
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+        except Exception as e:
+            yield ('Error %s when loading exploration' % str(e), [item.id])
+            return
+
+        html_list = exploration.get_all_html_content_strings()
+        try:
+            err_dict = html_validation_service.validate_customization_args(
+                html_list)
+        except Exception as e:
+            yield (
+                'Error in validating customization args for exploration %s' % (
+                    item.id),
+                [traceback.format_exc()])
+            return
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield (key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))

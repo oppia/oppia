@@ -21,14 +21,14 @@
 oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
-  'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
+  'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ContextService',
   'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
-      EditorStateService, ValidatorsService, StatesObjectFactory,
+      StateEditorService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ContextService,
       UrlInterpolationService) {
@@ -345,12 +345,12 @@ oppia.factory('ExplorationStatesService', [
 
           ChangeListService.deleteState(deleteStateName);
 
-          if (EditorStateService.getActiveStateName() === deleteStateName) {
-            EditorStateService.setActiveStateName(
+          if (StateEditorService.getActiveStateName() === deleteStateName) {
+            StateEditorService.setActiveStateName(
               ExplorationInitStateNameService.savedMemento);
           }
 
-          $location.path('/gui/' + EditorStateService.getActiveStateName());
+          $location.path('/gui/' + StateEditorService.getActiveStateName());
           stateDeletedCallbacks.forEach(function(callback) {
             callback(deleteStateName);
           });
@@ -373,7 +373,7 @@ oppia.factory('ExplorationStatesService', [
 
         _states.renameState(oldStateName, newStateName);
 
-        EditorStateService.setActiveStateName(newStateName);
+        StateEditorService.setActiveStateName(newStateName);
         // The 'rename state' command must come before the 'change
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not

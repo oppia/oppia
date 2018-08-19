@@ -30,11 +30,11 @@ oppia.directive('paramChangesEditor', [
         '/pages/exploration_editor/' +
         'param_changes_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'EditabilityService', 'EditorStateService',
+        '$scope', '$rootScope', 'EditabilityService', 'StateEditorService',
         'ExplorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory', 'ExplorationStatesService',
         function(
-            $scope, $rootScope, EditabilityService, EditorStateService,
+            $scope, $rootScope, EditabilityService, StateEditorService,
             ExplorationParamSpecsService, AlertsService,
             ParamChangeObjectFactory, ExplorationStatesService) {
           $scope.EditabilityService = EditabilityService;

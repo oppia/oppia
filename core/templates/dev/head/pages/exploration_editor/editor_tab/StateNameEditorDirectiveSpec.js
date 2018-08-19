@@ -48,7 +48,7 @@ describe('Sidebar state name controller', function() {
         $compile, $filter, $injector, $rootScope, $templateCache) {
       filter = $filter;
       rootScope = $rootScope;
-      ecs = $injector.get('EditorStateService');
+      ecs = $injector.get('StateEditorService');
       fs = $injector.get('FocusManagerService');
       ess = $injector.get('ExplorationStatesService');
       $httpBackend = $injector.get('$httpBackend');

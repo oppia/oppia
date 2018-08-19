@@ -17,9 +17,6 @@
  * in editor.
  */
 
-// This will be removed after translation tab will be ready.
-oppia.constant('ENABLE_TRANSLATION_TAB', false);
-
 oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -27,19 +24,16 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$uibModal',
-        'RouterService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'ENABLE_TRANSLATION_TAB',
-        'StateEditorTutorialFirstTimeService',
-        'ThreadDataService', 'siteAnalyticsService',
-        'ContextService', 'WindowDimensionsService',
+        '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
+        'ExplorationRightsService', 'ExplorationWarningsService',
+        'RouterService', 'StateEditorTutorialFirstTimeService',
+        'siteAnalyticsService', 'ThreadDataService', 'WindowDimensionsService',
+
         function(
-            $scope, $rootScope, $timeout, $uibModal,
-            RouterService, ExplorationRightsService,
-            ExplorationWarningsService, ENABLE_TRANSLATION_TAB,
-            StateEditorTutorialFirstTimeService,
-            ThreadDataService, siteAnalyticsService,
-            ContextService, WindowDimensionsService) {
+            $scope, $rootScope, $timeout, $uibModal, ContextService,
+            ExplorationRightsService, ExplorationWarningsService,
+            RouterService, StateEditorTutorialFirstTimeService,
+            siteAnalyticsService, ThreadDataService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -59,8 +53,6 @@ oppia.directive('editorNavigation', [
           });
 
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
-          // This will be removed after translation tab will be ready.
-          $scope.enableTranslationTab = ENABLE_TRANSLATION_TAB;
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();

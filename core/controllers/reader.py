@@ -31,11 +31,13 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import story_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -111,6 +113,10 @@ def _get_exploration_player_data(
 
     # TODO(sll): Cache these computations.
     interaction_ids = exploration.get_interaction_ids()
+    for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
+        if interaction_id not in interaction_ids:
+            interaction_ids.append(interaction_id)
+
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
             interaction_ids))
@@ -281,6 +287,8 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
+        whitelisted_exp_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -295,6 +303,41 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
+            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids,
+            'record_playthrough_probability': (
+                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
+        })
+        self.render_json(self.values)
+
+
+class PretestHandler(base.BaseHandler):
+    """Provides subsequent pretest questions after initial batch."""
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id):
+        """Handles GET request."""
+        start_cursor = self.request.get('cursor')
+        story_id = self.request.get('story_id')
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise self.InvalidInputException
+
+        if not story.has_exploration(exploration_id):
+            raise self.InvalidInputException
+
+        pretest_questions, next_start_cursor = (
+            question_services.get_questions_by_skill_ids(
+                feconf.NUM_PRETEST_QUESTIONS,
+                story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
+                start_cursor)
+        )
+        pretest_question_dicts = [
+            question.to_dict() for question in pretest_questions
+        ]
+
+        self.values.update({
+            'pretest_question_dicts': pretest_question_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 

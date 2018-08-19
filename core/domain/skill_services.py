@@ -496,6 +496,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
     ]
+    skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     memcache_services.delete(_get_skill_memcache_key(skill.id))
