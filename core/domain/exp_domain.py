@@ -4031,7 +4031,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
-        """ Converts a v23 exploration dict into a v24 exploration dict.
+        """Converts a v23 exploration dict into a v24 exploration dict.
 
         Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
