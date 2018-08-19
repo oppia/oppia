@@ -4062,7 +4062,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
-        """ Converts a v25 exploration dict into a v26 exploration dict.
+        """Converts a v25 exploration dict into a v26 exploration dict.
 
         Move audio_translations into a seperate dict.
         """
