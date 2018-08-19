@@ -24,23 +24,16 @@ oppia.factory('StateCardObjectFactory', [
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
       ExplorationHtmlFormatterService, AudioTranslationLanguageService) {
     var StateCard = function(
-        stateName, currentParams, contentHtml, interactionHtml, interaction,
-        leadsToConceptCard, destStateName, inputResponsePairs,
-        contentIdsToAudioTranslations, contentId) {
+        stateName, contentHtml, interactionHtml, interaction,
+        inputResponsePairs, contentIdsToAudioTranslations, contentId) {
       this._stateName = stateName;
-      this._currentParams = currentParams;
       this._contentHtml = contentHtml;
       this._interactionHtml = interactionHtml;
-      this._leadsToConceptCard = leadsToConceptCard;
-      this._destStateName = destStateName;
       this._inputResponsePairs = inputResponsePairs;
       this._interaction = interaction;
       this._contentIdsToAudioTranslations = contentIdsToAudioTranslations;
       this._contentId = contentId;
-    };
-
-    StateCard.prototype.getDestStateName = function() {
-      return this._destStateName;
+      this._completed = false;
     };
 
     StateCard.prototype.getStateName = function() {
@@ -78,10 +71,37 @@ oppia.factory('StateCardObjectFactory', [
       return null;
     };
 
-    StateCard.prototype.isCardTerminal = function() {
+    StateCard.prototype.isTerminal = function() {
       var interactionId = this.getInteractionId();
       return (
         interactionId && INTERACTION_SPECS[interactionId].is_terminal);
+    };
+
+    StateCard.prototype.getHints = function() {
+      return this.getInteraction().hints;
+    };
+
+    StateCard.prototype.getSolution = function() {
+      return this.getInteraction().solution;
+    };
+
+    StateCard.prototype.doesInteractionSupportHints = function() {
+      var interactionId = this.getInteractionId();
+      return (
+        !INTERACTION_SPECS[interactionId].is_terminal &&
+        !INTERACTION_SPECS[interactionId].is_linear);
+    };
+
+    StateCard.prototype.isCompleted = function() {
+      return this._completed;
+    };
+
+    StateCard.prototype.markAsCompleted = function() {
+      this._completed = true;
+    };
+
+    StateCard.prototype.markAsNotCompleted = function() {
+      this._completed = false;
     };
 
     StateCard.prototype.getInteractionInstructions = function() {
@@ -106,10 +126,6 @@ oppia.factory('StateCardObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
-    StateCard.prototype.getCurrentParams = function() {
-      return this._currentParams;
-    };
-
     StateCard.prototype.getContentHtml = function() {
       return this._contentHtml;
     };
@@ -120,10 +136,6 @@ oppia.factory('StateCardObjectFactory', [
 
     StateCard.prototype.getOppiaResponse = function(index) {
       return this._inputResponsePairs[index].oppiaResponse;
-    };
-
-    StateCard.prototype.getLeadsToConceptCard = function() {
-      return this._leadsToConceptCard;
     };
 
     StateCard.prototype.getInputResponsePairs = function() {
@@ -148,56 +160,30 @@ oppia.factory('StateCardObjectFactory', [
       this._inputResponsePairs.push(angular.copy(inputResponsePair));
     };
 
-    StateCard.prototype.setDestStateName = function(destStateName) {
-      this._destStateName = destStateName;
-    };
-
-    StateCard.prototype.setOppiaResponse = function(index, response) {
-      this._inputResponsePairs[index].oppiaResponse = response;
-    };
-
     StateCard.prototype.setLastOppiaResponse = function(response) {
-      this.setOppiaResponse(this._inputResponsePairs.length - 1, response);
+      this._inputResponsePairs[
+        this._inputResponsePairs.length - 1].oppiaResponse = response;
     };
 
     StateCard.prototype.setInteractionHtml = function(interactionHtml) {
       this._interactionHtml = interactionHtml;
     };
 
-    StateCard.prototype.setLeadsToConceptCard = function(leadsToConceptCard) {
-      this._leadsToConceptCard = leadsToConceptCard;
-    };
-
-    StateCard.prototype.addRandomSuffixToContentHtml = function(randomSuffix) {
-      this._contentHtml = this._contentHtml + randomSuffix;
-    };
-
-    StateCard.prototype.addRandomSuffixToInteractionHtml =
-      function(randomSuffix) {
-        if (this._interactionHtml) {
-          this._interactionHtml = this._interactionHtml + randomSuffix;
-        }
-      };
-
     /**
      * @param {string} stateName - The state name for the current card.
-     * @param {object} params - The set of parameters for the learner associated
-     *        with a card.
      * @param {string} contentHtml - The HTML string for the content displayed
      *        on the content card.
      * @param {string} interactionHtml - The HTML that calls the interaction
      *        directive for the current card.
      * @param {Interaction} interaction - An interaction object that stores all
      *        the properties of the card's interaction.
-     * @param {bool} leadsToConceptCard - Whether the current card leads to a
-     *        concept card in the exploration.
      */
     StateCard.createNewCard = function(
-        stateName, params, contentHtml, interactionHtml, interaction,
-        leadsToConceptCard, contentIdsToAudioTranslations, contentId) {
+        stateName, contentHtml, interactionHtml, interaction,
+        contentIdsToAudioTranslations, contentId) {
       return new StateCard(
-        stateName, params, contentHtml, interactionHtml, interaction,
-        leadsToConceptCard, null, [], contentIdsToAudioTranslations, contentId);
+        stateName, contentHtml, interactionHtml, interaction,
+        [], contentIdsToAudioTranslations, contentId);
     };
 
     return StateCard;

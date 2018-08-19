@@ -89,56 +89,11 @@ oppia.factory('ExplorationPlayerStateService', [
         _setExplorationMode();
         ExplorationEngineService.moveToExploration(callback);
       },
-      doesInteractionSupportHints: function() {
-        return _currentEngineService.doesInteractionSupportHints();
-      },
-      getCurrentStateName: function() {
-        return _currentEngineService.getCurrentStateName();
-      },
-      getNextInteraction: function() {
-        return _currentEngineService.getNextInteraction();
-      },
-      getNextInteractionHtml: function(nextFocusLabel) {
-        return _currentEngineService.getNextInteractionHtml(nextFocusLabel);
-      },
       getLanguageCode: function() {
         return _currentEngineService.getLanguageCode();
       },
-      getCurrentInteraction: function() {
-        return _currentEngineService.getCurrentInteraction();
-      },
-      getNextInteractionInstructions: function() {
-        return _currentEngineService.getNextInteractionInstructions();
-      },
-      isNextInteractionInline: function() {
-        return _currentEngineService.isNextInteractionInline();
-      },
-      getNextContentId: function() {
-        return _currentEngineService.getNextContentId();
-      },
-      isStateShowingConceptCard: function() {
-        if (_inPretestMode) {
-          return false;
-        }
-        if (ExplorationEngineService.getCurrentStateName() === null) {
-          return true;
-        }
-        return false;
-      },
-      getContentIdsToAudioTranslations: function() {
-        return _currentEngineService.getContentIdsToAudioTranslations();
-      },
-      getNextContentIdsToAudioTranslations: function() {
-        return _currentEngineService.getNextContentIdsToAudioTranslations();
-      },
       recordNewCardAdded: function() {
         return _currentEngineService.recordNewCardAdded();
-      },
-      getHints: function() {
-        return _currentEngineService.getHints();
-      },
-      getSolution: function() {
-        return _currentEngineService.getSolution();
       },
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();

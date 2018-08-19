@@ -24,6 +24,7 @@ oppia.directive('progressNav', [
         onSubmit: '&',
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
+        getDisplayedCard: '&displayedCard',
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
@@ -49,8 +50,7 @@ oppia.directive('progressNav', [
             transcriptLength = PlayerTranscriptService.getNumCards();
             $scope.displayedCardIndex =
               PlayerPositionService.getDisplayedCardIndex();
-            $scope.displayedCard = PlayerTranscriptService.getCard(
-              $scope.displayedCardIndex);
+            $scope.displayedCard = $scope.getDisplayedCard();
             $scope.hasPrevious = $scope.displayedCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.displayedCardIndex);
@@ -119,8 +119,7 @@ oppia.directive('progressNav', [
             }
             return Boolean(
               interactionIsInline &&
-              ($scope.displayedCard.getDestStateName() ||
-              $scope.displayedCard.getLeadsToConceptCard()) &&
+              $scope.displayedCard.isCompleted() &&
               $scope.displayedCard.getLastOppiaResponse());
           };
         }

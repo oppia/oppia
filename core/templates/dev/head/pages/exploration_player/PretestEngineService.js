@@ -56,6 +56,21 @@ oppia.factory('PretestEngineService', [
         newState.content.getHtml(), envs);
     };
 
+    var _getRandomSuffix = function() {
+      // This is a bit of a hack. When a refresh to a $scope variable
+      // happens,
+      // AngularJS compares the new value of the variable to its previous
+      // value. If they are the same, then the variable is not updated.
+      // Appending a random suffix makes the new value different from the
+      // previous one, and thus indirectly forces a refresh.
+      var randomSuffix = '';
+      var N = Math.round(Math.random() * 1000);
+      for (var i = 0; i < N; i++) {
+        randomSuffix += ' ';
+      }
+      return randomSuffix;
+    };
+
     // This should only be called when 'exploration' is non-null.
     var _loadInitialQuestion = function(successCallback) {
       var initialState = pretestQuestions[0].getStateData();
@@ -80,14 +95,13 @@ oppia.factory('PretestEngineService', [
           interactionId,
           interaction.customizationArgs,
           true, nextFocusLabel);
-        FocusManagerService.setFocusIfOnDesktop(nextFocusLabel);
       }
       var initialCard =
         StateCardObjectFactory.createNewCard(
-          null, {}, questionHtml, interactionHtml, interaction, false,
+          null, questionHtml, interactionHtml, interaction,
           initialState.contentIdsToAudioTranslations,
           initialState.content.getContentId());
-      successCallback(initialCard);
+      successCallback(initialCard, nextFocusLabel);
     };
 
     var _getCurrentStateData = function() {
@@ -141,43 +155,8 @@ oppia.factory('PretestEngineService', [
       getExplorationVersion: function() {
         return version;
       },
-      isNextInteractionInline: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          !interactionId ||
-          INTERACTION_SPECS[interactionId].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-      },
-      getNextInteractionInstructions: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
-      },
-      isNextStateTerminal: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          interactionId && INTERACTION_SPECS[interactionId].is_terminal);
-      },
-      getHints: function() {
-        return _getCurrentStateData().interaction.hints;
-      },
-      getSolution: function() {
-        return _getCurrentStateData().interaction.solution;
-      },
       getLanguageCode: function() {
         return pretestQuestions[currentIndex].getLanguageCode();
-      },
-      getCurrentInteraction: function() {
-        return _getCurrentStateData().interaction;
-      },
-      getContentIdsToAudioTranslations: function() {
-        return _getCurrentStateData().contentIdsToAudioTranslations;
-      },
-      doesInteractionSupportHints: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          !INTERACTION_SPECS[interactionId].is_terminal &&
-        !INTERACTION_SPECS[interactionId].is_linear);
       },
       isInPreviewMode: function() {
         return false;
@@ -249,9 +228,13 @@ oppia.factory('PretestEngineService', [
         var nextCard = null;
         if (!isFinalQuestion) {
           var nextInteractionHtml = _getNextInteractionHtml(_nextFocusLabel);
+
+          questionHtml = questionHtml + _getRandomSuffix();
+          nextInteractionHtml = nextInteractionHtml + _getRandomSuffix();
+
           nextCard = StateCardObjectFactory.createNewCard(
-            true, oldParams, questionHtml, nextInteractionHtml,
-            _getNextStateData().interaction, false,
+            true, questionHtml, nextInteractionHtml,
+            _getNextStateData().interaction,
             _getNextStateData().contentIdsToAudioTranslations,
             _getNextStateData().content.getContentId()
           );
