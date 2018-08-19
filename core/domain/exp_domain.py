@@ -4000,7 +4000,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
-        """ Converts a v21 exploration dict into a v22 exploration dict.
+        """Converts a v21 exploration dict into a v22 exploration dict.
 
         Moves the labelled_as_correct field from the answer group level to the
         outcome level, and adds two extra customization args to the
