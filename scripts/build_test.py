@@ -258,14 +258,13 @@ class BuildTests(test_utils.GenericTestBase):
         correct number of copy tasks.
         """
         assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
-        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
         copy_tasks = collections.deque()
 
         self.assertEqual(len(copy_tasks), 0)
         build.generate_copy_tasks_to_copy_from_source_to_target(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes,
             copy_tasks)
-        # Minus 1 to account for added hashes.js.
         self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self):
@@ -373,8 +372,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks)
-        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
-        # Minus 1 to adjust for hashes.js.
+        total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
         self.assertEqual(len(build_tasks), total_file_count)
 
         # Only build HTML files.
@@ -421,7 +419,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html', '.py',)):
             self.assertEqual(
                 len(recently_changed_filenames), build.get_file_count(
-                    build.ASSETS_DEV_DIR) - 1)
+                    build.ASSETS_DEV_DIR))
         # Minus 1 from ASSETS_DEV_DIR to account for added hashes.js.
 
     def test_remove_deleted_files(self):

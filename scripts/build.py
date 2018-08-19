@@ -48,7 +48,7 @@ TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
 }
 
 HASHES_JS_FILENAME = 'hashes.js'
-HASHES_JSON = os.path.join('build', 'assets', HASHES_JS_FILENAME)
+HASHES_JSON = os.path.join(ASSETS_DEV_DIR, HASHES_JS_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -204,9 +204,6 @@ def get_file_count(directory_path):
             if not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 total_file_count += 1
-    if directory_path == ASSETS_DEV_DIR:
-        # Add 1 to account for the added hashes.js.
-        total_file_count += 1
     return total_file_count
 
 
@@ -882,7 +879,7 @@ def generate_build_directory():
             hashes_js_file, get_hashes_json_file_contents(hashes))
     # Update hash dict with newly created hashes.js.
     hashes.update({HASHES_JS_FILENAME: generate_md5_hash(HASHES_JSON)})
-    # Make sure hashes.js is available to the frontend.
+    # Make sure /assets/hashes.js is available to the frontend.
     _ensure_files_exist([HASHES_JSON])
 
     # Build files in /extensions and copy them into staging directory.
@@ -906,13 +903,6 @@ def generate_build_directory():
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes, copy_tasks)
     _execute_tasks(copy_tasks)
 
-    # Rewrite hashes.js as JSON again due to deletion by copy functions.
-    # Add hash to filename from hash dict.
-    hash_final_file_path = _insert_hash(HASHES_JSON, hashes[HASHES_JS_FILENAME])
-    with open(hash_final_file_path, 'w+') as hashes_js_file:
-        write_to_file_stream(
-            hashes_js_file, get_hashes_json_file_contents(hashes))
-
     for i in xrange(len(COPY_INPUT_DIRS)):
         # Make sure that all files in source directory and staging directory are
         # accounted for.
@@ -928,9 +918,12 @@ def generate_build_directory():
                     # These filenames do not contain hashes.
                     continue
                 _match_filename_with_hashes(filename, hashes)
-    # Make sure hashes.[HASH].js is available.
-    _ensure_files_exist([hash_final_file_path])
-
+    # Make sure /build/assets/hashes.[HASH].js is available.
+    hash_final_filename = _insert_hash(
+        HASHES_JS_FILENAME, hashes[HASHES_JS_FILENAME])
+    _ensure_files_exist([os.path.join(ASSETS_OUT_DIR, hash_final_filename)])
+    # Clean up un-hashed hashes.js.
+    os.remove(HASHES_JSON)
     print 'Build completed.'
 
 
