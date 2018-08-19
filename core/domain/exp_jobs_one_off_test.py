@@ -1092,7 +1092,8 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
 
         # Test that validation passes after migration.
         # There should be no validation errors in the new (updated)
-        # explorations, but there are 16 validation errors in the old versions.
+        # exploration, but there are 16 validation errors in the old
+        # exploration.
         self.assertEqual(len(actual_output), 16)
 
 
