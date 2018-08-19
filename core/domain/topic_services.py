@@ -201,6 +201,25 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
+def get_topic_by_name(topic_name):
+    """Returns a domain object representing a topic.
+
+    Args:
+        topic_name: str. The name of the topic.
+
+    Returns:
+        Topic or None. The domain object representing a topic with the
+        given id, or None if it does not exist.
+    """
+    topic_model = topic_models.TopicModel.get_by_name(topic_name)
+
+    if topic_model is None:
+        return None
+
+    topic = get_topic_from_model(topic_model)
+    return topic
+
+
 def get_topic_summary_by_id(topic_id, strict=True):
     """Returns a domain object representing a topic summary.
 
@@ -268,7 +287,14 @@ def save_new_topic(committer_id, topic):
     Args:
         committer_id: str. ID of the committer.
         topic: Topic. Topic to be saved.
+
+    Raises:
+        Exception. Topic with same name already exists.
     """
+    existing_topic = get_topic_by_name(topic.name)
+    if existing_topic is not None:
+        raise Exception('Topic with name \'%s\' already exists' % topic.name)
+
     commit_message = (
         'New topic created with name \'%s\'.' % topic.name)
     _create_topic(
