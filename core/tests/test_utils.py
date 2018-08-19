@@ -35,6 +35,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -1276,14 +1277,14 @@ class AppEngineTestBase(TestBase):
         Returns:
             dict. The default question_data dict.
         """
-        state = exp_domain.State.create_default_state(
+        state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        solution_explanation = exp_domain.SubtitledHtml(
+        solution_explanation = state_domain.SubtitledHtml(
             'solution', 'Solution explanation')
-        solution = exp_domain.Solution(
+        solution = state_domain.Solution(
             'TextInput', False, 'Solution', solution_explanation)
-        hint_content = exp_domain.SubtitledHtml('hint_1', 'Hint 1')
-        hint = exp_domain.Hint(hint_content)
+        hint_content = state_domain.SubtitledHtml('hint_1', 'Hint 1')
+        hint = state_domain.Hint(hint_content)
         state.interaction.id = 'TextInput'
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',

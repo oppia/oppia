@@ -1048,26 +1048,33 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertGreater(len(actual_output), 0)
+        self.assertEqual(len(actual_output), 16)
 
         exploration_dict = exploration.to_dict()
-        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+        # We need to create a brand-new exploration here in addition to the old
+        # one (rather than just overwriting the old one), because state id
+        # mapping model is generated when each (exp, version) is saved for
+        # first time. Hence when an exisiting exploration is overwritten
+        # state id mapping model throws an error that mapping already exists.
+        new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
         # This is done to ensure that exploration is not passed through CKEditor
         # Migration pipeline.
-        updated_dict['schema_version'] = 29
-        updated_dict['states_schema_version'] = 24
-        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
-        updated_states = updated_dict['states']
+        new_exp_dict['id'] = self.NEW_EXP_ID
+        new_exp_dict['schema_version'] = 29
+        new_exp_dict['states_schema_version'] = 24
+        new_exploration = exp_domain.Exploration.from_dict(new_exp_dict)
+        new_states = new_exp_dict['states']
 
         for index, state_name in enumerate(state_list):
-            updated_html = updated_states[state_name]['content']['html']
+            new_html = new_states[state_name]['content']['html']
 
             # Test that html matches the expected format after migration.
             self.assertEqual(
-                updated_html, unicode(test_cases[index]['expected_output']))
+                new_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(self.albert_id, updated_exploration)
+        exp_services.save_new_exploration(self.albert_id, new_exploration)
+
         # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
@@ -1084,7 +1091,10 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation passes after migration.
-        self.assertEqual(actual_output, [])
+        # There should be no validation errors in the new (updated)
+        # exploration, but there are 16 validation errors in the old
+        # exploration.
+        self.assertEqual(len(actual_output), 16)
 
 
 class ExplorationContentValidationJobForCKEditorTest(

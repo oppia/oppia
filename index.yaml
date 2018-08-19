@@ -126,6 +126,21 @@ indexes:
   - name: entity_type
   - name: last_updated
 
+- kind: GeneralFeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: entity_id
+  - name: entity_type
+  - name: last_updated
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: score_category
+  - name: status
+  - name: author_id
+
 - kind: GeneralSuggestionModel
   properties:
   - name: deleted
@@ -162,6 +177,12 @@ indexes:
   properties:
   - name: realtime_layer
   - name: created_on
+
+- kind: UserContributionScoringModel
+  properties:
+  - name: deleted
+  - name: user_id
+  - name: score
 
 - kind: UserImpactRealtimeModel
   properties:

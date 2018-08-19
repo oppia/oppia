@@ -56,6 +56,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
 
+    def test_to_human_readable_dict(self):
+        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        expected_dict = {
+            'id': self.STORY_ID,
+            'title': 'Title',
+            'description': 'Description'
+        }
+
+        self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
+
     def test_defaults(self):
         """Test the create_default_story and create_default_story_node
         method of class Story.

@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
@@ -505,7 +506,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_feedback_threads_with_suggestions(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            new_content = exp_domain.SubtitledHtml(
+            new_content = state_domain.SubtitledHtml(
                 'content', 'new content html').to_dict()
             change_cmd = {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -517,6 +518,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
                 self.user_id, change_cmd, 'sample description', None)
+
             response = self.get_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
