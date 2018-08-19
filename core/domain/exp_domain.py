@@ -3939,7 +3939,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
-        """ Converts a v17 exploration dict into a v18 exploration dict.
+        """Converts a v17 exploration dict into a v18 exploration dict.
 
         Adds auto_tts_enabled property.
         """
@@ -3954,7 +3954,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
-        """ Converts a v18 exploration dict into a v19 exploration dict.
+        """Converts a v18 exploration dict into a v19 exploration dict.
 
         Adds audio translations to feedback, hints, and solutions.
         """
@@ -3968,7 +3968,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
-        """ Converts a v19 exploration dict into a v20 exploration dict.
+        """Converts a v19 exploration dict into a v20 exploration dict.
 
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
