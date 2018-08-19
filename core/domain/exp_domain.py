@@ -3985,7 +3985,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
-        """ Converts a v20 exploration dict into a v21 exploration dict.
+        """Converts a v20 exploration dict into a v21 exploration dict.
 
         Adds a refresher_exploration_id field to each answer group outcome, and
         to the default outcome (if it exists).
