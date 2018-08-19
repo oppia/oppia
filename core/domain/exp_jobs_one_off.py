@@ -40,11 +40,13 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
+ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
 FILE_FOUND_IN_GCS = 'File found in GCS'
 FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
 FILE_DELETED = 'File has been deleted'
+FILE_FOUND_IN_GCS = 'File is there in GCS'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
@@ -770,6 +772,13 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
                 catched_groups = GCS_IMAGE_ID_REGEX.match(url)
                 if not catched_groups:
                     yield (INVALID_GCS_URL, url)
+                else:
+                    try:
+                        filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
+                        if fs_old.isfile('image/%s' % filename):
+                            yield (FILE_FOUND_IN_GCS, filename)
+                    except Exception:
+                        yield (ERROR_IN_FILENAME, url)
             for url in audio_urls:
                 catched_groups = GCS_AUDIO_ID_REGEX.match(url)
                 if not catched_groups:
@@ -808,14 +817,17 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                 GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
 
             for image_filename in image_filenames:
-                raw_image = fs_old.get('image/%s' % image_filename)
-                height, width = gae_image_services.get_image_dimensions(
-                    raw_image)
-                filename_with_dimensions = (
-                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                        image_filename, height, width))
-                exp_services.save_original_and_compressed_versions_of_image(
-                    'ADMIN', filename_with_dimensions, exp_id, raw_image)
+                try:
+                    raw_image = fs_old.get('image/%s' % image_filename)
+                    height, width = gae_image_services.get_image_dimensions(
+                        raw_image)
+                    filename_with_dimensions = (
+                        html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
+                            image_filename, height, width))
+                    exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
+                        'ADMIN', filename_with_dimensions, exp_id, raw_image)
+                except Exception:
+                    yield (ERROR_IN_FILENAME, image_filename)
 
             for audio_filename in audio_filenames:
                 filetype = audio_filename[audio_filename.rfind('.') + 1:]
