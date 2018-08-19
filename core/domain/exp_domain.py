@@ -4046,7 +4046,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """ Converts a v24 exploration dict into a v25 exploration dict.
+        """Converts a v24 exploration dict into a v25 exploration dict.
 
         Adds additional tagged_misconception_id and
         missing_prerequisite_skill_id fields to answer groups and outcomes
