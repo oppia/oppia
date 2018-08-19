@@ -16,7 +16,7 @@
             <div class="col-sm-6 col-sm-pull-6" style="z-index:20">
               <h1 class="oppia-fractions-landing-h1">Fractions just got easier</h1>
               <h2 class="oppia-fractions-landing-h2">Get your students and kids started with our free, effective math lessons.</h2>
-              <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
+              <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('teacher')" style="left:30px;">Get Started</button>
               <button class="btn oppia-fractions-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
             </div>
           </div>
@@ -169,9 +169,9 @@
     <div class="oppia-fractions-landing-section text-center" style="background-color: #afd2eb">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1" style="text-align: center; padding-left: 0px; padding-bottom: 10px; margin-left: 10%; margin-right: 10%">Imagine what your students could learn today!</h1>
-        <button class="btn oppia-fractions-landing-get-started" style="margin-top: 2%; left: 0" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
+        <button class="btn oppia-fractions-landing-get-started oppia-fractions-landing-get-started-mobile" style="margin-top: 2%;" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
         <h2 class="oppia-fractions-landing-h2 oppia-fractions-landing-centered-h2" style="margin-top: 2.5%; text-align: center; width: 55%;">To see high quality lessons on subjects other than Fractions, visit our Library!</h2>
-        <button class="btn oppia-fractions-landing-explore-lessons" style="left: 0" ng-click="onClickExploreLessonsButton()">Explore Lessons</button>
+        <button class="btn oppia-fractions-landing-explore-lessons oppia-fractions-landing-explore-lessons-mobile" ng-click="onClickExploreLessonsButton()">Explore Lessons</button>
         <div style="position: absolute; top: 40%">
           <div class="oppia-fractions-landing-background-icon-row">
             <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-fractions-landing-background-icon" alt="">
@@ -297,7 +297,7 @@
     .oppia-fractions-landing-explore-lessons {
       background-color: #015c53;
       color: #fff;
-      left: 30px;
+      left: 0;
       margin-right: 15px;
     }
     .oppia-fractions-landing-learn-more {
@@ -388,6 +388,12 @@
       }
       .oppia-fractions-landing-get-started {
         margin-right: 5%;
+      }
+      .oppia-fractions-landing-get-started-mobile {
+        left:15px;
+      }
+      .oppia-fractions-landing-explore-lessons-mobile {
+        left:6.5px;
       }
       .oppia-fractions-landing-image-mobile {
         display: block;
