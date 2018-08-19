@@ -231,7 +231,8 @@ def _compare_file_count(source_path, target_path):
        target_path: str. Final filepath or built file's directory.
 
     Raises:
-        ValueError: Raised if both dir do not have the same file count.
+        ValueError: The source directory does not have the same file count as
+            the target directory.
     """
     source_dir_file_count = get_file_count(source_path)
     target_dir_file_count = get_file_count(target_path)
@@ -251,9 +252,9 @@ def _match_filename_with_hashes(filename, file_hashes):
         file_hashes: dict(str, str). Dictionary of file hashes.
 
     Raises:
-        ValueError: Raised if hash dict is empty.
-        ValueError: Raised if filename does not contain hash.
-        KeyError: Raised if filename's hash does not match hash dict entries.
+        ValueError: The hash dict is empty.
+        ValueError: The filename does not contain hash.
+        KeyError: The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
@@ -785,7 +786,8 @@ def build_directory(dirnames_dict, file_hashes, build_tasks):
             rebuild_new_files(
                 source_dir, staging_dir, recently_changed_filenames,
                 file_hashes, build_tasks)
-            # Clean up files in staging dir that have been removed in DEV dir.
+            # Clean up files in staging directory that have been removed from
+            # source directory.
             print 'Scanning directory %s to remove deleted file' % staging_dir
             remove_deleted_files(dev_dir_hashes, staging_dir, delete_tasks)
             _execute_tasks(delete_tasks)
@@ -793,12 +795,13 @@ def build_directory(dirnames_dict, file_hashes, build_tasks):
             print 'No changes detected. Using previously built files.'
 
 
-def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
+def remove_deleted_files(source_dir_hashes, staging_directory, delete_tasks):
     """Walk the staging directory and remove files that are not in the hash dict
-    i.e. remaining files in staging dir that have since been deleted from /DEV.
+    i.e. remaining files in staging directory that have since been deleted from
+    source directory.
 
     Args:
-        dev_dir_hashes: dict(str, str). Dictionary of file hashes.
+        source_dir_hashes: dict(str, str). Dictionary of file hashes.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
         delete_tasks: deque(Thread). A deque that contains all delete tasks
@@ -815,9 +818,9 @@ def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
             if any(target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 continue
             relative_path = os.path.relpath(target_path, staging_directory)
-            # Remove file found in staging dir but not in /DEV, i.e.
-            # file not listed in hash dict.
-            if relative_path not in dev_dir_hashes:
+            # Remove file found in staging directory but not in source directory
+            # , i.e. file not listed in hash dict.
+            if relative_path not in source_dir_hashes:
                 print ('Unable to find %s in file hashes, deleting file'
                        % relative_path)
                 _ensure_files_exist([target_path])
@@ -825,12 +828,13 @@ def remove_deleted_files(dev_dir_hashes, staging_directory, delete_tasks):
                 delete_tasks.append(task)
 
 
-def get_recently_changed_filenames(dev_dir_hashes, out_dir):
-    """Compare hashes of DEV files and BUILD files. Return a list of filenames
-    that were recently changed.
+def get_recently_changed_filenames(source_dir_hashes, out_dir):
+    """Compare hashes of source files and built files. Return a list of
+    filenames that were recently changed.
 
     Args:
-        dev_dir_hashes: str. dict(str, str). Dictionary of /DEV's file hashes.
+        source_dir_hashes: str. dict(str, str). Dictionary of hashes of files
+            to be built.
         out_dir: str. Path relative to /oppia where BUILD files are located.
 
     Returns:
@@ -843,7 +847,7 @@ def get_recently_changed_filenames(dev_dir_hashes, out_dir):
     recently_changed_filenames = []
     # Currently, we do not hash Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
-    for file_name, md5_hash in dev_dir_hashes.iteritems():
+    for file_name, md5_hash in source_dir_hashes.iteritems():
         # Ignore files with certain extensions.
         if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
@@ -923,7 +927,8 @@ def generate_build_directory():
             hashes_js_file, get_hashes_json_file_contents(hashes))
 
     for i in xrange(len(COPY_INPUT_DIRS)):
-        # Make sure that all files in /DEV and staging dir are accounted for.
+        # Make sure that all files in source directory and staging directory are
+        # accounted for.
         _compare_file_count(COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i])
     # Make sure that hashed file name matches with current hash dict.
     for built_dir in COPY_OUTPUT_DIRS:
