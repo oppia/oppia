@@ -78,8 +78,10 @@ class BuildTests(test_utils.GenericTestBase):
         # returncode is the exit status of the child process.
         self.assertEqual(calledProcessException.returncode, 1)
 
-    def test_copy_fonts(self):
-        """Test _copy_fonts to ensure that all fonts files are copied over."""
+    def test_generate_copy_tasks_for_fonts(self):
+        """Test _generate_copy_tasks_for_fonts to ensure that a correct number
+        of copy tasks for fonts are queued.
+        """
         copy_tasks = collections.deque()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
@@ -88,7 +90,7 @@ class BuildTests(test_utils.GenericTestBase):
         # pylint: disable=protected-access
 
         self.assertEqual(len(copy_tasks), 0)
-        build._copy_fonts(
+        build._generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], target_fonts_dir, copy_tasks)
         # pylint: enable=protected-access
         # Asserting the same number of copy tasks and number of font files.
@@ -110,17 +112,6 @@ class BuildTests(test_utils.GenericTestBase):
                 'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
         # pylint: enable=protected-access
 
-    def test_does_directory_exist(self):
-        """Test does_directory_exist to return whether directory tree of file
-        exists.
-        """
-        self.assertTrue(build.does_directory_tree_exist(build.ASSETS_DEV_DIR))
-        self.assertTrue(build.does_directory_tree_exist(
-            build.THIRD_PARTY_GENERATED_DEV_DIR))
-        self.assertFalse(
-            build.does_directory_tree_exist(os.path.join('random')))
-        self.assertFalse(build.does_directory_tree_exist(os.path.join('*.txt')))
-
     def test_ensure_files_exist(self):
         """Test _ensure_files_exist raises exception with a non-existent
         filepath.
@@ -141,17 +132,20 @@ class BuildTests(test_utils.GenericTestBase):
         ignored files.
         """
         all_inclusive_file_count = 0
-        for _, _, files in os.walk(build.EXTENSIONS_DIR.get('dev_dir')):
+        for _, _, files in os.walk(
+                build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']):
             all_inclusive_file_count += len(files)
         ignored_file_count = 0
-        for _, _, files in os.walk(build.EXTENSIONS_DIR.get('dev_dir')):
+        for _, _, files in os.walk(
+                build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']):
             for filename in files:
                 if any(filename.endswith(p)
                        for p in build.FILE_EXTENSIONS_TO_IGNORE):
                     ignored_file_count += 1
         self.assertEqual(
             all_inclusive_file_count - ignored_file_count,
-            build.get_file_count(build.EXTENSIONS_DIR.get('dev_dir')))
+            build.get_file_count(
+                build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']))
 
     def test_compare_file_count(self):
         """Test _compare_file_count to raise exception when there is a
@@ -160,13 +154,13 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaises(ValueError) as incorrectFileCount:
             # pylint: disable=protected-access
             build._compare_file_count(
-                build.EXTENSIONS_DIR.get('dev_dir'),
-                build.TEMPLATES_CORE_DIR.get('dev_dir'))
+                build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+                build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
         # pylint: enable=protected-access
         source_dir_file_count = build.get_file_count(
-            build.EXTENSIONS_DIR.get('dev_dir'))
+            build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'])
         target_dir_file_count = build.get_file_count(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'))
+            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
         self.assertTrue(
             ('%s files in source dir != %s files in target dir.') % (
                 source_dir_file_count, target_dir_file_count) in
@@ -186,7 +180,6 @@ class BuildTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             build._match_filename_with_hashes(base_filename, file_hashes)
             # pylint: enable=protected-access
-        print emptyHashDict.exception
         self.assertTrue('Hash dict is empty' in emptyHashDict.exception)
 
         file_hashes = {base_filename: random.getrandbits(128)}
@@ -214,7 +207,8 @@ class BuildTests(test_utils.GenericTestBase):
     def test_process_html(self):
         """Test process_html to remove whitespaces and hash filepaths."""
         base_source_path = os.path.join(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'), 'pages', 'base.html')
+            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'], 'pages',
+            'base.html')
         # Prepare a file_stream object from StringIO.
         minified_html_file_stream = StringIO.StringIO()
         # Obtain actual file hashes of /templates to add hash to all filepaths
@@ -222,7 +216,7 @@ class BuildTests(test_utils.GenericTestBase):
         # E.g <script ... app.js></script>
         # --> <script ... app.[hash].js></script>.
         file_hashes = build.get_file_hashes(
-            build.TEMPLATES_CORE_DIR.get('dev_dir'))
+            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'])
         # pylint: disable=protected-access
         # Reading from actual base.html file and not simply a dummy file.
         build._ensure_files_exist([base_source_path])
@@ -244,16 +238,20 @@ class BuildTests(test_utils.GenericTestBase):
                 result = re.findall(filepath, source_base_file_content)
                 if result:
                     base_file_unhashed_filenames.append(result[0])
-        self.assertGreater(len(base_file_unhashed_filenames), 0)
-        build.process_html(
-            base_source_path, minified_html_file_stream, file_hashes)
+            self.assertGreater(len(base_file_unhashed_filenames), 0)
+
+            build.process_html(
+                source_base_file, minified_html_file_stream, file_hashes)
+
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
-            msg="All white spaces must be removed from %s" % base_source_path)
+            msg='All white spaces must be removed from %s' %
+            base_source_path)
         # Assert that all filenames must be hashed.
         for unhashed_filename in base_file_unhashed_filenames:
-            result = re.findall(unhashed_filename, minified_html_file_content)
+            result = re.findall(
+                unhashed_filename, minified_html_file_content)
             self.assertEqual(len(result), 0)
 
     def test_hash_should_be_inserted(self):
@@ -275,16 +273,16 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertTrue(build.hash_should_be_inserted(
                 'rich_text_components/Video/protractor.js'))
 
-    def test_copy_files_source_to_target(self):
-        """Test copy_files_source_to_target to queue up correct number of copy
-        tasks.
+    def test_generate_copy_tasks_to_copy_from_source_to_target(self):
+        """Test generate_copy_tasks_to_copy_from_source_to_target to queue up
+        correct number of copy tasks.
         """
         assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR) - 1
         copy_tasks = collections.deque()
 
         self.assertEqual(len(copy_tasks), 0)
-        build.copy_files_source_to_target(
+        build.generate_copy_tasks_to_copy_from_source_to_target(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes,
             copy_tasks)
         # Minus 1 to account for added hashes.js.
@@ -366,7 +364,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_execute_tasks(self):
         """Test _execute_tasks to join all threads after executing all tasks."""
         build_tasks = collections.deque()
-        TASK_COUNT = 5
+        TASK_COUNT = 2
         count = TASK_COUNT
         while count:
             task = threading.Thread(
@@ -380,7 +378,13 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(threading.active_count(), 1)
         # pylint: disable=protected-access
         build._execute_tasks(build_tasks)
+        with self.assertRaises(OSError) as threadAlreadyStarted:
+            build._execute_tasks(build_tasks)
         # pylint: enable=protected-access
+        self.assertTrue(
+            'threads can only be started once' in
+            threadAlreadyStarted.exception)
+        # Assert that all threads are joined.
         self.assertEqual(threading.active_count(), 1)
 
     def test_build_files(self):
