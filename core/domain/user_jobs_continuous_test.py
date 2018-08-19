@@ -581,7 +581,7 @@ class ModifiedUserStatsMRJobManager(
 
 
 class UserStatsAggregatorTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's statistics -
+    """Tests the calculation of a user's statistics -
     impact score, average ratings, total plays
     from the continuous computation of UserStatsAggregator.
     """
