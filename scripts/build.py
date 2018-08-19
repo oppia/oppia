@@ -35,19 +35,6 @@ THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', '')
 
-STAGING_THIRD_PARTY_JS = os.path.join(
-    THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
-STAGING_THIRD_PARTY_CSS = os.path.join(
-    THIRD_PARTY_GENERATED_STAGING_DIR, 'css', 'third_party.min.css')
-STAGING_FONTS_DIR = os.path.join(
-    THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts', '')
-
-DEV_THIRD_PARTY_JS = os.path.join(
-    THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
-DEV_THIRD_PARTY_CSS = os.path.join(
-    THIRD_PARTY_GENERATED_DEV_DIR, 'css', 'third_party.css')
-DEV_FONTS_DIR = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts', '')
-
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
