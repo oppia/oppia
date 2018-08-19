@@ -103,12 +103,12 @@
 
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-right: 0px;">
-      <li>
-        <a ng-if="canEdit" ng-href="/collection_editor/create/{{collection_id}}" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank">
-          <i class="material-icons">&#xE254;</i>
-          <span class="oppia-icon-accessibility-label">Edit</span>
-        </a>
-      </li>
+    <li>
+      <a ng-if="canEdit" ng-href="/collection_editor/create/{{collection_id}}" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank">
+        <i class="material-icons">&#xE254;</i>
+        <span class="oppia-icon-accessibility-label">Edit</span>
+      </a>
+    </li>
   </ul>
 {% endblock local_top_nav_options %}
 
