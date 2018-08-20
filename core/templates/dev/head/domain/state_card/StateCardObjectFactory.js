@@ -149,6 +149,13 @@ oppia.factory('StateCardObjectFactory', [
       return this._inputResponsePairs[this._inputResponsePairs.length - 1];
     };
 
+    StateCard.prototype.getLastAnswer = function() {
+      if (this.getLastInputResponsePair() === null) {
+        return null;
+      }
+      return this.getLastInputResponsePair().learnerInput;
+    };
+
     StateCard.prototype.getLastOppiaResponse = function() {
       if (this.getLastInputResponsePair() === null) {
         return null;

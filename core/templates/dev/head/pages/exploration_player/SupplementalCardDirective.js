@@ -47,8 +47,7 @@ oppia.directive('supplementalCard', [
             $scope.clearHelpCard();
             $scope.lastAnswer = null;
             if ($scope.displayedCard.isCompleted()) {
-              $scope.lastAnswer =
-                $scope.displayedCard.getLastInputResponsePair();
+              $scope.lastAnswer = $scope.displayedCard.getLastAnswer();
             }
           };
 

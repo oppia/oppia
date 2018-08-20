@@ -41,11 +41,9 @@ oppia.factory('PlayerTranscriptService', [
         numAnswersSubmitted = 0;
       },
       hasEncounteredStateBefore: function(stateName) {
-        var stateHistory = [];
-        transcript.forEach(function(transcriptItem) {
-          stateHistory.push(transcriptItem.getStateName());
+        return transcript.some(function(transcriptItem) {
+          return transcriptItem.getStateName() === stateName;
         });
-        return stateHistory.indexOf(stateName) !== -1;
       },
       addNewCard: function(newCard) {
         transcript.push(newCard);
@@ -59,9 +57,10 @@ oppia.factory('PlayerTranscriptService', [
         }
         // TODO(aks681): Once worked examples are introduced, modify the below
         // line to take into account the number of worked examples displayed.
-        var previousCard = angular.copy(transcript[transcript.length - 2]);
-        previousCard.markAsNotCompleted();
-        transcript.push(previousCard);
+        var copyOfPreviousCard =
+          angular.copy(transcript[transcript.length - 2]);
+        copyOfPreviousCard.markAsNotCompleted();
+        transcript.push(copyOfPreviousCard);
       },
       addNewInput: function(input, isHint) {
         var card = this.getLastCard();
@@ -83,11 +82,6 @@ oppia.factory('PlayerTranscriptService', [
       },
       addNewResponse: function(response) {
         var card = this.getLastCard();
-        if (card.getLastOppiaResponse() !== null) {
-          throw Error(
-            'Trying to add a response when it has already been added.',
-            transcript);
-        }
         card.setLastOppiaResponse(response);
       },
       getNumCards: function() {

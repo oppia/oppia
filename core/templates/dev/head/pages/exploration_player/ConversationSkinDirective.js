@@ -255,7 +255,7 @@ oppia.directive('conversationSkin', [
         'LearnerParamsService', 'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'siteAnalyticsService',
-        'PretestQuestionBackendApiService',
+        'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
@@ -280,7 +280,7 @@ oppia.directive('conversationSkin', [
             LearnerParamsService, ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, siteAnalyticsService,
-            PretestQuestionBackendApiService,
+            PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
@@ -604,6 +604,9 @@ oppia.directive('conversationSkin', [
           };
 
           $rootScope.$on('playerStateChange', function(evt, newStateName) {
+            if (!newStateName) {
+              return;
+            }
             // To restart the preloader for the new state if required.
             if (!_editorPreviewMode) {
               ImagePreloaderService.onStateChange(newStateName);
@@ -807,7 +810,6 @@ oppia.directive('conversationSkin', [
                     }
                     FatigueDetectionService.reset();
                     NumberAttemptsService.reset();
-                    _nextFocusLabel = focusLabel;
 
                     var _isNextInteractionInline =
                       $scope.nextCard.isInteractionInline();
@@ -886,6 +888,12 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
+            if ($scope.moveToExploration) {
+              $scope.moveToExploration = false;
+              ExplorationPlayerStateService.moveToExploration(
+                _initializeDirectiveComponents);
+              return;
+            }
             if (
               $scope.displayedCard.isCompleted() &&
               ($scope.nextCard.getStateName() ===
@@ -910,12 +918,6 @@ oppia.directive('conversationSkin', [
               $scope.pendingCardWasSeenBefore = false;
             }
             $scope.answerIsCorrect = false;
-            if ($scope.moveToExploration) {
-              $scope.moveToExploration = false;
-              ExplorationPlayerStateService.moveToExploration(
-                _initializeDirectiveComponents);
-              return;
-            }
             $scope.showPendingCard();
           };
 

@@ -123,11 +123,6 @@ describe('Player transcript service', function() {
         'input has been received.'));
 
     pts.addNewResponse('feedback');
-    expect(function() {
-      pts.addNewResponse('invalid feedback');
-    }).toThrow(
-      new Error('Trying to add a response when it has already been added.'));
-
     pts.addNewInput('second answer', true);
 
     var firstCard = pts.getCard(0);

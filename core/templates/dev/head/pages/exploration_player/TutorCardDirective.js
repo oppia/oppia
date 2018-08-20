@@ -76,28 +76,27 @@ oppia.directive('tutorCard', [
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var updateDisplayedCard = function() {
-            $scope.displayedCard = $scope.getDisplayedCard();
             $scope.arePreviousResponsesShown = false;
             $scope.lastAnswer = null;
             $scope.conceptCardIsBeingShown = Boolean(
-              !$scope.displayedCard.getInteraction());
-            $scope.interactionIsActive = !$scope.displayedCard.isCompleted();
+              !$scope.getDisplayedCard().getInteraction());
+            $scope.interactionIsActive =
+              !$scope.getDisplayedCard().isCompleted();
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
               $scope.interactionIsActive = false;
             });
             if (!$scope.interactionIsActive) {
-              $scope.lastAnswer =
-                $scope.displayedCard.getLastInputResponsePair();
+              $scope.lastAnswer = $scope.getDisplayedCard().getLastAnswer();
             }
             if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
-                $scope.displayedCard.getInteractionInstructions());
+                $scope.getDisplayedCard().getInteractionInstructions());
               $scope.contentAudioTranslations = (
-                $scope.displayedCard.getAudioTranslations());
+                $scope.getDisplayedCard().getAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
-                $scope.displayedCard.getContentHtml(),
+                $scope.getDisplayedCard().getContentHtml(),
                 COMPONENT_NAME_CONTENT);
               AudioPlayerService.stop();
               AudioPreloaderService.clearMostRecentlyRequestedAudioFilename();
@@ -109,7 +108,7 @@ oppia.directive('tutorCard', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
-            return $scope.displayedCard.isInteractionInline();
+            return $scope.getDisplayedCard().isInteractionInline();
           };
 
           $scope.getContentAudioHighlightClass = function() {
@@ -177,7 +176,7 @@ oppia.directive('tutorCard', [
             $scope.onChangeInteractionAnswerValidity({
               answerValidity: answerValidity
             });
-            if ($scope.displayedCard.getInteraction().id === 'CodeRepl') {
+            if ($scope.getDisplayedCard().getInteraction().id === 'CodeRepl') {
               $scope.onChangeInteractionAnswerValidity({
                 answerValidity: true
               });
@@ -195,7 +194,7 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              $scope.displayedCard.isContentAudioTranslationAvailable());
+              $scope.getDisplayedCard().isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -204,7 +203,7 @@ oppia.directive('tutorCard', [
 
           $scope.isOnTerminalCard = function() {
             return (
-              $scope.displayedCard.isTerminal());
+              $scope.getDisplayedCard().isTerminal());
           };
 
           $scope.getInputResponsePairId = function(index) {
@@ -220,9 +219,8 @@ oppia.directive('tutorCard', [
 
             // Auto scroll to the new feedback on mobile device.
             if (DeviceInfoService.isMobileDevice()) {
-              var displayedCard = $scope.getDisplayedCard();
               var latestFeedbackIndex = (
-                displayedCard.getInputResponsePairs().length - 1);
+                $scope.getDisplayedCard().getInputResponsePairs().length - 1);
               /* Reference: https://stackoverflow.com/questions/40134381
                  $anchorScroll() without changing actual hash value of url works
                  only when written inside a timeout of 0 ms. */
