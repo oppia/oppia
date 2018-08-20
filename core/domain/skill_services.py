@@ -25,8 +25,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(skill_models, user_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.user])
+(skill_models, user_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -857,5 +857,6 @@ def skill_has_associated_questions(skill_id):
         bool. Whether any question has this skill attached.
     """
     question_ids = (
-        question_models.QuestionSkillModel.get_all_question_ids_linked_to_skill_id(skill_id))
+        question_models.QuestionSkillModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
+            skill_id))
     return (len(question_ids) > 0)
