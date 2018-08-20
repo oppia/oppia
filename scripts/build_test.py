@@ -434,7 +434,7 @@ class BuildTests(test_utils.GenericTestBase):
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
         self.assertEqual(len(tasks), total_file_count)
 
-    def generate_build_tasks_to_build_files_from_filepaths(self):
+    def test_generate_build_tasks_to_build_files_from_filepaths(self):
         """Test generate_build_tasks_to_build_files_from_filepaths queue up a
         corresponding number of build tasks to the number of file changes.
         """
