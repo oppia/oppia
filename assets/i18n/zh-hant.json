@@ -502,6 +502,8 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "探索的內容代表著必須不間斷地改進，若一些探索長時間未有編輯記錄會被視為「孤立」。在此情況下，多數會將探索所有權移交給 Oppia 社群處理（版主斟酌決定），以讓探索內容能有繼續改進的機會。",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "參與規範",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "以 Oppia 教學",
+	"I18N_TOPIC_VIEWER_PRACTICE": "練習",
+	"I18N_TOPIC_VIEWER_STORY": "故事",
 	"I18N_TOPNAV_ABOUT": "關於",
 	"I18N_TOPNAV_ABOUT_OPPIA": "關於 Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "管理頁面",

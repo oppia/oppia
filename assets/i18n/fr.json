@@ -502,6 +502,8 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Les explorations sont conçues pour être constamment améliorées, et celles qui n’ont pas été modifiées depuis longtemps peuvent être considérées comme « orphelines ». Dans ce cas, leur propriété peut être récupérée par la communauté Oppia au sens large (selon l’avis du modérateur), afin qu’elle puisse continuer à être améliorée.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Recueil de participation",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
+	"I18N_TOPIC_VIEWER_PRACTICE": "Application",
+	"I18N_TOPIC_VIEWER_STORY": "Histoire",
 	"I18N_TOPNAV_ABOUT": "À propos",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Concernant Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Page de l'administrateur",

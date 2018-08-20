@@ -502,6 +502,8 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "من المفترض أن يتم تحسين عمليات الاستكشاف بشكل مستمر، ويمكن اعتبار الاستكشافات التي لم يتم تحريرها لفترة طويلة \"يتيمة\"، وفي هذه الحالة، يمكن تسليم الملكية إلى مجتمع أوبيا عموما (بناء على تقدير المحرر)، بحيث يمكن مواصلة تحسين عملية الاستكشاف.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "مشاركة دليل التشغيل",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "التعليم مع أوبيا",
+	"I18N_TOPIC_VIEWER_PRACTICE": "الممارسة",
+	"I18N_TOPIC_VIEWER_STORY": "القصة",
 	"I18N_TOPNAV_ABOUT": "حول",
 	"I18N_TOPNAV_ABOUT_OPPIA": "عن أوبيا",
 	"I18N_TOPNAV_ADMIN_PAGE": "صفحة الإداري",
