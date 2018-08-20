@@ -77,8 +77,8 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(calledProcessException.returncode, 1)
 
     def test_generate_copy_tasks_for_fonts(self):
-        """Test _generate_copy_tasks_for_fonts to ensure that a correct number
-        of copy tasks for fonts are queued.
+        """Test _generate_copy_tasks_for_fonts to ensure that the number of copy
+        tasks matches the number of font files.
         """
         copy_tasks = collections.deque()
         # Get all filepaths from manifest.json.
@@ -120,8 +120,8 @@ class BuildTests(test_utils.GenericTestBase):
             fileNotExist.exception)
 
     def test_get_file_count(self):
-        """Test get_file_count to return the correct number of files, minus
-        ignored files.
+        """Test get_file_count to return the correct number of files, excluding
+        file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
         all_inclusive_file_count = 0
         for _, _, files in os.walk(
@@ -255,7 +255,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_generate_copy_tasks_to_copy_from_source_to_target(self):
         """Test generate_copy_tasks_to_copy_from_source_to_target to queue up
-        correct number of copy tasks.
+        the same number of copy tasks as the number of files in the directory.
         """
         assets_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
@@ -362,14 +362,16 @@ class BuildTests(test_utils.GenericTestBase):
         # Assert that all threads are joined.
         self.assertEqual(threading.active_count(), 1)
 
-    def test_build_files(self):
-        """Test build_files to queue up correct number of build tasks."""
+    def test_generate_build_task_to_build_files(self):
+        """Test generate_build_task_to_build_files to queue up the same number
+        of build tasks to the number of files to be built.
+        """
         asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
         # Build all files.
-        build.build_files(
+        build.generate_build_task_to_build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks)
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
@@ -384,14 +386,14 @@ class BuildTests(test_utils.GenericTestBase):
                     total_html_file_count += 1
 
         self.assertEqual(len(build_tasks), 0)
-        build.build_files(
+        build.generate_build_task_to_build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
             build_tasks, file_formats=('.html',))
         self.assertEqual(len(build_tasks), total_html_file_count)
 
-    def test_rebuild_new_files(self):
-        """Test rebuid_new_files queue up a corresponding number of build tasks
-        to the number of file changes.
+    def test_generate_task_to_rebuild_new_files(self):
+        """Test generate_task_to_rebuild_new_files queue up a corresponding
+        number of build tasks to the number of file changes.
         """
         new_file_name = 'manifest.json'
         recently_changed_filenames = [
@@ -400,7 +402,7 @@ class BuildTests(test_utils.GenericTestBase):
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
-        build.rebuild_new_files(
+        build.generate_task_to_rebuild_new_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR,
             recently_changed_filenames, asset_hashes, build_tasks)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
@@ -421,16 +423,16 @@ class BuildTests(test_utils.GenericTestBase):
                 len(recently_changed_filenames), build.get_file_count(
                     build.ASSETS_DEV_DIR))
 
-    def test_remove_deleted_files(self):
-        """Test remove_deleted_files to queue up the correct number of deletion
-        task.
+    def test_generate_delete_task_to_remove_deleted_files(self):
+        """Test generate_delete_task_to_remove_deleted_files to queue up the
+        same number of deletion task as the number of deleted files.
         """
         delete_tasks = collections.deque()
         # The empty dict means that all files should be removed.
         file_hashes = dict()
 
         self.assertEqual(len(delete_tasks), 0)
-        build.remove_deleted_files(
+        build.generate_delete_task_to_remove_deleted_files(
             file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR, delete_tasks)
         self.assertEqual(
             len(delete_tasks), build.get_file_count(
