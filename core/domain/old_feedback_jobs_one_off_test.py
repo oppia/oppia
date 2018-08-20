@@ -332,7 +332,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
 
-        self.old_content = state_domain.SubtitledHtml(
+        self.old_content = exp_domain.SubtitledHtml(
             'content', 'old content').to_dict()
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID,
