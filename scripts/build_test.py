@@ -183,7 +183,7 @@ class BuildTests(test_utils.GenericTestBase):
             build._match_filename_with_hashes(base_filename, file_hashes)
         # Generate a random hash dict for base.html.
         self.assertTrue(
-            '%s is expected to contain hash' % base_filename
+            '%s is expected to contain MD5 hash' % base_filename
             in noHashInFilename.exception)
 
         hashed_base_filename = build._insert_hash(
@@ -301,6 +301,56 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(
                 build.is_file_hash_provided_to_frontend('bad_end.css'))
 
+    def test_get_filepaths_by_extensions(self):
+        """Test get_filepaths_by_extensions to only return filepaths in
+        directory with given extensions.
+        """
+        filepaths = []
+        build.ensure_directory_exists(build.ASSETS_DEV_DIR)
+        extensions = ('.json', '.svg',)
+
+        self.assertEqual(len(filepaths), 0)
+        filepaths = build.get_filepaths_by_extensions(
+            build.ASSETS_DEV_DIR, extensions)
+        for filepath in filepaths:
+            self.assertTrue(any(filepath.endswith(p) for p in extensions))
+        file_count = 0
+        for _, _, filenames in os.walk(build.ASSETS_DEV_DIR):
+            for filename in filenames:
+                if any(filename.endswith(p) for p in extensions):
+                    file_count += 1
+        self.assertEqual(len(filepaths), file_count)
+
+        filepaths = []
+        extensions = ('.pdf', '.viminfo', '.idea',)
+
+        self.assertEqual(len(filepaths), 0)
+        filepaths = build.get_filepaths_by_extensions(
+            build.ASSETS_DEV_DIR, extensions)
+        self.assertEqual(len(filepaths), 0)
+
+    def test_get_file_hashes(self):
+        """Test get_file_hashes to get hashes of all files in directory,
+        excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
+        """
+        file_hashes = dict()
+        build.ensure_directory_exists(
+            build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'])
+
+        self.assertEqual(len(file_hashes), 0)
+        file_hashes = build.get_file_hashes(
+            build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'])
+        self.assertGreater(len(file_hashes), 0)
+        # Assert that each hash's filepath exist and does not include files with
+        # extensions in FILE_EXTENSIONS_TO_IGNORE.
+        for filepath in file_hashes:
+            abs_filepath = os.path.join(
+                build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath)
+            self.assertTrue(os.path.isfile(abs_filepath))
+            self.assertFalse(
+                any(filepath.endswith(p) for p in
+                    build.FILE_EXTENSIONS_TO_IGNORE))
+
     def test_filter_hashes(self):
         """Test filter_hashes to filter the provided hash correctly."""
         # set constant to provide everything to frontend.
@@ -369,49 +419,49 @@ class BuildTests(test_utils.GenericTestBase):
         # Assert that all threads are joined.
         self.assertEqual(threading.active_count(), 1)
 
-    def test_generate_build_task_to_build_files(self):
-        """Test generate_build_task_to_build_files to queue up the same number
-        of build tasks to the number of files to be built.
+    def test_generate_build_tasks_to_build_all_files_in_directory(self):
+        """Test generate_build_tasks_to_build_all_files_in_directory to queue up
+        the same number of build tasks as the number of files in the source
+        directory.
         """
         asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
-        build_tasks = collections.deque()
+        tasks = collections.deque()
 
-        self.assertEqual(len(build_tasks), 0)
+        self.assertEqual(len(tasks), 0)
         # Build all files.
-        build_tasks += build.generate_build_task_to_build_files(
+        tasks = build.generate_build_tasks_to_build_all_files_in_directory(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes)
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
-        self.assertEqual(len(build_tasks), total_file_count)
+        self.assertEqual(len(tasks), total_file_count)
 
-        # Only build HTML files.
-        build_tasks.clear()
-        total_html_file_count = 0
-        for _, _, files in os.walk(build.ASSETS_DEV_DIR):
-            for filename in files:
-                if filename.endswith('.html'):
-                    total_html_file_count += 1
-
-        self.assertEqual(len(build_tasks), 0)
-        build_tasks += build.generate_build_task_to_build_files(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            file_formats=('.html',))
-        self.assertEqual(len(build_tasks), total_html_file_count)
-
-    def test_generate_build_task_to_rebuild_new_files(self):
-        """Test generate_build_task_to_rebuild_new_files queue up a
+    def generate_build_tasks_to_build_files_from_filepaths(self):
+        """Test generate_build_tasks_to_build_files_from_filepaths queue up a
         corresponding number of build tasks to the number of file changes.
         """
-        new_file_name = 'manifest.json'
+        new_filename = 'manifest.json'
         recently_changed_filenames = [
-            os.path.join(build.ASSETS_DEV_DIR, 'i18n', new_file_name)]
+            os.path.join(build.ASSETS_DEV_DIR, 'i18n', new_filename)]
         asset_hashes = build.get_file_hashes(build.ASSETS_DEV_DIR)
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
-        build_tasks += build.generate_build_task_to_rebuild_new_files(
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR,
             recently_changed_filenames, asset_hashes)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
+
+        build_tasks.clear()
+        svg_filepaths = build.get_filepaths_by_extensions(
+            build.ASSETS_DEV_DIR, ('.svg',))
+        # Make sure there is at least 1 SVG file.
+        self.assertGreater(len(svg_filepaths), 0)
+
+        self.assertEqual(len(build_tasks), 0)
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR,
+            svg_filepaths, asset_hashes)
+        self.assertEqual(len(build_tasks), len(svg_filepaths))
+
 
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames to detect file recently added."""
@@ -429,8 +479,8 @@ class BuildTests(test_utils.GenericTestBase):
                 len(recently_changed_filenames), build.get_file_count(
                     build.ASSETS_DEV_DIR))
 
-    def test_generate_delete_task_to_remove_deleted_files(self):
-        """Test generate_delete_task_to_remove_deleted_files to queue up the
+    def test_generate_delete_tasks_to_remove_deleted_files(self):
+        """Test generate_delete_tasks_to_remove_deleted_files to queue up the
         same number of deletion task as the number of deleted files.
         """
         delete_tasks = collections.deque()
@@ -438,7 +488,7 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = dict()
 
         self.assertEqual(len(delete_tasks), 0)
-        delete_tasks += build.generate_delete_task_to_remove_deleted_files(
+        delete_tasks += build.generate_delete_tasks_to_remove_deleted_files(
             file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR)
         self.assertEqual(
             len(delete_tasks), build.get_file_count(
