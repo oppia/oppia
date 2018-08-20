@@ -594,7 +594,7 @@ def get_completed_nodes_in_story(user_id, story_id):
     completed_node_ids = get_completed_node_ids(user_id, story_id)
     for node in story.story_contents.nodes:
         if node.id in completed_node_ids:
-            completed_nodes.extend([node])
+            completed_nodes.append(node)
 
     return completed_nodes
 

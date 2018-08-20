@@ -615,13 +615,15 @@ class StoryProgressModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, story_id=story_id)
 
     @classmethod
-    def get(cls, user_id, story_id):
+    def get(cls, user_id, story_id, strict=False):
         """Gets the StoryProgressModel for the given user and story
         id.
 
         Args:
             user_id: str. The id of the user.
             story_id: str. The id of the story.
+            strict: bool. Whether to fail noisily if no StoryProgressModel
+                with the given id exists in the datastore.
 
         Returns:
             StoryProgressModel. The StoryProgressModel instance which
@@ -629,7 +631,7 @@ class StoryProgressModel(base_models.BaseModel):
         """
         instance_id = cls._generate_id(user_id, story_id)
         return super(StoryProgressModel, cls).get(
-            instance_id, strict=False)
+            instance_id, strict=strict)
 
     @classmethod
     def get_multi(cls, user_id, story_ids):
