@@ -19,6 +19,7 @@
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;
+  var ContentIdsToAudioTranslations = null;
   var _sampleCard = null;
 
   beforeEach(module('oppia'));
@@ -26,6 +27,10 @@ describe('State card object factory', function() {
   beforeEach(inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
+    ContentIdsToAudioTranslationsObjectFactory =
+      $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+    AudioTranslationObjectFactory =
+      $injector.get('AudioTranslationObjectFactory');
 
     var interactionDict = {
       answer_groups: [],
@@ -50,14 +55,27 @@ describe('State card object factory', function() {
       id: 'TextInput'
     };
     _sampleCard = StateCardObjectFactory.createNewCard(
-      'State 1', {}, '<p>Content</p>', '<interaction></interaction>',
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
       InteractionObjectFactory.createFromBackendDict(interactionDict),
-      false);
+      ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict({
+        content: {
+          en: {
+            filename: 'filename1.mp3',
+            file_size_bytes: 100000,
+            needs_update: false
+          },
+          hi: {
+            filename: 'filename2.mp3',
+            file_size_bytes: 11000,
+            needs_update: false
+          }
+        }
+      }),
+      'content');
   }));
 
   it('should be able to get the various fields', function() {
     expect(_sampleCard.getStateName()).toEqual('State 1');
-    expect(_sampleCard.getCurrentParams()).toEqual({});
     expect(_sampleCard.getContentHtml()).toEqual('<p>Content</p>');
     expect(_sampleCard.getInteraction().id).toEqual('TextInput');
     expect(_sampleCard.getInteractionHtml()).toEqual(
@@ -65,8 +83,48 @@ describe('State card object factory', function() {
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);
     expect(_sampleCard.getLastInputResponsePair()).toEqual(null);
     expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
-    expect(_sampleCard.getDestStateName()).toEqual(null);
-    expect(_sampleCard.getLeadsToConceptCard()).toEqual(false);
+    expect(
+      _sampleCard.getContentIdsToAudioTranslations().
+        getBindableAudioTranslations('content')).toEqual({
+      en: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename1.mp3',
+        file_size_bytes: 100000,
+        needs_update: false
+      }),
+      hi: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: false
+      })
+    });
+    expect(_sampleCard.getAudioTranslations()).toEqual({
+      en: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename1.mp3',
+        file_size_bytes: 100000,
+        needs_update: false
+      }),
+      hi: AudioTranslationObjectFactory.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: false
+      })
+    });
+
+    expect(_sampleCard.getInteractionId()).toEqual('TextInput');
+    expect(_sampleCard.isTerminal()).toEqual(false);
+    expect(_sampleCard.isInteractionInline()).toEqual(true);
+    expect(_sampleCard.getInteractionInstructions()).toEqual(null);
+    expect(_sampleCard.getInteractionCustomizationArgs()).toEqual({
+      rows: {
+        value: 1
+      },
+      placeholder: {
+        value: 'Type your answer here.'
+      }
+    });
+    expect(_sampleCard.getInteractionHtml()).toEqual(
+      '<interaction></interaction>'
+    );
 
     _sampleCard.addInputResponsePair({
       oppiaResponse: 'response'
@@ -88,16 +146,10 @@ describe('State card object factory', function() {
     _sampleCard.setInteractionHtml('<interaction_2></interaction_2>');
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction_2></interaction_2>');
-    _sampleCard.setDestStateName('state 2');
-    expect(_sampleCard.getDestStateName()).toEqual('state 2');
-    _sampleCard.setLeadsToConceptCard(true);
-    expect(_sampleCard.getLeadsToConceptCard()).toEqual(true);
 
     _sampleCard.addInputResponsePair({
       oppiaResponse: 'response'
     });
-    _sampleCard.setOppiaResponse(0, 'response_2');
-    expect(_sampleCard.getOppiaResponse(0)).toEqual('response_2');
 
     _sampleCard.setLastOppiaResponse('response_3');
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');

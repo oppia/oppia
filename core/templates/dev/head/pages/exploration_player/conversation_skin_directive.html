@@ -6,7 +6,7 @@
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
       <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
-                         html-data="upcomingContentHtml">
+                         html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
 
@@ -39,17 +39,20 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   is-learn-again-button="isLearnAgainButton()"
+                  displayed-card="displayedCard"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            is-learn-again-button="isLearnAgainButton()"
+                           displayed-card="displayedCard"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
+                    displayed-card="displayedCard"
                     submit-button-is-disabled="!interactionAnswerIsValid"
                     submit-button-is-shown="!answerIsBeingProcessed"
                     on-click-continue-button="showUpcomingCard()">
@@ -60,6 +63,7 @@
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          is-learn-again-button="isLearnAgainButton()"
+                         displayed-card="displayedCard"
                          on-submit-answer="submitAnswer(answer, rulesService)">
       </supplemental-card>
       <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">

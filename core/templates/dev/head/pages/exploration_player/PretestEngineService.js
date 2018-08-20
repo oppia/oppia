@@ -23,11 +23,13 @@ oppia.factory('PretestEngineService', [
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'INTERACTION_SPECS',
   'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'FocusManagerService', 'StateCardObjectFactory',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, INTERACTION_SPECS,
-      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE) {
+      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
+      FocusManagerService, StateCardObjectFactory) {
     var _explorationId = ContextService.getExplorationId();
 
     var version = GLOBALS.explorationVersion;
@@ -54,6 +56,21 @@ oppia.factory('PretestEngineService', [
         newState.content.getHtml(), envs);
     };
 
+    var _getRandomSuffix = function() {
+      // This is a bit of a hack. When a refresh to a $scope variable
+      // happens,
+      // AngularJS compares the new value of the variable to its previous
+      // value. If they are the same, then the variable is not updated.
+      // Appending a random suffix makes the new value different from the
+      // previous one, and thus indirectly forces a refresh.
+      var randomSuffix = '';
+      var N = Math.round(Math.random() * 1000);
+      for (var i = 0; i < N; i++) {
+        randomSuffix += ' ';
+      }
+      return randomSuffix;
+    };
+
     // This should only be called when 'exploration' is non-null.
     var _loadInitialQuestion = function(successCallback) {
       var initialState = pretestQuestions[0].getStateData();
@@ -66,7 +83,25 @@ oppia.factory('PretestEngineService', [
 
       currentIndex = 0;
       nextIndex = 0;
-      successCallback(null, questionHtml);
+
+      var interaction = initialState.interaction;
+      var nextFocusLabel = FocusManagerService.generateFocusLabel();
+
+      var interactionId = interaction.id;
+      var interactionHtml = null;
+
+      if (interactionId) {
+        interactionHtml = ExplorationHtmlFormatterService.getInteractionHtml(
+          interactionId,
+          interaction.customizationArgs,
+          true, nextFocusLabel);
+      }
+      var initialCard =
+        StateCardObjectFactory.createNewCard(
+          null, questionHtml, interactionHtml, interaction,
+          initialState.contentIdsToAudioTranslations,
+          initialState.content.getContentId());
+      successCallback(initialCard, nextFocusLabel);
     };
 
     var _getCurrentStateData = function() {
@@ -75,6 +110,16 @@ oppia.factory('PretestEngineService', [
 
     var _getNextStateData = function() {
       return pretestQuestions[nextIndex].getStateData();
+    };
+
+    var _getNextInteractionHtml = function(labelForFocusTarget) {
+      var interactionId = _getNextStateData().interaction.id;
+
+      return ExplorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        _getNextStateData().interaction.customizationArgs,
+        true,
+        labelForFocusTarget);
     };
 
     return {
@@ -110,96 +155,8 @@ oppia.factory('PretestEngineService', [
       getExplorationVersion: function() {
         return version;
       },
-      getStateContentHtml: function() {
-        return _getCurrentStateData().content.getHtml();
-      },
-      getStateContentAudioTranslations: function() {
-        return null;
-      },
-      isContentAudioTranslationAvailable: function() {
-        return false;
-      },
-      getCurrentInteractionHtml: function(labelForFocusTarget) {
-        var interactionId = _getCurrentStateData().interaction.id;
-        if (!interactionId) {
-          return null;
-        }
-
-        return ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          _getCurrentStateData().interaction.customizationArgs,
-          true,
-          labelForFocusTarget);
-      },
-      getNextInteractionHtml: function(labelForFocusTarget) {
-        var interactionId = _getNextStateData().interaction.id;
-
-        return ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          _getNextStateData().interaction.customizationArgs,
-          true,
-          labelForFocusTarget);
-      },
-      getCurrentInteraction: function() {
-        return _getCurrentStateData().interaction;
-      },
-      isInteractionInline: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          !interactionId ||
-          INTERACTION_SPECS[interactionId].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-      },
-      isNextInteractionInline: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          !interactionId ||
-          INTERACTION_SPECS[interactionId].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-      },
-      getCurrentInteractionInstructions: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
-      },
-      getNextInteractionInstructions: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
-      },
-      getNextInteraction: function() {
-        return _getNextStateData().interaction;
-      },
-      isCurrentStateTerminal: function() {
-        var interactionId = _getCurrentStateData().interaction.id;
-        return (
-          interactionId && INTERACTION_SPECS[interactionId].is_terminal);
-      },
-      isNextStateTerminal: function() {
-        var interactionId = _getNextStateData().interaction.id;
-        return (
-          interactionId && INTERACTION_SPECS[interactionId].is_terminal);
-      },
-      isStateShowingConceptCard: function() {
-        return false;
-      },
       getLanguageCode: function() {
         return pretestQuestions[currentIndex].getLanguageCode();
-      },
-      getHints: function() {
-        return _getCurrentStateData().interaction.hints;
-      },
-      doesInteractionSupportHints: function() {
-        return (
-          !INTERACTION_SPECS[
-            _getCurrentStateData().interaction.id].is_terminal &&
-          !INTERACTION_SPECS[_getCurrentStateData().interaction.id].is_linear);
-      },
-      getSolution: function() {
-        return _getCurrentStateData().interaction.solution;
-      },
-      getContentIdsToAudioTranslations: function() {
-        return _getCurrentStateData().contentIdsToAudioTranslations;
       },
       isInPreviewMode: function() {
         return false;
@@ -255,17 +212,37 @@ oppia.factory('PretestEngineService', [
         }
         answerIsBeingProcessed = false;
 
+        var interactionId = oldState.interaction.id;
+        var interactionIsInline = (
+          !interactionId ||
+          INTERACTION_SPECS[interactionId].display_mode ===
+            INTERACTION_DISPLAY_MODE_INLINE);
         var refreshInteraction = (
-          answerIsCorrect || this.isInteractionInline());
+          answerIsCorrect || interactionIsInline);
 
         nextIndex = currentIndex + 1;
         var isFinalQuestion = (nextIndex === pretestQuestions.length);
         var onSameCard = !answerIsCorrect;
 
+        var _nextFocusLabel = FocusManagerService.generateFocusLabel();
+        var nextCard = null;
+        if (!isFinalQuestion) {
+          var nextInteractionHtml = _getNextInteractionHtml(_nextFocusLabel);
+
+          questionHtml = questionHtml + _getRandomSuffix();
+          nextInteractionHtml = nextInteractionHtml + _getRandomSuffix();
+
+          nextCard = StateCardObjectFactory.createNewCard(
+            true, questionHtml, nextInteractionHtml,
+            _getNextStateData().interaction,
+            _getNextStateData().contentIdsToAudioTranslations,
+            _getNextStateData().content.getContentId()
+          );
+        }
         successCallback(
-          nextIndex, refreshInteraction, feedbackHtml,
-          feedbackAudioTranslations, questionHtml, oldParams,
-          null, null, onSameCard, null, null, isFinalQuestion);
+          nextCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations,
+          null, null, onSameCard, null, null, isFinalQuestion, _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
