@@ -235,7 +235,7 @@ def _match_filename_with_hashes(relative_filepath, file_hashes):
     Args:
         relative_filepath: str. Filepath that is relative from /build.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Raises:
         ValueError: The hash dict is empty.
@@ -276,7 +276,7 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         target_file_stream: file. The stream object to write the minified HTML
             file to.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
     """
     content = source_file_stream.read()
     for filepath, file_hash in file_hashes.iteritems():
@@ -395,9 +395,9 @@ def get_dependencies_filepaths():
 
     Returns:
         dict(str, list(str)). A dict mapping file types to lists of filepaths.
-        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-        corresponding values is a full list of dependency file paths of the
-        given type.
+            The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+            corresponding values is a full list of dependency file paths of the
+            given type.
     """
     filepaths = {
         'js': [],
@@ -503,7 +503,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Returns:
         copy_tasks: deque(Thread). A deque that contains all copy tasks queued
@@ -584,7 +584,7 @@ def get_file_hashes(directory_path):
 
     Returns:
         dict(str, str). Dictionary with keys specifying file paths and values
-        specifying file hashes.
+            specifying file hashes.
     """
     file_hashes = dict()
 
@@ -610,11 +610,11 @@ def filter_hashes(file_hashes):
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Returns:
         dict(str, str). Filtered dictionary of only filepaths that should be
-        provided to the frontend.
+            provided to the frontend.
     """
     filtered_hashes = dict()
     for filepath, file_hash in file_hashes.iteritems():
@@ -628,7 +628,7 @@ def get_hashes_json_file_contents(file_hashes):
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Returns:
         str. JS code loading hashes as JSON into variable.
@@ -696,7 +696,7 @@ def generate_build_task_to_build_files(
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
         file_formats: tuple(str) or None. Tuple of specific file formats to be
             built. If None then all files within the source directory will be
             built.
@@ -749,7 +749,7 @@ def generate_build_task_to_rebuild_new_files(
         recently_changed_filenames: list(str). List of filenames that were
             recently changed.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
@@ -776,7 +776,7 @@ def generate_build_task_to_build_directory(dirnames_dict, file_hashes):
             the directory containing source files to be built, the staging
             directory and the final directory containing built files.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
-        hashes of file content as values.
+            hashes of file content as values.
 
     Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
@@ -831,7 +831,8 @@ def generate_delete_task_to_remove_deleted_files(
     have since been deleted from source directory.
 
     Args:
-        source_dir_hashes: dict(str, str). Dictionary of file hashes.
+        source_dir_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
 
