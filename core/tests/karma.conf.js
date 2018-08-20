@@ -3,7 +3,7 @@ var prodEnv = (argv.prod_env === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (prodEnv) {
   generatedJs = (
-    'backend_prod_files/third_party/generated/js/third_party.min.js');
+    'third_party/generated/js/third_party.min.js');
 }
 
 module.exports = function(config) {
