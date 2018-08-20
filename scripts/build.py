@@ -128,20 +128,24 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     subprocess.check_call(cmd, shell=True)
 
 
-def _generate_copy_tasks_for_fonts(source_paths, target_path, copy_tasks):
+def _generate_copy_tasks_for_fonts(source_paths, target_path):
     """Queue up a copy task for each font file.
 
     Args:
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
+
+    Returns:
         copy_tasks: deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
+    copy_tasks = collections.deque()
     for font_path in source_paths:
         copy_task = threading.Thread(
             target=shutil.copy,
             args=(font_path, target_path))
         copy_tasks.append(copy_task)
+    return copy_tasks
 
 
 def _insert_hash(filepath, file_hash):
@@ -454,8 +458,8 @@ def build_third_party_libs(third_party_directory_path):
 
     ensure_directory_exists(FONTS_DIR)
     copy_tasks = collections.deque()
-    _generate_copy_tasks_for_fonts(
-        dependency_filepaths['fonts'], FONTS_DIR, copy_tasks)
+    copy_tasks += _generate_copy_tasks_for_fonts(
+        dependency_filepaths['fonts'], FONTS_DIR)
     _execute_tasks(copy_tasks)
 
 
@@ -474,7 +478,7 @@ def hash_should_be_inserted(filepath):
 
 
 def generate_copy_tasks_to_copy_from_source_to_target(
-        source, target, file_hashes, copy_tasks):
+        source, target, file_hashes):
     """Generate copy task for each file in source directory, excluding files
     with extensions in FILE_EXTENSIONS_TO_IGNORE. Insert hash from hash dict
     into the destination filename.
@@ -485,12 +489,14 @@ def generate_copy_tasks_to_copy_from_source_to_target(
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
         copy_tasks: deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Copying into %s' % os.path.join(os.getcwd(), target)
-
+    copy_tasks = collections.deque()
     ensure_directory_exists(target)
     shutil.rmtree(target)
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
@@ -520,6 +526,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 target=shutil.copyfile,
                 args=(source_path, target_path))
             copy_tasks.append(copy_task)
+    return copy_tasks
 
 
 def is_file_hash_provided_to_frontend(filepath):
@@ -573,7 +580,7 @@ def get_file_hashes(directory_path):
             os.path.join(os.getcwd(), directory_path)):
         for directory in dirnames:
             print('Computing hashes for files in %s'
-                  % os.path.join(directory))
+                  % os.path.join(root, directory))
         for filename in filenames:
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, directory_path)
@@ -658,7 +665,7 @@ def _execute_tasks(tasks, batch_size=24):
 
 
 def generate_build_task_to_build_files(
-        source, target, file_hashes, build_tasks, file_formats=None):
+        source, target, file_hashes, file_formats=None):
     """If no specific file formats is provided, queue up build task to minify
     all CSS and JS files, removes whitespace from HTML and interpolates paths
     in HTML to include hashes in source directory and copies it to target.
@@ -671,14 +678,17 @@ def generate_build_task_to_build_files(
         target: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary of file hashes.
-        build_tasks: deque(Thread). A deque that contains all build tasks queued
-            to be processed.
         file_formats: tuple(str) or None. Tuple of specific file formats to be
             built. If None then all files within the source directory will be
             built.
+
+    Returns:
+        build_tasks: deque(Thread). A deque that contains all build tasks queued
+            to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
+    build_tasks = collections.deque()
     ensure_directory_exists(target)
     if file_formats is None:
         print 'Deleting dir %s' % target
@@ -705,11 +715,11 @@ def generate_build_task_to_build_files(
                 # Skip files that are not the specified format.
                 continue
             build_tasks.append(task)
+    return build_tasks
 
 
-def generate_task_to_rebuild_new_files(
-        source_path, target_path, recently_changed_filenames, file_hashes,
-        build_tasks):
+def generate_build_task_to_rebuild_new_files(
+        source_path, target_path, recently_changed_filenames, file_hashes):
     """Queue up build task to minify recently changed files.
 
     Args:
@@ -720,9 +730,12 @@ def generate_task_to_rebuild_new_files(
         recently_changed_filenames: list(str). List of filenames that were
             recently changed.
         file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
+    build_tasks = collections.deque()
     for file_name in recently_changed_filenames:
         source_file_path = os.path.join(source_path, file_name)
         target_file_path = os.path.join(target_path, file_name)
@@ -730,10 +743,10 @@ def generate_task_to_rebuild_new_files(
         task = threading.Thread(target=minify_func, args=(
             source_file_path, target_file_path, file_hashes, file_name))
         build_tasks.append(task)
+    return build_tasks
 
 
-def generate_build_task_to_build_directory(
-        dirnames_dict, file_hashes, build_tasks):
+def generate_build_task_to_build_directory(dirnames_dict, file_hashes):
     """Queue up build tasks to build all files in source directory if there is
     no existing staging directory. Otherwise, selectively queue up build task
     to build recently changed files and save them at staging directory.
@@ -743,26 +756,29 @@ def generate_build_task_to_build_directory(
             the directory containing source files to be built, the staging
             directory and the final directory containing built files.
         file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
+    build_tasks = collections.deque()
     delete_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % staging_dir
-        generate_build_task_to_build_files(
-            source_dir, staging_dir, file_hashes, build_tasks)
+        build_tasks.append(generate_build_task_to_build_files(
+            source_dir, staging_dir, file_hashes))
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         mandatory_file_formats = ('.html', '.py')
         print (
             'Staging dir exists, re-building all %s files'
             % str(mandatory_file_formats))
-        generate_build_task_to_build_files(
-            source_dir, staging_dir, file_hashes, build_tasks,
+        build_tasks += generate_build_task_to_build_files(
+            source_dir, staging_dir, file_hashes,
             file_formats=mandatory_file_formats)
         # Compare source files with already built files using file hashes.
         dev_dir_hashes = get_file_hashes(source_dir)
@@ -772,22 +788,23 @@ def generate_build_task_to_build_directory(
         if recently_changed_filenames:
             # Only re-build files that have changed since last build.
             print 'Re-building recently changed files at %s' % source_dir
-            generate_task_to_rebuild_new_files(
+            build_tasks += generate_build_task_to_rebuild_new_files(
                 source_dir, staging_dir, recently_changed_filenames,
-                file_hashes, build_tasks)
+                file_hashes)
             # Clean up files in staging directory that have been removed from
             # source directory.
             print 'Scanning directory %s to remove deleted file' % staging_dir
-            generate_delete_task_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir, delete_tasks)
+            delete_tasks.append(generate_delete_task_to_remove_deleted_files(
+                dev_dir_hashes, staging_dir))
             _execute_tasks(delete_tasks)
         else:
             print 'No changes detected. Using previously built files.'
+    return build_tasks
 
 
 def generate_delete_task_to_remove_deleted_files(
-        source_dir_hashes, staging_directory, delete_tasks):
-    """Walk the staging directory and queue up deletion task to remove files
+        source_dir_hashes, staging_directory):
+    """Walk the staging directory and queue up deletion tasks to remove files
     that are not in the hash dict i.e. remaining files in staging directory that
     have since been deleted from source directory.
 
@@ -795,9 +812,12 @@ def generate_delete_task_to_remove_deleted_files(
         source_dir_hashes: dict(str, str). Dictionary of file hashes.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
+
+    Returns:
         delete_tasks: deque(Thread). A deque that contains all delete tasks
             queued to be processed.
     """
+    delete_tasks = collections.deque()
     print 'Scanning directory %s to remove deleted file' % staging_directory
     for root, dirnames, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
@@ -817,6 +837,7 @@ def generate_delete_task_to_remove_deleted_files(
                 _ensure_files_exist([target_path])
                 task = threading.Thread(target=os.remove, args=(target_path))
                 delete_tasks.append(task)
+    return delete_tasks
 
 
 def get_recently_changed_filenames(source_dir_hashes, out_dir):
@@ -889,11 +910,11 @@ def generate_build_directory():
     _ensure_files_exist([HASHES_JS_FILEPATH])
 
     # Build files in /extensions and copy them into staging directory.
-    generate_build_task_to_build_directory(
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes, build_tasks)
+    build_tasks += generate_build_task_to_build_directory(
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes)
     # Minify all template files copy them into build/templates/head.
-    generate_build_task_to_build_directory(
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes, build_tasks)
+    build_tasks += generate_build_task_to_build_directory(
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes)
     _execute_tasks(build_tasks)
 
     # Copy all files from staging directory to production directory (/build).
@@ -907,8 +928,8 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_OUT_DIR]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
     for i in xrange(len(COPY_INPUT_DIRS)):
-        generate_copy_tasks_to_copy_from_source_to_target(
-            COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes, copy_tasks)
+        copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
+            COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
     _execute_tasks(copy_tasks)
 
     for i in xrange(len(COPY_INPUT_DIRS)):

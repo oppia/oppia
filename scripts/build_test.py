@@ -87,8 +87,8 @@ class BuildTests(test_utils.GenericTestBase):
         target_fonts_dir = os.path.join('target', 'fonts', '')
 
         self.assertEqual(len(copy_tasks), 0)
-        build._generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], target_fonts_dir, copy_tasks)
+        copy_tasks += build._generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], target_fonts_dir)
         # Asserting the same number of copy tasks and number of font files.
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
@@ -262,9 +262,8 @@ class BuildTests(test_utils.GenericTestBase):
         copy_tasks = collections.deque()
 
         self.assertEqual(len(copy_tasks), 0)
-        build.generate_copy_tasks_to_copy_from_source_to_target(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes,
-            copy_tasks)
+        copy_tasks += build.generate_copy_tasks_to_copy_from_source_to_target(
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, assets_hashes)
         self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self):
@@ -371,9 +370,8 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(build_tasks), 0)
         # Build all files.
-        build.generate_build_task_to_build_files(
-            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            build_tasks)
+        build_tasks += build.generate_build_task_to_build_files(
+            build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes)
         total_file_count = build.get_file_count(build.ASSETS_DEV_DIR)
         self.assertEqual(len(build_tasks), total_file_count)
 
@@ -386,14 +384,14 @@ class BuildTests(test_utils.GenericTestBase):
                     total_html_file_count += 1
 
         self.assertEqual(len(build_tasks), 0)
-        build.generate_build_task_to_build_files(
+        build_tasks += build.generate_build_task_to_build_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR, asset_hashes,
-            build_tasks, file_formats=('.html',))
+            file_formats=('.html',))
         self.assertEqual(len(build_tasks), total_html_file_count)
 
-    def test_generate_task_to_rebuild_new_files(self):
-        """Test generate_task_to_rebuild_new_files queue up a corresponding
-        number of build tasks to the number of file changes.
+    def test_generate_build_task_to_rebuild_new_files(self):
+        """Test generate_build_task_to_rebuild_new_files queue up a
+        corresponding number of build tasks to the number of file changes.
         """
         new_file_name = 'manifest.json'
         recently_changed_filenames = [
@@ -402,9 +400,9 @@ class BuildTests(test_utils.GenericTestBase):
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
-        build.generate_task_to_rebuild_new_files(
+        build_tasks += build.generate_build_task_to_rebuild_new_files(
             build.ASSETS_DEV_DIR, build.ASSETS_OUT_DIR,
-            recently_changed_filenames, asset_hashes, build_tasks)
+            recently_changed_filenames, asset_hashes)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
 
     def test_get_recently_changed_filenames(self):
@@ -432,8 +430,8 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = dict()
 
         self.assertEqual(len(delete_tasks), 0)
-        build.generate_delete_task_to_remove_deleted_files(
-            file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR, delete_tasks)
+        delete_tasks += build.generate_delete_task_to_remove_deleted_files(
+            file_hashes, build.THIRD_PARTY_GENERATED_DEV_DIR)
         self.assertEqual(
             len(delete_tasks), build.get_file_count(
                 build.THIRD_PARTY_GENERATED_DEV_DIR))
