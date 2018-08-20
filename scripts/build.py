@@ -59,7 +59,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with this extension shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc',)
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
 
 # Files with this paths should be moved to build directory but shouldn't be
 # renamed (i.e. the filepath shouldn't contain hash)
@@ -228,30 +228,42 @@ def _compare_file_count(source_path, target_path):
                 source_dir_file_count, target_dir_file_count))
 
 
-def _match_filename_with_hashes(filename, file_hashes):
-    """Ensure that hashes in filenames match with the hash entries in hash
+def _match_filename_with_hashes(relative_filepath, file_hashes):
+    """Ensure that hashes in filepaths match with the hash entries in hash
     dict.
 
     Args:
-        filename: str. Filepath to be matched.
+        relative_filepath: str. Filepath that is relative from /build.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
         hashes of file content as values.
 
     Raises:
         ValueError: The hash dict is empty.
+        ValueError: Filepath has less than 2 partitions after splitting by '.'
+            delimiter.
         ValueError: The filename does not contain hash.
         KeyError: The filename's hash cannot be found in the hash dict.
     """
-    # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
+    # Final filepath example:
+    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
-    file_hash = re.findall(r'([a-fA-F\d]{32})', filename)
-    # Convert current /build path to /backend_prod_files path.
-    if not file_hash:
-        raise ValueError('%s is expected to contain hash' % filename)
-    if file_hash[0] not in file_hashes.values():
+
+    HASH_STRING_INDEX = 2
+    filename_partitions = relative_filepath.split('.')
+    if len(filename_partitions) < HASH_STRING_INDEX:
+        raise ValueError('Filepath has less than 2 partitions after splitting')
+
+    hash_string_from_filename = filename_partitions[- HASH_STRING_INDEX]
+    # Ensure hash string obtained from filename follows MD5 hash format.
+    hash_string_from_filename = re.findall(
+        r'([a-fA-F\d]{32})', hash_string_from_filename)
+    if not hash_string_from_filename:
+        raise ValueError('%s is expected to contain hash' % relative_filepath)
+    if hash_string_from_filename[0] not in file_hashes.values():
         raise KeyError(
-            'Hashed file %s does not match hash dict keys' % filename)
+            'Hash from file named %s does not match hash dict values' %
+            relative_filepath)
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
@@ -804,8 +816,8 @@ def generate_build_task_to_build_directory(dirnames_dict, file_hashes):
             # Clean up files in staging directory that have been removed from
             # source directory.
             print 'Scanning directory %s to remove deleted file' % staging_dir
-            delete_tasks.append(generate_delete_task_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir))
+            delete_tasks += generate_delete_task_to_remove_deleted_files(
+                dev_dir_hashes, staging_dir)
             _execute_tasks(delete_tasks)
         else:
             print 'No changes detected. Using previously built files.'
@@ -956,7 +968,10 @@ def generate_build_directory():
                 if not hash_should_be_inserted(converted_filepath):
                     # These filenames should not be hashed.
                     continue
-                _match_filename_with_hashes(filename, hashes)
+                # Obtain the same filepath format as the hash dict's key.
+                filepath = os.path.join(root, filename)
+                relative_filepath = os.path.relpath(filepath, built_dir)
+                _match_filename_with_hashes(relative_filepath, hashes)
     # Make sure /build/assets/hashes.[HASH].js is available.
     hash_final_filename = _insert_hash(
         HASHES_JS_FILENAME, hashes[HASHES_JS_FILENAME])
