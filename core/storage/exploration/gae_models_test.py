@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Exploration models."""
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -31,12 +32,17 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            'id', title='A title',
+            'id', title='A Title',
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration)
 
         self.assertEquals(
             exploration_models.ExplorationModel.get_exploration_count(), 1)
+        saved_exploration = (
+            exploration_models.ExplorationModel.get_all().fetch(1)[0])
+        self.assertEquals(saved_exploration.title, 'A Title')
+        self.assertEquals(saved_exploration.category, 'A Category')
+        self.assertEquals(saved_exploration.objective, 'An Objective')
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -45,19 +51,22 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_save(self):
         exploration_models.ExplorationRightsModel(
             id='id_0',
-            owner_ids=['owner_ids'],
-            editor_ids=['editor_ids'],
-            translator_ids=['translator_ids'],
-            viewer_ids=['viewer_ids'],
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            translator_ids=['translator_id'],
+            viewer_ids=['viewer_id'],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new collection',
+            'cid', 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         saved_model = exploration_models.ExplorationRightsModel.get('id_0')
         self.assertEqual(saved_model.id, 'id_0')
+        self.assertEqual(saved_model.owner_ids, ['owner_id'])
+        self.assertEqual(saved_model.translator_ids, ['translator_id'])
+        self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -108,6 +117,10 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExplorationCommitLogEntryModel
             .get_all_exploration_commits('a', 2))
         self.assertEquals(results, [commit_v1, commit_v2])
+        results = (
+            exploration_models.ExplorationCommitLogEntryModel
+            .get_all_exploration_commits('a', 3))
+        self.assertEquals(results, [commit_v1, commit_v2, None])
 
 
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
@@ -121,12 +134,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PUBLIC,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -142,12 +155,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -169,12 +182,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PUBLIC,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -191,12 +204,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PUBLIC,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -211,6 +224,10 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             [good_rating_exploration_summary_model])
         self.assertEqual(
             exploration_models.ExpSummaryModel.get_top_rated(2),
+            [good_rating_exploration_summary_model,
+             bad_rating_exploration_summary_model])
+        self.assertEqual(
+            exploration_models.ExpSummaryModel.get_top_rated(3),
             [good_rating_exploration_summary_model,
              bad_rating_exploration_summary_model])
 
@@ -230,11 +247,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
                 viewer_ids=['a'],
                 contributor_ids=[''],
                 contributors_summary={},
@@ -251,12 +268,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -278,12 +295,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
                 owner_ids=['a'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -299,12 +316,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 category='category',
                 objective='objective',
                 language_code='language_code',
-                tags=['tags'],
+                tags=['tag'],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
+                owner_ids=['owner_id'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
                 contributor_ids=[''],
                 contributors_summary={},
                 version=0,
@@ -312,12 +329,19 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         uneditable_collection_summary_model.put()
+
         exploration_summary_models = (
             exploration_models.ExpSummaryModel
             .get_at_least_editable('a'))
         self.assertEqual(1, len(exploration_summary_models))
         self.assertEqual('id0', exploration_summary_models[0].id)
+
         exploration_summary_models = (
             exploration_models.ExpSummaryModel
-            .get_at_least_editable('viewer_ids'))
+            .get_at_least_editable('viewer_id'))
+        self.assertEqual(0, len(exploration_summary_models))
+
+        exploration_summary_models = (
+            exploration_models.ExpSummaryModel
+            .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
