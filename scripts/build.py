@@ -934,7 +934,7 @@ def generate_build_directory():
     # Build files in /extensions and copy them into staging directory.
     build_tasks += generate_build_task_to_build_directory(
         EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes)
-    # Minify all template files copy them into build/templates/head.
+    # Minify all template files and copy them into build/templates/head.
     build_tasks += generate_build_task_to_build_directory(
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes)
     _execute_tasks(build_tasks)
