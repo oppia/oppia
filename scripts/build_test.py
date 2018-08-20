@@ -171,6 +171,14 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertTrue('Hash dict is empty' in emptyHashDict.exception)
 
         file_hashes = {base_filename: random.getrandbits(128)}
+        bad_filepath = 'README'
+        with self.assertRaises(ValueError) as filepathWithoutExtension:
+            build._match_filename_with_hashes(bad_filepath, file_hashes)
+        # Generate a random hash dict for base.html.
+        self.assertTrue(
+            'Filepath has less than 2 partitions after splitting'
+            in filepathWithoutExtension.exception)
+
         with self.assertRaises(ValueError) as noHashInFilename:
             build._match_filename_with_hashes(base_filename, file_hashes)
         # Generate a random hash dict for base.html.
@@ -183,7 +191,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaises(KeyError) as incorrectHashInFilename:
             build._match_filename_with_hashes(hashed_base_filename, file_hashes)
         self.assertTrue(
-            'Hashed file %s does not match hash dict keys'
+            'Hash from file named %s does not match hash dict values'
             % hashed_base_filename in incorrectHashInFilename.exception)
 
     def test_process_html(self):
