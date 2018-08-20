@@ -679,27 +679,27 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             rights_manager.ROLE_TRANSLATOR)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id)
-        self.assertEqual(response.status_int, 200)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id,
+            expected_status_int=200)
         self.logout()
 
     def test_deletion_rights_for_published_exploration(self):
@@ -718,33 +718,33 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id)
-        self.assertEqual(response.status_int, 200)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id,
+            expected_status_int=200)
         self.logout()
 
     def test_logging_info_after_deletion(self):
@@ -769,7 +769,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.owner_id, exploration)
 
             self.login(self.OWNER_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
 
             # Observed_log_messages[1] is 'Attempting to delete documents
@@ -796,7 +796,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.admin_id, exploration)
 
             self.login(self.ADMIN_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
@@ -817,7 +817,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.moderator_id, exploration)
 
             self.login(self.MODERATOR_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
