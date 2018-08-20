@@ -249,18 +249,16 @@ def _match_filename_with_hashes(relative_filepath, file_hashes):
     if not file_hashes:
         raise ValueError('Hash dict is empty')
 
-    HASH_STRING_INDEX = 2
     filename_partitions = relative_filepath.split('.')
-    if len(filename_partitions) < HASH_STRING_INDEX:
+    if len(filename_partitions) < 2:
         raise ValueError('Filepath has less than 2 partitions after splitting')
 
-    hash_string_from_filename = filename_partitions[- HASH_STRING_INDEX]
+    hash_string_from_filename = filename_partitions[- 2]
     # Ensure hash string obtained from filename follows MD5 hash format.
-    hash_string_from_filename = re.findall(
-        r'([a-fA-F\d]{32})', hash_string_from_filename)
-    if not hash_string_from_filename:
-        raise ValueError('%s is expected to contain hash' % relative_filepath)
-    if hash_string_from_filename[0] not in file_hashes.values():
+    if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
+        raise ValueError(
+            '%s is expected to contain MD5 hash' % relative_filepath)
+    if hash_string_from_filename not in file_hashes.values():
         raise KeyError(
             'Hash from file named %s does not match hash dict values' %
             relative_filepath)
@@ -471,10 +469,9 @@ def build_third_party_libs(third_party_directory_path):
         _join_files(dependency_filepaths['css'], third_party_css_file)
 
     ensure_directory_exists(FONTS_DIR)
-    copy_tasks = collections.deque()
-    copy_tasks += _generate_copy_tasks_for_fonts(
-        dependency_filepaths['fonts'], FONTS_DIR)
-    _execute_tasks(copy_tasks)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], FONTS_DIR))
 
 
 def hash_should_be_inserted(filepath):
@@ -576,6 +573,27 @@ def generate_md5_hash(filepath):
     return m.hexdigest()
 
 
+def get_filepaths_by_extensions(source_dir, file_extensions):
+    """Return list of filepaths in a directory with certain extensions.
+
+    Args:
+        source_dir: str. Root directory to be walked.
+        file_extensions: tuple(str). Tuple of file extensions.
+
+    Returns:
+        filepaths: list(str). List of filepaths with specified extensions.
+    """
+    filepaths = []
+    for root, _, filenames in os.walk(source_dir):
+        for filename in filenames:
+            filepath = os.path.join(root, filename)
+            relative_filepath = os.path.relpath(filepath, source_dir)
+            if any(filename.endswith(p) for p in file_extensions):
+                print relative_filepath
+                filepaths.append(relative_filepath)
+    return filepaths
+
+
 def get_file_hashes(directory_path):
     """Returns hashes of all files in directory tree.
 
@@ -597,6 +615,8 @@ def get_file_hashes(directory_path):
             print('Computing hashes for files in %s'
                   % os.path.join(root, directory))
         for filename in filenames:
+            if any(filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, directory_path)
             file_hashes[relative_filepath] = generate_md5_hash(filepath)
@@ -642,7 +662,11 @@ def get_hashes_json_file_contents(file_hashes):
 
 def minify_func(source_path, target_path, file_hashes, filename):
     """Call the appropriate functions to handle different types of file
-    formats.
+    formats:
+        - CSS and JS files: Minify and save at target directory.
+        - HTML files: Remove whitespaces, interpolates paths in HTML to include
+        hashes in source directory and save edited file at target directory.
+        - Other files: Copy the file from source directory to target directory.
     """
     if filename.endswith('.html'):
         print 'Building %s' % source_path
@@ -682,24 +706,9 @@ def _execute_tasks(tasks, batch_size=24):
                 raise OSError(threadAlreadyStarted.message)
 
 
-def generate_build_task_to_build_files(
-        source, target, file_hashes, file_formats=None):
-    """If no specific file formats is provided, queue up build task to minify
-    all CSS and JS files, removes whitespace from HTML and interpolates paths
-    in HTML to include hashes in source directory and copies it to target.
-    If specific file formats is provided, only queue up build task to build
-    files pertaining to the provided formats will be minified.
-
-    Args:
-        source: str. Path relative to /oppia directory of directory
-            containing files and directories to be copied.
-        target: str. Path relative to /oppia directory of directory where
-            to copy the files and directories.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
-        file_formats: tuple(str) or None. Tuple of specific file formats to be
-            built. If None then all files within the source directory will be
-            built.
+def generate_build_tasks_to_build_all_files_in_directory(
+        source, target, file_hashes):
+    """This function queues up tasks to build all files in a directory.
 
     Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
@@ -709,10 +718,8 @@ def generate_build_task_to_build_files(
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     build_tasks = collections.deque()
     ensure_directory_exists(target)
-    if file_formats is None:
-        print 'Deleting dir %s' % target
-        # Only delete BUILD directory when building all files.
-        shutil.rmtree(target)
+    print 'Deleting dir %s' % target
+    shutil.rmtree(target)
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
@@ -725,29 +732,24 @@ def generate_build_task_to_build_files(
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            if file_formats is None or any(
-                    filename.endswith(p) for p in file_formats):
-                task = threading.Thread(
-                    target=minify_func,
-                    args=(source_path, target_path, file_hashes, filename))
-            else:
-                # Skip files that are not the specified format.
-                continue
+            task = threading.Thread(
+                target=minify_func,
+                args=(source_path, target_path, file_hashes, filename))
             build_tasks.append(task)
     return build_tasks
 
 
-def generate_build_task_to_rebuild_new_files(
-        source_path, target_path, recently_changed_filenames, file_hashes):
-    """Queue up build task to minify recently changed files.
+def generate_build_tasks_to_build_files_from_filepaths(
+        source_path, target_path, filepaths, file_hashes):
+    """This function queues up build tasks to build files from a list of
+    filepaths.
 
     Args:
         source_path: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
         target_path: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
-        recently_changed_filenames: list(str). List of filenames that were
-            recently changed.
+        filepaths: list(str). List of filepaths to be built.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
 
@@ -756,79 +758,21 @@ def generate_build_task_to_rebuild_new_files(
             to be processed.
     """
     build_tasks = collections.deque()
-    for file_name in recently_changed_filenames:
-        source_file_path = os.path.join(source_path, file_name)
-        target_file_path = os.path.join(target_path, file_name)
+    for filepath in filepaths:
+        source_file_path = os.path.join(source_path, filepath)
+        target_file_path = os.path.join(target_path, filepath)
         ensure_directory_exists(target_file_path)
         task = threading.Thread(target=minify_func, args=(
-            source_file_path, target_file_path, file_hashes, file_name))
+            source_file_path, target_file_path, file_hashes, filepath))
         build_tasks.append(task)
     return build_tasks
 
 
-def generate_build_task_to_build_directory(dirnames_dict, file_hashes):
-    """Queue up build tasks to build all files in source directory if there is
-    no existing staging directory. Otherwise, selectively queue up build task
-    to build recently changed files and save them at staging directory.
-
-    Args:
-        dirnames_dict: dict(str, str, str). A dict containing directory paths to
-            the directory containing source files to be built, the staging
-            directory and the final directory containing built files.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
-
-    Returns:
-        build_tasks: deque(Thread). A deque that contains all build tasks queued
-            to be processed.
-    """
-    source_dir = dirnames_dict['dev_dir']
-    staging_dir = dirnames_dict['staging_dir']
-    out_dir = dirnames_dict['out_dir']
-    build_tasks = collections.deque()
-    delete_tasks = collections.deque()
-    if not os.path.isdir(staging_dir):
-        # If there is no staging dir, perform build process on all files.
-        print 'Creating new %s folder' % staging_dir
-        build_tasks.append(generate_build_task_to_build_files(
-            source_dir, staging_dir, file_hashes))
-    else:
-        # If staging dir exists, rebuild all HTML and Python files.
-        mandatory_file_formats = ('.html', '.py')
-        print (
-            'Staging dir exists, re-building all %s files'
-            % str(mandatory_file_formats))
-        build_tasks += generate_build_task_to_build_files(
-            source_dir, staging_dir, file_hashes,
-            file_formats=mandatory_file_formats)
-        # Compare source files with already built files using file hashes.
-        dev_dir_hashes = get_file_hashes(source_dir)
-        print 'Getting files that have changed between %s and %s' % (
-            source_dir, out_dir)
-        recently_changed_filenames = get_recently_changed_filenames(
-            dev_dir_hashes, out_dir)
-        if recently_changed_filenames:
-            # Only re-build files that have changed since last build.
-            print 'Re-building recently changed files at %s' % source_dir
-            build_tasks += generate_build_task_to_rebuild_new_files(
-                source_dir, staging_dir, recently_changed_filenames,
-                file_hashes)
-            # Clean up files in staging directory that have been removed from
-            # source directory.
-            print 'Scanning directory %s to remove deleted file' % staging_dir
-            delete_tasks += generate_delete_task_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir)
-            _execute_tasks(delete_tasks)
-        else:
-            print 'No changes detected. Using previously built files.'
-    return build_tasks
-
-
-def generate_delete_task_to_remove_deleted_files(
+def generate_delete_tasks_to_remove_deleted_files(
         source_dir_hashes, staging_directory):
-    """Walk the staging directory and queue up deletion tasks to remove files
-    that are not in the hash dict i.e. remaining files in staging directory that
-    have since been deleted from source directory.
+    """This function walks the staging directory and queues up deletion tasks to
+    remove files that are not in the hash dict i.e. remaining files in staging
+    directory that have since been deleted from source directory.
 
     Args:
         source_dir_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -882,20 +826,132 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     recently_changed_filenames = []
     # Currently, we do not hash Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
-    for file_name, md5_hash in source_dir_hashes.iteritems():
+    for filename, md5_hash in source_dir_hashes.iteritems():
         # Ignore files with certain extensions.
-        if any(file_name.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
+        if any(filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
         final_filepath = _insert_hash(
-            os.path.join(out_dir, file_name), md5_hash)
+            os.path.join(out_dir, filename), md5_hash)
         if not os.path.isfile(final_filepath):
             # Filename with provided hash cannot be found, this file has been
             # recently changed or created since last build.
-            recently_changed_filenames.append(file_name)
+            recently_changed_filenames.append(filename)
     if recently_changed_filenames:
         print ('The following files will be rebuilt due to recent changes: %s' %
                recently_changed_filenames)
     return recently_changed_filenames
+
+
+def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
+    """This function queues up build tasks to build all files in source
+    directory if there is no existing staging directory. Otherwise, selectively
+    queue up build tasks to build recently changed files.
+
+    Args:
+        dirnames_dict: dict(str, str, str). A dict containing directory paths to
+            the directory containing source files to be built, the staging
+            directory and the final directory containing built files.
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values.
+
+    Returns:
+        build_tasks: deque(Thread). A deque that contains all build tasks queued
+            to be processed.
+    """
+    source_dir = dirnames_dict['dev_dir']
+    staging_dir = dirnames_dict['staging_dir']
+    out_dir = dirnames_dict['out_dir']
+    build_tasks = collections.deque()
+    if not os.path.isdir(staging_dir):
+        # If there is no staging dir, perform build process on all files.
+        print 'Creating new %s folder' % staging_dir
+        build_tasks += generate_build_tasks_to_build_all_files_in_directory(
+            source_dir, staging_dir, file_hashes)
+    else:
+        # If staging dir exists, rebuild all HTML and Python files.
+        mandatory_file_extensions = ('.html', '.py',)
+        print (
+            'Staging dir exists, re-building all %s files'
+            % str(mandatory_file_extensions))
+        mandatory_file_lists = get_filepaths_by_extensions(
+            source_dir, mandatory_file_extensions)
+        build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+            source_dir, staging_dir, mandatory_file_lists, file_hashes)
+        dev_dir_hashes = get_file_hashes(source_dir)
+        print 'Getting files that have changed between %s and %s' % (
+            source_dir, out_dir)
+        recently_changed_filenames = get_recently_changed_filenames(
+            dev_dir_hashes, out_dir)
+        if recently_changed_filenames:
+            print 'Re-building recently changed files at %s' % source_dir
+            build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+                source_dir, staging_dir, recently_changed_filenames,
+                file_hashes)
+            # Clean up files in staging directory that have been removed from
+            # source directory.
+            _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
+                dev_dir_hashes, staging_dir))
+        else:
+            print 'No changes detected. Using previously built files.'
+    return build_tasks
+
+
+def _verify_build(input_dirnames, output_dirnames, file_hashes):
+    """Verify a few metrics after build process finishes:
+        1) Number of files between staging directory and final directory
+        matches.
+        2) The hashes in filenames belongs to the hash dict.
+        3) hashes.js, third_party.min.css and third_party.min.js are built and
+        hashes are inserted.
+
+        Args:
+            input_dirnames: list(str). List of directory paths that contain
+                source files
+            output_dirnames: list(str). List of directory paths that contain
+                built files.
+            file_hashes: dict(str, str). Dictionary with filepaths as keys and
+                hashes of file content as values.
+    """
+    for i in xrange(len(input_dirnames)):
+        # Make sure that all files in source directory and staging directory are
+        # accounted for.
+        _compare_file_count(input_dirnames[i], input_dirnames[i])
+    # Make sure that hashed file name matches with current hash dict.
+    for built_dir in output_dirnames:
+        for root, _, filenames in os.walk(built_dir):
+            for filename in filenames:
+                parent_dir = os.path.basename(root)
+                converted_filepath = os.path.join(
+                    THIRD_PARTY_GENERATED_DEV_DIR, parent_dir, filename)
+                if not hash_should_be_inserted(converted_filepath):
+                    # These filenames should not be hashed.
+                    continue
+                # Obtain the same filepath format as the hash dict's key.
+                filepath = os.path.join(root, filename)
+                relative_filepath = os.path.relpath(filepath, built_dir)
+                _match_filename_with_hashes(relative_filepath, file_hashes)
+
+    hash_final_filename = _insert_hash(
+        HASHES_JS_FILENAME, file_hashes[HASHES_JS_FILENAME])
+
+    MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
+        'js', 'third_party.min.js')
+    third_party_js_final_filename = _insert_hash(
+        MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
+        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
+
+    MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
+        'css', 'third_party.min.css')
+    third_party_css_final_filename = _insert_hash(
+        MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
+        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH])
+
+    _ensure_files_exist([
+        os.path.join(ASSETS_OUT_DIR, hash_final_filename),
+        os.path.join(
+            THIRD_PARTY_GENERATED_OUT_DIR, third_party_js_final_filename),
+        os.path.join(
+            THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename)])
 
 
 def generate_build_directory():
@@ -933,14 +989,14 @@ def generate_build_directory():
     _ensure_files_exist([HASHES_JS_FILEPATH])
 
     # Build files in /extensions and copy them into staging directory.
-    build_tasks += generate_build_task_to_build_directory(
+    build_tasks += generate_build_tasks_to_build_directory(
         EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes)
-    # Minify all template files and copy them into build/templates/head.
-    build_tasks += generate_build_task_to_build_directory(
+    # Minify all template files and copy them into staging directory.
+    build_tasks += generate_build_tasks_to_build_directory(
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes)
     _execute_tasks(build_tasks)
 
-    # Copy all files from staging directory to production directory (/build).
+    # Copy all files from staging directory to production directory.
     COPY_INPUT_DIRS = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
@@ -954,31 +1010,10 @@ def generate_build_directory():
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
     _execute_tasks(copy_tasks)
-
-    for i in xrange(len(COPY_INPUT_DIRS)):
-        # Make sure that all files in source directory and staging directory are
-        # accounted for.
-        _compare_file_count(COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i])
-    # Make sure that hashed file name matches with current hash dict.
-    for built_dir in COPY_OUTPUT_DIRS:
-        for root, _, filenames in os.walk(built_dir):
-            for filename in filenames:
-                parent_dir = os.path.basename(root)
-                converted_filepath = os.path.join(
-                    THIRD_PARTY_GENERATED_DEV_DIR, parent_dir, filename)
-                if not hash_should_be_inserted(converted_filepath):
-                    # These filenames should not be hashed.
-                    continue
-                # Obtain the same filepath format as the hash dict's key.
-                filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(filepath, built_dir)
-                _match_filename_with_hashes(relative_filepath, hashes)
-    # Make sure /build/assets/hashes.[HASH].js is available.
-    hash_final_filename = _insert_hash(
-        HASHES_JS_FILENAME, hashes[HASHES_JS_FILENAME])
-    _ensure_files_exist([os.path.join(ASSETS_OUT_DIR, hash_final_filename)])
     # Clean up un-hashed hashes.js.
     os.remove(HASHES_JS_FILEPATH)
+
+    _verify_build(COPY_INPUT_DIRS, COPY_OUTPUT_DIRS, hashes)
     print 'Build completed.'
 
 
