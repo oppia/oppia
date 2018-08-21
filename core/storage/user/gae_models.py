@@ -578,9 +578,9 @@ class StoryProgressModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The story id.
     story_id = ndb.StringProperty(required=True, indexed=True)
-    # The list of nodes which have been completed within the context of
+    # The list of node ids which have been completed within the context of
     # the story represented by story_id.
-    completed_nodes = ndb.StringProperty(repeated=True)
+    completed_node_ids = ndb.StringProperty(repeated=True)
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -671,7 +671,7 @@ class StoryProgressModel(base_models.BaseModel):
             one if it does not already exist.
         """
         instance_model = cls.get(user_id, story_id)
-        if instance_model:
+        if instance_model is not None:
             return instance_model
         else:
             return cls.create(user_id, story_id)

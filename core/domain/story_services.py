@@ -550,7 +550,7 @@ def get_completed_node_ids(user_id, story_id):
     """
     progress_model = user_models.StoryProgressModel.get(user_id, story_id)
 
-    return progress_model.completed_nodes if progress_model else []
+    return progress_model.completed_node_ids if progress_model else []
 
 
 def get_node_ids_completed_in_stories(user_id, story_ids):
@@ -561,7 +561,7 @@ def get_node_ids_completed_in_stories(user_id, story_ids):
         story_ids: list(str). IDs of the stories.
 
     Returns:
-        dict(list(str)). Dict of the story id and the node ids completed
+        dict(str, list(str)). Dict of the story id and the node ids completed
             in each story as key-value pairs.
     """
     progress_models = user_models.StoryProgressModel.get_multi(
@@ -570,9 +570,9 @@ def get_node_ids_completed_in_stories(user_id, story_ids):
     node_ids_completed_in_stories = {}
 
     for progress_model in progress_models:
-        if progress_model:
+        if progress_model is not None:
             node_ids_completed_in_stories[progress_model.story_id] = (
-                progress_model.completed_nodes)
+                progress_model.completed_node_ids)
 
     return node_ids_completed_in_stories
 
@@ -611,6 +611,6 @@ def record_completed_node_in_story_context(user_id, story_id, node_id):
     progress_model = user_models.StoryProgressModel.get_or_create(
         user_id, story_id)
 
-    if node_id not in progress_model.completed_nodes:
-        progress_model.completed_nodes.append(node_id)
+    if node_id not in progress_model.completed_node_ids:
+        progress_model.completed_node_ids.append(node_id)
         progress_model.put()

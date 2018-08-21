@@ -296,7 +296,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             self.owner_id, self.STORY_1_ID)
         self.assertIsNotNone(completion_model)
         self.assertEqual(
-            completion_model.completed_nodes, [
+            completion_model.completed_node_ids, [
                 self.NODE_ID_1])
 
         # If the same node is completed again within the context of this
@@ -306,7 +306,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
         self.assertEqual(
-            completion_model.completed_nodes, [
+            completion_model.completed_node_ids, [
                 self.NODE_ID_1])
 
         # If the same node and another are completed within the context
@@ -321,7 +321,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
         self.assertEqual(
-            completion_model.completed_nodes, [
+            completion_model.completed_node_ids, [
                 self.NODE_ID_1])
 
         # If two more nodes are completed, they are recorded.
@@ -332,5 +332,5 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         completion_model = self._get_progress_model(
             self.owner_id, self.STORY_1_ID)
         self.assertEqual(
-            completion_model.completed_nodes, [
+            completion_model.completed_node_ids, [
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
