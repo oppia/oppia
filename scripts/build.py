@@ -33,6 +33,16 @@ THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', '')
 
+THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join('js', 'third_party.js')
+MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
+    'css', 'third_party.min.css')
+
+THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
+MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
+    'js', 'third_party.min.js')
+
+FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
+
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
@@ -174,6 +184,16 @@ def ensure_directory_exists(filepath):
         os.makedirs(directory)
 
 
+def delete_directory_tree(directory_path):
+    """Recursively delete a directory tree.
+
+    Args:
+        directory_path: str. Directory path to be deleted.
+    """
+    ensure_directory_exists(directory_path)
+    shutil.rmtree(directory_path)
+
+
 def _ensure_files_exist(filepaths):
     """Ensures that files exist at the given filepaths.
 
@@ -189,8 +209,8 @@ def _ensure_files_exist(filepaths):
 
 
 def get_file_count(directory_path):
-    """Count total number of file in directory, ignoring any files with
-    extensions in FILE_EXTENSIONS_TO_IGNORE.
+    """Count total number of file in the given directory, ignoring any files
+    with extensions in FILE_EXTENSIONS_TO_IGNORE.
 
     Args:
         directory_path: str. Directory to be walked.
@@ -226,42 +246,6 @@ def _compare_file_count(source_path, target_path):
         raise ValueError(
             '%s files in source dir != %s files in target dir.' % (
                 source_dir_file_count, target_dir_file_count))
-
-
-def _match_filename_with_hashes(relative_filepath, file_hashes):
-    """Ensure that hashes in filepaths match with the hash entries in hash
-    dict.
-
-    Args:
-        relative_filepath: str. Filepath that is relative from /build.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
-
-    Raises:
-        ValueError: The hash dict is empty.
-        ValueError: Filepath has less than 2 partitions after splitting by '.'
-            delimiter.
-        ValueError: The filename does not contain hash.
-        KeyError: The filename's hash cannot be found in the hash dict.
-    """
-    # Final filepath example:
-    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
-    if not file_hashes:
-        raise ValueError('Hash dict is empty')
-
-    filename_partitions = relative_filepath.split('.')
-    if len(filename_partitions) < 2:
-        raise ValueError('Filepath has less than 2 partitions after splitting')
-
-    hash_string_from_filename = filename_partitions[- 2]
-    # Ensure hash string obtained from filename follows MD5 hash format.
-    if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
-        raise ValueError(
-            '%s is expected to contain MD5 hash' % relative_filepath)
-    if hash_string_from_filename not in file_hashes.values():
-        raise KeyError(
-            'Hash from file named %s does not match hash dict values' %
-            relative_filepath)
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
@@ -426,13 +410,14 @@ def minify_third_party_libs(third_party_directory_path):
     """Minify third_party.js and third_party.css and remove un-minified files.
     """
     THIRD_PARTY_JS_FILEPATH = os.path.join(
-        third_party_directory_path, 'js', 'third_party.js')
-    MINIFIED_THIRD_PARTY_JS_FILEPATH = os.path.join(
-        third_party_directory_path, 'js', 'third_party.min.js')
+        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
     THIRD_PARTY_CSS_FILEPATH = os.path.join(
-        third_party_directory_path, 'css', 'third_party.css')
+        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
+
+    MINIFIED_THIRD_PARTY_JS_FILEPATH = os.path.join(
+        third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)
     MINIFIED_THIRD_PARTY_CSS_FILEPATH = os.path.join(
-        third_party_directory_path, 'css', 'third_party.min.css')
+        third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
     _minify_and_create_sourcemap(
         THIRD_PARTY_JS_FILEPATH, MINIFIED_THIRD_PARTY_JS_FILEPATH)
@@ -449,15 +434,12 @@ def build_third_party_libs(third_party_directory_path):
 
     print 'Building third party libs at %s' % third_party_directory_path
 
-    ensure_directory_exists(third_party_directory_path)
-    # Regenerate /third_party/generated from scratch.
-    shutil.rmtree(third_party_directory_path)
-
     THIRD_PARTY_JS_FILEPATH = os.path.join(
-        third_party_directory_path, 'js', 'third_party.js')
+        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
     THIRD_PARTY_CSS_FILEPATH = os.path.join(
-        third_party_directory_path, 'css', 'third_party.css')
-    FONTS_DIR = os.path.join(third_party_directory_path, 'fonts', '')
+        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
+    FONTS_DIR = os.path.join(
+        third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
     ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
@@ -509,8 +491,6 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Copying into %s' % os.path.join(os.getcwd(), target)
     copy_tasks = collections.deque()
-    ensure_directory_exists(target)
-    shutil.rmtree(target)
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
             print 'Copying %s' % os.path.join(root, directory)
@@ -589,13 +569,13 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, source_dir)
             if any(filename.endswith(p) for p in file_extensions):
-                print relative_filepath
                 filepaths.append(relative_filepath)
     return filepaths
 
 
 def get_file_hashes(directory_path):
-    """Returns hashes of all files in directory tree.
+    """Returns hashes of all files in directory tree, excluding files with
+    extensions in FILE_EXTENSIONS_TO_IGNORE.
 
     Args:
         directory_path: str. Root directory of the tree.
@@ -626,7 +606,7 @@ def get_file_hashes(directory_path):
 
 def filter_hashes(file_hashes):
     """Filters hashes that should be provided to the frontend
-    and prefixes / in front of the keys.
+    and prefixes "/" in front of the keys.
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -717,9 +697,6 @@ def generate_build_tasks_to_build_all_files_in_directory(
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     build_tasks = collections.deque()
-    ensure_directory_exists(target)
-    print 'Deleting dir %s' % target
-    shutil.rmtree(target)
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
@@ -772,7 +749,8 @@ def generate_delete_tasks_to_remove_deleted_files(
         source_dir_hashes, staging_directory):
     """This function walks the staging directory and queues up deletion tasks to
     remove files that are not in the hash dict i.e. remaining files in staging
-    directory that have since been deleted from source directory.
+    directory that have since been deleted from source directory. Files with
+    extensions in FILE_EXTENSIONS_TO_IGNORE will be excluded.
 
     Args:
         source_dir_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -848,9 +826,13 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     queue up build tasks to build recently changed files.
 
     Args:
-        dirnames_dict: dict(str, str, str). A dict containing directory paths to
-            the directory containing source files to be built, the staging
-            directory and the final directory containing built files.
+        dirnames_dict: dict(str, str, str). This dict should contain three keys,
+            with corresponding values as follows:
+            - 'dev_dir': the directory that contains source files to be built.
+            - 'staging_dir': the directory that contains minified files waiting
+            for final copy process.
+            - 'out_dir': the final directory that contains built files with hash
+            inserted into filenames.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
 
@@ -865,18 +847,19 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % staging_dir
+        ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
             source_dir, staging_dir, file_hashes)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
-        mandatory_file_extensions = ('.html', '.py',)
+        file_extensions_to_always_rebuild = ('.html', '.py',)
         print (
             'Staging dir exists, re-building all %s files'
-            % str(mandatory_file_extensions))
-        mandatory_file_lists = get_filepaths_by_extensions(
-            source_dir, mandatory_file_extensions)
+            % str(file_extensions_to_always_rebuild))
+        filenames_to_always_rebuild = get_filepaths_by_extensions(
+            source_dir, file_extensions_to_always_rebuild)
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-            source_dir, staging_dir, mandatory_file_lists, file_hashes)
+            source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
         dev_dir_hashes = get_file_hashes(source_dir)
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
@@ -896,6 +879,42 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     return build_tasks
 
 
+def _verify_filepath_hash(relative_filepath, file_hashes):
+    """Ensure that hashes in filepaths match with the hash entries in hash
+    dict.
+
+    Args:
+        relative_filepath: str. Filepath that is relative from /build.
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values.
+
+    Raises:
+        ValueError: The hash dict is empty.
+        ValueError: Filepath has less than 2 partitions after splitting by '.'
+            delimiter.
+        ValueError: The filename does not contain hash.
+        KeyError: The filename's hash cannot be found in the hash dict.
+    """
+    # Final filepath example:
+    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
+    if not file_hashes:
+        raise ValueError('Hash dict is empty')
+
+    filename_partitions = relative_filepath.split('.')
+    if len(filename_partitions) < 2:
+        raise ValueError('Filepath has less than 2 partitions after splitting')
+
+    hash_string_from_filename = filename_partitions[-2]
+    # Ensure hash string obtained from filename follows MD5 hash format.
+    if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
+        raise ValueError(
+            '%s is expected to contain MD5 hash' % relative_filepath)
+    if hash_string_from_filename not in file_hashes.values():
+        raise KeyError(
+            'Hash from file named %s does not match hash dict values' %
+            relative_filepath)
+
+
 def _verify_build(input_dirnames, output_dirnames, file_hashes):
     """Verify a few metrics after build process finishes:
         1) Number of files between staging directory and final directory
@@ -906,7 +925,7 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
 
         Args:
             input_dirnames: list(str). List of directory paths that contain
-                source files
+                source files.
             output_dirnames: list(str). List of directory paths that contain
                 built files.
             file_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -915,7 +934,7 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
     for i in xrange(len(input_dirnames)):
         # Make sure that all files in source directory and staging directory are
         # accounted for.
-        _compare_file_count(input_dirnames[i], input_dirnames[i])
+        _compare_file_count(input_dirnames[i], output_dirnames[i])
     # Make sure that hashed file name matches with current hash dict.
     for built_dir in output_dirnames:
         for root, _, filenames in os.walk(built_dir):
@@ -929,19 +948,15 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
                 # Obtain the same filepath format as the hash dict's key.
                 filepath = os.path.join(root, filename)
                 relative_filepath = os.path.relpath(filepath, built_dir)
-                _match_filename_with_hashes(relative_filepath, file_hashes)
+                _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_JS_FILENAME, file_hashes[HASHES_JS_FILENAME])
 
-    MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
-        'js', 'third_party.min.js')
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
         file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
 
-    MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
-        'css', 'third_party.min.css')
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH])
@@ -1007,13 +1022,14 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_OUT_DIR]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
     for i in xrange(len(COPY_INPUT_DIRS)):
+        delete_directory_tree(COPY_OUTPUT_DIRS[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
     _execute_tasks(copy_tasks)
-    # Clean up un-hashed hashes.js.
-    os.remove(HASHES_JS_FILEPATH)
 
     _verify_build(COPY_INPUT_DIRS, COPY_OUTPUT_DIRS, hashes)
+    # Clean up un-hashed hashes.js.
+    os.remove(HASHES_JS_FILEPATH)
     print 'Build completed.'
 
 
@@ -1022,6 +1038,8 @@ def build():
     parser.add_option(
         '--prod_env', action='store_true', default=False, dest='prod_mode')
     options = parser.parse_args()[0]
+    # Regenerate /third_party/generated from scratch.
+    delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
     if options.prod_mode:
         generate_build_directory()

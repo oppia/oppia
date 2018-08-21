@@ -84,16 +84,16 @@ class BuildTests(test_utils.GenericTestBase):
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Setup a sandbox folder for copying fonts.
-        target_fonts_dir = os.path.join('target', 'fonts', '')
+        test_target = os.path.join('target', 'fonts', '')
 
         self.assertEqual(len(copy_tasks), 0)
         copy_tasks += build._generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], target_fonts_dir)
+            dependency_filepaths['fonts'], test_target)
         # Asserting the same number of copy tasks and number of font files.
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
-        """Test _insert_hash to return correct filenames with provided hashes.
+        """Test _insert_hash returns correct filenames with provided hashes.
         """
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')
@@ -120,7 +120,7 @@ class BuildTests(test_utils.GenericTestBase):
             fileNotExist.exception)
 
     def test_get_file_count(self):
-        """Test get_file_count to return the correct number of files, excluding
+        """Test get_file_count returns the correct number of files, excluding
         file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
         all_inclusive_file_count = 0
@@ -156,8 +156,8 @@ class BuildTests(test_utils.GenericTestBase):
                 source_dir_file_count, target_dir_file_count) in
             incorrectFileCount.exception)
 
-    def test_match_filename_with_hashes(self):
-        """Test _match_filename_with_hashes to raise exception:
+    def test_verify_filepath_hash(self):
+        """Test _verify_filepath_hash to raise exception:
             1) When there is an empty hash dict.
             2) When a filename is expected to contain hash but does not.
             3) When there is a hash in filename that cannot be found in
@@ -167,20 +167,20 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = dict()
         base_filename = 'base.html'
         with self.assertRaises(ValueError) as emptyHashDict:
-            build._match_filename_with_hashes(base_filename, file_hashes)
+            build._verify_filepath_hash(base_filename, file_hashes)
         self.assertTrue('Hash dict is empty' in emptyHashDict.exception)
 
         file_hashes = {base_filename: random.getrandbits(128)}
         bad_filepath = 'README'
         with self.assertRaises(ValueError) as filepathWithoutExtension:
-            build._match_filename_with_hashes(bad_filepath, file_hashes)
+            build._verify_filepath_hash(bad_filepath, file_hashes)
         # Generate a random hash dict for base.html.
         self.assertTrue(
             'Filepath has less than 2 partitions after splitting'
             in filepathWithoutExtension.exception)
 
         with self.assertRaises(ValueError) as noHashInFilename:
-            build._match_filename_with_hashes(base_filename, file_hashes)
+            build._verify_filepath_hash(base_filename, file_hashes)
         # Generate a random hash dict for base.html.
         self.assertTrue(
             '%s is expected to contain MD5 hash' % base_filename
@@ -189,7 +189,7 @@ class BuildTests(test_utils.GenericTestBase):
         hashed_base_filename = build._insert_hash(
             base_filename, random.getrandbits(128))
         with self.assertRaises(KeyError) as incorrectHashInFilename:
-            build._match_filename_with_hashes(hashed_base_filename, file_hashes)
+            build._verify_filepath_hash(hashed_base_filename, file_hashes)
         self.assertTrue(
             'Hash from file named %s does not match hash dict values'
             % hashed_base_filename in incorrectHashInFilename.exception)
@@ -243,7 +243,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(len(result), 0)
 
     def test_hash_should_be_inserted(self):
-        """Test hash_should_be_inserted to return the correct boolean value
+        """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
         """
         with self.swap(
@@ -275,7 +275,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self):
-        """Test is_file_hash_provided_to_frontend to return the correct boolean
+        """Test is_file_hash_provided_to_frontend returns the correct boolean
         value for filepath that should be provided to frontend.
         """
         with self.swap(
@@ -341,8 +341,8 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = build.get_file_hashes(
             build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'])
         self.assertGreater(len(file_hashes), 0)
-        # Assert that each hash's filepath exist and does not include files with
-        # extensions in FILE_EXTENSIONS_TO_IGNORE.
+        # Assert that each hash's filepath exists and does not include files
+        # with extensions in FILE_EXTENSIONS_TO_IGNORE.
         for filepath in file_hashes:
             abs_filepath = os.path.join(
                 build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath)
