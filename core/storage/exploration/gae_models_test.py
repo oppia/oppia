@@ -93,35 +93,6 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEquals(len(results), 1)
 
-    def test_get_all_exploration_commits(self):
-        commit_v1 = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
-                'create', [{}],
-                constants.ACTIVITY_STATUS_PRIVATE, False))
-        commit_v2 = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'commiter_id', 'username', 'msg',
-                'edit', [{}],
-                constants.ACTIVITY_STATUS_PRIVATE, False))
-        commit_v1.exploration_id = 'a'
-        commit_v2.exploration_id = 'a'
-        commit_v1.put()
-        commit_v2.put()
-
-        results = (
-            exploration_models.ExplorationCommitLogEntryModel
-            .get_all_exploration_commits('a', 1))
-        self.assertEquals(results, [commit_v1])
-        results = (
-            exploration_models.ExplorationCommitLogEntryModel
-            .get_all_exploration_commits('a', 2))
-        self.assertEquals(results, [commit_v1, commit_v2])
-        results = (
-            exploration_models.ExplorationCommitLogEntryModel
-            .get_all_exploration_commits('a', 3))
-        self.assertEquals(results, [commit_v1, commit_v2, None])
-
 
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the ExpSummaryModel."""
