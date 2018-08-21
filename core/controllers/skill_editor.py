@@ -185,6 +185,8 @@ class EditableSkillDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
         skill_services.delete_skill(self.user_id, skill_id)
 
+        self.render_json(self.values)
+
 
 class SkillPublishHandler(base.BaseHandler):
     """A handler for publishing skills."""

@@ -277,6 +277,7 @@ class ExplorationHandler(EditorHandler):
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
+        self.render_json(self.values)
 
 
 class ExplorationRightsHandler(EditorHandler):
