@@ -55,7 +55,7 @@ oppia.factory('BrowserCheckerService', [
       supportsSpeechSynthesis: function() {
         return _supportsSpeechSynthesis();
       },
-      supportsAudioPlayback: function() {
+      supportsUploadedAudioPlayback: function() {
         return !isSafari;
       },
       isMobileDevice: function() {
