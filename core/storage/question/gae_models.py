@@ -239,6 +239,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ]
         return question_ids
 
+
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.
 
