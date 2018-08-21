@@ -857,6 +857,6 @@ def skill_has_associated_questions(skill_id):
         bool. Whether any question has this skill attached.
     """
     question_ids = (
-        question_models.QuestionSkillModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
+        question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
             skill_id))
-    return (len(question_ids) > 0)
+    return len(question_ids) > 0
