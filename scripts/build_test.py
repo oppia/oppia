@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
+import collections
+import os
+import random
+import re
+import shutil
+import subprocess
+import threading
+
 # pylint: disable=relative-import
 import build
 from core.tests import test_utils
@@ -21,22 +30,346 @@ from core.tests import test_utils
 # pylint: enable=relative-import
 
 
+TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
+
+ASSETS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'assets', '')
+ASSETS_OUT_DIR = os.path.join(TEST_DIRECTORY, 'static', 'assets', '')
+
+EXTENSIONS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'extensions', '')
+
+TEMPLATES_DEV_DIR = os.path.join(TEST_DIRECTORY, 'templates', '')
+BASE_JS_TARGET_DIRPATH = os.path.join(TEMPLATES_DEV_DIR, 'pages', '')
+
+# The source directory should contain files with these extensions.
+ASSETS_FILE_EXTENSIONS = ('.svg', '.json', '.html', '.js',)
+EXTENSIONS_FILE_EXTENSIONS = ('.py', '.html', '.js',)
+
+INVALID_INPUT_FILEPATH = os.path.join(
+    TEST_DIRECTORY, 'invalid', 'path', 'to', 'input.js')
+INVALID_OUTPUT_FILEPATH = os.path.join(
+    TEST_DIRECTORY, 'invalid', 'path', 'to', 'output.js')
+
+EMPTY_DIRECTORY = os.path.join(TEST_DIRECTORY, 'empty', '')
+
+
+def ensure_directory_exists(file_path):
+    """Ensures if directory tree exists, if not creates the directories.
+
+    Args:
+        file_path: str. Path to file located in directory that we want to
+            ensure exists.
+    """
+    parent_directory = os.path.dirname(file_path)
+    if not os.path.exists(parent_directory):
+        os.makedirs(parent_directory)
+
+
+def safe_delete_directory_tree(directory_path):
+    """Recursively delete a directory tree. If directory tree does not exist,
+    create the directories first then delete the directory tree.
+
+    Args:
+        directory_path: str. Directory path to be deleted.
+    """
+    ensure_directory_exists(directory_path)
+    shutil.rmtree(directory_path)
+
+
+def copy_files_of_extension_from_source_to_target(
+        file_extensions, max_file_count, source_directory, target_directory):
+    """Copy at most max_file_count number of files that has a certain extension
+    from source directory to target directory.
+
+    Args:
+        file_extensions: tuple(str). Tuple of file extensions to be copied.
+        max_file_count: int. Total number of files to be copied.
+        source_directory: str. Directory where source files are located.
+        target_directory: str. Directory where the files will be coped to.
+    """
+    ensure_directory_exists(target_directory)
+    for file_extension in file_extensions:
+        count = 0
+        for root, _, filenames in os.walk(source_directory):
+            for filename in filenames:
+                if count >= max_file_count:
+                    break
+                if filename.endswith(file_extension):
+                    shutil.copy2(
+                        os.path.join(root, filename), target_directory)
+                    count += 1
+
+
+# Override Pylint's protected access rule due to multiple private functions in
+# the file.
+# pylint: disable=protected-access
+
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
+    def setUp(self):
+        super(BuildTests, self).setUp()
+        safe_delete_directory_tree(TEST_DIRECTORY)
+        # Create copies of source directories.
+        # E.g. One of each file with extension in ASSETS_FILE_EXTENSIONS is
+        # copied from /assets to ASSETS_DEV_DIR.
+        copy_files_of_extension_from_source_to_target(
+            ASSETS_FILE_EXTENSIONS, 1, build.ASSETS_DEV_DIR, ASSETS_DEV_DIR)
+
+        copy_files_of_extension_from_source_to_target(
+            EXTENSIONS_FILE_EXTENSIONS, 1,
+            build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            EXTENSIONS_DEV_DIR)
+
+        # Set up for test_process_html().
+        # Copy Base.js from /templates/dev/head/pages to
+        # TEMPLATES_DEV_DIR/pages.
+        BASE_JS_RELATIVE_FILEPATH = os.path.join('pages', 'Base.js')
+        BASE_JS_SOURCE_FILEPATH = os.path.join(
+            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            BASE_JS_RELATIVE_FILEPATH)
+        if not os.path.isfile(BASE_JS_SOURCE_FILEPATH):
+            raise OSError(
+                '%s no longer exists' % BASE_JS_SOURCE_FILEPATH)
+        ensure_directory_exists(BASE_JS_TARGET_DIRPATH)
+        shutil.copy(BASE_JS_SOURCE_FILEPATH, BASE_JS_TARGET_DIRPATH)
+
+        # Copy base.html from /templates/dev/head/pages to TEMPLATES_DEV_DIR.
+        BASE_HTML_RELATIVE_FILEPATH = os.path.join('pages', 'base.html')
+        BASE_HTML_SOURCE_FILEPATH = os.path.join(
+            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            BASE_HTML_RELATIVE_FILEPATH)
+        if not os.path.isfile(BASE_HTML_SOURCE_FILEPATH):
+            raise OSError(
+                '%s no longer exists' % BASE_HTML_SOURCE_FILEPATH)
+        shutil.copy(BASE_HTML_SOURCE_FILEPATH, TEMPLATES_DEV_DIR)
+
+    def test_minify(self):
+        """Tests _minify with an invalid filepath."""
+        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+            build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
+        # returncode is the exit status of the child process.
+        self.assertEqual(called_process.exception.returncode, 1)
+
+    def test_minify_and_create_sourcemap(self):
+        """Tests _minify_and_create_sourcemap with an invalid filepath."""
+        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+            build._minify_and_create_sourcemap(
+                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
+        # returncode is the exit status of the child process.
+        self.assertEqual(called_process.exception.returncode, 1)
+
+    def test_ensure_files_exist(self):
+        """Test _ensure_files_exist raises exception with a non-existent
+        filepath.
+        """
+        non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+        # Exception will be raised at first file determined to be non-existent.
+        with self.assertRaisesRegexp(
+            OSError, ('File %s does not exist.') % non_existent_filepaths[0]):
+            build._ensure_files_exist(non_existent_filepaths)
+
+    def test_join_files(self):
+        """Determine third_party.js contains the content of the first 10 JS
+        files in /third_party/static.
+        """
+        # Prepare a file_stream object from StringIO.
+        third_party_js_stream = StringIO.StringIO()
+        # Get all filepaths from manifest.json.
+        dependency_filepaths = build.get_dependencies_filepaths()
+        # Join and write all JS files in /third_party/static to file_stream.
+        build._join_files(dependency_filepaths['js'], third_party_js_stream)
+        counter = 0
+        # Only checking first 10 files.
+        JS_FILE_COUNT = 10
+        for js_filepath in dependency_filepaths['js']:
+            if counter == JS_FILE_COUNT:
+                break
+            with open(js_filepath, 'r') as js_file:
+                # Assert that each line is copied over to file_stream object.
+                for line in js_file:
+                    self.assertIn(line, third_party_js_stream.getvalue())
+            counter += 1
+
+    def test_generate_copy_tasks_for_fonts(self):
+        """Test _generate_copy_tasks_for_fonts ensures that the number of copy
+        tasks matches the number of font files.
+        """
+        copy_tasks = collections.deque()
+        # Get all filepaths from manifest.json.
+        dependency_filepaths = build.get_dependencies_filepaths()
+        # Setup a sandbox folder for copying fonts.
+        test_target = os.path.join('target', 'fonts', '')
+
+        self.assertEqual(len(copy_tasks), 0)
+        copy_tasks += build._generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], test_target)
+        # Asserting the same number of copy tasks and number of font files.
+        self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
+
     def test_insert_hash(self):
-        # pylint: disable=protected-access
-        self.assertEquals(build._insert_hash('file.js', '123456'),
-                          'file.123456.js')
-        self.assertEquals(build._insert_hash('path/to/file.js', '654321'),
-                          'path/to/file.654321.js')
-        self.assertEquals(build._insert_hash('file.min.js', 'abcdef'),
-                          'file.min.abcdef.js')
-        self.assertEquals(build._insert_hash('path/to/file.min.js', 'fedcba'),
-                          'path/to/file.min.fedcba.js')
-        # pylint: enable=protected-access
+        """Test _insert_hash returns correct filenames with provided hashes.
+        """
+        self.assertEqual(
+            build._insert_hash('file.js', '123456'), 'file.123456.js')
+        self.assertEqual(
+            build._insert_hash(
+                'path/to/file.js', '654321'), 'path/to/file.654321.js')
+        self.assertEqual(
+            build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js')
+        self.assertEqual(
+            build._insert_hash(
+                'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
+
+    def test_get_file_count(self):
+        """Test get_file_count returns the correct number of files, excluding
+        file with extensions in FILE_EXTENSIONS_TO_IGNORE.
+        """
+        all_inclusive_file_count = 0
+        for _, _, files in os.walk(EXTENSIONS_DEV_DIR):
+            all_inclusive_file_count += len(files)
+        ignored_file_count = 0
+        for _, _, files in os.walk(EXTENSIONS_DEV_DIR):
+            for filename in files:
+                if any(filename.endswith(p)
+                       for p in build.FILE_EXTENSIONS_TO_IGNORE):
+                    ignored_file_count += 1
+        self.assertEqual(
+            all_inclusive_file_count - ignored_file_count,
+            build.get_file_count(EXTENSIONS_DEV_DIR))
+
+    def test_compare_file_count(self):
+        """Test _compare_file_count raises exception when there is a
+        mismatched file count between 2 dirs.
+        """
+        ensure_directory_exists(EMPTY_DIRECTORY)
+        source_dir_file_count = build.get_file_count(EMPTY_DIRECTORY)
+        assert source_dir_file_count == 0
+        target_dir_file_count = build.get_file_count(ASSETS_DEV_DIR)
+        # Ensure that ASSETS_DEV_DIR has at least 1 file.
+        assert target_dir_file_count > 0
+        with self.assertRaisesRegexp(
+            ValueError, ('%s files in source dir != %s files in target dir.') %
+            (source_dir_file_count, target_dir_file_count)):
+            build._compare_file_count(EMPTY_DIRECTORY, ASSETS_DEV_DIR)
+
+    def test_verify_filepath_hash(self):
+        """Test _verify_filepath_hash raises exception:
+            1) When there is an empty hash dict.
+            2) When a filename is expected to contain hash but does not.
+            3) When there is a hash in filename that cannot be found in
+                hash dict.
+        """
+        # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
+        file_hashes = dict()
+        base_filename = 'base.html'
+        with self.assertRaisesRegexp(ValueError, 'Hash dict is empty'):
+            build._verify_filepath_hash(base_filename, file_hashes)
+
+        # Generate a random hash dict for base.html.
+        file_hashes = {base_filename: random.getrandbits(128)}
+        with self.assertRaisesRegexp(
+            ValueError, '%s is expected to contain MD5 hash' % base_filename):
+            build._verify_filepath_hash(base_filename, file_hashes)
+
+        bad_filepath = 'README'
+        with self.assertRaisesRegexp(
+            ValueError, 'Filepath has less than 2 partitions after splitting'):
+            build._verify_filepath_hash(bad_filepath, file_hashes)
+
+        hashed_base_filename = build._insert_hash(
+            base_filename, random.getrandbits(128))
+        with self.assertRaisesRegexp(
+            KeyError,
+            'Hash from file named %s does not match hash dict values' %
+            hashed_base_filename):
+            build._verify_filepath_hash(hashed_base_filename, file_hashes)
+
+    def test_process_html(self):
+        """Test process_html removes whitespaces and adds hash to filepaths."""
+        base_source_path = os.path.join(TEMPLATES_DEV_DIR, 'base.html')
+        # Prepare a file_stream object from StringIO.
+        minified_html_file_stream = StringIO.StringIO()
+        # Obtain actual file hashes of /templates to add hash to all filepaths
+        # within the HTML file. The end result will look like:
+        # E.g <script ... app.js></script>
+        # --> <script ... app.[hash].js></script>.
+        # Only need to hash Base.js.
+        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
+            file_hashes = build.get_file_hashes(TEMPLATES_DEV_DIR)
+
+        # Assert that base.html has white spaces and has original filepaths.
+        with open(base_source_path, 'r') as source_base_file:
+            source_base_file_content = source_base_file.read()
+            self.assertRegexpMatches(
+                source_base_file_content, r'\s{2,}',
+                msg="No white spaces detected in %s unexpectedly"
+                % base_source_path)
+            for filepath in file_hashes:
+                # Looking for templates/pages/Base.js in
+                # source_base_file_content.
+                self.assertTrue(
+                    re.search(filepath, source_base_file_content))
+
+        # Build base.html file.
+        with open(base_source_path, 'r') as source_base_file:
+            build.process_html(
+                source_base_file, minified_html_file_stream, file_hashes)
+
+        minified_html_file_content = minified_html_file_stream.getvalue()
+        self.assertNotRegexpMatches(
+            minified_html_file_content, r'\s{2,}',
+            msg='All white spaces must be removed from %s' % base_source_path)
+        # Assert that hash is inserted into filenames in base.html.
+        # Final filepath in base.html example:
+        # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
+        for filepath in file_hashes:
+            final_filename = build._insert_hash(filepath, file_hashes[filepath])
+            # Looking for
+            # templates/pages/Base.081ce90f17ecdf07701d83cb860985c2.js in
+            # minified_html_file_content.
+            self.assertTrue(
+                re.search(final_filename, minified_html_file_content))
+
+    def test_hash_should_be_inserted(self):
+        """Test hash_should_be_inserted returns the correct boolean value
+        for filepath that should be hashed.
+        """
+        with self.swap(
+            build, 'FILEPATHS_NOT_TO_RENAME', (
+                '*.py', 'path/to/fonts/*', 'path/to/third_party.min.js.map',
+                'path/to/third_party.min.css.map')):
+            self.assertFalse(build.hash_should_be_inserted(
+                'path/to/fonts/fontawesome-webfont.svg'))
+            self.assertFalse(build.hash_should_be_inserted(
+                'path/to/third_party.min.css.map'))
+            self.assertFalse(build.hash_should_be_inserted(
+                'path/to/third_party.min.js.map'))
+            self.assertTrue(build.hash_should_be_inserted(
+                'path/to/wrongFonts/fonta.eot'))
+            self.assertTrue(build.hash_should_be_inserted(
+                'rich_text_components/Video/protractor.js'))
+            self.assertFalse(build.hash_should_be_inserted(
+                'main.py'))
+            self.assertFalse(build.hash_should_be_inserted(
+                'extensions/domain.py'))
+
+    def test_generate_copy_tasks_to_copy_from_source_to_target(self):
+        """Test generate_copy_tasks_to_copy_from_source_to_target queues up
+        the same number of copy tasks as the number of files in the directory.
+        """
+        assets_hashes = build.get_file_hashes(ASSETS_DEV_DIR)
+        total_file_count = build.get_file_count(ASSETS_DEV_DIR)
+        copy_tasks = collections.deque()
+
+        self.assertEqual(len(copy_tasks), 0)
+        copy_tasks += build.generate_copy_tasks_to_copy_from_source_to_target(
+            ASSETS_DEV_DIR, ASSETS_OUT_DIR, assets_hashes)
+        self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self):
+        """Test is_file_hash_provided_to_frontend returns the correct boolean
+        value for filepath that should be provided to frontend.
+        """
         with self.swap(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/file.js', 'path/to/file.html', 'file.js')):
@@ -60,16 +393,63 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(
                 build.is_file_hash_provided_to_frontend('bad_end.css'))
 
+    def test_get_filepaths_by_extensions(self):
+        """Test get_filepaths_by_extensions only returns filepaths in
+        directory with given extensions.
+        """
+        filepaths = []
+        build.ensure_directory_exists(ASSETS_DEV_DIR)
+        extensions = ('.json', '.svg',)
+
+        self.assertEqual(len(filepaths), 0)
+        filepaths = build.get_filepaths_by_extensions(
+            ASSETS_DEV_DIR, extensions)
+        for filepath in filepaths:
+            self.assertTrue(any(filepath.endswith(p) for p in extensions))
+        file_count = 0
+        for _, _, filenames in os.walk(ASSETS_DEV_DIR):
+            for filename in filenames:
+                if any(filename.endswith(p) for p in extensions):
+                    file_count += 1
+        self.assertEqual(len(filepaths), file_count)
+
+        filepaths = []
+        extensions = ('.pdf', '.viminfo', '.idea',)
+
+        self.assertEqual(len(filepaths), 0)
+        filepaths = build.get_filepaths_by_extensions(
+            ASSETS_DEV_DIR, extensions)
+        self.assertEqual(len(filepaths), 0)
+
+    def test_get_file_hashes(self):
+        """Test get_file_hashes gets hashes of all files in directory,
+        excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
+        """
+        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
+            file_hashes = dict()
+            self.assertEqual(len(file_hashes), 0)
+            file_hashes = build.get_file_hashes(EXTENSIONS_DEV_DIR)
+            self.assertGreater(len(file_hashes), 0)
+            # Assert that each hash's filepath exists and does not include files
+            # with extensions in FILE_EXTENSIONS_TO_IGNORE.
+            for filepath in file_hashes:
+                abs_filepath = os.path.join(EXTENSIONS_DEV_DIR, filepath)
+                self.assertTrue(os.path.isfile(abs_filepath))
+                self.assertFalse(
+                    any(filepath.endswith(p) for p in
+                        build.FILE_EXTENSIONS_TO_IGNORE))
+
     def test_filter_hashes(self):
+        """Test filter_hashes filters the provided hash correctly."""
         # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/to/file.js'],
                 hashes['path/to/file.js'])
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/file.min.js'],
                 hashes['path/file.min.js'])
 
@@ -89,6 +469,9 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(filtered_hashes.has_key('/file.html'))
 
     def test_get_hashes_json_file_contents(self):
+        """Test get_hashes_json_file_contents parses provided hash dict
+        correctly to JSON format.
+        """
         # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/file.js': '123456'}
@@ -101,3 +484,98 @@ class BuildTests(test_utils.GenericTestBase):
                 build.get_hashes_json_file_contents(hashes),
                 ('var hashes = JSON.parse(\'{"/file.min.js": "654321", '
                  '"/file.js": "123456"}\');'))
+
+    def test_execute_tasks(self):
+        """Test _execute_tasks joins all threads after executing all tasks."""
+        build_tasks = collections.deque()
+        TASK_COUNT = 2
+        count = TASK_COUNT
+        while count:
+            task = threading.Thread(
+                target=build._minify,
+                args=(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH))
+            build_tasks.append(task)
+            count -= 1
+
+        self.assertEqual(threading.active_count(), 1)
+        build._execute_tasks(build_tasks)
+        with self.assertRaisesRegexp(
+            OSError, 'threads can only be started once'):
+            build._execute_tasks(build_tasks)
+        # Assert that all threads are joined.
+        self.assertEqual(threading.active_count(), 1)
+
+    def test_generate_build_tasks_to_build_all_files_in_directory(self):
+        """Test generate_build_tasks_to_build_all_files_in_directory queues up
+        the same number of build tasks as the number of files in the source
+        directory.
+        """
+        asset_hashes = build.get_file_hashes(ASSETS_DEV_DIR)
+        tasks = collections.deque()
+
+        self.assertEqual(len(tasks), 0)
+        # Build all files.
+        tasks = build.generate_build_tasks_to_build_all_files_in_directory(
+            ASSETS_DEV_DIR, ASSETS_OUT_DIR, asset_hashes)
+        total_file_count = build.get_file_count(ASSETS_DEV_DIR)
+        self.assertEqual(len(tasks), total_file_count)
+
+    def test_generate_build_tasks_to_build_files_from_filepaths(self):
+        """Test generate_build_tasks_to_build_files_from_filepaths queues up a
+        corresponding number of build tasks to the number of file changes.
+        """
+        new_filename = 'manifest.json'
+        recently_changed_filenames = [
+            os.path.join(ASSETS_DEV_DIR, new_filename)]
+        asset_hashes = build.get_file_hashes(ASSETS_DEV_DIR)
+        build_tasks = collections.deque()
+
+        self.assertEqual(len(build_tasks), 0)
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
+            ASSETS_DEV_DIR, ASSETS_OUT_DIR,
+            recently_changed_filenames, asset_hashes)
+        self.assertEqual(len(build_tasks), len(recently_changed_filenames))
+
+        build_tasks.clear()
+        svg_filepaths = build.get_filepaths_by_extensions(
+            ASSETS_DEV_DIR, ('.svg',))
+        # Make sure there is at least 1 SVG file.
+        self.assertGreater(len(svg_filepaths), 0)
+
+        self.assertEqual(len(build_tasks), 0)
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
+            ASSETS_DEV_DIR, ASSETS_OUT_DIR, svg_filepaths, asset_hashes)
+        self.assertEqual(len(build_tasks), len(svg_filepaths))
+
+    def test_get_recently_changed_filenames(self):
+        """Test get_recently_changed_filenames detects file recently added."""
+        # Create an empty folder.
+        ensure_directory_exists(EMPTY_DIRECTORY)
+        # Get hashes from ASSETS_DEV_DIR to simulate a folder with built files.
+        assets_hashes = build.get_file_hashes(ASSETS_DEV_DIR)
+        recently_changed_filenames = []
+
+        self.assertEqual(len(recently_changed_filenames), 0)
+        recently_changed_filenames = build.get_recently_changed_filenames(
+            assets_hashes, EMPTY_DIRECTORY)
+        # Since all HTML and Python files are already built, they are ignored.
+        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html', '.py',)):
+            self.assertEqual(
+                len(recently_changed_filenames), build.get_file_count(
+                    ASSETS_DEV_DIR))
+
+    def test_generate_delete_tasks_to_remove_deleted_files(self):
+        """Test generate_delete_tasks_to_remove_deleted_files queues up the
+        same number of deletion task as the number of deleted files.
+        """
+        delete_tasks = collections.deque()
+        # The empty dict means that all files should be removed.
+        file_hashes = dict()
+
+        self.assertEqual(len(delete_tasks), 0)
+        delete_tasks += build.generate_delete_tasks_to_remove_deleted_files(
+            file_hashes, TEMPLATES_DEV_DIR)
+        self.assertEqual(
+            len(delete_tasks), build.get_file_count(TEMPLATES_DEV_DIR))
+
+# pylint: enable=protected-access
