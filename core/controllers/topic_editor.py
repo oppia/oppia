@@ -322,6 +322,8 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
 
+        self.render_json(self.values)
+
 
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""

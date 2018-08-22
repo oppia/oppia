@@ -1218,7 +1218,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.testapp.delete(str(
+        self.delete_json(str(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1229,7 +1229,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.testapp.delete(str(
+        self.delete_json(str(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1254,7 +1254,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.testapp.delete(str(
+        self.delete_json(str(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1265,7 +1265,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.testapp.delete(str(
+        self.delete_json(str(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
