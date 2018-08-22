@@ -34,12 +34,12 @@ THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', '')
 
 THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join('js', 'third_party.js')
-MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
-    'css', 'third_party.min.css')
-
-THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
 MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
     'js', 'third_party.min.js')
+
+THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
+MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
+    'css', 'third_party.min.css')
 
 FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
 
@@ -68,14 +68,17 @@ NODE_FILE = os.path.join(
 UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
-# Files with this extension shouldn't be moved to build directory.
+# Files with these extension shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
-
-# Files with this paths should be moved to build directory but shouldn't be
-# renamed (i.e. the filepath shouldn't contain hash)
-# This is because these files are referenced from third party files or don't
-# need cache invalidation.
+# Files with these names pattern shouldn't be moved to build directory.
+JS_FILENAMES_TO_IGNORE = ('Spec.js', 'protractor.js')
+GENERAL_FILENAMES_TO_IGNORE = ('_test.py', '.pyc')
+# These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
+# hash).
+# This is because these files don't need cache invalidation, are referenced
+# from third party files or should not be moved to the build directory.
 FILEPATHS_NOT_TO_RENAME = (
+    '*.py',
     'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map')
 
@@ -184,8 +187,9 @@ def ensure_directory_exists(filepath):
         os.makedirs(directory)
 
 
-def delete_directory_tree(directory_path):
-    """Recursively delete a directory tree.
+def safe_delete_directory_tree(directory_path):
+    """Recursively delete a directory tree. If directory tree does not exist,
+    create the directories first then delete the directory tree.
 
     Args:
         directory_path: str. Directory path to be deleted.
@@ -643,10 +647,14 @@ def get_hashes_json_file_contents(file_hashes):
 def minify_func(source_path, target_path, file_hashes, filename):
     """Call the appropriate functions to handle different types of file
     formats:
-        - CSS and JS files: Minify and save at target directory.
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
         hashes in source directory and save edited file at target directory.
-        - Other files: Copy the file from source directory to target directory.
+        - CSS files: Minify and save at target directory.
+        - JS files: Minify and save at target directory, excluding filenames
+        that matches the patterns in JS_FILENAMES_TO_IGNORE.
+        - Other files: Copy the file from source directory to target directory,
+        excluding filesnames that matches the patterns in
+        GENERAL_FILENAMES_TO_IGNORE.
     """
     if filename.endswith('.html'):
         print 'Building %s' % source_path
@@ -657,11 +665,13 @@ def minify_func(source_path, target_path, file_hashes, filename):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
     elif filename.endswith('.js'):
-        print 'Minifying %s' % source_path
-        _minify(source_path, target_path)
+        if not any(filename.endswith(p) for p in JS_FILENAMES_TO_IGNORE):
+            print 'Minifying %s' % source_path
+            _minify(source_path, target_path)
     else:
-        print 'Copying %s' % source_path
-        shutil.copyfile(source_path, target_path)
+        if not any(filename.endswith(p) for p in GENERAL_FILENAMES_TO_IGNORE):
+            print 'Copying %s' % source_path
+            shutil.copyfile(source_path, target_path)
 
 
 def _execute_tasks(tasks, batch_size=24):
@@ -1022,7 +1032,7 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_OUT_DIR]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
     for i in xrange(len(COPY_INPUT_DIRS)):
-        delete_directory_tree(COPY_OUTPUT_DIRS[i])
+        safe_delete_directory_tree(COPY_OUTPUT_DIRS[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
     _execute_tasks(copy_tasks)
@@ -1039,7 +1049,7 @@ def build():
         '--prod_env', action='store_true', default=False, dest='prod_mode')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
-    delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
+    safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
     if options.prod_mode:
         generate_build_directory()
