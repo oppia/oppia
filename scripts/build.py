@@ -71,8 +71,10 @@ UGLIFY_FILE = os.path.join(
 # Files with these extension shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
 # Files with these names pattern shouldn't be moved to build directory.
+# At the point of writing this, Protractor files in /extensions share
+# the same name.
 JS_FILENAMES_TO_IGNORE = ('Spec.js', 'protractor.js')
-GENERAL_FILENAMES_TO_IGNORE = ('_test.py', '.pyc')
+GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
 # This is because these files don't need cache invalidation, are referenced
@@ -198,6 +200,19 @@ def safe_delete_directory_tree(directory_path):
     shutil.rmtree(directory_path)
 
 
+def remove_should_not_be_built_files(staging_directory_path):
+    """Delete all previously built file in staging directory that are not
+    supposed to be built to begin with. Files that should be built will
+    remain untouched.
+    """
+    for root, _, filenames in os.walk(staging_directory_path):
+        for filename in filenames:
+            if not file_should_be_built(filename):
+                complete_filepath = os.path.join(root, filename)
+                _ensure_files_exist([complete_filepath])
+                os.remove(os.path.join(complete_filepath))
+
+
 def _ensure_files_exist(filepaths):
     """Ensures that files exist at the given filepaths.
 
@@ -214,7 +229,8 @@ def _ensure_files_exist(filepaths):
 
 def get_file_count(directory_path):
     """Count total number of file in the given directory, ignoring any files
-    with extensions in FILE_EXTENSIONS_TO_IGNORE.
+    with extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be
+    built.
 
     Args:
         directory_path: str. Directory to be walked.
@@ -226,8 +242,10 @@ def get_file_count(directory_path):
     for _, _, filenames in os.walk(directory_path):
         for filename in filenames:
             # Ignore files with certain extensions.
-            if not any(
+            if not file_should_be_built(filename) or any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
+            else:
                 total_file_count += 1
     return total_file_count
 
@@ -474,6 +492,30 @@ def hash_should_be_inserted(filepath):
                    in FILEPATHS_NOT_TO_RENAME)
 
 
+def file_should_be_built(filepath):
+    """Determines if the file should be built.
+        - JS files: Returns False if filepath matches with pattern in
+        JS_FILENAMES_TO_IGNORE, else returns True.
+        - Python files: Returns False if filepath ends with test.py, else
+        returns True
+        - Other files: Returns False if filepath matches with pattern in
+        GENERAL_FILENAMES_TO_IGNORE, else returns True.
+
+    Args:
+        filepath: str. Path relative to file we are currently building.
+
+    Returns:
+        bool. True if filepath should be built, else False.
+    """
+    if filepath.endswith('.js'):
+        return not any(filepath.endswith(p) for p in JS_FILENAMES_TO_IGNORE)
+    elif filepath.endswith('test.py'):
+        return False
+    else:
+        return not any(
+            filepath.endswith(p) for p in GENERAL_FILENAMES_TO_IGNORE)
+
+
 def generate_copy_tasks_to_copy_from_source_to_target(
         source, target, file_hashes):
     """Generate copy task for each file in source directory, excluding files
@@ -506,7 +548,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if source not in source_path:
                 continue
 
-            # Ignore files with certain extensions.
+            # Python files should not be copied to final build directory.
             if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 continue
 
@@ -558,7 +600,8 @@ def generate_md5_hash(filepath):
 
 
 def get_filepaths_by_extensions(source_dir, file_extensions):
-    """Return list of filepaths in a directory with certain extensions.
+    """Return list of filepaths in a directory with certain extensions,
+    excluding filepaths that should not be built.
 
     Args:
         source_dir: str. Root directory to be walked.
@@ -572,14 +615,15 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
         for filename in filenames:
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, source_dir)
-            if any(filename.endswith(p) for p in file_extensions):
+            if file_should_be_built(filename) and any(
+                    filename.endswith(p) for p in file_extensions):
                 filepaths.append(relative_filepath)
     return filepaths
 
 
 def get_file_hashes(directory_path):
     """Returns hashes of all files in directory tree, excluding files with
-    extensions in FILE_EXTENSIONS_TO_IGNORE.
+    extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be built.
 
     Args:
         directory_path: str. Root directory of the tree.
@@ -599,11 +643,11 @@ def get_file_hashes(directory_path):
             print('Computing hashes for files in %s'
                   % os.path.join(root, directory))
         for filename in filenames:
-            if any(filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
-            filepath = os.path.join(root, filename)
-            relative_filepath = os.path.relpath(filepath, directory_path)
-            file_hashes[relative_filepath] = generate_md5_hash(filepath)
+            if file_should_be_built(filename) and not any(
+                    filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                filepath = os.path.join(root, filename)
+                relative_filepath = os.path.relpath(filepath, directory_path)
+                file_hashes[relative_filepath] = generate_md5_hash(filepath)
 
     return file_hashes
 
@@ -649,29 +693,20 @@ def minify_func(source_path, target_path, file_hashes, filename):
     formats:
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
         hashes in source directory and save edited file at target directory.
-        - CSS files: Minify and save at target directory.
-        - JS files: Minify and save at target directory, excluding filenames
-        that matches the patterns in JS_FILENAMES_TO_IGNORE.
-        - Other files: Copy the file from source directory to target directory,
-        excluding filesnames that matches the patterns in
-        GENERAL_FILENAMES_TO_IGNORE.
+        - CSS or JS files: Minify and save at target directory.
+        - Other files: Copy the file from source directory to target directory.
     """
     if filename.endswith('.html'):
         print 'Building %s' % source_path
         with open(source_path, 'r+') as source_html_file:
             with open(target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file, file_hashes)
-    elif filename.endswith('.css'):
+    elif filename.endswith('.css') or filename.endswith('.js'):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
-    elif filename.endswith('.js'):
-        if not any(filename.endswith(p) for p in JS_FILENAMES_TO_IGNORE):
-            print 'Minifying %s' % source_path
-            _minify(source_path, target_path)
     else:
-        if not any(filename.endswith(p) for p in GENERAL_FILENAMES_TO_IGNORE):
-            print 'Copying %s' % source_path
-            shutil.copyfile(source_path, target_path)
+        print 'Copying %s' % source_path
+        shutil.copyfile(source_path, target_path)
 
 
 def _execute_tasks(tasks, batch_size=24):
@@ -698,7 +733,8 @@ def _execute_tasks(tasks, batch_size=24):
 
 def generate_build_tasks_to_build_all_files_in_directory(
         source, target, file_hashes):
-    """This function queues up tasks to build all files in a directory.
+    """This function queues up tasks to build all files in a directory,
+    excluding files that should not be built.
 
     Returns:
         build_tasks: deque(Thread). A deque that contains all build tasks queued
@@ -719,17 +755,18 @@ def generate_build_tasks_to_build_all_files_in_directory(
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            task = threading.Thread(
-                target=minify_func,
-                args=(source_path, target_path, file_hashes, filename))
-            build_tasks.append(task)
+            if file_should_be_built(source_path):
+                task = threading.Thread(
+                    target=minify_func,
+                    args=(source_path, target_path, file_hashes, filename))
+                build_tasks.append(task)
     return build_tasks
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
         source_path, target_path, filepaths, file_hashes):
     """This function queues up build tasks to build files from a list of
-    filepaths.
+    filepaths, excluding files that should not be built.
 
     Args:
         source_path: str. Path relative to /oppia directory of directory
@@ -749,9 +786,12 @@ def generate_build_tasks_to_build_files_from_filepaths(
         source_file_path = os.path.join(source_path, filepath)
         target_file_path = os.path.join(target_path, filepath)
         ensure_directory_exists(target_file_path)
-        task = threading.Thread(target=minify_func, args=(
-            source_file_path, target_file_path, file_hashes, filepath))
-        build_tasks.append(task)
+        if file_should_be_built(source_path):
+            task = threading.Thread(
+                target=minify_func,
+                args=(
+                    source_file_path, target_file_path, file_hashes, filepath))
+            build_tasks.append(task)
     return build_tasks
 
 
@@ -797,7 +837,8 @@ def generate_delete_tasks_to_remove_deleted_files(
 
 def get_recently_changed_filenames(source_dir_hashes, out_dir):
     """Compare hashes of source files and built files. Return a list of
-    filenames that were recently changed.
+    filenames that were recently changed. Skips files that are not supposed to
+    built or already built.
 
     Args:
         source_dir_hashes: str. dict(str, str). Dictionary of hashes of files
@@ -812,11 +853,12 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     # e.g base.240933e7564bd72a4dde42ee23260c5f.html
     # If a file gets edited, a different MD5 hash is generated.
     recently_changed_filenames = []
-    # Currently, we do not hash Python files and HTML files are always re-built.
+    # Currently, Python files and HTML files are always re-built.
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
     for filename, md5_hash in source_dir_hashes.iteritems():
-        # Ignore files with certain extensions.
-        if any(filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
+        # Skip files that are already built or should not be built.
+        if not file_should_be_built(filename) or any(
+                filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
         final_filepath = _insert_hash(
             os.path.join(out_dir, filename), md5_hash)
@@ -866,15 +908,22 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         print (
             'Staging dir exists, re-building all %s files'
             % str(file_extensions_to_always_rebuild))
+
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
+
+        # Remove built files in staging dir that should not be built in the
+        # first place.
+        remove_should_not_be_built_files(staging_dir)
+
         dev_dir_hashes = get_file_hashes(source_dir)
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
         recently_changed_filenames = get_recently_changed_filenames(
             dev_dir_hashes, out_dir)
+
         if recently_changed_filenames:
             print 'Re-building recently changed files at %s' % source_dir
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
@@ -1037,7 +1086,11 @@ def generate_build_directory():
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
     _execute_tasks(copy_tasks)
 
-    _verify_build(COPY_INPUT_DIRS, COPY_OUTPUT_DIRS, hashes)
+    SOURCE_DIRS = [
+        ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        THIRD_PARTY_GENERATED_DEV_DIR]
+    _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, hashes)
     # Clean up un-hashed hashes.js.
     os.remove(HASHES_JS_FILEPATH)
     print 'Build completed.'

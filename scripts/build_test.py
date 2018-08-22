@@ -330,6 +330,36 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertTrue(
                 re.search(final_filename, minified_html_file_content))
 
+    def test_file_should_be_built(self):
+        """Test file_should_be_built returns the correct boolean value for
+        filepath that should be built.
+        """
+        service_js_filepath = os.path.join('core', 'pages', 'AudioService.js')
+        spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
+        # At the point of writing this, Protractor files in /extensions share
+        # the same name.
+        protractor_filepath = os.path.join('extensions', 'protractor.js')
+
+        python_controller_filepath = os.path.join('base.py')
+        pyc_test_filepath = os.path.join(
+            'core', 'controllers', 'base.pyc')
+        python_test_filepath = os.path.join(
+            'core', 'tests', 'base_test.py')
+
+        self.assertFalse(build.file_should_be_built(spec_js_filepath))
+        self.assertFalse(build.file_should_be_built(protractor_filepath))
+        self.assertTrue(build.file_should_be_built(service_js_filepath))
+
+        self.assertFalse(build.file_should_be_built(python_test_filepath))
+        self.assertFalse(build.file_should_be_built(pyc_test_filepath))
+        self.assertTrue(build.file_should_be_built(python_controller_filepath))
+
+        # Swapping out constants to check if the reverse is true.
+        # ALL JS files that ends with ...Service.js should not be built.
+        with self.swap(build, 'JS_FILENAMES_TO_IGNORE', ('Service.js',)):
+            self.assertFalse(build.file_should_be_built(service_js_filepath))
+            self.assertTrue(build.file_should_be_built(spec_js_filepath))
+
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
@@ -425,6 +455,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test get_file_hashes gets hashes of all files in directory,
         excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
+        # Prevent getting hashes of HTML files.
         with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
             file_hashes = dict()
             self.assertEqual(len(file_hashes), 0)
@@ -435,9 +466,7 @@ class BuildTests(test_utils.GenericTestBase):
             for filepath in file_hashes:
                 abs_filepath = os.path.join(EXTENSIONS_DEV_DIR, filepath)
                 self.assertTrue(os.path.isfile(abs_filepath))
-                self.assertFalse(
-                    any(filepath.endswith(p) for p in
-                        build.FILE_EXTENSIONS_TO_IGNORE))
+                self.assertFalse(filepath.endswith('.html'))
 
     def test_filter_hashes(self):
         """Test filter_hashes filters the provided hash correctly."""
