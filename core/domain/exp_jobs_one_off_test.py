@@ -493,7 +493,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
-        self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are

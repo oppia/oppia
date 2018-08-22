@@ -36,13 +36,13 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration)
 
-        self.assertEquals(
+        self.assertEqual(
             exploration_models.ExplorationModel.get_exploration_count(), 1)
         saved_exploration = (
             exploration_models.ExplorationModel.get_all().fetch(1)[0])
-        self.assertEquals(saved_exploration.title, 'A Title')
-        self.assertEquals(saved_exploration.category, 'A Category')
-        self.assertEquals(saved_exploration.objective, 'An Objective')
+        self.assertEqual(saved_exploration.title, 'A Title')
+        self.assertEqual(saved_exploration.category, 'A Category')
+        self.assertEqual(saved_exploration.objective, 'An Objective')
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -91,7 +91,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, None))
         self.assertFalse(more)
-        self.assertEquals(len(results), 1)
+        self.assertEqual(len(results), 1)
 
 
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
