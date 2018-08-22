@@ -26,14 +26,14 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_insert_hash(self):
         # pylint: disable=protected-access
-        self.assertEquals(build._insert_hash('file.js', '123456'),
-                          'file.123456.js')
-        self.assertEquals(build._insert_hash('path/to/file.js', '654321'),
-                          'path/to/file.654321.js')
-        self.assertEquals(build._insert_hash('file.min.js', 'abcdef'),
-                          'file.min.abcdef.js')
-        self.assertEquals(build._insert_hash('path/to/file.min.js', 'fedcba'),
-                          'path/to/file.min.fedcba.js')
+        self.assertEqual(build._insert_hash('file.js', '123456'),
+                         'file.123456.js')
+        self.assertEqual(build._insert_hash('path/to/file.js', '654321'),
+                         'path/to/file.654321.js')
+        self.assertEqual(build._insert_hash('file.min.js', 'abcdef'),
+                         'file.min.abcdef.js')
+        self.assertEqual(build._insert_hash('path/to/file.min.js', 'fedcba'),
+                         'path/to/file.min.fedcba.js')
         # pylint: enable=protected-access
 
     def test_is_file_hash_provided_to_frontend(self):
@@ -66,10 +66,10 @@ class BuildTests(test_utils.GenericTestBase):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/to/file.js'],
                 hashes['path/to/file.js'])
-            self.assertEquals(
+            self.assertEqual(
                 filtered_hashes['/path/file.min.js'],
                 hashes['path/file.min.js'])
 
