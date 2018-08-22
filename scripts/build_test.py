@@ -30,6 +30,28 @@ from core.tests import test_utils
 # pylint: enable=relative-import
 
 
+TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
+
+ASSETS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'assets', '')
+ASSETS_OUT_DIR = os.path.join(TEST_DIRECTORY, 'static', 'assets', '')
+
+EXTENSIONS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'extensions', '')
+
+TEMPLATES_DEV_DIR = os.path.join(TEST_DIRECTORY, 'templates', '')
+BASE_JS_TARGET_DIRPATH = os.path.join(TEMPLATES_DEV_DIR, 'pages', '')
+
+# The source directory should contain files with these extensions.
+ASSETS_FILE_EXTENSIONS = ('.svg', '.json', '.html', '.js',)
+EXTENSIONS_FILE_EXTENSIONS = ('.py', '.html', '.js',)
+
+INVALID_INPUT_FILEPATH = os.path.join(
+    TEST_DIRECTORY, 'invalid', 'path', 'to', 'input.js')
+INVALID_OUTPUT_FILEPATH = os.path.join(
+    TEST_DIRECTORY, 'invalid', 'path', 'to', 'output.js')
+
+EMPTY_DIRECTORY = os.path.join(TEST_DIRECTORY, 'empty', '')
+
+
 def ensure_directory_exists(file_path):
     """Ensures if directory tree exists, if not creates the directories.
 
@@ -75,28 +97,6 @@ def copy_files_of_extension_from_source_to_target(
                     shutil.copy2(
                         os.path.join(root, filename), target_directory)
                     count += 1
-
-
-TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
-
-ASSETS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'assets', '')
-ASSETS_OUT_DIR = os.path.join(TEST_DIRECTORY, 'static', 'assets', '')
-
-EXTENSIONS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'extensions', '')
-
-TEMPLATES_DEV_DIR = os.path.join(TEST_DIRECTORY, 'templates', '')
-BASE_JS_TARGET_DIRPATH = os.path.join(TEMPLATES_DEV_DIR, 'pages', '')
-
-# The source directory should contain files with these extensions.
-ASSETS_FILE_EXTENSIONS = ('.svg', '.json', '.html', '.js',)
-EXTENSIONS_FILE_EXTENSIONS = ('.py', '.html', '.js',)
-
-INVALID_INPUT_FILEPATH = os.path.join(
-    TEST_DIRECTORY, 'invalid', 'path', 'to', 'input.js')
-INVALID_OUTPUT_FILEPATH = os.path.join(
-    TEST_DIRECTORY, 'invalid', 'path', 'to', 'output.js')
-
-EMPTY_DIRECTORY = os.path.join(TEST_DIRECTORY, 'empty', '')
 
 
 # Override Pylint's protected access rule due to multiple private functions in
@@ -297,7 +297,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
             file_hashes = build.get_file_hashes(TEMPLATES_DEV_DIR)
 
-        # Assert that base.html has white spaces and unhashed filepath.
+        # Assert that base.html has white spaces and has original filepaths.
         with open(base_source_path, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
@@ -319,7 +319,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
             msg='All white spaces must be removed from %s' % base_source_path)
-        # Assert that filenames in HTML file is hashed.
+        # Assert that hash is inserted into filenames in base.html.
         # Final filepath in base.html example:
         # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
         for filepath in file_hashes:
