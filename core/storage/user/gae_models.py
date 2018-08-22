@@ -615,7 +615,7 @@ class StoryProgressModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, story_id=story_id)
 
     @classmethod
-    def get(cls, user_id, story_id, strict=False):
+    def get(cls, user_id, story_id, strict=True):
         """Gets the StoryProgressModel for the given user and story
         id.
 
@@ -670,7 +670,7 @@ class StoryProgressModel(base_models.BaseModel):
             matches the given user_id and story_id, or the newly created
             one if it does not already exist.
         """
-        instance_model = cls.get(user_id, story_id)
+        instance_model = cls.get(user_id, story_id, strict=False)
         if instance_model is not None:
             return instance_model
         else:

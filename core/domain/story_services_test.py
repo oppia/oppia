@@ -195,7 +195,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     """
 
     def _get_progress_model(self, user_id, STORY_ID):
-        return user_models.StoryProgressModel.get(user_id, STORY_ID)
+        return user_models.StoryProgressModel.get(
+            user_id, STORY_ID, strict=False)
 
     def _record_completion(self, user_id, STORY_ID, node_id):
         story_services.record_completed_node_in_story_context(

@@ -548,7 +548,8 @@ def get_completed_node_ids(user_id, story_id):
     Returns:
         list(str). List of the node ids completed in story.
     """
-    progress_model = user_models.StoryProgressModel.get(user_id, story_id)
+    progress_model = user_models.StoryProgressModel.get(
+        user_id, story_id, strict=False)
 
     return progress_model.completed_node_ids if progress_model else []
 
