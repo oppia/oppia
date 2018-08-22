@@ -33,11 +33,11 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         config_model1 = config_models.ConfigPropertyModel(
             id='config_model1', value='c')
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        config_model1 = config_models.ConfigPropertyModel.get_version(
+        retrieved_model1 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 1)
-        self.assertEqual(config_model1.value, 'c')
-        config_model1.value = 'd'
-        config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        config_model2 = config_models.ConfigPropertyModel.get_version(
+        self.assertEqual(retrieved_model1.value, 'c')
+        retrieved_model1.value = 'd'
+        retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
-        self.assertEqual(config_model2.value, 'd')
+        self.assertEqual(retrieved_model2.value, 'd')
