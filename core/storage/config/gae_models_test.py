@@ -38,6 +38,6 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(config_model1.value, 'c')
         config_model1.value = 'd'
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        retrieve_commit = config_models.ConfigPropertyModel.get_version(
+        config_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
-        self.assertEqual(retrieve_commit.value, 'd')
+        self.assertEqual(config_model2.value, 'd')
