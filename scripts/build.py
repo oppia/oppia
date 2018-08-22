@@ -836,7 +836,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     queue up build tasks to build recently changed files.
 
     Args:
-        dirnames_dict: dict(str, str, str). This dict should contain three keys,
+        dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
             - 'staging_dir': the directory that contains minified files waiting
