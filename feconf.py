@@ -701,6 +701,8 @@ SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
@@ -778,9 +780,6 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
-# Whether state id mapping model should be generated and stored when exploration
-# is created or updated.
-ENABLE_STATE_ID_MAPPING = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.

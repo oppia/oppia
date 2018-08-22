@@ -158,10 +158,10 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 1)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 0)
+        self.assertEqual(user_model.num_ratings, 0)
         self.assertIsNone(user_model.average_ratings)
         self.logout()
 
@@ -178,11 +178,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 0)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 0)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 1)
-        self.assertEquals(user_model.average_ratings, 4)
+        self.assertEqual(user_model.num_ratings, 1)
+        self.assertEqual(user_model.average_ratings, 4)
         self.logout()
 
     def test_one_play_and_rating_for_single_exploration(self):
@@ -204,11 +204,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 1)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 1)
-        self.assertEquals(user_model.average_ratings, 3)
+        self.assertEqual(user_model.num_ratings, 1)
+        self.assertEqual(user_model.average_ratings, 3)
         self.logout()
 
     def test_multiple_plays_and_ratings_for_single_exploration(self):
@@ -232,11 +232,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 4)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 4)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 3)
-        self.assertEquals(user_model.average_ratings, 4)
+        self.assertEqual(user_model.num_ratings, 3)
+        self.assertEqual(user_model.average_ratings, 4)
         self.logout()
 
     def test_one_play_and_rating_for_multiple_explorations(self):
@@ -260,11 +260,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 1)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 1)
-        self.assertEquals(user_model.average_ratings, 4)
+        self.assertEqual(user_model.num_ratings, 1)
+        self.assertEqual(user_model.average_ratings, 4)
         self.logout()
 
     def test_multiple_plays_and_ratings_for_multiple_explorations(self):
@@ -294,11 +294,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self._run_user_stats_aggregator_job()
 
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 3)
-        self.assertEquals(
+        self.assertEqual(user_model.total_plays, 3)
+        self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 3)
-        self.assertEquals(user_model.average_ratings, 10 / 3.0)
+        self.assertEqual(user_model.num_ratings, 3)
+        self.assertEqual(user_model.average_ratings, 10 / 3.0)
         self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
@@ -333,19 +333,19 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         user_model_1 = user_models.UserStatsModel.get(
             self.owner_id_1)
-        self.assertEquals(user_model_1.total_plays, 2)
-        self.assertEquals(
+        self.assertEqual(user_model_1.total_plays, 2)
+        self.assertEqual(
             user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model_1.num_ratings, 3)
-        self.assertEquals(user_model_1.average_ratings, 4)
+        self.assertEqual(user_model_1.num_ratings, 3)
+        self.assertEqual(user_model_1.average_ratings, 4)
 
         user_model_2 = user_models.UserStatsModel.get(
             self.owner_id_2)
-        self.assertEquals(user_model_2.total_plays, 2)
-        self.assertEquals(
+        self.assertEqual(user_model_2.total_plays, 2)
+        self.assertEqual(
             user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model_2.num_ratings, 3)
-        self.assertEquals(user_model_2.average_ratings, 4)
+        self.assertEqual(user_model_2.num_ratings, 3)
+        self.assertEqual(user_model_2.average_ratings, 4)
         self.logout()
 
     def test_stats_for_multiple_explorations_with_multiple_owners(self):
@@ -390,13 +390,13 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         }
 
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)
-        self.assertEquals(
+        self.assertEqual(
             user_model_2.total_plays, expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(
+        self.assertEqual(
             user_model_2.num_ratings, expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_model_2.average_ratings, expected_results['average_ratings'])
         self.logout()
 
@@ -405,13 +405,13 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 2)
 
         user_model_1 = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(
+        self.assertEqual(
             user_model_1.total_plays, expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(
+        self.assertEqual(
             user_model_1.num_ratings, expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_model_1.average_ratings, expected_results['average_ratings'])
         self.logout()
 

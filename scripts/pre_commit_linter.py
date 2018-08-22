@@ -193,6 +193,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
         'excluded_dirs': ('scripts/',)
+    },
+    {
+        'regexp': r'self.assertEquals\(',
+        'message': "Please do not use self.assertEquals method. " +
+                   "This method has been deprecated. Instead use " +
+                   "self.assertEqual method.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
