@@ -29,6 +29,7 @@ from core.tests import test_utils
 
 # pylint: enable=relative-import
 
+
 def ensure_directory_exists(file_path):
     """Ensures if directory tree exists, if not creates the directories.
 
@@ -40,6 +41,7 @@ def ensure_directory_exists(file_path):
     if not os.path.exists(parent_directory):
         os.makedirs(parent_directory)
 
+
 def safe_delete_directory_tree(directory_path):
     """Recursively delete a directory tree. If directory tree does not exist,
     create the directories first then delete the directory tree.
@@ -49,6 +51,7 @@ def safe_delete_directory_tree(directory_path):
     """
     ensure_directory_exists(directory_path)
     shutil.rmtree(directory_path)
+
 
 def copy_files_of_extension_from_source_to_target(
         file_extensions, max_file_count, source_directory, target_directory):
@@ -73,6 +76,7 @@ def copy_files_of_extension_from_source_to_target(
                         os.path.join(root, filename), target_directory)
                     count += 1
 
+
 TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
 
 ASSETS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'assets', '')
@@ -93,6 +97,7 @@ INVALID_OUTPUT_FILEPATH = os.path.join(
     TEST_DIRECTORY, 'invalid', 'path', 'to', 'output.js')
 
 EMPTY_DIRECTORY = os.path.join(TEST_DIRECTORY, 'empty', '')
+
 
 # Override Pylint's protected access rule due to multiple private functions in
 # the file.
@@ -316,7 +321,7 @@ class BuildTests(test_utils.GenericTestBase):
             msg='All white spaces must be removed from %s' % base_source_path)
         # Assert that filenames in HTML file is hashed.
         # Final filepath in base.html example:
-        # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js
+        # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
         for filepath in file_hashes:
             final_filename = build._insert_hash(filepath, file_hashes[filepath])
             # Looking for
