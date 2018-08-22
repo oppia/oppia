@@ -395,7 +395,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-            self.assertEquals(response['feedback_thread_dicts'], [])
+            self.assertEqual(response['feedback_thread_dicts'], [])
             expected_thread_dict = {
                 'original_author_username': self.USER_USERNAME,
                 'status': feedback_models.STATUS_CHOICES_OPEN,

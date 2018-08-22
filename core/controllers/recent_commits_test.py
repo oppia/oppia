@@ -53,7 +53,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
-        self.assertEquals(len(response_dict['results']), 2)
+        self.assertEqual(len(response_dict['results']), 2)
         self.assertDictContainsSubset(
             {'username': 'Janet', 'exploration_id': 'exp_1',
              'post_commit_status': 'public', 'version': 0,
@@ -76,8 +76,8 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
-        self.assertEquals(len(response_dict['exp_ids_to_exp_data']), 1)
-        self.assertEquals(
+        self.assertEqual(len(response_dict['exp_ids_to_exp_data']), 1)
+        self.assertEqual(
             response_dict['exp_ids_to_exp_data']['exp_1']['title'],
             'MyExploration')
         self.logout()
@@ -101,7 +101,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
 
-        self.assertEquals(
+        self.assertEqual(
             len(response_dict['results']),
             feconf.COMMIT_LIST_PAGE_SIZE)
         self.assertTrue(response_dict['more'])
@@ -113,7 +113,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'query_type': 'all_non_private_commits',
                 'cursor': cursor
             })
-        self.assertEquals(
+        self.assertEqual(
             len(response_dict['results']),
             feconf.COMMIT_LIST_PAGE_SIZE)
         self.assertTrue(response_dict['more'])
@@ -125,5 +125,5 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'cursor': cursor
             })
         self.assertFalse(response_dict['more'])
-        self.assertEquals(len(response_dict['results']), 2)
+        self.assertEqual(len(response_dict['results']), 2)
         self.logout()

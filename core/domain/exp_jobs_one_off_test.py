@@ -493,7 +493,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
-        self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are
@@ -685,9 +685,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         """Tests that mapreduce job works correctly when the only first
         exploration version exists.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
@@ -705,26 +704,25 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
     def test_that_mapreduce_job_works(self):
         """Test that mapreduce job is working as expected."""
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state 2',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'new state'
-                })], 'Modify states')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state 2',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state'
+            })], 'Modify states')
 
-            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
