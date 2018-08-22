@@ -16,7 +16,7 @@
             <div class="col-sm-6 col-sm-pull-6" style="z-index:20">
               <h1 class="oppia-fractions-landing-h1">Fractions just got easier</h1>
               <h2 class="oppia-fractions-landing-h2">Get your students and kids started with our free, effective math lessons.</h2>
-              <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('teacher')" style="left:30px;">Get Started</button>
+              <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('teacher')" style="left:22px">Get Started</button>
               <button class="btn oppia-fractions-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
             </div>
           </div>
@@ -154,7 +154,7 @@
               </video>
             </div>
             <div class="col-sm-6">
-              <h1 id="easyToFollow" class="oppia-fractions-landing-h1" style="color: #FFFFFF; text-align: right; padding-right: 80px;">Easy-to-follow lessons</h1>
+              <h1 class="oppia-fractions-landing-h1 easy-to-follow" style="color: #FFFFFF; text-align: right; padding-right: 80px;">Easy-to-follow lessons</h1>
               <h2 class="oppia-fractions-landing-h2" style="color: #FFFFFF; text-align: left; right: 80px">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
                 <br>
                 <br>
@@ -258,7 +258,7 @@
       top: 160px;
     }
 
-    #easyToFollow {
+    .easy-to-follow {
         white-space: nowrap;
     }
     .oppia-fractions-landing-section-inner {
@@ -289,7 +289,7 @@
     .oppia-fractions-landing-explore-lessons {
       border-radius: 0;
       font-family: "Capriola", "Roboto", Arial, sans-serif;
-      font-size: 1.9vw;
+      font-size: 1.9vmax;
       height: 56px;
       position: relative;
       text-align: center;
@@ -362,57 +362,7 @@
     .oppia-fractions-landing-image-mobile {
       display: none;
     }
-    @media screen and (min-width: 451px) and (max-width: 768px) {
-      .oppia-fractions-landing-section-inner,
-      .oppia-fractions-landing-section {
-        height: auto;
-      }
-      .oppia-fractions-landing-h1 {
-        font-size: 1.6em;
-        margin-left: 10%;
-        margin-right: 20%;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        padding-top: 40px;
-        text-align: center !important;
-        width: 80%;
-      }
-      .oppia-fractions-landing-h2 {
-        font-size: 1em;
-        text-align: center !important;
-        width: 80% !important;
-        left: 10%;
-      }
-      .oppia-fractions-landing-learn-more,
-      .oppia-fractions-landing-get-started,
-      .oppia-fractions-landing-explore-lessons {
-        font-size: 2.8vw;
-        margin-bottom: 30px;
-        width: auto;
-      }
-      .oppia-fractions-landing-get-started {
-        margin-right: 5%;
-      }
-      .oppia-fractions-landing-get-started-mobile {
-        left: 15px;
-      }
-      .oppia-fractions-landing-explore-lessons-mobile {
-        left: 6.5px;
-      }
-      .oppia-fractions-landing-image-mobile {
-        display: block;
-        left: 0;
-      }
-      .oppia-fractions-landing-image-desktop {
-        display: none;
-      }
-      .oppia-fractions-landing-centered-h2 {
-        margin-left: 10%;
-        margin-right: 10%;
-        left: 0;
-      }
-    }
-    @media screen and (max-width: 450px) {
+    @media screen and (max-width: 768px) {
       .oppia-fractions-landing-section-inner,
       .oppia-fractions-landing-section {
         height: auto;
@@ -428,7 +378,7 @@
         width: 80%;
       }
 
-      #easyToFollow {
+      .easy-to-follow {
         white-space: pre-wrap;
       }
       .oppia-fractions-landing-h2 {
@@ -440,7 +390,7 @@
       .oppia-fractions-landing-learn-more,
       .oppia-fractions-landing-get-started,
       .oppia-fractions-landing-explore-lessons {
-        font-size: 4vw;
+        font-size: 2.8vmax;
         margin-bottom: 30px;
         width: auto;
       }
@@ -448,7 +398,7 @@
         margin-right: 5%;
       }
       .oppia-fractions-landing-get-started-mobile {
-        left: 12.5px;
+        left: 9.5px;
       }
       .oppia-fractions-landing-explore-lessons-mobile {
         left: 6.5px;
