@@ -68,9 +68,9 @@ NODE_FILE = os.path.join(
 UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
-# Files with these extension shouldn't be moved to build directory.
+# Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
-# Files with these names pattern shouldn't be moved to build directory.
+# Files with these name patterns shouldn't be moved to build directory.
 # At the point of writing this, Protractor files in /extensions share
 # the same name.
 JS_FILENAMES_TO_IGNORE = ('Spec.js', 'protractor.js')
@@ -198,19 +198,6 @@ def safe_delete_directory_tree(directory_path):
     """
     ensure_directory_exists(directory_path)
     shutil.rmtree(directory_path)
-
-
-def remove_should_not_be_built_files(staging_directory_path):
-    """Delete all previously built file in staging directory that are not
-    supposed to be built to begin with. Files that should be built will
-    remain untouched.
-    """
-    for root, _, filenames in os.walk(staging_directory_path):
-        for filename in filenames:
-            if not file_should_be_built(filename):
-                complete_filepath = os.path.join(root, filename)
-                _ensure_files_exist([complete_filepath])
-                os.remove(os.path.join(complete_filepath))
 
 
 def _ensure_files_exist(filepaths):
@@ -795,6 +782,31 @@ def generate_build_tasks_to_build_files_from_filepaths(
     return build_tasks
 
 
+def generate_delete_tasks_to_remove_should_not_be_built_files(directory_path):
+    """This function walks the directory and queues up deletion task to delete
+    all previously built file that are not supposed to be built(e.g. Karma test
+    files, Protractor files, or Python test files).
+
+    Args:
+        directory_path: str. The directory to be walked to find
+            files that should not be built.
+
+    Returns:
+        delete_tasks: deque(Thread). A deque that contains all delete tasks
+            queued to be processed.
+    """
+    delete_tasks = collections.deque()
+    for root, _, filenames in os.walk(directory_path):
+        for filename in filenames:
+            if not file_should_be_built(filename):
+                complete_filepath = os.path.join(root, filename)
+                _ensure_files_exist([complete_filepath])
+                task = threading.Thread(
+                    target=os.remove, args=(complete_filepath))
+                delete_tasks.append(task)
+    return delete_tasks
+
+
 def generate_delete_tasks_to_remove_deleted_files(
         source_dir_hashes, staging_directory):
     """This function walks the staging directory and queues up deletion tasks to
@@ -896,6 +908,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
     build_tasks = collections.deque()
+    delete_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % staging_dir
@@ -914,9 +927,10 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
-        # Remove built files in staging dir that should not be built in the
-        # first place.
-        remove_should_not_be_built_files(staging_dir)
+        # Remove built files in staging dir that should not be built.
+        delete_tasks += (
+            generate_delete_tasks_to_remove_should_not_be_built_files(
+                staging_dir))
 
         dev_dir_hashes = get_file_hashes(source_dir)
         print 'Getting files that have changed between %s and %s' % (
@@ -931,10 +945,12 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
                 file_hashes)
             # Clean up files in staging directory that have been removed from
             # source directory.
-            _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir))
+            delete_tasks += generate_delete_tasks_to_remove_deleted_files(
+                dev_dir_hashes, staging_dir)
         else:
             print 'No changes detected. Using previously built files.'
+
+        _execute_tasks(delete_tasks)
     return build_tasks
 
 
@@ -994,6 +1010,7 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
         # Make sure that all files in source directory and staging directory are
         # accounted for.
         _compare_file_count(input_dirnames[i], output_dirnames[i])
+
     # Make sure that hashed file name matches with current hash dict.
     for built_dir in output_dirnames:
         for root, _, filenames in os.walk(built_dir):
