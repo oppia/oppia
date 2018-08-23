@@ -19,7 +19,6 @@ import collections
 import os
 import random
 import re
-import shutil
 import subprocess
 import threading
 
@@ -29,20 +28,15 @@ from core.tests import test_utils
 
 # pylint: enable=relative-import
 
+TEST_DIRECTORY = os.path.join('core', 'tests', 'build')
+TEST_SOURCE_DIRECTORY = os.path.join('core', 'tests', 'build_sources')
 
-TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
-
-ASSETS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'assets', '')
+ASSETS_DEV_DIR = os.path.join(TEST_SOURCE_DIRECTORY, 'assets', '')
 ASSETS_OUT_DIR = os.path.join(TEST_DIRECTORY, 'static', 'assets', '')
 
-EXTENSIONS_DEV_DIR = os.path.join(TEST_DIRECTORY, 'extensions', '')
+EXTENSIONS_DEV_DIR = os.path.join(TEST_SOURCE_DIRECTORY, 'extensions', '')
 
-TEMPLATES_DEV_DIR = os.path.join(TEST_DIRECTORY, 'templates', '')
-BASE_JS_TARGET_DIRPATH = os.path.join(TEMPLATES_DEV_DIR, 'pages', '')
-
-# The source directory should contain files with these extensions.
-ASSETS_FILE_EXTENSIONS = ('.svg', '.json', '.html', '.js',)
-EXTENSIONS_FILE_EXTENSIONS = ('.py', '.html', '.js',)
+TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIRECTORY, 'templates', '')
 
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIRECTORY, 'invalid', 'path', 'to', 'input.js')
@@ -51,97 +45,18 @@ INVALID_OUTPUT_FILEPATH = os.path.join(
 
 EMPTY_DIRECTORY = os.path.join(TEST_DIRECTORY, 'empty', '')
 
-
-def ensure_directory_exists(file_path):
-    """Ensures if directory tree exists, if not creates the directories.
-
-    Args:
-        file_path: str. Path to file located in directory that we want to
-            ensure exists.
-    """
-    parent_directory = os.path.dirname(file_path)
-    if not os.path.exists(parent_directory):
-        os.makedirs(parent_directory)
-
-
-def safe_delete_directory_tree(directory_path):
-    """Recursively delete a directory tree. If directory tree does not exist,
-    create the directories first then delete the directory tree.
-
-    Args:
-        directory_path: str. Directory path to be deleted.
-    """
-    ensure_directory_exists(directory_path)
-    shutil.rmtree(directory_path)
-
-
-def copy_files_of_extension_from_source_to_target(
-        file_extensions, max_file_count, source_directory, target_directory):
-    """Copy at most max_file_count number of files that has a certain extension
-    from source directory to target directory.
-
-    Args:
-        file_extensions: tuple(str). Tuple of file extensions to be copied.
-        max_file_count: int. Total number of files to be copied.
-        source_directory: str. Directory where source files are located.
-        target_directory: str. Directory where the files will be coped to.
-    """
-    ensure_directory_exists(target_directory)
-    for file_extension in file_extensions:
-        count = 0
-        for root, _, filenames in os.walk(source_directory):
-            for filename in filenames:
-                if count >= max_file_count:
-                    break
-                if filename.endswith(file_extension):
-                    shutil.copy2(
-                        os.path.join(root, filename), target_directory)
-                    count += 1
-
-
 # Override Pylint's protected access rule due to multiple private functions in
 # the file.
 # pylint: disable=protected-access
+
 
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
     def setUp(self):
         super(BuildTests, self).setUp()
-        safe_delete_directory_tree(TEST_DIRECTORY)
-        # Create copies of source directories.
-        # E.g. One of each file with extension in ASSETS_FILE_EXTENSIONS is
-        # copied from /assets to ASSETS_DEV_DIR.
-        copy_files_of_extension_from_source_to_target(
-            ASSETS_FILE_EXTENSIONS, 1, build.ASSETS_DEV_DIR, ASSETS_DEV_DIR)
-
-        copy_files_of_extension_from_source_to_target(
-            EXTENSIONS_FILE_EXTENSIONS, 1,
-            build.EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-            EXTENSIONS_DEV_DIR)
-
-        # Set up for test_process_html().
-        # Copy Base.js from /templates/dev/head/pages to
-        # TEMPLATES_DEV_DIR/pages.
-        BASE_JS_RELATIVE_FILEPATH = os.path.join('pages', 'Base.js')
-        BASE_JS_SOURCE_FILEPATH = os.path.join(
-            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-            BASE_JS_RELATIVE_FILEPATH)
-        if not os.path.isfile(BASE_JS_SOURCE_FILEPATH):
-            raise OSError(
-                '%s no longer exists' % BASE_JS_SOURCE_FILEPATH)
-        ensure_directory_exists(BASE_JS_TARGET_DIRPATH)
-        shutil.copy(BASE_JS_SOURCE_FILEPATH, BASE_JS_TARGET_DIRPATH)
-
-        # Copy base.html from /templates/dev/head/pages to TEMPLATES_DEV_DIR.
-        BASE_HTML_RELATIVE_FILEPATH = os.path.join('pages', 'base.html')
-        BASE_HTML_SOURCE_FILEPATH = os.path.join(
-            build.TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-            BASE_HTML_RELATIVE_FILEPATH)
-        if not os.path.isfile(BASE_HTML_SOURCE_FILEPATH):
-            raise OSError(
-                '%s no longer exists' % BASE_HTML_SOURCE_FILEPATH)
-        shutil.copy(BASE_HTML_SOURCE_FILEPATH, TEMPLATES_DEV_DIR)
+        build.safe_delete_directory_tree(TEST_DIRECTORY)
+        build.safe_delete_directory_tree(EMPTY_DIRECTORY)
 
     def test_minify(self):
         """Tests _minify with an invalid filepath."""
@@ -222,7 +137,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_get_file_count(self):
         """Test get_file_count returns the correct number of files, excluding
-        file with extensions in FILE_EXTENSIONS_TO_IGNORE.
+        file with extensions in FILE_EXTENSIONS_TO_IGNORE and files that should
+        not be built.
         """
         all_inclusive_file_count = 0
         for _, _, files in os.walk(EXTENSIONS_DEV_DIR):
@@ -230,8 +146,9 @@ class BuildTests(test_utils.GenericTestBase):
         ignored_file_count = 0
         for _, _, files in os.walk(EXTENSIONS_DEV_DIR):
             for filename in files:
-                if any(filename.endswith(p)
-                       for p in build.FILE_EXTENSIONS_TO_IGNORE):
+                if not build.file_should_be_built(filename) or any(
+                        filename.endswith(p)
+                        for p in build.FILE_EXTENSIONS_TO_IGNORE):
                     ignored_file_count += 1
         self.assertEqual(
             all_inclusive_file_count - ignored_file_count,
@@ -241,7 +158,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test _compare_file_count raises exception when there is a
         mismatched file count between 2 dirs.
         """
-        ensure_directory_exists(EMPTY_DIRECTORY)
+        build.ensure_directory_exists(EMPTY_DIRECTORY)
         source_dir_file_count = build.get_file_count(EMPTY_DIRECTORY)
         assert source_dir_file_count == 0
         target_dir_file_count = build.get_file_count(ASSETS_DEV_DIR)
@@ -286,7 +203,10 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_process_html(self):
         """Test process_html removes whitespaces and adds hash to filepaths."""
-        base_source_path = os.path.join(TEMPLATES_DEV_DIR, 'base.html')
+        BASE_HTML_SOURCE_PATH = os.path.join(TEMPLATES_DEV_DIR, 'base.html')
+        BASE_JS_SOURCE_PATH = os.path.join(
+            TEMPLATES_DEV_DIR, 'pages', 'Base.js')
+        build._ensure_files_exist([BASE_HTML_SOURCE_PATH, BASE_JS_SOURCE_PATH])
         # Prepare a file_stream object from StringIO.
         minified_html_file_stream = StringIO.StringIO()
         # Obtain actual file hashes of /templates to add hash to all filepaths
@@ -298,12 +218,12 @@ class BuildTests(test_utils.GenericTestBase):
             file_hashes = build.get_file_hashes(TEMPLATES_DEV_DIR)
 
         # Assert that base.html has white spaces and has original filepaths.
-        with open(base_source_path, 'r') as source_base_file:
+        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
                 msg="No white spaces detected in %s unexpectedly"
-                % base_source_path)
+                % BASE_HTML_SOURCE_PATH)
             for filepath in file_hashes:
                 # Looking for templates/pages/Base.js in
                 # source_base_file_content.
@@ -311,14 +231,15 @@ class BuildTests(test_utils.GenericTestBase):
                     re.search(filepath, source_base_file_content))
 
         # Build base.html file.
-        with open(base_source_path, 'r') as source_base_file:
+        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             build.process_html(
                 source_base_file, minified_html_file_stream, file_hashes)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
-            msg='All white spaces must be removed from %s' % base_source_path)
+            msg='All white spaces must be removed from %s' %
+            BASE_HTML_SOURCE_PATH)
         # Assert that hash is inserted into filenames in base.html.
         # Final filepath in base.html example:
         # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
@@ -579,7 +500,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.
-        ensure_directory_exists(EMPTY_DIRECTORY)
+        build.ensure_directory_exists(EMPTY_DIRECTORY)
         # Get hashes from ASSETS_DEV_DIR to simulate a folder with built files.
         assets_hashes = build.get_file_hashes(ASSETS_DEV_DIR)
         recently_changed_filenames = []
@@ -592,6 +513,25 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(
                 len(recently_changed_filenames), build.get_file_count(
                     ASSETS_DEV_DIR))
+
+    def test_generate_delete_tasks_to_remove_should_not_be_built_files(self):
+        """Test generate_delete_tasks_to_remove_should_not_be_built_files queues
+        up the same number of deletion task as the number of files that
+        should not be built.
+        """
+        delete_tasks = collections.deque()
+        file_count = 0
+        for _, _, filenames in os.walk(EXTENSIONS_DEV_DIR):
+            for filename in filenames:
+                if not build.file_should_be_built(filename):
+                    file_count += 1
+        self.assertGreater(file_count, 0)
+
+        self.assertEqual(len(delete_tasks), 0)
+        delete_tasks += (
+            build.generate_delete_tasks_to_remove_should_not_be_built_files(
+                EXTENSIONS_DEV_DIR))
+        self.assertEqual(len(delete_tasks), file_count)
 
     def test_generate_delete_tasks_to_remove_deleted_files(self):
         """Test generate_delete_tasks_to_remove_deleted_files queues up the
