@@ -63,6 +63,17 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         parsed_str = jinja_utils.parse_string('int {{i}}', {'i': 2})
         self.assertEqual(parsed_str, 'int 2')
 
+        # Invalid input string is used.
+        with self.assertRaises(Exception) as cm:
+            parsed_str = jinja_utils.parse_string('{{', {'a': 3, 'b': 0})
+        exception = cm.exception
+        expected_exception = 'Unable to parse string with Jinja: %s' % ('{{')
+        self.assertEqual(exception.message, expected_exception)
+
+        # Invalid expression is used.
+        parsed_str = jinja_utils.parse_string('{{ a/b }}', {'a': 1, 'b': 0})
+        self.assertEqual(parsed_str, unicode('[CONTENT PARSING ERROR]'))
+
     def test_evaluate_object(self):
         parsed_object = jinja_utils.evaluate_object('abc', {})
         self.assertEqual(parsed_object, 'abc')
@@ -108,3 +119,14 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         parsed_dict = jinja_utils.evaluate_object(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
+
+        # int type input used.
+        parsed_object = jinja_utils.evaluate_object(34, {})
+        self.assertEqual(parsed_object, 34)
+
+    def test__log2_floor_filter(self):
+        log_value = jinja_utils._log2_floor_filter(10)
+        self.assertEqual(log_value, 3)
+
+        log_value = jinja_utils._log2_floor_filter(0.0001)
+        self.assertEqual(log_value, -13)
