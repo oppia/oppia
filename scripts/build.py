@@ -229,7 +229,7 @@ def get_file_count(directory_path):
     for _, _, filenames in os.walk(directory_path):
         for filename in filenames:
             # Ignore files with certain extensions.
-            if not file_should_be_built(filename) or any(
+            if not should_file_be_built(filename) or any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 continue
             else:
@@ -479,11 +479,11 @@ def hash_should_be_inserted(filepath):
                    in FILEPATHS_NOT_TO_RENAME)
 
 
-def file_should_be_built(filepath):
+def should_file_be_built(filepath):
     """Determines if the file should be built.
         - JS files: Returns False if filepath matches with pattern in
         JS_FILENAMES_TO_IGNORE, else returns True.
-        - Python files: Returns False if filepath ends with test.py, else
+        - Python files: Returns False if filepath ends with _test.py, else
         returns True
         - Other files: Returns False if filepath matches with pattern in
         GENERAL_FILENAMES_TO_IGNORE, else returns True.
@@ -496,7 +496,7 @@ def file_should_be_built(filepath):
     """
     if filepath.endswith('.js'):
         return not any(filepath.endswith(p) for p in JS_FILENAMES_TO_IGNORE)
-    elif filepath.endswith('test.py'):
+    elif filepath.endswith('_test.py'):
         return False
     else:
         return not any(
@@ -602,7 +602,7 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
         for filename in filenames:
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, source_dir)
-            if file_should_be_built(filename) and any(
+            if should_file_be_built(filename) and any(
                     filename.endswith(p) for p in file_extensions):
                 filepaths.append(relative_filepath)
     return filepaths
@@ -630,7 +630,7 @@ def get_file_hashes(directory_path):
             print('Computing hashes for files in %s'
                   % os.path.join(root, directory))
         for filename in filenames:
-            if file_should_be_built(filename) and not any(
+            if should_file_be_built(filename) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 filepath = os.path.join(root, filename)
                 relative_filepath = os.path.relpath(filepath, directory_path)
@@ -742,7 +742,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
                 continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
-            if file_should_be_built(source_path):
+            if should_file_be_built(source_path):
                 task = threading.Thread(
                     target=minify_func,
                     args=(source_path, target_path, file_hashes, filename))
@@ -773,38 +773,13 @@ def generate_build_tasks_to_build_files_from_filepaths(
         source_file_path = os.path.join(source_path, filepath)
         target_file_path = os.path.join(target_path, filepath)
         ensure_directory_exists(target_file_path)
-        if file_should_be_built(source_path):
+        if should_file_be_built(source_path):
             task = threading.Thread(
                 target=minify_func,
                 args=(
                     source_file_path, target_file_path, file_hashes, filepath))
             build_tasks.append(task)
     return build_tasks
-
-
-def generate_delete_tasks_to_remove_should_not_be_built_files(directory_path):
-    """This function walks the directory and queues up deletion task to delete
-    all previously built file that are not supposed to be built(e.g. Karma test
-    files, Protractor files, or Python test files).
-
-    Args:
-        directory_path: str. The directory to be walked to find
-            files that should not be built.
-
-    Returns:
-        delete_tasks: deque(Thread). A deque that contains all delete tasks
-            queued to be processed.
-    """
-    delete_tasks = collections.deque()
-    for root, _, filenames in os.walk(directory_path):
-        for filename in filenames:
-            if not file_should_be_built(filename):
-                complete_filepath = os.path.join(root, filename)
-                _ensure_files_exist([complete_filepath])
-                task = threading.Thread(
-                    target=os.remove, args=(complete_filepath))
-                delete_tasks.append(task)
-    return delete_tasks
 
 
 def generate_delete_tasks_to_remove_deleted_files(
@@ -824,8 +799,8 @@ def generate_delete_tasks_to_remove_deleted_files(
         delete_tasks: deque(Thread). A deque that contains all delete tasks
             queued to be processed.
     """
-    delete_tasks = collections.deque()
     print 'Scanning directory %s to remove deleted file' % staging_directory
+    delete_tasks = collections.deque()
     for root, dirnames, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
         for directory in dirnames:
@@ -840,7 +815,7 @@ def generate_delete_tasks_to_remove_deleted_files(
             # directory, i.e. file not listed in hash dict.
             if relative_path not in source_dir_hashes:
                 print ('Unable to find %s in file hashes, deleting file'
-                       % relative_path)
+                       % target_path)
                 _ensure_files_exist([target_path])
                 task = threading.Thread(target=os.remove, args=(target_path))
                 delete_tasks.append(task)
@@ -869,7 +844,7 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
     for filename, md5_hash in source_dir_hashes.iteritems():
         # Skip files that are already built or should not be built.
-        if not file_should_be_built(filename) or any(
+        if not should_file_be_built(filename) or any(
                 filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
             continue
         final_filepath = _insert_hash(
@@ -908,7 +883,6 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
     build_tasks = collections.deque()
-    delete_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
         print 'Creating new %s folder' % staging_dir
@@ -927,11 +901,6 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
-        # Remove built files in staging dir that should not be built.
-        delete_tasks += (
-            generate_delete_tasks_to_remove_should_not_be_built_files(
-                staging_dir))
-
         dev_dir_hashes = get_file_hashes(source_dir)
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
@@ -943,14 +912,13 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames,
                 file_hashes)
-            # Clean up files in staging directory that have been removed from
-            # source directory.
-            delete_tasks += generate_delete_tasks_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir)
+            # Clean up files in staging directory that cannot be found in file
+            # hashes dictionary.
+            _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
+                dev_dir_hashes, staging_dir))
         else:
             print 'No changes detected. Using previously built files.'
 
-        _execute_tasks(delete_tasks)
     return build_tasks
 
 

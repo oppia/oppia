@@ -10,6 +10,7 @@ core/templates/prod/*
 core/tests/.browserstack.env
 .coverage*
 .viminfo
+.vscode/*
 libpeerconnection.log
 uploads/*
 venv/
