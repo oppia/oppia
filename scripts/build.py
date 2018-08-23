@@ -158,7 +158,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
     for font_path in source_paths:
         copy_task = threading.Thread(
             target=shutil.copy,
-            args=(font_path, target_path))
+            args=(font_path, target_path,))
         copy_tasks.append(copy_task)
     return copy_tasks
 
@@ -212,6 +212,29 @@ def _ensure_files_exist(filepaths):
     for filepath in filepaths:
         if not os.path.isfile(filepath):
             raise OSError('File %s does not exist.' % filepath)
+
+
+def safe_copy_file(source_filepath, target_filepath):
+    """Copy a file (no metadata) after ensuring the file exists at the given
+    source filepath.
+    NOTE: shutil.copyfile does not accept directory path as arguments.
+
+    Args:
+        source_filepath: str. Path to source file that we want to copy from.
+        target_filepath: str. Path to target file that we want to copy to.
+    """
+    _ensure_files_exist([source_filepath])
+    shutil.copyfile(source_filepath, target_filepath)
+
+
+def safe_delete_file(filepath):
+    """Delete a file after ensuring the provided file actually exists.
+
+    Args:
+        filepath: str. Filepath to be deleted.
+    """
+    _ensure_files_exist([filepath])
+    os.remove(filepath)
 
 
 def get_file_count(directory_path):
@@ -432,8 +455,8 @@ def minify_third_party_libs(third_party_directory_path):
         THIRD_PARTY_JS_FILEPATH, MINIFIED_THIRD_PARTY_JS_FILEPATH)
     _minify(THIRD_PARTY_CSS_FILEPATH, MINIFIED_THIRD_PARTY_CSS_FILEPATH)
     # Clean up un-minified third_party.js and third_party.css.
-    os.remove(THIRD_PARTY_JS_FILEPATH)
-    os.remove(THIRD_PARTY_CSS_FILEPATH)
+    safe_delete_file(THIRD_PARTY_JS_FILEPATH)
+    safe_delete_file(THIRD_PARTY_CSS_FILEPATH)
 
 
 def build_third_party_libs(third_party_directory_path):
@@ -548,8 +571,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             target_path = os.path.join(os.getcwd(), target, relative_path)
             ensure_directory_exists(target_path)
             copy_task = threading.Thread(
-                target=shutil.copyfile,
-                args=(source_path, target_path))
+                target=safe_copy_file,
+                args=(source_path, target_path,))
             copy_tasks.append(copy_task)
     return copy_tasks
 
@@ -693,7 +716,7 @@ def minify_func(source_path, target_path, file_hashes, filename):
         _minify(source_path, target_path)
     else:
         print 'Copying %s' % source_path
-        shutil.copyfile(source_path, target_path)
+        safe_copy_file(source_path, target_path)
 
 
 def _execute_tasks(tasks, batch_size=24):
@@ -745,7 +768,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
             if should_file_be_built(source_path):
                 task = threading.Thread(
                     target=minify_func,
-                    args=(source_path, target_path, file_hashes, filename))
+                    args=(source_path, target_path, file_hashes, filename,))
                 build_tasks.append(task)
     return build_tasks
 
@@ -777,7 +800,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
             task = threading.Thread(
                 target=minify_func,
                 args=(
-                    source_file_path, target_file_path, file_hashes, filepath))
+                    source_file_path, target_file_path, file_hashes, filepath,))
             build_tasks.append(task)
     return build_tasks
 
@@ -816,8 +839,8 @@ def generate_delete_tasks_to_remove_deleted_files(
             if relative_path not in source_dir_hashes:
                 print ('Unable to find %s in file hashes, deleting file'
                        % target_path)
-                _ensure_files_exist([target_path])
-                task = threading.Thread(target=os.remove, args=(target_path))
+                task = threading.Thread(
+                    target=safe_delete_file, args=(target_path,))
                 delete_tasks.append(task)
     return delete_tasks
 
@@ -902,20 +925,20 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
         dev_dir_hashes = get_file_hashes(source_dir)
+        # Clean up files in staging directory that cannot be found in file
+        # hashes dictionary.
+        _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
+            dev_dir_hashes, staging_dir))
+
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
         recently_changed_filenames = get_recently_changed_filenames(
             dev_dir_hashes, out_dir)
-
         if recently_changed_filenames:
             print 'Re-building recently changed files at %s' % source_dir
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames,
                 file_hashes)
-            # Clean up files in staging directory that cannot be found in file
-            # hashes dictionary.
-            _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
-                dev_dir_hashes, staging_dir))
         else:
             print 'No changes detected. Using previously built files.'
 
@@ -960,7 +983,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
 
 def _verify_build(input_dirnames, output_dirnames, file_hashes):
     """Verify a few metrics after build process finishes:
-        1) Number of files between staging directory and final directory
+        1) Number of files between source directory and final directory
         matches.
         2) The hashes in filenames belongs to the hash dict.
         3) hashes.js, third_party.min.css and third_party.min.js are built and
@@ -1077,7 +1100,7 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_DEV_DIR]
     _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, hashes)
     # Clean up un-hashed hashes.js.
-    os.remove(HASHES_JS_FILEPATH)
+    safe_delete_file(HASHES_JS_FILEPATH)
     print 'Build completed.'
 
 
