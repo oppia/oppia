@@ -309,6 +309,8 @@
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia lhe permite <a href=\"/creator_dashboard?mode=create\">criar</a> e <a href=\"/library\">compartilhar</a> explorações sobre uma ampla gama de assuntos, limitado apenas pela sua imaginação.",
 	"I18N_SPLASH_TITLE": "Pense de forma inovadora.",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Inscrever",
+	"I18N_TOPIC_VIEWER_PRACTICE": "Prática",
+	"I18N_TOPIC_VIEWER_STORY": "História",
 	"I18N_TOPNAV_ABOUT": "Sobre",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Sobre o Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Página Administrativa",
