@@ -28,7 +28,7 @@ from core.tests import test_utils
 
 # pylint: enable=relative-import
 
-TEST_DIRECTORY = os.path.join('core', 'tests', 'build')
+TEST_DIRECTORY = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIRECTORY = os.path.join('core', 'tests', 'build_sources')
 
 ASSETS_DEV_DIR = os.path.join(TEST_SOURCE_DIRECTORY, 'assets', '')
