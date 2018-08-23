@@ -118,6 +118,14 @@ oppia.controller('ExplorationEditor', [
         ExplorationStatesService.init(data.states);
 
         ExplorationTitleService.init(data.title);
+
+        if ((data.title !== undefined) && (data.title !== '')) {
+          $rootScope.title = data.title + '- Oppia Editor';
+        } else {
+          $rootScope.title = 'Untitled Exploration - Oppia Editor';
+        }
+
+
         ExplorationCategoryService.init(data.category);
         ExplorationObjectiveService.init(data.objective);
         ExplorationLanguageCodeService.init(data.language_code);
