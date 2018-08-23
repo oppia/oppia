@@ -151,7 +151,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
         target_path: str. Path where the fonts should be copied.
 
     Returns:
-        copy_tasks: deque(Thread). A deque that contains all copy tasks queued
+        deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
     copy_tasks = collections.deque()
@@ -541,7 +541,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             hashes of file content as values.
 
     Returns:
-        copy_tasks: deque(Thread). A deque that contains all copy tasks queued
+        deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
@@ -618,7 +618,7 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
         file_extensions: tuple(str). Tuple of file extensions.
 
     Returns:
-        filepaths: list(str). List of filepaths with specified extensions.
+        list(str). List of filepaths with specified extensions.
     """
     filepaths = []
     for root, _, filenames in os.walk(source_dir):
@@ -747,7 +747,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
     excluding files that should not be built.
 
     Returns:
-        build_tasks: deque(Thread). A deque that contains all build tasks queued
+        deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
@@ -788,7 +788,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
             hashes of file content as values.
 
     Returns:
-        build_tasks: deque(Thread). A deque that contains all build tasks queued
+        deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     build_tasks = collections.deque()
@@ -819,7 +819,7 @@ def generate_delete_tasks_to_remove_deleted_files(
             containing files and directories to be walked.
 
     Returns:
-        delete_tasks: deque(Thread). A deque that contains all delete tasks
+        deque(Thread). A deque that contains all delete tasks
             queued to be processed.
     """
     print 'Scanning directory %s to remove deleted file' % staging_directory
@@ -851,7 +851,7 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     built or already built.
 
     Args:
-        source_dir_hashes: str. dict(str, str). Dictionary of hashes of files
+        source_dir_hashes: dict(str, str). Dictionary of hashes of files
             to be built.
         out_dir: str. Path relative to /oppia where built files are located.
 
@@ -899,7 +899,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             hashes of file content as values.
 
     Returns:
-        build_tasks: deque(Thread). A deque that contains all build tasks queued
+        deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
