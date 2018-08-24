@@ -122,13 +122,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, 'skill_1')
 
     def test_get_question_skill_links_of_skill(self):
-        # If the skill id doesnt exist at all, it returns an empty list
+        # If the skill id doesnt exist at all, it returns an empty list.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
                 'non_existent_skill_id'))
         self.assertEqual(len(question_skill_links), 0)
 
-        # If the question ids dont exist for a skill, it returns an empty list
+        # If the question ids dont exist for a skill, it returns an empty list.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
                 'skill_1'))
@@ -150,7 +150,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2')
 
-        # When question ids exist, it returns a list of questionskilllinks
+        # When question ids exist, it returns a list of questionskilllinks.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
                 'skill_1'))
