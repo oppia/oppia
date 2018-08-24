@@ -243,7 +243,30 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             domains that are linked to the skill ID. None if the skill
             ID doesn't exist.
         """
-        return cls.query(cls.skill_id == skill_id)
+        return QuestionSkillLinkModel.query().filter(
+            cls.skill_id == skill_id).fetch()
+
+    @classmethod
+    def put_multi_question_skill_links(cls, question_skill_links):
+        """Puts multiple question skill links into the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLink). This list of
+            question skill link domain objects to put into the datastore.
+        """
+        cls.put_multi(question_skill_links)
+
+
+    @classmethod
+    def delete_multi_question_skill_links(cls, question_skill_links):
+        """Deletes multiple question skill links from the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLinkModel). This list of
+            question skill link domain objects to delete from the datastore.
+        """
+        cls.delete_multi(question_skill_links)
+
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

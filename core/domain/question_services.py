@@ -177,58 +177,23 @@ def get_question_by_id(question_id, strict=True):
 
 
 def get_question_skill_links_of_skill(skill_id):
-    """Returns a list of QuestionSkillLink domain objects of
+    """Returns a list of QuestionSkillLinkModels of
     a particular skill ID.
 
     Args:
         skill_id: str. ID of the skill.
 
     Returns:
-        list(QuestionSkillLink). The list of question skill link
+        list(QuestionSkillLinkModel). The list of question skill link
         domain objects that are linked to the skill ID or an empty list
          if the skill does not exist.
     """
 
-    question_skill_link_model_list = (
+    question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
             skill_id)
     )
-    question_skill_links = [
-        question_domain.QuestionSkillLink(
-            question_skill_link_model.question_id,
-            question_skill_link_model.skill_id)
-        for question_skill_link_model in question_skill_link_model_list
-    ]
-    return question_skill_links
-
-
-def delete_multi_question_skill_links(question_skill_links):
-    """Deletes multiple question skill links from the model.
-
-    Args:
-    question_skill_links: list(QuestionSkillLink). The list of
-        question skill link domain objects that need to be deleted
-        from the model.
-    """
-
-    for question_skill_link in question_skill_links:
-        delete_question_skill_link(
-            question_skill_link.question_id, question_skill_link.skill_id)
-
-
-def put_multi_question_skill_links(question_skill_links, skill_id):
-    """Creates multiple question skill links in the model with a new
-    skill id.
-
-    Args:
-    question_skill_links: list(QuestionSkillLink). The list of
-        question skill link domain objects that need to be created
-        in the model,
-    """
-
-    for question_skill_link in question_skill_links:
-        create_new_question_skill_link(
-            question_skill_link.question_id, skill_id)
+    return question_skill_link_models
 
 
 def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
@@ -240,8 +205,16 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
         new_skill_id: str. ID of the superseding skill.
     """
     old_question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
-    delete_multi_question_skill_links(old_question_skill_links)
-    put_multi_question_skill_links(old_question_skill_links, new_skill_id)
+    new_question_skill_links = []
+    for question_skill_link in old_question_skill_links:
+        new_question_skill_links.append(
+            question_models.QuestionSkillLinkModel.create(
+                question_skill_link.question_id, new_skill_id)
+            )
+    question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
+        old_question_skill_links)
+    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        new_question_skill_links)
 
 
 def get_question_summaries_linked_to_skills(
