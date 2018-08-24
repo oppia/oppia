@@ -46,6 +46,14 @@ oppia.factory('StoryContentsObjectFactory', [
       return this._nodes;
     };
 
+    StoryContents.prototype.getNodeCount = function() {
+      return this._nodes.length;
+    };
+
+    StoryContents.prototype.getNodeById = function(nodeId) {
+      return this._nodes[this.getNodeIndex(nodeId)];
+    };
+
     StoryContents.prototype.validate = function() {
       var issues = [];
       var nodes = this._nodes;

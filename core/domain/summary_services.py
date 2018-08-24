@@ -24,6 +24,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
+from core.domain import story_services
 from core.domain import user_services
 import utils
 
@@ -743,3 +744,71 @@ def get_recently_published_exp_summary_dicts(limit):
         reverse=True)
 
     return get_displayable_exp_summary_dicts(summaries)
+
+
+def get_learner_story_dict_by_id(story_id, strict=True):
+    """Gets a dictionary representation of a story given by the provided
+    story ID.
+
+    Args:
+        story_id: str. The id of the story.
+        strict: bool. Whether to fail noisily if no story with the given
+            id exists in the datastore.
+
+    Returns:
+        dict. A dictionary that contains extra information along with the dict
+        returned by story_domain.Story.to_dict() which includes useful
+        data for the story learner view. The information includes progress
+        in the story, information about explorations referenced within the
+        story, and a slightly nicer data structure for frontend work.
+
+    Raises:
+        ValidationError: If the story retrieved using the given
+            ID references non-existent explorations.
+    """
+    story = story_services.get_story_by_id(
+        story_id, strict=strict)
+
+    exp_ids = []
+    for node in story.story_contents.nodes:
+        exp_ids.append(node.exploration_id)
+    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+        exp_ids)
+    exp_summaries_dict_map = {
+        exp_summary_dict['id']: exp_summary_dict
+        for exp_summary_dict in exp_summary_dicts
+    }
+
+    next_exploration_id = story.story_contents.initial_node_id
+    completed_nodes = []
+
+    story_dict = story.to_dict()
+
+    story_dict['playthrough_dict'] = {
+        'next_exploration_id': next_exploration_id,
+        'completed_exploration_ids': completed_nodes
+    }
+    # story_is_public = rights_manager.is_story_public(story_id)
+
+    for story_node in story_dict['story_contents']['nodes']:
+        exploration_id = story_node['exploration_id']
+        summary_dict = exp_summaries_dict_map.get(exploration_id)
+        if not summary_dict:
+            raise utils.ValidationError(
+                'Expected story to only reference valid '
+                'explorations, but found an exploration with ID: %s (was '
+                'the exploration deleted or is it a private exploration '
+                'that you do not have edit access to?)'
+                % exploration_id)
+        if rights_manager.is_exploration_private(
+                exploration_id):
+            raise utils.ValidationError(
+                'Cannot reference a private exploration within a public '
+                'story, exploration ID: %s' % exploration_id)
+
+        if summary_dict:
+            story_node['exploration_summary'] = summary_dict
+        else:
+            story_node['exploration_summary'] = None
+
+    return story_dict

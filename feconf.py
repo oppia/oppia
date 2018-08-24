@@ -373,7 +373,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
+ENABLE_NEW_STRUCTURES = True
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -696,6 +696,8 @@ SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_VIEWER_URL_PREFIX = '/story'
+STORY_DATA_HANDLER = '/story_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'

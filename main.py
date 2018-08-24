@@ -41,6 +41,7 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
+from core.controllers import story_viewer
 from core.controllers import subscriptions
 from core.controllers import suggestion
 from core.controllers import topic_editor
@@ -335,6 +336,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
+        story_viewer.StoryViewerPage),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
+        story_viewer.StoryPageDataHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
         reader.PretestHandler),

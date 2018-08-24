@@ -21,7 +21,7 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
   function(NODE_ID_PREFIX) {
     var StoryNode = function(
         id, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds, outline,
-        outlineIsFinalized, explorationId) {
+        outlineIsFinalized, explorationId, explorationSummaryObject) {
       this._id = id;
       this._destinationNodeIds = destinationNodeIds;
       this._prerequisiteSkillIds = prerequisiteSkillIds;
@@ -29,6 +29,7 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
       this._outline = outline;
       this._outlineIsFinalized = outlineIsFinalized;
       this._explorationId = explorationId;
+      this._explorationSummaryObject = angular.copy(explorationSummaryObject);
     };
 
     var _checkValidNodeId = function(nodeId) {
@@ -74,6 +75,10 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
 
     StoryNode.prototype.markOutlineAsNotFinalized = function() {
       this._outlineIsFinalized = false;
+    };
+
+    StoryNode.prototype.getExplorationSummaryObject = function(){
+      return angular.copy(this._explorationSummaryObject);
     };
 
     StoryNode.prototype.validate = function() {
@@ -207,7 +212,8 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
         storyNodeBackendObject.acquired_skill_ids,
         storyNodeBackendObject.outline,
         storyNodeBackendObject.outline_is_finalized,
-        storyNodeBackendObject.exploration_id
+        storyNodeBackendObject.exploration_id,
+        storyNodeBackendObject.exploration_summary
       );
     };
 

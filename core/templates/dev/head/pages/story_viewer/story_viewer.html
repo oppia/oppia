@@ -1,0 +1,342 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ story_title }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <story-viewer-navbar-breadcrumb>
+  </story-viewer-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div ng-controller="StoryViewer">
+    <background-banner></background-banner>
+    <div ng-if="story" class="oppia-story-player-tiles-container">
+      <h2 ng-if="!storyPlaythrough.hasFinishedStory()" class="oppia-page-heading" align="center">
+        <span ng-if="!storyPlaythrough.hasStartedStory()" class="oppia-story-player-title-font">Begin <[story.getTitle()]>:</span>
+        <span ng-if="storyPlaythrough.hasStartedStory()" class="oppia-story-player-title-font">Continue <[story.getTitle()]>:</span>
+      </h2>
+      <h2 ng-if="storyPlaythrough.hasFinishedStory()" class="oppia-page-heading">
+        <span>You have finished the story! Feel free to replay any explorations below.</span>
+      </h2>
+      <div ng-if="story" class="oppia-story-path-section hidden-sm hidden-xs">
+        <svg width="500px" ng-attr-height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+          <path fill="none"
+                stroke="#296E5F"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="12"
+                d="M80 80 L220 80"/>
+          <path fill="none"
+                stroke="#296E5F"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="12"
+                ng-attr-d="<[pathSvgParameters]>"/>
+          <image ng-if="!storyPlaythrough.hasStartedStory()"
+                x="175"
+                y="100"
+                height="100"
+                width="100"
+                ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
+                xlink:href="">
+          </image>
+          <text ng-if="!storyPlaythrough.hasStartedStory()"
+                x="210"
+                y="170"
+                alignment-baseline="middle"
+                font-family="Capriola, Roboto, Arial, sans-serif"
+                font-size="15"
+                fill="#E14738"
+                text-anchor="middle"
+                translate="I18N_START_HERE">
+          </text>
+        </svg>
+
+        <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="story-mascot">
+        <a ng-repeat="node in story._storyContents.getNodes()"
+          ng-href="<[getExplorationUrl(node.getExplorationId())]>"
+          ng-style="{position: 'absolute', left: '<[pathIconParameters[$index].left]>', top: '<[pathIconParameters[$index].top]>'}">
+          <svg class="protractor-test-story-exploration"
+              width="100"
+              height="125"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              version="1.1">
+            <defs>
+              <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
+                <circle cx="50"
+                        cy="70"
+                        r="50"
+                        ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+                <image ng-if="isCompletedExploration(node.getExplorationId())"
+                      x="0"
+                      y="20"
+                      height="100"
+                      width="100"
+                      ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
+                      xlink:href="">
+                </image>
+                <image ng-if="!isCompletedExploration(node.getExplorationId())"
+                      x="10"
+                      y="30"
+                      height="80"
+                      width="80"
+                      ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
+                      xlink:href="">
+                </image>
+              </pattern>
+            </defs>
+            <a xlink:href="<[getExplorationUrl(node.getExplorationId())]>"
+              ng-mouseover="updateExplorationPreview(node.getId());
+                            setIconHighlight($index);"
+              ng-mouseleave="togglePreviewCard();
+                              unsetIconHighlight($index);">
+              <circle ng-show="node.getExplorationId() === nextExplorationId &&
+                $index !== activeHighlightedIconIndex"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#FF8C00"
+                      fill-opacity="0.5"/>
+              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#A6DACF"
+                      fill-opacity="0.5"/>
+              <circle cx="50"
+                      cy="70"
+                      r="42"
+                      fill="url(#image<[$index]>)"
+                      stroke="#006553"
+                      stroke-width="2"/>
+            </a>
+          </svg>
+        </a>
+      </div>
+
+      <div ng-if="story" class="oppia-story-table hidden-md hidden-lg hidden-xl">
+        <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
+        <div class="mobile-path-segment" ng-repeat="node in story._storyContents.getNodes()" id="mobile-path-anchor-<[$index]>">
+          <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
+            <svg class="protractor-mobile-test-story-exploration"
+                 width="100"
+                 height="150"
+                 xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 version="1.1"
+                 ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getId());">
+              <image ng-if="!storyPlaythrough.hasStartedStory() && $index===0"
+                     x="0"
+                     y="83"
+                     height="80"
+                     width="100"
+                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
+                     xlink:href="">
+              </image>
+              <text ng-if="!storyPlaythrough.hasStartedStory() && $index===0"
+                    x="50"
+                    y="140"
+                    alignment-baseline="middle"
+                    font-family="Capriola, Roboto, Arial, sans-serif"
+                    font-size="11"
+                    fill="#E14738"
+                    text-anchor="middle"
+                    translate="I18N_START_HERE">
+              </text>
+              <defs>
+                <pattern id="image0<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
+                  <circle cx="50"
+                          cy="70"
+                          r="50"
+                          ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+                  <image ng-if="isCompletedExploration(node.getExplorationId())"
+                         x="0"
+                         y="20"
+                         height="100"
+                         width="100"
+                         ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
+                         xlink:href="">
+                  </image>
+                  <image ng-if="!isCompletedExploration(node.getExplorationId())"
+                         x="10"
+                         y="30"
+                         height="80"
+                         width="80"
+                         ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
+                         xlink:href="">
+                  </image>
+                </pattern>
+              </defs>
+              <circle ng-show="node.getExplorationId() === nextExplorationId &&
+                $index !== activeHighlightedIconIndex"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#FF8C00"
+                      fill-opacity="0.5"/>
+              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#A6DACF"
+                      fill-opacity="0.5"/>
+              <circle cx="50"
+                      cy="70"
+                      r="42"
+                      fill="url(#image0<[$index]>)"
+                      stroke="#006553"
+                      stroke-width="2"/>
+            </svg>
+          </a>
+          <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
+          <div style="position: fixed; z-index: 100; top: 0; left: 0;">
+            <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside()">
+              <exploration-summary-tile ng-if="explorationCardIsShown"
+                                        ng-click="onClickStopPropagation($event)"
+                                        exploration-id="currentExplorationId"
+                                        exploration-title="summaryToPreview.title"
+                                        last-updated-msec="summaryToPreview.last_updated_msec"
+                                        objective="summaryToPreview.objective"
+                                        category="summaryToPreview.category"
+                                        ratings="summaryToPreview.ratings"
+                                        num-views="summaryToPreview.num_views"
+                                        thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                        thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                        is-community-owned="summaryToPreview.community_owned"
+                                        is-story-preview-tile="true"
+                                        style="position: absolute; z-index: 10;">
+              </exploration-summary-tile>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="story" class="oppia-card-preview-panel hidden-sm hidden-xs">
+      <md-card class="oppia-activity-summary-tile md-default-theme">
+        <div class="title-section" style="background-color: blue; z-index: 1;">
+        </div>
+        <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
+          <span>Hover over an icon to preview an exploration.</span>
+        </div>
+      </md-card>
+      <exploration-summary-tile ng-if="explorationCardIsShown"
+                                exploration-id="currentExplorationId"
+                                exploration-title="summaryToPreview.title"
+                                last-updated-msec="summaryToPreview.last_updated_msec"
+                                objective="summaryToPreview.objective"
+                                category="summaryToPreview.category"
+                                ratings="summaryToPreview.ratings"
+                                num-views="summaryToPreview.num_views"
+                                thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                is-community-owned="summaryToPreview.community_owned"
+                                style="position: absolute; left: 85px; top: 30px; z-index: 10;">
+      </exploration-summary-tile>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    html, body {
+      background: #eeeeee no-repeat center center fixed;
+      background-size: cover;
+    }
+    .oppia-story-path-section {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      float: left;
+      margin-top: 20px;
+      max-width: 675px;
+      padding: 20px 20px 60px 20px;
+      position: absolute;
+      text-align: left;
+      top: 168px;
+    }
+    .oppia-story-table {
+      margin: 0 auto;
+      max-width: 90%;
+      padding: 50px 20px 420px 20px;
+      position: relative;
+      text-align: left;
+      top: 35px;
+      width: 100%;
+    }
+    .oppia-card-preview-panel {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      left: 50%;
+      padding: 30px 85px 70px 85px;
+      pointer-events: none;
+      position: fixed;
+      text-align: left;
+      top: 244px;
+      transform: translateX(29%);
+    }
+    .story-mascot {
+      left: 40px;
+      position: absolute;
+      top: 40px;
+      width: 120px;
+    }
+    @media only screen and (max-width : 600px) {
+      .oppia-story-player-title-font {
+        font-size: 32px;
+      }
+    }
+    /* To avoid double shadows caused by overlaying preview card
+    over the blank preview card */
+    .exploration-summary-tile md-card {
+      box-shadow: none;
+    }
+    .mobile-path-segment {
+      margin: 0 auto;
+      width: 250px;
+    }
+    .mobile-lesson-icon {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+    }
+
+    @media only screen and (max-width: 998px) {
+      .oppia-activity-summary-tile-mobile-background-mask {
+        align-items: center;
+        background: rgba(0,0,0,0.25);
+        display: flex;
+        height: 100vh;
+        justify-content: space-around;
+        width: 100vw;
+        z-index: -1;
+      }
+    }
+
+  </style>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
+
+  <script src="/templates/dev/head/domain/story_viewer/StoryViewerBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryContentsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story_viewer/StoryPlaythroughObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryNodeObjectFactory.js"></script>
+  <script src="/templates/dev/head/components/RatingComputationService.js"></script>
+
+  <script src="/templates/dev/head/pages/story_viewer/StoryViewerNavbarBreadcrumbDirective.js"></script>
+  <script src="/templates/dev/head/pages/story_viewer/StoryViewer.js"></script>
+{% endblock footer_js %}

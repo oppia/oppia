@@ -69,6 +69,13 @@ oppia.factory('UrlService', ['$window', function($window) {
       }
       throw Error('Invalid story id url');
     },
+    getStoryIdFromLearnerUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(story|topic)/g)) {
+        return pathname.split('/')[2];
+      }
+      throw Error('Invalid URL for topic');
+    },
     getStoryIdInPlayer: function() {
       var query = this.getCurrentQueryString();
       if (query.match(/\?story_id=((\w|-){12}\b)/g)) {
