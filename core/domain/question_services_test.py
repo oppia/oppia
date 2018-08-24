@@ -122,7 +122,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, 'skill_1')
 
     def test_get_question_skill_links_of_skill(self):
-
         # If the skill id doesnt exist at all, it returns an empty list
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
