@@ -784,7 +784,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
                         'ADMIN', filename_with_dimensions, exp_id, raw_image)
                 except Exception:
-                    yield (ERROR_IN_FILENAME, image_filename)
+                    yield (ERROR_IN_FILENAME, image_filename.encode('utf-8'))
 
             for audio_filename in audio_filenames:
                 filetype = audio_filename[audio_filename.rfind('.') + 1:]
