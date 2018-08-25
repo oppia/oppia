@@ -1037,6 +1037,16 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isSubmitButtonDisabled = function() {
+            var currentIndex = PlayerPositionService.getDisplayedCardIndex();
+            // This check is added because it was observed that when returning
+            // to current card after navigating through previous cards, using
+            // the arrows, the Submit button was sometimes falsely disabled.
+            // Also, since a learner's answers would always be in the current
+            // card, this additional check doesn't interfere with its normal
+            // working.
+            if (!PlayerTranscriptService.isLastCard(currentIndex)) {
+              return false;
+            }
             return CurrentInteractionService.isSubmitButtonDisabled();
           };
 
