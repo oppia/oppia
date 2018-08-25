@@ -165,7 +165,7 @@ describe('Responses Service', function() {
 
     it('should update the feedback of the answer group', function() {
       var feedback = shtml.createDefault('New feedback', 'feedback_1');
-      var feedbackUpdates = {feedback};
+      var feedbackUpdates = {feedback: feedback};
 
       rs.updateAnswerGroup(0, feedbackUpdates);
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
@@ -205,7 +205,7 @@ describe('Responses Service', function() {
 
     it('should update the feedback of the default outcome', function() {
       var feedback = shtml.createDefault('New feedback', 'feedback_1');
-      var feedbackUpdates = {feedback};
+      var feedbackUpdates = {feedback: feedback};
 
       rs.updateDefaultOutcome(feedbackUpdates);
       expect(rs.getDefaultOutcome().feedback).toEqual(feedback);
