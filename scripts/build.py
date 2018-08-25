@@ -70,10 +70,10 @@ UGLIFY_FILE = os.path.join(
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
-# Files with these name patterns shouldn't be moved to build directory.
-# At the point of writing this, Protractor files in /extensions share
-# the same name.
-JS_FILENAMES_TO_IGNORE = ('Spec.js', 'protractor.js')
+# Files with these name patterns shouldn't be moved to build directory, and will
+# not be served in production. (This includes protractor.js files in
+# /extensions.)
+JS_FILENAMES_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -128,14 +128,14 @@ def _join_files(source_paths, target_file_stream):
 
 
 def _minify_and_create_sourcemap(source_path, target_file_path):
-    """Minifies and generates source map for a JS file.
+    """Minifies and generates source map for a JS file. This function is only
+    meant to be used with third_party.min.js.
 
     Args:
         source_path: str. Path to JS file to minify.
         target_file_path: str. Path to location of the minified file.
     """
     print 'Minifying and creating sourcemap for %s' % source_path
-    ensure_directory_exists(target_file_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         NODE_FILE, UGLIFY_FILE, source_path,
@@ -258,24 +258,24 @@ def get_file_count(directory_path):
     return total_file_count
 
 
-def _compare_file_count(source_path, target_path):
+def _compare_file_count(first_dir_path, second_dir_path):
     """Ensure that two dir's file counts match.
 
     Args:
-       source_path: str. Source of staging files.
-       target_path: str. Final filepath or built file's directory.
+       first_dir_path: str. First directory to compare.
+       second_dir_path: str. Second directory to compare.
 
     Raises:
         ValueError: The source directory does not have the same file count as
             the target directory.
     """
-    source_dir_file_count = get_file_count(source_path)
-    target_dir_file_count = get_file_count(target_path)
-    if source_dir_file_count != target_dir_file_count:
-        print 'Comparing %s vs %s' % (source_path, target_path)
+    first_dir_file_count = get_file_count(first_dir_path)
+    second_dir_file_count = get_file_count(second_dir_path)
+    if first_dir_file_count != second_dir_file_count:
+        print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
         raise ValueError(
             '%s files in source dir != %s files in target dir.' % (
-                source_dir_file_count, target_dir_file_count))
+                first_dir_file_count, second_dir_file_count))
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
@@ -502,7 +502,7 @@ def hash_should_be_inserted(filepath):
 def should_file_be_built(filepath):
     """Determines if the file should be built.
         - JS files: Returns False if filepath matches with pattern in
-        JS_FILENAMES_TO_IGNORE, else returns True.
+        JS_FILENAMES_SUFFIXES_TO_IGNORE, else returns True.
         - Python files: Returns False if filepath ends with _test.py, else
         returns True
         - Other files: Returns False if filepath matches with pattern in
@@ -515,7 +515,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return not any(filepath.endswith(p) for p in JS_FILENAMES_TO_IGNORE)
+        return not any(
+            filepath.endswith(p) for p in JS_FILENAMES_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     else:
