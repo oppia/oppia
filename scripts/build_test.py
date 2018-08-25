@@ -259,8 +259,6 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_js_filepath = os.path.join('core', 'pages', 'AudioService.js')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
-        # At the point of writing this, Protractor files in /extensions share
-        # the same name.
         protractor_filepath = os.path.join('extensions', 'protractor.js')
 
         python_controller_filepath = os.path.join('base.py')
@@ -393,7 +391,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_filter_hashes(self):
         """Test filter_hashes filters the provided hash correctly."""
-        # set constant to provide everything to frontend.
+        # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
@@ -499,6 +497,69 @@ class BuildTests(test_utils.GenericTestBase):
             ASSETS_DEV_DIR, ASSETS_OUT_DIR, svg_filepaths, asset_hashes)
         self.assertEqual(len(build_tasks), len(svg_filepaths))
 
+    def test_generate_build_tasks_to_build_directory(self):
+        """Test generate_build_tasks_to_build_directory queues up a
+        corresponding number of build tasks according to the given scenario.
+        """
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
+            'dev_dir': EXTENSIONS_DEV_DIR,
+            'staging_dir': os.path.join(
+                TEST_DIR, 'backend_prod_files', 'extensions', ''),
+            'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
+        }
+        file_hashes = build.get_file_hashes(EXTENSIONS_DEV_DIR)
+        build_dir_tasks = collections.deque()
+        build_all_files_tasks = (
+            build.generate_build_tasks_to_build_all_files_in_directory(
+                EXTENSIONS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                file_hashes))
+
+        # Test for building all files when staging dir does not exist.
+        self.assertEqual(len(build_dir_tasks), 0)
+        self.assertLess(len(build_dir_tasks), len(build_all_files_tasks))
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+        self.assertNotEqual(len(build_dir_tasks), 0)
+        self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
+
+        build.safe_delete_directory_tree(TEST_DIR)
+        build_dir_tasks.clear()
+
+        # Test for building only new files when staging dir exists.
+        build.ensure_directory_exists(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
+        self.assertEqual(len(build_dir_tasks), 0)
+        self.assertLess(len(build_dir_tasks), len(build_all_files_tasks))
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+        self.assertNotEqual(len(build_dir_tasks), 0)
+        self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
+
+        build.safe_delete_directory_tree(TEST_DIR)
+
+        # Build all files and save to final directory.
+        build.ensure_directory_exists(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
+        build._execute_tasks(build_dir_tasks)
+        self.assertEqual(threading.active_count(), 1)
+        build._execute_tasks(
+            build.generate_copy_tasks_to_copy_from_source_to_target(
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'], file_hashes))
+
+        build_dir_tasks.clear()
+
+        # Test for task queue to only build files that need to be rebuilt.
+        self.assertEqual(len(build_dir_tasks), 0)
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS, build_dir_tasks)
+        file_extensions_to_always_rebuild = ('.html', '.py',)
+        always_rebuilt_filepaths = build.get_filepaths_by_extensions(
+            EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
+        self.assertEqual(len(build_dir_tasks), len(always_rebuilt_filepaths))
+
+        build.safe_delete_directory_tree(TEST_DIR)
+
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.
@@ -516,7 +577,6 @@ class BuildTests(test_utils.GenericTestBase):
                 len(recently_changed_filenames), build.get_file_count(
                     ASSETS_DEV_DIR))
 
-        # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
 
     def test_generate_delete_tasks_to_remove_deleted_files(self):

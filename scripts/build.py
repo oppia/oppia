@@ -252,10 +252,8 @@ def get_file_count(directory_path):
     for _, _, filenames in os.walk(directory_path):
         for filename in filenames:
             # Ignore files with certain extensions.
-            if not should_file_be_built(filename) or any(
+            if should_file_be_built(filename) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
-            else:
                 total_file_count += 1
     return total_file_count
 
@@ -297,25 +295,24 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # We are adding hash in all file paths except for html paths.
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
-        if filepath.endswith('.html'):
-            continue
-        filepath_with_hash = _insert_hash(filepath, file_hash)
-        content = content.replace(
-            '%s%s' % (TEMPLATES_DEV_DIR, filepath),
-            '%s%s' % (
-                TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
-                filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (ASSETS_DEV_DIR, filepath),
-            '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath),
-            '%s%s' % (
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                filepath_with_hash))
-        content = content.replace(
-            '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
-            '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
+        if not filepath.endswith('.html'):
+            filepath_with_hash = _insert_hash(filepath, file_hash)
+            content = content.replace(
+                '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+                '%s%s' % (
+                    TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (ASSETS_DEV_DIR, filepath),
+                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath),
+                '%s%s' % (
+                    EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
+                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
     content = REMOVE_WS(' ', content)
     write_to_file_stream(target_file_stream, content)
 
@@ -550,30 +547,23 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
             print 'Copying %s' % os.path.join(root, directory)
-
         for filename in filenames:
             source_path = os.path.join(root, filename)
-            if target in source_path:
-                continue
-            if source not in source_path:
-                continue
-
             # Python files should not be copied to final build directory.
-            if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
+            if not any(
+                    source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                target_path = source_path
+                relative_path = os.path.relpath(source_path, source)
+                if hash_should_be_inserted(source + relative_path):
+                    relative_path = (
+                        _insert_hash(relative_path, file_hashes[relative_path]))
 
-            target_path = source_path
-            relative_path = os.path.relpath(source_path, source)
-            if hash_should_be_inserted(source + relative_path):
-                relative_path = (
-                    _insert_hash(relative_path, file_hashes[relative_path]))
-
-            target_path = os.path.join(os.getcwd(), target, relative_path)
-            ensure_directory_exists(target_path)
-            copy_task = threading.Thread(
-                target=safe_copy_file,
-                args=(source_path, target_path,))
-            copy_tasks.append(copy_task)
+                target_path = os.path.join(os.getcwd(), target, relative_path)
+                ensure_directory_exists(target_path)
+                copy_task = threading.Thread(
+                    target=safe_copy_file,
+                    args=(source_path, target_path,))
+                copy_tasks.append(copy_task)
     return copy_tasks
 
 
@@ -655,9 +645,11 @@ def get_file_hashes(directory_path):
         for filename in filenames:
             if should_file_be_built(filename) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(filepath, directory_path)
-                file_hashes[relative_filepath] = generate_md5_hash(filepath)
+                complete_filepath = os.path.join(root, filename)
+                relative_filepath = os.path.relpath(
+                    complete_filepath, directory_path)
+                file_hashes[relative_filepath] = generate_md5_hash(
+                    complete_filepath)
 
     return file_hashes
 
@@ -746,6 +738,14 @@ def generate_build_tasks_to_build_all_files_in_directory(
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
 
+    Args:
+        source: str.  Path relative to /oppia of directory containing source
+            files and directories to be built.
+        target: str. Path relative to /oppia of directory where the built files
+            and directories will be saved to.
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values.
+
     Returns:
         deque(Thread). A deque that contains all build tasks queued
             to be processed.
@@ -759,10 +759,6 @@ def generate_build_tasks_to_build_all_files_in_directory(
             print 'Building directory %s' % os.path.join(root, directory)
         for filename in filenames:
             source_path = os.path.join(root, filename)
-            if target in source_path:
-                continue
-            if source not in source_path:
-                continue
             target_path = source_path.replace(source, target)
             ensure_directory_exists(target_path)
             if should_file_be_built(source_path):
@@ -831,17 +827,17 @@ def generate_delete_tasks_to_remove_deleted_files(
         for filename in filenames:
             target_path = os.path.join(root, filename)
             # Ignore files with certain extensions.
-            if any(target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
-            relative_path = os.path.relpath(target_path, staging_directory)
-            # Remove file found in staging directory but not in source
-            # directory, i.e. file not listed in hash dict.
-            if relative_path not in source_dir_hashes:
-                print ('Unable to find %s in file hashes, deleting file'
-                       % target_path)
-                task = threading.Thread(
-                    target=safe_delete_file, args=(target_path,))
-                delete_tasks.append(task)
+            if not any(
+                    target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                relative_path = os.path.relpath(target_path, staging_directory)
+                # Remove file found in staging directory but not in source
+                # directory, i.e. file not listed in hash dict.
+                if relative_path not in source_dir_hashes:
+                    print ('Unable to find %s in file hashes, deleting file'
+                           % target_path)
+                    task = threading.Thread(
+                        target=safe_delete_file, args=(target_path,))
+                    delete_tasks.append(task)
     return delete_tasks
 
 
@@ -867,15 +863,14 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
     for filename, md5_hash in source_dir_hashes.iteritems():
         # Skip files that are already built or should not be built.
-        if not should_file_be_built(filename) or any(
+        if should_file_be_built(filename) and not any(
                 filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
-            continue
-        final_filepath = _insert_hash(
-            os.path.join(out_dir, filename), md5_hash)
-        if not os.path.isfile(final_filepath):
-            # Filename with provided hash cannot be found, this file has been
-            # recently changed or created since last build.
-            recently_changed_filenames.append(filename)
+            final_filepath = _insert_hash(
+                os.path.join(out_dir, filename), md5_hash)
+            if not os.path.isfile(final_filepath):
+                # Filename with provided hash cannot be found, this file has
+                # been recently changed or created since last build.
+                recently_changed_filenames.append(filename)
     if recently_changed_filenames:
         print ('The following files will be rebuilt due to recent changes: %s' %
                recently_changed_filenames)
@@ -1009,13 +1004,11 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
                 parent_dir = os.path.basename(root)
                 converted_filepath = os.path.join(
                     THIRD_PARTY_GENERATED_DEV_DIR, parent_dir, filename)
-                if not hash_should_be_inserted(converted_filepath):
-                    # These filenames should not be hashed.
-                    continue
-                # Obtain the same filepath format as the hash dict's key.
-                filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(filepath, built_dir)
-                _verify_filepath_hash(relative_filepath, file_hashes)
+                if hash_should_be_inserted(converted_filepath):
+                    # Obtain the same filepath format as the hash dict's key.
+                    relative_filepath = os.path.relpath(
+                        os.path.join(root, filename), built_dir)
+                    _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_JS_FILENAME, file_hashes[HASHES_JS_FILENAME])
