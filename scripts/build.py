@@ -274,7 +274,7 @@ def _compare_file_count(first_dir_path, second_dir_path):
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
         raise ValueError(
-            '%s files in source dir != %s files in target dir.' % (
+            '%s files in first dir. != %s files in second dir.' % (
                 first_dir_file_count, second_dir_file_count))
 
 
