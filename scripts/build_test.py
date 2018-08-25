@@ -164,7 +164,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Ensure that ASSETS_DEV_DIR has at least 1 file.
         assert target_dir_file_count > 0
         with self.assertRaisesRegexp(
-            ValueError, ('%s files in first dir. != %s files in second dir.') %
+            ValueError, ('%s files in first dir != %s files in second dir') %
             (source_dir_file_count, target_dir_file_count)):
             build._compare_file_count(EMPTY_DIR, MOCK_ASSETS_DEV_DIR)
 
@@ -276,7 +276,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
         with self.swap(
-            build, 'JS_FILENAMES_SUFFIXES_TO_IGNORE', ('Service.js',)):
+            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
