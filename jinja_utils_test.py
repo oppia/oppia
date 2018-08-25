@@ -126,10 +126,10 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
 
     def test__log2_floor_filter(self):
         # disabling pylint warning for protected access
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         log_value = jinja_utils._log2_floor_filter(10)
         self.assertEqual(log_value, 3)
 
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         log_value = jinja_utils._log2_floor_filter(0.0001)
         self.assertEqual(log_value, -13)
