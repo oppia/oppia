@@ -31,7 +31,7 @@ describe('Responses Service', function() {
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       module(function($provide) {
-        $provide.varant('INTERACTION_SPECS', {
+        $provide.constant('INTERACTION_SPECS', {
           TextInput: {
             display_mode: 'inline',
             is_terminal: false
