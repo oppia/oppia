@@ -129,7 +129,7 @@ describe('Responses Service', function() {
       ecs.setActiveStateName('Test');
     }));
 
-    //onInteractionIdChanged
+    // onInteractionIdChanged
 
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
@@ -150,7 +150,7 @@ describe('Responses Service', function() {
     });
 
     it('should return null if no answer choices provided', function() {
-      expect(rs.getAnswerChoices()).toEqual(null)
+      expect(rs.getAnswerChoices()).toEqual(null);
     });
 
     it('should update the rules of the answer group', function() {
@@ -222,7 +222,7 @@ describe('Responses Service', function() {
       expect(rs.getDefaultOutcome().dest).toEqual(destUpdates.dest);
     });
 
-    //updateConfirmedUnclassifiedAnswers
+    // updateConfirmedUnclassifiedAnswers
 
     it('should update the answer choices', function() {
       var updates = [{
@@ -250,7 +250,7 @@ describe('Responses Service', function() {
     });
 
     it('should count the answer groups', function() {
-      expect(rs.getAnswerGroupCount()).toEqual(1)
+      expect(rs.getAnswerGroupCount()).toEqual(1);
     });
 
     it('should get the default outcome', function() {
@@ -279,5 +279,5 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
       expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
     });
-  })
-})
+  });
+});
