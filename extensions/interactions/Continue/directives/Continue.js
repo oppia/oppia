@@ -56,7 +56,7 @@ oppia.directive('oppiaInteractiveContinue', [
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitAnswer);
+            $scope.submitAnswer, null);
         }
       ]
     };

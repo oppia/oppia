@@ -778,7 +778,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         CurrentInteractionService.registerCurrentInteraction(
-          scope.submitAnswer);
+          scope.submitAnswer, null);
 
         /** *****************************************************************
          * Functions involving MIDI playback.

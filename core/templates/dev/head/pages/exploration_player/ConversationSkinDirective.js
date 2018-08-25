@@ -846,7 +846,7 @@ oppia.directive('conversationSkin', [
                       $scope.answerIsCorrect = false;
                       $scope.showPendingCard();
                     }
-                    CurrentInteractionService.clearPreSubmitHooks();
+                    CurrentInteractionService.clearPresubmitHooks();
                   }
                   $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);

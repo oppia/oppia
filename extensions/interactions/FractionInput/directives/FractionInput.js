@@ -127,7 +127,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
           };
 
           $scope.isAnswerValid = function() {
-            if (typeof $scope.FractionInputForm === 'undefined') {
+            if ($scope.FractionInputForm === undefined) {
               return false;
             }
             return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');

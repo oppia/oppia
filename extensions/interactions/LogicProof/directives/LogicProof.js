@@ -256,7 +256,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitProof);
+            $scope.submitProof, null);
 
           $scope.showHelp = function() {
             $uibModal.open({

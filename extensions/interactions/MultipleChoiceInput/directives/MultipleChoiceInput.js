@@ -46,7 +46,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
             CurrentInteractionService.onSubmit(
               answer, multipleChoiceInputRulesService);
           };
-          CurrentInteractionService.registerCurrentInteraction();
+          CurrentInteractionService.registerCurrentInteraction(null, null);
         }
       ]
     };

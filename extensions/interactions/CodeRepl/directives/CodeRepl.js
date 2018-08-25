@@ -248,7 +248,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             $scope.$apply();
           };
 
-          CurrentInteractionService.registerCurrentInteraction(submitAnswer);
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswer, null);
         }
       ]
     };

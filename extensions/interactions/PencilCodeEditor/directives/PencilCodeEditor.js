@@ -173,7 +173,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             }, 1000);
           });
 
-          CurrentInteractionService.registerCurrentInteraction();
+          CurrentInteractionService.registerCurrentInteraction(null, null);
         }]
     };
   }

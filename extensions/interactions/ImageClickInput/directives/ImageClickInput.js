@@ -192,7 +192,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               answer, imageClickInputRulesService);
           };
 
-          CurrentInteractionService.registerCurrentInteraction();
+          CurrentInteractionService.registerCurrentInteraction(null, null);
         }
       ]
     };
