@@ -27,7 +27,7 @@ oppia.directive('storyViewerNavbarBreadcrumb', [
           StoryViewerBackendApiService.fetchStoryData(
             UrlService.getStoryIdFromLearnerUrl()).then(
             function(storyDataDict) {
-              $scope.storyTitle = storyDataDict.story_title;
+              $scope.storyTitle = storyDataDict.title;
             });
         }
       ]
