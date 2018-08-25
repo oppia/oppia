@@ -16,22 +16,22 @@
  * @fileoverview Unit tests for Responses Service.
  */
 
-describe('Responses Service', () => {
-  describe('ResponsesService', () => {
-    let $httpBackend;
-    let scope;
-    let siis, ecs, rs, ess, rof, shtml, aof, oof;
-    let mockExplorationData;
-    let state;
+describe('Responses Service', function() {
+  describe('ResponsesService', function() {
+    var $httpBackend;
+    var scope;
+    var siis, ecs, rs, ess, rof, shtml, aof, oof;
+    var mockExplorationData;
+    var state;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(() => {
+    beforeEach(function() {
       module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
-      module(($provide) => {
-        $provide.constant('INTERACTION_SPECS', {
+      module(function($provide) {
+        $provide.varant('INTERACTION_SPECS', {
           TextInput: {
             display_mode: 'inline',
             is_terminal: false
@@ -40,17 +40,17 @@ describe('Responses Service', () => {
       });
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: () => {}
+        autosaveChangeList: function() {}
       };
 
-      module(($provide) => {
+      module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
 
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(($injector, $rootScope) => {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
       siis = $injector.get('stateInteractionIdService');
@@ -131,31 +131,31 @@ describe('Responses Service', () => {
 
     //onInteractionIdChanged
 
-    it('should return -1 if no answer group is active', () => {
+    it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
     });
 
-    it('should change the answer group index', () => {
+    it('should change the answer group index', function() {
       rs.changeActiveAnswerGroupIndex(5);
       expect(rs.getActiveAnswerGroupIndex()).toEqual(5);
     });
 
-    it('should return 0 for the active rule index by default', () => {
+    it('should return 0 for the active rule index by default', function() {
       expect(rs.getActiveRuleIndex()).toEqual(0);
     });
 
-    it('should change the active rule index', () => {
+    it('should change the active rule index', function() {
       rs.changeActiveRuleIndex(5);
       expect(rs.getActiveRuleIndex()).toEqual(5);
     });
 
-    it('should return null if no answer choices provided', () => {
+    it('should return null if no answer choices provided', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
 
-    it('should update the rules of the answer group', () => {
-      const rule = rof.createNew('Equals', {x: 'New answer'});
-      const ruleUpdates = {
+    it('should update the rules of the answer group', function() {
+      var rule = rof.createNew('Equals', {x: 'New answer'});
+      var ruleUpdates = {
         rules: [rule]
       };
 
@@ -163,16 +163,16 @@ describe('Responses Service', () => {
       expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
     });
 
-    it('should update the feedback of the answer group', () => {
-      const feedback = shtml.createDefault('New feedback', 'feedback_1');
-      const feedbackUpdates = {feedback};
+    it('should update the feedback of the answer group', function() {
+      var feedback = shtml.createDefault('New feedback', 'feedback_1');
+      var feedbackUpdates = {feedback};
 
       rs.updateAnswerGroup(0, feedbackUpdates);
       expect(rs.getAnswerGroup(0).outcome.feedback).toEqual(feedback);
     });
 
-    it('should update the destination of the answer group', () => {
-      const destUpdates = {
+    it('should update the destination of the answer group', function() {
+      var destUpdates = {
         dest: 'New dest',
         refresherExplorationId: null,
         missingPrerequisiteSkillId: null
@@ -182,14 +182,14 @@ describe('Responses Service', () => {
       expect(rs.getAnswerGroup(0).outcome.dest).toEqual(destUpdates.dest);
     });
 
-    it('should delete the answer group', () => {
+    it('should delete the answer group', function() {
       rs.deleteAnswerGroup(0);
       expect(rs.getAnswerGroupCount()).toEqual(0);
     });
 
-    it('should update the rules of active answer group', () => {
-      const rule = rof.createNew('Equals', {x: 'New answer'});
-      const ruleUpdates = {
+    it('should update the rules of active answer group', function() {
+      var rule = rof.createNew('Equals', {x: 'New answer'});
+      var ruleUpdates = {
         rules: [rule]
       };
 
@@ -198,21 +198,21 @@ describe('Responses Service', () => {
       expect(rs.getAnswerGroup(0).rules[0]).toEqual(rule);
     });
 
-    it('should update answer choices', () => {
+    it('should update answer choices', function() {
       rs.updateAnswerChoices('some answer');
       expect(rs.getAnswerChoices()).toEqual('some answer');
     });
 
-    it('should update the feedback of the default outcome', () => {
-      const feedback = shtml.createDefault('New feedback', 'feedback_1');
-      const feedbackUpdates = {feedback};
+    it('should update the feedback of the default outcome', function() {
+      var feedback = shtml.createDefault('New feedback', 'feedback_1');
+      var feedbackUpdates = {feedback};
 
       rs.updateDefaultOutcome(feedbackUpdates);
       expect(rs.getDefaultOutcome().feedback).toEqual(feedback);
     });
 
-    it('should update the destination of the default outcome', () => {
-      const destUpdates = {
+    it('should update the destination of the default outcome', function() {
+      var destUpdates = {
         dest: 'New dest',
         refresherExplorationId: null,
         missingPrerequisiteSkillId: null
@@ -224,8 +224,8 @@ describe('Responses Service', () => {
 
     //updateConfirmedUnclassifiedAnswers
 
-    it('should update the answer choices', () => {
-      const updates = [{
+    it('should update the answer choices', function() {
+      var updates = [{
         label: '<p>Label_1</p>',
         val: 'value_1'
       }, {
@@ -237,42 +237,42 @@ describe('Responses Service', () => {
       expect(rs.getAnswerChoices()).toEqual(updates);
     });
 
-    it('should get the answer groups', () => {
-      const answerGroups = state.interaction.answerGroups;
+    it('should get the answer groups', function() {
+      var answerGroups = state.interaction.answerGroups;
 
       expect(rs.getAnswerGroups()).toEqual(answerGroups);
     });
 
-    it('should get the answer group', () => {
-      const answerGroup = state.interaction.answerGroups[0];
+    it('should get the answer group', function() {
+      var answerGroup = state.interaction.answerGroups[0];
 
       expect(rs.getAnswerGroup(0)).toEqual(answerGroup);
     });
 
-    it('should count the answer groups', () => {
+    it('should count the answer groups', function() {
       expect(rs.getAnswerGroupCount()).toEqual(1)
     });
 
-    it('should get the default outcome', () => {
-      const defaultOutcome = state.interaction.defaultOutcome;
+    it('should get the default outcome', function() {
+      var defaultOutcome = state.interaction.defaultOutcome;
 
       expect(rs.getDefaultOutcome()).toEqual(defaultOutcome);
     });
 
-    it('should get the confirmed unclassified answers', () => {
-      const confirmedUnclassifiedAnswers = (
+    it('should get the confirmed unclassified answers', function() {
+      var confirmedUnclassifiedAnswers = (
         state.interaction.confirmedUnclassifiedAnswers);
 
       expect(rs.getConfirmedUnclassifiedAnswers()).toEqual(
         confirmedUnclassifiedAnswers);
     });
 
-    it('should save the answer groups and the default outcome', () => {
-      const rules = [rof.createNew('Equals', {x: 'New answer'})];
-      const outcome = oof.createNew('Test', 'feedback_1', 'New feedback', []);
+    it('should save the answer groups and the default outcome', function() {
+      var rules = [rof.createNew('Equals', {x: 'New answer'})];
+      var outcome = oof.createNew('Test', 'feedback_1', 'New feedback', []);
 
-      const answerGroups = [aof.createNew(rules, outcome, [], null)];
-      const defaultOutcome = oof.createNew(
+      var answerGroups = [aof.createNew(rules, outcome, [], null)];
+      var defaultOutcome = oof.createNew(
         'Test', 'default_outcome', 'New default outcome', []);
 
       rs.save(answerGroups, defaultOutcome);
