@@ -98,6 +98,7 @@ class BaseStoryViewerControllerTest(test_utils.GenericTestBase):
         story_domain.Story.create_default_story(
             self.unsaved_story_id, 'story_title')
 
+
 class StoryViewerPage(BaseStoryViewerControllerTest):
 
     def test_any_user_can_access_story_viewer_page(self):

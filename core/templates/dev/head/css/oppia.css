@@ -1666,30 +1666,6 @@ pre.oppia-pre-wrapped-text {
   word-wrap: break-word;
 }
 
-/* Styles for the story viewer view */
-
-
-.oppia-story-player-tiles-container {
-  height: 100%;
-  margin: 0 auto;
-  max-width: 975px;
-  min-height: 500px;
-  padding-bottom: 25px;
-  padding-top: 30px;
-  position: relative;
-}
-
-.oppia-story-player-tiles-container .oppia-page-heading {
-  color: #005048;
-  text-align: center;
-  width: 100%;
-}
-
-.oppia-story-player-title-font {
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 45px;
-}
-
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {
@@ -1724,6 +1700,29 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 45px;
+}
+
+/* Styles for the story viewer view */
+
+.oppia-story-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-story-player-tiles-container {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 975px;
+  min-height: 500px;
+  padding-bottom: 25px;
+  padding-top: 30px;
+  position: relative;
+}
+
+.oppia-story-player-title-font {
   font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 45px;
 }

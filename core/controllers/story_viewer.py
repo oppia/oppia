@@ -45,7 +45,8 @@ class StoryViewerPage(base.BaseHandler):
 
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the story
-    viewer page."""
+    viewer page.
+    """
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):

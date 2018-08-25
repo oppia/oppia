@@ -35,12 +35,12 @@
                 stroke-width="12"
                 ng-attr-d="<[pathSvgParameters]>"/>
           <image ng-if="!storyPlaythrough.hasStartedStory()"
-                x="175"
-                y="100"
-                height="100"
-                width="100"
-                ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
-                xlink:href="">
+                 x="175"
+                 y="100"
+                 height="100"
+                 width="100"
+                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
+                 xlink:href="">
           </image>
           <text ng-if="!storyPlaythrough.hasStartedStory()"
                 x="210"
@@ -56,14 +56,14 @@
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="story-mascot">
         <a ng-repeat="node in story._storyContents.getNodes()"
-          ng-href="<[getExplorationUrl(node.getExplorationId())]>"
-          ng-style="{position: 'absolute', left: '<[pathIconParameters[$index].left]>', top: '<[pathIconParameters[$index].top]>'}">
+           ng-href="<[getExplorationUrl(node.getExplorationId())]>"
+           ng-style="{position: 'absolute', left: '<[pathIconParameters[$index].left]>', top: '<[pathIconParameters[$index].top]>'}">
           <svg class="protractor-test-story-exploration"
-              width="100"
-              height="125"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              version="1.1">
+               width="100"
+               height="125"
+               xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               version="1.1">
             <defs>
               <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                 <circle cx="50"
@@ -71,28 +71,28 @@
                         r="50"
                         ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
                 <image ng-if="isCompletedExploration(node.getExplorationId())"
-                      x="0"
-                      y="20"
-                      height="100"
-                      width="100"
-                      ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
-                      xlink:href="">
+                       x="0"
+                       y="20"
+                       height="100"
+                       width="100"
+                       ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
+                       xlink:href="">
                 </image>
                 <image ng-if="!isCompletedExploration(node.getExplorationId())"
-                      x="10"
-                      y="30"
-                      height="80"
-                      width="80"
-                      ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
-                      xlink:href="">
+                       x="10"
+                       y="30"
+                       height="80"
+                       width="80"
+                       ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
+                       xlink:href="">
                 </image>
               </pattern>
             </defs>
             <a xlink:href="<[getExplorationUrl(node.getExplorationId())]>"
-              ng-mouseover="updateExplorationPreview(node.getId());
+               ng-mouseover="updateExplorationPreview(node.getId());
                             setIconHighlight($index);"
-              ng-mouseleave="togglePreviewCard();
-                              unsetIconHighlight($index);">
+               ng-mouseleave="togglePreviewCard();
+                             unsetIconHighlight($index);">
               <circle ng-show="node.getExplorationId() === nextExplorationId &&
                 $index !== activeHighlightedIconIndex"
                       cx="50"
@@ -219,26 +219,26 @@
       </div>
 
       <div ng-if="story" class="oppia-card-preview-panel hidden-sm hidden-xs">
-      <md-card class="oppia-activity-summary-tile md-default-theme">
-        <div class="title-section" style="background-color: blue; z-index: 1;">
-        </div>
-        <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
-          <span>Hover over an icon to preview an exploration.</span>
-        </div>
-      </md-card>
-      <exploration-summary-tile ng-if="explorationCardIsShown"
-                                exploration-id="currentExplorationId"
-                                exploration-title="summaryToPreview.title"
-                                last-updated-msec="summaryToPreview.last_updated_msec"
-                                objective="summaryToPreview.objective"
-                                category="summaryToPreview.category"
-                                ratings="summaryToPreview.ratings"
-                                num-views="summaryToPreview.num_views"
-                                thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
-                                thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
-                                is-community-owned="summaryToPreview.community_owned"
-                                style="position: absolute; left: 85px; top: 30px; z-index: 10;">
-      </exploration-summary-tile>
+        <md-card class="oppia-activity-summary-tile md-default-theme">
+          <div class="title-section" style="background-color: blue; z-index: 1;">
+          </div>
+          <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
+            <span>Hover over an icon to preview an exploration.</span>
+          </div>
+        </md-card>
+        <exploration-summary-tile ng-if="explorationCardIsShown"
+                                  exploration-id="currentExplorationId"
+                                  exploration-title="summaryToPreview.title"
+                                  last-updated-msec="summaryToPreview.last_updated_msec"
+                                  objective="summaryToPreview.objective"
+                                  category="summaryToPreview.category"
+                                  ratings="summaryToPreview.ratings"
+                                  num-views="summaryToPreview.num_views"
+                                  thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                  thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                  is-community-owned="summaryToPreview.community_owned"
+                                  style="position: absolute; left: 85px; top: 30px; z-index: 10;">
+        </exploration-summary-tile>
       </div>
     </div>
   </div>
