@@ -5,8 +5,8 @@ repository to provide a deterministic test environment, that never changes,
 for build testing.
 
 - Changes, such as file deletion, file renaming, ...etc, to contents inside
-  core/tests/build/assets, core/tests/build/extensions,
-  core/tests/build/templates will affect test cases in scripts/build_test.py.
+  core/tests/build_sources/assets, core/tests/build_sources/extensions, and
+  core/tests/build_sources/templates will affect test cases in build_test.py.
 
 - Processed, minified or built files should go to core/tests/build.
 
