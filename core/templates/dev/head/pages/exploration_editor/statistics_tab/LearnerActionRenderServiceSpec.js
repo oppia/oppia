@@ -61,7 +61,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName2'
               },
-              time_spent_state_in_msecs: {
+              time_spent_in_state_in_msecs: {
                 value: 120
               }
             }, 1
@@ -126,7 +126,7 @@ describe('Learner Action Render Service', function() {
                 state_name: {
                   value: 'stateName1'
                 },
-                time_spent_state_in_msecs: {
+                time_spent_in_state_in_msecs: {
                   value: 120
                 }
               }, 1
@@ -254,7 +254,7 @@ describe('Learner Action Render Service', function() {
               state_name: {
                 value: 'stateName1'
               },
-              time_spent_state_in_msecs: {
+              time_spent_in_state_in_msecs: {
                 value: 120
               }
             }, 1
@@ -264,17 +264,20 @@ describe('Learner Action Render Service', function() {
 
     it('should render tables for MultipleIncorrectSubmissions issue block.',
       function() {
+        var feedback = {
+          _html: 'Try again'
+        };
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
         this.ps.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.ps.getPlaythrough().actions;

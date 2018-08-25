@@ -19,9 +19,9 @@
 
 oppia.factory('RefresherExplorationConfirmationModalService', [
   '$uibModal', 'UrlInterpolationService', 'UrlService',
-  'ExplorationPlayerService',
+  'ExplorationEngineService',
   function($uibModal, UrlInterpolationService, UrlService,
-      ExplorationPlayerService) {
+      ExplorationEngineService) {
     return {
       displayRedirectConfirmationModal: function(
           refresherExplorationId, redirectConfirmationCallback) {
@@ -51,7 +51,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                   url = UrlService.addField(url, 'parent', parentIdList[i]);
                 }
                 url = UrlService.addField(
-                  url, 'parent', ExplorationPlayerService.getExplorationId());
+                  url, 'parent', ExplorationEngineService.getExplorationId());
 
                 // Wait a little before redirecting the page to ensure other
                 // tasks started here (e.g. event recording) have sufficient

@@ -27,8 +27,8 @@
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 oppia.directive('feedbackPopup', [
-  'ExplorationPlayerService', 'UrlInterpolationService',
-  function(ExplorationPlayerService, UrlInterpolationService) {
+  'ExplorationEngineService', 'UrlInterpolationService',
+  function(ExplorationEngineService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -46,7 +46,7 @@ oppia.directive('feedbackPopup', [
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
+          $scope.isLoggedIn = ExplorationEngineService.isLoggedIn();
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.
@@ -61,7 +61,7 @@ oppia.directive('feedbackPopup', [
 
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
-            ExplorationPlayerService.getExplorationId());
+            ExplorationEngineService.getExplorationId());
 
           var getTriggerElt = function() {
             // Find the popover trigger node (the one with a popover-template

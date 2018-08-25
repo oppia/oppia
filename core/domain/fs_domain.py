@@ -471,20 +471,35 @@ class GcsFileSystem(object):
         except cloudstorage.NotFoundError:
             return False
 
-    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+        """Gets a file as an unencoded stream of raw bytes.
+
+        If `version` argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other file systems.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. The version of the file.
-            mode: str. The mode in which the file is to be opened.
+            version: str. Unused argument.
+            mode: str. Unused argument.
 
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
+        Returns:
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
         """
-        raise NotImplementedError
+        if self.isfile(filepath):
+            bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+            gcs_file_url = (
+                '/%s/%s/assets/%s' % (
+                    bucket_name, self._exploration_id, filepath))
+            gcs_file = cloudstorage.open(gcs_file_url)
+            data = gcs_file.read()
+            gcs_file.close()
+            return FileStreamWithMetadata(data, None, None)
+        else:
+            return None
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:

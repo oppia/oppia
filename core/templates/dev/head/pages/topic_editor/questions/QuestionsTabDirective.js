@@ -52,8 +52,7 @@ oppia.directive('questionsTab', [
               return;
             }
             EditableQuestionBackendApiService.createQuestion(
-              $scope.skillId, $scope.question.toBackendDict(
-                true)
+              $scope.skillId, $scope.question.toBackendDict(true)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
                 $scope.topic.getId(), function() {

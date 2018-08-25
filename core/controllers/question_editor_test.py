@@ -150,8 +150,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                 ), {}, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id)
             self.logout()
@@ -166,8 +166,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                 ), {}, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
             question_ids = [summary.id for summary in question_summaries]
             self.assertItemsEqual(
@@ -196,8 +196,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                     self.skill_id
                 ), expect_errors=False)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id_2)
             self.logout()
@@ -209,8 +209,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
                     self.skill_id
                 ), expect_errors=False)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills([
-                    self.skill_id], ''))
+                question_services.get_question_summaries_linked_to_skills(
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 0)
             self.logout()
 
