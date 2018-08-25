@@ -94,7 +94,8 @@ var AdminPage = function(){
     };
   }
 
-  var saveConfigProperty = function(configProperty) {
+  var saveConfigProperty = function(
+      configProperty, propertyName, objectType, editingInstructions) {
     return configProperty.element(by.css('.protractor-test-config-title'))
       .getText()
       .then(function(title) {
@@ -120,7 +121,10 @@ var AdminPage = function(){
       propertyName, objectType, editingInstructions) {
     this.get();
     configTab.click();
-    configProperties.map(saveConfigProperty).then(function(results) {
+    configProperties.map(function(x) {
+      return saveConfigProperty(
+        x, propertyName, objectType, editingInstructions);
+    }).then(function(results) {
       var success = false;
       for (var i = 0; i < results.length; i++) {
         success = success || results[i];

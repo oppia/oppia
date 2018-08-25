@@ -6,7 +6,7 @@
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
       <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
-                         html-data="upcomingContentHtml">
+                         html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
 
@@ -37,17 +37,20 @@
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card is-learn-again-button="isLearnAgainButton()"
+      <tutor-card displayed-card="displayedCard"
+                  is-learn-again-button="isLearnAgainButton()"
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
+                           displayed-card="displayedCard"
                            is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
                     submit-button-is-disabled="isSubmitButtonDisabled()"
+                    displayed-card="displayedCard"
                     submit-button-is-shown="!answerIsBeingProcessed"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
@@ -56,6 +59,7 @@
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
+                         displayed-card="displayedCard"
                          is-learn-again-button="isLearnAgainButton()">
       </supplemental-card>
       <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">

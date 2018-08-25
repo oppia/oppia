@@ -23,7 +23,7 @@ oppia.factory('ResponsesService', [
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'ExplorationStatesService',
+  'SolutionValidityService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
@@ -32,7 +32,7 @@ oppia.factory('ResponsesService', [
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, ExplorationStatesService,
+      SolutionValidityService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
@@ -137,9 +137,6 @@ oppia.factory('ResponsesService', [
           _answerGroups[i].outcome.feedback.getContentId());
       }
       StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-      ExplorationStatesService.saveContentIdsToAudioTranslations(
-        StateEditorService.getActiveStateName(),
-        StateContentIdsToAudioTranslationsService.displayed);
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -174,8 +171,10 @@ oppia.factory('ResponsesService', [
         _defaultOutcome = angular.copy(data.defaultOutcome);
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(
-          StateInteractionIdService.savedMemento, _answerGroups);
+        if (StateInteractionIdService.savedMemento !== null) {
+          AnswerGroupsCacheService.set(
+            StateInteractionIdService.savedMemento, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -219,7 +218,9 @@ oppia.factory('ResponsesService', [
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);
         _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        if (newInteractionId) {
+          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
+        }
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);

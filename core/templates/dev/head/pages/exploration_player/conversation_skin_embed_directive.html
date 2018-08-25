@@ -5,7 +5,8 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content" html-data="upcomingContentHtml">
+      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+                         html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
     <div ng-if="upcomingInlineInteractionHtml">
@@ -24,14 +25,17 @@
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
            style="margin-bottom: 100px">
-        <tutor-card start-card-change-animation="startCardChangeAnimation">
+        <tutor-card displayed-card="displayedCard"
+                    start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-          <supplemental-card on-click-continue-button="showUpcomingCard()">
+          <supplemental-card on-click-continue-button="showUpcomingCard()"
+                             displayed-card="displayedCard">
           </supplemental-card>
         </div>
         <progress-nav on-submit="submitAnswerFromProgressNav()"
                       submit-button-is-disabled="submitButtonIsDisabled()"
+                      displayed-card="displayedCard"
                       submit-button-is-shown="!answerIsBeingProcessed"
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
@@ -39,7 +43,8 @@
 
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()">
+        <supplemental-card on-click-continue-button="showUpcomingCard()"
+                           displayed-card="displayedCard">
         </supplemental-card>
       </div>
     </div>

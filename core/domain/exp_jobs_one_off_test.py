@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -35,6 +36,11 @@ import utils
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -487,7 +493,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
-        self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are
@@ -679,9 +685,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         """Tests that mapreduce job works correctly when the only first
         exploration version exists.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
@@ -699,26 +704,25 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
     def test_that_mapreduce_job_works(self):
         """Test that mapreduce job is working as expected."""
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state 2',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'new state'
-                })], 'Modify states')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state 2',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state'
+            })], 'Modify states')
 
-            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
@@ -762,127 +766,6 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertEqual(mapping.exploration_version, 4)
         self.assertEqual(mapping.largest_state_id_used, 2)
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-
-class CreateVersionsOfImageJobTest(test_utils.GenericTestBase):
-    """Tests for CreateVersionsOfImageJob one off job."""
-
-    USER = 'ADMIN'
-    EXPLORATION_ID = 'eid'
-    FILENAME_1 = 'random1.png'
-    FILENAME_2 = 'random2.png'
-
-    def setUp(self):
-        super(CreateVersionsOfImageJobTest, self).setUp()
-        self.process_and_flush_pending_tasks()
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            original_image_content = f.read()
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
-        fs.commit(
-            self.USER, self.FILENAME_1, original_image_content,
-            mimetype='image/png')
-        fs.commit(
-            self.USER, self.FILENAME_2, original_image_content,
-            mimetype='image/png')
-
-    def test_for_creating_versions_of_image(self):
-        """Test for creating different versions of the images."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXPLORATION_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                'Here is test case <a href="https://github.com">hello<b><i>'
-                'testing</i></b>in <b>progress</b><p>for migration</p>'
-            )
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': (
-                'Here is test case <a href="https://github.com">'
-                '<oppia-noninteractive-image filepath-with-value="'
-                '&amp;quot;random1.png&amp;quot;" caption-with-value="&amp;'
-                'quot;&amp;quot;" alt-with-value="&amp;'
-                'quot;&amp;quot;"></oppia-noninteractive-image><p>'
-                ' testing in progress</p>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<p>Sorry, it doesn\'t look like your <span>program '
-                    '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to do something?</p></blockquote> Can do this by '
-                    'using statement like prints. <br> You can ask any if you '
-                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
-                    'https://www.example.com&amp;quot;" text-with-value="'
-                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><li>This is last case</li><oppia-noninteractive-image '
-                    'filepath-with-value="&amp;quot;random2.png&amp;quot;" '
-                    'caption-with-value="&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;">'
-                    '</oppia-noninteractive-image></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        exp_services.save_new_exploration(self.USER, exploration)
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXPLORATION_ID))
-
-        self.assertEqual(fs.isfile('random1_compressed.png'), False)
-        self.assertEqual(fs.isfile('random1_micro.png'), False)
-        self.assertEqual(fs.isfile('random2_compressed.png'), False)
-        self.assertEqual(fs.isfile('random2_micro.png'), False)
-
-        job_id = exp_jobs_one_off.CreateVersionsOfImageJob.create_new()
-        exp_jobs_one_off.CreateVersionsOfImageJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(fs.isfile('random1_compressed.png'), True)
-        self.assertEqual(fs.isfile('random1_micro.png'), True)
-        self.assertEqual(fs.isfile('random2_compressed.png'), True)
-        self.assertEqual(fs.isfile('random2_micro.png'), True)
-
-        actual_output = (
-            exp_jobs_one_off.CreateVersionsOfImageJob.get_output(
-                job_id))
-
-        expected_output = [
-            "[u'Added compressed versions of images in exploration', [u'eid']]"
-        ]
-
-        self.assertEqual(actual_output, expected_output)
 
 
 class ExplorationContentValidationJobForTextAngularTest(
@@ -1163,41 +1046,53 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertGreater(len(actual_output), 0)
+        self.assertEqual(len(actual_output), 16)
 
         exploration_dict = exploration.to_dict()
-        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+        # We need to create a brand-new exploration here in addition to the old
+        # one (rather than just overwriting the old one), because state id
+        # mapping model is generated when each (exp, version) is saved for
+        # first time. Hence when an exisiting exploration is overwritten
+        # state id mapping model throws an error that mapping already exists.
+        new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
         # This is done to ensure that exploration is not passed through CKEditor
         # Migration pipeline.
-        updated_dict['schema_version'] = 29
-        updated_dict['states_schema_version'] = 24
-        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
-        updated_states = updated_dict['states']
+        new_exp_dict['id'] = self.NEW_EXP_ID
+        new_exp_dict['schema_version'] = 29
+        new_exp_dict['states_schema_version'] = 24
+        new_exploration = exp_domain.Exploration.from_dict(new_exp_dict)
+        new_states = new_exp_dict['states']
 
         for index, state_name in enumerate(state_list):
-            updated_html = updated_states[state_name]['content']['html']
+            new_html = new_states[state_name]['content']['html']
 
             # Test that html matches the expected format after migration.
             self.assertEqual(
-                updated_html, unicode(test_cases[index]['expected_output']))
+                new_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(
-            self.albert_id, updated_exploration)
+        exp_services.save_new_exploration(self.albert_id, new_exploration)
 
         # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
             job_id)
-        self.process_and_flush_pending_tasks()
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+            self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
 
         # Test that validation passes after migration.
-        self.assertEqual(actual_output, [])
+        # There should be no validation errors in the new (updated)
+        # exploration, but there are 16 validation errors in the old
+        # exploration.
+        self.assertEqual(len(actual_output), 16)
 
 
 class ExplorationContentValidationJobForCKEditorTest(
@@ -1367,6 +1262,10 @@ class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
     def test_for_deletion_job(self):
         """Checks that images get deleted from the GAE after running the job.
         """
+        # This job is for deleting the images from the datastore that were
+        # stored in old format --- exp_id/assets/image.png . It should not be
+        # run on the current develop branch because we now store the images
+        # as exploration/exp_id/assets/image.png .
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
         imageData = ''
@@ -1466,10 +1365,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
-
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;random.png&amp;quot;">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
                 )
             },
             'labelled_as_correct': False,

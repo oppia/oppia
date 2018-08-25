@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for playing audio in the exploration editor.
+ * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
-
-oppia.directive('audioPlayer', [
+oppia.directive('topicsViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getSourceUrl: '&sourceUrl',
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/audio_player_directive.html'),
-      controller: ['$scope', '$element', function($scope, $element) {
-        var audio = $element.find('audio')[0];
-        $scope.$on('$locationChangeStart', function(event) {
-          // The audio is paused when a change in route is detected.
-          audio.pause();
-        });
-      }]
+        '/pages/topic_viewer/topic_viewer_navbar_breadcrumb_directive.html'),
+      controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
+        function($scope, TopicViewerBackendApiService, UrlService) {
+          TopicViewerBackendApiService.fetchTopicData(
+            UrlService.getTopicNameFromLearnerUrl()).then(
+            function(topicDataDict) {
+              $scope.topicName = topicDataDict.topic_name;
+            });
+        }
+      ]
     };
-  }
-]);
+  }]);

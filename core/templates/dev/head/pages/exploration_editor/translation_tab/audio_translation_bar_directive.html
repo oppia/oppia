@@ -1,3 +1,7 @@
+<div  class="oppia-drop-area" ng-if="showDropArea">
+  <div class="oppia-blur-background"></div>
+  <div class="oppia-drop-area-message">Drop your file here!</div>
+</div>
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <button class="btn oppia-audio-button" disabled>
     <i class="material-icons">&#xE039;</i>
@@ -140,6 +144,29 @@
 </div>
 
 <style>
+  .oppia-drop-area {
+    border: 3px dashed #aaa;
+    height: 80%;
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    z-index: 100;
+  }
+  .oppia-blur-background {
+    background-color: #fff;
+    height: 100%;
+    opacity: 0.8;
+    position: absolute;
+    width: 100%;
+  }
+  .oppia-drop-area-message {
+    font-size: 36px;
+    height: 100%;
+    padding: 20%;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+  }
   .oppia-audio-recording-bar {
     width: 100%;
     height: 100%;

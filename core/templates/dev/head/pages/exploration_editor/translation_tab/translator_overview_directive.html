@@ -3,7 +3,7 @@
     <span style="font-size: 16px;">
       <strong>Translation in language:</strong>
     </span>
-    <select id="audioTranslationLanguageCodeField" class="oppia-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+    <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
             ng-options="language.id as language.description for language in languageCodesAndDescriptions">
     </select>
   </div>
@@ -43,7 +43,7 @@
     width: 350px;
     height: 10px;
   }
-  .oppia-language-selector {
+  .oppia-translation-language-selector {
     padding: 2px;
     border-radius: 8px;
   }

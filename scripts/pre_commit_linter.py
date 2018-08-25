@@ -113,6 +113,12 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(browser.sleep)\(',
+        'message': "In tests, please do not use browser.sleep().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'\b(browser.waitForAngular)\(',
         'message': "In tests, please do not use browser.waitForAngular().",
         'excluded_files': (),
@@ -187,6 +193,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
         'excluded_dirs': ('scripts/',)
+    },
+    {
+        'regexp': r'self.assertEquals\(',
+        'message': "Please do not use self.assertEquals method. " +
+                   "This method has been deprecated. Instead use " +
+                   "self.assertEqual method.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -1098,6 +1112,16 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
+def _validate_and_parse_js_file(filename, content):
+    """This function validates a JavaScript file and returns the parsed contents
+    as a Python dictionary.
+    """
+    # Use Pyjsparser to parse a JS file as a Python dictionary.
+    parser = pyjsparser.PyJsParser()
+    print 'Validating and parsing %s file ...' % filename
+    return parser.parse(content)
+
+
 def _check_directive_scope(all_files):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
@@ -1111,13 +1135,12 @@ def _check_directive_scope(all_files):
         and filename.endswith('.js')]
     failed = False
     summary_messages = []
-    # Use Pyjsparser to parse a JS file as a Python dictionary.
-    parser = pyjsparser.PyJsParser()
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
+        parsed_dict = _validate_and_parse_js_file(filename, content)
         # Parse the body of the content as nodes.
-        parsed_nodes = parser.parse(content)['body']
+        parsed_nodes = parsed_dict['body']
         for parsed_node in parsed_nodes:
             # Check the type of the node.
             if parsed_node['type'] != 'ExpressionStatement':

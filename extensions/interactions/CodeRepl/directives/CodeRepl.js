@@ -80,7 +80,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           $scope.initCodeEditor = function(editor) {
             editor.setValue($scope.code);
-
             // Options for the ui-codemirror display.
             editor.setOption('lineNumbers', true);
             editor.setOption('indentWithTabs', true);
