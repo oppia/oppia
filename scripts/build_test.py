@@ -164,7 +164,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Ensure that ASSETS_DEV_DIR has at least 1 file.
         assert target_dir_file_count > 0
         with self.assertRaisesRegexp(
-            ValueError, ('%s files in source dir != %s files in target dir.') %
+            ValueError, ('%s files in first dir. != %s files in second dir.') %
             (source_dir_file_count, target_dir_file_count)):
             build._compare_file_count(EMPTY_DIR, MOCK_ASSETS_DEV_DIR)
 
