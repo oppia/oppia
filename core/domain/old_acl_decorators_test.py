@@ -125,14 +125,13 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
 
     def test_guest_cannot_comment_on_feedback_threads(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            response = self.mock_testapp.get(
-                '/mock/%s.thread1' % self.private_exp_id,
-                expect_errors=True)
-            self.assertEqual(response.status_int, 302)
-            response = self.mock_testapp.get(
-                '/mock/%s.thread1' % self.published_exp_id,
-                expect_errors=True)
-            self.assertEqual(response.status_int, 302)
+            with self.swap(self, 'testapp', self.mock_testapp):
+                self.get_json(
+                    '/mock/%s.thread1' % self.private_exp_id,
+                    expect_errors=True, expected_status_int=401)
+                self.get_json(
+                    '/mock/%s.thread1' % self.published_exp_id,
+                    expect_errors=True, expected_status_int=401)
 
     def test_owner_can_comment_on_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
