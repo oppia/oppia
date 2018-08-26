@@ -21,14 +21,10 @@
 
 oppia.factory('CurrentInteractionService', [
   function() {
-    var _defaultValidityCheck = function() {
-      return true;
-    };
-
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
-    var _validityCheckFn = _defaultValidityCheck;
-    var _preSubmitHooks = [];
+    var _validityCheckFn = null;
+    var _presubmitHooks = [];
 
     return {
       setOnSubmitFn: function(onSubmit) {
@@ -42,39 +38,37 @@ oppia.factory('CurrentInteractionService', [
       },
       registerCurrentInteraction: function(submitAnswer, validityCheckFn) {
         /**
-         * Every interaction directive should register themselves here,
-         * even those which do not use the progress nav. All arguments are
-         * optional.
+         * Each interaction directive should call registerCurrentInteraction
+         * when the interaction directive is first created.
          *
-         * @param {function} submitAnswer - Should grab the learner's answer
-         *   and pass it to onSubmit. The interaction can pass in null if
-         *   it does not use the progress nav's submit button
+         * @param {function|null} submitAnswer - Should grab the learner's
+         *   answer and pass it to onSubmit. The interaction can pass in
+         *   null if it does not use the progress nav's submit button
          *   (ex: MultipleChoiceInput).
          * @param {function} validityCheckFn - The progress nav will use this
-         *   to decide whether or not to disable the submit button. The
-         *   interaction can pass in null if it does not use the progress
-         *   nav's submit button.
+         *   to decide whether or not to disable the submit button. If the
+         *   interaction passes in null, the submit button will remain
+         *   enabled (for the entire duration of the current interaction).
          */
-        _submitAnswerFn = submitAnswer;
-        _validityCheckFn = validityCheckFn || _defaultValidityCheck;
+        _submitAnswerFn = submitAnswer || null;
+        _validityCheckFn = validityCheckFn || null;
       },
-      registerPreSubmitHook: function(hookFn) {
-        /* Register a time hook that will be called right before onSubmit.
+      registerPresubmitHook: function(hookFn) {
+        /* Register a one-time hook that will be called right before onSubmit.
          * All hooks for the current interaction will be cleared right
          * before loading the next card.
          */
-        _preSubmitHooks.push(hookFn);
+        _presubmitHooks.push(hookFn);
       },
       clearPresubmitHooks: function() {
         /* Clear out all the hooks for the current interaction. Should
          * be called before loading the next card.
          */
-        _preSubmitHooks = [];
+        _presubmitHooks = [];
       },
       onSubmit: function(answer, interactionRulesService) {
-        for (var i = 0; i < _preSubmitHooks.length; i++) {
-          hookFn = _preSubmitHooks[i];
-          hookFn();
+        for (var i = 0; i < _presubmitHooks.length; i++) {
+          _presubmitHooks[i]();
         }
         _onSubmitFn(answer, interactionRulesService);
       },
@@ -91,8 +85,12 @@ oppia.factory('CurrentInteractionService', [
       },
       isSubmitButtonDisabled: function() {
         /* Returns whether or not the Submit button should be disabled based on
-         * the validity of the current answer.
+         * the validity of the current answer. If there is no _validityCheckFn,
+         * return false.
          */
+        if (_validityCheckFn === null) {
+          return false;
+        }
         return !_validityCheckFn();
       },
     };

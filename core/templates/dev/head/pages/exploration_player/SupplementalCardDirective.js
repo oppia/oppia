@@ -86,7 +86,7 @@ oppia.directive('supplementalCard', [
             return Math.max(container.height() - helpCard.height() / 2, 0);
           };
 
-          CurrentInteractionService.registerPreSubmitHook(function() {
+          CurrentInteractionService.registerPresubmitHook(function() {
             // Do not clear the help card or submit an answer if there is an
             // upcoming card.
             if ($scope.displayedCard.isCompleted()) {
