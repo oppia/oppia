@@ -36,12 +36,12 @@ oppia.factory('CurrentInteractionService', [
          */
         _onSubmitFn = onSubmit;
       },
-      registerCurrentInteraction: function(submitAnswer, validityCheckFn) {
+      registerCurrentInteraction: function(submitAnswerFn, validityCheckFn) {
         /**
          * Each interaction directive should call registerCurrentInteraction
          * when the interaction directive is first created.
          *
-         * @param {function|null} submitAnswer - Should grab the learner's
+         * @param {function|null} submitAnswerFn - Should grab the learner's
          *   answer and pass it to onSubmit. The interaction can pass in
          *   null if it does not use the progress nav's submit button
          *   (ex: MultipleChoiceInput).
@@ -50,11 +50,11 @@ oppia.factory('CurrentInteractionService', [
          *   interaction passes in null, the submit button will remain
          *   enabled (for the entire duration of the current interaction).
          */
-        _submitAnswerFn = submitAnswer || null;
+        _submitAnswerFn = submitAnswerFn || null;
         _validityCheckFn = validityCheckFn || null;
       },
       registerPresubmitHook: function(hookFn) {
-        /* Register a one-time hook that will be called right before onSubmit.
+        /* Register a hook that will be called right before onSubmit.
          * All hooks for the current interaction will be cleared right
          * before loading the next card.
          */
@@ -85,8 +85,10 @@ oppia.factory('CurrentInteractionService', [
       },
       isSubmitButtonDisabled: function() {
         /* Returns whether or not the Submit button should be disabled based on
-         * the validity of the current answer. If there is no _validityCheckFn,
-         * return false.
+         * the validity of the current answer. If the interaction does not pass
+         * in a _validityCheckFn, then _validityCheckFn will be null and by
+         * default we assume the answer is valid, so the submit button should
+         * not be disabled.
          */
         if (_validityCheckFn === null) {
           return false;
