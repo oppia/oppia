@@ -75,6 +75,9 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
           };
 
           $scope.isAnswerValid = function() {
+            if ($scope.NumberWithUnitsForm === undefined) {
+              return true;
+            }
             return (!$scope.NumberWithUnitsForm.$invalid &&
               $scope.answer !== '');
           };
