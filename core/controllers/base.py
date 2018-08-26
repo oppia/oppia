@@ -440,8 +440,18 @@ class BaseHandler(webapp2.RequestHandler):
                 in debug mode.
         """
         if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
+            # This checks if the response should be JSON or HTML.
+            # For GET requests, there is no payload, so we check against
+            # GET_HANDLER_ERROR_RETURN_TYPE.
+            # Otherwise, we check whether self.payload exists.
+            if (self.payload is not None or
+                    self.GET_HANDLER_ERROR_RETURN_TYPE ==
+                    feconf.HANDLER_TYPE_JSON):
+                self.error(401)
+                self._render_exception(401, {'error': unicode(exception)})
+            else:
+                self.redirect(
+                    current_user_services.create_login_url(self.request.uri))
             return
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
