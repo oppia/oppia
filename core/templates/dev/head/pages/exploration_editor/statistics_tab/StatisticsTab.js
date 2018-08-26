@@ -213,6 +213,7 @@ oppia.controller('StatisticsTab', [
                   var el = $(
                     '<oppia-visualization-' +
                     $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
+                  el.attr('state-name', stateName);
                   el.attr('escaped-data', escapedData);
                   el.attr('escaped-options', escapedOptions);
                   el.attr(

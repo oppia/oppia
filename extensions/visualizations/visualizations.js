@@ -62,6 +62,45 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   };
 }]);
 
+// TODO(brianrodri): These controllers may benefit from being reused
+// by future visualizations. If we end up using them a lot, consider
+// moving them into a service.
+var answersColumnController = {
+  getHeaderHtml: function() {
+    return 'Answer';
+  },
+  getWidthCss: function() {
+    return '75%';
+  },
+  makeCellHtmlForRow: function(row) {
+    return row.answer;
+  },
+};
+
+var frequenciesColumnController = {
+  getHeaderHtml: function() {
+    return 'Count';
+  },
+  getWidthCss: function() {
+    return '10%';
+  },
+  makeCellHtmlForRow: function(row) {
+    return row.frequency;
+  },
+};
+
+var addressedInfoColumnController = {
+  getHeaderHtml: function() {
+    return 'Addressed specifically?';
+  },
+  getWidthCss: function() {
+    return '15%';
+  },
+  makeCellHtmlForRow: function(row) {
+    return row.is_addressed ? 'Yes' : 'No';
+  },
+};
+
 oppia.directive('oppiaVisualizationFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -70,12 +109,21 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/visualizations/frequency_table_directive.html'),
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+        '$scope', '$attrs', 'HtmlEscaperService', 'StateTopAnswersStatsService',
+        function(
+            $scope, $attrs, HtmlEscaperService, StateTopAnswersStatsService) {
+          $scope.rows =
+            StateTopAnswersStatsService.hasStateStats($attrs.stateName) ?
+            StateTopAnswersStatsService.getStateStats($attrs.stateName) : [];
           $scope.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          $scope.columnControllers = [
+            answersColumnController,
+            frequenciesColumnController,
+          ];
+          if ($attrs.addressedInfoIsSupported) {
+            $scope.columnControllers.push(addressedInfoColumnController);
+          }
         }
       ]
     };
