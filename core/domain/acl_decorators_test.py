@@ -218,13 +218,13 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
-    def test_guest_cannot_edit_collection_on_JSON_return_type(self):
+    def test_guest_cannot_edit_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_col_id, expect_errors=True,
                 expected_status_int=401)
 
-    def test_guest_is_redirected_on_HTML_return_type(self):
+    def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
             self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML):
@@ -307,12 +307,12 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
         self.logout()
 
-    def test_guest_cannot_create_exploration_on_JSON_return_type(self):
+    def test_guest_cannot_create_exploration_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/create', expect_errors=True,
                           expected_status_int=401)
 
-    def test_guest_is_redirected_on_HTML_return_type(self):
+    def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
             self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML):
@@ -345,12 +345,12 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_guest_cannot_create_collection_on_JSON_return_type(self):
+    def test_guest_cannot_create_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/create', expect_errors=True, expected_status_int=401)
 
-    def test_guest_is_redirected_on_HTML_return_type(self):
+    def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
             self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML):
@@ -449,7 +449,7 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_comment_on_feedback_threads_on_JSON_return_type(self):
+    def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             with self.swap(self, 'testapp', self.mock_testapp):
                 self.get_json(
@@ -459,7 +459,7 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
                     '/mock/exploration.%s.thread1' % self.published_exp_id,
                     expect_errors=True, expected_status_int=401)
 
-    def test_guest_is_redirected_on_HTML_return_type(self):
+    def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             with self.swap(
                 self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',

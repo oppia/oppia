@@ -123,7 +123,7 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_comment_on_feedback_threads_on_JSON_return_type(self):
+    def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             with self.swap(self, 'testapp', self.mock_testapp):
                 self.get_json(
@@ -133,7 +133,7 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
                     '/mock/%s.thread1' % self.published_exp_id,
                     expect_errors=True, expected_status_int=401)
 
-    def test_guest_is_redirected_on_HTML_return_type(self):
+    def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             with self.swap(
                 self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
