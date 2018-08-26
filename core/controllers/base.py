@@ -440,7 +440,6 @@ class BaseHandler(webapp2.RequestHandler):
                 in debug mode.
         """
         if isinstance(exception, self.NotLoggedInException):
-
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
