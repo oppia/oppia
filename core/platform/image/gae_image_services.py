@@ -26,6 +26,10 @@ from google.appengine.api import images
 app_identity_services = models.Registry.import_app_identity_services()
 
 
+# The maximum width or length an image can be resized to, inclusive.
+MAX_RESIZE_DIMENSION_PX = 4000.0
+
+
 def get_image_dimensions(file_content):
     """Gets the dimensions of the image with the given file_content.
 
@@ -43,18 +47,34 @@ def get_image_dimensions(file_content):
 def compress_image(image_content, scaling_factor):
     """Compresses the image by resizing the image with the scaling factor.
 
+    Note that if the image's dimensions, after the scaling factor is applied,
+    exceed 4000 then the scaling factor will be recomputed and applied such that
+    the larger dimension of the image does not exceed 4000 after resizing. This
+    is due to an implementation limitation. See https://goo.gl/TJCbmE for
+    context.
+
     Args:
         image_content: str. Content of the file to be compressed.
         scaling_factor: float. The number by which the dimensions of the image
-            will be scaled.
+            will be scaled. This is expected to be greater than zero.
 
     Returns:
         str. Returns the content of the compressed image.
     """
     if not feconf.DEV_MODE:
         height, width = get_image_dimensions(image_content)
+        new_width = int(width * scaling_factor)
+        new_height = int(height * scaling_factor)
+        if (new_width > MAX_RESIZE_DIMENSION_PX
+            or new_height > MAX_RESIZE_DIMENSION_PX):
+            # Recompute the scaling factor such that the larger dimension does
+            # not exceed 4000 when scaled.
+            new_scaling_factor = MAX_RESIZE_DIMENSION_PX / max(width, height)
+            new_width = int(width * new_scaling_factor)
+            new_height = int(height * new_scaling_factor)
         return images.resize(
-            image_data=image_content, width=int(width * scaling_factor),
-            height=int(height * scaling_factor))
+            image_data=image_content,
+            width=min(new_width, MAX_RESIZE_DIMENSION_PX),
+            height=min(new_height, MAX_RESIZE_DIMENSION_PX))
     else:
         return image_content
