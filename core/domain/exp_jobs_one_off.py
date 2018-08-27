@@ -45,6 +45,7 @@ FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
 FILE_DELETED = 'File has been deleted'
 FILE_FOUND_IN_GCS = 'File is there in GCS'
+EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
@@ -773,9 +774,25 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
             audio_filenames = [
                 GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
 
+            references_unicode_files = False
             for image_filename in image_filenames:
                 try:
-                    raw_image = fs_old.get('image/%s' % image_filename)
+                    fs_old.get('image/%s' % image_filename)
+                except Exception:
+                    references_unicode_files = True
+                    break
+
+            if references_unicode_files:
+                image_filenames_str = '%s' % image_filenames
+                yield (
+                    EXP_REFERENCES_UNICODE_FILES,
+                    'Exp: %s, image filenames: %s' % (
+                        exp_id, image_filenames_str.encode('utf-8')))
+
+            for image_filename in image_filenames:
+                try:
+                    raw_image = fs_old.get(
+                        'image/%s' % image_filename.encode('utf-8'))
                     height, width = gae_image_services.get_image_dimensions(
                         raw_image)
                     filename_with_dimensions = (
@@ -784,7 +801,13 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
                         'ADMIN', filename_with_dimensions, exp_id, raw_image)
                 except Exception:
-                    yield (ERROR_IN_FILENAME, image_filename.encode('utf-8'))
+                    error = traceback.format_exc()
+                    logging.error(
+                        'File %s in %s failed migration: %s' %
+                        (image_filename.encode('utf-8'), exp_id, error))
+                    yield (
+                        ERROR_IN_FILENAME, 'Error when copying %s in %s: %s' % (
+                            image_filename.encode('utf-8'), exp_id, error))
 
             for audio_filename in audio_filenames:
                 filetype = audio_filename[audio_filename.rfind('.') + 1:]
