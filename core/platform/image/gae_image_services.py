@@ -66,7 +66,7 @@ def compress_image(image_content, scaling_factor):
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
         if (new_width > MAX_RESIZE_DIMENSION_PX
-            or new_height > MAX_RESIZE_DIMENSION_PX):
+                or new_height > MAX_RESIZE_DIMENSION_PX):
             # Recompute the scaling factor such that the larger dimension does
             # not exceed 4000 when scaled.
             new_scaling_factor = MAX_RESIZE_DIMENSION_PX / max(width, height)

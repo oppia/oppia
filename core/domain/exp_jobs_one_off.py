@@ -778,7 +778,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
             for image_filename in image_filenames:
                 try:
                     fs_old.get('image/%s' % image_filename)
-                except Exception as e:
+                except Exception:
                     references_unicode_files = True
                     break
 
@@ -800,7 +800,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                             image_filename, height, width))
                     exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
                         'ADMIN', filename_with_dimensions, exp_id, raw_image)
-                except Exception as e:
+                except Exception:
                     error = traceback.format_exc()
                     logging.error(
                         'File %s in %s failed migration: %s' %
