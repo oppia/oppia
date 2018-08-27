@@ -298,8 +298,8 @@ def get_empty_ratings():
     """Returns a copy of the Empty Ratings object.
 
     Returns:
-        dict: Copy of the '_EMPTY_RATINGS' dict object which contains the empty
-        ratings.
+        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
+            ratings.
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
