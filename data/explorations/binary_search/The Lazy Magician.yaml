@@ -1,6 +1,8 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Algorithms
+correctness_feedback_enabled: false
 init_state_name: Introduction
 language_code: en
 objective: discover the binary search algorithm
@@ -50,119 +52,179 @@ param_specs:
     obj_type: UnicodeString
   worstnum:
     obj_type: UnicodeString
-schema_version: 17
+schema_version: 30
 states:
   3 case 3 tries:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Hmm, I guess it''s pretty easy to guess 3 numbers in 3 tries - just
-        try every number!"<br><br>"There''s gotta be a trick to make it go faster,
-        though. It''s way too slow if I just ask about each number one at a time.
-        For example, to guess 1000 numbers, I would need 1000 tries! And the magician
+      content_id: content
+      html: <p>"Hmm, I guess it's pretty easy to guess 3 numbers in 3 tries - just
+        try every number!"<br><br>"There's gotta be a trick to make it go faster,
+        though. It's way too slow if I just ask about each number one at a time. For
+        example, to guess 1000 numbers, I would need 1000 tries! And the magician
         does it so much faster."<br><br>"So we need to make one guess eliminate more
-        than one number. Hmm, how can we do that in the 3-number-guessing case?"<br>'
+        than one number. Hmm, how can we do that in the 3-number-guessing case?"<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
+      feedback_8: {}
+      feedback_9: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"Oh yeah! when the magician responds to our guess, he also tells us if
-            his number is bigger or smaller!"'
+            content_id: feedback_1
+            html: <p>"Oh yeah! when the magician responds to our guess, he also tells
+              us if his number is bigger or smaller!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: bigger
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"Oh yeah! when the magician responds to our guess, he also tells us if
-            his number is bigger or smaller!"'
+            content_id: feedback_2
+            html: <p>"Oh yeah! when the magician responds to our guess, he also tells
+              us if his number is bigger or smaller!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: smaller
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - "\_\"Oh yeah! when the magician responds to our guess, he also tells us\
-            \ if his number is bigger or smaller!\""
+            content_id: feedback_3
+            html: "<p>\_\"Oh yeah! when the magician responds to our guess, he also\
+              \ tells us if his number is bigger or smaller!\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: lower
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"Oh yeah! when the magician responds to our guess, he also tells us if
-            his number is bigger or smaller!"'
+            content_id: feedback_4
+            html: <p>"Oh yeah! when the magician responds to our guess, he also tells
+              us if his number is bigger or smaller!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: higher
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"Oh! so if we guess ''2'' as our first try, then we know what number
-            to guess on the second try, even if 2 wasn''t right!"'
+            content_id: feedback_5
+            html: <p>"Oh! so if we guess '2' as our first try, then we know what number
+              to guess on the second try, even if 2 wasn't right!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '2'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"Oh! so if we guess ''2'' as our first try, then we know what number
-            to guess on the second try, even if 2 wasn''t right!"'
+            content_id: feedback_6
+            html: <p>"Oh! so if we guess '2' as our first try, then we know what number
+              to guess on the second try, even if 2 wasn't right!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: two
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"I see! If we guess the number in the middle (which is 2 in our case),
-            then no matter what the magician answers, we''ll eliminate two numbers!"'
+            content_id: feedback_7
+            html: <p>"I see! If we guess the number in the middle (which is 2 in our
+              case), then no matter what the magician answers, we'll eliminate two
+              numbers!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: middle
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"I see! If we guess the number in the middle (which is 2 in our case),
-            then no matter what the magician answers, we''ll eliminate two numbers!"'
+            content_id: feedback_8
+            html: <p>"I see! If we guess the number in the middle (which is 2 in our
+              case), then no matter what the magician answers, we'll eliminate two
+              numbers!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: between
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"I see! If we guess the number in the middle (which is 2 in our case),
-            then no matter what the magician answers, we''ll eliminate two numbers!"'
+            content_id: feedback_9
+            html: <p>"I see! If we guess the number in the middle (which is 2 in our
+              case), then no matter what the magician answers, we'll eliminate two
+              numbers!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: half
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -172,10 +234,12 @@ states:
       default_outcome:
         dest: 3 case 3 tries
         feedback:
-        - '"What kind of extra information does the magician give us?"'
-        - '"What else do we know about the magician''s number after we make our guess?"'
-        - '"What can we use to eliminate more than one number with our first guess?"'
+          content_id: default_outcome
+          html: <p>"What kind of extra information does the magician give us?"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -183,65 +247,90 @@ states:
   3 tries 7 numbers:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Cool! how would you do that?"<br><br>"If you were guessing a number
+      content_id: content
+      html: <p>"Cool! how would you do that?"<br><br>"If you were guessing a number
         between 1 and 7 and you only had three tries, what would your first guess
-        be?"'
+        be?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Three tries explanation
           feedback:
-          - '"I see! So if the magician said it was smaller than that, we would be
-            back to the ''between 1 and 3'' case!"
+            content_id: feedback_1
+            html: '<p>"I see! So if the magician said it was smaller than that, we
+              would be back to the ''between 1 and 3'' case!"
 
 
-            "And of course if it was equal to 4, we would be done!"
+              "And of course if it was equal to 4, we would be done!"
 
 
-            "But what if he said it was bigger than 4? Then we would still have to
-            guess a number between 5 and 7... But wait, that''s the same thing as
-            between 1 and 3, just shifted over!"'
+              "But what if he said it was bigger than 4? Then we would still have
+              to guess a number between 5 and 7... But wait, that''s the same thing
+              as between 1 and 3, just shifted over!"</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4.0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 3 tries 7 numbers
           feedback:
-          - '"OK, but what if the magician says that his number is greater than {{answer}}?
-            Then we would only have two tries left, but we would have to guess a number
-            between {{answer+1}} and 7. That''s {{7-answer}} possible options! I don''t
-            think we could do that in 2 tries."'
+            content_id: feedback_2
+            html: <p>"OK, but what if the magician says that his number is greater
+              than {{answer}}? Then we would only have two tries left, but we would
+              have to guess a number between {{answer+1}} and 7. That's {{7-answer}}
+              possible options! I don't think we could do that in 2 tries."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4.0
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 3 tries 7 numbers
           feedback:
-          - '"OK, but what if the magician says that his number is smaller than {{answer}}?
-            Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{answer-1}}. That''s {{answer-1}} possible options! I don''t
-            think we could do that in 2 tries. We can do between 1 and 3 in 2 tries
-            though..."'
+            content_id: feedback_3
+            html: <p>"OK, but what if the magician says that his number is smaller
+              than {{answer}}? Then we would only have two tries left, but we would
+              have to guess a number between 1 and {{answer-1}}. That's {{answer-1}}
+              possible options! I don't think we could do that in 2 tries. We can
+              do between 1 and 3 in 2 tries though..."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: 3 tries 7 numbers
         feedback:
-        - But that's not even between 1 and 7!
+          content_id: default_outcome
+          html: <p>But that's not even between 1 and 7!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -249,45 +338,58 @@ states:
   4 tries abstract:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: <div><br></div><div>It works almost the same as when we added the third
-        try!</div><div>When we had only two tries, we could guess any number from
-        1 to 3.</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;2tree.png&amp;quot;"></oppia-noninteractive-image><br></div><div>With
-        3 tries, and the trick of asking "Is it 4?" first, we added 4 more numbers,
-        so we could guess from 1 to 7.<br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3tree.png&amp;quot;"></oppia-noninteractive-image><br></div><div>If
-        we have 4 tries, we can use the same trick:<br></div><div><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;4tree-half.png&amp;quot;"></oppia-noninteractive-image><br></div><div>You
-        can write in all the numbers from left to right (or just count them up!).<br></div><div>So,
-        how many is that?</div>
+      content_id: content
+      html: "<p>\_</p><p>It works almost the same as when we added the third try!</p><p>When\
+        \ we had only two tries, we could guess any number from 1 to 3.</p><oppia-noninteractive-image\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2tree_height_366_width_753.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>With 3 tries, and the trick of asking\
+        \ \"Is it 4?\" first, we added 4 more numbers, so we could guess from 1 to\
+        \ 7.<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;3tree_height_408_width_839.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>If we have 4 tries, we can use the\
+        \ same trick:<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;4tree-half_height_556_width_1121.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>You can write in all the numbers\
+        \ from left to right (or just count them up!).<br></p><p>So, how many is that?</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - "That's right! In fact, every time we add another guess, we can <b>double</b>\
-            \ our range of numbers, plus one more!\_<div>1 try = 1 number range</div><div>2\
-            \ tries = 3 number range</div><div>3 tries = 7 number range</div><div>4\
-            \ tries = 15 number range</div><div>etc.</div><div><br></div><div>So that's\
-            \ how you <b>maximize</b> your <u>range</u> if you know how many guesses\
-            \ you have!</div><div><br></div><div>But that's kind of backwards from\
-            \ how the game works - we should think about how to <b>minimize</b> the\
-            \ <u>number of guesses</u> when we know what our starting range is.</div>"
+            content_id: feedback_1
+            html: "<p>That's right! In fact, every time we add another guess, we can\
+              \ <strong>double</strong> our range of numbers, plus one more!\_</p><p>1\
+              \ try = 1 number range</p><p>2 tries = 3 number range</p><p>3 tries\
+              \ = 7 number range</p><p>4 tries = 15 number range</p><p>etc.</p><p>\_\
+              </p><p>So that's how you <strong>maximize</strong> your range if you\
+              \ know how many guesses you have!</p><p>\_</p><p>But that's kind of\
+              \ backwards from how the game works - we should think about how to <strong>minimize</strong>\
+              \ the number of guesses when we know what our starting range is.</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 15.0
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: 4 tries abstract
         feedback:
-        - "No, that's not right.\_"
-        - 'Think of it this way: We already know that the left half of the picture
-          is 7 numbers. The right half is the same. And there''s one more at the top!
-          So how many is that?'
+          content_id: default_outcome
+          html: "<p>No, that's not right.\_</p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -295,45 +397,66 @@ states:
   Add one more:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"So, we can divide the range into two halves by guessing a number in
+      content_id: content
+      html: <p>"So, we can divide the range into two halves by guessing a number in
         the middle! and then, both of those half-ranges is at most 3 numbers long,
         so even in the worst case, we know how to find that number in two more tries!"<br><br>"But
-        wait - our number wasn''t exactly in the middle... in fact, there''s no exact
-        middle for numbers between 1 and 6. And one of our ''halves'' actually turned
-        out to be a bit smaller!"<br><br>"So that must mean..."'
+        wait - our number wasn't exactly in the middle... in fact, there's no exact
+        middle for numbers between 1 and 6. And one of our 'halves' actually turned
+        out to be a bit smaller!"<br><br>"So that must mean..."</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Three tries explanation
           feedback:
-          - '"Exactly!"'
+            content_id: feedback_1
+            html: <p>"Exactly!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '7'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Three tries explanation
           feedback:
-          - '"Yeah!"'
+            content_id: feedback_2
+            html: <p>"Yeah!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: seven
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Three tries explanation
           feedback:
-          - '"That''s what I was thinking!"'
+            content_id: feedback_3
+            html: <p>"That's what I was thinking!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '"one more"'
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -343,9 +466,13 @@ states:
       default_outcome:
         dest: Three tries explanation
         feedback:
-        - '"... That we can actually add one more number to the range! We can do numbers
-          from 1 to 7 in three tries!"'
+          content_id: default_outcome
+          html: <p>"... That we can actually add one more number to the range! We
+            can do numbers from 1 to 7 in three tries!"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -353,83 +480,135 @@ states:
   After three case:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;elimination.png&amp;quot;"></oppia-noninteractive-image><br></p><p>"So,
-        no matter which number the magician is thinking of, if we guess 2 on our first
-        try, we can eliminate two numbers! Then for the second try (if we even need
-        it), we know exactly what number to guess!"<br><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;2tree.png&amp;quot;"></oppia-noninteractive-image><br>"So
-        maybe we don't save TOO much time by being able to guess a number between
-        1-3 in just two tries... but I wonder what we could do with one more try?"</p><p>"If
-        we had three tries, what kind of range of numbers would we be able to always
-        guess?"</p>
+      content_id: content
+      html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;elimination_height_419_width_1596.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"So, no matter which number the\
+        \ magician is thinking of, if we guess 2 on our first try, we can eliminate\
+        \ two numbers! Then for the second try (if we even need it), we know exactly\
+        \ what number to guess!\"<br></p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2tree_height_366_width_753.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br>\"So maybe we don't save TOO much time\
+        \ by being able to guess a number between 1-3 in just two tries... but I wonder\
+        \ what we could do with one more try?\"</p><p>\"If we had three tries, what\
+        \ kind of range of numbers would we be able to always guess?\"</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Doubling range concept
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: double
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: twice
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: two
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
           feedback:
-          - '"Six! Whoa, that''s twice as many!"'
+            content_id: feedback_4
+            html: <p>"Six! Whoa, that's twice as many!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '6'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
           feedback:
-          - '"Six! Whoa, that''s twice as many!"'
+            content_id: feedback_5
+            html: <p>"Six! Whoa, that's twice as many!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: six
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 3 tries 7 numbers
-          feedback: []
+          feedback:
+            content_id: feedback_6
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '7'
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 3 tries 7 numbers
-          feedback: []
+          feedback:
+            content_id: feedback_7
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: seven
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -439,11 +618,15 @@ states:
       default_outcome:
         dest: Reduce 3 guesses to 2
         feedback:
-        - '"Here is another thing I like to do when I''m thinking about a hard question.
-          I try to imagine what the world would be like if I already knew the answer.
-          Then I try to find a way to change that situation to one where I really
-          do know the answer!"<div><br></div>'
+          content_id: default_outcome
+          html: "<p>\"Here is another thing I like to do when I'm thinking about a\
+            \ hard question. I try to imagine what the world would be like if I already\
+            \ knew the answer. Then I try to find a way to change that situation to\
+            \ one where I really do know the answer!\"</p><p>\_</p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -451,46 +634,69 @@ states:
   Degenerate Case:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"I like starting with really simple cases. Sometimes it turns out it''s
-        obvious how to get to the more complex ones from there!"<div><br>"The simplest
-        thing would be if I had to guess a number from 1 to 1. Then I know the answer
-        in one try - it''s 1!"<div><br><div><oppia-noninteractive-image filepath-with-value="&amp;quot;magician-1.png&amp;quot;"></oppia-noninteractive-image><br><br></div><div>"The
-        next simplest thing is if I had a number between 1 and 2. How many tries would
-        I need?.."<br></div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;magician-2.png&amp;quot;"></oppia-noninteractive-image><br><br><br></div></div></div>'
+      content_id: content
+      html: "<p>\"I like starting with really simple cases. Sometimes it turns out\
+        \ it's obvious how to get to the more complex ones from there!\"</p><p><br>\"\
+        The simplest thing would be if I had to guess a number from 1 to 1. Then I\
+        \ know the answer in one try - it's 1!\"</p><p>\_</p><oppia-noninteractive-image\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;magician-1_height_147_width_125.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br><br></p><p>\"The next simplest thing\
+        \ is if I had a number between 1 and 2. How many tries would I need?..\"<br></p><p>\_\
+        </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;magician-2_height_223_width_504.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br><br><br></p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Three Case
           feedback:
-          - '"Right! since it can only be 1 or 2, whatever I choose first, I could
-            be wrong; but then I can always get it right on the second try"'
+            content_id: feedback_1
+            html: <p>"Right! since it can only be 1 or 2, whatever I choose first,
+              I could be wrong; but then I can always get it right on the second try"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2.0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Degenerate Case
           feedback:
-          - '"I don''t think I can always get it that fast though. If you''re thinking
-            of a 1 or a 2 and I''m just guessing, there''s always a chance I don''t
-            get it right at first."'
+            content_id: feedback_2
+            html: <p>"I don't think I can always get it that fast though. If you're
+              thinking of a 1 or a 2 and I'm just guessing, there's always a chance
+              I don't get it right at first."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2.0
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Degenerate Case
         feedback:
-        - '"No, I don''t think I would ever need that many tries... All I''m trying
-          to do is guess whether you''re thinking 1 or 2!"'
+          content_id: default_outcome
+          html: <p>"No, I don't think I would ever need that many tries... All I'm
+            trying to do is guess whether you're thinking 1 or 2!"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -498,97 +704,148 @@ states:
   Discussion Start:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: <div>{{if redux==1 then "'So, how do you think he does it?' asks your
-        friend." else "Ah, so where were we again?"}}</div>
+      content_id: content
+      html: <p>{{if redux==1 then "'So, how do you think he does it?' asks your friend."
+        else "Ah, so where were we again?"}}</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
+      feedback_8: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"I agree, it''s probably important that he''s always picking a number
-            in the middle of the range of possible numbers."'
+            content_id: feedback_1
+            html: <p>"I agree, it's probably important that he's always picking a
+              number in the middle of the range of possible numbers."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: middle
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Yeah, he divides the range of possible numbers about in half every time.
-            I wonder why?"'
+            content_id: feedback_2
+            html: <p>"Yeah, he divides the range of possible numbers about in half
+              every time. I wonder why?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: half
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - Yeah, he divides the range of possible numbers about in half every time.
-            I wonder why?<br>
+            content_id: feedback_3
+            html: <p>Yeah, he divides the range of possible numbers about in half
+              every time. I wonder why?<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: divide
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - Yeah, he divides the range of possible numbers about in half every time.
-            I wonder why?
+            content_id: feedback_4
+            html: <p>Yeah, he divides the range of possible numbers about in half
+              every time. I wonder why?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: halves
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - '"Yeah, there''s something important about how he keeps track of the range
-            of possible numbers!"'
+            content_id: feedback_5
+            html: <p>"Yeah, there's something important about how he keeps track of
+              the range of possible numbers!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: range
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - '"Yeah, there''s something important about how he keeps track of the range
-            of possible numbers!"'
+            content_id: feedback_6
+            html: <p>"Yeah, there's something important about how he keeps track of
+              the range of possible numbers!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: between
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Discussion Start
           feedback:
-          - '"What does binary mean?"'
+            content_id: feedback_7
+            html: <p>"What does binary mean?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: binary
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Worst Case start
           feedback:
-          - '"You want to try guessing yourself?"'
+            content_id: feedback_8
+            html: <p>"You want to try guessing yourself?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: try guess
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -598,8 +855,12 @@ states:
       default_outcome:
         dest: Degenerate Case
         feedback:
-        - '"Hmm, I have a thought..."'
+          content_id: default_outcome
+          html: <p>"Hmm, I have a thought..."</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -612,70 +873,96 @@ states:
   Doubling range concept:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"You think we can <b>double</b> our range with just one more try? But
-        how?"<br><br>"Oh, I think I see! when the number was between 1 and 3, and
-        we guessed 2, we were cutting it right in the middle!"<br><br>"OK, if we''re
-        guessing a number between 1 and 6, what should we guess to cut the range in
-        half?"'
+      content_id: content
+      html: <p>"You think we can <strong>double</strong> our range with just one more
+        try? But how?"<br><br>"Oh, I think I see! when the number was between 1 and
+        3, and we guessed 2, we were cutting it right in the middle!"<br><br>"OK,
+        if we're guessing a number between 1 and 6, what should we guess to cut the
+        range in half?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Add one more
           feedback:
-          - '"So if the magician said it was smaller than that, we would be back to
-            the ''between 1 and {{answer-1}}'' case!"
+            content_id: feedback_1
+            html: '<p>"So if the magician said it was smaller than that, we would
+              be back to the ''between 1 and {{answer-1}}'' case!"
 
 
-            "And of course if it was equal to {{answer}}, we would be done!"
+              "And of course if it was equal to {{answer}}, we would be done!"
 
 
-            "But what if he said it was bigger than {{answer}}? Then we would still
-            have to guess a number between {{answer+1}} and 6... But wait, that''s
-            the same thing as between 1 and {{6-answer}}, just shifted over a bit!"'
+              "But what if he said it was bigger than {{answer}}? Then we would still
+              have to guess a number between {{answer+1}} and 6... But wait, that''s
+              the same thing as between 1 and {{6-answer}}, just shifted over a bit!"</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             a: 3.0
             b: 4.0
           rule_type: IsInclusivelyBetween
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
           feedback:
-          - '"But what if the magician says that his number is greater than {{answer}}?
-            Then we would only have two tries left, but we would have to guess a number
-            between {{answer+1}} and 6. That''s {{6-answer}} possible options! I don''t
-            think we could do that in 2 tries."<div>"No, we have to guess something
-            else for numbers between 1 and 6..."</div>'
+            content_id: feedback_2
+            html: <p>"But what if the magician says that his number is greater than
+              {{answer}}? Then we would only have two tries left, but we would have
+              to guess a number between {{answer+1}} and 6. That's {{6-answer}} possible
+              options! I don't think we could do that in 2 tries."</p><p>"No, we have
+              to guess something else for numbers between 1 and 6..."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3.0
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Doubling range concept
           feedback:
-          - '"But what if the magician says that his number is smaller than {{answer}}?
-            Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{answer-1}}. That''s {{answer-1}} possible options! I don''t
-            think we could do that in 2 tries. We can do between 1 and 3 in 2 tries
-            though."<div><div>"What number could we guess between 1 and 6 that might
-            bring us back to the ''between 1 and 3'' case?"</div></div><div><br></div>'
+            content_id: feedback_3
+            html: "<p>\"But what if the magician says that his number is smaller than\
+              \ {{answer}}? Then we would only have two tries left, but we would have\
+              \ to guess a number between 1 and {{answer-1}}. That's {{answer-1}}\
+              \ possible options! I don't think we could do that in 2 tries. We can\
+              \ do between 1 and 3 in 2 tries though.\"</p><p>\"What number could\
+              \ we guess between 1 and 6 that might bring us back to the 'between\
+              \ 1 and 3' case?\"</p><p>\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Doubling range concept
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -683,8 +970,10 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -699,62 +988,88 @@ states:
   Explain two guesses:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"So, what''s the best guess to make first if I''m trying to guess a number
+      content_id: content
+      html: <p>"So, what's the best guess to make first if I'm trying to guess a number
         between 1 and 3 in just two tries?"<br><br>"I want it to work all the time,
-        so let''s think about what is the <b>best</b> thing to do in the <b>worst</b>
-        case!"'
+        so let's think about what is the <strong>best</strong> thing to do in the
+        <strong>worst</strong> case!"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"But then in the worst case, the number could be either 2 or 3, and we''d
-            only have one try left to pick between those two! And all we would know
-            is that it''s bigger than 1!"'
+            content_id: feedback_1
+            html: <p>"But then in the worst case, the number could be either 2 or
+              3, and we'd only have one try left to pick between those two! And all
+              we would know is that it's bigger than 1!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"But then in the worst case, the number could be either 1 or 2, and we''d
-            only have one try left to pick between those two. And all we would know
-            is that it''s smaller than 3!"'
+            content_id: feedback_2
+            html: <p>"But then in the worst case, the number could be either 1 or
+              2, and we'd only have one try left to pick between those two. And all
+              we would know is that it's smaller than 3!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: After three case
           feedback:
-          - '"Interesting! If we pick 2 the first time, then in the worst case the
-            number is either 1 or 3. But the Magician will also tell us if the number
-            is smaller or greater than our guess! So we''ll be able to tell whether
-            it''s 1 or 3 because we''ll know if it''s bigger or smaller than 2!"'
+            content_id: feedback_3
+            html: <p>"Interesting! If we pick 2 the first time, then in the worst
+              case the number is either 1 or 3. But the Magician will also tell us
+              if the number is smaller or greater than our guess! So we'll be able
+              to tell whether it's 1 or 3 because we'll know if it's bigger or smaller
+              than 2!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - '1'
-          - '2'
-          - '3'
+          - <p>1</p>
+          - <p>2</p>
+          - <p>3</p>
       default_outcome:
         dest: Explain two guesses
         feedback:
-        - '"There should be no default"'
+          content_id: default_outcome
+          html: <p>"There should be no default"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -762,66 +1077,93 @@ states:
   Introduction:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "\"So, anyway, he just keeps getting it right and how is that possible,\
+      content_id: content
+      html: "<p>\"So, anyway, he just keeps getting it right and how is that possible,\
         \ I ask you?\"<br>You nod along distractedly.\_<br>She's leading you briskly\
         \ along a sunny path toward the next town, running excitedly, sometimes in\
-        \ circles, sometimes just up the road and back toward you.<br><span><br>\"\
-        He's gotta be cheating. He's probably in cahoots with... everybody in the\
-        \ village! and he tells them what numbers to think of. We need to go and figure\
-        \ this out!\"</span><br>From experience, you know that she means it. She <i>has\
-        \ to</i> figure everything out or she just won't be able to rest. And really,\
-        \ how *can* you rest when you know there's a possibility of a cheating magician\
+        \ circles, sometimes just up the road and back toward you.<br><br>\"He's gotta\
+        \ be cheating. He's probably in cahoots with... everybody in the village!\
+        \ and he tells them what numbers to think of. We need to go and figure this\
+        \ out!\"<br>From experience, you know that she means it. She <em>has to</em>\
+        \ figure everything out or she just won't be able to rest. And really, how\
+        \ *can* you rest when you know there's a possibility of a cheating magician\
         \ right in your town?<br><br>Apparently, this magician can guess, in just\
         \ a few tries, what number anyone is thinking of. Even big numbers, like a\
         \ thousand! If he's cheating and reading minds, he's gotta be stopped! And\
         \ if he's not, you have to meet him and figure out what his secret is!<br><br>\"\
-        So, what do you think? How does he do it?\""
+        So, what do you think? How does he do it?\"</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Town Square
           feedback:
-          - '"Well, let''s just pretend you don''t know what binary search is and
-            go along with the story for a bit, eh?"'
+            content_id: feedback_1
+            html: <p>"Well, let's just pretend you don't know what binary search is
+              and go along with the story for a bit, eh?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: binary
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Town Square
           feedback:
-          - '"You think he reads minds? But then couldn''t he use that for something
-            a bit more flashy than guessing numbers?.."'
+            content_id: feedback_2
+            html: <p>"You think he reads minds? But then couldn't he use that for
+              something a bit more flashy than guessing numbers?.."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: read
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Town Square
           feedback:
-          - <span>"You think he reads minds? But then couldn't he use that for something
-            a bit more flashy than guessing numbers?.."</span>
+            content_id: feedback_3
+            html: <p>"You think he reads minds? But then couldn't he use that for
+              something a bit more flashy than guessing numbers?.."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: mind
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Town Square
           feedback:
-          - '"You think the magician is using... magic?"'
+            content_id: feedback_4
+            html: <p>"You think the magician is using... magic?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: magic
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -831,9 +1173,13 @@ states:
       default_outcome:
         dest: Town Square
         feedback:
-        - '"I''ve got a theory or two, but we should watch him first to figure out
-          what he does."'
+          content_id: default_outcome
+          html: <p>"I've got a theory or two, but we should watch him first to figure
+            out what he does."</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -841,48 +1187,77 @@ states:
   Magician Guesses:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Is it {{guess}}?"'
+      content_id: content
+      html: <p>"Is it {{guess}}?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: lower-reguess
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: higher-reguess
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: correct
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - No, it's smaller
-          - No, it's bigger
-          - Yes, that's correct!
+          - <p>No, it's smaller</p>
+          - <p>No, it's bigger</p>
+          - <p>Yes, that's correct!</p>
       default_outcome:
         dest: correct
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -895,41 +1270,62 @@ states:
   Magician or Player guess:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: You wave your hand until you get the Magician's attention.<br><br>"Ah,
+      content_id: content
+      html: <p>You wave your hand until you get the Magician's attention.<br><br>"Ah,
         welcome back! Would you like to think of a number and see how quickly I can
-        guess it? or would you like to try guessing yourself?"
+        guess it? or would you like to try guessing yourself?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Pick Limit for Magician
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Player Guess Setup
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - Magician guesses my number
-          - I guess Magician's number
+          - <p>Magician guesses my number</p>
+          - <p>I guess Magician's number</p>
       default_outcome:
         dest: Magician or Player guess
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -937,46 +1333,68 @@ states:
   Middle Explanation:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"I see a pattern! the closer we are to the middle between 1 and 10, the
-        better the worst case is! so to get the <b>best worst case</b>, we have to
-        guess as close to the middle as possible."<br><br>"So in this case, if we
-        guess either 5 or 6, the worst case will be that the new range is 5 numbers
-        long. That''s the best we can do!"<div><oppia-noninteractive-image filepath-with-value="&amp;quot;middleworst1-10.png&amp;quot;"></oppia-noninteractive-image><br>"(there''s
+      content_id: content
+      html: <p>"I see a pattern! the closer we are to the middle between 1 and 10,
+        the better the worst case is! so to get the <strong>best worst case</strong>,
+        we have to guess as close to the middle as possible."<br><br>"So in this case,
+        if we guess either 5 or 6, the worst case will be that the new range is 5
+        numbers long. That's the best we can do!"</p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;middleworst1-10_height_511_width_647.png&amp;quot;"></oppia-noninteractive-image><p><br>"(there's
         no whole number exactly between 1 and 10... we could of course try guessing
-        5 and a half, but that doesn''t make a whole lot of sense!)"</div>'
+        5 and a half, but that doesn't make a whole lot of sense!)"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Worst Case start
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - I think I get it now! let me try the whole game out!
-          - That kind of makes sense. But what happens after I guess in the middle
-            the first time? What do I find "the middle" of after that?
+          - <p>I think I get it now! let me try the whole game out!</p>
+          - <p>That kind of makes sense. But what happens after I guess in the middle
+            the first time? What do I find "the middle" of after that?</p>
       default_outcome:
         dest: Middle Explanation
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -984,51 +1402,66 @@ states:
   Middle try it out:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, now you try it out.<br>Pretend we''re guessing a number from 1 to
-        10. You pick what number to guess, and I''ll say what the worst case would
-        be."'
+      content_id: content
+      html: <p>"OK, now you try it out.<br>Pretend we're guessing a number from 1
+        to 10. You pick what number to guess, and I'll say what the worst case would
+        be."</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Middle Explanation
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 10
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - '1'
-          - '2'
-          - '3'
-          - '4'
-          - '5'
-          - '6'
-          - '7'
-          - '8'
-          - '9'
-          - '10'
-          - OK, I understand now! Let's move on.
+          - <p>1</p>
+          - <p>2</p>
+          - <p>3</p>
+          - <p>4</p>
+          - <p>5</p>
+          - <p>6</p>
+          - <p>7</p>
+          - <p>8</p>
+          - <p>9</p>
+          - <p>10</p>
+          - <p>OK, I understand now! Let's move on.</p>
       default_outcome:
         dest: Middle try it out
         feedback:
-        - "If it's less than {{answer+1}}, then the number is between 1 and {{answer}}.\
-          \ That is a range of <b>{{answer}} numbers</b>.\_<div>{{if answer==0 then\
-          \ \"Oh wait, it doesn't make sense for the number to be less than 1! We're\
-          \ guessing a number between 1 and 10!\" else \"\"}}\_\n</div><div>If it\
-          \ IS {{answer+1}}, then we're done! that's definitely not the worst case\
-          \ though.\n\nif it's bigger than {{answer+1}}, then it's between {{answer+2}}\
-          \ and 10. That's a range of <b>{{9-answer}} numbers</b>.\_<div>{{if answer==9\
-          \ then \"Oh wait, it doesn't make sense for the number to be bigger than\
-          \ 10! We're guessing a number between 1 and 10!\" else \"\"}}<br><div>So,\
-          \ the worst case is if the real number is {{if (answer-5==abs(answer-5))\
-          \ then \"less than\" else \"greater than\"}} {{answer+1}}!<br></div></div></div>"
+          content_id: default_outcome
+          html: "<p>If it's less than {{answer+1}}, then the number is between 1 and\
+            \ {{answer}}. That is a range of <strong>{{answer}} numbers</strong>.\_\
+            </p><p>{{if answer==0 then \"Oh wait, it doesn't make sense for the number\
+            \ to be less than 1! We're guessing a number between 1 and 10!\" else\
+            \ \"\"}}\_\n</p><p>If it IS {{answer+1}}, then we're done! that's definitely\
+            \ not the worst case though.\n\nif it's bigger than {{answer+1}}, then\
+            \ it's between {{answer+2}} and 10. That's a range of <strong>{{9-answer}}\
+            \ numbers</strong>.\_</p><p>{{if answer==9 then \"Oh wait, it doesn't\
+            \ make sense for the number to be bigger than 10! We're guessing a number\
+            \ between 1 and 10!\" else \"\"}}<br></p><p>So, the worst case is if the\
+            \ real number is {{if (answer-5==abs(answer-5)) then \"less than\" else\
+            \ \"greater than\"}} {{answer+1}}!<br></p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -1036,27 +1469,41 @@ states:
   Pick Limit for Magician:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, how big of a number do you want me to guess?"'
+      content_id: content
+      html: <p>"OK, how big of a number do you want me to guess?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Pick Limit for Magician
           feedback:
-          - '"No, that could take me more than 19 guesses! Then everyone would get
-            bored. Try something smaller than a million."'
+            content_id: feedback_1
+            html: <p>"No, that could take me more than 19 guesses! Then everyone would
+              get bored. Try something smaller than a million."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1000000.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Think of a number
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1064,65 +1511,92 @@ states:
   Picking in the middle:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "<div>We don't know what number the magician picked (That's the whole\
-        \ point of trying to guess it!), so if we want to come up with a strategy\
-        \ that'll work in <b>all</b> the cases, we can just think about what happens\
-        \ in the <b>worst</b> case. And come up with a strategy where we always do\
-        \ <u>the <b>best</b> thing for the <b>worst</b> case</u>.<br></div><div><div><br></div><div>For\
-        \ example!\_</div><div><br></div><div>Suppose that I'm trying to guess a number\
-        \ from 1 to 10, and I guess '7'.\_</div><div>Then the magician would answer\
-        \ that the real number is either <u>less than</u> 7, <u>greater than</u> 7,\
-        \ or <u>is</u> 7.\_</div><div><oppia-noninteractive-image filepath-with-value=\"\
-        &amp;quot;pick7worst.png&amp;quot;\"></oppia-noninteractive-image><br></div><div>What\
-        \ would be the worst of those cases for me?</div></div>"
+      content_id: content
+      html: "<p>We don't know what number the magician picked (That's the whole point\
+        \ of trying to guess it!), so if we want to come up with a strategy that'll\
+        \ work in <strong>all</strong> the cases, we can just think about what happens\
+        \ in the <strong>worst</strong> case. And come up with a strategy where we\
+        \ always do the <strong>best</strong> thing for the <strong>worst</strong>\
+        \ case.<br></p><p>\_</p><p>For example!\_</p><p>\_</p><p>Suppose that I'm\
+        \ trying to guess a number from 1 to 10, and I guess '7'.\_</p><p>Then the\
+        \ magician would answer that the real number is either less than 7, greater\
+        \ than 7, or is 7.\_</p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;pick7worst_height_653_width_538.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>What would be the worst of those\
+        \ cases for me?</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Middle try it out
           feedback:
-          - '"Exactly! A range of 6 numbers is worse than a range of 3 numbers, and
-            certainly worse than being right on the first try!"'
+            content_id: feedback_1
+            html: <p>"Exactly! A range of 6 numbers is worse than a range of 3 numbers,
+              and certainly worse than being right on the first try!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"No, that doesn''t make sense. Winning is the best possible thing, not
-            the worst!"'
+            content_id: feedback_2
+            html: <p>"No, that doesn't make sense. Winning is the best possible thing,
+              not the worst!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"No, I don''t think so. In this case we would have a range of just 3
-            numbers left to guess. There''s a worse case."'
+            content_id: feedback_3
+            html: <p>"No, I don't think so. In this case we would have a range of
+              just 3 numbers left to guess. There's a worse case."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - The real number is less than 7, so it's between 1 and 6 (6 number range)
-          - The real number IS 7 (so we win!)
-          - The real number is bigger than 7, so it's between 8 and 10 (3 number range)
+          - <p>The real number is less than 7, so it's between 1 and 6 (6 number range)</p>
+          - <p>The real number IS 7 (so we win!)</p>
+          - <p>The real number is bigger than 7, so it's between 8 and 10 (3 number
+            range)</p>
       default_outcome:
         dest: Middle try it out
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -1130,47 +1604,73 @@ states:
   Player Guess Setup:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, I''m thinking of a number between 1 and 100!<br>Make a guess and
-        I''ll tell you if it''s bigger or smaller!<br>See if you can get it in 7 guesses!"'
+      content_id: content
+      html: <p>"OK, I'm thinking of a number between 1 and 100!<br>Make a guess and
+        I'll tell you if it's bigger or smaller!<br>See if you can get it in 7 guesses!"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: PlayerCorrect
           feedback:
-          - '"Hey, that''s right! first try - beginner''s luck!"'
+            content_id: feedback_1
+            html: <p>"Hey, that's right! first try - beginner's luck!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: PlayerGuessing
           feedback:
-          - '"No, it''s smaller than that!"'
+            content_id: feedback_2
+            html: <p>"No, it's smaller than that!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: PlayerGuessing
           feedback:
-          - '"No, it''s bigger than that!"'
+            content_id: feedback_3
+            html: <p>"No, it's bigger than that!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: PlayerGuessing
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1196,8 +1696,11 @@ states:
   PlayerCorrect:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Pretty good! That only took you {{tries}} tries!"'
+      content_id: content
+      html: <p>"Pretty good! That only took you {{tries}} tries!"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1206,8 +1709,13 @@ states:
           value: Continue
       default_outcome:
         dest: correct
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -1215,47 +1723,72 @@ states:
   PlayerGuessing:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: PlayerCorrect
           feedback:
-          - '"That''s right!"'
+            content_id: feedback_1
+            html: <p>"That's right!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: PlayerGuessing
           feedback:
-          - '"No, it''s bigger than that!"'
+            content_id: feedback_2
+            html: <p>"No, it's bigger than that!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: PlayerGuessing
           feedback:
-          - '"No, it''s smaller than that!"'
+            content_id: feedback_3
+            html: <p>"No, it's smaller than that!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: PlayerGuessing
         feedback:
-        - '"This should never happen"'
+          content_id: default_outcome
+          html: <p>"This should never happen"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1268,46 +1801,59 @@ states:
   Ranges:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"The trick to keeping track of all the possible numbers that are left
+      content_id: content
+      html: <p>"The trick to keeping track of all the possible numbers that are left
         is that you only have to remember two numbers - the lowest and highest possible
-        number. But these numbers are <b>variable</b> - one of them changes every
-        time you make a guess."<br><br>"So if we''re guessing a number between 1 and
-        10, then at first we know that the number is <b>greater than</b> 0, and <b>smaller
-        than</b> 11. Or we can just say it''s 0-11"<br><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;range0-11.png&amp;quot;"></oppia-noninteractive-image><br>"Then,
-        suppose we guess 5, and the Magician says it''s bigger than that."<br><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;rangeadd5.png&amp;quot;"></oppia-noninteractive-image><br>"Now
-        we just have to remember that it''s <b>greater than</b> 5, but <b>smaller
-        than</b> 11. In other words, the range is 5-11 "<br><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;range5-11.png&amp;quot;"></oppia-noninteractive-image><br>"Now
-        suppose after that, we guess 7; and the Magician says it''s smaller than that!"<br><br>"What
-        is the range now? put it in the same format as ''0-11'' or ''5-11'' from before."'
+        number. But these numbers are <strong>variable</strong> - one of them changes
+        every time you make a guess."<br><br>"So if we're guessing a number between
+        1 and 10, then at first we know that the number is <strong>greater than</strong>
+        0, and <strong>smaller than</strong> 11. Or we can just say it's 0-11"<br></p><oppia-noninteractive-image
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range0-11_height_131_width_644.png&amp;quot;"></oppia-noninteractive-image><p><br>"Then,
+        suppose we guess 5, and the Magician says it's bigger than that."<br></p><oppia-noninteractive-image
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;rangeadd5_height_246_width_695.png&amp;quot;"></oppia-noninteractive-image><p><br>"Now
+        we just have to remember that it's <strong>greater than</strong> 5, but <strong>smaller
+        than</strong> 11. In other words, the range is 5-11 "<br></p><oppia-noninteractive-image
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range5-11_height_90_width_467.png&amp;quot;"></oppia-noninteractive-image><p><br>"Now
+        suppose after that, we guess 7; and the Magician says it's smaller than that!"<br><br>"What
+        is the range now? put it in the same format as '0-11' or '5-11' from before."</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: practice ranges
           feedback:
-          - '"You got it!"'
+            content_id: feedback_1
+            html: <p>"You got it!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 5-7
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - That's not right... Remember, we already knew it was greater than 5. And
-            the magician gave us a new number it's smaller than.
-          - That's not right... Remember, the magician told us it's smaller than 7.
-            And we already had a number it was greater than.
+            content_id: feedback_2
+            html: <p>That's not right... Remember, we already knew it was greater
+              than 5. And the magician gave us a new number it's smaller than.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '-'
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -1317,10 +1863,15 @@ states:
       default_outcome:
         dest: Ranges
         feedback:
-        - 'I don''t think you''ve got the format right - it should be something like:
+          content_id: default_outcome
+          html: '<p>I don''t think you''ve got the format right - it should be something
+            like:
 
-          X-Y except X and Y will be numbers.'
+            X-Y except X and Y will be numbers.</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -1328,67 +1879,97 @@ states:
   Reduce 3 guesses to 2:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "\"Suppose I knew that I could guess a number from 1 to SOMETHING with\
+      content_id: content
+      html: "<p>\"Suppose I knew that I could guess a number from 1 to SOMETHING with\
         \ three guesses, and I knew exactly what my first guess should be to do this.\
         \ After I made the first guess, I would have two guesses left. And we already\
-        \ know something we can do with two guesses!\"<div><br>\"So let's pretend\
+        \ know something we can do with two guesses!\"</p><p><br>\"So let's pretend\
         \ that after my first guess, we see the same two-guess case that we saw before\
         \ - that we know the magician is thinking of a number between 1 and 3:\"\_\
-        <div><oppia-noninteractive-image filepath-with-value=\"&amp;quot;ThinkOf3.png&amp;quot;\"\
-        ></oppia-noninteractive-image><br></div><div>\"So our first guess, and the\
-        \ information the magician gave us in response, narrowed down our possibilities\
-        \ to numbers between 1 and 3.\"<br></div><div><oppia-noninteractive-image\
-        \ filepath-with-value=\"&amp;quot;3guessSeq1.png&amp;quot;\"></oppia-noninteractive-image><br></div><div>\"\
-        What could his response have been?\"</div><div><oppia-noninteractive-image\
-        \ filepath-with-value=\"&amp;quot;3guessSeq3.png&amp;quot;\"></oppia-noninteractive-image><br></div></div>"
+        </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;ThinkOf3_height_489_width_608.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"So our first guess, and the information\
+        \ the magician gave us in response, narrowed down our possibilities to numbers\
+        \ between 1 and 3.\"<br></p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessSeq1_height_674_width_648.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"What could his response have been?\"\
+        </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;3guessSeq3_height_679_width_648.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Reduce 3 guesses to 2
           feedback:
-          - '"But if our first guess was correct, we wouldn''t need any more guesses!"'
+            content_id: feedback_1
+            html: <p>"But if our first guess was correct, we wouldn't need any more
+              guesses!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Reduce 3 guesses to 2
           feedback:
-          - '"No, I don''t think we could ever make a reasonable guess where the number
-            turned out to be between 1 and 3 and was bigger than our guess"'
+            content_id: feedback_2
+            html: <p>"No, I don't think we could ever make a reasonable guess where
+              the number turned out to be between 1 and 3 and was bigger than our
+              guess"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Reduce2 - what was the guess
           feedback:
-          - '"Yeah, that sounds right! if we narrowed it down to between 1 and 3,
-            then it''s a pretty small number, and we must have guessed something slightly
-            bigger!"'
+            content_id: feedback_3
+            html: <p>"Yeah, that sounds right! if we narrowed it down to between 1
+              and 3, then it's a pretty small number, and we must have guessed something
+              slightly bigger!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - The number is bigger than your guess
-          - The number is smaller than your guess
-          - Your guess is correct
+          - <p>The number is bigger than your guess</p>
+          - <p>The number is smaller than your guess</p>
+          - <p>Your guess is correct</p>
       default_outcome:
         dest: Reduce 3 guesses to 2
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -1396,29 +1977,45 @@ states:
   Reduce2 - what was the guess:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, so if the magician said that the number is less than our guess,
-        and that told us that the number is between 1 and 3, what must our guess have
-        been?"<div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessSeq4.png&amp;quot;"></oppia-noninteractive-image><br></div>'
+      content_id: content
+      html: "<p>\"OK, so if the magician said that the number is less than our guess,\
+        \ and that told us that the number is between 1 and 3, what must our guess\
+        \ have been?\"</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;3guessSeq4_height_693_width_616.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: What if it was bigger than 4
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4.0
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Reduce2 - what was the guess
         feedback:
-        - '"Hmm, but if the number was less than {{answer}}, wouldn''t it be between
-          1 and {{answer-1}}?"'
+          content_id: default_outcome
+          html: <p>"Hmm, but if the number was less than {{answer}}, wouldn't it be
+            between 1 and {{answer-1}}?"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1426,8 +2023,11 @@ states:
   Think of a number:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, think of a number between {{lowest}} and {{highest-1}}"!'
+      content_id: content
+      html: <p>"OK, think of a number between {{lowest}} and {{highest-1}}"!</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1436,8 +2036,13 @@ states:
           value: I thought of a number!
       default_outcome:
         dest: Magician Guesses
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -1454,50 +2059,78 @@ states:
   Three Case:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, that was pretty simple. But what if it''s a number between 1 and
-        3? Now I think there''s some kind of trick I can use to make it go faster."<br>"How
-        many tries do I need to guess a range of 3 numbers?"<div><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;ThinkOf3.png&amp;quot;"></oppia-noninteractive-image><br></div>'
+      content_id: content
+      html: "<p>\"OK, that was pretty simple. But what if it's a number between 1\
+        \ and 3? Now I think there's some kind of trick I can use to make it go faster.\"\
+        <br>\"How many tries do I need to guess a range of 3 numbers?\"</p><oppia-noninteractive-image\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;ThinkOf3_height_489_width_608.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Three Case
           feedback:
-          - '"No, I don''t think I ever need more than 3 guesses if I''m only guessing
-            3 numbers."'
+            content_id: feedback_1
+            html: <p>"No, I don't think I ever need more than 3 guesses if I'm only
+              guessing 3 numbers."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3.0
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Explain two guesses
           feedback:
-          - '"Oh! You think we can still do it in 2?"'
+            content_id: feedback_2
+            html: <p>"Oh! You think we can still do it in 2?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2.0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 3 case 3 tries
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3.0
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Three Case
         feedback:
-        - '"But I made the range bigger! how can I possible need fewer guesses now?"'
+          content_id: default_outcome
+          html: <p>"But I made the range bigger! how can I possible need fewer guesses
+            now?"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1505,79 +2138,122 @@ states:
   Three tries explanation:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;3tree.png&amp;quot;"></oppia-noninteractive-image><br></p><p>"Wow!
-        having three tries means that we can guess any number from 1 to 7! That's
-        a lot better than what we could do with 2 tries!"</p>"In fact, the extra try
-        more than doubled our range! On the first guess, we split our range into two,
-        and then no matter what the magician answers, we only have to deal with <b>half</b>
-        the remaining numbers."<br><br>I think we can <b>generalize</b> this - the
-        idea of halving the range can apply in general, to any range of numbers!"<br><br>"What
-        do you think?"
+      content_id: content
+      html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;3tree_height_408_width_839.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"Wow! having three tries means\
+        \ that we can guess any number from 1 to 7! That's a lot better than what\
+        \ we could do with 2 tries!\"</p><p>\"In fact, the extra try more than doubled\
+        \ our range! On the first guess, we split our range into two, and then no\
+        \ matter what the magician answers, we only have to deal with <strong>half</strong>\
+        \ the remaining numbers.\"<br><br>I think we can <strong>generalize</strong>\
+        \ this - the idea of halving the range can apply in general, to any range\
+        \ of numbers!\"<br><br>\"What do you think?\"</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Picking in the middle
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Worst Case start
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Magician or Player guess
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
-          feedback: []
+          feedback:
+            content_id: feedback_4
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 3
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: 4 tries abstract
           feedback:
-          - Excellent question!
+            content_id: feedback_5
+            html: <p>Excellent question!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 4
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - I'm not sure what you mean yet. How do we split the numbers in half, and
-            why is that always the best thing to do?
-          - I think I understand! Let me try guessing!
-          - Hmm, that's interesting. Let's watch the magician some more - is that
-            what he does, too?
-          - What do you mean by "range"?
-          - Wait, but what happens if we have 4 tries?
+          - <p>I'm not sure what you mean yet. How do we split the numbers in half,
+            and why is that always the best thing to do?</p>
+          - <p>I think I understand! Let me try guessing!</p>
+          - <p>Hmm, that's interesting. Let's watch the magician some more - is that
+            what he does, too?</p>
+          - <p>What do you mean by "range"?</p>
+          - <p>Wait, but what happens if we have 4 tries?</p>
       default_outcome:
         dest: Three tries explanation
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -1585,14 +2261,17 @@ states:
   Town Square:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "You arrive at the town square. There's a magician standing here, and\
+      content_id: content
+      html: "<p>You arrive at the town square. There's a magician standing here, and\
         \ a small crowd of locals surrounding him.\_<br><br>\"{{previousNumber}}!\"\
         \ he exclaims dramatically, pointing his wand at one of the locals. The crowd's\
-        \ collective gaze shifts from the magician to the local.<br><br><span>\"That's\
-        \ right!\" says the local, and the crowd oohs and aahs in appreciation of\
-        \ the Magician's number-guessing powers.<br></span><br>...<br><br>\"You there!\"\
-        \ the magician points to you<br>\"Think of a number between 1 and 85!\""
+        \ collective gaze shifts from the magician to the local.<br><br>\"That's right!\"\
+        \ says the local, and the crowd oohs and aahs in appreciation of the Magician's\
+        \ number-guessing powers.<br><br>...<br><br>\"You there!\" the magician points\
+        \ to you<br>\"Think of a number between 1 and 85!\"</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1601,8 +2280,13 @@ states:
           value: OK, I've thought of a number!
       default_outcome:
         dest: Magician Guesses
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -1631,73 +2315,109 @@ states:
   What if it was bigger than 4:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Alright! So what do we know so far?"<br><br>"We are trying to guess
-        a number in 3 tries. And we decided that on our first try, we should guess
-        the number 4."<div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessSeq5.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"If
-        the magician says his number is less than 4, we already know what to do, and
-        we can definitely guess that number in 2 more tries!"</div><div><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;3tree-half.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"OK,
-        now suppose we guessed 4 but the magician told us his number was bigger than
-        that!"</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessbigger.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"Now
-        we have two tries left, and we know that the number is between 5 and SOMETHING...
-        and we''re trying to figure out what that SOMETHING can be, so that we can
-        still do this in two tries."</div><div><br></div><div>"I have a feeling that
-        we can do almost the same thing as in our ''between 1 and 3'' case, just...
-        shifted."</div><div><p>"What do you think our SOMETHING limit should be?"</p></div>'
+      content_id: content
+      html: "<p>\"Alright! So what do we know so far?\"<br><br>\"We are trying to\
+        \ guess a number in 3 tries. And we decided that on our first try, we should\
+        \ guess the number 4.\"</p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessSeq5_height_594_width_517.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"If the magician says his number\
+        \ is less than 4, we already know what to do, and we can definitely guess\
+        \ that number in 2 more tries!\"</p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3tree-half_height_426_width_711.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"OK, now suppose we guessed 4 but\
+        \ the magician told us his number was bigger than that!\"</p><oppia-noninteractive-image\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessbigger_height_651_width_514.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\"Now we have two tries left, and\
+        \ we know that the number is between 5 and SOMETHING... and we're trying to\
+        \ figure out what that SOMETHING can be, so that we can still do this in two\
+        \ tries.\"</p><p>\_</p><p>\"I have a feeling that we can do almost the same\
+        \ thing as in our 'between 1 and 3' case, just... shifted.\"</p><p>\"What\
+        \ do you think our SOMETHING limit should be?\"</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Three tries explanation
           feedback:
-          - '"Aha! ''between 5 and 7'' is just like ''between 1 and 3'' but shifted
-            over to be bigger than 4!"'
+            content_id: feedback_1
+            html: <p>"Aha! 'between 5 and 7' is just like 'between 1 and 3' but shifted
+              over to be bigger than 4!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 7.0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: What if it was bigger than 4
           feedback:
-          - '"Wait, that doesn''t make sense! how can a number be greater than 4 but
-            less than {{answer}}?"'
+            content_id: feedback_2
+            html: <p>"Wait, that doesn't make sense! how can a number be greater than
+              4 but less than {{answer}}?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 5.0
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: What if it was bigger than 4
           feedback:
-          - '"Hmm, I suppose it''s pretty easy to guess a number between 5 and {{answer}}
-            in 2 tries, but I think we can do even better!"'
+            content_id: feedback_3
+            html: <p>"Hmm, I suppose it's pretty easy to guess a number between 5
+              and {{answer}} in 2 tries, but I think we can do even better!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 7.0
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: What if it was bigger than 4
           feedback:
-          - But there are {{answer-4}} numbers between 5 and {{answer}}! I don't think
-            we can always find the right number in 2 tries if the range is that big.
+            content_id: feedback_4
+            html: <p>But there are {{answer-4}} numbers between 5 and {{answer}}!
+              I don't think we can always find the right number in 2 tries if the
+              range is that big.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 7.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: What if it was bigger than 4
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1705,21 +2425,25 @@ states:
   Worst Case Finished:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "\"Wow, that's pretty good!\" - says the Magician. \"You figured out my\
-        \ trick!\"<br><br>You suddenly realize that he's been watching you practice.<br><br>\"\
+      content_id: content
+      html: "<p>\"Wow, that's pretty good!\" - says the Magician. \"You figured out\
+        \ my trick!\"<br><br>You suddenly realize that he's been watching you practice.<br><br>\"\
         So I guess you weren't really cheating!\" - says your friend<br>\"You just\
         \ knew what the best questions to ask were to get the answer really quickly!\"\
         <br><br>\"That's right! I'm actually pretty lazy. So when people ask me to\
         \ guess a number from 1 to 1000 I really don't feel like going through 1000\
         \ numbers! So I figured out what I can do so I don't have to do too much!\
-        \ See?\"<div><br>He shows you his hand. It's covered in ink scribblings:<br><oppia-noninteractive-image\
-        \ filepath-with-value=\"&amp;quot;Algorithm.png&amp;quot;\"></oppia-noninteractive-image></div><div><br>\"\
-        Just like we did!\"<br><br>\"That's right! \_I call these little notes <b>algorithms</b>.\
-        \ Hey, you guys are pretty clever - maybe you can help me figure out another\
-        \ one! You see, I really want to travel to a Far Away land, but I really don't\
-        \ want to travel more than I have to. So I was thinking...\"<br><br>The three\
-        \ of you walk off along a winding path, planning your next adventure...<br><br></div>"
+        \ See?\"</p><p><br>He shows you his hand. It's covered in ink scribblings:<br></p><oppia-noninteractive-image\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;Algorithm_height_443_width_662.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br>\"Just like we did!\"<br><br>\"That's\
+        \ right! \_I call these little notes <strong>algorithms</strong>. Hey, you\
+        \ guys are pretty clever - maybe you can help me figure out another one! You\
+        \ see, I really want to travel to a Far Away land, but I really don't want\
+        \ to travel more than I have to. So I was thinking...\"<br><br>The three of\
+        \ you walk off along a winding path, planning your next adventure...<br><br></p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1728,8 +2452,13 @@ states:
           value: End of Chapter 1
       default_outcome:
         dest: END
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -1742,110 +2471,159 @@ states:
   Worst Case Guess:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: ' '
+      content_id: content
+      html: <p> </p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Ranges
           feedback:
-          - '"Wait, but I already said that the number is bigger than {{lowest}}!
+            content_id: feedback_1
+            html: '<p>"Wait, but I already said that the number is bigger than {{lowest}}!
 
-            Hmm, there''s gotta be a better way of keeping track of that than just
-            looking through all the answers all the time..."'
+              Hmm, there''s gotta be a better way of keeping track of that than just
+              looking through all the answers all the time..."</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowest}}'
           rule_type: IsLessThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - "\"Wait, but I already said that the number is smaller than {{highest}}!\
-            \ \nHmm, there's gotta be a better way of keeping track of this than just\
-            \ looking through all the previous answers all the time.\""
+            content_id: feedback_2
+            html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
+              \ \nHmm, there's gotta be a better way of keeping track of this than\
+              \ just looking through all the previous answers all the time.\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{highest}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Worst Case Finished
           feedback:
-          - That's right!
+            content_id: feedback_3
+            html: <p>That's right!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{worstnum}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case bigger
           feedback:
-          - '"Let''s say that the number is bigger than that"'
+            content_id: feedback_4
+            html: <p>"Let's say that the number is bigger than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case smaller
           feedback:
-          - '"Let''s say that the number is smaller than that"'
+            content_id: feedback_5
+            html: <p>"Let's say that the number is smaller than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_6
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is smaller than that. Then we know that
-            the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer-lowest-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"</div>'
+              Suppose I say that the number is smaller than that. Then we know that
+              the number has to be bigger than {{lowest}} but smaller than {{answer}}.
+              But that still leaves a range of {{answer-lowest-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{upperBound}}'
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_7
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is bigger than that. Then we know that the
-            number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest-answer-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"<br></div>'
+              Suppose I say that the number is bigger than that. Then we know that
+              the number has to be bigger than {{answer}} but smaller than {{highest}}.
+              But that still leaves a range of {{highest-answer-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"<br></p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
         feedback:
-        - '{{rangeSize}}
+          content_id: default_outcome
+          html: '<p>{{rangeSize}}
 
-          {{worstnum}}
+            {{worstnum}}
 
-          {{answer}}
+            {{answer}}
 
-          {{middle}}'
+            {{middle}}</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -1888,11 +2666,15 @@ states:
   Worst Case start:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, but just to be sure our strategy works in all cases, instead of
-        <i>really</i> thinking of a number, I''m going to give you the <b>worst-case
-        </b>answer every time you pick. That way, we can be sure that this trick will
-        work<b> at least </b>as well in all the other cases, and maybe even better!"<br>'
+      content_id: content
+      html: <p>"OK, but just to be sure our strategy works in all cases, instead of
+        <em>really</em> thinking of a number, I'm going to give you the <strong>worst-case
+        </strong>answer every time you pick. That way, we can be sure that this trick
+        will work<strong> at least </strong>as well in all the other cases, and maybe
+        even better!"<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1902,8 +2684,12 @@ states:
       default_outcome:
         dest: Worst Case Guess
         feedback:
-        - '"OK, try to guess a number between 1 and 30!"'
+          content_id: default_outcome
+          html: <p>"OK, try to guess a number between 1 and 30!"</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -1923,50 +2709,78 @@ states:
   correct:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: The crowd goes wild again!<br>"Do you want to play again?" asks the magician.
-        "I'll even let you pick a bigger number this time!"
+      content_id: content
+      html: <p>The crowd goes wild again!<br>"Do you want to play again?" asks the
+        magician. "I'll even let you pick a bigger number this time!"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Pick Limit for Magician
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Discussion Start
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Player Guess Setup
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - Let's play again
-          - No, not right now. I need to confer with my colleague.
-          - This time, I want to try guessing!
+          - <p>Let's play again</p>
+          - <p>No, not right now. I need to confer with my colleague.</p>
+          - <p>This time, I want to try guessing!</p>
       default_outcome:
         dest: correct
         feedback:
-        - ERROR
+          content_id: default_outcome
+          html: <p>ERROR</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -1974,49 +2788,77 @@ states:
   higher-reguess:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Is it {{guess}}"?'
+      content_id: content
+      html: <p>"Is it {{guess}}"?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: lower-reguess
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: higher-reguess
           feedback:
-          - Is it {{precomputeGuess}}?
+            content_id: feedback_2
+            html: <p>Is it {{precomputeGuess}}?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: correct
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - No, it's smaller
-          - No, it's bigger
-          - Yes, that's right!
+          - <p>No, it's smaller</p>
+          - <p>No, it's bigger</p>
+          - <p>Yes, that's right!</p>
       default_outcome:
         dest: correct
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -2044,49 +2886,77 @@ states:
   lower-reguess:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"Is it {{guess}}?"'
+      content_id: content
+      html: <p>"Is it {{guess}}?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: lower-reguess
           feedback:
-          - Is it {{precomputeGuess}}?
+            content_id: feedback_1
+            html: <p>Is it {{precomputeGuess}}?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: higher-reguess
-          feedback: []
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: correct
-          feedback: []
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - No, it's smaller
-          - No, it's bigger
-          - Yes, that's right!
+          - <p>No, it's smaller</p>
+          - <p>No, it's bigger</p>
+          - <p>Yes, that's right!</p>
       default_outcome:
         dest: correct
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -2114,41 +2984,60 @@ states:
   practice ranges:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, suppose that we knew the number was bigger than {{lowest}} but smaller
-        than {{highest}}."<br><br>"And suppose we guess {{guess}}, and the magician
-        tells us it''s {{comparison}} than that."<br><br>What''s the new <b>upper
-        limit</b>? That is, what is our number <b>smaller than</b>?'
+      content_id: content
+      html: <p>"OK, suppose that we knew the number was bigger than {{lowest}} but
+        smaller than {{highest}}."<br><br>"And suppose we guess {{guess}}, and the
+        magician tells us it's {{comparison}} than that."<br><br>What's the new <strong>upper
+        limit</strong>? That is, what is our number <strong>smaller than</strong>?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: practice ranges lowest
           feedback:
-          - '"Yep!"'
+            content_id: feedback_1
+            html: <p>"Yep!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{newHighest}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: practice ranges
           feedback:
-          - Well, technically that's true... it does have to be smaller than {{answer}}.
-            But we can be even more precise!
+            content_id: feedback_2
+            html: <p>Well, technically that's true... it does have to be smaller than
+              {{answer}}. But we can be even more precise!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{newHighest}}'
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: practice ranges
         feedback:
-        - No, we can't really say that!
+          content_id: default_outcome
+          html: <p>No, we can't really say that!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -2197,41 +3086,60 @@ states:
   practice ranges lowest:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '"OK, so what is our <b>lower limit</b>? what does the number have to
-        be greater than?"'
+      content_id: content
+      html: <p>"OK, so what is our <strong>lower limit</strong>? what does the number
+        have to be greater than?"</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Worst Case start
           feedback:
-          - '"You got it! Alright, now let''s practice the whole game!"'
+            content_id: feedback_1
+            html: <p>"You got it! Alright, now let's practice the whole game!"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{newLowest}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: practice ranges lowest
           feedback:
-          - '"Technically, it does have to be smaller than {{answer}}... but that''s
-            not the best we can do! What''s the biggest number it has to be smaller
-            than?"'
+            content_id: feedback_2
+            html: <p>"Technically, it does have to be smaller than {{answer}}... but
+              that's not the best we can do! What's the biggest number it has to be
+              smaller than?"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{newLowest}}'
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: practice ranges lowest
         feedback:
-        - '"No, that''s not right... the number doesn''t have to be bigger than that
-          based on the information we have."'
+          content_id: default_outcome
+          html: <p>"No, that's not right... the number doesn't have to be bigger than
+            that based on the information we have."</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -2239,110 +3147,159 @@ states:
   worst case bigger:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Ranges
           feedback:
-          - '"Wait, but I already said that the number is bigger than {{lowest}}!
+            content_id: feedback_1
+            html: '<p>"Wait, but I already said that the number is bigger than {{lowest}}!
 
-            Hmm, there''s gotta be a better way of keeping track of that than just
-            looking through all the answers all the time..."'
+              Hmm, there''s gotta be a better way of keeping track of that than just
+              looking through all the answers all the time..."</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowest}}'
           rule_type: IsLessThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - "\"Wait, but I already said that the number is smaller than {{highest}}!\
-            \ \nHmm, there's gotta be a better way of keeping track of this than just\
-            \ looking through all the previous answers all the time.\""
+            content_id: feedback_2
+            html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
+              \ \nHmm, there's gotta be a better way of keeping track of this than\
+              \ just looking through all the previous answers all the time.\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{highest}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Worst Case Finished
           feedback:
-          - That's right!
+            content_id: feedback_3
+            html: <p>That's right!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{worstnum}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case bigger
           feedback:
-          - '"Let''s say that the number is bigger than that"'
+            content_id: feedback_4
+            html: <p>"Let's say that the number is bigger than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case smaller
           feedback:
-          - '"Let''s say that the number is smaller than that"'
+            content_id: feedback_5
+            html: <p>"Let's say that the number is smaller than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_6
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is smaller than that. Then we know that
-            the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer-lowest-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"<br></div>'
+              Suppose I say that the number is smaller than that. Then we know that
+              the number has to be bigger than {{lowest}} but smaller than {{answer}}.
+              But that still leaves a range of {{answer-lowest-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"<br></p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{upperBound}}'
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_7
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is bigger than that. Then we know that the
-            number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest-answer-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"<br></div>'
+              Suppose I say that the number is bigger than that. Then we know that
+              the number has to be bigger than {{answer}} but smaller than {{highest}}.
+              But that still leaves a range of {{highest-answer-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"<br></p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
         feedback:
-        - '{{rangeSize}}
+          content_id: default_outcome
+          html: '<p>{{rangeSize}}
 
-          {{worstnum}}
+            {{worstnum}}
 
-          {{answer}}
+            {{answer}}
 
-          {{middle}}'
+            {{middle}}</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -2395,110 +3352,159 @@ states:
   worst case smaller:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Ranges
           feedback:
-          - '"Wait, but I already said that the number is bigger than {{lowest}}!
+            content_id: feedback_1
+            html: '<p>"Wait, but I already said that the number is bigger than {{lowest}}!
 
-            Hmm, there''s gotta be a better way of keeping track of that than just
-            looking through all the answers all the time..."'
+              Hmm, there''s gotta be a better way of keeping track of that than just
+              looking through all the answers all the time..."</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowest}}'
           rule_type: IsLessThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Ranges
           feedback:
-          - "\"Wait, but I already said that the number is smaller than {{highest}}!\
-            \ \nHmm, there's gotta be a better way of keeping track of this than just\
-            \ looking through all the previous answers all the time.\""
+            content_id: feedback_2
+            html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
+              \ \nHmm, there's gotta be a better way of keeping track of this than\
+              \ just looking through all the previous answers all the time.\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{highest}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Worst Case Finished
           feedback:
-          - That's right!
+            content_id: feedback_3
+            html: <p>That's right!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{worstnum}}'
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case bigger
           feedback:
-          - '"Let''s say that the number is bigger than that"'
+            content_id: feedback_4
+            html: <p>"Let's say that the number is bigger than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsLessThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: worst case smaller
           feedback:
-          - '"Let''s say that the number is smaller than that"'
+            content_id: feedback_5
+            html: <p>"Let's say that the number is smaller than that"</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{middle}}'
           rule_type: IsGreaterThanOrEqualTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_6
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is smaller than that. Then we know that
-            the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer-lowest-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"<br></div>'
+              Suppose I say that the number is smaller than that. Then we know that
+              the number has to be bigger than {{lowest}} but smaller than {{answer}}.
+              But that still leaves a range of {{answer-lowest-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"<br></p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{upperBound}}'
           rule_type: IsGreaterThan
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Picking in the middle
           feedback:
-          - '"Hmm, I don''t know if that was the best guess to make.
+            content_id: feedback_7
+            html: '<p>"Hmm, I don''t know if that was the best guess to make.
 
-            Suppose I say that the number is bigger than that. Then we know that the
-            number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest-answer-2}} numbers! I think
-            that''s too many."<div>"We should always pick numbers in the middle of
-            the possible range, remember?"<br></div>'
+              Suppose I say that the number is bigger than that. Then we know that
+              the number has to be bigger than {{answer}} but smaller than {{highest}}.
+              But that still leaves a range of {{highest-answer-2}} numbers! I think
+              that''s too many."</p><p>"We should always pick numbers in the middle
+              of the possible range, remember?"<br></p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
         feedback:
-        - '{{rangeSize}}
+          content_id: default_outcome
+          html: '<p>{{rangeSize}}
 
-          {{worstnum}}
+            {{worstnum}}
 
-          {{answer}}
+            {{answer}}
 
-          {{middle}}'
+            {{middle}}</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -2548,6 +3554,6 @@ states:
         value: '{{highest-largestValidRange-1}}'
       generator_id: Copier
       name: lowerBound
-states_schema_version: 13
+states_schema_version: 25
 tags: []
 title: The Lazy Magician
