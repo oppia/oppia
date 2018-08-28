@@ -626,6 +626,9 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
 
+    # Delete the summary of the topic (regardless of whether
+    # force_deletion is True or not).
+    delete_topic_summary(topic_id)
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
@@ -638,10 +641,6 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # key will be reinstated.
     topic_memcache_key = _get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
-
-    # Delete the summary of the topic (regardless of whether
-    # force_deletion is True or not).
-    delete_topic_summary(topic_id)
 
 
 def delete_topic_summary(topic_id):

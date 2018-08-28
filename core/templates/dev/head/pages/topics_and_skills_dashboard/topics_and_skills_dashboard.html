@@ -23,8 +23,7 @@
     </div>
     <div ng-if="topicSummaries.length > 0 || untriagedSkillSummaries.length > 0 || unpublishedSkillSummaries.length > 0">
       <ul class="dashboard-tabs">
-        <li ng-if="topicSummaries.length > 0"
-            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
+        <li ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
           <a class="dashboard-tabs-text"
              ng-click="setActiveTab(TAB_NAME_TOPICS)">
              Topics
@@ -34,23 +33,27 @@
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
           <a class="dashboard-tabs-text"
              ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
-             Untriaged Skills
+             Unused Skills (<[untriagedSkillSummaries.length]>)
           </a>
         </li>
         <li ng-if="unpublishedSkillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNPUBLISHED_SKILLS}">
           <a class="dashboard-tabs-text"
              ng-click="setActiveTab(TAB_NAME_UNPUBLISHED_SKILLS)">
-             Unpublished Skills
+             Unpublished Skills (<[unpublishedSkillSummaries.length]>)
           </a>
         </li>
       </ul>
 
       <div ng-if="activeTab === TAB_NAME_TOPICS">
         <topics-list topic-summaries="topicSummaries"
+                     ng-if="topicSummaries.length > 0"
                      user-can-delete-topic="userCanDeleteTopic"
                      in-modal="false">
         </topics-list>
+        <p class="intro-card-message" ng-if="isTopicTabHelpTextVisible()" style="padding-top: 6px;">
+          No topics have been created yet.
+        </p>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
@@ -77,12 +80,17 @@
                 ng-if="userCanCreateTopic">
           Create Topic
         </button>
+        <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+                style="color: white; text-decoration: none;"
+                ng-click="createSkill()"
+                ng-if="userCanCreateSkill">
+          Create Skill
+        </button>
       </blockquote>
     </div>
   </div>
   <style>
     .oppia-topics-and-skills-dashboard .dashboard-tabs {
-      border-bottom: 1px solid #eee;
       display: -webkit-flex;
       display: flex;
       flex-wrap: wrap;
@@ -97,7 +105,7 @@
       display: -webkit-flex;
       display: flex;
       margin-bottom: 0;
-      width: 200px;
+      width: 250px;
     }
     .oppia-topics-and-skills-dashboard .dashboard-title {
       color: #01645c;

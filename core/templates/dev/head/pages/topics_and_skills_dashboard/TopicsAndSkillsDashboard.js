@@ -28,16 +28,16 @@ oppia.constant(
   'topicsAndSkillsDashboardReinitialized');
 
 oppia.controller('TopicsAndSkillsDashboard', [
-  '$scope', '$rootScope', '$http', '$window',
+  '$scope', '$rootScope', '$http', '$window', '$uibModal',
   'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
-  'UrlInterpolationService', 'TopicCreationService',
+  'UrlInterpolationService', 'TopicCreationService', 'SkillCreationService',
   'FATAL_ERROR_CODES', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
   'EVENT_TYPE_SKILL_CREATION_ENABLED',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   function(
-      $scope, $rootScope, $http, $window,
+      $scope, $rootScope, $http, $window, $uibModal,
       AlertsService, TopicsAndSkillsDashboardBackendApiService,
-      UrlInterpolationService, TopicCreationService,
+      UrlInterpolationService, TopicCreationService, SkillCreationService,
       FATAL_ERROR_CODES, EVENT_TYPE_TOPIC_CREATION_ENABLED,
       EVENT_TYPE_SKILL_CREATION_ENABLED,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
@@ -85,11 +85,42 @@ oppia.controller('TopicsAndSkillsDashboard', [
       );
     };
 
+    $scope.isTopicTabHelpTextVisible = function() {
+      return (
+        ($scope.topicSummaries.length === 0) &&
+        ($scope.untriagedSkillSummaries.length > 0 ||
+        $scope.unpublishedSkillSummaries.length > 0));
+    };
     $scope.setActiveTab = function(tabName) {
       $scope.activeTab = tabName;
     };
     $scope.createTopic = function() {
       TopicCreationService.createNewTopic();
+    };
+    $scope.createSkill = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topics_and_skills_dashboard/' +
+          'create_new_skill_modal_directive.html'),
+        backdrop: 'static',
+        controller: [
+          '$scope', '$uibModalInstance',
+          function($scope, $uibModalInstance) {
+            $scope.newSkillDescription = '';
+            $scope.createNewSkill = function() {
+              $uibModalInstance.close({
+                description: $scope.newSkillDescription
+              });
+            };
+
+            $scope.cancel = function() {
+              $uibModalInstance.dismiss('cancel');
+            };
+          }
+        ]
+      }).result.then(function(result) {
+        SkillCreationService.createNewSkill(result.description);
+      });
     };
 
     _initDashboard();

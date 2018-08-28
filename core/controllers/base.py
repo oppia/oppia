@@ -197,6 +197,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
+        self.values['is_topic_manager'] = (
+            user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):

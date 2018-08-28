@@ -6,57 +6,54 @@
   </div>
   <div class="modal-body">
     <div class="subtopic-title">
-      <span ng-if="!subtopicTitleEditorIsShown" ng-click="openSubtopicTitleEditor()"
-            class="oppia-editable-section">
-        <strong style="font-size: 1.2em;"><[editableTitle]></strong>
-        <i class="material-icons oppia-editor-edit-icon"
-           title="Edit Subtopic Title">&#xE254;
-        </i>
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Title</strong>
+      </p>
+      <form class="form-horizontal" role="form">
+        <input class="form-control" type="text" ng-blur="updateSubtopicTitle(editableTitle)" ng-model="editableTitle" maxlength="80" ng-change="resetErrorMsg()">
+      </form>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+        <em><[errorMsg]></em>
       </span>
-      <span ng-if="subtopicTitleEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateSubtopicTitle(editableTitle)">
-          <input type="text" ng-model="editableTitle">
-          <button type="submit" ng-disabled="editableTitle === ''" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeSubtopicTitleEditor()">Cancel</button>
-        </form>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 80">
+        <em>The maximum length of subtopic title is 80 characters.</em>
       </span>
     </div>
     <div class="subtopic-page-editor">
-      <strong> Subtopic Page </strong>
-      <div ng-if="!subtopicEditorIsShown" class="preview">
-        <angular-html-bind html-data="htmlData">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Page</strong>
+      </p>
+      <div ng-if="!subtopicEditorIsShown" class="preview" ng-click="closePreviewSubtopicPage(htmlData)">
+        <span ng-if="htmlData === ''" class="oppia-placeholder">
+          Click here to add content for the subtopic pages.
+        </span>
+        <angular-html-bind class="oppia-rte-editor"
+                           html-data="htmlData">
         </angular-html-bind>
-        <div class="pull-right">
-          <button type="button"
-                  class="btn btn-default save-button"
-                  ng-click="closePreviewSubtopicPage(htmlData)">
-            Edit
-          </button>
-        </div>
       </div>
       <div ng-if="subtopicEditorIsShown" class="oppia-editor-card-body">
         <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
                              local-value="htmlData">
         </schema-based-editor>
 
-        <div class="pull-right">
+        <div style="padding-top: 5px;">
+          <button type="button"
+                  class="btn btn-default save-button"
+                  ng-click="openPreviewSubtopicPage()">
+            Cancel
+          </button>
           <button type="button"
                   class="btn btn-success save-button"
                   ng-click="updateHtmlData(htmlData)">
             Save
-          </button>
-          <button type="button"
-                  class="btn btn-default save-button"
-                  ng-click="openPreviewSubtopicPage(htmlData)">
-            Preview
           </button>
         </div>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" ng-disabled="editableTitle === ''" ng-click="save()"> Done </button>
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-primary" ng-disabled="editableTitle === ''" ng-click="save()"> Done </button>
   </div>
 </div>
 
@@ -67,5 +64,9 @@
 
   .subtopic-editor .modal-body .subtopic-title {
     margin-bottom: 3%;
+  }
+
+  .subtopic-editor .modal-footer{
+    margin-top: 50px;
   }
 </style>
