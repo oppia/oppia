@@ -729,14 +729,14 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
             for url in image_urls:
                 catched_groups = GCS_IMAGE_ID_REGEX.match(url)
                 if not catched_groups:
-                    yield (INVALID_GCS_URL, url)
+                    yield (INVALID_GCS_URL, url.encode('utf-8'))
                 else:
                     try:
                         filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
-                        if fs_old.isfile('image/%s' % filename):
-                            yield (FILE_FOUND_IN_GCS, filename)
+                        if fs_old.isfile('image/%s' % filename.encode('utf-8')):
+                            yield (FILE_FOUND_IN_GCS, filename.encode('utf-8'))
                     except Exception:
-                        yield (ERROR_IN_FILENAME, url)
+                        yield (ERROR_IN_FILENAME, url.encode('utf-8'))
             for url in audio_urls:
                 catched_groups = GCS_AUDIO_ID_REGEX.match(url)
                 if not catched_groups:
