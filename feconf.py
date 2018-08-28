@@ -295,7 +295,7 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
-    """Returns a copy of the Empty Ratings object.
+    """Returns a copy of the empty ratings object.
 
     Returns:
         dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
