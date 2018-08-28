@@ -18,7 +18,7 @@ describe('DragAndDropSortInputValidationService', function() {
   var currentState;
   var answerGroups, goodDefaultOutcome;
   var equalsListWithEmptyValuesRule, equalsListWithDuplicatesRule,
-    equalsListWithAllowedValuesRule, equalsListWithValuesRule;
+    equalsListWithAllowedValuesRule, equalsListWithValuesRule, hasXBeforeYRule;
   var customizationArgs;
   var oof, agof, rof;
 
@@ -80,6 +80,14 @@ describe('DragAndDropSortInputValidationService', function() {
       }
     });
 
+    hasXBeforeYRule = rof.createFromBackendDict({
+      rule_type: 'HasElementXBeforeElementY',
+      inputs: {
+        x: 'b',
+        y: 'b'
+      }
+    });
+
     answerGroups = [agof.createNew(
       [equalsListWithAllowedValuesRule],
       goodDefaultOutcome,
@@ -117,6 +125,17 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
+  it('should expect at least two choices', function() {
+    customizationArgs.choices.value = ['1'];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please enter at least two choices.'
+    }]);
+  });
+
   it('should expect all choices to be nonempty', function() {
     // Set the first choice to empty.
     customizationArgs.choices.value[0] = '';
@@ -151,6 +170,18 @@ describe('DragAndDropSortInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
+  it('should catch non-distinct selected choices', function() {
+    answerGroups[0].rules = [hasXBeforeYRule];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 1 will never be matched ' +
+          'because both the selected elements are same.'
     }]);
   });
 });

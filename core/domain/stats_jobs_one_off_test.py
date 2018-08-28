@@ -713,7 +713,6 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
-    session_id_1 = 'session_id_1'
 
     def setUp(self):
         super(RecomputeActualStartStatisticsTest, self).setUp()
@@ -731,28 +730,28 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_1',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id2',
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_2',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id3',
             exp_id=self.exp_id,
             exp_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_3',
             event_schema_version=1).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id4',
             exp_id=self.exp_id,
             exp_version=2,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_4',
             event_schema_version=2).put()
 
         state_stats_dict = {
@@ -818,7 +817,6 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
-    session_id_1 = 'session_id_1'
 
     def setUp(self):
         super(RecomputeCompleteEventStatisticsTest, self).setUp()
@@ -834,7 +832,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_1',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -845,7 +843,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=self.exp_version,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_2',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -856,7 +854,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             exploration_id=self.exp_id,
             exploration_version=2,
             state_name=self.state,
-            session_id=self.session_id_1,
+            session_id='session_id_3',
             client_time_spent_in_secs=1.0,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,

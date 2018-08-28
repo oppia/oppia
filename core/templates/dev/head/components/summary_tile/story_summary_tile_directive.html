@@ -1,0 +1,44 @@
+<a ng-href="<[getStoryLink()]>">
+  <div class="oppia-story-image">
+    <img ng-src="<[getStaticImageUrl('/icons/story-image-icon.png')]>" alt="">
+  </div>
+  <div class="oppia-story-details">
+    <div class="oppia-story-title">
+      <[::getStoryTitle()]>
+    </div>
+    <div class="oppia-story-description">
+      <[::getStoryDescription()]>
+    </div>
+  </div>
+</a>
+<style>
+  story-summary-tile a {
+    padding: 20px;
+  }
+  story-summary-tile .oppia-story-image {
+    padding: 0 34px 0 34px;
+  }
+  story-summary-tile .oppia-story-details {
+    padding: 10px;
+  }
+  story-summary-tile .oppia-story-title {
+    display: block;
+    color: #4a4a4a;
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: bold;
+    padding-bottom: 20px;
+  }
+  story-summary-tile .oppia-story-description {
+    display: block;
+    color: #4a4a4a;
+    text-align: center;
+    font-size: 1.1em;
+    position: absolute;
+    bottom: 10px;
+    padding-right: 10px;
+  }
+  story-summary-tile a:hover {
+    text-decoration: none;
+  }
+</style>

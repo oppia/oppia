@@ -158,7 +158,7 @@ var CollectionEditorPage = function() {
   };
 
   // Saves changes and publishes collection.
-  this.saveChanges = function () {
+  this.saveChanges = function() {
     waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
     saveChangesButton.click();

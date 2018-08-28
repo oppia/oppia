@@ -35,16 +35,16 @@ oppia.directive('ruleEditor', [
         '/components/' +
         'rule_editor_directive.html'),
       controller: [
-        '$scope', '$timeout', 'EditorStateService',
-        'ExplorationStatesService', 'RouterService', 'ValidatorsService',
-        'ResponsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'StateEditorService',
+        'ValidatorsService', 'INTERACTION_SPECS',
+        'ResponsesService', 'StateInteractionIdService',
         function(
-            $scope, $timeout, EditorStateService,
-            ExplorationStatesService, RouterService, ValidatorsService,
-            ResponsesService, stateInteractionIdService, INTERACTION_SPECS) {
+            $scope, $timeout, StateEditorService,
+            ValidatorsService, INTERACTION_SPECS,
+            ResponsesService, StateInteractionIdService) {
           var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
-          $scope.currentInteractionId = stateInteractionIdService.savedMemento;
+          $scope.currentInteractionId = StateInteractionIdService.savedMemento;
           $scope.editRuleForm = {};
 
           // This returns the rule description string.
@@ -106,6 +106,34 @@ oppia.directive('ruleEditor', [
                     );
                     result.push({
                       type: 'dropdown',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropHtmlString') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropHtmlStringSelect',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropPositiveIntSelect',
                       varName: finalInputArray[i + 1]
                     });
                   } else {

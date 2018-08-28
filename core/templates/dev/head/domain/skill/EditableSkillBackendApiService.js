@@ -16,6 +16,10 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
+oppia.constant(
+  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
+  '/skill_editor_handler/data/<skill_id>');
+
 oppia.factory('EditableSkillBackendApiService', [
   '$http', '$q', 'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function(

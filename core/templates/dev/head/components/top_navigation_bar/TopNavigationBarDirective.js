@@ -87,6 +87,10 @@ oppia.directive('topNavigationBar', [
               $window.location = GLOBALS.loginUrl;
             }, 150);
           };
+
+          $scope.googleSignInIconUrl = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/google_signin_buttons/google_signin.svg'));
           $scope.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };

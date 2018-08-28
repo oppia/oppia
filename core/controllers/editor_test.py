@@ -20,8 +20,8 @@ import logging
 import os
 import zipfile
 
+from constants import constants
 from core.controllers import creator_dashboard
-from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -139,7 +139,14 @@ class EditorTest(BaseEditorControllerTest):
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
+        self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
+        # Validates if the current NEW_STATE_TEMPLATE is the latest version
+        # by validating it.
+        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
+        self.assertEqual(
+            feconf.CURRENT_STATES_SCHEMA_VERSION,
+            constants.CURRENT_STATES_SCHEMA_VERSION)
+
 
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
@@ -535,14 +542,48 @@ param_changes: []
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
-        exploration.rename_state('State 2', 'State B')
-        exploration.delete_state('State 3')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 2',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 3',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State A',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State 2',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State 3',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'State 2',
+                    'new_state_name': 'State B'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'State 3',
+                })], 'changes')
+        exploration = exp_services.get_exploration_by_id(exp_id)
         response = self.testapp.get('/create/%s' % exp_id)
 
         # Check download to zip file.
@@ -638,27 +679,27 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             rights_manager.ROLE_TRANSLATOR)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % unpublished_exp_id)
-        self.assertEqual(response.status_int, 200)
+        self.delete_json(
+            '/createhandler/data/%s' % unpublished_exp_id,
+            expected_status_int=200)
         self.logout()
 
     def test_deletion_rights_for_published_exploration(self):
@@ -677,33 +718,33 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            expected_status_int=401)
         self.logout()
 
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.delete(
-            '/createhandler/data/%s' % published_exp_id)
-        self.assertEqual(response.status_int, 200)
+        self.delete_json(
+            '/createhandler/data/%s' % published_exp_id,
+            expected_status_int=200)
         self.logout()
 
     def test_logging_info_after_deletion(self):
@@ -728,7 +769,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.owner_id, exploration)
 
             self.login(self.OWNER_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
 
             # Observed_log_messages[1] is 'Attempting to delete documents
@@ -755,7 +796,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.admin_id, exploration)
 
             self.login(self.ADMIN_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
@@ -776,7 +817,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.moderator_id, exploration)
 
             self.login(self.MODERATOR_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(

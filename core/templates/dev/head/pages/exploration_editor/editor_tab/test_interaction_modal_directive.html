@@ -13,7 +13,7 @@
             <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
           </td>
           <td class="preview-conversation-skin-learner-input">
-            <angular-html-bind html-data="inputTemplate()"></angular-html-bind>
+            <angular-html-bind html-data="getInputTemplate()"></angular-html-bind>
           </td>
         </tr>
       </table>
@@ -23,7 +23,7 @@
     <div>
       <md-card class="preview-conversation-skin-supplemental-card">
         <div>
-          <angular-html-bind html-data="inputTemplate()">
+          <angular-html-bind html-data="getInputTemplate()">
           </angular-html-bind>
         </div>
       </md-card>
@@ -32,7 +32,7 @@
   <br>
   <div class="submit-answer-btn">
     <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
-               ng-disabled="!interactionAnswerIsValid"
+               ng-disabled="isSubmitButtonDisabled()"
                ng-click="onSubmitAnswerFromButton()"
                translate="I18N_INTERACTIONS_SUBMIT">
     </md-button>

@@ -92,14 +92,37 @@ else
   $PYTHON_CMD scripts/build.py
 fi
 
+# Set up a local dev instance.
+# TODO(sll): do this in a new shell.
+echo Starting GAE development server
+# To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
+# settings in feconf.py. Be careful with this -- you do not want to spam people
+# accidentally!
+
+
+($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG)&
+
+
+# Wait for the servers to come up.
+while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
+
 # Launch a browser window.
 if [ ${OS} == "Linux" ]; then
-  echo ""
-  echo "  INFORMATION"
-  echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  default browser window pointing to this server."
-  echo ""
-  (sleep 5; xdg-open http://localhost:8181/ )&
+  detect_virtualbox="$(ls -1 /dev/disk/by-id/)"
+  if [[ $detect_virtualbox = *"VBOX"* ]]; then
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server. You can access this server"
+    echo "  by navigating to localhost:8181 in a browser window."
+    echo ""
+  else
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server at localhost:8181. Opening a"
+    echo "  default browser window pointing to this server."
+    echo ""
+    (sleep 5; xdg-open http://localhost:8181/ )&
+  fi
 elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
@@ -115,14 +138,18 @@ else
   echo ""
 fi
 
-# Set up a local dev instance.
-# TODO(sll): do this in a new shell.
-echo Starting GAE development server
-# To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
-# settings in feconf.py. Be careful with this -- you do not want to spam people
-# accidentally!
-
-
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG
-
 echo Done!
+
+# Function for waiting for the servers to go down.
+function cleanup {
+  echo ""
+  echo "  INFORMATION"
+  echo "  Cleaning up the servers."
+  echo ""
+  while ( nc -vz localhost 8181 >/dev/null 2>&1 ); do sleep 1; done
+}
+
+# Runs cleanup function on exit.
+trap cleanup Exit
+
+wait

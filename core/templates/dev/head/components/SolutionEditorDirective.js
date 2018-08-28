@@ -17,44 +17,44 @@
  */
 
 oppia.directive('solutionEditor', [
-  '$uibModal', 'UrlInterpolationService', 'stateSolutionService',
-  'EditorStateService', 'ExplorationStatesService',
-  'ExplorationWarningsService', 'AlertsService',
+  '$uibModal', 'UrlInterpolationService', 'StateSolutionService',
+  'StateEditorService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateCustomizationArgsService',
+  'StateInteractionIdService', 'StateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  function($uibModal, UrlInterpolationService, stateSolutionService,
-      EditorStateService, ExplorationStatesService,
-      ExplorationWarningsService, AlertsService,
+  function($uibModal, UrlInterpolationService, StateSolutionService,
+      StateEditorService, AlertsService,
       SolutionObjectFactory, SolutionVerificationService,
       ContextService, ExplorationHtmlFormatterService,
-      stateInteractionIdService, stateCustomizationArgsService,
+      StateInteractionIdService, StateCustomizationArgsService,
       INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
       restrict: 'E',
       scope: {
         getInteractionId: '&interactionId',
+        onSaveSolution: '=',
+        onSaveContentIdsToAudioTranslations: '=',
         correctAnswerEditorHtml: '=',
         onOpenSolutionEditor: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_editor_directive.html'),
       controller: [
-        '$scope', 'stateSolutionService',
-        function($scope, stateSolutionService) {
-          $scope.stateSolutionService = stateSolutionService;
+        '$scope', 'StateSolutionService',
+        function($scope, StateSolutionService) {
+          $scope.StateSolutionService = StateSolutionService;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
-          $scope.getAnswerHtml = function () {
+          $scope.getAnswerHtml = function() {
             return ExplorationHtmlFormatterService.getAnswerHtml(
-              stateSolutionService.savedMemento.correctAnswer,
-              stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento);
+              StateSolutionService.savedMemento.correctAnswer,
+              StateInteractionIdService.savedMemento,
+              StateCustomizationArgsService.savedMemento);
           };
         }
       ]

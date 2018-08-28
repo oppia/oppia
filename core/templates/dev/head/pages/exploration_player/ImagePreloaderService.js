@@ -18,18 +18,17 @@
 
 oppia.factory('ImagePreloaderService', [
   '$q', '$uibModal', 'ContextService', 'AssetsBackendApiService',
-  'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'ComputeGraphService', 'ExtractImageFilenamesFromStateService',
+  'UrlInterpolationService', 'ComputeGraphService',
+  'ExtractImageFilenamesFromStateService',
   function($q, $uibModal, ContextService, AssetsBackendApiService,
-      ExplorationPlayerStateService, UrlInterpolationService,
-      ComputeGraphService, ExtractImageFilenamesFromStateService) {
+      UrlInterpolationService, ComputeGraphService,
+      ExtractImageFilenamesFromStateService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];
     var _filenamesOfImageToBeDownloaded = [];
     var _filenamesOfImageFailedToDownload = [];
     var _exploration = null;
-    var _imageDimensions = null;
     var _hasImagePreloaderServiceStarted = false;
     // imageLoadedCallback is an object of objects (identified by the filenames
     // which are being downloaded at the time they are required by the
@@ -41,24 +40,9 @@ oppia.factory('ImagePreloaderService', [
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
-      _getDimensionsOfImages();
       _hasImagePreloaderServiceStarted = true;
     };
 
-    /**
-     * Gets the dimensions of the images in the exploration.
-     */
-    var _getDimensionsOfImages = function() {
-      _imageDimensions = {};
-      var states = (_states.getStateNames()).map(function(stateName) {
-        return _states.getState(stateName);
-      });
-      states.forEach(function(state){
-        Object.assign(_imageDimensions,
-          ExtractImageFilenamesFromStateService.getImageDimensionsInState(
-            state));
-      });
-    };
     /**
      * Gets the Url for the image file.
      * @param {string} filename - Filename of the image whose Url is to be
@@ -241,12 +225,31 @@ oppia.factory('ImagePreloaderService', [
       }
     };
 
+    /**
+    * Gets the dimensions of the images from the filename provided.
+    * @param {string} filename - The string from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var getDimensionsOfImage = function(filename) {
+      var dimensionsRegex = RegExp(
+        '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif)$', 'g');
+      imageDimensions = dimensionsRegex.exec(filename);
+      if (imageDimensions) {
+        dimensions = {
+          height: Number(imageDimensions[1]),
+          width: Number(imageDimensions[2])
+        };
+        return dimensions;
+      } else {
+        throw new Error(
+          'The image name is invalid, it does not contain dimensions.');
+      }
+    };
+
     return {
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
-      getDimensionsOfImage: function(filename) {
-        return _imageDimensions[filename];
-      },
+      getDimensionsOfImage: getDimensionsOfImage,
       onStateChange: _onStateChange,
       isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {

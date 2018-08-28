@@ -1782,6 +1782,37 @@ def can_change_topic_publication_status(handler):
     return test_can_change_topic_publication_status
 
 
+def can_access_topic_viewer_page(handler):
+    """Decorator to check whether user can access topic viewer page."""
+
+    def test_can_access(self, topic_name, **kwargs):
+        """Checks if the user can access topic viewer page.
+
+        Args:
+            topic_name: str. The name of the topic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can access topic viewer page.
+        """
+        topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
+            raise self.PageNotFoundException
+
+        topic_id = topic.id
+        topic_rights = topic_services.get_topic_rights(
+            topic_id, strict=False)
+
+        if topic_rights.topic_is_published:
+            return handler(self, topic_name, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in

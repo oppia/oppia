@@ -157,3 +157,5 @@ class EditableStoryDataHandler(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         story_services.delete_story(self.user_id, story_id)
+
+        self.render_json(self.values)

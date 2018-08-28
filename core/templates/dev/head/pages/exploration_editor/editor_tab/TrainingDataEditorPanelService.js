@@ -33,23 +33,26 @@ oppia.factory('TrainingDataEditorPanelService', [
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance', '$filter',
-            'ExplorationStatesService', 'EditorStateService', 'AlertsService',
+            'ExplorationStatesService', 'StateEditorService', 'AlertsService',
             'AnswerClassificationService', 'ContextService',
-            'stateInteractionIdService', 'AngularNameService',
+            'StateInteractionIdService', 'AngularNameService',
             'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
             'ExplorationHtmlFormatterService', 'ResponsesService',
-            'stateCustomizationArgsService', 'TrainingDataService',
+            'StateCustomizationArgsService', 'TrainingDataService',
             'TrainingModalService', 'FocusManagerService',
+            'CurrentInteractionService',
             function($scope, $injector, $uibModalInstance, $filter,
-                ExplorationStatesService, EditorStateService, AlertsService,
+                ExplorationStatesService, StateEditorService, AlertsService,
                 AnswerClassificationService, ContextService,
-                stateInteractionIdService, AngularNameService,
+                StateInteractionIdService, AngularNameService,
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
                 ExplorationHtmlFormatterService, ResponsesService,
-                stateCustomizationArgsService, TrainingDataService,
-                TrainingModalService, FocusManagerService) {
+                StateCustomizationArgsService, TrainingDataService,
+                TrainingModalService, FocusManagerService,
+                CurrentInteractionService) {
               var _explorationId = ContextService.getExplorationId();
-              var _stateName = EditorStateService.getActiveStateName();
+              var _stateName = StateEditorService.getActiveStateName();
+              $scope.stateName = _stateName;
               var _state = ExplorationStatesService.getState(_stateName);
               var answerGroupIndex = (
                 ResponsesService.getActiveAnswerGroupIndex());
@@ -62,8 +65,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                   answerGroupIndex).rules.length > 0);
               $scope.inputTemplate = (
                 ExplorationHtmlFormatterService.getInteractionHtml(
-                  stateInteractionIdService.savedMemento,
-                  stateCustomizationArgsService.savedMemento,
+                  StateInteractionIdService.savedMemento,
+                  StateCustomizationArgsService.savedMemento,
                   false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
 
               var _rebuildTrainingData = function() {
@@ -72,8 +75,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                   answerGroupIndex).forEach(function(answer) {
                   var answerTemplate = (
                     ExplorationHtmlFormatterService.getAnswerHtml(
-                      answer, stateInteractionIdService.savedMemento,
-                      stateCustomizationArgsService.savedMemento));
+                      answer, StateInteractionIdService.savedMemento,
+                      StateCustomizationArgsService.savedMemento));
                   $scope.trainingData.push({
                     answer: answer,
                     answerTemplate: answerTemplate
@@ -103,7 +106,7 @@ oppia.factory('TrainingDataEditorPanelService', [
               $scope.submitAnswer = function(newAnswer) {
                 $scope.newAnswerIsAlreadyResolved = false;
 
-                var interactionId = stateInteractionIdService.savedMemento;
+                var interactionId = StateInteractionIdService.savedMemento;
 
                 var rulesServiceName =
                   AngularNameService.getNameOfInteractionRulesService(
@@ -114,13 +117,12 @@ oppia.factory('TrainingDataEditorPanelService', [
 
                 var newAnswerTemplate = (
                   ExplorationHtmlFormatterService.getAnswerHtml(
-                    newAnswer, stateInteractionIdService.savedMemento,
-                    stateCustomizationArgsService.savedMemento));
+                    newAnswer, StateInteractionIdService.savedMemento,
+                    StateCustomizationArgsService.savedMemento));
 
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
-                    _explorationId, _stateName, _state,
-                    newAnswer, rulesService));
+                    _stateName, _state.interaction, newAnswer, rulesService));
                 var newAnswerOutcomeDest = classificationResult.outcome.dest;
                 var newAnswerFeedback = classificationResult.outcome.feedback;
                 if (newAnswerOutcomeDest === _stateName) {
@@ -154,6 +156,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                 }
               };
 
+              CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
+
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
                 // An answer group must have either a rule or at least one
                 // answer in training data. Don't allow modification of training
@@ -163,7 +167,7 @@ oppia.factory('TrainingDataEditorPanelService', [
                     $scope.trainingData.length > 0) ||
                     $scope.trainingData.length > 1) {
                   var answer = $scope.trainingData[answerIndex].answer;
-                  var interactionId = stateInteractionIdService.savedMemento;
+                  var interactionId = StateInteractionIdService.savedMemento;
                   return TrainingModalService.openTrainUnresolvedAnswerModal(
                     answer, function() {
                       var truncatedAnswer = $filter(
