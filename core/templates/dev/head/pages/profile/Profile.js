@@ -126,11 +126,13 @@ oppia.controller('Profile', [
           $log.error('Error: cannot decrement page');
         } else {
           $scope.currentPageNumber--;
-          $scope.startingExplorationNumber = ($scope.currentPageNumber *
-                                              $scope.PAGE_SIZE + 1);
+          $scope.startingExplorationNumber = (
+            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
+          );
           $scope.endingExplorationNumber = (
             Math.min($scope.numUserPortfolioExplorations,
-              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE));
+              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE)
+          );
         }
       };
       $scope.goToNextPage = function() {
@@ -139,11 +141,13 @@ oppia.controller('Profile', [
           $log.error('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
-          $scope.startingExplorationNumber = ($scope.currentPageNumber *
-                                              $scope.PAGE_SIZE + 1);
+          $scope.startingExplorationNumber = (
+            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
+          );
           $scope.endingExplorationNumber = (
             Math.min($scope.numUserPortfolioExplorations,
-              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE));
+              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE)
+          );
         }
       };
 

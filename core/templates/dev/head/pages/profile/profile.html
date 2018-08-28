@@ -114,7 +114,7 @@
 
     <md-card class="oppia-profile-content-card">
       <md-content class="oppia-profile-portfolio-container">
-        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
+        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay() track by $index"
                                   exploration-id="expl.id"
                                   exploration-title="expl.title"
                                   last-updated-msec="expl.last_updated_msec"
@@ -140,7 +140,7 @@
           &#xE5C4;
         </i>
         Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
-        <i ng-class="{'material-icons md-18 oppia-navigation-button':true,'disabled':endingExplorationNumber >= numUserPortfolioExplorations}"  ng-click="goToNextPage()">&#xE5C8;</i>
+        <i ng-class="{'material-icons md-18 oppia-navigation-button': true, 'disabled': endingExplorationNumber >= numUserPortfolioExplorations}"  ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
   </div>
