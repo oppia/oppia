@@ -130,8 +130,7 @@ oppia.controller('Profile', [
             $scope.currentPageNumber * $scope.PAGE_SIZE + 1
           );
           $scope.endingExplorationNumber = (
-            Math.min($scope.numUserPortfolioExplorations,
-              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE)
+            ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE
           );
         }
       };
