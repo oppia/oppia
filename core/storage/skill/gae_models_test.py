@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Skill models."""
+
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
@@ -34,28 +35,28 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             creator_id='janet',
             skill_is_private=True
         ).commit(
-            'janet', 'Created new skill right',
+            'janet', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_2',
             creator_id='janet',
             skill_is_private=True
         ).commit(
-            'janet', 'Edited skill',
+            'janet', 'Edited skill rights',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
         skill_models.SkillRightsModel(
             id='id_3',
             creator_id='joe',
             skill_is_private=False
         ).commit(
-            'joe', 'Created new skill right',
+            'joe', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         skill_models.SkillRightsModel(
             id='id_4',
             creator_id='joe',
             skill_is_private=True
         ).commit(
-            'joe', 'Created new skill right',
+            'joe', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_get_unpublished_by_creator_id(self):
@@ -70,6 +71,6 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             .get_unpublished_by_creator_id('joe').fetch(2))
         self.assertEqual(len(results), 1)
 
-    def test_unpublished(self):
+    def test_get_unpublished_fetches_all_unpublished_skills(self):
         self.assertEqual(
             len(skill_models.SkillRightsModel.get_unpublished().fetch(4)), 3)
