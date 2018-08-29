@@ -153,7 +153,7 @@
               oppia-fractions-landing-image-mobile">Sorry, your browser doesn't support embedded videos.
               </video>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-6 text-box-2">
               <h1 class="oppia-fractions-landing-h1 easy-to-follow" style="color: #FFFFFF; text-align: right; padding-right: 80px;">Easy-to-follow lessons</h1>
               <h2 class="oppia-fractions-landing-h2" style="color: #FFFFFF; text-align: left; right: 80px">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
                 <br>
@@ -257,9 +257,8 @@
       text-align: left;
       top: 160px;
     }
-
     .easy-to-follow {
-        white-space: nowrap;
+      white-space: nowrap;
     }
     .oppia-fractions-landing-section-inner {
       height: auto;
@@ -271,7 +270,7 @@
     }
     .oppia-fractions-landing-h2{
       margin-top: 5%;
-      font-size: 1.7vw;
+      font-size: 1.8vmax;
       left: 80px;
       line-height: 1.6em;
       position: relative;
@@ -331,6 +330,11 @@
       margin-left: 25%;
       margin-right: 25%;
       padding-left: 0px;
+    }
+    .text-box-2 {
+      margin-top: 100px;
+      padding-right: 40px;
+      margin-left: -30px;
     }
     .oppia-fractions-landing-background-icon-row {
       margin-top: 0;
@@ -405,7 +409,7 @@
       }
       .oppia-fractions-landing-image-mobile {
         display: block;
-        left: 0;
+        margin: auto;
       }
       .oppia-fractions-landing-image-desktop {
         display: none;
@@ -415,6 +419,11 @@
         margin-right: 10%;
         left: 0;
       }
+      .text-box-2 {
+        margin-top: 0;
+        padding-right: inherit;
+        margin-left: auto;
+    }
     }
   </style>
 {% endblock %}
