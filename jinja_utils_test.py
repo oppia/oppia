@@ -120,7 +120,7 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
 
-        # int type input used.
+        # Test that int type input is used.
         parsed_object = jinja_utils.evaluate_object(34, {})
         self.assertEqual(parsed_object, 34)
 
