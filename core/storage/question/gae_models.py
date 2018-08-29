@@ -251,7 +251,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """Puts multiple question skill links into the datastore.
 
         Args:
-            question_skill_links: list(QuestionSkillLink). This list of
+            question_skill_links: list(QuestionSkillLink). The list of
             question skill link domain objects to put into the datastore.
         """
         cls.put_multi(question_skill_links)
@@ -262,7 +262,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """Deletes multiple question skill links from the datastore.
 
         Args:
-            question_skill_links: list(QuestionSkillLinkModel). This list of
+            question_skill_links: list(QuestionSkillLinkModel). The list of
             question skill link domain objects to delete from the datastore.
         """
         cls.delete_multi(question_skill_links)
