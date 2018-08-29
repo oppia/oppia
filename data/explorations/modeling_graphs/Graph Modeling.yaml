@@ -1,21 +1,26 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Graph Theory
+correctness_feedback_enabled: false
 init_state_name: Introduction
 language_code: en
 objective: Learn how to model objects as graphs
 param_changes: []
 param_specs: {}
-schema_version: 17
+schema_version: 30
 states:
   Bosses correct:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: "As you can see, graphs are very useful for modeling real world behavior.\
+      content_id: content
+      html: "<p>As you can see, graphs are very useful for modeling real world behavior.\
         \ They are widely used in many fields, such as computer science and statistics.\_\
-        <div><br></div><div>Maybe from now on you'll start seeing graphs all over\
-        \ the place!\_</div>"
+        </p><p>\_</p><p>Maybe from now on you'll start seeing graphs all over the\
+        \ place!\_</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -24,8 +29,13 @@ states:
           value: Continue
       default_outcome:
         dest: END
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -33,20 +43,27 @@ states:
   Bosses question:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: 'There are 6 employees in a company: Fred, George, Hannah, Irene, John
-        and Kevin.<div><ul><li>Fred and Hannah report to John.</li><li>Kevin reports
-        to George.</li><li>John and George report to Irene.</li></ul><div>Try modeling
+      content_id: content
+      html: '<p>There are 6 employees in a company: Fred, George, Hannah, Irene, John
+        and Kevin.</p><ul><li>Fred and Hannah report to John.</li><li>Kevin reports
+        to George.</li><li>John and George report to Irene.</li></ul><p>Try modeling
         this as a graph, with a directed edge from an employee to his or her immediate
-        superior.</div></div>'
+        superior.</p>'
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Bosses correct
           feedback:
-          - Well done!
+            content_id: feedback_1
+            html: <p>Well done!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -89,6 +106,8 @@ states:
                 x: 218.59375
                 y: 162.0
           rule_type: IsIsomorphicTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
@@ -133,8 +152,12 @@ states:
       default_outcome:
         dest: Bosses question
         feedback:
-        - Not exactly... try again!
+          content_id: default_outcome
+          html: <p>Not exactly... try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: GraphInput
       solution: null
@@ -142,16 +165,20 @@ states:
   Cities correct:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Distances on a map are a very common thing to use graphs to model, as
-        computers can then process these graphs to do stuff like path-finding without
-        worrying about extra details that a full map would have. Note that it doesn't
-        matter how far apart the vertices are when you draw them, the important thing
-        is the weight of the edge.<div><br></div><div>Another piece of extra information
-        we might want to add to a graph are relations that only go in one direction.
-        In that case, instead of having lines between dots, we have arrows instead.
-        In mathematician-speak, this would be a "directed graph", since every edge
-        has a direction.</div><div><br></div><div>Let's give this a try now!</div>
+      content_id: content
+      html: "<p>Distances on a map are a very common thing to use graphs to model,\
+        \ as computers can then process these graphs to do stuff like path-finding\
+        \ without worrying about extra details that a full map would have. Note that\
+        \ it doesn't matter how far apart the vertices are when you draw them, the\
+        \ important thing is the weight of the edge.</p><p>\_</p><p>Another piece\
+        \ of extra information we might want to add to a graph are relations that\
+        \ only go in one direction. In that case, instead of having lines between\
+        \ dots, we have arrows instead. In mathematician-speak, this would be a \"\
+        directed graph\", since every edge has a direction.</p><p>\_</p><p>Let's give\
+        \ this a try now!</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -160,8 +187,13 @@ states:
           value: Continue
       default_outcome:
         dest: Bosses question
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -169,21 +201,28 @@ states:
   Cities question:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: 'Use the following information about distances between cities to model
-        them on a graph:<div><ul><li>Paris is 344km from London.</li><li>London is
+      content_id: content
+      html: '<p>Use the following information about distances between cities to model
+        them on a graph:</p><ul><li>Paris is 344km from London.</li><li>London is
         932km from Berlin.</li><li>Berlin is 878km from Paris.</li><li>Paris is 1054km
         from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
-        from Berlin.</li></ul><div>(Note: On the graph, don''t put "km" on the edges,
-        just put the number)</div></div>'
+        from Berlin.</li></ul><p>(Note: On the graph, don''t put "km" on the edges,
+        just put the number)</p>'
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Cities correct
           feedback:
-          - Excellent!
+            content_id: feedback_1
+            html: <p>Excellent!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -223,6 +262,8 @@ states:
                 x: 99.59375
                 y: 177.0
           rule_type: IsIsomorphicTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
@@ -261,8 +302,12 @@ states:
       default_outcome:
         dest: Cities question
         feedback:
-        - Not quite, try again!
+          content_id: default_outcome
+          html: <p>Not quite, try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: GraphInput
       solution: null
@@ -270,8 +315,10 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -286,14 +333,17 @@ states:
   Friends correct:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Friendships and social relations are just one example of things that can
-        be modeled by graphs.<div><br></div><div>Sometimes, though, we want a bit
-        more information in our graphs. For example, let's say that we want to use
-        a graph to model distances between cities. In this case, we can attach numbers
-        to each edge to represent this data. In mathematician-speak, such a graph
-        is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
-        give this a try!</div>
+      content_id: content
+      html: "<p>Friendships and social relations are just one example of things that\
+        \ can be modeled by graphs.</p><p>\_</p><p>Sometimes, though, we want a bit\
+        \ more information in our graphs. For example, let's say that we want to use\
+        \ a graph to model distances between cities. In this case, we can attach numbers\
+        \ to each edge to represent this data. In mathematician-speak, such a graph\
+        \ is a \"weighted graph\", since each edge has a \"weight\" number.</p><p>\_\
+        </p><p>Let's give this a try!</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -302,8 +352,13 @@ states:
           value: Continue
       default_outcome:
         dest: Cities question
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -311,21 +366,28 @@ states:
   Friends question:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: '<div>There are a group of 5 people in a room: Alice, Bob, Charlie, David
-        and Emily. We have that:</div><div><ul><li>Alice is friends with everyone
-        but David<br></li><li>Bob is friends with Alice only<br></li><li>Charlie is
-        friends with Alice and David<br></li><li>David is friends with Charlie and
-        Emily<br></li><li>Emily is friends with Alice and David<br></li></ul></div><div>Try
-        to model the friendships as a graph!</div>'
+      content_id: content
+      html: '<p>There are a group of 5 people in a room: Alice, Bob, Charlie, David
+        and Emily. We have that:</p><ul><li>Alice is friends with everyone but David<br></li><li>Bob
+        is friends with Alice only<br></li><li>Charlie is friends with Alice and David<br></li><li>David
+        is friends with Charlie and Emily<br></li><li>Emily is friends with Alice
+        and David<br></li></ul><p>Try to model the friendships as a graph!</p>'
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: Friends correct
           feedback:
-          - Correct!
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -365,12 +427,17 @@ states:
                 x: 17.09375
                 y: 161
           rule_type: IsIsomorphicTo
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Friends question
           feedback:
-          - Did you forget to add new edges?
+            content_id: feedback_2
+            html: <p>Did you forget to add new edges?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -395,6 +462,8 @@ states:
                 x: 80.09375
                 y: 138
           rule_type: IsIsomorphicTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
@@ -436,8 +505,12 @@ states:
       default_outcome:
         dest: Friends question
         feedback:
-        - Not quite... Let's try again!
+          content_id: default_outcome
+          html: <p>Not quite... Let's try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: GraphInput
       solution: null
@@ -445,16 +518,20 @@ states:
   Introduction:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: 'When mathematicians talk about graph theory, they usually aren''t referring
-        to curve sketching!<div><br></div><div>A graph is a mathematical object that
-        consists of "vertices" and "edges". Does this sound complicated? Actually,
-        it isn''t: in simple terms, graphs are just dots joined by lines! The dots are
-        called "vertices" and the lines are called "edges". An example of a graph
-        is shown below:</div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;A
-        simple graph.png&amp;quot;"></oppia-noninteractive-image><br></div><div><br></div><div>Despite
-        this simplicity, graphs are useful for modeling all kinds of real world behavior.
-        Not convinced? Let''s take a look at some things that graphs can model...</div>'
+      content_id: content
+      html: "<p>When mathematicians talk about graph theory, they usually aren't referring\
+        \ to curve sketching!</p><p>\_</p><p>A graph is a mathematical object that\
+        \ consists of \"vertices\" and \"edges\". Does this sound complicated? Actually,\
+        \ it isn't: in simple terms, graphs are just dots joined by lines! The dots\
+        \ are called \"vertices\" and the lines are called \"edges\". An example of\
+        \ a graph is shown below:</p><p>\_</p><oppia-noninteractive-image caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;A simple graph_height_100_width_112.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p>\_</p><p>Despite this simplicity,\
+        \ graphs are useful for modeling all kinds of real world behavior. Not convinced?\
+        \ Let's take a look at some things that graphs can model...</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -463,12 +540,17 @@ states:
           value: Continue
       default_outcome:
         dest: Friends question
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
     param_changes: []
-states_schema_version: 13
+states_schema_version: 25
 tags: []
 title: Graph Modeling

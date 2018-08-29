@@ -37,7 +37,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
-        self.assertEquals(num_collections, 1)
+        self.assertEqual(num_collections, 1)
 
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
@@ -79,8 +79,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commits = (
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, None))
-        self.assertEquals(False, commits[2])
-        self.assertEquals('collection--b--0', commits[0][0].id)
+        self.assertEqual(False, commits[2])
+        self.assertEqual('collection--b--0', commits[0][0].id)
 
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):

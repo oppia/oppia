@@ -1687,19 +1687,19 @@ def save_original_and_compressed_versions_of_image(
     # already there. Also, even if the compressed, micro versions for some
     # image exists, then this would prevent from creating another copy of
     # the same.
-    if not fs.isfile(filepath):
+    if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
-            user_id, filepath, original_image_content,
+            user_id, filepath.encode('utf-8'), original_image_content,
             mimetype='image/%s' % filetype)
 
-    if not fs.isfile(compressed_image_filepath):
+    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
         fs.commit(
-            user_id, compressed_image_filepath,
+            user_id, compressed_image_filepath.encode('utf-8'),
             compressed_image_content, mimetype='image/%s' % filetype)
 
-    if not fs.isfile(micro_image_filepath):
+    if not fs.isfile(micro_image_filepath.encode('utf-8')):
         fs.commit(
-            user_id, micro_image_filepath,
+            user_id, micro_image_filepath.encode('utf-8'),
             micro_image_content, mimetype='image/%s' % filetype)
 
 
@@ -2257,9 +2257,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = generate_state_id_mapping_model(
         exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
@@ -2309,9 +2306,6 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = (
         generate_state_id_mapping_model_for_reverted_exploration(
             exploration_id, current_version, revert_to_version))
@@ -2327,9 +2321,6 @@ def delete_state_id_mapping_model_for_exploration(
         exploration_id: str. Id of the exploration.
         exploration_version: int. Latest version of the exploration.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)

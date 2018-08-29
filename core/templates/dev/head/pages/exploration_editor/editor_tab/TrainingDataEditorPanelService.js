@@ -40,6 +40,7 @@ oppia.factory('TrainingDataEditorPanelService', [
             'ExplorationHtmlFormatterService', 'ResponsesService',
             'StateCustomizationArgsService', 'TrainingDataService',
             'TrainingModalService', 'FocusManagerService',
+            'CurrentInteractionService',
             function($scope, $injector, $uibModalInstance, $filter,
                 ExplorationStatesService, StateEditorService, AlertsService,
                 AnswerClassificationService, ContextService,
@@ -47,7 +48,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
                 ExplorationHtmlFormatterService, ResponsesService,
                 StateCustomizationArgsService, TrainingDataService,
-                TrainingModalService, FocusManagerService) {
+                TrainingModalService, FocusManagerService,
+                CurrentInteractionService) {
               var _explorationId = ContextService.getExplorationId();
               var _stateName = StateEditorService.getActiveStateName();
               $scope.stateName = _stateName;
@@ -153,6 +155,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                   _rebuildTrainingData();
                 }
               };
+
+              CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
 
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
                 // An answer group must have either a rule or at least one
