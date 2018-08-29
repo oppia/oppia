@@ -135,14 +135,15 @@
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
         <i class="material-icons md-18 oppia-navigation-button"
-           ng-disabled="startingExplorationNumber==1"
+           ng-disabled="startingExplorationNumber === 1"
            ng-click="goToPreviousPage()">
           &#xE5C4;
         </i>
         Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
         <i class="material-icons md-18 oppia-navigation-button"
            ng-disabled="endingExplorationNumber >= numUserPortfolioExplorations"
-           ng-click="goToNextPage()">&#xE5C8;
+           ng-click="goToNextPage()">
+          &#xE5C8;
         </i>
       </span>
     </md-card>
