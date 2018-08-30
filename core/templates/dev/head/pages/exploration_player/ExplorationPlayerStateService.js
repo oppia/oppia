@@ -22,7 +22,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'ContextService', 'UrlService', 'StateClassifierMappingService',
   'StatsReportingService', 'PlaythroughService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
-  'EditableExplorationBackendApiService',
+  'EditableExplorationBackendApiService', 'PlayerPositionService',
   'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
   'NumberAttemptsService',
   function(
@@ -30,7 +30,7 @@ oppia.factory('ExplorationPlayerStateService', [
       ContextService, UrlService, StateClassifierMappingService,
       StatsReportingService, PlaythroughService,
       PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
-      EditableExplorationBackendApiService,
+      EditableExplorationBackendApiService, PlayerPositionService,
       ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
       NumberAttemptsService) {
     var _currentEngineService = null;
@@ -89,62 +89,11 @@ oppia.factory('ExplorationPlayerStateService', [
         _setExplorationMode();
         ExplorationEngineService.moveToExploration(callback);
       },
-      doesInteractionSupportHints: function() {
-        return _currentEngineService.doesInteractionSupportHints();
-      },
-      getCurrentStateName: function() {
-        return _currentEngineService.getCurrentStateName();
-      },
-      getCurrentInteraction: function() {
-        return _currentEngineService.getCurrentInteraction();
-      },
-      getNextInteraction: function() {
-        return _currentEngineService.getNextInteraction();
-      },
-      getCurrentInteractionHtml: function(nextFocusLabel) {
-        return _currentEngineService.getCurrentInteractionHtml(nextFocusLabel);
-      },
-      getNextInteractionHtml: function(nextFocusLabel) {
-        return _currentEngineService.getNextInteractionHtml(nextFocusLabel);
-      },
       getLanguageCode: function() {
         return _currentEngineService.getLanguageCode();
       },
-      getCurrentInteractionInstructions: function() {
-        return _currentEngineService.getCurrentInteractionInstructions();
-      },
-      getNextInteractionInstructions: function() {
-        return _currentEngineService.getNextInteractionInstructions();
-      },
-      isInteractionInline: function() {
-        return _currentEngineService.isInteractionInline();
-      },
-      isNextInteractionInline: function() {
-        return _currentEngineService.isNextInteractionInline();
-      },
-      isContentAudioTranslationAvailable: function() {
-        return _currentEngineService.isContentAudioTranslationAvailable();
-      },
-      isCurrentStateTerminal: function() {
-        return _currentEngineService.isCurrentStateTerminal();
-      },
-      isStateShowingConceptCard: function() {
-        return _currentEngineService.isStateShowingConceptCard();
-      },
-      getContentIdsToAudioTranslations: function() {
-        return _currentEngineService.getContentIdsToAudioTranslations();
-      },
       recordNewCardAdded: function() {
         return _currentEngineService.recordNewCardAdded();
-      },
-      getStateContentAudioTranslations: function() {
-        return _currentEngineService.getStateContentAudioTranslations();
-      },
-      getHints: function() {
-        return _currentEngineService.getHints();
-      },
-      getSolution: function() {
-        return _currentEngineService.getSolution();
       },
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();

@@ -69,8 +69,6 @@ oppia.constant(
   '/createhandler/translate/<exploration_id>');
 
 
-oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');
-
 /* This should match the CSS class defined in the tutor card directive. */
 oppia.constant(
   'AUDIO_HIGHLIGHT_CSS_CLASS', 'conversation-skin-audio-highlight');
