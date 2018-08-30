@@ -231,6 +231,42 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         )
         return question_ids, next_cursor_str
 
+    @classmethod
+    def get_models_by_skill_id(cls, skill_id):
+        """Returns a list of QuestionSkillLink domains of a particular skill ID.
+
+        Args:
+            skill_id: str. ID of the skill.
+
+        Returns:
+            list(QuestionSkillLinkModel)|None. The list of question skill link
+            domains that are linked to the skill ID. None if the skill
+            ID doesn't exist.
+        """
+        return QuestionSkillLinkModel.query().filter(
+            cls.skill_id == skill_id).fetch()
+
+    @classmethod
+    def put_multi_question_skill_links(cls, question_skill_links):
+        """Puts multiple question skill links into the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLink). The list of
+            question skill link domain objects to put into the datastore.
+        """
+        cls.put_multi(question_skill_links)
+
+
+    @classmethod
+    def delete_multi_question_skill_links(cls, question_skill_links):
+        """Deletes multiple question skill links from the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLinkModel). The list of
+            question skill link domain objects to delete from the datastore.
+        """
+        cls.delete_multi(question_skill_links)
+
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.
