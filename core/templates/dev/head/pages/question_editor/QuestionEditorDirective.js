@@ -25,7 +25,7 @@ oppia.directive('questionEditor', [
         getQuestionId: '&questionId',
         getMisconceptions: '&misconceptions',
         canEditQuestion: '&',
-        questionStateData: '='
+        question: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
@@ -83,7 +83,8 @@ oppia.directive('questionEditor', [
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            var stateData = $scope.questionStateData;
+            console.log($scope.question);
+            var stateData = $scope.question.getStateData();
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
               $rootScope.$broadcast('stateEditorInitialized', stateData);
@@ -100,8 +101,8 @@ oppia.directive('questionEditor', [
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
-            var oldQuestionStateData = angular.copy($scope.questionStateData);
-            $scope.questionStateData.content = angular.copy(displayedValue);
+            var oldQuestionStateData = angular.copy($scope.question.getStateData());
+            $scope.question._stateData.content = angular.copy(displayedValue);
             QuestionUpdateService.setQuestionStateData(
               $scope.question,
               oldQuestionStateData,
@@ -114,10 +115,10 @@ oppia.directive('questionEditor', [
           };
 
           $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
-            console.log(angular.copy($scope.questionStateData));
+            console.log(angular.copy($scope.question.getStateData()));
             StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
-            console.log(angular.copy($scope.questionStateData));
+            console.log(angular.copy($scope.question.getStateData()));
           };
 
           $scope.saveInteractionDefaultOutcome = function(newOutcome) {
@@ -141,7 +142,7 @@ oppia.directive('questionEditor', [
           };
 
           $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
-            $scope.questionStateData.contentIdsToAudioTranslations =
+            $scope.question._stateData.contentIdsToAudioTranslations =
               angular.copy(displayedValue);
           };
 

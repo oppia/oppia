@@ -75,10 +75,9 @@ oppia.factory('QuestionUpdateService', [
       setQuestionStateData: function(question, oldStateData, newStateData) {
         _applyPropertyChange(
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
-          newStateData, oldStateData,
+          newStateData.toBackendDict(), oldStateData.toBackendDict(),
           function(changeDict, question) {
-            var stateData = _getNewPropertyValueFromChangeDict(changeDict);
-            question.setStateData(stateData);
+            question.setStateData(newStateData);
           }, function(changeDict, question) {
             question.setStateData(oldStateData);
           });

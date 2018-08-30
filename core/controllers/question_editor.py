@@ -160,7 +160,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         question_dict = question_services.get_question_by_id(
             question_id).to_dict()
-        return self.render_json({
+        self.render_json({
             'question_dict': question_dict
         })
 

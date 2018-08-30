@@ -78,6 +78,7 @@ oppia.directive('questionsTab', [
               });
             } else {
               if (UndoRedoService.hasChanges()) {
+                console.log(UndoRedoService.getCommittableChangeList());
                 $scope.questionIsBeingSaved = true;
                 EditableQuestionBackendApiService.updateQuestion(
                   $scope.questionId, $scope.question.getVersion(), 'test',

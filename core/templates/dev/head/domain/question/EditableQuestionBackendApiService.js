@@ -85,7 +85,7 @@ oppia.factory('EditableQuestionBackendApiService', [
       var putData = {
         version: questionVersion,
         commit_message: commitMessage,
-        change_dicts: changeList
+        change_list: changeList
       };
       $http.put(editableQuestionDataUrl, putData).then(function(response) {
         // The returned data is an updated question dict.
