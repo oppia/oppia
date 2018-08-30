@@ -29,15 +29,15 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'UndoRedoService', function(
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'UndoRedoService', 'UrlService', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            UndoRedoService) {
+            EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            UndoRedoService, UrlService) {
           $scope.UndoRedoService = UndoRedoService;
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
@@ -66,11 +66,11 @@ oppia.directive('questionsTab', [
             if (!$scope.questionIsBeingUpdated) {
               $scope.questionIsBeingSaved = true;
               EditableQuestionBackendApiService.createQuestion(
-                UrlService.getSkillIdFromUrl(),
+                $scope.skillId,
                 $scope.question.toBackendDict(true)
               ).then(function() {
-                SkillEditorStateService.fetchQuestionSummaries(
-                  UrlService.getSkillIdFromUrl(), function() {
+                TopicEditorStateService.fetchQuestionSummaries(
+                  $scope.topic.getId(), function() {
                     _initTab();
                   }
                 );
@@ -184,7 +184,7 @@ oppia.directive('questionsTab', [
             var threadsPromise = $http.get(
               UrlInterpolationService.interpolateUrl(
                 '/threadlisthandlerfortopic/<topic_id>', {
-                  topic_id: $scope.topic.getId()
+                  topic_id: UrlService.getTopicIdFromUrl()
                 }));
             $q.all([suggestionsPromise, threadsPromise]).then(function(res) {
               var suggestionThreads = res[1].data.suggestion_thread_dicts;

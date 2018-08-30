@@ -100,12 +100,12 @@ oppia.directive('questionEditor', [
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            $scope.question.getStateData().content = angular.copy(displayedValue);
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            var oldQuestionStateData = angular.copy($scope.questionStateData);
+            $scope.questionStateData.content = angular.copy(displayedValue);
+            // QuestionUpdateService.setQuestionStateData(
+            //   $scope.question,
+            //   oldQuestionStateData,
+            //   angular.copy($scope.question.getStateData()));
             $scope.interactionIsShown = true;
           };
 
@@ -114,10 +114,10 @@ oppia.directive('questionEditor', [
           };
 
           $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
-            console.log(angular.copy($scope.question.getStateData()));
+            console.log(angular.copy($scope.questionStateData));
             StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
-            console.log(angular.copy($scope.question.getStateData()));
+            console.log(angular.copy($scope.questionStateData));
           };
 
           $scope.saveInteractionDefaultOutcome = function(newOutcome) {
