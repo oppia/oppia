@@ -169,6 +169,9 @@ class Normalizers(object):
 
     @classmethod
     def get(cls, normalizer_id):
+        """If the object has the given name attribute then 
+        returns the value of the named attribute of an object.
+        """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
@@ -221,6 +224,9 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
+        """If the object has the given name attribute then 
+        returns the value of the named attribute of an object.
+        """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
