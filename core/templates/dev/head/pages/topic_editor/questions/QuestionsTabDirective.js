@@ -49,24 +49,66 @@ oppia.directive('questionsTab', [
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
+            $scope.questionIsBeingUpdated = false;
+            $scope.questionIsBeingSaved = false;
           };
 
-          $scope.saveAndPublishQuestion = function() {
+          $scope.saveQuestion = function() {
             var validationErrors = $scope.question.validate(
               $scope.misconceptions);
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
             }
-            EditableQuestionBackendApiService.createQuestion(
-              $scope.skillId, $scope.question.toBackendDict(true)
-            ).then(function() {
-              TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId(), function() {
-                  _initTab();
-                }
-              );
-            });
+            if (!$scope.questionIsBeingUpdated) {
+              $scope.questionIsBeingSaved = true;
+              EditableQuestionBackendApiService.createQuestion(
+                UrlService.getSkillIdFromUrl(),
+                $scope.question.toBackendDict(true)
+              ).then(function() {
+                SkillEditorStateService.fetchQuestionSummaries(
+                  UrlService.getSkillIdFromUrl(), function() {
+                    _initTab();
+                  }
+                );
+                $scope.questionIsBeingSaved = false;
+              });
+            } else {
+              console.log(angular.copy(UndoRedoService.getCommittableChangeList()));
+              if (UndoRedoService.hasChanges()) {
+                $scope.questionIsBeingSaved = true;
+                EditableQuestionBackendApiService.updateQuestion(
+                  $scope.questionId, $scope.question.getVersion(), 'test',
+                  UndoRedoService.getCommittableChangeList()).then(function() {
+                    UndoRedoService.clearChanges();
+                    $scope.questionIsBeingSaved = false;
+                  }, function(error) {
+                    AlertsService.addWarning(
+                      error || 'There was an error saving the question.');
+                      $scope.questionIsBeingSaved = false;
+                  });
+              }
+            }
+          };
+
+          $scope.editQuestion = function(questionSummary) {
+            EditableQuestionBackendApiService.fetchQuestion(
+              questionSummary.id).then(function(response) {
+                $scope.misconceptions = $scope.skill.getMisconceptions().map(
+                  function(misconceptionsBackendDict) {
+                    return MisconceptionObjectFactory.createFromBackendDict(
+                      misconceptionsBackendDict);
+                  });
+                $scope.question =
+                  QuestionObjectFactory.createFromBackendDict(response);
+                $scope.questionId = $scope.question.getId();
+                $scope.questionStateData = $scope.question.getStateData();
+                $scope.questionEditorIsShown = true;
+                $scope.questionIsBeingUpdated = true;
+              }, function(errorResponse) {
+                AlertsService.addWarning(
+                  errorResponse.error || 'Failed to fetch question.');
+              });
           };
 
           $scope.createQuestion = function() {
