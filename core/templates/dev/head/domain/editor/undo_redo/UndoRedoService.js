@@ -147,6 +147,8 @@ oppia.factory('UndoRedoService', [
   }
 ]);
 
+// TODO(tjiang11): Figure out way to create new instance of service without
+// code duplication.
 oppia.factory('QuestionUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {

@@ -87,6 +87,11 @@ oppia.directive('questionsTab', [
                   QuestionUndoRedoService.getCommittableChangeList()).then(function() {
                     QuestionUndoRedoService.clearChanges();
                     $scope.questionIsBeingSaved = false;
+                  TopicEditorStateService.fetchQuestionSummaries(
+                    $scope.topic.getId(), function() {
+                      _initTab();
+                    }
+                );
                   }, function(error) {
                     AlertsService.addWarning(
                       error || 'There was an error saving the question.');
