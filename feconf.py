@@ -379,7 +379,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
+ENABLE_NEW_STRUCTURES = True
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
