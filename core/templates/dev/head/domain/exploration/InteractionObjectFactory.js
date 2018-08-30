@@ -59,6 +59,16 @@ oppia.factory('InteractionObjectFactory', [
       this.hints = newValue;
     };
 
+    Interaction.prototype.copy = function(otherInteraction) {
+      this.answerGroups = angular.copy(otherInteraction.answerGroups);
+      this.confirmedUnclassifiedAnswers = angular.copy(otherInteraction.confirmedUnclassifiedAnswers);
+      this.customizationArgs = angular.copy(otherInteraction.customizationArgs);
+      this.defaultOutcome = angular.copy(otherInteraction.defaultOutcome);
+      this.hints = angular.copy(otherInteraction.hints);
+      this.id = angular.copy(otherInteraction.id);
+      this.solution = angular.copy(otherInteraction.solution);
+    };
+
     Interaction.prototype.toBackendDict = function() {
       return {
         answer_groups: this.answerGroups.map(function(answerGroup) {

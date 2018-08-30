@@ -54,7 +54,7 @@ oppia.factory('StateObjectFactory', [
       this.name = otherState.name;
       this.classifierModelId = otherState.classifierModelId;
       this.content = angular.copy(otherState.content);
-      this.interaction = angular.copy(otherState.interaction);
+      this.interaction.copy(otherState.interaction);
       this.paramChanges = angular.copy(otherState.paramChanges);
       this.contentIdsToAudioTranslations = angular.copy(otherState.contentIdsToAudioTranslations);
     };
