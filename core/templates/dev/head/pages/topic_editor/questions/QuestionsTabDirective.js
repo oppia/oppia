@@ -30,15 +30,17 @@ oppia.directive('questionsTab', [
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        'UndoRedoService', 'UrlService', function(
+        'QuestionUndoRedoService', 'UrlService',
+        'UndoRedoService', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            UndoRedoService, UrlService) {
-          $scope.UndoRedoService = UndoRedoService;
+            QuestionUndoRedoService, UrlService,
+            UndoRedoService) {
+          $scope.QuestionUndoRedoService = QuestionUndoRedoService;
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -77,13 +79,13 @@ oppia.directive('questionsTab', [
                 $scope.questionIsBeingSaved = false;
               });
             } else {
-              if (UndoRedoService.hasChanges()) {
-                console.log(UndoRedoService.getCommittableChangeList());
+              if (QuestionUndoRedoService.hasChanges()) {
                 $scope.questionIsBeingSaved = true;
+                // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
-                  $scope.questionId, $scope.question.getVersion(), 'test',
-                  UndoRedoService.getCommittableChangeList()).then(function() {
-                    UndoRedoService.clearChanges();
+                  $scope.questionId, $scope.question.getVersion(), 'blank',
+                  QuestionUndoRedoService.getCommittableChangeList()).then(function() {
+                    QuestionUndoRedoService.clearChanges();
                     $scope.questionIsBeingSaved = false;
                   }, function(error) {
                     AlertsService.addWarning(

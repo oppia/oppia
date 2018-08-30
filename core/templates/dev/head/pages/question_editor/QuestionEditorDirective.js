@@ -86,9 +86,7 @@ oppia.directive('questionEditor', [
             var stateData = $scope.question.getStateData();
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              angular.element(document).ready(function() {
-                $rootScope.$broadcast('stateEditorInitialized', stateData);
-              });
+              $rootScope.$broadcast('stateEditorInitialized', stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
                 $scope.interactionIsShown = true;

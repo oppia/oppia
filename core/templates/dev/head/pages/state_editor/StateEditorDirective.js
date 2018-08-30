@@ -64,7 +64,6 @@ oppia.directive('stateEditor', [
           };
 
           $scope.reinitializeEditor = function() {
-            console.log($scope.stateData);
             $rootScope.$broadcast('stateEditorInitialized', $scope.stateData);
           };
 
