@@ -35,14 +35,14 @@ oppia.directive('questionEditor', [
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateContentService', 'StateContentIdsToAudioTranslationsService',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
-        'SolutionValidityService',
+        'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateContentService, StateContentIdsToAudioTranslationsService,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
-            SolutionValidityService) {
+            SolutionValidityService, QuestionUpdateService) {
           if ($scope.canEditQuestion()) {
             EditabilityService.markEditable();
           } else {
@@ -102,10 +102,10 @@ oppia.directive('questionEditor', [
             // content is entered.
             var oldQuestionStateData = angular.copy($scope.questionStateData);
             $scope.questionStateData.content = angular.copy(displayedValue);
-            // QuestionUpdateService.setQuestionStateData(
-            //   $scope.question,
-            //   oldQuestionStateData,
-            //   angular.copy($scope.question.getStateData()));
+            QuestionUpdateService.setQuestionStateData(
+              $scope.question,
+              oldQuestionStateData,
+              angular.copy($scope.question.getStateData()));
             $scope.interactionIsShown = true;
           };
 
