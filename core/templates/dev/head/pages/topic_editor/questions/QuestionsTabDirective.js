@@ -84,18 +84,19 @@ oppia.directive('questionsTab', [
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
                   $scope.questionId, $scope.question.getVersion(), 'blank',
-                  QuestionUndoRedoService.getCommittableChangeList()).then(function() {
+                  QuestionUndoRedoService.getCommittableChangeList()).then(
+                  function() {
                     QuestionUndoRedoService.clearChanges();
                     $scope.questionIsBeingSaved = false;
-                  TopicEditorStateService.fetchQuestionSummaries(
-                    $scope.topic.getId(), function() {
-                      _initTab();
-                    }
-                );
+                    TopicEditorStateService.fetchQuestionSummaries(
+                      $scope.topic.getId(), function() {
+                        _initTab();
+                      }
+                    );
                   }, function(error) {
                     AlertsService.addWarning(
                       error || 'There was an error saving the question.');
-                      $scope.questionIsBeingSaved = false;
+                    $scope.questionIsBeingSaved = false;
                   });
               }
             }
@@ -104,22 +105,22 @@ oppia.directive('questionsTab', [
           $scope.editQuestion = function(questionSummary) {
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
-                response.associated_skill_dicts.forEach(function(skill_dict) {
-                  skill_dict.misconceptions.forEach(function(misconception) {
-                    $scope.misconceptions.append(misconception);
-                  });
+              response.associated_skill_dicts.forEach(function(skillDict) {
+                skillDict.misconceptions.forEach(function(misconception) {
+                  $scope.misconceptions.append(misconception);
                 });
-                $scope.question =
-                  QuestionObjectFactory.createFromBackendDict(
-                    response.question_dict);
-                $scope.questionId = $scope.question.getId();
-                $scope.questionStateData = $scope.question.getStateData();
-                $scope.questionEditorIsShown = true;
-                $scope.questionIsBeingUpdated = true;
-              }, function(errorResponse) {
-                AlertsService.addWarning(
-                  errorResponse.error || 'Failed to fetch question.');
               });
+              $scope.question =
+                QuestionObjectFactory.createFromBackendDict(
+                  response.question_dict);
+              $scope.questionId = $scope.question.getId();
+              $scope.questionStateData = $scope.question.getStateData();
+              $scope.questionEditorIsShown = true;
+              $scope.questionIsBeingUpdated = true;
+            }, function(errorResponse) {
+              AlertsService.addWarning(
+                errorResponse.error || 'Failed to fetch question.');
+            });
           };
 
           $scope.createQuestion = function() {

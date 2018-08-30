@@ -56,7 +56,8 @@ oppia.factory('StateObjectFactory', [
       this.content = angular.copy(otherState.content);
       this.interaction.copy(otherState.interaction);
       this.paramChanges = angular.copy(otherState.paramChanges);
-      this.contentIdsToAudioTranslations = angular.copy(otherState.contentIdsToAudioTranslations);
+      this.contentIdsToAudioTranslations =
+        angular.copy(otherState.contentIdsToAudioTranslations);
     };
 
     State.createDefaultState = function(newStateName) {

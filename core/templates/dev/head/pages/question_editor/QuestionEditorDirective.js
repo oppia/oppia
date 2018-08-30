@@ -98,13 +98,14 @@ oppia.directive('questionEditor', [
           };
 
           var _updateQuestion = function(updateFunction) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
+            var oldQuestionStateData =
+              angular.copy($scope.question.getStateData());
             updateFunction();
             QuestionUpdateService.setQuestionStateData(
               $scope.question,
               oldQuestionStateData,
               angular.copy($scope.question.getStateData()));
-          }
+          };
 
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no

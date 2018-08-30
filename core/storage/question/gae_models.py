@@ -248,7 +248,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_models_by_question_id(cls, question_id):
-        """Returns a list of QuestionSkillLink domains of a particular question ID.
+        """Returns a list of QuestionSkillLink domains of a particular
+        question ID.
 
         Args:
             question_id: str. ID of the question.
