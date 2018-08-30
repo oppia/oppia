@@ -68,7 +68,7 @@
     string it would be displayed as is. This is the only way to translate
     the page title because the head of the file is outside the scope of
     any other controller. -->
-    <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
+    <title itemprop="name" ng-bind="$root.title" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
     {% block base_url %}
     {% endblock base_url %}
 

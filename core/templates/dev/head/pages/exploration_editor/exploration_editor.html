@@ -1,13 +1,5 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  {% if title %}
-    {{ title }} - Oppia Editor
-  {% else %}
-    Untitled Exploration - Oppia Editor
-  {% endif %}
-{% endblock maintitle %}
-
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
