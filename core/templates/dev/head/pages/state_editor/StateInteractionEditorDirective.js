@@ -100,10 +100,12 @@ oppia.directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
+          console.log("set listener stateEditorInitialized");
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            console.log("receive stateEditorInitialized");
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
-
+            console.log("broadcast initializeAnswerGroups");
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
               answerGroups: stateData.interaction.answerGroups,
@@ -115,6 +117,8 @@ oppia.directive('stateInteractionEditor', [
             _updateInteractionPreviewAndAnswerChoices();
             $scope.hasLoaded = true;
           });
+
+          $rootScope.$broadcast('interactionEditorInitialized');
 
           // If a terminal interaction is selected for a state with no content,
           // this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.

@@ -165,6 +165,7 @@ oppia.factory('ResponsesService', [
       // The 'data' arg is a list of interaction handlers for the
       // currently-active state.
       init: function(data) {
+        console.log(data);
         AnswerGroupsCacheService.reset();
 
         _answerGroups = angular.copy(data.answerGroups);

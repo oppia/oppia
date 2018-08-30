@@ -204,7 +204,9 @@ oppia.directive('stateResponses', [
             }
           };
 
+          console.log("set listener initializeAnswerGroups");
           $scope.$on('initializeAnswerGroups', function(evt, data) {
+            console.log('receive initializeAnswerGroups');
             ResponsesService.init(data);
             $scope.answerGroups = ResponsesService.getAnswerGroups();
             $scope.defaultOutcome = ResponsesService.getDefaultOutcome();

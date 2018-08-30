@@ -87,7 +87,10 @@ oppia.directive('questionEditor', [
             var stateData = $scope.question.getStateData();
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              console.log("broadcast stateEditorInitialized");
+              angular.element(document).ready(function() {
+                $rootScope.$broadcast('stateEditorInitialized', stateData);
+              });
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
                 $scope.interactionIsShown = true;
@@ -102,7 +105,8 @@ oppia.directive('questionEditor', [
             // Show the interaction when the text content is saved, even if no
             // content is entered.
             var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            $scope.question._stateData.content = angular.copy(displayedValue);
+            var stateData = $scope.question.getStateData();
+            stateData.content = angular.copy(displayedValue);
             QuestionUpdateService.setQuestionStateData(
               $scope.question,
               oldQuestionStateData,
@@ -171,7 +175,8 @@ oppia.directive('questionEditor', [
 
           $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
             var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            $scope.question._stateData.contentIdsToAudioTranslations =
+            var stateData = $scope.question.getStateData();
+            stateData.contentIdsToAudioTranslations =
               angular.copy(displayedValue);
             QuestionUpdateService.setQuestionStateData(
               $scope.question,
@@ -180,6 +185,10 @@ oppia.directive('questionEditor', [
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+            _init();
+          });
+
+          $scope.$on('interactionEditorInitialized', function(evt) {
             _init();
           });
 
