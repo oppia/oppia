@@ -97,87 +97,71 @@ oppia.directive('questionEditor', [
             $scope.stateEditorInitialized = true;
           };
 
+          var _updateQuestion = function(updateFunction) {
+            var oldQuestionStateData = angular.copy($scope.question.getStateData());
+            updateFunction();
+            QuestionUpdateService.setQuestionStateData(
+              $scope.question,
+              oldQuestionStateData,
+              angular.copy($scope.question.getStateData()));
+          }
+
           $scope.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            var stateData = $scope.question.getStateData();
-            stateData.content = angular.copy(displayedValue);
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
-            $scope.interactionIsShown = true;
+            _updateQuestion(function() {
+              var stateData = $scope.question.getStateData();
+              stateData.content = angular.copy(displayedValue);
+            });
           };
 
           $scope.saveInteractionId = function(displayedValue) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionId(angular.copy(displayedValue));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionId(angular.copy(displayedValue));
+            });
           };
 
           $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionAnswerGroups(
-              angular.copy(newAnswerGroups));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionAnswerGroups(
+                angular.copy(newAnswerGroups));
+            });
           };
 
           $scope.saveInteractionDefaultOutcome = function(newOutcome) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionDefaultOutcome(
-              angular.copy(newOutcome));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionDefaultOutcome(
+                angular.copy(newOutcome));
+            });
           };
 
           $scope.saveInteractionCustomizationArgs = function(displayedValue) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionCustomizationArgs(
-              angular.copy(displayedValue));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionCustomizationArgs(
+                angular.copy(displayedValue));
+            });
           };
 
           $scope.saveSolution = function(displayedValue) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionSolution(
-              angular.copy(displayedValue));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionSolution(
+                angular.copy(displayedValue));
+            });
           };
 
           $scope.saveHints = function(displayedValue) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            StateEditorService.setInteractionHints(
-              angular.copy(displayedValue));
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              StateEditorService.setInteractionHints(
+                angular.copy(displayedValue));
+            });
           };
 
           $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
-            var oldQuestionStateData = angular.copy($scope.question.getStateData());
-            var stateData = $scope.question.getStateData();
-            stateData.contentIdsToAudioTranslations =
-              angular.copy(displayedValue);
-            QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              oldQuestionStateData,
-              angular.copy($scope.question.getStateData()));
+            _updateQuestion(function() {
+              var stateData = $scope.question.getStateData();
+              stateData.contentIdsToAudioTranslations =
+                angular.copy(displayedValue);
+            });
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {
