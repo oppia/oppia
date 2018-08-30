@@ -201,8 +201,6 @@ def get_multi_skills(skill_ids):
     Returns:
         list(Skill). The list of skills matching the provided IDs.
     """
-    print "\n\n\n\n\n\n\n\n"
-    print get_skill_by_id(skill_ids[0])
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
     skills = [
         get_skill_from_model(skill_model)

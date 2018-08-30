@@ -1114,7 +1114,7 @@ class State(object):
         if not set(content_id_list) <= set(available_content_ids):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to have all '
-                'of the listed content ids %s' % content_id_list)
+                'of the listed content ids %s, found %s' % (content_id_list, available_content_ids))
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
