@@ -185,7 +185,7 @@ class EditableSkillDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         if skill_services.skill_has_associated_questions(skill_id):
-            raise self.InvalidInputException(
+            raise Exception(
                 'Please delete all questions associated with this skill '
                 'first.')
 
