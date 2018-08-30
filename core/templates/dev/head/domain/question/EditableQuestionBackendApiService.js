@@ -60,9 +60,12 @@ oppia.factory('EditableQuestionBackendApiService', [
         });
 
       $http.get(questionDataUrl).then(function(response) {
-        var questionDict = angular.copy(response.data.question_dict);
+        var data = angular.copy(response.data);
         if (successCallback) {
-          successCallback(questionDict);
+          successCallback({
+            question_dict: data.question_dict,
+            associated_skill_dicts: data.associated_skill_dicts
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

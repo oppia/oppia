@@ -186,12 +186,32 @@ def get_question_skill_links_of_skill(skill_id):
     Returns:
         list(QuestionSkillLinkModel). The list of question skill link
         domain objects that are linked to the skill ID or an empty list
-         if the skill does not exist.
+        if the skill does not exist.
     """
 
     question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
             skill_id)
+    )
+    return question_skill_link_models
+
+
+def get_question_skill_links_of_question(question_id):
+    """Returns a list of QuestionSkillLinkModels of
+    a particular question ID.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        list(QuestionSkillLinkModel). The list of question skill link
+        domain objects that are linked to the question ID or an empty list
+        if the question does not exist.
+    """
+
+    question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_models_by_question_id(
+            question_id)
     )
     return question_skill_link_models
 

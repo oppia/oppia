@@ -192,6 +192,24 @@ def get_multi_skill_summaries(skill_ids):
     return skill_summaries
 
 
+def get_multi_skills(skill_ids):
+    """Returns a list of skills matching the skill IDs provided.
+
+    Args:
+        skill_ids: list(str). List of skill IDs to get skills for.
+
+    Returns:
+        list(Skill). The list of skills matching the provided IDs.
+    """
+    print "\n\n\n\n\n\n\n\n"
+    print get_skill_by_id(skill_ids[0])
+    local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skills = [
+        get_skill_from_model(skill_model)
+        for skill_model in local_skill_models]
+    return skills
+
+
 def get_skill_summary_from_model(skill_summary_model):
     """Returns a domain object for an Oppia skill summary given a
     skill summary model.

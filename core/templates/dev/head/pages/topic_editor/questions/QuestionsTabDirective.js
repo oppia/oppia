@@ -77,7 +77,6 @@ oppia.directive('questionsTab', [
                 $scope.questionIsBeingSaved = false;
               });
             } else {
-              console.log(angular.copy(UndoRedoService.getCommittableChangeList()));
               if (UndoRedoService.hasChanges()) {
                 $scope.questionIsBeingSaved = true;
                 EditableQuestionBackendApiService.updateQuestion(
@@ -97,13 +96,14 @@ oppia.directive('questionsTab', [
           $scope.editQuestion = function(questionSummary) {
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
-                $scope.misconceptions = $scope.skill.getMisconceptions().map(
-                  function(misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory.createFromBackendDict(
-                      misconceptionsBackendDict);
+                response.associated_skill_dicts.forEach(function(skill_dict) {
+                  skill_dict.misconceptions.forEach(function(misconception) {
+                    $scope.misconceptions.append(misconception);
                   });
+                });
                 $scope.question =
-                  QuestionObjectFactory.createFromBackendDict(response);
+                  QuestionObjectFactory.createFromBackendDict(
+                    response.question_dict);
                 $scope.questionId = $scope.question.getId();
                 $scope.questionStateData = $scope.question.getStateData();
                 $scope.questionEditorIsShown = true;

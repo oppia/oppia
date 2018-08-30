@@ -247,6 +247,21 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             cls.skill_id == skill_id).fetch()
 
     @classmethod
+    def get_models_by_question_id(cls, question_id):
+        """Returns a list of QuestionSkillLink domains of a particular question ID.
+
+        Args:
+            question_id: str. ID of the question.
+
+        Returns:
+            list(QuestionSkillLinkModel)|None. The list of question skill link
+            domains that are linked to the question ID. None if the question
+            ID doesn't exist.
+        """
+        return QuestionSkillLinkModel.query().filter(
+            cls.question_id == question_id).fetch()
+
+    @classmethod
     def put_multi_question_skill_links(cls, question_skill_links):
         """Puts multiple question skill links into the datastore.
 
