@@ -83,11 +83,9 @@ oppia.directive('questionEditor', [
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            console.log($scope.question);
             var stateData = $scope.question.getStateData();
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              console.log("broadcast stateEditorInitialized");
               angular.element(document).ready(function() {
                 $rootScope.$broadcast('stateEditorInitialized', stateData);
               });

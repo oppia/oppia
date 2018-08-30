@@ -330,7 +330,6 @@ def apply_change_list(question_id, change_list):
       Question. The resulting question domain object.
     """
     question = get_question_by_id(question_id)
-    print "\n\n\na"
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
