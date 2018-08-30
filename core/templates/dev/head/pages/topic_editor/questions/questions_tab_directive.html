@@ -20,7 +20,8 @@
         </th>
       </tr>
       <tr ng-repeat="question in questionSummaries"
-          class="list-item">
+          class="list-item"
+          ng-click="editQuestion(question)">
         <td> <[$index + 1]> </td>
         <td>
           <a class="list-summary">
@@ -70,12 +71,15 @@
   <div style="padding-left: 45%;">
     <button type="button"
             class="btn btn-success oppia-editor-publish-button"
-            ng-click="saveAndPublishQuestion()">
+            ng-click="saveAndPublishQuestion()"
+            ng-disabled="!UndoRedoService.hasChanges() || questionIsBeingSaved">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
       </i>
-      <span class="oppia-save-publish-button-label">Save and Publish Question</span>
+      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingSaved">Saving...</span>
+      <span class="oppia-save-publish-button-label" ng-if="!questionIsBeingUpdated && !questionIsBeingSaved">Save and Publish Question</span>
+      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingUpdated && !questionIsBeingSaved">Save Changes</span>
     </button>
   </div>
   <question-editor question-id="questionId"

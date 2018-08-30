@@ -29,13 +29,16 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
+        'UndoRedoService', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService) {
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
+            UndoRedoService) {
+          $scope.UndoRedoService = UndoRedoService;
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
