@@ -18,28 +18,29 @@
 
 oppia.factory('PlayerPositionService', [
   'PlayerTranscriptService', function(PlayerTranscriptService) {
-    var activeCardIndex = null;
+    var displayedCardIndex = null;
     var onChangeCallback = null;
     var learnerJustSubmittedAnAnswer = false;
 
     return {
       init: function(callback) {
-        activeCardIndex = null;
+        displayedCardIndex = null;
         onChangeCallback = callback;
       },
       getCurrentStateName: function() {
-        return PlayerTranscriptService.getCard(activeCardIndex).stateName;
+        return (
+          PlayerTranscriptService.getCard(displayedCardIndex).getStateName());
       },
-      setActiveCardIndex: function(index) {
-        var oldIndex = activeCardIndex;
-        activeCardIndex = index;
+      setDisplayedCardIndex: function(index) {
+        var oldIndex = displayedCardIndex;
+        displayedCardIndex = index;
 
-        if (oldIndex !== activeCardIndex) {
+        if (oldIndex !== displayedCardIndex) {
           onChangeCallback();
         }
       },
-      getActiveCardIndex: function() {
-        return activeCardIndex;
+      getDisplayedCardIndex: function() {
+        return displayedCardIndex;
       },
       recordAnswerSubmission: function() {
         learnerJustSubmittedAnAnswer = true;

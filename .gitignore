@@ -4,10 +4,13 @@
 *.swo
 gae_runtime/*
 third_party/*
+assets/hashes.js
 backend_prod_files/*
 core/templates/prod/*
+core/tests/.browserstack.env
 .coverage*
 .viminfo
+.vscode/*
 libpeerconnection.log
 uploads/*
 venv/

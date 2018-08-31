@@ -384,10 +384,10 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a topic.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expected_status_int=200)
             self.logout()
 
             # Check that non-admins cannot delete a topic.

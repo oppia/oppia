@@ -95,19 +95,33 @@ md-input-group.md-default-theme label {
 
 .md-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
-.md-button.oppia-learner-try-again-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
   color: #ffffff;
   padding: 6px 12px;
 }
 
+.md-button.oppia-learner-reload-image-button {
+  background:#ffffff;
+  border: 2px solid;
+  border-color:#0D48A1;
+  color:  #0D48A1;
+  padding-bottom: 12px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 12px;
+}
+
+.md-button.md-default-theme.oppia-learner-reload-image-button:focus,
+.md-button.md-default-theme.oppia-learner-reload-image-button:hover {
+  background-color: rgba(224,242,241,1);
+  text-decoration: none;
+}
+
 .md-button.md-default-theme.oppia-learner-confirm-button:focus,
 .md-button.md-default-theme.oppia-learner-confirm-button:hover,
 .md-button.md-default-theme.oppia-learner-got-it-button:focus,
 .md-button.md-default-theme.oppia-learner-got-it-button:hover,
-.md-button.md-default-theme.oppia-learner-try-again-button:focus,
-.md-button.md-default-theme.oppia-learner-try-again-button:hover,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
   background-color: #115FD4;
@@ -300,6 +314,11 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   font-style: italic;
 }
 
+.oppia-issues-learner-action-table td,
+.oppia-issues-learner-action-table th {
+  border: 1px solid black;
+}
+
 /* Change the color of odd-numbered lines in a table. */
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
@@ -435,6 +454,15 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   min-height: 100%;
+  position: relative;
+}
+
+/*
+  Style for the oppia reload symbol in reload image button.
+*/
+.oppia-reload-image-symbol {
+  padding-bottom: 10px;
+  padding-left: 16px;
   position: relative;
 }
 
@@ -988,6 +1016,16 @@ textarea {
     margin-right: 2vw;
     max-width: 96vw;
   }
+}
+
+.oppia-story-tile {
+  display: block;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+  min-height: 300px;
+  width: 100vw;
 }
 
 .oppia-fractions-landing-page-generic-title {
@@ -1565,7 +1603,7 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-state-graph-container, 
+.oppia-state-graph-container,
 .oppia-translation-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -3728,7 +3766,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 
-.oppia-rte{
+.oppia-rte {
   min-height: 80px;
   height: auto;
   border: 1px solid #ccc;
@@ -3747,4 +3785,169 @@ md-card.preview-conversation-skin-supplemental-card {
   -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
   padding: 8px;
+}
+
+span.learner-action {
+  margin-bottom: 2em;
+}
+
+span.oppia-issues-learner-action {
+  display: block;
+  margin-bottom: 2em;
+}
+
+.oppia-issues-hexagon-text {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  color: white;
+}
+
+.oppia-issues-playthrough-modal-btn {
+  background: transparent;
+  border-radius: 0;
+}
+
+/* Values below were experimentally generated using 'http://csshexagon.com' */
+.oppia-hexagon {
+  transform: scale(0.5);
+  position: relative;
+  width: 200px;
+  height: 115.47px;
+  background-color: #009A8B;
+  margin: 20px 0;
+  border-left: solid 2px #009A8B;
+  border-right: solid 2px #009A8B;
+}
+
+.oppia-hexagon:before,
+.oppia-hexagon:after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 141.42px;
+  height: 141.42px;
+  -webkit-transform: scaleY(0.5774) rotate(-45deg);
+  -ms-transform: scaleY(0.5774) rotate(-45deg);
+  transform: scaleY(0.5774) rotate(-45deg);
+  background-color: inherit;
+  left: 27.2893px;
+}
+
+.oppia-hexagon:before {
+  top: -70.7107px;
+  border-top: solid 2.8284px #009A8B;
+  border-right: solid 2.8284px #009A8B;
+}
+
+.oppia-hexagon:after {
+  bottom: -70.7107px;
+  border-bottom: solid 2.8284px #009A8B;
+  border-left: solid 2.8284px #009A8B;
+}
+
+.oppia-issues-content {
+  width: 66%;
+}
+
+.oppia-issues-border-gray {
+  border: 2px solid #b2b2bb;
+}
+
+.issueNav:hover {
+  cursor: pointer;
+}
+
+.oppia-issues-bor-btm {
+  border-bottom: 2px solid #b2b2bb;
+}
+
+.oppia-issues-bor-right {
+  border-right: 1px solid #b2b2bb;
+}
+
+.oppia-issues-bor-left {
+  border-left: 1px solid #b2b2bb;
+}
+
+.oppia-issues-clr-green {
+  color: #66A79D;
+}
+
+.oppia-issues-bg-clr {
+  background: #469689;
+}
+
+.oppia-issues-suggestion-header {
+  color: red;
+  margin-left: 10px;
+}
+
+.oppia-issues-tips {
+  list-style-type: square;
+}
+
+.oppia-issues-playthrough-content {
+  font-size: 1.3em;
+  color: white;
+}
+
+.oppia-issues-btn-arrow {
+  margin: auto;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.oppia-issues-highlight {
+  background-color: #cfffe1;
+  opacity: 0.5;
+}
+
+.oppia-issues-btn-resolve {
+  padding: .35rem 1.2rem;
+  border-radius: 10px !important;
+}
+
+.oppia-ft-14 {
+  font-size: 14px;
+}
+
+.oppia-issues-state-link {
+  text-decoration: underline;
+  color: blue;
+}
+
+.oppia-issues-row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.oppia-issues-text-white {
+  color: white;
+}
+
+.oppia-pt2 {
+  padding-top: .5rem;
+}
+
+.oppia-pt4 {
+  padding-top: 1.5rem;
+}
+
+.oppia-pb2 {
+  padding-bottom: .5rem;
+}
+
+.oppia-issues-issue-dir {
+  font-family: montserrat, sans-serif;
+}
+
+.oppia-issues-learner-action-table {
+  width: 100%;
+  border: 1px solid black;
 }

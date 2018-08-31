@@ -22,6 +22,8 @@
 #   bash scripts/run_e2e_tests.sh
 #
 # Optional arguments:
+#   --browserstack Run the tests on browserstack using the
+#         protractor-browserstack.conf.js file.
 #   --skip-install=true/false If true, skips installing dependencies. The
 #         default value is false.
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
@@ -86,6 +88,9 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
+if [ "$TRAVIS" == 'true' ]; then
+  source $(dirname $0)/install_chrome_on_travis.sh || exit 1
+fi
 
 export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
@@ -109,11 +114,18 @@ trap cleanup EXIT
 
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
+RUN_ON_BROWSERSTACK=False
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
+  fi
+
+  # Used to run the e2e tests on browserstack.
+  if [ "$arg" == "--browserstack" ]; then
+    RUN_ON_BROWSERSTACK=True
+    echo "  Running the tests on browserstack..."
   fi
 done
 
@@ -179,6 +191,10 @@ for j in "$@"; do
     shift
     ;;
 
+    --browserstack*)
+    shift
+    ;;
+
     *)
     echo "Error: Unknown command line option: $j"
     ;;
@@ -190,8 +206,16 @@ done
 # Isolated tests do not work properly unless no sharding parameters are passed
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
-if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 else
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 fi

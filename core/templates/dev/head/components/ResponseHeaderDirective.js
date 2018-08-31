@@ -28,24 +28,30 @@ oppia.directive('responseHeader', [
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
         getNumRules: '&numRules',
-        isResponse: '&isResponse'
+        isResponse: '&isResponse',
+        showWarning: '&showWarning',
+        navigateToState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/response_header_directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
-        'PLACEHOLDER_OUTCOME_DEST', 'ExplorationCorrectnessFeedbackService',
-        'stateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', 'EditabilityService', 'StateEditorService',
+        'PLACEHOLDER_OUTCOME_DEST',
+        'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, EditabilityService, EditorStateService, RouterService,
-            PLACEHOLDER_OUTCOME_DEST, ExplorationCorrectnessFeedbackService,
-            stateInteractionIdService, INTERACTION_SPECS) {
+            $scope, EditabilityService, StateEditorService,
+            PLACEHOLDER_OUTCOME_DEST,
+            StateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
+          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return StateEditorService.getCorrectnessFeedbackEnabled();
+          };
           // This returns false if the current interaction ID is null.
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
@@ -58,21 +64,13 @@ oppia.directive('responseHeader', [
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();
-            var activeStateName = EditorStateService.getActiveStateName();
+            var activeStateName = StateEditorService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
-          };
-
-          $scope.isCorrectnessFeedbackEnabled = function() {
-            return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
           $scope.isCreatingNewState = function() {
             var outcome = $scope.getOutcome();
             return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-          };
-
-          $scope.navigateToState = function(stateName) {
-            RouterService.navigateToMainTab(stateName);
           };
 
           $scope.deleteResponse = function(evt) {

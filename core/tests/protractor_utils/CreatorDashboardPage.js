@@ -35,6 +35,8 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-create-collection'));
   var createExplorationButton =
     element(by.css('.protractor-test-create-exploration'));
+  var createNewExplorationButton =
+    element(by.css('.protractor-test-create-new-exploration-button'));
 
     // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
@@ -88,6 +90,15 @@ var CreatorDashboardPage = function() {
       createExplorationButton,
       'Create Exploration button takes too long to be clickable');
     createExplorationButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.clickCreateNewExplorationButton = function() {
+    waitFor.elementToBeClickable(
+      createNewExplorationButton,
+      'Create Exploration button on the creator' +
+      'dashboard page takes too long to be clickable');
+    createNewExplorationButton.click();
     waitFor.pageToFullyLoad();
   };
 

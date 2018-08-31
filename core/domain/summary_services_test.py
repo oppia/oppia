@@ -22,6 +22,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -29,6 +30,11 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class ExplorationDisplayableSummariesTest(
@@ -252,12 +258,17 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'reload_exploration',
-                'exploration_id': '2'
-            }, csrf_token=csrf_token)
-        self.logout()
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'reload_exploration',
+                    'exploration_id': '2'
+                }, csrf_token=csrf_token)
+            self.logout()
 
     def test_get_library_groups(self):
         """The exploration with id '2' is an exploration in the Mathematics

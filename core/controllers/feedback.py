@@ -36,14 +36,11 @@ class ThreadListHandler(base.BaseHandler):
         self.values.update({
             'feedback_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
-                    exploration_id, False)])
-            })
-        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            self.values.update({
-                'suggestion_thread_dicts': (
-                    [t.to_dict() for t in feedback_services.get_all_threads(
-                        exploration_id, True)])
-            })
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
+            'suggestion_thread_dicts': (
+                [t.to_dict() for t in feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+        })
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
@@ -59,11 +56,25 @@ class ThreadListHandler(base.BaseHandler):
                 'Text for the first message in the thread must be specified.')
 
         feedback_services.create_thread(
-            exploration_id,
-            self.payload.get('state_name'),
-            self.user_id,
-            subject,
-            text)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id,
+            self.payload.get('state_name'), self.user_id, subject, text)
+        self.render_json(self.values)
+
+
+class ThreadListHandlerForTopics(base.BaseHandler):
+    """Handles listing of suggestions threads linked to topics."""
+    @acl_decorators.can_edit_topic
+    def get(self, topic_id):
+        if (
+                not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS or
+                not feconf.ENABLE_NEW_STRUCTURES):
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'suggestion_thread_dicts': (
+                [t.to_dict() for t in feedback_services.get_all_threads(
+                    feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
+            })
         self.render_json(self.values)
 
 
@@ -74,11 +85,11 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
-        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             suggestion_id = 'exploration.%s' % thread_id
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         else:
-            suggestion = feedback_services.get_suggestion(thread_id)
+            suggestion_id = thread_id
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         messages = [m.to_dict() for m in feedback_services.get_messages(
             thread_id)]
@@ -104,11 +115,8 @@ class ThreadHandler(base.BaseHandler):
                 'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
-            thread_id,
-            self.user_id,
-            updated_status,
-            self.payload.get('updated_subject'),
-            text)
+            thread_id, self.user_id, updated_status,
+            self.payload.get('updated_subject'), text)
         self.render_json(self.values)
 
 
@@ -226,13 +234,13 @@ class SuggestionListHandler(base.BaseHandler):
                 'Invalid value for has_suggestion.')
         if list_type == self._LIST_TYPE_OPEN:
             threads = feedback_services.get_open_threads(
-                exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_CLOSED:
             threads = feedback_services.get_closed_threads(
-                exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_ALL:
             threads = feedback_services.get_all_threads(
-                exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')
 

@@ -1,4 +1,3 @@
-
 # coding: utf-8
 #
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
@@ -17,11 +16,11 @@
 
 """Controllers for suggestions."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
+import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -31,14 +30,11 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         suggestion_services.create_suggestion(
             self.payload.get('suggestion_type'),
             self.payload.get('target_type'), self.payload.get('target_id'),
             self.payload.get('target_version_at_submission'),
-            self.user_id, self.payload.get('change_cmd'),
+            self.user_id, self.payload.get('change'),
             self.payload.get('description'),
             self.payload.get('final_reviewer_id'))
         self.render_json(self.values)
@@ -47,21 +43,17 @@ class SuggestionHandler(base.BaseHandler):
 class SuggestionToExplorationActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to explorations."""
 
-    ACTION_TYPE_ACCEPT = 'accept'
-    ACTION_TYPE_REJECT = 'reject'
-
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException('Invalid format for suggestion_id.'
                                              ' It must contain 3 parts'
                                              ' separated by \'.\'')
 
-        if suggestion_id.split('.')[0] != 'exploration':
+        if (
+                suggestion_id.split('.')[0] !=
+                suggestion_models.TARGET_TYPE_EXPLORATION):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to explorations.')
 
@@ -78,11 +70,57 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.UnauthorizedUserException('You cannot accept/reject your'
                                                  ' own suggestion.')
 
-        if action == self.ACTION_TYPE_ACCEPT:
+        if action == suggestion_models.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
-        elif action == self.ACTION_TYPE_REJECT:
+        elif action == suggestion_models.ACTION_TYPE_REJECT:
+            suggestion_services.reject_suggestion(
+                suggestion, self.user_id, self.payload.get('review_message'))
+        else:
+            raise self.InvalidInputException('Invalid action.')
+
+        self.render_json(self.values)
+
+
+class SuggestionToTopicActionHandler(base.BaseHandler):
+    """Handles actions performed on suggestions to topics."""
+
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_topic)
+    def put(self, target_id, suggestion_id):
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id. It must contain 3 parts'
+                ' separated by \'.\'')
+
+        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
+            raise self.InvalidInputException(
+                'This handler allows actions only on suggestions to topics.')
+
+        if suggestion_id.split('.')[1] != target_id:
+            raise self.InvalidInputException(
+                'The topic id provided does not match the topic id present as '
+                'part of the suggestion_id')
+
+        action = self.payload.get('action')
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if action == suggestion_models.ACTION_TYPE_ACCEPT:
+            if (
+                    suggestion.suggestion_type ==
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                # The skill_id is passed only at the time of accepting the
+                # suggestion.
+                skill_id = self.payload.get('skill_id')
+                suggestion.change.skill_id = skill_id
+            suggestion_services.accept_suggestion(
+                suggestion, self.user_id, self.payload.get('commit_message'),
+                self.payload.get('review_message'))
+        elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
                 suggestion, self.user_id, self.payload.get('review_message'))
         else:
@@ -96,9 +134,6 @@ class SuggestionListHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            raise self.PageNotFoundException
-
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
         # element is the value of the field being queried.

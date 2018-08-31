@@ -24,18 +24,14 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSortInput/directives/' +
         'drag_and_drop_sort_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        '$scope', '$attrs', 'UrlService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            $scope, $attrs, UrlService, CurrentInteractionService) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
 
@@ -75,7 +71,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
             });
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          $scope.$on(CurrentInteractionService, $scope.submitAnswer);
         }
       ]
     };
@@ -173,6 +169,29 @@ oppia.factory('dragAndDropSortInputRulesService', [function() {
     },
     IsEqualToOrderingWithOneItemAtIncorrectPosition: function(answer, inputs) {
       return checkEqualityWithIncorrectPositions(answer, inputs);
+    },
+    HasElementXAtPositionY: function(answer, inputs) {
+      for (var i = 0; i < answer.length; i++) {
+        var index = answer[i].indexOf(inputs.x);
+        if (index !== -1) {
+          return ((i + 1) === inputs.y);
+        }
+      }
+    },
+    HasElementXBeforeElementY: function(answer, inputs) {
+      var indX = -1;
+      var indY = -1;
+      for (var i = 0; i < answer.length; i++) {
+        var index = answer[i].indexOf(inputs.x);
+        if (index !== -1) {
+          indX = i;
+        }
+        index = answer[i].indexOf(inputs.y);
+        if (index !== -1) {
+          indY = i;
+        }
+      }
+      return indX < indY;
     }
   };
 }]);

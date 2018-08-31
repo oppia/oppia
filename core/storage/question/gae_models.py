@@ -17,7 +17,6 @@
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
-import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -194,33 +193,35 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_ids_linked_to_skill_ids(cls, skill_ids, start_cursor):
+    def get_question_ids_linked_to_skill_ids(
+            cls, question_count, skill_ids, start_cursor):
         """Fetches the list of question ids linked to the skill in batches.
 
         Args:
+            question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
             start_cursor: str. The starting point from which the batch of
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(str), str. The question ids linked to given skills and the next
-                cursor value to be used for the next page. The returned next
-                cursor value is urlsafe.
+            list(str), str|None. The question ids linked to given skills and the
+                next cursor value to be used for the next page (or None if no
+                more pages are left). The returned next cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NUM_QUESTIONS_PER_PAGE,
+                question_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NUM_QUESTIONS_PER_PAGE
+                question_count
             )
         question_ids = [
             model.question_id for model in question_skill_link_models
@@ -229,6 +230,42 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
         return question_ids, next_cursor_str
+
+    @classmethod
+    def get_models_by_skill_id(cls, skill_id):
+        """Returns a list of QuestionSkillLink domains of a particular skill ID.
+
+        Args:
+            skill_id: str. ID of the skill.
+
+        Returns:
+            list(QuestionSkillLinkModel)|None. The list of question skill link
+            domains that are linked to the skill ID. None if the skill
+            ID doesn't exist.
+        """
+        return QuestionSkillLinkModel.query().filter(
+            cls.skill_id == skill_id).fetch()
+
+    @classmethod
+    def put_multi_question_skill_links(cls, question_skill_links):
+        """Puts multiple question skill links into the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLink). The list of
+            question skill link domain objects to put into the datastore.
+        """
+        cls.put_multi(question_skill_links)
+
+
+    @classmethod
+    def delete_multi_question_skill_links(cls, question_skill_links):
+        """Deletes multiple question skill links from the datastore.
+
+        Args:
+            question_skill_links: list(QuestionSkillLinkModel). The list of
+            question skill link domain objects to delete from the datastore.
+        """
+        cls.delete_multi(question_skill_links)
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

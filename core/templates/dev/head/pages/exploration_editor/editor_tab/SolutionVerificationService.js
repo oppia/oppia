@@ -18,19 +18,24 @@
 
 oppia.factory('SolutionVerificationService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
+  'StateEditorService',
   function(
-      $injector, AngularNameService, AnswerClassificationService) {
+      $injector, AngularNameService, AnswerClassificationService,
+      StateEditorService) {
     return {
-      verifySolution: function(explorationId, state, correctAnswer) {
-        var interactionId = state.interaction.id;
+      verifySolution: function(stateName, interaction, correctAnswer) {
+        var interactionId = interaction.id;
         var rulesServiceName = (
           AngularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
         var result = (
           AnswerClassificationService.getMatchingClassificationResult(
-            explorationId, state.name, state, correctAnswer, rulesService
+            stateName, interaction, correctAnswer, rulesService
           ));
-        return state.name !== result.outcome.dest;
+        if (StateEditorService.isInQuestionMode()) {
+          return result.outcome.labelledAsCorrect;
+        }
+        return stateName !== result.outcome.dest;
       }
     };
   }]);

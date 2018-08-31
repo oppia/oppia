@@ -316,9 +316,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'add_state',
             'state_name': 'New state 2'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -344,9 +345,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state 2',
             'new_state_name': 'Renamed state'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -362,9 +364,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'New state'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -389,9 +392,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'Renamed state 2'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -417,9 +421,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state 3',
             'new_state_name': 'New state 4'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -460,9 +465,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state',
             'new_state_name': 'New state 4'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -489,6 +495,21 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 'New state 4'].total_answers_count_v2, 0)
 
+        # Test reverts.
+        exploration.version += 1
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            exp_versions_diff=None, revert_to_version=5)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 8)
+        self.assertEqual(
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'Renamed state', 'End']))
+
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
+        self.assertEqual(exploration_stats.num_completions_v2, 0)
+
     def test_create_exp_issues_for_new_exploration(self):
         """Test the create_exp_issues_for_new_exploration method."""
         # Create exploration object in datastore.
@@ -497,10 +518,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         stats_services.create_exp_issues_for_new_exploration(
@@ -520,10 +540,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         exp_issues = stats_services.get_exp_issues(

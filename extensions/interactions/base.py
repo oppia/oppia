@@ -43,7 +43,6 @@ from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 import feconf
-import jinja_utils
 import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
@@ -113,8 +112,10 @@ class BaseInteraction(object):
     can_have_solution = None
     # Whether to show a Submit button in the progress navigation area. This is
     # a generic submit button so do not use this if special interaction-specific
-    # behavior is required. The interaction JS must also handle the
-    # EVENT_PROGRESS_NAV_SUBMITTED event broadcast by this Submit button.
+    # behavior is required. The interaction directive must also register
+    # callbacks with CurrentInteractionService which handle answer submission
+    # when the button is clicked and control the enabling/disabling of the
+    # submit button.
     show_generic_submit_button = False
 
     # Temporary cache for the rule definitions.
@@ -196,7 +197,7 @@ class BaseInteraction(object):
         """
         html_templates = utils.get_file_contents(os.path.join(
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
+        return html_templates
 
     @property
     def validator_html(self):

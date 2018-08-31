@@ -276,6 +276,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
@@ -312,7 +313,6 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
-            'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
@@ -326,7 +326,6 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in self.user.actions),
             'username': self.username,
@@ -392,6 +391,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
@@ -442,8 +442,18 @@ class BaseHandler(webapp2.RequestHandler):
                 in debug mode.
         """
         if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
+            # This checks if the response should be JSON or HTML.
+            # For GET requests, there is no payload, so we check against
+            # GET_HANDLER_ERROR_RETURN_TYPE.
+            # Otherwise, we check whether self.payload exists.
+            if (self.payload is not None or
+                    self.GET_HANDLER_ERROR_RETURN_TYPE ==
+                    feconf.HANDLER_TYPE_JSON):
+                self.error(401)
+                self._render_exception(401, {'error': unicode(exception)})
+            else:
+                self.redirect(
+                    current_user_services.create_login_url(self.request.uri))
             return
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))

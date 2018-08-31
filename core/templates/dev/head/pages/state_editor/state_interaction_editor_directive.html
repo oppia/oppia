@@ -1,0 +1,33 @@
+<div id="tutorialStateInteraction">
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!interactionId">
+    <div class="oppia-add-interaction-button-container">
+      <button type="button" class="btn btn-default btn-lg oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
+        + Add Interaction / End Exploration
+      </button>
+    </div>
+  </md-card>
+
+  <div ng-if="interactionId">
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
+        <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
+        <div class="oppia-editor-card-section-container">
+          <div class="oppia-editor-card-section" style="height: 100%;">
+            <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="EditabilityService.isEditable()">
+              <i class="material-icons md-18">&#xE5CD;</i>
+            </button>
+
+            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': EditabilityService.isEditable()}">
+              <div class="oppia-interaction-preview oppia-transition-200" style="position: absolute; width: 100%; height: 100%;" ng-click="openInteractionCustomizerModal()">
+              </div>
+              <div>
+                <angular-html-bind html-data="interactionPreviewHtml" style="padding: 5px; pointer-events: none;">
+                </angular-html-bind>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </md-card>
+  </div>
+</div>

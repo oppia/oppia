@@ -87,7 +87,7 @@ BAD_PATTERNS = {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
         'excluded_dirs': (
-            'assets/i18n/',)},
+            'assets/i18n/', 'core/tests/build_sources/assets/')},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': (),
@@ -109,6 +109,12 @@ BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'\b(browser.pause)\(',
         'message': "In tests, please do not use browser.pause().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\b(browser.sleep)\(',
+        'message': "In tests, please do not use browser.sleep().",
         'excluded_files': (),
         'excluded_dirs': ()
     },
@@ -181,12 +187,20 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r'print \'',
+        'regexp': r'print ',
         'message': "Please do not use print statement.",
         'excluded_files': (
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
         'excluded_dirs': ('scripts/',)
+    },
+    {
+        'regexp': r'self.assertEquals\(',
+        'message': "Please do not use self.assertEquals method. " +
+                   "This method has been deprecated. Instead use " +
+                   "self.assertEqual method.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -215,6 +229,7 @@ GENERATED_FILE_PATHS = (
     'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.js',
     'core/templates/dev/head/mathjaxConfig.js',
@@ -253,6 +268,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
@@ -783,6 +799,8 @@ def _check_bad_pattern_in_file(filename, content, pattern):
             or filename in pattern['excluded_files']):
         bad_pattern_count = 0
         for line_num, line in enumerate(content.split('\n'), 1):
+            if line.endswith('disable-bad-pattern-check'):
+                continue
             if re.search(regexp, line):
                 print '%s --> Line %s: %s' % (
                     filename, line_num, pattern['message'])
@@ -1094,6 +1112,16 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
+def _validate_and_parse_js_file(filename, content):
+    """This function validates a JavaScript file and returns the parsed contents
+    as a Python dictionary.
+    """
+    # Use Pyjsparser to parse a JS file as a Python dictionary.
+    parser = pyjsparser.PyJsParser()
+    print 'Validating and parsing %s file ...' % filename
+    return parser.parse(content)
+
+
 def _check_directive_scope(all_files):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
@@ -1107,13 +1135,12 @@ def _check_directive_scope(all_files):
         and filename.endswith('.js')]
     failed = False
     summary_messages = []
-    # Use Pyjsparser to parse a JS file as a Python dictionary.
-    parser = pyjsparser.PyJsParser()
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
+        parsed_dict = _validate_and_parse_js_file(filename, content)
         # Parse the body of the content as nodes.
-        parsed_nodes = parser.parse(content)['body']
+        parsed_nodes = parsed_dict['body']
         for parsed_node in parsed_nodes:
             # Check the type of the node.
             if parsed_node['type'] != 'ExpressionStatement':

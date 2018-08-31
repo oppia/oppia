@@ -17,21 +17,17 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
         'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'EVENT_PROGRESS_NAV_SUBMITTED', function(
+        'CurrentInteractionService', function(
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
             numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -69,10 +65,8 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             try {
               var numberWithUnits =
                 NumberWithUnitsObjectFactory.fromRawInputString(answer);
-              $scope.onSubmit({
-                answer: numberWithUnits,
-                rulesService: numberWithUnitsRulesService
-              });
+              CurrentInteractionService.onSubmit(
+                numberWithUnits, numberWithUnitsRulesService);
             } catch (parsingError) {
               errorMessage = parsingError.message;
               $scope.NumberWithUnitsForm.answer.$setValidity(
@@ -80,22 +74,20 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             }
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
-            $scope.submitAnswer($scope.answer);
-          });
-
           $scope.isAnswerValid = function() {
+            if ($scope.NumberWithUnitsForm === undefined) {
+              return true;
+            }
             return (!$scope.NumberWithUnitsForm.$invalid &&
               $scope.answer !== '');
           };
 
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid()
-            });
-          });
+          var submitAnswerFn = function() {
+            $scope.submitAnswer($scope.answer);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, $scope.isAnswerValid);
 
           $scope.showHelp = function() {
             $uibModal.open({
@@ -130,8 +122,18 @@ oppia.directive('oppiaResponseNumberWithUnits', [
         'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
+        // Sometimes, it was found that in the time it takes for this
+        // interaction to load, it used the learner input for the previous
+        // interaction which threw a console error. Though, this doesn't
+        // affect user experience as, as soon as the new card was recorded in
+        // the transcript, this starts taking the right value. this is a
+        // temporary fix until the issue is resolved.
+        if (!answer.type) {
+          $scope.answer = null;
+        } else {
+          $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+            answer).toString();
+        }
       }]
     };
   }

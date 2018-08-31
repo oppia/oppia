@@ -270,7 +270,7 @@ oppia.controller('LearnerDashboard', [
           ui.placeholder.height(ui.item.height());
           $scope.$apply();
         },
-        sort: function (e, ui) {
+        sort: function(e, ui) {
           /* eslint-disable quote-props */
           // Reset the position of the window on scrolling. This keeps the mouse
           // position and elements in sync.

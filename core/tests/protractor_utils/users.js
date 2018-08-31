@@ -90,6 +90,17 @@ var createAndLoginAdminUser = function(email, username) {
   adminPage.updateRole(username, 'admin');
 };
 
+var createAdminMobile = function(email, username) {
+  createAndLoginAdminUserMobile(email, username);
+  logout();
+};
+
+var createAndLoginAdminUserMobile = function(email, username) {
+  login(email, true);
+  _completeSignup(username);
+};
+
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -97,3 +108,5 @@ exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
 exports.createAndLoginAdminUser = createAndLoginAdminUser;
+exports.createAdminMobile = createAdminMobile;
+exports.createAndLoginAdminUserMobile = createAndLoginAdminUserMobile;
