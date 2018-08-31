@@ -74,6 +74,8 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
             self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 0)
+            self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
             self.assertEqual(
@@ -99,6 +101,8 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 json_response['topic_summary_dicts'][0]['id'], self.topic_id)
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
+            self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 0)
             self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)

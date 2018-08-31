@@ -84,11 +84,15 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 skill_services.get_all_unpublished_skill_rights())]
 
         untriaged_skill_summary_dicts = []
+        mergeable_skill_summary_dicts = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in skill_ids_for_unpublished_skills):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
+            if (skill_id in skill_ids_assigned_to_some_topic) and (
+                    skill_id not in skill_ids_for_unpublished_skills):
+                mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         unpublished_skill_summary_dicts = [
             summary.to_dict() for summary in (
@@ -106,6 +110,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'unpublished_skill_summary_dicts': unpublished_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,

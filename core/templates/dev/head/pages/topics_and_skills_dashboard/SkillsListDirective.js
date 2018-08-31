@@ -21,20 +21,28 @@ oppia.directive('skillsList', [
       restrict: 'E',
       scope: {
         getSkillSummaries: '&skillSummaries',
-        getEditableTopicSummaries: '&editableTopicSummaries'
+        getEditableTopicSummaries: '&editableTopicSummaries',
+        isInModal: '&inModal',
+        getMergeableSkillSummaries: '&mergeableSkillSummaries',
+        selectedSkill: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        'EditableSkillBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
+            EditableSkillBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
           ];
           $scope.getSkillEditorUrl = function(skillId) {
+            if ($scope.isInModal()) {
+              return '#';
+            }
             return '/skill_editor/' + skillId;
           };
           $scope.assignSkillToTopic = function(skillId) {
@@ -81,6 +89,62 @@ oppia.directive('skillsList', [
                   }
                 }
               }
+            });
+          };
+
+          $scope.selectSkill = function(skill) {
+            $scope.selectedSkill = skill;
+          };
+
+          $scope.mergeSkill = function(skill) {
+            var skillSummaries = $scope.getMergeableSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'merge_skill_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkill = {};
+                  $scope.done = function() {
+                    $uibModalInstance.close(
+                      {skill: skill,
+                        superseding_skill: $scope.selectedSkill
+                      });
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(result) {
+              var skill = result.skill;
+              var supersedingSkill = result.superseding_skill;
+              var changeList = [{
+                cmd: 'update_skill_property',
+                property_name: 'superseding_skill_id',
+                old_value: '',
+                new_value: supersedingSkill.id
+              },
+              {
+                cmd: 'update_skill_property',
+                property_name: 'all_questions_merged',
+                old_value: '',
+                new_value: false
+              }];
+              EditableSkillBackendApiService.updateSkill(
+                skill.id, skill.version,
+                'Added superseding skill id ' +
+                 supersedingSkill.id + ' to skill.',
+                changeList
+              ).then(function() {
+                $rootScope.$broadcast(
+                  EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+              });
             });
           };
         }
