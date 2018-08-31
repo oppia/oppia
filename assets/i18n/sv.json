@@ -433,6 +433,8 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Utforskningar är ämnade att förbättras kontinuerligt och utforskningar som inte har redigerats på länge kan anses vara \"bortglömda\". I detta fall kan ägarskapet i stort sätt överlämnas till Oppia-gemenskapen (vid diskretion av moderatorer) så att utforskningen kan fortsätta att förbättras.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Deltagandescenario",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Undervisa med Oppia",
+	"I18N_TOPIC_VIEWER_PRACTICE": "Öva",
+	"I18N_TOPIC_VIEWER_STORY": "Historia",
 	"I18N_TOPNAV_ABOUT": "Om",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Om Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Administratörssida",
@@ -455,5 +457,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Logga in med Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervisa med Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du har totalt <[totalSubscribers]> prenumeranter.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Avsluta prenumeration"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Avsluta prenumeration",
+	"I18N_WORKED_EXAMPLE": "Fungerande exempel"
 }

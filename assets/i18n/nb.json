@@ -41,6 +41,7 @@
 	"I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Totalt antall avspillinger",
 	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Abonnenter",
 	"I18N_DASHBOARD_SUBSCRIBERS": "Abonnenter",
+	"I18N_DASHBOARD_SUGGESTIONS": "Forslag",
 	"I18N_DASHBOARD_TABLE_HEADING_EXPLORATION": "Utforskning",
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "Sist oppdatert",
 	"I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS": "Åpne tråder",
@@ -187,5 +188,6 @@
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Språk",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Laster lyd …",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Brukernavn kan bare ha alfanumeriske tegn.",
-	"I18N_SPLASH_TITLE": "Tenk utenfor bøkene."
+	"I18N_SPLASH_TITLE": "Tenk utenfor bøkene.",
+	"I18N_TOPIC_VIEWER_STORY": "Historie"
 }
