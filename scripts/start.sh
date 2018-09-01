@@ -81,16 +81,18 @@ for arg in "$@"; do
   fi
 done
 
-feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
-sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
-# Delete the modified feconf.py file(-i.bak)
-rm feconf.py.bak
-
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  constants_env_variable="\"DEV_MODE\": false"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env
 else
+  constants_env_variable="\"DEV_MODE\": true"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py
 fi
+
+# Delete the modified feconf.py file(-i.bak)
+rm assets/constants.js.bak
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.

@@ -1084,7 +1084,7 @@ tags: []
         examples: '' or 'build/'.
         """
         filepath = ''
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             filepath = os.path.join('build')
 
         return filepath

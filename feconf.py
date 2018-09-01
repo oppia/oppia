@@ -20,6 +20,7 @@ import copy
 import datetime
 import os
 
+from constants import constants  # pylint: disable=relative-import
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -37,10 +38,9 @@ FORCE_PROD_MODE = False
 # or if you want to use minified resources in the development environment.
 
 if PLATFORM == 'gae':
-    DEV_MODE = (
-        (not os.environ.get('SERVER_SOFTWARE') or
-         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
-        not FORCE_PROD_MODE)
+    if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
+            not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+        raise Exception('Invalid platform: expected one of [\'gae\']')
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
@@ -51,7 +51,7 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not DEV_MODE else '')
+    'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -66,7 +66,7 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not DEV_MODE:
+if not constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
