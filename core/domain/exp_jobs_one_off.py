@@ -842,12 +842,12 @@ class ValidationOfImagesOnGCSJobUsingExps(jobs.BaseMapReduceOneOffJobManager):
                     'image/%s_micro.%s' % (filename_wo_filetype, filetype))
 
                 if not fs_new.isfile(filepath.encode('utf-8')):
-                    yield (FILE_IS_NOT_IN_GCS, instance_id)
+                    yield (FILE_IS_NOT_IN_GCS, url.encode('utf-8'))
                 elif not fs_new.isfile(
                         compressed_image_filepath.encode('utf-8')):
-                    yield ('Compressed file not in GCS', instance_id)
+                    yield ('Compressed file not in GCS', url.encode('utf-8'))
                 elif not fs_new.isfile(micro_image_filepath.encode('utf-8')):
-                    yield ('Micro file not in GCS', instance_id)
+                    yield ('Micro file not in GCS', url.encode('utf-8'))
                 else:
                     yield (FILE_FOUND_IN_GCS, 1)
 
