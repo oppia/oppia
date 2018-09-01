@@ -65,13 +65,12 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
               }
             }
 
-            $scope.onSubmit({
-              answer: answers,
-              rulesService: dragAndDropSortInputRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              answers, dragAndDropSortInputRulesService);
           };
 
-          $scope.$on(CurrentInteractionService, $scope.submitAnswer);
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitAnswer, null);
         }
       ]
     };
