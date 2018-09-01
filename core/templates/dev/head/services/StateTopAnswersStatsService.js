@@ -20,11 +20,11 @@
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   'AnswerStatsObjectFactory', 'ContextService',
-  'ExplorationStatesService',
+  'ExplorationStatesService', 'ExplorationRightsService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
       AnswerStatsObjectFactory, ContextService,
-      ExplorationStatesService) {
+      ExplorationStatesService, ExplorationRightsService) {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
@@ -88,7 +88,9 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onStateAnswerGroupsSaved = function(stateName) {
-      refreshAddressedInfo(stateName);
+      if (ExplorationRightsService.isPublic()) {
+        refreshAddressedInfo(stateName);
+      }
     };
 
     return {
