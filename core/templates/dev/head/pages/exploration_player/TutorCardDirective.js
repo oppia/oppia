@@ -178,6 +178,13 @@ oppia.directive('tutorCard', [
             $scope.onChangeInteractionAnswerValidity({
               answerValidity: answerValidity
             });
+            if (
+              ExplorationEngineService.getCurrentInteraction().id ===
+                'CodeRepl') {
+              $scope.onChangeInteractionAnswerValidity({
+                answerValidity: true
+              });
+            }
           };
 
           $scope.isContentAudioTranslationAvailable = function() {
