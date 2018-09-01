@@ -321,11 +321,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_3, 'skill_2')
 
         question_skill_links = (
-        question_services.get_question_skill_links_of_question(
-            question_id_2))
+            question_services.get_question_skill_links_of_question(
+                question_id_2))
 
         self.assertEqual(len(question_skill_links), 2)
         skill_ids = [question_skill.skill_id for question_skill
-                        in question_skill_links]
+                     in question_skill_links]
         self.assertItemsEqual(
             skill_ids, ['skill_1', 'skill_2'])
