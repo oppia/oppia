@@ -25,6 +25,6 @@ describe('IdGenerationService', function() {
   }));
 
   it('should test a random id generated', function() {
-    expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]{11}/);
+    expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]+/);
   });
 });
