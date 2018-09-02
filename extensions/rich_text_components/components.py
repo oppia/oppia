@@ -150,3 +150,16 @@ class Video(BaseRteComponent):
         video_id = value_dict['video_id-with-value']
         if len(video_id) != 11:
             raise Exception('Video id length is not 11')
+
+
+class Audio(BaseRteComponent):
+    """Class fro Audio component."""
+
+    @classmethod
+    def validate(cls, value_dict):
+        """Validates Audio component."""
+        super(Audio, cls).validate(value_dict)
+        filename_re = r'^[A-Za-z0-9+/]*\.((mp3)|(amr)|(wave)|(aac))$'
+        filepath = value_dict['filepath-with-value']
+        if not re.match(filename_re, filepath):
+            raise Exception('Invalid filepath')

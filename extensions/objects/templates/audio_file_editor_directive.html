@@ -1,0 +1,38 @@
+<div ng-model="data" ui-validate="'validate($value)'">
+  <div class="row">
+    <div class="col-md-4 col-xs-4 col-sm-12 oppia-audio-file">
+      <input style="display: none;" type="file" name="audio_file" accept=".mp3" id="audio_file" class="form-control">
+      <button type="button" class="btn btn-primary" ng-click="openExplorer()">From computer</button>
+      <strong class="oppia-divider">Or</strong>
+    </div>
+    <div class="col-md-8 col-xs-8 col-sm-12 oppia-audio-url">
+      <div class="input-group">
+        <input type="text" name="audio_url" placeholder="Enter Audio Url" id="audio_url" class="form-control">
+        <span class="input-group-addon" ng-click="uploadAudioFromUrl()">upload</span>
+      </div>
+    </div>
+  </div>
+  <div class="row oppia-audio-result">
+    <div class="col-md-12">
+      <div ng-if="value">
+        <audio ng-src="<[value]>" controls></audio>
+      </div>
+      <div ng-if="data.showProgress">
+        <strong> Uploading <loading-dots></loading-dots></strong>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="oppia-form-error">
+  <[warningText]>
+</div>
+<style type="text/css">
+.oppia-audio-result {
+  margin-top: 20px;
+}
+
+.oppia-divider {
+  float: right;
+  padding-top: 6px;
+}
+</style>

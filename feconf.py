@@ -511,6 +511,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
+    'Audio': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Audio')
+    }
 }
 
 # These categories and interactions are displayed in the order in which they

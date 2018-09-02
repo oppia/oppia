@@ -400,6 +400,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
     get_redirect_route(
+        r'/createhandler/editor_audioupload/<exploration_id>',
+        editor.AudioUploadHandler),
+    get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
         translator.AudioUploadHandler),
     get_redirect_route(

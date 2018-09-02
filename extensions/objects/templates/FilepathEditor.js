@@ -588,6 +588,7 @@ oppia.directive('filepathEditor', [
               savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
             }
           };
+
           if (updateParent) {
             AlertsService.clearWarnings();
             $scope.value = filename;

@@ -33,17 +33,19 @@ oppia.factory('AssetsBackendApiService', [
 
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
-        ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
-       '/exploration/<exploration_id>/assets/audio/<filename>') :
-        '/audiohandler/<exploration_id>/audio/<filename>');
+      ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
+        '/exploration/<exploration_id>/assets/audio/<filename>') :
+      '/audiohandler/<exploration_id>/audio/<filename>');
     var IMAGE_DOWNLOAD_URL_TEMPLATE = (
-        GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
-        ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
-       '/exploration/<exploration_id>/assets/image/<filename>') :
-        '/imagehandler/<exploration_id>/<filename>');
+      GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
+      ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
+        '/exploration/<exploration_id>/assets/image/<filename>') :
+      '/imagehandler/<exploration_id>/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
+    var AUDIO_DOWNLOAD_AND_UPLOAD_URL_TEMPLATE =
+      '/createhandler/editor_audioupload/<exploration_id>';
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
@@ -68,9 +70,9 @@ oppia.factory('AssetsBackendApiService', [
           var assetBlob = new Blob([data]);
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
-                         window.WebKitBlobBuilder ||
-                         window.MozBlobBuilder ||
-                         window.MSBlobBuilder;
+            window.WebKitBlobBuilder ||
+            window.MozBlobBuilder ||
+            window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(data);
@@ -112,7 +114,7 @@ oppia.factory('AssetsBackendApiService', [
         assetType) {
       if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
         for (var index = 0; index <
-             _audioFilesCurrentlyBeingRequested.length; index++) {
+          _audioFilesCurrentlyBeingRequested.length; index++) {
           if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
             _audioFilesCurrentlyBeingRequested.splice(index, 1);
             break;
@@ -120,7 +122,7 @@ oppia.factory('AssetsBackendApiService', [
         }
       } else if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_IMAGE)) {
         for (var index = 0; index <
-             _imageFilesCurrentlyBeingRequested.length; index++) {
+          _imageFilesCurrentlyBeingRequested.length; index++) {
           if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
             _imageFilesCurrentlyBeingRequested.splice(index, 1);
             break;
@@ -166,11 +168,51 @@ oppia.factory('AssetsBackendApiService', [
         }
       });
     };
+    var _downloadAndSaveAudio = function(
+        explorationId, filename, data, successCallback,
+        errorCallback) {
+      var form = new FormData();
+      if (data.audioUrl) {
+        form.append('audio_url', data.audioUrl);
+      } else if (data.audioFile) {
+        form.append('raw_audio_file', data.audioFile);
+      }
+      form.append('payload', JSON.stringify({
+        filename: filename,
+      }));
+      form.append('csrf_token', GLOBALS.csrf_token);
+
+      $.ajax({
+        url: _getAudioDownloadAndUploadUrl(explorationId),
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
+      }).done(function(response) {
+        if (successCallback) {
+          successCallback(response);
+        }
+      }).fail(function(data) {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = angular.fromJson(transformedData);
+        console.error(parsedResponse);
+        if (errorCallback) {
+          errorCallback(parsedResponse);
+        }
+      });
+    };
 
     var _getDownloadUrl = function(explorationId, filename, assetType) {
       return UrlInterpolationService.interpolateUrl(
         (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
-        IMAGE_DOWNLOAD_URL_TEMPLATE), {
+          IMAGE_DOWNLOAD_URL_TEMPLATE), {
           exploration_id: explorationId,
           filename: filename
         });
@@ -180,6 +222,12 @@ oppia.factory('AssetsBackendApiService', [
       return UrlInterpolationService.interpolateUrl(AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
+    };
+    var _getAudioDownloadAndUploadUrl = function(explorationId) {
+      return UrlInterpolationService.interpolateUrl(
+        AUDIO_DOWNLOAD_AND_UPLOAD_URL_TEMPLATE, {
+          exploration_id: explorationId
+        });
     };
 
     var _isAssetCurrentlyBeingRequested = function(filename, assetType) {
@@ -228,6 +276,11 @@ oppia.factory('AssetsBackendApiService', [
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
         });
       },
+      downloadAndSaveAudio: function(explorationId, filename, data) {
+        return $q(function(resolve, reject) {
+          _downloadAndSaveAudio(explorationId, filename, data, resolve, reject);
+        });
+      },
       isCached: function(filename) {
         return _isCached(filename);
       },
@@ -241,7 +294,8 @@ oppia.factory('AssetsBackendApiService', [
         _abortAllCurrentDownloads(ASSET_TYPE_IMAGE);
       },
       getAssetsFilesCurrentlyBeingRequested: function() {
-        return { audio: _audioFilesCurrentlyBeingRequested,
+        return {
+          audio: _audioFilesCurrentlyBeingRequested,
           image: _imageFilesCurrentlyBeingRequested
         };
       },

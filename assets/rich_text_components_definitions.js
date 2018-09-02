@@ -55,26 +55,6 @@ var richTextComponents = {
         "obj_type": "Filepath"
       },
       "default_value": ""
-    }, {
-      "name": "caption",
-      "description": "Caption for image (optional)",
-      "schema": {
-        "type": "unicode"
-      },
-      "default_value": ""
-    }, {
-      "name": "alt",
-      "description": "Briefly explain this image to a visually impaired learner",
-      "schema": {
-        "type": "unicode",
-        "validators": [{
-          "id": "is_nonempty"
-        }],
-        "ui_config": {
-          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)"
-        }
-      },
-      "default_value": ""
     }]
   },
   "Link": {
@@ -183,10 +163,10 @@ var richTextComponents = {
       "description": "Video end time in seconds: (leave at 0 to play until the end.)",
       "schema": {
         "type": "int",
-          "validators": [{
-            "id": "is_at_least",
-            "min_value": 0
-          }]
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
       },
       "default_value": 0
     }, {
@@ -196,6 +176,26 @@ var richTextComponents = {
         "type": "bool"
       },
       "default_value": false
+    }]
+  },
+  "Audio": {
+    "backend_id": "Audio",
+    "category": "Basic Input",
+    "description": "An audio.",
+    "frontend_id": "audio",
+    "tooltip": "Insert audio",
+    "icon_data_url": "/rich_text_components/Audio/Audio.png",
+    "is_complex": false,
+    "requires_fs": false,
+    "is_block_element": false,
+    "customization_arg_specs": [{
+      "name": "audio_src",
+      "description": "Upload audio",
+      "schema": {
+        "type": "custom",
+        "obj_type": "audioUrl"
+      },
+      "default_value": ""
     }]
   }
 };
