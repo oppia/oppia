@@ -64,11 +64,11 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(parsed_str, 'int 2')
 
         # Invalid input string is used.
-        with self.assertRaises(Exception) as cm:
-            parsed_str = jinja_utils.parse_string('{{', {'a': 3, 'b': 0})
-        exception = cm.exception
-        expected_exception = 'Unable to parse string with Jinja: %s' % ('{{')
-        self.assertEqual(exception.message, expected_exception)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unable to parse string with Jinja: {{'
+        ):
+            jinja_utils.parse_string('{{', {'a': 3, 'b': 0})
 
         # Invalid expression is used.
         parsed_str = jinja_utils.parse_string('{{ a/b }}', {'a': 1, 'b': 0})
