@@ -24,7 +24,13 @@ describe('IdGenerationService', function() {
     IdGenerationService = $injector.get('IdGenerationService');
   }));
 
-  it('should test a random id generated', function() {
+  it('should generate a random id', function() {
     expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]+/);
+  });
+
+  it('should test two ids to be different', function() {
+    var id1 = IdGenerationService.generateNewId();
+    var id2 = IdGenerationService.generateNewId();
+    expect(id1).not.toEqual(id2);
   });
 });
