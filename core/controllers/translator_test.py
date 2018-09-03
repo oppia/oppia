@@ -104,6 +104,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
         # Checking the response to have error.
         self.assertEqual(
             response, {'status_code': 400,
+                       'error_page_title': 'I18N_ERROR_PAGE_TITLE_400',
                        'error': (
                            'Translator does not have permission to make'
                            ' some changes in the change list.')
@@ -193,6 +194,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
         self.assertEqual(
             response, {'status_code': 400,
+                       'error_page_title': 'I18N_ERROR_PAGE_TITLE_400',
                        'error': (
                            'Translator does not have permission to make'
                            ' some changes in the change list.')
