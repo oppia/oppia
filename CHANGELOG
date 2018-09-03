@@ -13,7 +13,7 @@ Rich-text editor
 * Fix issue #5423 (#5424)
 
 Statistics
-* Permamently flip ENABLE_STATE_ID_MAPPING to true #5523.
+* Permamently flip ENABLE_STATE_ID_MAPPING to true (#5523).
 * Disable modify training data button until ML is enabled. (#5328)
 * Convert all floating point numbers back to float from strings in received classifier data (#5291)
 * Fix cast and improve output messages in stats job. (#5312)
@@ -43,8 +43,8 @@ Image pipeline
 * Corrected an error in html_validation_service.py (#5534)
 * Fix issue in html_validation_service (#5522)
 * Corrected the FILE_ID_MODEL regex to support deletion of images from datastore. (#5521)
-* (Must be merged in conjunction with #5490) RE -- -ExplorationMigration --- renaming the files. (#5509)
-* (Must be merged in conjunction with #5509) Shifting images/audio to the new exploration folder. it involves compressing and renaming the images as well. (#5490)
+* Implement exploration migration to update image references. (#5509)
+* Shifting images/audio to the new exploration folder, which involves compressing and renaming the images as well. (#5490)
 * Fix: #5407 changed to click to reload image (#5449)
 * Removed the ENABLE_GCS_STORAGE_FLAG, and add develop condition for PIL in appengine_config (#5492)
 * Added the PR for the Mac os troubleshoot and inside gae_suite.py in test (#5480)
@@ -143,6 +143,7 @@ Bug fixes
 * Fix #5071: Replace closeSubmenu with closeSubmenuIfNotMobile to make dropdown menu work (#5261)
 * Stop submit button for MultipleChoiceInput from firing ng-click twice (#5266)
 * Replacing Youtube video link (#5264)
+* Updated last update coloumn (#5564)
 
 Miscellaneous
 * Add Code of Conduct (#5475)
@@ -196,9 +197,6 @@ Testing, documentation, and code health
 * E2e refactor follow-up for PR#5139 (#5224)
 * E2e testing: Introducing waitFor utility file. (#5240)
 * Graph Interaction e2e Test (#5230)
-
-Creator dashboard
-* Updated last update coloumn (#5564)
 
 
 v2.6.6 (1 Aug 2018)
