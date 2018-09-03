@@ -34,10 +34,26 @@ current_user_services = models.Registry.import_current_user_services()
 
 
 def open_access(handler):
-    """Decorator to give access to everyone."""
+    """Decorator to give access to everyone.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that can
+            also give access to everyone.
+    """
 
     def test_can_access(self, *args, **kwargs):
-        """Gives access to everyone."""
+        """Gives access to everyone.
+
+        Args:
+            *args: *. Arguments.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
         return handler(self, *args, **kwargs)
     test_can_access.__wrapped__ = True
 
@@ -45,7 +61,15 @@ def open_access(handler):
 
 
 def can_play_exploration(handler):
-    """Decorator to check whether user can play given exploration."""
+    """Decorator to check whether user can play given exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check
+            if users can play a given exploration.
+    """
 
     def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user can play the exploration.
@@ -77,7 +101,15 @@ def can_play_exploration(handler):
 
 
 def can_view_skill(handler):
-    """Decorator to check whether user can play a given skill."""
+    """Decorator to check whether user can play a given skill.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that can also
+            check if the user can play a given skill.
+    """
 
     def test_can_play(self, skill_id, **kwargs):
         """Checks if the user can play the skill.
@@ -88,6 +120,9 @@ def can_view_skill(handler):
 
         Returns:
             bool. Whether the user can play the given skill.
+
+        Raises:
+            PageNotFoundException: The page is not found.
         """
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
@@ -104,7 +139,15 @@ def can_view_skill(handler):
 
 
 def can_play_collection(handler):
-    """Decorator to check whether user can play given collection."""
+    """Decorator to check whether user can play given collection.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that can also
+            check if a user can play a given collection.
+    """
 
     def test_can_play(self, collection_id, **kwargs):
         """Checks if the user can play the collection.
@@ -135,6 +178,14 @@ def can_play_collection(handler):
 def can_download_exploration(handler):
     """Decorator to check whether user can download given exploration.
     If a user is authorized to play given exploration, they can download it.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that can also check
+            if the user has permission to download a given
+            exploration.
     """
 
     def test_can_download(self, exploration_id, **kwargs):
@@ -168,6 +219,13 @@ def can_download_exploration(handler):
 def can_view_exploration_stats(handler):
     """Decorator to check whether user can view exploration stats.
     If a user is authorized to play given exploration, they can view its stats.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if the user
+            has permission to view exploration stats.
     """
 
     def test_can_view_stats(self, exploration_id, **kwargs):
@@ -199,7 +257,15 @@ def can_view_exploration_stats(handler):
 
 
 def can_edit_collection(handler):
-    """Decorator to check whether the user can edit collection."""
+    """Decorator to check whether the user can edit collection.
+
+    Args:
+        handler: The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if
+            the user has permission to edit a given collection.
+    """
 
     def test_can_edit(self, collection_id, **kwargs):
         """Checks if the user is logged in and can edit the collection.
@@ -235,7 +301,16 @@ def can_edit_collection(handler):
 
 
 def can_manage_email_dashboard(handler):
-    """Decorator to check whether user can access email dashboard."""
+    """Decorator to check whether user can access email dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user has permission to access the email
+            dashboard.
+    """
 
     def test_can_manage_emails(self, **kwargs):
         """Checks if the user is logged in and can access email dashboard.
@@ -265,10 +340,19 @@ def can_manage_email_dashboard(handler):
 
 
 def can_access_moderator_page(handler):
-    """Decorator to check whether user can access moderator page."""
+    """Decorator to check whether user can access moderator page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user has permission to access the moderator
+            page.
+    """
 
     def test_can_access_moderator_page(self, **kwargs):
-        """Checks if the user is logged in and can access moderater page.
+        """Checks if the user is logged in and can access moderator page.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -325,10 +409,10 @@ def can_send_moderator_emails(handler):
 
 
 def can_manage_own_profile(handler):
-    """Decorator to check whether user can manage his profile."""
+    """Decorator to check whether user can manage their profile."""
 
     def test_can_manage_profile(self, **kwargs):
-        """Checks if the user is logged in and can manage his profile.
+        """Checks if the user is logged in and can manage their profile.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -503,8 +587,7 @@ def can_access_creator_dashboard(handler):
 
 
 def can_create_feedback_thread(handler):
-    """Decorator to check whether the user can create a feedback thread.
-    """
+    """Decorator to check whether the user can create a feedback thread."""
 
     def test_can_access(self, exploration_id, **kwargs):
         """Checks if the user can create a feedback thread.
@@ -579,8 +662,7 @@ def can_view_feedback_thread(handler):
 
 
 def can_comment_on_feedback_thread(handler):
-    """Decorator to check whether the user can comment on feedback thread.
-    """
+    """Decorator to check whether the user can comment on feedback thread."""
 
     def test_can_access(self, thread_id, **kwargs):
         """Checks if the user can comment on the feedback thread.
@@ -799,6 +881,7 @@ def can_delete_exploration(handler):
             *. The return value of the decorated function.
 
         Raises:
+            NotLoggedInException: The user is not logged in.
             UnauthorizedUserException: The user does not have
                 permissions to delete an exploration.
         """
@@ -891,6 +974,7 @@ def can_publish_exploration(handler):
             *. The return value of the decorated function.
 
         Raises:
+            PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
                 credentials to publish an exploration.
         """
@@ -925,6 +1009,7 @@ def can_publish_collection(handler):
             *. The return value of the decorated function.
 
         Raises:
+            PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
                 credentials to publish a collection.
         """
@@ -958,6 +1043,7 @@ def can_unpublish_collection(handler):
             *. The return value of the decorated function.
 
         Raises:
+            PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
                 credentials to unpublish a collection.
         """
@@ -1126,6 +1212,7 @@ def require_user_id_else_redirect_to_homepage(handler):
 
 def can_edit_topic(handler):
     """Decorator to check whether the user can edit given topic."""
+
     def test_can_edit(self, topic_id, **kwargs):
         """Checks whether the user can edit a given topic.
 
@@ -1161,6 +1248,7 @@ def can_edit_topic(handler):
 
 def can_edit_question(handler):
     """Decorator to check whether the user can edit given question."""
+
     def test_can_edit(self, question_id, **kwargs):
         """Checks whether the user can edit the given question.
 
@@ -1275,8 +1363,8 @@ def can_delete_question(handler):
 
 
 def can_edit_subtopic_page(handler):
-    """Decorator to check whether the user can edit a subtopic page of a topic.
-    """
+    """Decorator to check whether the user can edit a subtopic page of a topic."""
+
     def test_can_edit(self, topic_id, **kwargs):
         """Checks whether the user can edit the subtopic page
         of a given topic.
@@ -1310,6 +1398,7 @@ def can_edit_subtopic_page(handler):
 
 def can_add_new_story_to_topic(handler):
     """Decorator to check whether the user can add a story to a given topic."""
+
     def test_can_add_story(self, topic_id, **kwargs):
         """Checks whether the user can add a story to
         a given topic.
@@ -1411,6 +1500,22 @@ def can_edit_skill(handler):
         return False
 
     def test_can_edit_skill(self, skill_id, **kwargs):
+        """ Test to see if user can edit a given skill by checking if
+        logged in and using can_user_edit_skill.
+
+        Args:
+            skill_id: str. The skill ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The given page cannot be found.
+            UnauthorizedUserException: The user does not have the
+                credentials to edit the given skill.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1429,8 +1534,8 @@ def can_edit_skill(handler):
 
 
 def can_delete_skill(handler):
-    """Decorator to check whether the user can delete a skill.
-    """
+    """Decorator to check whether the user can delete a skill."""
+
     def test_can_delete_skill(self, **kwargs):
         """Checks whether the user can delete a skill.
 
@@ -1493,6 +1598,7 @@ def can_create_skill(handler):
 
 
 def can_publish_skill(handler):
+    """Decorator to check whether the user can publish a skill."""
 
     def can_user_publish_skill(user, skill_rights):
         """Checks whether the user can publish the given skill.
@@ -1516,6 +1622,22 @@ def can_publish_skill(handler):
         return False
 
     def test_can_publish_skill(self, skill_id, **kwargs):
+        """Tests whether the user can publish a given skill by checking
+        if the user is logged in and using can_user_publish_skill.
+
+        Args:
+            skill_id: str. The skill ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the desired function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The given page cannot be found.
+            UnauthorizedUserException: The given user does not have
+                credentials to publish the given skill.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1534,10 +1656,10 @@ def can_publish_skill(handler):
 
 
 def can_delete_story(handler):
-    """Decorator to check whether the user can delete a story in a given topic.
-    """
+    """Decorator to check whether the user can delete a story in a given topic."""
+
     def test_can_delete_story(self, topic_id, **kwargs):
-        """Checks whether the user can delet a story in
+        """Checks whether the user can delete a story in
         a given topic.
 
         Args:
@@ -1793,7 +1915,10 @@ def can_access_topic_viewer_page(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can access topic viewer page.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
         """
         topic = topic_services.get_topic_by_name(topic_name)
 
@@ -1832,6 +1957,10 @@ def get_decorator_for_accepting_suggestion(decorator):
             accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(handler):
+        """Function that generates a decorator for a given handler.
+
+        Args:
+            handler:
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
             if not self.user_id:
