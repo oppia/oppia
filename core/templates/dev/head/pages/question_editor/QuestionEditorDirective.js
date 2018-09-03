@@ -22,7 +22,6 @@ oppia.directive('questionEditor', [
     return {
       restrict: 'E',
       scope: {
-        getQuestionId: '&questionId',
         getMisconceptions: '&misconceptions',
         canEditQuestion: '&',
         question: '='
@@ -113,6 +112,7 @@ oppia.directive('questionEditor', [
             _updateQuestion(function() {
               var stateData = $scope.question.getStateData();
               stateData.content = angular.copy(displayedValue);
+              $scope.interactionIsShown = true;
             });
           };
 

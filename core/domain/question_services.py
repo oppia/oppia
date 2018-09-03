@@ -155,6 +155,12 @@ def get_question_from_model(question_model):
         question_model.created_on, question_model.last_updated)
 
 
+def get_question_skill_link_from_model(question_skill_link_model):
+    return question_domain.QuestionSkillLink(
+        question_skill_link_model.question_id,
+        question_skill_link_model.skill_id)
+
+
 def get_question_by_id(question_id, strict=True):
     """Returns a domain object representing a question.
 
@@ -209,11 +215,11 @@ def get_question_skill_links_of_question(question_id):
         if the question does not exist.
     """
 
-    question_skill_link_models = (
+    question_skill_links = [
+        get_question_skill_link_from_model(model) for model in
         question_models.QuestionSkillLinkModel.get_models_by_question_id(
-            question_id)
-    )
-    return question_skill_link_models
+            question_id)]
+    return question_skill_links
 
 
 def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
