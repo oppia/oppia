@@ -27,7 +27,12 @@ oppia.directive('subtopicViewerNavbar', [
         'subtopic_viewer_navbar_directive.html'),
       controller: ['$scope', 'SubtopicPageInfoService', function(
           $scope, SubtopicPageInfoService) {
-        $scope.SubtopicPageInfoService = SubtopicPageInfoService;
+        $scope.getTopicName = function() {
+          return SubtopicPageInfoService.getTopicName();
+        };
+        $scope.getSubtopicTitle = function() {
+          return SubtopicPageInfoService.getSubtopicTitle();
+        };
       }]
     };
   }

@@ -19,19 +19,19 @@
 oppia.factory('SubtopicPageInfoService', [
   function() {
     var _subtopicTitle = null;
-    var _topicTitle = null;
+    var _topicName = null;
     return {
       setSubtopicTitle: function(subtopicTitle) {
         _subtopicTitle = subtopicTitle;
       },
-      setTopicTitle: function(topicTitle) {
-        _topicTitle = topicTitle;
+      setTopicName: function(topicName) {
+        _topicName = topicName;
       },
       getSubtopicTitle: function() {
         return _subtopicTitle;
       },
-      getTopicTitle: function() {
-        return _topicTitle;
+      getTopicName: function() {
+        return _topicName;
       }
     };
   }

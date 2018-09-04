@@ -42,7 +42,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
         self.values.update({
             'subtopic_html_data': subtopic_page.html_data,
             'language_code': subtopic_page.language_code,
-            'topic_title': topic.name,
+            'topic_name': topic.name,
             'subtopic_title': subtopic.title
         })
         self.render_json(self.values)

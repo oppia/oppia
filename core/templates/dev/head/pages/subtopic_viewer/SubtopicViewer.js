@@ -25,7 +25,9 @@ oppia.controller('SubtopicViewer', [
       UrlInterpolationService, UrlService, SubtopicPageObjectFactory,
       SubtopicPageInfoService) {
     var _initSubtopicPage = function() {
-      $scope.SubtopicPageInfoService = SubtopicPageInfoService;
+      $scope.getSubtopicTitle = function() {
+        return SubtopicPageInfoService.getSubtopicTitle();
+      };
       var topicIdAndSubtopicId = UrlService.getTopicIdAndSubtopicIdFromUrl();
       topicId = topicIdAndSubtopicId.topicId;
       subtopicId = topicIdAndSubtopicId.subtopicId;
@@ -40,7 +42,7 @@ oppia.controller('SubtopicViewer', [
               language_code: response.language_code,
             });
           SubtopicPageInfoService.setSubtopicTitle(response.subtopic_title);
-          SubtopicPageInfoService.setTopicTitle(response.topic_title);
+          SubtopicPageInfoService.setTopicName(response.topic_name);
         }
       );
     };
