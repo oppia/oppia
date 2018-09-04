@@ -240,6 +240,7 @@ class Registry(object):
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
+    GAE_PLATFORM = 'gae'
 
     @classmethod
     def _get(cls):
@@ -249,7 +250,7 @@ class Registry(object):
         Returns:
             class: The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get("gae")
+        return cls._PLATFORM_MAPPING.get(Registry.GAE_PLATFORM)
 
     @classmethod
     def import_models(cls, model_names):
