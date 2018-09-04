@@ -61,6 +61,7 @@ describe('Responses Service', function() {
       shtml = $injector.get('SubtitledHtmlObjectFactory');
       aof = $injector.get('AnswerGroupObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
+      cache = $injector.get('AnswerGroupsCacheService');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
