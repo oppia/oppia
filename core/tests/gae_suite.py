@@ -89,8 +89,6 @@ def main():
                 for subtest in _iterate(test):
                     yield subtest
 
-    feconf.PLATFORM = 'gae'
-
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)

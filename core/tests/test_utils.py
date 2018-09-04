@@ -1317,12 +1317,6 @@ class AppEngineTestBase(TestBase):
         return state
 
 
-if feconf.PLATFORM == 'gae':
-    GenericTestBase = AppEngineTestBase
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
-
-
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
