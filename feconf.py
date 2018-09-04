@@ -25,20 +25,10 @@ from constants import constants  # pylint: disable=relative-import
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform for the storage backend. This is used in the model-switching
-# code in core/platform.
-PLATFORM = 'gae'
-
-# Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment,
-# or if you want to use minified resources in the development environment.
-
-if PLATFORM == 'gae':
-    if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
-            not os.environ['SERVER_SOFTWARE'].startswith('Development')):
-        raise Exception('Invalid platform: expected one of [\'gae\']')
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+# When DEV_MODE = true check that we are running in development enviroment.
+if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
+        not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+    raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
