@@ -129,9 +129,9 @@ class BaseHandler(webapp2.RequestHandler):
 
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -446,15 +446,15 @@ class BaseHandler(webapp2.RequestHandler):
         if method == 'GET':
             self._render_exception_json_or_html(
                 self.GET_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'POST':
+            self._render_exception_json_or_html(
+                self.POST_HANDLER_ERROR_RETURN_TYPE, values)
         elif method == 'PUT':
             self._render_exception_json_or_html(
                 self.PUT_HANDLER_ERROR_RETURN_TYPE, values)
         elif method == 'DELETE':
             self._render_exception_json_or_html(
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
-        elif method == 'POST':
-            self._render_exception_json_or_html(
-                self.POST_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
             self._render_exception_json_or_html(

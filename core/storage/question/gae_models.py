@@ -276,7 +276,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         cls.delete_multi(question_skill_links)
 
 
-
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.
 
