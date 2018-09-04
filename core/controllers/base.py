@@ -131,6 +131,7 @@ class BaseHandler(webapp2.RequestHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -408,10 +409,32 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filepath).render(**values))
 
+    def _render_exception_json_or_html(self, return_type, values):
+        """Renders an error page, or an error JSON response.
+
+        Args:
+            return_type: str. Indicator to return JSON or HTML.
+            values: dict. The key-value pairs to include in the response.
+        """
+
+        if return_type == feconf.HANDLER_TYPE_JSON:
+            self.render_json(values)
+        elif return_type == feconf.HANDLER_TYPE_HTML:
+            self.values.update(values)
+            if 'iframed' in self.values and self.values['iframed']:
+                self.render_template(
+                    'pages/error/error_iframed.html', iframe_restriction=None)
+            else:
+                self.render_template('pages/error/error.html')
+        else:
+            logging.warning('Not a recognized return type: '
+                            'defaulting to render JSON.')
+            self.render_json(values)
+
     def _render_exception(self, error_code, values):
         """Renders an error page, or an error JSON response.
 
-         Args:
+        Args:
             error_code: int. The HTTP status code (expected to be one of
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
@@ -421,18 +444,21 @@ class BaseHandler(webapp2.RequestHandler):
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
-            self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
-                self.render_template(
-                    'pages/error/error_iframed.html', iframe_restriction=None)
-            else:
-                self.render_template('pages/error/error.html')
-        elif method == 'PUT' or method == 'DELETE' or method == 'POST':
-            self.render_json(values)
+            self._render_exception_json_or_html(
+                self.GET_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'PUT':
+            self._render_exception_json_or_html(
+                self.PUT_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'DELETE':
+            self._render_exception_json_or_html(
+                self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'POST':
+            self._render_exception_json_or_html(
+                self.POST_HANDLER_ERROR_RETURN_TYPE, values)
         else:
-            logging.warning('Not a recognized request method: '
-                            'defaulting to render JSON.')
-            self.render_json(values)
+            logging.warning('Not a recognized request method.')
+            self._render_exception_json_or_html(
+                None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.
