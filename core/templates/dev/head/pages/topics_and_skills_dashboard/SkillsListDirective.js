@@ -68,10 +68,6 @@ oppia.directive('skillsList', [
                 function(status) {
                   $rootScope.$broadcast(
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                },
-                function(error) {
-                  AlertsService.addWarning(
-                    error || 'There was an error deleting the skill.');
                 }
               );
             });

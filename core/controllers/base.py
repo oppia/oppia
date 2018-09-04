@@ -129,6 +129,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -416,22 +418,21 @@ class BaseHandler(webapp2.RequestHandler):
         """
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
+        method = self.request.environ['REQUEST_METHOD']
 
-        # This checks if the response should be JSON or HTML.
-        # For GET requests, there is no payload, so we check against
-        # GET_HANDLER_ERROR_RETURN_TYPE.
-        # Otherwise, we check whether self.payload exists.
-        if (self.payload is not None or
-                self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                feconf.HANDLER_TYPE_JSON):
-            self.render_json(values)
-        else:
+        if method == 'GET':
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
                     'pages/error/error_iframed.html', iframe_restriction=None)
             else:
                 self.render_template('pages/error/error.html')
+        elif method == 'PUT' or method == 'DELETE' or method == 'POST':
+            self.render_json(values)
+        else:
+            logging.warning('Not a recognized request method: '
+                            'defaulting to render JSON.')
+            self.render_json(values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.
