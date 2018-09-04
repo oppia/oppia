@@ -56,15 +56,15 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
 
     Args:
-      obj: a object.
-      schema: the schema.
-      apply_custom_validators: Validate the normalized object.
+        obj: *. Object to validate.
+        schema: str. Type object.
+        apply_custom_validators: bool. Validate the normalized object.
 
     Returns:
-      the normalized object.
+        *. Returns the normalized object.
 
     Raises:
-      AssertionError: if the object fails to validate against the schema.
+        AssertionError: if the object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -178,11 +178,14 @@ class Normalizers(object):
         returns the value of the named attribute of an object.
 
         Args:
-          cls: object whose named attribute's value is to be returned.
-          normalizer_id: string that contains the attribute's name.
+            cls: *. object whose named attribute's value is to be returned.
+            normalizer_id: str. String that contains the attribute's name.
 
         Returns:
-          Returns the value of the name attribute of an object.
+            *. Returns the value of the name attribute of an object.
+
+        Raises:
+            Exception: 'normalizer_id' is not valid.
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
@@ -193,11 +196,11 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-          obj: a string.
+            obj: str. String to collapse.
 
         Returns:
-          a string that is the same as `obj`, except that each block of
-          whitespace is collapsed into a single space character.
+            str. A string that is the same as `obj`, except that each block of
+                whitespace is collapsed into a single space character.
         """
         return ' '.join(obj.split())
 
@@ -206,11 +209,14 @@ class Normalizers(object):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-          obj: a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
-          An empty string if the URL does not start with http:// or https://.
-          Otherwise, returns the original URL.
+            str. An empty string if the URL does not start with http:// or https://.
+                Otherwise, returns the original URL.
+
+        Raises:
+            AssertionError: if the URL is invalid. 
         """
         url_components = urlparse.urlsplit(obj)
         quoted_url_components = (
@@ -240,11 +246,14 @@ class _Validators(object):
         returns the value of the named attribute of an object.
 
         Args:
-          cls: object whose named attribute's value is to be returned.
-          validator_id: string that contains the attribute's name.
+            cls: *. object whose named attribute's value is to be returned.
+            validator_id: str. That contains the attribute's name.
 
         Returns:
-          Returns the value of the name attribute of an object.
+            *. Returns the value of the name attribute of an object.
+
+        Raises:
+            Exception: 'validator_id' is not valid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
@@ -256,11 +265,11 @@ class _Validators(object):
         `min_value` elements.
 
         Args:
-          obj: a object.
-          min_value: int value.
+            obj: *. Object to evaluate.
+            min_value: int. Minimum value of elements.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the number of elements is greater than or equal to min_value.
         """
         return len(obj) >= min_value
 
@@ -270,11 +279,11 @@ class _Validators(object):
         `max_value` elements.
 
         Args:
-          obj: a object.
-          max_value: int value.
+            obj: *. Object to evaluate.
+            max_value: int. Maximum value of elements.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the number of elements is less than or equal to min_value.
         """
         return len(obj) <= max_value
 
@@ -283,10 +292,10 @@ class _Validators(object):
         """Returns True iff the given object (a string) is nonempty.
         
         Args:
-          obj: a object.
+            obj: str. String to evaluate.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the object is not empty.
         """
         return bool(obj)
 
@@ -295,10 +304,10 @@ class _Validators(object):
         """Returns True iff the given object (a list) has no duplicates.
         
         Args:
-          obj: a object.
+            obj: list. List to evaluate.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the object has no duplicates.
         """
         return sorted(list(set(obj))) == sorted(obj)
 
@@ -307,11 +316,11 @@ class _Validators(object):
         """Ensures that `obj` (an int/float) is at least `min_value`.
         
         Args:
-          obj: a object.
-          min_value: int value.
+            obj: int or float. Object to evaluate.
+            min_value: int. Value to compare.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the object is greater than or equal to min_value.       
         """
         return obj >= min_value
 
@@ -320,11 +329,11 @@ class _Validators(object):
         """Ensures that `obj` (an int/float) is at most `max_value`.
         
         Args:
-          obj: a object.
-          max_value: int value.
+            obj: int or float. Object to evaluate.
+            max_value: int. Value to compare.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the object is less than or equal to max_value.
         """
         return obj <= max_value
 
@@ -333,10 +342,11 @@ class _Validators(object):
         """Ensures that `obj` (a string) defines a valid regex.
         
         Args:
-          obj: a object.
+            obj: str. String to evaluate.
 
-        Returns:
-          Returns a Boolean.        
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
         """
         raise NotImplementedError
 
@@ -345,11 +355,12 @@ class _Validators(object):
         """Ensures that `obj` (a string) matches the given regex.
         
         Args:
-          obj: a object.
-          regex: a regex.
+            obj: str. String to evaluate.
+            regex: str. Regular expresion. 
 
-        Returns:
-         Returns a Boolean.
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
         """
         raise NotImplementedError
 
@@ -358,9 +369,9 @@ class _Validators(object):
         """Ensures that `obj` (a string) is a valid email.
         
         Args:
-          obj: a object.
+            obj: str. String to evaluate.
 
         Returns:
-          Returns a Boolean.
+            bool. True if the email is valid.
         """
         return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
