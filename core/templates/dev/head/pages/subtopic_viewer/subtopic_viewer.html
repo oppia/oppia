@@ -17,7 +17,7 @@
   <div ng-controller="SubtopicViewer" style="position: relative;">
     <div>
       <div class="oppia-static-header">
-        <h1>{{ subtopic_title }}</h1>
+        <h1><[SubtopicPageInfoService.getSubtopicTitle()]></h1>
       </div>
       <background-banner></background-banner>
     </div>
@@ -31,14 +31,14 @@
 {% endblock content %}
 
 {% block footer_js %}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicViewer.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicPageInfoService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicViewerBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/subtopic_viewer/SubtopicViewerNavbarDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicPageObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/templates/dev/head/pages/subtopic_viewer/SubtopicViewer.js"></script>
+  <script src="/templates/dev/head/pages/subtopic_viewer/SubtopicPageInfoService.js"></script>
+  <script src="/templates/dev/head/pages/subtopic_viewer/SubtopicViewerBackendApiService.js"></script>
+  <script src="/templates/dev/head/pages/subtopic_viewer/SubtopicViewerNavbarDirective.js"></script>
+  <script src="/templates/dev/head/domain/topic/SubtopicPageObjectFactory.js"></script>
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
   {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}

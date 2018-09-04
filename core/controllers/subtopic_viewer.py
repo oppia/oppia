@@ -52,10 +52,19 @@ class SubtopicViewerPage(base.BaseHandler):
     """Manages to render subtopic viewer page."""
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self):
+    def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
+
+        if topic is None:
+            raise self.PageNotFoundException
+
+        if subtopic is None:
             raise self.PageNotFoundException
 
         self.render_template('/pages/subtopic_viewer/subtopic_viewer.html')
