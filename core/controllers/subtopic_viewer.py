@@ -64,6 +64,10 @@ class SubtopicViewerPage(base.BaseHandler):
         if topic is None:
             raise self.PageNotFoundException
 
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if not topic_rights.topic_is_published:
+            raise self.PageNotFoundException
+
         if subtopic is None:
             raise self.PageNotFoundException
 
