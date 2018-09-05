@@ -25,4 +25,5 @@ oppia.directive('skillEditorNavbarBreadcrumb', [
       controller: [function() {}
       ]
     };
-  }]);
+  }
+]);

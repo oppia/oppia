@@ -49,7 +49,7 @@
           <span ng-if="!topic.is_published"> Not Published </span>
         </a>
       </td>
-      <td ng-if="canDeleteTopic()">
+      <td ng-if="canDeleteTopic()" class="delete-icon">
         <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
       </td>
     </tr>
@@ -87,6 +87,19 @@
     text-decoration: none;
   }
 
+  topics-list .list-item {
+    height: 2.5em;
+  }
+
+  topics-list .delete-icon {
+    border-bottom: 1px solid #fff;
+    padding-left: 0.8vw;
+  }
+
+  topics-list .list-item:hover .delete-icon {
+    background-color: #fff;
+  }
+
   topics-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
@@ -101,7 +114,7 @@
     vertical-align: middle;
   }
 
-  @media(max-width: 815px) {
+  @media(max-width: 1200px) {
     topics-list .list-summary .additional-text{
       display: none;
     }

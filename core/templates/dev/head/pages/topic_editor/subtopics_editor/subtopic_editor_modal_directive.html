@@ -25,7 +25,7 @@
       </p>
       <div ng-if="!subtopicEditorIsShown" class="preview" ng-click="closePreviewSubtopicPage(htmlData)">
         <span ng-if="htmlData === ''" class="oppia-placeholder">
-          Click here to add content for the subtopic pages.
+          Click here to edit the page that explains this subtopic.
         </span>
         <angular-html-bind class="oppia-rte-editor"
                            html-data="htmlData">
@@ -43,9 +43,9 @@
             Cancel
           </button>
           <button type="button"
-                  class="btn btn-success save-button"
+                  class="btn btn-primary save-button"
                   ng-click="updateHtmlData(htmlData)">
-            Save
+            Preview
           </button>
         </div>
       </div>
@@ -53,7 +53,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-    <button class="btn btn-primary" ng-disabled="editableTitle === ''" ng-click="save()"> Done </button>
+    <button class="btn btn-success" ng-disabled="editableTitle === ''" ng-click="save()"> Save & Exit </button>
   </div>
 </div>
 
