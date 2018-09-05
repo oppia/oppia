@@ -212,7 +212,6 @@ def get_topic_by_name(topic_name):
         given id, or None if it does not exist.
     """
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
-
     if topic_model is None:
         return None
 

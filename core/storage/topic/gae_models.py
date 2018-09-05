@@ -114,9 +114,9 @@ class TopicModel(base_models.VersionedModel):
             TopicModel|None. The topic model of the topic or None if not
             found.
         """
-        return (
-            TopicModel.query().filter(
-                cls.name == topic_name and cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return TopicModel.query().filter(
+            cls.name == topic_name).filter(
+                cls.deleted == False).get() #pylint: disable=singleton-comparison
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

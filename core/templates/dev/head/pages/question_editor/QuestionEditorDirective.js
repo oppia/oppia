@@ -16,7 +16,6 @@
  * @fileoverview Controller for the questions editor directive.
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');
 
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

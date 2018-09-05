@@ -43,8 +43,13 @@ _COMMIT_TYPE_REVERT = 'revert'
 ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
+FILE_FOUND_IN_GCS = 'File found in GCS'
+FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
+FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
+FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
 FILE_DELETED = 'File has been deleted'
 FILE_FOUND_IN_GCS = 'File is there in GCS'
+EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
@@ -660,6 +665,200 @@ class ExplorationMigrationValidationJobForCKEditor(
         yield (key, list(set().union(*final_values)))
 
 
+class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating the images in the exploration
+    from the GAE to GCS.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileModel]
+
+    @staticmethod
+    def map(file_model):
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if feconf.DEV_MODE:
+            return
+
+        instance_id = file_model.id
+        filetype = instance_id[instance_id.rfind('.') + 1:]
+        # To separate the image entries from the audio entries we get from the
+        # FileSnapshotContentModel.
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
+            if not catched_groups:
+                yield (WRONG_INSTANCE_ID, instance_id)
+            else:
+                filename = catched_groups.group(2)
+                exploration_id = catched_groups.group(1)
+                content = file_model.content
+                fs = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem(exploration_id))
+                if fs.isfile('image/%s' % filename):
+                    yield (FILE_ALREADY_EXISTS, file_model.id)
+                else:
+                    fs.commit(
+                        'ADMIN', 'image/%s' % filename,
+                        content, mimetype='image/%s' % filetype)
+                    if not fs.isfile('image/%s' % filename):
+                        yield ('Failed to commit file', instance_id)
+                    else:
+                        yield (FILE_COPIED, 1)
+        else:
+            yield ('Invalid filetype', filetype)
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_COPIED or status == FILE_ALREADY_EXISTS:
+            yield (status, len(values))
+        else:
+            yield (status, '%s' % set(values))
+
+
+class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for checking that all the images in the GAE are there in
+    the GCS or not, using file models as the source of truth.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileModel]
+
+    @staticmethod
+    def map(file_model):
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if feconf.DEV_MODE:
+            return
+
+        instance_id = file_model.id
+        filetype = instance_id[instance_id.rfind('.') + 1:]
+        # To separate the image entries from the audio entries we get from
+        # the FileSnapshotContentModel.
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
+            if not catched_groups:
+                yield (WRONG_INSTANCE_ID, instance_id)
+            else:
+                filename = catched_groups.group(2)
+                exploration_id = catched_groups.group(1)
+                fs = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem(
+                        'exploration/%s' % exploration_id))
+                fs_old = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem(exploration_id))
+
+                raw_image = fs_old.get('image/%s' % filename)
+                height, width = gae_image_services.get_image_dimensions(
+                    raw_image)
+                filename_with_dimensions = (
+                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
+                        filename, height, width))
+
+                filename_wo_filetype = filename_with_dimensions[
+                    :filename_with_dimensions.rfind('.')]
+                filetype = filename_with_dimensions[
+                    filename_with_dimensions.rfind('.') + 1:]
+                filepath = 'image/%s' % filename_with_dimensions
+                compressed_image_filepath = (
+                    'image/%s_compressed.%s' % (filename_wo_filetype, filetype))
+                micro_image_filepath = (
+                    'image/%s_micro.%s' % (filename_wo_filetype, filetype))
+
+                exp_model = exp_models.ExplorationModel.get(
+                    exploration_id, strict=False)
+                if not fs.isfile(filepath):
+                    yield (FILE_IS_NOT_IN_GCS, instance_id)
+                elif not fs.isfile(compressed_image_filepath):
+                    yield ('Compressed file not in GCS', instance_id)
+                elif not fs.isfile(micro_image_filepath):
+                    yield ('Micro file not in GCS', instance_id)
+                else:
+                    yield (FILE_FOUND_IN_GCS, 1)
+
+                if not exp_model:
+                    yield (FILE_REFERENCES_NON_EXISTENT_EXP_KEY, instance_id)
+                elif exp_model.deleted:
+                    yield (FILE_REFERENCES_DELETED_EXP_KEY, instance_id)
+        else:
+            yield ('Invalid filetype', filetype)
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_FOUND_IN_GCS:
+            yield (status, len(values))
+        else:
+            yield (status, '%s' % set(values))
+
+
+class ValidationOfImagesOnGCSJobUsingExps(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for checking that all the images in the GAE are there in
+    the GCS or not, using exploration models as the source of truth.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if feconf.DEV_MODE:
+            return
+
+        exp_id = exp_model.id
+        fs_old = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exp_id))
+        fs_new = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem('exploration/%s' % exp_id))
+        # We have to make sure we pass the dir name without starting or
+        # ending with '/'.
+        image_urls = fs_old.listdir('image')
+        for url in image_urls:
+            catched_groups = GCS_IMAGE_ID_REGEX.match(url)
+            if not catched_groups:
+                yield (INVALID_GCS_URL, url.encode('utf-8'))
+            else:
+                try:
+                    filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
+                except Exception:
+                    yield (ERROR_IN_FILENAME, url.encode('utf-8'))
+
+                raw_image = fs_old.get(
+                    'image/%s' % filename.encode('utf-8'))
+                height, width = gae_image_services.get_image_dimensions(
+                    raw_image)
+                filename_with_dimensions = (
+                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
+                        filename, height, width))
+
+                filename_wo_filetype = filename_with_dimensions[
+                    :filename_with_dimensions.rfind('.')]
+                filetype = filename_with_dimensions[
+                    filename_with_dimensions.rfind('.') + 1:]
+                filepath = 'image/%s' % filename_with_dimensions
+                compressed_image_filepath = (
+                    'image/%s_compressed.%s' % (filename_wo_filetype, filetype))
+                micro_image_filepath = (
+                    'image/%s_micro.%s' % (filename_wo_filetype, filetype))
+
+                if not fs_new.isfile(filepath.encode('utf-8')):
+                    yield (FILE_IS_NOT_IN_GCS, url.encode('utf-8'))
+                elif not fs_new.isfile(
+                        compressed_image_filepath.encode('utf-8')):
+                    yield ('Compressed file not in GCS', url.encode('utf-8'))
+                elif not fs_new.isfile(micro_image_filepath.encode('utf-8')):
+                    yield ('Micro file not in GCS', url.encode('utf-8'))
+                else:
+                    yield (FILE_FOUND_IN_GCS, 1)
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_FOUND_IN_GCS:
+            yield (status, len(values))
+        else:
+            yield (status, '%s' % set(values))
+
+
 class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for deleting the images in the exploration
     from the GAE.
@@ -728,14 +927,14 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
             for url in image_urls:
                 catched_groups = GCS_IMAGE_ID_REGEX.match(url)
                 if not catched_groups:
-                    yield (INVALID_GCS_URL, url)
+                    yield (INVALID_GCS_URL, url.encode('utf-8'))
                 else:
                     try:
                         filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
-                        if fs_old.isfile('image/%s' % filename):
-                            yield (FILE_FOUND_IN_GCS, filename)
+                        if fs_old.isfile('image/%s' % filename.encode('utf-8')):
+                            yield (FILE_FOUND_IN_GCS, filename.encode('utf-8'))
                     except Exception:
-                        yield (ERROR_IN_FILENAME, url)
+                        yield (ERROR_IN_FILENAME, url.encode('utf-8'))
             for url in audio_urls:
                 catched_groups = GCS_AUDIO_ID_REGEX.match(url)
                 if not catched_groups:
@@ -743,7 +942,10 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(status, values):
-        yield (status, values)
+        if status == FILE_FOUND_IN_GCS:
+            yield (status, len(values))
+        else:
+            yield (status, values)
 
 
 class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
@@ -773,9 +975,25 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
             audio_filenames = [
                 GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
 
+            references_unicode_files = False
             for image_filename in image_filenames:
                 try:
-                    raw_image = fs_old.get('image/%s' % image_filename)
+                    fs_old.get('image/%s' % image_filename)
+                except Exception:
+                    references_unicode_files = True
+                    break
+
+            if references_unicode_files:
+                image_filenames_str = '%s' % image_filenames
+                yield (
+                    EXP_REFERENCES_UNICODE_FILES,
+                    'Exp: %s, image filenames: %s' % (
+                        exp_id, image_filenames_str.encode('utf-8')))
+
+            for image_filename in image_filenames:
+                try:
+                    raw_image = fs_old.get(
+                        'image/%s' % image_filename.encode('utf-8'))
                     height, width = gae_image_services.get_image_dimensions(
                         raw_image)
                     filename_with_dimensions = (
@@ -783,8 +1001,15 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                             image_filename, height, width))
                     exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
                         'ADMIN', filename_with_dimensions, exp_id, raw_image)
+                    yield ('Copied file', 1)
                 except Exception:
-                    yield (ERROR_IN_FILENAME, image_filename.encode('utf-8'))
+                    error = traceback.format_exc()
+                    logging.error(
+                        'File %s in %s failed migration: %s' %
+                        (image_filename.encode('utf-8'), exp_id, error))
+                    yield (
+                        ERROR_IN_FILENAME, 'Error when copying %s in %s: %s' % (
+                            image_filename.encode('utf-8'), exp_id, error))
 
             for audio_filename in audio_filenames:
                 filetype = audio_filename[audio_filename.rfind('.') + 1:]
@@ -798,7 +1023,10 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(status, values):
-        yield (status, values)
+        if status == 'Copied file':
+            yield (status, len(values))
+        else:
+            yield (status, values)
 
 
 class InteractionCustomizationArgsValidationJob(

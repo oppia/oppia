@@ -40,12 +40,10 @@ oppia.directive('tutorCard', [
     return {
       restrict: 'E',
       scope: {
-        onSubmitAnswer: '&',
         isLearnAgainButton: '&',
         onDismiss: '&',
         getDisplayedCard: '&displayedCard',
         startCardChangeAnimation: '=',
-        onChangeInteractionAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
@@ -162,25 +160,6 @@ oppia.directive('tutorCard', [
 
           $scope.canWindowShowTwoCards = function() {
             return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
-          };
-
-          $scope.submitAnswer = function(answer, interactionRulesService) {
-            $scope.waitingForOppiaFeedback = true;
-            $scope.onSubmitAnswer({
-              answer: answer,
-              rulesService: interactionRulesService
-            });
-          };
-
-          $scope.setInteractionAnswerValidity = function(answerValidity) {
-            $scope.onChangeInteractionAnswerValidity({
-              answerValidity: answerValidity
-            });
-            if ($scope.getDisplayedCard().getInteraction().id === 'CodeRepl') {
-              $scope.onChangeInteractionAnswerValidity({
-                answerValidity: true
-              });
-            }
           };
 
           $scope.showAudioBar = function() {

@@ -258,7 +258,7 @@ oppia.directive('conversationSkin', [
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'EVENT_NEW_CARD_AVAILABLE',
         'FatigueDetectionService', 'NumberAttemptsService',
         'PlayerCorrectnessFeedbackEnabledService', 'ContextService',
         'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
@@ -271,6 +271,7 @@ oppia.directive('conversationSkin', [
         'PlaythroughService', 'PretestEngineService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
+        'CurrentInteractionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             $location, $q, MessengerService, AlertsService,
@@ -283,7 +284,7 @@ oppia.directive('conversationSkin', [
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
+            EVENT_NEW_CARD_AVAILABLE,
             FatigueDetectionService, NumberAttemptsService,
             PlayerCorrectnessFeedbackEnabledService, ContextService,
             ConceptCardBackendApiService, ConceptCardObjectFactory,
@@ -295,7 +296,8 @@ oppia.directive('conversationSkin', [
             StateClassifierMappingService, ImagePreloaderService,
             PlaythroughService, PretestEngineService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-            ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE) {
+            ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
+            CurrentInteractionService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -844,12 +846,14 @@ oppia.directive('conversationSkin', [
                       $scope.answerIsCorrect = false;
                       $scope.showPendingCard();
                     }
+                    CurrentInteractionService.clearPresubmitHooks();
                   }
                   $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
               }
             );
           };
+          CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
           $scope.startCardChangeAnimation = false;
           $scope.showPendingCard = function() {
             $scope.startCardChangeAnimation = true;
@@ -1032,12 +1036,7 @@ oppia.directive('conversationSkin', [
               $scope.explorationId);
           };
 
-          // Interaction answer validity is used to enable/disable
-          // the progress-nav's Submit button. This logic is here because
-          // Interactions and the progress-nav are both descendants
-          // of ConversationSkinDirective.
-          $scope.interactionAnswerIsValid = true;
-          $scope.setInteractionAnswerValidity = function(answerValidity) {
+          $scope.isSubmitButtonDisabled = function() {
             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
             // This check is added because it was observed that when returning
             // to current card after navigating through previous cards, using
@@ -1046,13 +1045,13 @@ oppia.directive('conversationSkin', [
             // card, this additional check doesn't interfere with its normal
             // working.
             if (!PlayerTranscriptService.isLastCard(currentIndex)) {
-              return;
+              return false;
             }
-            $scope.interactionAnswerIsValid = answerValidity;
+            return CurrentInteractionService.isSubmitButtonDisabled();
           };
 
           $scope.submitAnswerFromProgressNav = function() {
-            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+            CurrentInteractionService.submitAnswer();
           };
         }
       ]
