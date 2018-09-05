@@ -205,8 +205,8 @@ class SkillRightsModel(base_models.VersionedModel):
         """
         return cls.query(
             cls.creator_id == user_id,
-            cls.skill_is_private == True, #pylint: disable=singleton-comparison
-            cls.deleted == False) #pylint: disable=singleton-comparison
+            cls.skill_is_private == True, # pylint: disable=singleton-comparison
+            cls.deleted == False) # pylint: disable=singleton-comparison
 
     @classmethod
     def get_unpublished(cls):
@@ -217,4 +217,4 @@ class SkillRightsModel(base_models.VersionedModel):
             list(SkillRightsModel). A list of skill rights models that are
             private.
         """
-        return cls.query(cls.skill_is_private == True, cls.deleted == False) #pylint: disable=singleton-comparison
+        return cls.query(cls.skill_is_private == True, cls.deleted == False) # pylint: disable=singleton-comparison
