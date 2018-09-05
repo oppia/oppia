@@ -36,6 +36,9 @@
           <span> Assign to Topic </span>
         </button>
       </td>
+      <td ng-if="canDeleteSkill()">
+        <span ng-click="deleteSkill(skill.id)" class="fa fa-trash list-summary"> </span>
+      </td>
     </tr>
   </table>
 </md-card>
