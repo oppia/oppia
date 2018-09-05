@@ -52,7 +52,7 @@ oppia.directive('unresolvedAnswersOverview', [
            * @returns {boolean} - answers from this state can be rendered with
            * HTML.
            */
-          var isStateInteractionIdHtmlRenderable = function(stateName) {
+          var isStateRequiredToBeResolved = function(stateName) {
             var state = ExplorationStatesService.getState(stateName);
             return (!!state && INTERACTION_IDS_REQUIRED_TO_RESOLVE.indexOf(
               state.interaction.id) !== -1);
@@ -61,7 +61,7 @@ oppia.directive('unresolvedAnswersOverview', [
           $scope.isUnresolvedAnswersOverviewShown = function() {
             var activeStateName = StateEditorService.getActiveStateName();
             return StateTopAnswersStatsService.hasStateStats(activeStateName) &&
-              isStateInteractionIdHtmlRenderable(activeStateName);
+              isStateRequiredToBeResolved(activeStateName);
           };
 
           $scope.getCurrentInteractionId = function() {
