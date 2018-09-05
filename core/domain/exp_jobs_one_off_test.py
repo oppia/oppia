@@ -493,7 +493,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
-        self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are
@@ -685,9 +685,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         """Tests that mapreduce job works correctly when the only first
         exploration version exists.
         """
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
@@ -705,26 +704,25 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
     def test_that_mapreduce_job_works(self):
         """Test that mapreduce job is working as expected."""
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            exploration = self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                })], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
 
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state 2',
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'new state'
-                })], 'Modify states')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state 2',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state'
+            })], 'Modify states')
 
-            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
 
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
@@ -1048,26 +1046,33 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertGreater(len(actual_output), 0)
+        self.assertEqual(len(actual_output), 16)
 
         exploration_dict = exploration.to_dict()
-        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+        # We need to create a brand-new exploration here in addition to the old
+        # one (rather than just overwriting the old one), because state id
+        # mapping model is generated when each (exp, version) is saved for
+        # first time. Hence when an exisiting exploration is overwritten
+        # state id mapping model throws an error that mapping already exists.
+        new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
         # This is done to ensure that exploration is not passed through CKEditor
         # Migration pipeline.
-        updated_dict['schema_version'] = 29
-        updated_dict['states_schema_version'] = 24
-        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
-        updated_states = updated_dict['states']
+        new_exp_dict['id'] = self.NEW_EXP_ID
+        new_exp_dict['schema_version'] = 29
+        new_exp_dict['states_schema_version'] = 24
+        new_exploration = exp_domain.Exploration.from_dict(new_exp_dict)
+        new_states = new_exp_dict['states']
 
         for index, state_name in enumerate(state_list):
-            updated_html = updated_states[state_name]['content']['html']
+            new_html = new_states[state_name]['content']['html']
 
             # Test that html matches the expected format after migration.
             self.assertEqual(
-                updated_html, unicode(test_cases[index]['expected_output']))
+                new_html, unicode(test_cases[index]['expected_output']))
 
-        exp_services.save_new_exploration(self.albert_id, updated_exploration)
+        exp_services.save_new_exploration(self.albert_id, new_exploration)
+
         # Start validation job on updated exploration.
         job_id = (
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
@@ -1084,7 +1089,10 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation passes after migration.
-        self.assertEqual(actual_output, [])
+        # There should be no validation errors in the new (updated)
+        # exploration, but there are 16 validation errors in the old
+        # exploration.
+        self.assertEqual(len(actual_output), 16)
 
 
 class ExplorationContentValidationJobForCKEditorTest(

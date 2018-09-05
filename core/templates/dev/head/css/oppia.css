@@ -314,7 +314,8 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   font-style: italic;
 }
 
-table.oppia-issues-learner-action-table td, th {
+.oppia-issues-learner-action-table td,
+.oppia-issues-learner-action-table th {
   border: 1px solid black;
 }
 
@@ -1015,6 +1016,16 @@ textarea {
     margin-right: 2vw;
     max-width: 96vw;
   }
+}
+
+.oppia-story-tile {
+  display: block;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+  min-height: 300px;
+  width: 100vw;
 }
 
 .oppia-fractions-landing-page-generic-title {

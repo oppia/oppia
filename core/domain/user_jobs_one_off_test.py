@@ -758,7 +758,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
@@ -776,7 +776,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
         self.assertEqual(weekly_stats, expected_results_list)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id),
             expected_results_list[0])
 
@@ -955,7 +955,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         ]
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, expected_results_list)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id),
             expected_results_list[1])
 

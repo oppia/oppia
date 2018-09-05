@@ -55,10 +55,11 @@ def create_suggestion(
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
-
+    if description is None:
+        description = DEFAULT_SUGGESTION_THREAD_SUBJECT
     thread_id = feedback_services.create_thread(
         target_type, target_id, None, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
@@ -276,13 +277,37 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
 
-
     thread_id = suggestion.suggestion_id
     if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_id = thread_id[thread_id.find('.') + 1:]
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)
+
+
+def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
+    """Returns a list of suggestions which need to be reviewed, in categories
+    where the user has crossed the minimum score to review.
+
+    Args:
+        user_id: str. The ID of the user.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
+    """
+    score_categories = (
+        user_models.UserContributionScoringModel
+        .get_all_categories_where_user_can_review(user_id))
+
+    if len(score_categories) == 0:
+        return []
+
+    return (
+        [get_suggestion_from_model(s)
+         for s in suggestion_models.GeneralSuggestionModel
+         .get_in_review_suggestions_in_score_categories(
+             score_categories, user_id)])
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):

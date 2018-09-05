@@ -44,6 +44,7 @@ from core.controllers import story_editor
 from core.controllers import subscriptions
 from core.controllers import suggestion
 from core.controllers import topic_editor
+from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
 from core.domain import acl_decorators
@@ -223,6 +224,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
+        topic_viewer.TopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
         topic_editor.TopicEditorQuestionHandler),
@@ -454,6 +461,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+        feedback.ThreadListHandlerForTopics),
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),

@@ -101,6 +101,9 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         can_create_topic = (
             role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
+        can_delete_skill = (
+            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+
         can_create_skill = (
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
@@ -110,6 +113,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
+            'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill
         })
         self.render_json(self.values)

@@ -621,6 +621,7 @@ describe('Issues visualization', function() {
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
   beforeAll(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorStatsTab = explorationEditorPage.getStatsTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -737,18 +738,15 @@ describe('Issues visualization', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer1');
-    browser.sleep(3000);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Try again'));
     explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer2');
-    browser.sleep(3000);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Try again'));
     explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer3');
-    browser.sleep(3000);
-    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer4');
-    browser.sleep(3000);
-    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer5');
-    browser.sleep(3000);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Try again'));
     explorationPlayerPage.expectExplorationToNotBeOver();
 
     oppiaLogo.click();
@@ -756,15 +754,12 @@ describe('Issues visualization', function() {
     users.logout();
 
     users.login('user1@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    general.moveToEditor();
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     explorationEditorPage.navigateToStatsTab();
-
     explorationEditorStatsTab.clickIssue(0, 'Issue 1');
     explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners submitted answers to card "Two" several times, ' +
+      'Several learners submitted answers to card "One" several times, ' +
       'then gave up and quit.');
     explorationEditorStatsTab.markResolved();
     users.logout();

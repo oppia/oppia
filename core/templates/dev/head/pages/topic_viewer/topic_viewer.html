@@ -1,0 +1,134 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ topic_name }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <topics-viewer-navbar-breadcrumb>
+  </topics-viewer-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <background-banner></background-banner>
+  <div ng-controller="TopicViewer" class="oppia-topic-viewer-container" style="position: relative;">
+    <div class="oppia-topic-name">
+      <[topicName]>
+    </div>
+    <div class="oppia-topic-viewer-tabs-container">
+      <div class="oppia-topic-viewer-tabs">
+        <span ng-class="{'oppia-topic-viewer-tabs-active': activeTab === 'story'}">
+          <a class="oppia-topic-viewer-tabs-text" ng-click="setActiveTab('story')" translate="I18N_TOPIC_VIEWER_STORY">
+          </a>
+        </span>
+        <span ng-class="{'oppia-topic-viewer-tabs-active': activeTab === 'practice'}">
+          <a class="oppia-topic-viewer-tabs-text" ng-click="setActiveTab('practice')" translate="I18N_TOPIC_VIEWER_PRACTICE">
+          </a>
+        </span>
+      </div>
+    </div>
+    <div ng-if="activeTab === 'story'" class="oppia-story-tab">
+      <stories-list topic-id="topicId" canonical-stories-list="canonicalStoriesList"></stories-list>
+    </div>
+  </div>
+  <style>
+    .oppia-topic-viewer-tabs-container {
+      margin: 0 auto;
+      width: 70%;
+    }
+    .oppia-story-tab {
+      margin: 0 auto;
+      width: fit-content;
+    }
+    .oppia-topic-viewer-container .oppia-topic-name {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 3em;
+      margin-top: 0px;
+      margin-bottom: 25px;
+      padding-top: 66.5px;
+      text-align: center;
+    }
+    .oppia-topic-viewer-container {
+      color: black;
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0 auto;
+      text-decoration: none;
+    }
+    .oppia-topic-viewer-tabs span {
+      display: -webkit-flex;
+      display: inline-flex;
+      margin-bottom: 0;
+      width: 200px;
+    }
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
+      color: white;
+      font-size: 1.1em;
+      font-weight: bold;
+      padding: 10px;
+      text-decoration: none;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
+    .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
+      background-color: #e7e7e2;
+      border-top: 4px solid #009688;
+      color: #009688;
+    }
+    .oppia-topic-viewer-tabs {
+      background-color: #7e7e7e;
+      margin: 0 auto 0 10%;
+      width: fit-content;
+    }
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
+      font-size: 1em;
+      padding: 10px;
+      text-transform: uppercase;
+      width: 100%;
+    }
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover,
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:focus {
+      text-decoration: underline;
+    }
+
+    @media(max-width: 925px) {
+      .oppia-topic-viewer-tabs {
+        margin: 0 auto;
+      }
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
+        justify-content: center;
+      }
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs li {
+        width: auto;
+      }
+      .oppia-topic-viewer-container {
+        max-width: 95%;
+      }
+    }
+
+    @media(max-width: 649px) {
+      .oppia-topic-viewer-tabs-container {
+        width: 100%;
+      }
+      stories-list {
+        display: inline-grid;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="/templates/dev/head/components/summary_tile/StorySummaryTileDirective.js"></script>
+  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
+
+  <script src="/templates/dev/head/domain/topic_viewer/TopicViewerBackendApiService.js"></script>
+
+  <script src="/templates/dev/head/pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.js"></script>
+  <script src="/templates/dev/head/pages/topic_viewer/StoriesListDirective.js"></script>
+  <script src="/templates/dev/head/pages/topic_viewer/TopicViewer.js"></script>
+{% endblock footer_js %}

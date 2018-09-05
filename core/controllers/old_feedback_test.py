@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
@@ -379,7 +380,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_feedback_threads_with_suggestions(self):
         with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            new_content = exp_domain.SubtitledHtml(
+            new_content = state_domain.SubtitledHtml(
                 'content', 'new content html').to_dict()
             change_cmd = {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -394,7 +395,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-            self.assertEquals(response['feedback_thread_dicts'], [])
+            self.assertEqual(response['feedback_thread_dicts'], [])
             expected_thread_dict = {
                 'original_author_username': self.USER_USERNAME,
                 'status': feedback_models.STATUS_CHOICES_OPEN,

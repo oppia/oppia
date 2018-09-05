@@ -19,6 +19,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import user_services
@@ -529,6 +530,46 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
+    def test_query_suggestions_that_can_be_reviewed_by_user(self):
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category1', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category2', 15)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category3', 5)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_1')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_2')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change, 'category3', 'exploration.exp1.thread_3')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_4')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
+        self.assertEqual(len(
+            suggestion_services
+            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
+        self.assertEqual(len(
+            suggestion_services
+            .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
+
+
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
@@ -569,11 +610,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
                 ['TextInput'], category='Algebra'))
 
-        self.old_content = exp_domain.SubtitledHtml(
+        self.old_content = state_domain.SubtitledHtml(
             'content', 'old content').to_dict()
         self.old_content_ids_to_audio_translations = {
             'content': {
-                self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                self.TRANSLATION_LANGUAGE_CODE: state_domain.AudioTranslation(
                     'filename.mp3', 20, False).to_dict()
             },
             'default_outcome': {}
@@ -589,7 +630,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
-        self.new_content = exp_domain.SubtitledHtml(
+        self.new_content = state_domain.SubtitledHtml(
             'content', 'new content').to_dict()
 
         self.change = {
