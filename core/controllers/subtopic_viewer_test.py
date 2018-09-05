@@ -76,3 +76,5 @@ class SubtopicPageViewerTest(test_utils.GenericTestBase):
         response = self.testapp.get(
             '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, self.topic_id_private, 1), expect_errors=True)
         self.assertEqual(response.status_int, 404)
+
+class SubtopicPageDataHandlerTest(test_utils.GenericTestBase):
