@@ -93,11 +93,11 @@ BAD_PATTERNS = {
         'excluded_files': (),
         'excluded_dirs': ()},
     '<<<<<<<': {
-        'message': 'Please remove Git conflict markers completely. ',
+        'message': 'Please fully resolve existing merge conflict.',
         'excluded_files': (),
         'excluded_dirs': ()},
     '>>>>>>>': {
-        'message': 'Please remove Git conflict markers completely. ',
+        'message': 'Please fully resolve existing merge conflict.',
         'excluded_files': (),
         'excluded_dirs': ()},
     'glyphicon': {
