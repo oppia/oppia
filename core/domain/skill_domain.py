@@ -642,6 +642,15 @@ class Skill(object):
             misconception_dict['id'])
 
     def get_incremented_misconception_id(self, misconception_id):
+        """Returns the incremented misconception id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be
+                incremented.
+
+        Returns:
+            str. The incremented misconception id.
+        """
         return misconception_id + 1
 
     def delete_misconception(self, misconception_id):

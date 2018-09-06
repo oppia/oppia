@@ -623,6 +623,8 @@ class NormalizedRectangle2D(BaseObject):
     def normalize(cls, raw):
         # Moves cur_value to the nearest available value in the range
         # [min_value, max_value].
+        """Returns the normalized coordinates of the rectangle.
+        """
         def clamp(min_value, current_value, max_value):
             return min(max_value, max(min_value, current_value))
         try:

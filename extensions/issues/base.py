@@ -32,6 +32,8 @@ class BaseExplorationIssueSpec(object):
 
     @property
     def customization_arg_specs(self):
+        """Returns the customization arg specs for the components.
+        """
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
