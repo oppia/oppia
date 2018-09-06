@@ -25,16 +25,16 @@ describe('IssuesService', function() {
 
   describe('.isStateRequiredToResolveUnaddressedAnswers', function() {
     it('returns true for TextInput interactions', function() {
-      var textInputState = {interaction: {id: 'TextInput'}};
+      var minimalState = {interaction: {id: 'TextInput'}};
       expect(
-        this.is.isStateRequiredToResolveUnaddressedAnswers(textInputState)
+        this.is.isStateRequiredToResolveUnaddressedAnswers(minimalState)
       ).toBe(true);
     });
 
     it('returns false for FractionInput interactions', function() {
-      var fractionInputState = {interaction: {id: 'FractionInput'}};
+      var minimalState = {interaction: {id: 'FractionInput'}};
       expect(
-        this.is.isStateRequiredToResolveUnaddressedAnswers(fractionInputState)
+        this.is.isStateRequiredToResolveUnaddressedAnswers(minimalState)
       ).toBe(false);
     });
   });
