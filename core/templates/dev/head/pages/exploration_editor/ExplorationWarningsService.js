@@ -24,15 +24,13 @@ oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService',
   'ParameterMetadataService', 'StateTopAnswersStatsService',
-  'SolutionValidityService', 'INTERACTION_IDS_REQUIRED_TO_RESOLVE',
-  'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'SolutionValidityService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, ExplorationParamChangesService, ExplorationStatesService,
       ExpressionInterpolationService, GraphDataService,
       ParameterMetadataService, StateTopAnswersStatsService,
-      SolutionValidityService, INTERACTION_IDS_REQUIRED_TO_RESOLVE,
-      INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      SolutionValidityService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
       UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -182,12 +180,9 @@ oppia.factory('ExplorationWarningsService', [
 
     var _getStatesWithAnswersThatMustBeResolved = function() {
       var stass = StateTopAnswersStatsService;
-      var states = ExplorationStatesService.getStates();
       return stass.getStateNamesWithStats().filter(function(stateName) {
-        var state = states.getState(stateName);
         var mustResolveState =
-          !!state && INTERACTION_IDS_REQUIRED_TO_RESOLVE.indexOf(
-            state.interaction.id) !== -1;
+          IssuesService.isStateRequiredToResolveUnaddressedAnswers(stateName);
         return mustResolveState &&
           stass.getUnresolvedStateStats(stateName).some(function(answer) {
             return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
