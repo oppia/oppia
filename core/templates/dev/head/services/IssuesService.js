@@ -22,7 +22,7 @@ oppia.factory('IssuesService', [function() {
 
   return {
     /**
-     * @param {string} stateName
+     * @param {Object.<string, *>} state
      * @returns {boolean} - having unresolved answers in this state is an
      * error which blocks exploration publishing.
      */
