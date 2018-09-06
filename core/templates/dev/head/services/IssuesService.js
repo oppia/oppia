@@ -18,7 +18,7 @@
  */
 
 oppia.factory('IssuesService', [function() {
-  INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
+  var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
   return {
     /**
