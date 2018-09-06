@@ -92,11 +92,11 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in skill_ids_for_unpublished_skills) and (
-                    skill_id not in merged_skill_ids):
+                        skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in skill_ids_for_unpublished_skills) and (
-                    skill_id not in merged_skill_ids):
+                        skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         unpublished_skill_summary_dicts = [
@@ -184,14 +184,16 @@ class NewSkillHandler(base.BaseHandler):
 class MergeSkillHandler(base.BaseHandler):
     """Handles merging of the skills."""
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
-        """Handles the POST request"""
+        """Handles the POST request."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         old_skill = self.payload.get('old_skill')
         new_skill_id = self.payload.get('new_skill_id')
-        question_services.update_skill_ids_of_questions(old_skill['id'], new_skill_id)
+        question_services.update_skill_ids_of_questions(
+            old_skill['id'], new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,

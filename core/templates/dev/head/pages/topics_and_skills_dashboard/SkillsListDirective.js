@@ -19,7 +19,7 @@ oppia.constant(
   'MERGE_SKILL_URL', '/merge_skill');
 
 oppia.directive('skillsList', [
-  '$http','AlertsService', 'UrlInterpolationService',
+  '$http', 'AlertsService', 'UrlInterpolationService',
   'MERGE_SKILL_URL',
   function(
       $http, AlertsService, UrlInterpolationService, MERGE_SKILL_URL) {
@@ -179,11 +179,11 @@ oppia.directive('skillsList', [
               });
 
               // Start merge question
-              var mergeSkillUrl = MERGE_SKILL_URL
+              var mergeSkillUrl = MERGE_SKILL_URL;
               var mergeSkillData = {
-                'old_skill': skill, 
-                'new_skill_id': supersedingSkill.id
-              }
+                old_skill: skill,
+                new_skill_id: supersedingSkill.id
+              };
               $http.post(mergeSkillUrl, mergeSkillData);
             });
           };
