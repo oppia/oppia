@@ -29,16 +29,16 @@
         </a>
       </td>
       <td>
-          <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary" uib-dropdown>
-            <span> <[topic.total_skill_count]> </span>
-            <div ng-show="topic.uncategorized_skill_count"
-                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-                 uib-tooltip="<[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']> in topic" tooltip-placement="bottom">
-              <span class="oppia-editor-warnings-count">
-                <[topic.uncategorized_skill_count]>
-              </span>
-            </div>
-          </a>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary" uib-dropdown>
+          <span> <[topic.total_skill_count]> </span>
+          <div ng-show="topic.uncategorized_skill_count"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               uib-tooltip="<[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']> in topic" tooltip-placement="bottom">
+            <span class="oppia-editor-warnings-count">
+              <[topic.uncategorized_skill_count]>
+            </span>
+          </div>
+        </a>
       </td>
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
