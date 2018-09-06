@@ -13,10 +13,10 @@
             <div class="col-sm-6 col-sm-push-6 oppia-fractions-landing-image-div" style="height: auto">
               <img ng-src="<[getStaticImageUrl('/fractions_landing/teachers/matthew_paper.png')]>" class="oppia-fractions-landing-image" style="width: 60%;" alt="">
             </div>
-            <div class="col-sm-6 col-sm-pull-6" style="z-index:20">
+            <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
               <div class="text-box-0">
                 <h1 class="oppia-fractions-landing-h1">Fractions just got easier</h1>
-                <h2 class="oppia-fractions-landing-h2" style="padding-right:15px;">Get your students and kids started with our free, effective math lessons.</h2>
+                <h2 class="oppia-fractions-landing-h2" style="padding-right: 15px;">Get your students and kids started with our free, effective math lessons.</h2>
               </div>
               <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
               <button class="btn oppia-fractions-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
@@ -157,7 +157,7 @@
                 <video controls type="video/mp4" ng-src="<[getStaticVideoUrl('/fractions_landing/teachers/fractions_video.mp4')]>" class="oppia-fractions-landing-image
                 oppia-fractions-landing-image-mobile">Sorry, your browser doesn't support embedded videos.
                 </video>
-            </div>
+              </div>
             </div>
             <div class="col-sm-6 text-box-2">
               <h1 class="oppia-fractions-landing-h1 easy-to-follow" style="color: #FFFFFF; padding-right: 130px;">Easy-to-follow lessons</h1>
@@ -374,6 +374,41 @@
     .oppia-fractions-landing-image-mobile {
       display: none;
     }
+    .video-frame {
+      position: relative;
+      width: 270px;
+      height: 600px;
+      margin: auto;
+      border: 11px black solid;
+      border-top-width: 50px;
+      border-bottom-width: 50px;
+      border-radius: 36px;
+    }
+    .video-frame:before {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 5px;
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #333;
+      border-radius: 10px;
+    }
+    .video-frame:after {
+      content: '';
+      display: block;
+      width: 35px;
+      height: 35px;
+      position: absolute;
+      left: 50%;
+      bottom: -58px;
+      transform: translate(-50%, -50%);
+      background: #333;
+      border-radius: 50%;
+    }
+
     @media screen and (max-width: 768px) {
       .oppia-fractions-landing-section-inner,
       .oppia-fractions-landing-section {
