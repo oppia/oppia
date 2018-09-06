@@ -16,17 +16,23 @@
     </tr>
     <tr ng-repeat="skill in getSkillSummaries()"
         class="list-item">
-      <td>
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.description]> </span>
         </a>
       </td>
-      <td>
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
-      <td>
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
@@ -82,7 +88,7 @@
     border-bottom: 1px solid #bbb;
   }
 
-  skills-list .list-item:hover {
+  skills-list .hoverable-cell {
     background-color: #ededed;
   }
 
@@ -96,14 +102,6 @@
 
   skills-list tr td:nth-child(5) {
     border-bottom: 1px solid #fff;
-  }
-
-  skills-list .list-item:hover td:nth-child(4) {
-    background-color: #fff;
-  }
-
-  skills-list .list-item:hover td:nth-child(5) {
-    background-color: #fff;
   }
 
   skills-list .list-summary span {

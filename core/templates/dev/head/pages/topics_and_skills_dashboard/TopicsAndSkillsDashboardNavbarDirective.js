@@ -26,14 +26,20 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
         'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'EVENT_TYPE_SKILL_CREATION_ENABLED',
+        'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            EVENT_TYPE_SKILL_CREATION_ENABLED) {
+            EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+          var topicSummaries = [];
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
+          $scope.$on('topicSummaries', function(evt, data) {
+            topicSummaries = data;
+          });
           $scope.createSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -43,10 +49,13 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.topicSummaries = topicSummaries;
+                  $scope.selectedTopicIds = [];
                   $scope.newSkillDescription = '';
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
-                      description: $scope.newSkillDescription
+                      description: $scope.newSkillDescription,
+                      selectedTopicIds: $scope.selectedTopicIds
                     });
                   };
 
@@ -56,7 +65,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
                 }
               ]
             }).result.then(function(result) {
-              SkillCreationService.createNewSkill(result.description);
+              SkillCreationService.createNewSkill(
+                result.description, result.selectedTopicIds);
             });
           };
           $rootScope.$on(

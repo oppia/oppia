@@ -14,8 +14,11 @@
 
   summary-list-header .oppia-example-header-block {
     overflow: hidden;
-    padding-left: 24px;
     white-space: nowrap;
+  }
+
+  summary-list-header .left-padding {
+    padding-left: 24px;
   }
 
   summary-list-header .oppia-example-header {
@@ -34,7 +37,7 @@
     }
   }
 </style>
-<div class="oppia-example-header-block">
+<div class="oppia-example-header-block" ng-class="{'left-padding': !getDisableSorting()}">
   <div class="oppia-example-header">
     <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
       <[getShortSummary()]>

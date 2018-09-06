@@ -21,6 +21,7 @@
                class="oppia-rule-tab"
                ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
               <summary-list-header index="$index"
+                                   disable-sorting="true"
                                    summary="getMisconceptionSummary(misconception)"
                                    short-summary="getMisconceptionSummary(misconception)"
                                    is-active="$index === activeMisconceptionIndex"

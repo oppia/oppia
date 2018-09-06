@@ -3,25 +3,12 @@
 </div>
 
 <div class="modal-body">
-  <div class="list-group">
-    <a class="list-group-item"
-       ng-repeat="topicSummary in topicSummaries"
-       ng-click="selectOrDeselectTopic(topicSummary.id, $index)"
-       ng-class="{'list-group-item-success': topicSummary.isSelected}">
-      <label class="list-group-item-heading"><[topicSummary.name]></label>
-      <p class="list-group-item-text">Uncategorized Skill Count: <[topicSummary.uncategorized_skill_count]></p>
-      <p class="list-group-item-text">Status: <[topicSummary.is_published ? 'Published' : 'Not Published']></p>
-    </a>
-  </div>
+  <select-topics topic-summaries="topicSummaries"
+                 selected-topic-ids="selectedTopicIds">
+  </select-topics>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success" ng-click="done()">Save</button>
 </div>
-
-<style>
-  .topics-table {
-    width: 100%;
-  }
-</style>

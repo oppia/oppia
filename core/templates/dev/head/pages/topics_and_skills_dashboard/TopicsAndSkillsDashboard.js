@@ -49,6 +49,7 @@ oppia.controller('TopicsAndSkillsDashboard', [
       TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
         function(response) {
           $scope.topicSummaries = response.data.topic_summary_dicts;
+          $rootScope.$broadcast('topicSummaries', $scope.topicSummaries);
           $scope.editableTopicSummaries = $scope.topicSummaries.filter(
             function(summary) {
               return summary.can_edit_topic === true;
@@ -91,6 +92,12 @@ oppia.controller('TopicsAndSkillsDashboard', [
         ($scope.topicSummaries.length === 0) &&
         ($scope.untriagedSkillSummaries.length > 0 ||
         $scope.unpublishedSkillSummaries.length > 0));
+    };
+    $scope.isSkillsTabHelpTextVisible = function() {
+      return (
+        ($scope.untriagedSkillSummaries.length === 0) &&
+        ($scope.topicSummaries.length > 0) &&
+        ($scope.unpublishedSkillSummaries.length === 0));
     };
     $scope.setActiveTab = function(tabName) {
       $scope.activeTab = tabName;

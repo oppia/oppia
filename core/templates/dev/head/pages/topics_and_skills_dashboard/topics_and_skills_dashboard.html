@@ -29,7 +29,7 @@
              Topics
           </a>
         </li>
-        <li ng-if="untriagedSkillSummaries.length > 0"
+        <li ng-if="isSkillsTabHelpTextVisible() || untriagedSkillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
           <a class="dashboard-tabs-text"
              ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
@@ -58,9 +58,13 @@
 
       <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
         <skills-list skill-summaries="untriagedSkillSummaries"
+                     ng-if="untriagedSkillSummaries.length > 0"
                      editable-topic-summaries="editableTopicSummaries"
                      user-can-delete-skill="userCanDeleteSkill">
         </skills-list>
+        <p class="intro-card-message" ng-if="isSkillsTabHelpTextVisible()" style="padding-top: 6px;">
+          There are no pending unused skills.
+        </p>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
@@ -231,6 +235,7 @@
   {{ super() }}
   <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
 
+  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/SelectTopicsDirective.js"></script>
   <script src="/templates/dev/head/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
   <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
   <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
