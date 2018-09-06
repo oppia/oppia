@@ -62,6 +62,7 @@ describe('Responses Service', function() {
       aof = $injector.get('AnswerGroupObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
       cache = $injector.get('AnswerGroupsCacheService');
+      aud = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -130,7 +131,10 @@ describe('Responses Service', function() {
       ecs.setActiveStateName('Test');
     }));
 
-    // onInteractionIdChanged
+    it('should add the continue interaction', function() {
+      rs.onInteractionIdChanged('Continue');
+      expect(cache.contains('Continue')).toEqual(true)
+    });
 
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
