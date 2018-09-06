@@ -22,13 +22,13 @@ oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
 
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
-  'ExpressionInterpolationService', 'GraphDataService',
+  'ExpressionInterpolationService', 'GraphDataService', 'IssuesService',
   'ParameterMetadataService', 'StateTopAnswersStatsService',
   'SolutionValidityService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, ExplorationParamChangesService, ExplorationStatesService,
-      ExpressionInterpolationService, GraphDataService,
+      ExpressionInterpolationService, GraphDataService, IssuesService,
       ParameterMetadataService, StateTopAnswersStatsService,
       SolutionValidityService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
       UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {

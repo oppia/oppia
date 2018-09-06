@@ -22,7 +22,6 @@ oppia.constant('INTERACTION_IDS_REQUIRED_TO_RESOLVE', ['TextInput']);
 oppia.factory('IssuesService', [
   'ExplorationStatesService', 'INTERACTION_IDS_REQUIRED_TO_RESOLVE',
   function(ExplorationStatesService, INTERACTION_IDS_REQUIRED_TO_RESOLVE) {
-    console.log("I'm hit");
     return {
       /**
        * @param {string} stateName
