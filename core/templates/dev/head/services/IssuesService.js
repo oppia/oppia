@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for maintaining the statistics of the top answers for
- * each state of an exploration.
+ * @fileoverview Service to help identify and manage issues in exploration
+ * states based on statistics.
  */
 
 oppia.factory('IssuesService', [function() {

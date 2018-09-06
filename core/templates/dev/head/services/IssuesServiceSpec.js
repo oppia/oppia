@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Factory for domain object which holds the list of top answer
- * statistics for a particular state.
- */
-
 describe('IssuesService', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
