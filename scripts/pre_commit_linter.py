@@ -92,6 +92,14 @@ BAD_PATTERNS = {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': (),
         'excluded_dirs': ()},
+    '<<<<<<<': {
+        'message': 'Please fully resolve existing merge conflicts.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    '>>>>>>>': {
+        'message': 'Please fully resolve existing merge conflicts.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',

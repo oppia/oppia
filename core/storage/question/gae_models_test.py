@@ -70,3 +70,71 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(questionskilllink_model.question_id, question_id)
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
+
+    def test_put_multi_question_skill_link(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1')
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1')
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id3')
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+                'skill_id1')
+        )
+        self.assertEqual(len(question_skill_links), 2)
+        question_ids = [question_skill.question_id for question_skill
+                        in question_skill_links]
+        self.assertEqual(question_ids, ['question_id1', 'question_id2'])
+
+    def test_delete_multi_question_skill_link(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1')
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1')
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id3')
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+                'skill_id1')
+        )
+        self.assertEqual(len(question_skill_links), 2)
+        question_ids = [question_skill.question_id for question_skill
+                        in question_skill_links]
+        self.assertEqual(question_ids, ['question_id1', 'question_id2'])
+
+        question_models.QuestionSkillLinkModel.delete_multi_question_skill_links( #pylint: disable=line-too-long
+            [questionskilllink_model1, questionskilllink_model2])
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+                'skill_id1')
+        )
+        self.assertEqual(len(question_skill_links), 0)
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+                'skill_id3')
+        )
+        self.assertEqual(len(question_skill_links), 1)
+        self.assertEqual(question_skill_links[0].question_id, 'question_id3')
