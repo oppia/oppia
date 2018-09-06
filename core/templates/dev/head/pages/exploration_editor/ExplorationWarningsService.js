@@ -180,10 +180,11 @@ oppia.factory('ExplorationWarningsService', [
 
     var _getStatesWithAnswersThatMustBeResolved = function() {
       var stass = StateTopAnswersStatsService;
+      var states = ExplorationStatesService.getStates();
       return stass.getStateNamesWithStats().filter(function(stateName) {
-        var state = ExplorationStatesService.getState(stateName);
         var mustResolveState =
-          IssuesService.isStateRequiredToResolveUnaddressedAnswers(state);
+          IssuesService.isStateRequiredToResolveUnaddressedAnswers(
+            states.getState(stateName));
         return mustResolveState &&
           stass.getUnresolvedStateStats(stateName).some(function(answer) {
             return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
