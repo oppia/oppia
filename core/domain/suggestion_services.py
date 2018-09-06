@@ -61,9 +61,6 @@ def create_suggestion(
         target_type, target_id, None, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
-    if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
-
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
@@ -234,8 +231,6 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
     thread_id = suggestion.suggestion_id
-    if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = thread_id[thread_id.find('.') + 1:]
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
@@ -278,8 +273,6 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
 
     thread_id = suggestion.suggestion_id
-    if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = thread_id[thread_id.find('.') + 1:]
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)

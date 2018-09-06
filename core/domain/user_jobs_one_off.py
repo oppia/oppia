@@ -226,17 +226,10 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-        classes_to_map_over = [
+        return [
             exp_models.ExplorationRightsModel,
             collection_models.CollectionRightsModel,
-        ]
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            classes_to_map_over.append(
-                feedback_models.GeneralFeedbackMessageModel)
-        else:
-            classes_to_map_over.append(
-                feedback_models.FeedbackMessageModel)
-        return classes_to_map_over
+            feedback_models.GeneralFeedbackMessageModel]
 
     @staticmethod
     def map(item):

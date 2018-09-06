@@ -45,7 +45,6 @@ describe('Suggestion object factory', function() {
       },
       last_updated: 1000
     };
-    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = true;
     suggestion = SuggestionObjectFactory.createFromBackendDict(
       suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
@@ -59,6 +58,5 @@ describe('Suggestion object factory', function() {
     expect(suggestion.oldValue).toEqual('old suggestion content');
     expect(suggestion.lastUpdated).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
-    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = false;
   });
 });

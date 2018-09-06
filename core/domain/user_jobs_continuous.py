@@ -241,10 +241,7 @@ class RecentUpdatesMRJobManager(
 
         exploration_ids_list = item.activity_ids
         collection_ids_list = item.collection_ids
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            feedback_thread_ids_list = item.general_feedback_thread_ids
-        else:
-            feedback_thread_ids_list = item.feedback_thread_ids
+        feedback_thread_ids_list = item.general_feedback_thread_ids
 
         (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
@@ -271,16 +268,10 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-                last_message = (
-                    feedback_models.GeneralFeedbackMessageModel
-                    .get_most_recent_message(feedback_thread_id))
-                exploration_id = last_message.entity_id
-            else:
-                last_message = (
-                    feedback_models.FeedbackMessageModel
-                    .get_most_recent_message(feedback_thread_id))
-                exploration_id = last_message.exploration_id
+            last_message = (
+                feedback_models.GeneralFeedbackMessageModel
+                .get_most_recent_message(feedback_thread_id))
+            exploration_id = last_message.entity_id
 
             yield (
                 reducer_key, {
