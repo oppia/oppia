@@ -44,6 +44,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
             var activeStateName = StateEditorService.getActiveStateName();
+            console.log(typeof IssuesService);
             return IssuesService.isStateRequiredToResolveUnaddressedAnswers(
               activeStateName) && StateTopAnswersStatsService.hasStateStats(
                 activeStateName);
