@@ -47,7 +47,7 @@ oppia.directive('unresolvedAnswersOverview', [
             var state = ExplorationStatesService.getState(activeStateName);
             return IssuesService.isStateRequiredToResolveUnaddressedAnswers(
               state) && StateTopAnswersStatsService.hasStateStats(
-                activeStateName);
+              activeStateName);
           };
 
           $scope.getCurrentInteractionId = function() {
