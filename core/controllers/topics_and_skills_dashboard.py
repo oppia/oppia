@@ -23,6 +23,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import question_services
 import feconf
 
 
@@ -62,6 +63,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = (
+            skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_services.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
             if topic_rights_dict[topic_summary['id']]:
@@ -88,10 +91,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in skill_ids_for_unpublished_skills):
+                    skill_id not in skill_ids_for_unpublished_skills) and (
+                    skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in skill_ids_for_unpublished_skills):
+                    skill_id not in skill_ids_for_unpublished_skills) and (
+                    skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         unpublished_skill_summary_dicts = [
@@ -174,3 +179,32 @@ class NewSkillHandler(base.BaseHandler):
         self.render_json({
             'skillId': new_skill_id
         })
+
+
+class MergeSkillHandler(base.BaseHandler):
+    """Handles merging of the skills."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def post(self):
+        """Handles the POST request"""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+        old_skill = self.payload.get('old_skill')
+        new_skill_id = self.payload.get('new_skill_id')
+        question_services.update_skill_ids_of_questions(old_skill['id'], new_skill_id)
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'old_value': False,
+                'new_value': True
+            })
+        ]
+        skill_services.update_skill(
+            self.user_id, old_skill['id'], changelist,
+            'Setting merge complete for skill.')
+
+        self.render_json({
+            'merged_into_skill': new_skill_id
+            })

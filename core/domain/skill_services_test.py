@@ -227,6 +227,35 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.all_questions_merged, True)
 
+
+    def test_get_merged_skill_ids(self):
+        skill_ids = skill_services.get_merged_skill_ids()
+        self.assertEqual(len(skill_ids), 0)
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'id': 0,
+                'old_value': False,
+                'new_value': True
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Merging skill.')
+        skill_ids = skill_services.get_merged_skill_ids()
+        self.assertEqual(len(skill_ids), 1)
+        self.assertEqual(skill_ids[0], self.SKILL_ID)
+
     def test_delete_skill(self):
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
         self.assertEqual(

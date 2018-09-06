@@ -15,10 +15,14 @@
 /**
  * @fileoverview Controller for the skills list viewer.
  */
+oppia.constant(
+  'MERGE_SKILL_URL', '/merge_skill');
+
 oppia.directive('skillsList', [
-  'AlertsService', 'UrlInterpolationService',
+  '$http','AlertsService', 'UrlInterpolationService',
+  'MERGE_SKILL_URL',
   function(
-      AlertsService, UrlInterpolationService) {
+      $http, AlertsService, UrlInterpolationService, MERGE_SKILL_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -26,7 +30,7 @@ oppia.directive('skillsList', [
         getEditableTopicSummaries: '&editableTopicSummaries',
         isInModal: '&inModal',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
-        selectedSkill: '='
+        selectedSkill: '=',
         canDeleteSkill: '&userCanDeleteSkill',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -163,12 +167,6 @@ oppia.directive('skillsList', [
                 property_name: 'superseding_skill_id',
                 old_value: '',
                 new_value: supersedingSkill.id
-              },
-              {
-                cmd: 'update_skill_property',
-                property_name: 'all_questions_merged',
-                old_value: '',
-                new_value: false
               }];
               EditableSkillBackendApiService.updateSkill(
                 skill.id, skill.version,
@@ -179,6 +177,14 @@ oppia.directive('skillsList', [
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               });
+
+              // Start merge question
+              var mergeSkillUrl = MERGE_SKILL_URL
+              var mergeSkillData = {
+                'old_skill': skill, 
+                'new_skill_id': supersedingSkill.id
+              }
+              $http.post(mergeSkillUrl, mergeSkillData);
             });
           };
         }
