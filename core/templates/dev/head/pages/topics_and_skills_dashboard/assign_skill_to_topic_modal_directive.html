@@ -3,15 +3,15 @@
 </div>
 
 <div class="modal-body">
-  <p>
-    Selected Topics Count: <[selectedTopicIds.length]>
-  </p>
-  <div class="topics-table">
-    <topics-list topic-summaries="topicSummaries"
-                 user-can-delete-topic="false"
-                 in-modal="true"
-                 selected-topic-ids="selectedTopicIds">
-    </topics-list>
+  <div class="list-group">
+    <a class="list-group-item"
+       ng-repeat="topicSummary in topicSummaries"
+       ng-click="selectOrDeselectTopic(topicSummary.id, $index)"
+       ng-class="{'list-group-item-success': topicSummary.isSelected}">
+      <label class="list-group-item-heading"><[topicSummary.name]></label>
+      <p class="list-group-item-text">Uncategorized Skill Count: <[topicSummary.uncategorized_skill_count]></p>
+      <p class="list-group-item-text">Status: <[topicSummary.is_published ? 'Published' : 'Not Published']></p>
+    </a>
   </div>
 </div>
 

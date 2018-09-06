@@ -83,8 +83,18 @@ oppia.directive('skillsList', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.topicSummaries = topicSummaries;
+                  $scope.topicSummaries = angular.copy(topicSummaries);
                   $scope.selectedTopicIds = [];
+                  $scope.selectOrDeselectTopic = function(topicId, index) {
+                    if (!$scope.topicSummaries[index].isSelected) {
+                      $scope.selectedTopicIds.push(topicId);
+                      $scope.topicSummaries[index].isSelected = true;
+                    } else {
+                      var idIndex = $scope.selectedTopicIds.indexOf(topicId);
+                      $scope.selectedTopicIds.splice(idIndex, 1);
+                      $scope.topicSummaries[index].isSelected = false;
+                    }
+                  };
                   $scope.done = function() {
                     $uibModalInstance.close($scope.selectedTopicIds);
                   };
