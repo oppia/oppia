@@ -17,20 +17,18 @@
  * each state of an exploration.
  */
 
-oppia.factory('IssuesService', [
-  'INTERACTION_IDS_REQUIRED_TO_RESOLVE',
-  function(INTERACTION_IDS_REQUIRED_TO_RESOLVE) {
-    INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
+oppia.factory('IssuesService', [function() {
+  INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-    return {
-      /**
-       * @param {string} stateName
-       * @returns {boolean} - having unresolved answers in this state is an
-       * error which blocks exploration publishing.
-       */
-      isStateRequiredToResolveUnaddressedAnswers: function(state) {
-        return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
-          state.interaction.id) !== -1;
-      }
-    };
-  }]);
+  return {
+    /**
+     * @param {string} stateName
+     * @returns {boolean} - having unresolved answers in this state is an
+     * error which blocks exploration publishing.
+     */
+    isStateRequiredToResolveUnaddressedAnswers: function(state) {
+      return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
+        state.interaction.id) !== -1;
+    }
+  };
+}]);
