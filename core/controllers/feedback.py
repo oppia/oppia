@@ -97,7 +97,7 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
-        suggestion = feedback_services.get_suggestion(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:

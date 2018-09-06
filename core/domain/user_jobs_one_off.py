@@ -234,10 +234,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
-        if isinstance(
-                item, (
-                    feedback_models.FeedbackMessageModel,
-                    feedback_models.GeneralFeedbackMessageModel)):
+        if isinstance(item, feedback_models.GeneralFeedbackMessageModel):
             if item.author_id:
                 yield (
                     item.author_id, {

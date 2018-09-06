@@ -442,7 +442,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_c_id, None, None, 'more text')
 
-            self._run_one_off_job()
+        self._run_one_off_job()
 
         # Both users are subscribed to the feedback thread.
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
