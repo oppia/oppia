@@ -33,4 +33,4 @@ oppia.factory('IssuesService', [
           state.interaction.id) !== -1;
       }
     };
-}]);
+  }]);
