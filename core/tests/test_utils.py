@@ -1317,6 +1317,9 @@ class AppEngineTestBase(TestBase):
         return state
 
 
+GenericTestBase = AppEngineTestBase
+
+
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
