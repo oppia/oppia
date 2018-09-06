@@ -26,14 +26,14 @@ oppia.directive('unresolvedAnswersOverview', [
         'unresolved_answers_overview_directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'EditabilityService',
-        'ExplorationRightsService', 'IssuesService', 'StateEditorService',
-        'StateInteractionIdService', 'StateTopAnswersStatsService',
-        'INTERACTION_SPECS',
+        'ExplorationRightsService', 'ExplorationStatesService', 'IssuesService',
+        'StateEditorService', 'StateInteractionIdService',
+        'StateTopAnswersStatsService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, $uibModal, EditabilityService,
-            ExplorationRightsService, IssuesService, StateEditorService,
-            StateInteractionIdService, StateTopAnswersStatsService,
-            INTERACTION_SPECS) {
+            ExplorationRightsService, ExplorationStatesService, IssuesService,
+            StateEditorService, StateInteractionIdService,
+            StateTopAnswersStatsService, INTERACTION_SPECS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
@@ -44,8 +44,9 @@ oppia.directive('unresolvedAnswersOverview', [
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
             var activeStateName = StateEditorService.getActiveStateName();
+            var state = ExplorationStatesService.getState(activeStateName);
             return IssuesService.isStateRequiredToResolveUnaddressedAnswers(
-              activeStateName) && StateTopAnswersStatsService.hasStateStats(
+              state) && StateTopAnswersStatsService.hasStateStats(
                 activeStateName);
           };
 

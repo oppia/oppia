@@ -20,16 +20,15 @@
 oppia.constant('INTERACTION_IDS_REQUIRED_TO_RESOLVE', ['TextInput']);
 
 oppia.factory('IssuesService', [
-  'ExplorationStatesService', 'INTERACTION_IDS_REQUIRED_TO_RESOLVE',
-  function(ExplorationStatesService, INTERACTION_IDS_REQUIRED_TO_RESOLVE) {
+  'INTERACTION_IDS_REQUIRED_TO_RESOLVE',
+  function(INTERACTION_IDS_REQUIRED_TO_RESOLVE) {
     return {
       /**
        * @param {string} stateName
        * @returns {boolean} - having unresolved answers in this state is an
        * error which blocks exploration publishing.
        */
-      isStateRequiredToResolveUnaddressedAnswers: function(stateName) {
-        var state = ExplorationStatesService.getState(stateName);
+      isStateRequiredToResolveUnaddressedAnswers: function(state) {
         return !!state && INTERACTION_IDS_REQUIRED_TO_RESOLVE.indexOf(
           state.interaction.id) !== -1;
       }
