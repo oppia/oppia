@@ -30,6 +30,7 @@ describe('IssuesService', function() {
           interaction: {id: 'TextInput'}
         })
       ).toBe(true);
+    });
 
     it('returns false for FractionInput interactions', function() {
       expect(
