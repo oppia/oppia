@@ -37,17 +37,19 @@ oppia.directive('unresolvedAnswersOverview', [
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
+          var isStateShown = function(stateName) {
+            var state = ExplorationStatesService.getState(stateName);
+            return IssuesService.isStateRequiredToResolveUnaddressedAnswers(
+              state) && StateTopAnswersStatsService.hasStateStats(stateName);
+          };
+
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
-            var activeStateName = StateEditorService.getActiveStateName();
-            var state = ExplorationStatesService.getState(activeStateName);
-            return IssuesService.isStateRequiredToResolveUnaddressedAnswers(
-              state) && StateTopAnswersStatsService.hasStateStats(
-              activeStateName);
+            return isStateShown(StateEditorService.getActiveStateName());
           };
 
           $scope.getCurrentInteractionId = function() {
