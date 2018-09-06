@@ -18,7 +18,6 @@
 
 import datetime
 
-from constants import constants
 from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
