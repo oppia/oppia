@@ -379,7 +379,15 @@ def can_access_moderator_page(handler):
 
 
 def can_send_moderator_emails(handler):
-    """Decorator to check whether user can send moderator emails."""
+    """Decorator to check whether user can send moderator emails.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to send moderator emails.
+    """
 
     def test_can_send_moderator_emails(self, **kwargs):
         """Checks if the user is logged in and can send moderator emails.
@@ -409,7 +417,15 @@ def can_send_moderator_emails(handler):
 
 
 def can_manage_own_profile(handler):
-    """Decorator to check whether user can manage their profile."""
+    """Decorator to check whether user can manage their profile.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to manage their profile.
+    """
 
     def test_can_manage_profile(self, **kwargs):
         """Checks if the user is logged in and can manage their profile.
@@ -439,7 +455,15 @@ def can_manage_own_profile(handler):
 
 
 def can_access_admin_page(handler):
-    """Decorator that checks if the current user is a super admin."""
+    """Decorator that checks if the current user is a super admin.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user is a super admin.
+    """
 
     def test_super_admin(self, **kwargs):
         """Checks if the user is logged in and is a super admin.
@@ -468,7 +492,15 @@ def can_access_admin_page(handler):
 
 
 def can_upload_exploration(handler):
-    """Decorator that checks if the current user can upload exploration."""
+    """Decorator that checks if the current user can upload exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to upload an exploration.
+    """
 
     def test_can_upload(self, **kwargs):
         """Checks if the user can upload exploration.
@@ -497,7 +529,15 @@ def can_upload_exploration(handler):
 
 
 def can_create_exploration(handler):
-    """Decorator to check whether the user can create an exploration."""
+    """Decorator to check whether the user can create an exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if a user has permission to create an exploration.
+    """
 
     def test_can_create(self, **kwargs):
         """Checks if the user can create an exploration.
@@ -527,7 +567,15 @@ def can_create_exploration(handler):
 
 
 def can_create_collection(handler):
-    """Decorator to check whether the user can create a collection."""
+    """Decorator to check whether the user can create a collection.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if a user has permission to create a collection.
+    """
 
     def test_can_create(self, **kwargs):
         """Checks if the user can create a collection.
@@ -557,7 +605,15 @@ def can_create_collection(handler):
 
 
 def can_access_creator_dashboard(handler):
-    """Decorator to check whether the user can access creator dashboard page."""
+    """Decorator to check whether the user can access creator dashboard page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a
+            user has permission to access the creator dashboard page.
+    """
 
     def test_can_access(self, **kwargs):
         """Checks if the user can access the creator dashboard page.
@@ -587,7 +643,15 @@ def can_access_creator_dashboard(handler):
 
 
 def can_create_feedback_thread(handler):
-    """Decorator to check whether the user can create a feedback thread."""
+    """Decorator to check whether the user can create a feedback thread.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to create a feedback thread.
+    """
 
     def test_can_access(self, exploration_id, **kwargs):
         """Checks if the user can create a feedback thread.
@@ -622,7 +686,15 @@ def can_create_feedback_thread(handler):
 
 
 def can_view_feedback_thread(handler):
-    """Decorator to check whether the user can view a feedback thread."""
+    """Decorator to check whether the user can view a feedback thread.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to view a feedback thread.
+    """
 
     def test_can_access(self, thread_id, **kwargs):
         """Checks if the user can view a feedback thread.
@@ -662,7 +734,16 @@ def can_view_feedback_thread(handler):
 
 
 def can_comment_on_feedback_thread(handler):
-    """Decorator to check whether the user can comment on feedback thread."""
+    """Decorator to check whether the user can comment on feedback thread.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to comment on a given feedback
+            thread.
+    """
 
     def test_can_access(self, thread_id, **kwargs):
         """Checks if the user can comment on the feedback thread.
@@ -710,6 +791,13 @@ def can_comment_on_feedback_thread(handler):
 def can_rate_exploration(handler):
     """Decorator to check whether the user can give rating to given
     exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to rate a given exploration.
     """
 
     def test_can_rate(self, exploration_id, **kwargs):
@@ -738,7 +826,15 @@ def can_rate_exploration(handler):
 
 
 def can_flag_exploration(handler):
-    """Decorator to check whether user can flag given exploration."""
+    """Decorator to check whether user can flag given exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user can flag a given exploration.
+    """
 
     def test_can_flag(self, exploration_id, **kwargs):
         """Checks if the user can flag the exploration.
@@ -765,7 +861,15 @@ def can_flag_exploration(handler):
 
 
 def can_subscribe_to_users(handler):
-    """Decorator to check whether user can subscribe/unsubscribe a creator."""
+    """Decorator to check whether user can subscribe/unsubscribe a creator.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to subscribe/unsubscribe a creator.
+    """
 
     def test_can_subscribe(self, **kwargs):
         """Checks if the user can subscribe/unsubscribe a creator.
@@ -791,7 +895,15 @@ def can_subscribe_to_users(handler):
 
 
 def can_edit_exploration(handler):
-    """Decorator to check whether the user can edit given exploration."""
+    """Decorator to check whether the user can edit given exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to edit a given exploration.
+    """
 
     def test_can_edit(self, exploration_id, *args, **kwargs):
         """Checks if the user can edit the exploration.
@@ -830,7 +942,15 @@ def can_edit_exploration(handler):
 
 
 def can_translate_exploration(handler):
-    """Decorator to check whether the user can translate given exploration."""
+    """Decorator to check whether the user can translate given exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a
+            user has permission to translate a given exploration.
+    """
 
     def test_can_translate(self, exploration_id, **kwargs):
         """Checks if the user can translate the exploration.
@@ -868,7 +988,16 @@ def can_translate_exploration(handler):
 
 
 def can_delete_exploration(handler):
-    """Decorator to check whether user can delete exploration."""
+    """Decorator to check whether user can delete exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if
+            a user has permission to delete a given
+            exploration.
+    """
 
     def test_can_delete(self, exploration_id, **kwargs):
         """Checks if the user can delete the exploration.
@@ -906,6 +1035,14 @@ def can_delete_exploration(handler):
 def can_suggest_changes_to_exploration(handler):
     """Decorator to check whether a user can make suggestions to an
     exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to make suggestions to an
+            exploration.
     """
 
     def test_can_suggest(self, exploration_id, **kwargs):
@@ -934,7 +1071,15 @@ def can_suggest_changes_to_exploration(handler):
 
 
 def can_suggest_changes(handler):
-    """Decorator to check whether a user can make suggestions."""
+    """Decorator to check whether a user can make suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to make suggestions.
+    """
 
     def test_can_suggest(self, **kwargs):
         """Checks if the user can make suggestions to an exploration.
@@ -960,7 +1105,16 @@ def can_suggest_changes(handler):
 
 
 def can_publish_exploration(handler):
-    """Decorator to check whether user can publish exploration."""
+    """Decorator to check whether user can publish exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also
+            checks if the user has permission to publish an
+            exploration.
+    """
 
     def test_can_publish(self, exploration_id, *args, **kwargs):
         """Checks if the user can publish the exploration.
@@ -996,7 +1150,15 @@ def can_publish_exploration(handler):
 
 
 def can_publish_collection(handler):
-    """Decorator to check whether user can publish collection."""
+    """Decorator to check whether user can publish collection.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if a user has permission to publish a collection.
+    """
 
     def test_can_publish_collection(self, collection_id, **kwargs):
         """Checks if the user can publish the collection.
@@ -1030,7 +1192,16 @@ def can_publish_collection(handler):
 
 
 def can_unpublish_collection(handler):
-    """Decorator to check whether user can unpublish collection."""
+    """Decorator to check whether user can unpublish a given
+    collection.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that also checks if
+            the user has permission to unpublish a collection.
+    """
 
     def test_can_unpublish_collection(self, collection_id, **kwargs):
         """Checks if the user can unpublish the collection.
@@ -1066,6 +1237,15 @@ def can_unpublish_collection(handler):
 def can_modify_exploration_roles(handler):
     """Decorators to check whether user can manage rights related to an
     exploration.
+
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to manage rights related to an
+            exploration.
     """
 
     def test_can_modify(self, exploration_id, **kwargs):
@@ -1100,6 +1280,14 @@ def can_modify_exploration_roles(handler):
 def can_perform_cron_tasks(handler):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also ensures that
+            the handler can only be executed if it is called by cron or by
+            a superadmin of the application.
     """
 
     def test_can_perform(self, **kwargs):
@@ -1128,7 +1316,15 @@ def can_perform_cron_tasks(handler):
 
 
 def can_access_learner_dashboard(handler):
-    """Decorator to check access to learner dashboard."""
+    """Decorator to check access to learner dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            one can access the learner dashboard.
+    """
 
     def test_can_access(self, **kwargs):
         """Checks if the user can access the learner dashboard.
@@ -1154,6 +1350,14 @@ def can_access_learner_dashboard(handler):
 def can_manage_question_skill_status(handler):
     """Decorator to check whether the user can publish a question and link it
     to a skill.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the
+            given user has permission to publish a question and link it
+            to a skill.
     """
 
     def test_can_manage_question_skill_status(self, **kwargs):
@@ -1189,6 +1393,14 @@ def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if a given user_id is associated with the current
+            session.
     """
 
     def test_login(self, **kwargs):
@@ -1247,7 +1459,15 @@ def can_edit_topic(handler):
 
 
 def can_edit_question(handler):
-    """Decorator to check whether the user can edit given question."""
+    """Decorator to check whether the user can edit given question.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            whether the user has permission to edit a given question.
+    """
 
     def test_can_edit(self, question_id, **kwargs):
         """Checks whether the user can edit the given question.
@@ -1287,7 +1507,15 @@ def can_edit_question(handler):
 
 
 def can_view_question_editor(handler):
-    """Decorator to check whether the user can view any question editor."""
+    """Decorator to check whether the user can view any question editor.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to view any question editor.
+    """
 
     def test_can_view_question_editor(self, question_id, **kwargs):
         """Checks whether the user can view the question editor.
@@ -1328,7 +1556,15 @@ def can_view_question_editor(handler):
 
 
 def can_delete_question(handler):
-    """Decorator to check whether the user can delete a question."""
+    """Decorator to check whether the user can delete a question.
+
+    Args:
+        handler. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to delete a question.
+    """
 
     def test_can_delete_question(self, question_id, **kwargs):
         """Checks whether the user can delete a given question.
@@ -1363,7 +1599,16 @@ def can_delete_question(handler):
 
 
 def can_edit_subtopic_page(handler):
-    """Decorator to check whether the user can edit a subtopic page of a topic."""
+    """Decorator to check whether the user can edit a subtopic page of a
+    topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to edit a subtopic page of a topic.
+    """
 
     def test_can_edit(self, topic_id, **kwargs):
         """Checks whether the user can edit the subtopic page
@@ -1397,7 +1642,15 @@ def can_edit_subtopic_page(handler):
 
 
 def can_add_new_story_to_topic(handler):
-    """Decorator to check whether the user can add a story to a given topic."""
+    """Decorator to check whether the user can add a story to a given topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user has permission to add a story to a given topic.
+    """
 
     def test_can_add_story(self, topic_id, **kwargs):
         """Checks whether the user can add a story to
@@ -1436,7 +1689,15 @@ def can_add_new_story_to_topic(handler):
 def can_edit_story(handler):
     """Decorator to check whether the user can edit a story belonging to a given
     topic.
+
+    Args:
+        handler. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to edit a story for a given topic.
     """
+
     def test_can_edit_story(self, topic_id, **kwargs):
         """Checks whether the user can edit a story belonging to
         a given topic.
@@ -1475,6 +1736,13 @@ def can_edit_story(handler):
 def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to edit a skill.
     """
     def can_user_edit_skill(user, skill_rights):
         """Checks whether the user can edit the given skill.
@@ -1534,7 +1802,15 @@ def can_edit_skill(handler):
 
 
 def can_delete_skill(handler):
-    """Decorator to check whether the user can delete a skill."""
+    """Decorator to check whether the user can delete a skill.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if the user can delete a skill.
+    """
 
     def test_can_delete_skill(self, **kwargs):
         """Checks whether the user can delete a skill.
@@ -1567,6 +1843,13 @@ def can_delete_skill(handler):
 def can_create_skill(handler):
     """Decorator to check whether the user can create a skill, which can be
     independent or added to a topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            the user has permission to create a skill.
     """
     def test_can_create_skill(self, **kwargs):
         """Checks whether the user can create a skill, which can be
@@ -1598,7 +1881,16 @@ def can_create_skill(handler):
 
 
 def can_publish_skill(handler):
-    """Decorator to check whether the user can publish a skill."""
+    """Decorator to check whether the user can publish a skill.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also
+            checks whether the user has permission to publish
+            a skill.
+    """
 
     def can_user_publish_skill(user, skill_rights):
         """Checks whether the user can publish the given skill.
@@ -1656,7 +1948,17 @@ def can_publish_skill(handler):
 
 
 def can_delete_story(handler):
-    """Decorator to check whether the user can delete a story in a given topic."""
+    """Decorator to check whether the user can delete a story in a given
+    topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            whether the user has permission to delete a story in a
+            given topic.
+    """
 
     def test_can_delete_story(self, topic_id, **kwargs):
         """Checks whether the user can delete a story in
@@ -1693,7 +1995,15 @@ def can_delete_story(handler):
 
 
 def can_delete_topic(handler):
-    """Decorator to check whether the user can delete a topic."""
+    """Decorator to check whether the user can delete a topic.
+
+    Args:
+        handler. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also
+            checks if the user can delete a given topic.
+    """
 
     def test_can_delete_topic(self, topic_id, **kwargs):
         """Checks whether the user can delete a given topic.
@@ -1727,7 +2037,15 @@ def can_delete_topic(handler):
 
 
 def can_create_topic(handler):
-    """Decorator to check whether the user can create a topic."""
+    """Decorator to check whether the user can create a topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that also checks
+            if the user can create a topic.
+    """
 
     def test_can_create_topic(self, **kwargs):
         """Checks whether the user can create a topic.
@@ -1762,6 +2080,13 @@ def can_create_topic(handler):
 def can_access_topics_and_skills_dashboard(handler):
     """Decorator to check whether the user can access the topics and skills
     dashboard.
+
+    Args:
+        handler. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that also checks if
+            the user can access the topics and skills dashboard.
     """
 
     def test_can_access_topics_and_skills_dashboard(self, **kwargs):
@@ -1799,7 +2124,15 @@ def can_access_topics_and_skills_dashboard(handler):
 
 
 def can_view_any_topic_editor(handler):
-    """Decorator to check whether the user can view any topic editor."""
+    """Decorator to check whether the user can view any topic editor.
+
+    Args:
+        handler: function. The newly decorated function.
+
+    Returns:
+        function. The newly decorated function that also checks
+            if the user can view any topic editor.
+    """
 
     def test_can_view_any_topic_editor(self, **kwargs):
         """Checks whether the user can view any topic editor.
@@ -1834,7 +2167,15 @@ def can_view_any_topic_editor(handler):
 
 
 def can_manage_rights_for_topic(handler):
-    """Decorator to check whether the user can manage a topic's rights."""
+    """Decorator to check whether the user can manage a topic's rights.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that also checks
+            if the user can manage a given topic's rights.
+    """
 
     def test_can_manage_topic_rights(self, topic_id, **kwargs):
         """Checks whether the user can manage a topic's rights.
@@ -1870,7 +2211,15 @@ def can_manage_rights_for_topic(handler):
 
 
 def can_change_topic_publication_status(handler):
-    """Decorator to check whether the user can publish or unpublish a topic."""
+    """Decorator to check whether the user can publish or unpublish a topic.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can publish or unpublish a topic.
+    """
 
     def test_can_change_topic_publication_status(self, **kwargs):
         """Checks whether the user can can publish or unpublish a topic.
@@ -1905,7 +2254,15 @@ def can_change_topic_publication_status(handler):
 
 
 def can_access_topic_viewer_page(handler):
-    """Decorator to check whether user can access topic viewer page."""
+    """Decorator to check whether user can access topic viewer page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the given topic viewer page.
+    """
 
     def test_can_access(self, topic_name, **kwargs):
         """Checks if the user can access topic viewer page.
@@ -1960,7 +2317,16 @@ def get_decorator_for_accepting_suggestion(decorator):
         """Function that generates a decorator for a given handler.
 
         Args:
-            handler:
+            handler: function. The function to be decorated.
+
+        Returns:
+            function. The newly decorated function that has common
+                checks and permissions specified by passed in
+                decorator.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
             if not self.user_id:
