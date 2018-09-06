@@ -16,7 +16,6 @@
 suggestions.
 """
 
-from constants import constants
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -58,7 +57,7 @@ def create_suggestion(
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
     thread_id = feedback_services.create_thread(
-        target_type, target_id, None, author_id, description,
+        target_type, target_id, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW

@@ -18,7 +18,6 @@
 
 import datetime
 
-from constants import constants
 from core.platform import models
 import utils
 

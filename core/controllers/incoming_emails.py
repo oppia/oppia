@@ -14,7 +14,6 @@
 
 """Controllers for incoming email handlers."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import feedback_services

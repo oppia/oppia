@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
 from core import jobs
 from core.domain import feedback_domain
 from core.platform import models

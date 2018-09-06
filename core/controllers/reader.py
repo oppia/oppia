@@ -720,7 +720,6 @@ class ReaderFeedbackHandler(base.BaseHandler):
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
             exploration_id,
-            state_name,
             self.user_id if include_author else None,
             subject,
             feedback)

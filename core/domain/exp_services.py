@@ -37,12 +37,10 @@ from core.domain import activity_services
 from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
-from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
-from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models

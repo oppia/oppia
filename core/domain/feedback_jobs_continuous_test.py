@@ -16,7 +16,6 @@
 
 """Tests for continuous computations relating to feedback analytics."""
 
-from constants import constants
 from core import jobs_registry
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
@@ -113,7 +112,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             })
 
             feedback_services.create_thread(
-                'exploration', exp_id_1, None, 'owner', 'subject', 'text')
+                'exploration', exp_id_1, 'owner', 'subject', 'text')
             self.process_and_flush_pending_tasks()
             feedback_threads = (
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
@@ -468,8 +467,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation event.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -486,11 +484,9 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -509,17 +505,13 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id_1, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_1, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_1, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_1, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_2, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_2, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_2, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_2, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id_1, {
@@ -541,8 +533,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
                     'num_open_threads': 1,
@@ -571,8 +562,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -615,8 +605,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -657,8 +646,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             # Start job.
             self.process_and_flush_pending_tasks()
@@ -682,8 +670,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Create another thread but don't start job.
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
                     'num_open_threads': 2,

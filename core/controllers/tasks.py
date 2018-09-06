@@ -16,7 +16,6 @@
 
 import json
 
-from constants import constants
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_services

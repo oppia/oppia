@@ -17,7 +17,6 @@
 
 """Tests for the incoming email handler."""
 
-from constants import constants
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
@@ -52,7 +51,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
-                'a_state_name', self.user_id_a, 'a subject', 'some text')
+                self.user_id_a, 'a subject', 'some text')
 
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)

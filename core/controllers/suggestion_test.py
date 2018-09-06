@@ -16,7 +16,6 @@
 
 """Tests for suggestion controllers."""
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -428,5 +427,5 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         )
         thread_messages = feedback_services.get_messages(
             suggestion_to_accept['suggestion_id'])
-    last_message = thread_messages[len(thread_messages) - 1]
-    self.assertEqual(last_message.text, 'This looks good!')
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(last_message.text, 'This looks good!')

@@ -17,7 +17,6 @@
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import exp_services
 from core.domain import feedback_services

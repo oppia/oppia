@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services

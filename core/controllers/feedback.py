@@ -14,10 +14,8 @@
 
 """Controllers for the feedback thread page."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
@@ -56,8 +54,8 @@ class ThreadListHandler(base.BaseHandler):
                 'Text for the first message in the thread must be specified.')
 
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id,
-            self.payload.get('state_name'), self.user_id, subject, text)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, self.user_id,
+            subject, text)
         self.render_json(self.values)
 
 

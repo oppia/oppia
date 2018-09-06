@@ -16,7 +16,6 @@
 
 """Tests for subscription management."""
 
-from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -161,7 +160,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # The viewer posts a message to the thread.
         message_text = 'text'
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 'state_name',
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
             self.viewer_id, 'subject', message_text)
 
         thread_ids_subscribed_to = self._get_thread_ids_subscribed_to(

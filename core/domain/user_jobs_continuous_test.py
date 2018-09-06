@@ -18,7 +18,6 @@
 
 import collections
 
-from constants import constants
 from core import jobs_registry
 from core.domain import collection_services
 from core.domain import event_services
@@ -292,8 +291,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User gives feedback on it.
             feedback_services.create_thread(
-                'exploration', EXP_1_ID, None, editor_id,
-                FEEDBACK_THREAD_SUBJECT, 'text')
+                'exploration', EXP_1_ID, editor_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = feedback_services.get_all_threads(
                 'exploration', EXP_1_ID, False)[0].id
             message = feedback_services.get_messages(thread_id)[0]
@@ -349,8 +348,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                'exploration', EXP_ID, None, user_b_id,
-                FEEDBACK_THREAD_SUBJECT, 'text')
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = feedback_services.get_all_threads(
                 'exploration', EXP_ID, False)[0].id
 
@@ -413,8 +412,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                'exploration', EXP_ID, None, user_b_id,
-                FEEDBACK_THREAD_SUBJECT, 'text')
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = feedback_services.get_all_threads(
                 'exploration', EXP_ID, False)[0].id
             message = feedback_services.get_messages(thread_id)[0]

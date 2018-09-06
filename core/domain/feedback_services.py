@@ -56,16 +56,13 @@ def get_exp_id_from_thread_id(thread_id):
 
 
 def _create_models_for_thread_and_first_message(
-        entity_type, entity_id, state_name, original_author_id, subject, text,
+        entity_type, entity_id, original_author_id, subject, text,
         has_suggestion):
     """Creates a feedback thread and its first message.
 
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        state_name: str or None. The state name for the thread. If None,
-            this indicates that the thread pertains to the exploration as a
-            whole.
         original_author_id: str. The author id who starts this thread.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
@@ -97,15 +94,13 @@ def _create_models_for_thread_and_first_message(
 
 
 def create_thread(
-        entity_type, entity_id, state_name, original_author_id, subject, text,
+        entity_type, entity_id, original_author_id, subject, text,
         has_suggestion=False):
     """Creates a thread and its first message.
 
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        state_name: str or None. The state name for the thread. If None, this
-            indicates that the thread pertains to the exploration as a whole.
         original_author_id: str. The author id who starts this thread.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
@@ -116,7 +111,7 @@ def create_thread(
         str. The ID of the newly created thread.
     """
     thread_id = _create_models_for_thread_and_first_message(
-        entity_type, entity_id, state_name, original_author_id, subject, text,
+        entity_type, entity_id, original_author_id, subject, text,
         has_suggestion)
     return thread_id
 
