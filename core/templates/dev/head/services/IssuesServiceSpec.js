@@ -37,5 +37,6 @@ describe('IssuesService', function() {
           interaction: {id: 'FractionInput'}
         })
       ).toBe(true);
+    });
   });
 });
