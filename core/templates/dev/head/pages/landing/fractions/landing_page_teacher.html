@@ -14,7 +14,7 @@
               <img ng-src="<[getStaticImageUrl('/fractions_landing/teachers/matthew_paper.png')]>" class="oppia-fractions-landing-image" style="width: 60%;" alt="">
             </div>
             <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
-              <div class="text-box-0">
+              <div class="oppia-fractions-landing-text-box-0">
                 <h1 class="oppia-fractions-landing-h1">Fractions just got easier</h1>
                 <h2 class="oppia-fractions-landing-h2" style="padding-right: 15px;">Get your students and kids started with our free, effective math lessons.</h2>
               </div>
@@ -131,7 +131,7 @@
               <img ng-src="<[getStaticImageUrl('/fractions_landing/teachers/matthew_fractions.png')]>" class="oppia-fractions-landing-image" alt="">
             </div>
             <div class="col-sm-6 col-sm-pull-6">
-              <div class="text-box-1">
+              <div class="oppia-fractions-landing-text-box-1">
                 <h1 class="oppia-fractions-landing-h1" style="color: #242424">Fun storytelling for all</h1>
                 <h2 class="oppia-fractions-landing-h2" style="color: #242424">Students are guided through explorations with targeted feedback and immersive storytelling.
                   <br>
@@ -159,8 +159,8 @@
                 </video>
               </div>
             </div>
-            <div class="col-sm-6 text-box-2">
-              <h1 class="oppia-fractions-landing-h1 easy-to-follow" style="color: #FFFFFF; padding-right: 130px;">Easy-to-follow lessons</h1>
+            <div class="col-sm-6 oppia-fractions-landing-text-box-2">
+              <h1 class="oppia-fractions-landing-h1 oppia-fractions-landing-easy-to-follow" style="color: #FFFFFF; padding-right: 130px;">Easy-to-follow lessons</h1>
               <h2 class="oppia-fractions-landing-h2" style="color: #FFFFFF;">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
                 <br>
                 <br>
@@ -249,10 +249,10 @@
 
   <style>
     .oppia-fractions-landing-section {
-      overflow: hidden;
       height: auto;
       margin-left: auto;
       margin-right: auto;
+      overflow: hidden;
       position: relative;
     }
     .oppia-fractions-landing-h1 {
@@ -261,21 +261,21 @@
       text-align: left;
       top: 160px;
     }
-    .easy-to-follow {
+     .oppia-fractions-landing-easy-to-follow {
       white-space: nowrap;
     }
     .oppia-fractions-landing-section-inner {
       height: auto;
       margin-left: auto;
       margin-right: auto;
-      padding-top: 8%;
       padding-bottom: 3%;
+      padding-top: 8%;
       position: relative;
     }
     .oppia-fractions-landing-h2{
-      margin-top: 5%;
       font-size: 1.8vmax;
       line-height: 1.6em;
+      margin-top: 5%;
       position: relative;
       text-align: left;
       width: 80%;
@@ -325,8 +325,8 @@
     .oppia-fractions-landing-learn-more:hover,
     .oppia-fractions-landing-learn-more:focus,
     .oppia-fractions-landing-learn-more:active {
-      color: #05beb2;
       border-color: #05beb2;
+      color: #05beb2;
     }
     .oppia-fractions-landing-centered-h2 {
       left: 0px;
@@ -337,15 +337,15 @@
     .library-text {
       margin-left: 22%;
     }
-    .text-box-0,
-    .text-box-1,
-    .text-box-2 {
+    .oppia-fractions-landing-text-box-0,
+    .oppia-fractions-landing-text-box-1,
+    .oppia-fractions-landing-text-box-2 {
       margin-left: 60px;
     }
-    .text-box-2 {
+    .oppia-fractions-landing-text-box-2 {
+      margin-left: auto;
       margin-top: 100px;
       padding-right: 40px;
-      margin-left: auto;
     }
     .oppia-fractions-landing-background-icon-row {
       margin-top: 0;
@@ -369,48 +369,48 @@
       width: 10%;
     }
     .oppia-fractions-landing-image {
-      position: relative;
-      z-index: 20;
       max-width: 100%;
       max-height: 500px;
+      position: relative;
+      z-index: 20;
     }
     .oppia-fractions-landing-image-mobile {
       display: none;
     }
     .video-frame {
-      position: relative;
-      width: 270px;
-      height: 600px;
-      margin: auto;
       border: 11px black solid;
       border-top-width: 50px;
       border-bottom-width: 50px;
       border-radius: 36px;
       background: #000000;
+      height: 600px;
+      margin: auto;
+      position: relative;
+      width: 270px;
     }
     .video-frame:before {
-      content: '';
-      display: block;
-      width: 60px;
-      height: 5px;
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      transform: translate(-50%, -50%);
       background: #333;
       border-radius: 10px;
-    }
-    .video-frame:after {
       content: '';
       display: block;
-      width: 35px;
-      height: 35px;
-      position: absolute;
+      height: 5px;
       left: 50%;
-      bottom: -58px;
+      position: absolute;
+      top: -25px;
       transform: translate(-50%, -50%);
+      width: 60px;
+    }
+    .video-frame:after {
       background: #333;
       border-radius: 50%;
+      bottom: -58px;
+      content: '';
+      display: block;
+      height: 35px;
+      left: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 35px;
     }
     @media screen and (max-width: 768px) {
       .oppia-fractions-landing-section-inner,
@@ -427,18 +427,18 @@
         text-align: center !important;
         width: 80%;
       }
-      .easy-to-follow {
+      .oppia-fractions-landing-easy-to-follow {
         white-space: pre-wrap;
       }
       .oppia-fractions-landing-h2 {
         font-size: 1em;
+        left: 10%;
         text-align: center !important;
         width: 80% !important;
-        left: 10%;
       }
-      .text-box-0,
-      .text-box-1,
-      .text-box-2 {
+      .oppia-fractions-landing-text-box-0,
+      .oppia-fractions-landing-text-box-1,
+      .oppia-fractions-landing-text-box-2 {
         margin-left: auto;
       }
       .oppia-fractions-landing-learn-more,
@@ -462,11 +462,11 @@
         display: none;
       }
       .oppia-fractions-landing-centered-h2 {
+        left: 0;
         margin-left: 10%;
         margin-right: 10%;
-        left: 0;
       }
-      .text-box-2 {
+      .oppia-fractions-landing-text-box-2 {
         margin-top: 0;
         padding-right: inherit;
       }
