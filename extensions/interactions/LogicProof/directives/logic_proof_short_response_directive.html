@@ -1,6 +1,8 @@
-<span ng-if="answer.correct" translate="I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS"
-      translate-values="{answer:'<pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre>'}" translate-compile>
+<span ng-if="answer.correct">
+  <span translate="I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS"></span>:
+  <pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre>
 </span>
-<span ng-if="!answer.correct" translate="I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS"
-      translate-values="{answer:'<pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre>'}" translate-compile>
+<span ng-if="!answer.correct">
+  <span translate="I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS"></span>:
+  <pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre>
 </span>
