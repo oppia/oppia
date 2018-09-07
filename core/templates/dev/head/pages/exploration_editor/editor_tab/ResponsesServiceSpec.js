@@ -63,6 +63,7 @@ describe('Responses Service', function() {
       oof = $injector.get('OutcomeObjectFactory');
       cache = $injector.get('AnswerGroupsCacheService');
       aud = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+      saud = $injector.get('stateContentIdsToAudioTranslationsService');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
