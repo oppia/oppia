@@ -152,10 +152,10 @@
             <div class="col-sm-6 oppia-fractions-landing-image-div">
               <div class="video-frame">
                 <video controls type="video/mp4" ng-src="<[getStaticVideoUrl('/fractions_landing/teachers/fractions_video.mp4')]>" class="oppia-fractions-landing-image
-                oppia-fractions-landing-image-desktop">Sorry, your browser doesn't support embedded videos.
+                oppia-fractions-landing-image-desktop" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
                 </video>
                 <video controls type="video/mp4" ng-src="<[getStaticVideoUrl('/fractions_landing/teachers/fractions_video.mp4')]>" class="oppia-fractions-landing-image
-                oppia-fractions-landing-image-mobile">Sorry, your browser doesn't support embedded videos.
+                oppia-fractions-landing-image-mobile" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
                 </video>
               </div>
             </div>
@@ -410,6 +410,15 @@
       transform: translate(-50%, -50%);
       width: 35px;
     }
+    video::-webkit-media-controls-fullscreen-button,
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-mute-button,
+    video::-webkit-media-controls-toggle-closed-captions-button,
+    video::-webkit-media-controls-volume-slider {
+      cursor: pointer;
+    }
+
     @media screen and (max-width: 768px) {
       .oppia-fractions-landing-section-inner,
       .oppia-fractions-landing-section {
