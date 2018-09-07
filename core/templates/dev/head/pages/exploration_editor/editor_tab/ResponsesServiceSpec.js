@@ -120,6 +120,13 @@ describe('Responses Service', function() {
         }
       });
 
+      var audio = {
+        content: {},
+        default_outcome: {},
+        feedback_1: {}
+      };
+      saud.init('Test', aud.createFromBackendDict(citatDict));
+
       state = ess.getState('Test');
 
       rs.init({
