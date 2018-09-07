@@ -44,8 +44,9 @@ oppia.directive('unresolvedAnswersOverview', [
 
           var isStateRequiredToBeResolved = function(stateName) {
             var state = ExplorationStatesService.getState(stateName);
-            return IssuesService
-              .isStateForcedToResolveOutstandingUnaddressedAnswers(state);
+            return
+              IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+                state);
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
