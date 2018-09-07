@@ -183,7 +183,7 @@ oppia.factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       return stass.getStateNamesWithStats().filter(function(stateName) {
         var mustResolveState =
-          IssuesService.isStateRequiredToResolveUnaddressedAnswers(
+          IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
             states.getState(stateName));
         return mustResolveState &&
           stass.getUnresolvedStateStats(stateName).some(function(answer) {

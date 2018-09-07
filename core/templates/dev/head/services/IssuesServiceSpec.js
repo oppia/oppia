@@ -18,12 +18,13 @@ describe('IssuesService', function() {
     this.IssuesService = $injector.get('IssuesService');
   }));
 
-  describe('.isStateRequiredToResolveUnaddressedAnswers', function() {
+  describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', function() {
     it('returns true for states with TextInput interactions', function() {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
-        this.IssuesService.isStateRequiredToResolveUnaddressedAnswers(mockState)
+        this.IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+          mockState)
       ).toBe(true);
     });
 
@@ -31,7 +32,8 @@ describe('IssuesService', function() {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(
-        this.IssuesService.isStateRequiredToResolveUnaddressedAnswers(mockState)
+        this.IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+          mockState)
       ).toBe(false);
     });
   });

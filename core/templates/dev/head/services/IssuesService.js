@@ -21,12 +21,7 @@ oppia.factory('IssuesService', [function() {
   var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
   return {
-    /**
-     * @param {Object.<string, *>} state
-     * @returns {boolean} - having unresolved answers in this state is an
-     * error which blocks exploration publishing.
-     */
-    isStateRequiredToResolveUnaddressedAnswers: function(state) {
+    isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
       return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
         state.interaction.id) !== -1;
     }
