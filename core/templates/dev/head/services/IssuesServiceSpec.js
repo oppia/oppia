@@ -19,7 +19,7 @@ describe('IssuesService', function() {
   }));
 
   describe('.isStateRequiredToResolveUnaddressedAnswers', function() {
-    it('returns true for TextInput interactions', function() {
+    it('returns true for states with TextInput interactions', function() {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
@@ -27,7 +27,7 @@ describe('IssuesService', function() {
       ).toBe(true);
     });
 
-    it('returns false for FractionInput interactions', function() {
+    it('returns false for states with FractionInput interactions', function() {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(
