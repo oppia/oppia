@@ -15,21 +15,23 @@
 describe('IssuesService', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    this.is = $injector.get('IssuesService');
+    this.IssuesService = $injector.get('IssuesService');
   }));
 
   describe('.isStateRequiredToResolveUnaddressedAnswers', function() {
     it('returns true for TextInput interactions', function() {
-      var minimalState = {interaction: {id: 'TextInput'}};
+      var mockState = {interaction: {id: 'TextInput'}};
+
       expect(
-        this.is.isStateRequiredToResolveUnaddressedAnswers(minimalState)
+        this.IssuesService.isStateRequiredToResolveUnaddressedAnswers(mockState)
       ).toBe(true);
     });
 
     it('returns false for FractionInput interactions', function() {
-      var minimalState = {interaction: {id: 'FractionInput'}};
+      var mockState = {interaction: {id: 'FractionInput'}};
+
       expect(
-        this.is.isStateRequiredToResolveUnaddressedAnswers(minimalState)
+        this.IssuesService.isStateRequiredToResolveUnaddressedAnswers(mockState)
       ).toBe(false);
     });
   });
