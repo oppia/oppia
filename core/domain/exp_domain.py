@@ -2471,7 +2471,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
-        """ Converts a v17 exploration dict into a v18 exploration dict.
+        """Converts a v17 exploration dict into a v18 exploration dict.
 
         Adds auto_tts_enabled property.
         """
@@ -2486,7 +2486,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
-        """ Converts a v18 exploration dict into a v19 exploration dict.
+        """Converts a v18 exploration dict into a v19 exploration dict.
 
         Adds audio translations to feedback, hints, and solutions.
         """
@@ -2500,7 +2500,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
-        """ Converts a v19 exploration dict into a v20 exploration dict.
+        """Converts a v19 exploration dict into a v20 exploration dict.
 
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
@@ -2517,7 +2517,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
-        """ Converts a v20 exploration dict into a v21 exploration dict.
+        """Converts a v20 exploration dict into a v21 exploration dict.
 
         Adds a refresher_exploration_id field to each answer group outcome, and
         to the default outcome (if it exists).
@@ -2532,7 +2532,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
-        """ Converts a v21 exploration dict into a v22 exploration dict.
+        """Converts a v21 exploration dict into a v22 exploration dict.
 
         Moves the labelled_as_correct field from the answer group level to the
         outcome level, and adds two extra customization args to the
@@ -2548,7 +2548,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
-        """ Converts a v22 exploration dict into a v23 exploration dict.
+        """Converts a v22 exploration dict into a v23 exploration dict.
 
         Adds a new customization arg to FractionInput interactions
         which allows you to add custom placeholders.
@@ -2563,7 +2563,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
-        """ Converts a v23 exploration dict into a v24 exploration dict.
+        """Converts a v23 exploration dict into a v24 exploration dict.
 
         Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
@@ -2578,7 +2578,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """ Converts a v24 exploration dict into a v25 exploration dict.
+        """Converts a v24 exploration dict into a v25 exploration dict.
 
         Adds additional tagged_misconception_id and
         missing_prerequisite_skill_id fields to answer groups and outcomes
@@ -2594,7 +2594,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
-        """ Converts a v25 exploration dict into a v26 exploration dict.
+        """Converts a v25 exploration dict into a v26 exploration dict.
 
         Move audio_translations into a seperate dict.
         """
