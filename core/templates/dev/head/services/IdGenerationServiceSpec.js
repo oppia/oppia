@@ -25,10 +25,10 @@ describe('IdGenerationService', function() {
   }));
 
   it('should generate a random id', function() {
-    expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]+/);
+    expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]{10}/);
   });
 
-  it('should test two ids to be different', function() {
+  it('should generate two different ids', function() {
     var id1 = IdGenerationService.generateNewId();
     var id2 = IdGenerationService.generateNewId();
     expect(id1).not.toEqual(id2);
