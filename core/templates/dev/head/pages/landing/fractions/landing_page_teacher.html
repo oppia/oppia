@@ -150,7 +150,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-6 oppia-fractions-landing-image-div">
-              <div class="video-frame">
+              <div class="oppia-fractions-landing-video-frame">
                 <video controls type="video/mp4" ng-src="<[getStaticVideoUrl('/fractions_landing/teachers/fractions_video.mp4')]>" class="oppia-fractions-landing-image
                 oppia-fractions-landing-image-desktop" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
                 </video>
@@ -375,7 +375,7 @@
     .oppia-fractions-landing-image-mobile {
       display: none;
     }
-    .video-frame {
+    .oppia-fractions-landing-video-frame {
       border: 11px black solid;
       border-top-width: 50px;
       border-bottom-width: 50px;
@@ -386,7 +386,7 @@
       position: relative;
       width: 270px;
     }
-    .video-frame:before {
+    .oppia-fractions-landing-video-frame:before {
       background: #333;
       border-radius: 10px;
       content: '';
@@ -398,7 +398,7 @@
       transform: translate(-50%, -50%);
       width: 60px;
     }
-    .video-frame:after {
+    .oppia-fractions-landing-video-frame:after {
       background: #333;
       border-radius: 50%;
       bottom: -58px;
