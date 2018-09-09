@@ -1,4 +1,8 @@
 <md-card layout="row" class="list-view-item">
+  Search By Skill
+  <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText">
+</md-card>
+<md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
       <col style="width: 40%;">
@@ -14,7 +18,7 @@
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
       </th>
     </tr>
-    <tr ng-repeat="skill in getSkillSummaries()"
+    <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
         ng-click="isInModal() && selectSkill(skill)"
         class="list-item">
       <td>
@@ -58,7 +62,10 @@
   }
 
   skills-list .dashboard-table {
+    display: block;
     font-size: 15px;
+    height: 250px;
+    overflow-y: scroll;
     width: 100%;
   }
 
