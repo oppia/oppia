@@ -31,8 +31,7 @@ class BaseVisualization(object):
 
     @property
     def id(self):
-        """Returns the name of the class.
-        """
+        """Returns the name of the class."""
         return self.__class__.__name__
 
     def __init__(

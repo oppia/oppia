@@ -624,6 +624,16 @@ class NormalizedRectangle2D(BaseObject):
         # Moves cur_value to the nearest available value in the range
         # [min_value, max_value].
         """Returns the normalized coordinates of the rectangle.
+
+        Args:
+            raw: *. An object to be validated against the schema, normalizing if
+                necessary.
+
+        Returns:
+            *. The normalized object.
+
+        Raises:
+            TypeError: Cannot convert to the Normalized Rectangle schema.
         """
         def clamp(min_value, current_value, max_value):
             return min(max_value, max(min_value, current_value))

@@ -32,8 +32,7 @@ class BaseLearnerActionSpec(object):
 
     @property
     def customization_arg_specs(self):
-        """Returns the customization arg specs for the components.
-        """
+        """The customization arg specs for the action definition."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
