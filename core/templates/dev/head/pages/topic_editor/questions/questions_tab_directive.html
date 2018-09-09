@@ -71,7 +71,8 @@
   <div style="padding-left: 45%;">
     <button type="button"
             class="btn btn-success oppia-editor-publish-button"
-            ng-click="saveQuestion()">
+            ng-click="saveQuestion()"
+            ng-disabled="!QuestionUndoRedoService.hasChanges()">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;

@@ -22,21 +22,13 @@ oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
 oppia.constant('CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
 
 oppia.factory('QuestionUpdateService', [
-  'QuestionObjectFactory',
-  'ChangeObjectFactory',
-  'QuestionUndoRedoService',
-  'QUESTION_PROPERTY_LANGUAGE_CODE',
-  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
+  'QuestionObjectFactory', 'ChangeObjectFactory', 'QuestionUndoRedoService',
+  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   'CMD_UPDATE_QUESTION_PROPERTY',
   function(
-      QuestionObjectFactory,
-      ChangeObjectFactory,
-      QuestionUndoRedoService,
-      QUESTION_PROPERTY_LANGUAGE_CODE,
-      QUESTION_PROPERTY_QUESTION_STATE_DATA,
+      QuestionObjectFactory, ChangeObjectFactory, QuestionUndoRedoService,
+      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA,
       CMD_UPDATE_QUESTION_PROPERTY) {
-    var _changeCount = 0;
-
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -83,12 +75,6 @@ oppia.factory('QuestionUpdateService', [
           }, function(changeDict, question) {
             question.setStateData(oldStateData);
           });
-      },
-      getChangeCount: function() {
-        return this._changeCount;
-      },
-      resetChangeCount: function() {
-        _changeCount = 0;
       }
     };
   }

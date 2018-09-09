@@ -138,7 +138,7 @@ def delete_question(
 
 
 def get_question_from_model(question_model):
-    """Returns domain object repersenting the given question model.
+    """Returns domain object representing the given question model.
 
     Args:
         question_model: QuestionModel. The question model loaded from the
@@ -156,6 +156,17 @@ def get_question_from_model(question_model):
 
 
 def get_question_skill_link_from_model(question_skill_link_model):
+    """Returns domain object representing the given question skill link model.
+
+    Args:
+        question_skill_link_model: QuestionSkillLinkModel. The question skill
+            link model loaded from the datastore.
+
+    Returns:
+        QuestionSkillLink. The domain object representing the question skill
+            link model.
+    """
+
     return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
         question_skill_link_model.skill_id)
@@ -183,14 +194,14 @@ def get_question_by_id(question_id, strict=True):
 
 
 def get_question_skill_links_of_skill(skill_id):
-    """Returns a list of QuestionSkillLinkModels of
+    """Returns a list of QuestionSkillLinks of
     a particular skill ID.
 
     Args:
         skill_id: str. ID of the skill.
 
     Returns:
-        list(QuestionSkillLinkModel). The list of question skill link
+        list(QuestionSkillLink). The list of question skill link
         domain objects that are linked to the skill ID or an empty list
         if the skill does not exist.
     """
@@ -467,7 +478,7 @@ def save_question_summary(question_summary):
 
 def get_question_summary_from_model(question_summary_model):
     """Returns a domain object for an Oppia question summary given a
-    questioin summary model.
+    question summary model.
 
     Args:
         question_summary_model: QuestionSummaryModel.

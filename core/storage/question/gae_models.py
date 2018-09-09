@@ -260,7 +260,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ID doesn't exist.
         """
         return QuestionSkillLinkModel.query().filter(
-            cls.question_id == question_id).fetch()
+            cls.question_id == question_id,
+            cls.deleted == False).fetch() #pylint: disable=singleton-comparison
 
     @classmethod
     def put_multi_question_skill_links(cls, question_skill_links):
