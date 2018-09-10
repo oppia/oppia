@@ -26,7 +26,7 @@ from constants import constants  # pylint: disable=relative-import
 DEBUG = False
 
 # When DEV_MODE = true check that we are running in development enviroment.
-if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
+if (constants.DEV_MODE and
         not os.environ['SERVER_SOFTWARE'].startswith('Development')):
     raise Exception('DEV_MODE can\'t be true on production.')
 
