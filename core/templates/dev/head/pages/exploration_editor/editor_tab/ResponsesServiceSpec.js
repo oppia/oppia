@@ -143,9 +143,10 @@ describe('Responses Service', function() {
       ecs.setActiveStateName('Test');
     }));
 
-    it('should add the continue interaction', function() {
+    it('should return empty list if interaction id is not present in answer' +
+      'groups cache service', function() {
       rs.onInteractionIdChanged('GraphInput');
-      expect(state.interaction.id).toEqual('GraphInput')
+      expect(rs.getAnswerGroups()).toEqual([])
     });
 
     it('should return -1 if no answer group is active', function() {
