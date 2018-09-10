@@ -272,7 +272,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # DEPRECATED. DO NOT USE. Use general_feedback_thread_ids instead
+    # DEPRECATED. DO NOT USE. Use general_feedback_thread_ids instead.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
