@@ -156,7 +156,7 @@ class BaseCalculation(object):
 
     @property
     def id(self):
-        """Returns the name of the class."""
+        """The name of the class."""
         return self.__class__.__name__
 
     def calculate_from_state_answers_dict(self, state_answers_dict):

@@ -44,12 +44,15 @@ class BaseObject(object):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
 
+        Args:
+            raw: *. A normalized Python object to be normalized.
+
         Returns:
-          a normalized Python object describing the Object specified by this
-          class.
+          *. A normalized Python object describing the Object specified by this
+            class.
 
         Raises:
-          TypeError: if the Python object cannot be normalized.
+          TypeError: The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -66,7 +69,15 @@ class Boolean(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            *. The normalized object.
+        """
         if raw is None or raw == '':
             raw = False
 
@@ -163,6 +174,15 @@ class CodeString(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            *. The normalized object.
+        """
         if '\t' in raw:
             raise TypeError(
                 'Unexpected tab characters in code string: %s' % raw)
@@ -411,7 +431,18 @@ class CheckedProof(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            *. The normalized object.
+
+        Raises:
+            TypeError: Cannot convert to the CheckedProof schema.
+        """
         try:
             assert isinstance(raw, dict)
             assert isinstance(raw['assumptions_string'], basestring)
@@ -435,7 +466,18 @@ class LogicQuestion(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            *. The normalized object.
+
+        Raises:
+            TypeError: Cannot convert to LogicQuestion schema.
+        """
 
         def _validate_expression(expression):
             assert isinstance(expression, dict)
@@ -547,6 +589,16 @@ class Graph(BaseObject):
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
         TODO(czx): Think about support for multigraphs?
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            *. The normalized object.
+
+        Raises:
+            TypeError: *. Cannot convert to the Graph schema.
         """
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
@@ -633,7 +685,7 @@ class NormalizedRectangle2D(BaseObject):
             *. The normalized object.
 
         Raises:
-            TypeError: Cannot convert to the Normalized Rectangle schema.
+            TypeError: Cannot convert to the NormalizedRectangle2D schema.
         """
         def clamp(min_value, current_value, max_value):
             return min(max_value, max(min_value, current_value))
