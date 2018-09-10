@@ -35,6 +35,10 @@ describe('Responses Service', function() {
           TextInput: {
             display_mode: 'inline',
             is_terminal: false
+          },
+          GraphInput: {
+            display_mode: 'inline',
+            is_terminal: false
           }
         });
       });
@@ -125,7 +129,7 @@ describe('Responses Service', function() {
         default_outcome: {},
         feedback_1: {}
       };
-      saud.init('Test', aud.createFromBackendDict(citatDict));
+      saud.init('Test', aud.createFromBackendDict(audio));
 
       state = ess.getState('Test');
 
@@ -140,8 +144,8 @@ describe('Responses Service', function() {
     }));
 
     it('should add the continue interaction', function() {
-      rs.onInteractionIdChanged('Continue');
-      expect(cache.contains('Continue')).toEqual(true)
+      rs.onInteractionIdChanged('GraphInput');
+      expect(state.interaction.id).toEqual('GraphInput')
     });
 
     it('should return -1 if no answer group is active', function() {
