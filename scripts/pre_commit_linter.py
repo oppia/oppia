@@ -992,6 +992,8 @@ def _check_docstrings(all_files):
         'There should be a period at the end of the docstring.')
     multiline_docstring_message = (
         'Multiline docstring should end with a new line.')
+    extra_space_message = (
+        'There should be no space after """ in the docstring.')
     single_line_docstring_message = (
         'Single line docstring should not span two lines. '
         'If line length exceeds 80 characters, '
