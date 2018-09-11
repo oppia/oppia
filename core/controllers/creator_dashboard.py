@@ -58,7 +58,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
         'platform for teaching and learning!'))
 
 
-class NotificationsDashboardPage(base.BaseHandler):
+class NotificationsDashboardPageHandler(base.BaseHandler):
     """Page with notifications for the user."""
 
     @acl_decorators.can_access_creator_dashboard
@@ -118,7 +118,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CreatorDashboardPage(base.BaseHandler):
+class CreatorDashboardPageHandler(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
     ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
@@ -404,7 +404,7 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class UploadExploration(base.BaseHandler):
+class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
     @acl_decorators.can_upload_exploration

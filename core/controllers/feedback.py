@@ -61,7 +61,7 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadListHandlerForTopics(base.BaseHandler):
+class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
     @acl_decorators.can_edit_topic
     def get(self, topic_id):

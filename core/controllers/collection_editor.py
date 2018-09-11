@@ -49,7 +49,7 @@ class CollectionEditorHandler(base.BaseHandler):
     pass
 
 
-class CollectionEditorPage(CollectionEditorHandler):
+class CollectionEditorPageHandler(CollectionEditorHandler):
     """The editor page for a single collection."""
 
     @acl_decorators.can_edit_collection

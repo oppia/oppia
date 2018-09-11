@@ -24,7 +24,7 @@ import feconf
 import utils
 
 
-class ProfilePage(base.BaseHandler):
+class ProfilePageHandler(base.BaseHandler):
     """The world-viewable profile page."""
 
     @acl_decorators.open_access
@@ -94,7 +94,7 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class PreferencesPage(base.BaseHandler):
+class PreferencesPageHandler(base.BaseHandler):
     """The preferences page."""
 
     @acl_decorators.can_manage_own_profile
@@ -219,7 +219,7 @@ class ProfilePictureHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ProfilePictureHandlerByUsername(base.BaseHandler):
+class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
@@ -240,7 +240,7 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SignupPage(base.BaseHandler):
+class SignupPageHandler(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False

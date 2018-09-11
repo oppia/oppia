@@ -28,7 +28,7 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
-class EmailDashboardPage(base.BaseHandler):
+class EmailDashboardPageHandler(base.BaseHandler):
     """Page to submit query and show past queries."""
 
     @acl_decorators.can_manage_email_dashboard
@@ -123,7 +123,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 
-class QueryStatusCheck(base.BaseHandler):
+class QueryStatusCheckHandler(base.BaseHandler):
     """Handler for checking status of individual queries."""
 
     @acl_decorators.can_manage_email_dashboard
@@ -146,7 +146,7 @@ class QueryStatusCheck(base.BaseHandler):
         self.render_json(data)
 
 
-class EmailDashboardResultPage(base.BaseHandler):
+class EmailDashboardResultPageHandler(base.BaseHandler):
     """Handler for email dashboard result page."""
 
     @acl_decorators.can_manage_email_dashboard

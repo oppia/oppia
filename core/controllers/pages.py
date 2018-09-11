@@ -36,7 +36,7 @@ def require_maintenance_mode(handler):
     return test_maintenance_mode
 
 
-class SplashPage(base.BaseHandler):
+class SplashPageHandler(base.BaseHandler):
     """Landing page for Oppia."""
 
     @acl_decorators.open_access
@@ -69,7 +69,7 @@ class SplashPage(base.BaseHandler):
                 return
 
 
-class AboutPage(base.BaseHandler):
+class AboutPageHandler(base.BaseHandler):
     """Page with information about Oppia."""
 
     @acl_decorators.open_access
@@ -82,7 +82,7 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about/about.html')
 
 
-class GetStartedPage(base.BaseHandler):
+class GetStartedPageHandler(base.BaseHandler):
     """Page with information about how to get started using Oppia."""
 
     @acl_decorators.open_access
@@ -95,7 +95,7 @@ class GetStartedPage(base.BaseHandler):
         self.render_template('pages/get_started/get_started.html')
 
 
-class TeachPage(base.BaseHandler):
+class TeachPageHandler(base.BaseHandler):
     """Page with information about how to teach on Oppia."""
 
     @acl_decorators.open_access
@@ -108,7 +108,7 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach/teach.html')
 
 
-class ContactPage(base.BaseHandler):
+class ContactPageHandler(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 
     @acl_decorators.open_access
@@ -121,7 +121,7 @@ class ContactPage(base.BaseHandler):
         self.render_template('pages/contact/contact.html')
 
 
-class DonatePage(base.BaseHandler):
+class DonatePageHandler(base.BaseHandler):
     """Page with information about how to donate to Oppia."""
 
     @acl_decorators.open_access
@@ -134,7 +134,7 @@ class DonatePage(base.BaseHandler):
         self.render_template('pages/donate/donate.html')
 
 
-class ThanksPage(base.BaseHandler):
+class ThanksPageHandler(base.BaseHandler):
     """Page that thanks people who donate to Oppia."""
 
     @acl_decorators.open_access
@@ -147,7 +147,7 @@ class ThanksPage(base.BaseHandler):
         self.render_template('pages/thanks/thanks.html')
 
 
-class ForumPage(base.BaseHandler):
+class ForumPageHandler(base.BaseHandler):
     """Page with an embedded forum."""
 
     @acl_decorators.open_access
@@ -171,7 +171,7 @@ class ForumPage(base.BaseHandler):
         self.render_template('pages/forum/forum.html')
 
 
-class TermsPage(base.BaseHandler):
+class TermsPageHandler(base.BaseHandler):
     """Page with terms and conditions."""
 
     @acl_decorators.open_access
@@ -184,7 +184,7 @@ class TermsPage(base.BaseHandler):
         self.render_template('pages/terms/terms.html')
 
 
-class PrivacyPage(base.BaseHandler):
+class PrivacyPageHandler(base.BaseHandler):
     """Page with privacy policy."""
 
     @acl_decorators.open_access
@@ -193,7 +193,7 @@ class PrivacyPage(base.BaseHandler):
         self.render_template('pages/privacy/privacy.html')
 
 
-class AboutRedirectPage(base.BaseHandler):
+class AboutRedirectPageHandler(base.BaseHandler):
     """A page that redirects to the main About page."""
 
     @acl_decorators.open_access
@@ -202,7 +202,7 @@ class AboutRedirectPage(base.BaseHandler):
         self.redirect('/about')
 
 
-class FoundationRedirectPage(base.BaseHandler):
+class FoundationRedirectPageHandler(base.BaseHandler):
     """A page that redirects to the separate Oppia Foundation site."""
     @acl_decorators.open_access
     def get(self):
@@ -211,7 +211,7 @@ class FoundationRedirectPage(base.BaseHandler):
         return
 
 
-class TeachRedirectPage(base.BaseHandler):
+class TeachRedirectPageHandler(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
     @acl_decorators.open_access
@@ -220,7 +220,7 @@ class TeachRedirectPage(base.BaseHandler):
         self.redirect('/teach')
 
 
-class ConsoleErrorPage(base.BaseHandler):
+class ConsoleErrorPageHandler(base.BaseHandler):
     """Page with missing resources to test cache slugs."""
 
     @acl_decorators.open_access
@@ -229,7 +229,7 @@ class ConsoleErrorPage(base.BaseHandler):
         self.render_template('pages/tests/console_errors.html')
 
 
-class MaintenancePage(base.BaseHandler):
+class MaintenancePageHandler(base.BaseHandler):
     """Page describing that Oppia is down for maintenance mode."""
 
     @acl_decorators.open_access

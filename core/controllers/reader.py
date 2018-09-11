@@ -152,7 +152,7 @@ def _get_exploration_player_data(
     }
 
 
-class ExplorationPageEmbed(base.BaseHandler):
+class ExplorationPageEmbedHandler(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
     @acl_decorators.can_play_exploration
@@ -194,7 +194,7 @@ class ExplorationPageEmbed(base.BaseHandler):
             iframe_restriction=None)
 
 
-class ExplorationPage(base.BaseHandler):
+class ExplorationPageHandler(base.BaseHandler):
     """Page describing a single exploration."""
 
     @acl_decorators.can_play_exploration

@@ -170,34 +170,34 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler),
     get_redirect_route(r'/', HomePageRedirectHandler),
 
-    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
-    get_redirect_route(r'/about', pages.AboutPage),
-    get_redirect_route(r'/get_started', pages.GetStartedPage),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
-    get_redirect_route(r'/credits', pages.AboutRedirectPage),
-    get_redirect_route(r'/teach', pages.TeachPage),
-    get_redirect_route(r'/participate', pages.TeachRedirectPage),
-    get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
-    get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
-    get_redirect_route(r'/contact', pages.ContactPage),
+    get_redirect_route(feconf.SPLASH_URL, pages.SplashPageHandler),
+    get_redirect_route(r'/about', pages.AboutPageHandler),
+    get_redirect_route(r'/get_started', pages.GetStartedPageHandler),
+    get_redirect_route(r'/foundation', pages.FoundationRedirectPageHandler),
+    get_redirect_route(r'/credits', pages.AboutRedirectPageHandler),
+    get_redirect_route(r'/teach', pages.TeachPageHandler),
+    get_redirect_route(r'/participate', pages.TeachRedirectPageHandler),
+    get_redirect_route(r'/site_guidelines', pages.TeachRedirectPageHandler),
+    get_redirect_route(r'/console_errors', pages.ConsoleErrorPageHandler),
+    get_redirect_route(r'/contact', pages.ContactPageHandler),
 
-    get_redirect_route(r'/forum', pages.ForumPage),
-    get_redirect_route(r'/donate', pages.DonatePage),
-    get_redirect_route(r'/thanks', pages.ThanksPage),
-    get_redirect_route(r'/terms', pages.TermsPage),
-    get_redirect_route(r'/privacy', pages.PrivacyPage),
+    get_redirect_route(r'/forum', pages.ForumPageHandler),
+    get_redirect_route(r'/donate', pages.DonatePageHandler),
+    get_redirect_route(r'/thanks', pages.ThanksPageHandler),
+    get_redirect_route(r'/terms', pages.TermsPageHandler),
+    get_redirect_route(r'/privacy', pages.PrivacyPageHandler),
 
-    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPageHandler),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvDownloadHandler),
 
     get_redirect_route(
         r'/notifications_dashboard',
-        creator_dashboard.NotificationsDashboardPage),
+        creator_dashboard.NotificationsDashboardPageHandler),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
         creator_dashboard.NotificationsDashboardHandler),
@@ -205,7 +205,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_URL,
-        creator_dashboard.CreatorDashboardPage),
+        creator_dashboard.CreatorDashboardPageHandler),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
@@ -226,7 +226,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
+        topic_viewer.TopicViewerPageHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
@@ -238,10 +238,10 @@ URLS = MAPREDUCE_HANDLERS + [
         topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        creator_dashboard.UploadExploration),
+        creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
-        learner_dashboard.LearnerDashboardPage),
+        learner_dashboard.LearnerDashboardPageHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
@@ -254,7 +254,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_dashboard.LearnerDashboardFeedbackThreadHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
-        topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
+        topics_and_skills_dashboard.TopicsAndSkillsDashboardPageHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
@@ -278,23 +278,25 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       custom_landing_pages.FractionLandingPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
+                       custom_landing_pages.FractionLandingPageHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL,
+                       library.LibraryPageHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
                        library.LibraryIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                       library.LibraryGroupPage),
+                       library.LibraryGroupPageHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-                       library.LibraryGroupPage),
+                       library.LibraryGroupPageHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
                        library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL,
+                       library.LibraryPageHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
-    get_redirect_route(r'/gallery', library.LibraryRedirectPage),
-    get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', library.LibraryRedirectPage),
-    get_redirect_route(r'/playtest', library.LibraryRedirectPage),
+    get_redirect_route(r'/gallery', library.LibraryRedirectPageHandler),
+    get_redirect_route(r'/contribute', library.LibraryRedirectPageHandler),
+    get_redirect_route(r'/learn', library.LibraryRedirectPageHandler),
+    get_redirect_route(r'/playtest', library.LibraryRedirectPageHandler),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
@@ -302,25 +304,25 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    get_redirect_route(r'/profile/<username>', profile.ProfilePage),
+    get_redirect_route(r'/profile/<username>', profile.ProfilePageHandler),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPage),
+    get_redirect_route(r'/preferences', profile.PreferencesPageHandler),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture_by_username/<username>',
-        profile.ProfilePictureHandlerByUsername),
-    get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
+        profile.ProfilePictureHandlerByUsernameHandler),
+    get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPageHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
 
-    get_redirect_route(r'/moderator', moderator.ModeratorPage),
+    get_redirect_route(r'/moderator', moderator.ModeratorPageHandler),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -328,10 +330,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-        reader.ExplorationPage),
+        reader.ExplorationPageHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
-        reader.ExplorationPageEmbed),
+        reader.ExplorationPageEmbedHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -386,7 +388,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage),
+        editor.ExplorationPageHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
@@ -463,7 +465,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.ThreadListHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-        feedback.ThreadListHandlerForTopics),
+        feedback.ThreadListHandlerForTopicsHandler),
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
@@ -504,14 +506,14 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.FlagExplorationHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage),
+        collection_viewer.CollectionPageHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
 
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage),
+        collection_editor.CollectionEditorPageHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
@@ -527,7 +529,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
-        topic_editor.TopicEditorPage),
+        topic_editor.TopicEditorPageHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),
@@ -553,7 +555,7 @@ URLS = MAPREDUCE_HANDLERS + [
         question_editor.QuestionSkillLinkHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
-        skill_editor.SkillEditorPage),
+        skill_editor.SkillEditorPageHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
@@ -566,20 +568,22 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
-        story_editor.StoryEditorPage),
+        story_editor.StoryEditorPageHandler),
     get_redirect_route(
         r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
 
-    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
+    get_redirect_route(
+        r'/emaildashboard',
+        email_dashboard.EmailDashboardPageHandler),
     get_redirect_route(
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
     get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheck),
+        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler),
     get_redirect_route(
         r'/emaildashboardresult/<query_id>',
-        email_dashboard.EmailDashboardResultPage),
+        email_dashboard.EmailDashboardResultPageHandler),
     get_redirect_route(
         r'/emaildashboardcancelresult/<query_id>',
         email_dashboard.EmailDashboardCancelEmailHandler),
@@ -592,7 +596,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-    get_redirect_route(r'/logout', base.LogoutPage),
+    get_redirect_route(r'/logout', base.LogoutPageHandler),
     get_redirect_route(
         r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
@@ -621,14 +625,14 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
         not current_user_services.is_current_user_super_admin()):
     # Show only the maintenance mode page.
     URLS_TO_SERVE = [
-        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPageHandler),
         get_redirect_route(r'/adminhandler', admin.AdminHandler),
         get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
             admin.AdminTopicsCsvDownloadHandler),
-        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
+        get_redirect_route(r'/<:.*>', pages.MaintenancePageHandler)]
 else:
     URLS_TO_SERVE = URLS
 

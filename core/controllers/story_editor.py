@@ -24,7 +24,7 @@ import feconf
 import utils
 
 
-class StoryEditorPage(base.BaseHandler):
+class StoryEditorPageHandler(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story

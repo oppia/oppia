@@ -21,7 +21,7 @@ from core.domain import topic_services
 import feconf
 
 
-class TopicViewerPage(base.BaseHandler):
+class TopicViewerPageHandler(base.BaseHandler):
     """Renders the topic viewer page."""
 
     @acl_decorators.can_access_topic_viewer_page

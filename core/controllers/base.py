@@ -76,7 +76,7 @@ def _clear_login_cookies(response_headers):
         response_headers.add_header(*cookie.output().split(': ', 1))
 
 
-class LogoutPage(webapp2.RequestHandler):
+class LogoutPageHandler(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
     def get(self):

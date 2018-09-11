@@ -128,7 +128,7 @@ class EditorHandler(base.BaseHandler):
         return logout_url
 
 
-class ExplorationPage(EditorHandler):
+class ExplorationPageHandler(EditorHandler):
     """The editor page for a single exploration."""
 
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']

@@ -23,7 +23,7 @@ from core.domain import summary_services
 import feconf
 
 
-class ModeratorPage(base.BaseHandler):
+class ModeratorPageHandler(base.BaseHandler):
     """The moderator page."""
 
     @acl_decorators.can_access_moderator_page

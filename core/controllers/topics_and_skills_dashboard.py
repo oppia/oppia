@@ -26,7 +26,7 @@ from core.domain import topic_services
 import feconf
 
 
-class TopicsAndSkillsDashboardPage(base.BaseHandler):
+class TopicsAndSkillsDashboardPageHandler(base.BaseHandler):
     """Page showing the topics and skills dashboard."""
 
     @acl_decorators.can_access_topics_and_skills_dashboard

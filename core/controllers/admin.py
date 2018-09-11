@@ -41,7 +41,7 @@ import jinja2
 current_user_services = models.Registry.import_current_user_services()
 
 
-class AdminPage(base.BaseHandler):
+class AdminPageHandler(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -307,7 +307,7 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminJobOutput(base.BaseHandler):
+class AdminJobOutputHandler(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
