@@ -36,7 +36,7 @@ class Export(webapp2.RequestHandler):
         assert output_url_prefix and output_url_prefix.startswith('gs://')
         if '/' not in output_url_prefix[5:]:
              # Only a bucket name has been provided - no prefix or trailing
-             # slash
+             # slash.
             output_url_prefix += '/' + timestamp
         else:
             output_url_prefix += timestamp
