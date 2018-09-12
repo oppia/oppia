@@ -23,6 +23,7 @@ from core.domain import user_services
 import feconf
 import utils
 
+current_user_services = models.Registry.import_current_user_services()
 
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
@@ -364,3 +365,17 @@ class SiteLanguageHandler(base.BaseHandler):
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
+
+class UserInfoHandler(base.BaseHandler):
+    """Checks whether a username has already been taken."""
+
+    @acl_decorators.require_user_id_else_redirect_to_homepage
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_json({
+            'is_moderator': user_services.is_at_least_moderator(self.user_id),
+            'is_admin': user_services.is_admin(self.user_id),
+            'is_super_admin': (
+                current_user_services.is_current_user_super_admin())
+        })
