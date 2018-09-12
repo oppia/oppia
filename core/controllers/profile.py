@@ -368,7 +368,7 @@ class SiteLanguageHandler(base.BaseHandler):
         self.render_json({})
 
 class UserInfoHandler(base.BaseHandler):
-    """Checks whether a username has already been taken."""
+    """Provides info about user."""
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
