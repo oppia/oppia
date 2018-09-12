@@ -20,6 +20,7 @@ from core.domain import email_manager
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
 

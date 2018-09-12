@@ -57,8 +57,11 @@ oppia.directive('outcomeDestinationEditor', [
           // We restrict editing of refresher exploration IDs to
           // admins/moderators for now, since the feature is still in
           // development.
-          $scope.canEditRefresherExplorationId = (
-            GLOBALS.isAdmin || GLOBALS.isModerator);
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.canEditRefresherExplorationId = (
+              userInfo.is_admin || userInfo.is_moderator);
+          });
+
           $scope.explorationAndSkillIdPattern =
             EXPLORATION_AND_SKILL_ID_PATTERN;
 

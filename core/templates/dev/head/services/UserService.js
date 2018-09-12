@@ -46,7 +46,18 @@ oppia.factory('UserService', [
           update_type: 'profile_picture_data_url',
           data: newProfileImageDataUrl
         });
-      }
+      },
+      getUserInfoAsync: function() {
+        if (_isLoggedIn) {
+          return $http.get(
+            '/userinfohandler'
+          ).then(function(response) {
+            return response.data;
+          });
+        } else {
+          return $q.resolve({});
+        }
+      },
     };
   }
 ]);

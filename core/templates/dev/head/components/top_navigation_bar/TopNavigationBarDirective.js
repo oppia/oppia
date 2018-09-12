@@ -51,9 +51,11 @@ oppia.directive('topNavigationBar', [
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             $scope.profilePictureDataUrl = dataUrl;
           });
-          $scope.isAdmin = GLOBALS.isAdmin;
-          $scope.isModerator = GLOBALS.isModerator;
-          $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.isModerator = userInfo.is_moderator;
+            $scope.isAdmin = userInfo.is_admin;
+            $scope.isSuperAdmin = userInfo.is_super_admin;
+          });
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.ACTION_OPEN = 'open';
           $scope.ACTION_CLOSE = 'close';
