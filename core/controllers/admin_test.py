@@ -106,7 +106,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
-    """ Test the conditions for generation of dummy explorations."""
+    """Test the conditions for generation of dummy explorations."""
 
     def test_generate_count_greater_than_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
