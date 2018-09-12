@@ -1641,7 +1641,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }
 
     def test_add_state_cmd(self):
-        """ Test adding of states."""
+        """Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertNotIn('new state', exploration.states)
