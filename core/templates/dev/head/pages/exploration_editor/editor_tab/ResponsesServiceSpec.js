@@ -143,10 +143,16 @@ describe('Responses Service', function() {
       ecs.setActiveStateName('Test');
     }));
 
-    it('should return empty list if interaction id is not present in answer' +
-      'groups cache service', function() {
+    it('should return empty list for answer groups if interaction id is not' +
+      'present in answer groups cache service', function() {
       rs.onInteractionIdChanged('GraphInput');
       expect(rs.getAnswerGroups()).toEqual([])
+    });
+
+    it('should return an answer groups if interaction id is present in' +
+      'answer groups cache service', function() {
+      rs.onInteractionIdChanged('TextInput');
+      expect(rs.getAnswerGroups()).toEqual(state.interaction.answerGroups)
     });
 
     it('should return -1 if no answer group is active', function() {
