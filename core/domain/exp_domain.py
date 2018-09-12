@@ -2548,7 +2548,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
-        """ Converts a v22 exploration dict into a v23 exploration dict.
+        """Converts a v22 exploration dict into a v23 exploration dict.
 
         Adds a new customization arg to FractionInput interactions
         which allows you to add custom placeholders.
