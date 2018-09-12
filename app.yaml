@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-6-8
+version: default
 runtime: python27
 api_version: 1
 threadsafe: false
