@@ -52,13 +52,13 @@
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>
       </div>
-      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0">
+      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0" style="padding-bottom: 10px;">
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
             ng-model="bindableFieldsDict.displayedWorkedExamples">
           <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
-              ng-class="{'active': activeWorkedExampleIndex === $index}"
+              ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
               class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
               style="margin-top: 0;">
             <span class="oppia-worked-example-sort-handle"
@@ -70,6 +70,7 @@
                class="oppia-rule-tab"
                ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
               <summary-list-header index="$index"
+                                   disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
                                    summary="getWorkedExampleSummary(workedExample)"
                                    short-summary="getWorkedExampleSummary(workedExample)"
                                    is-active="$index === activeWorkedExampleIndex"
@@ -91,7 +92,8 @@
         </ul>
       </div>
       <button type="button"
-              class="btn btn-success"
+              class="btn"
+              style="background-color: rgba(5,140,166,0.9); color: white;"
               ng-click="openAddWorkedExampleModal()">
         + Add Worked Example
       </button>
@@ -108,6 +110,10 @@
 
   skill-concept-card-editor .review-material {
     padding-bottom: 36px;
+  }
+
+  skill-concept-card-editor .last-element {
+    border-bottom: 1px solid #ccc;
   }
 
   skill-concept-card-editor .editor-buttons {

@@ -33,9 +33,9 @@
           <span> <[topic.total_skill_count]> </span>
           <div ng-show="topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               uib-tooltip="<[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']> in topic" tooltip-placement="bottom">
+               uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
             <span class="oppia-editor-warnings-count">
-              <[topic.uncategorized_skill_count]>
+              &nbsp;!
             </span>
           </div>
         </a>
@@ -111,7 +111,12 @@
   }
 
   topics-list .oppia-editor-warnings-indicator {
-   left: 10px;
+   left: 15px;
+   bottom: 13px;
+  }
+
+  topics-list .oppia-editor-warnings-error-color {
+    border-color: transparent transparent #ffbe63 transparent;
   }
 
   topics-list .list-summary span {

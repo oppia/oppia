@@ -22,7 +22,18 @@ oppia.directive('skillEditorNavbarBreadcrumb', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_editor/skill_editor_navbar_breadcrumb_directive.html'),
-      controller: [function() {}
+      controller: [
+        '$scope', 'SkillEditorStateService',
+        function($scope, SkillEditorStateService) {
+          var skill = SkillEditorStateService.getSkill();
+          $scope.getTruncatedDescription = function() {
+            var truncDescription = skill.getDescription().substr(0, 15);
+            if (skill.getDescription().length > 15) {
+              truncDescription += '...';
+            }
+            return truncDescription;
+          };
+        }
       ]
     };
   }

@@ -9,12 +9,12 @@
           </i>
         </span>
       </div>
-      <div ng-if="misconceptions.length > 0">
+      <div ng-if="misconceptions.length > 0" style="padding-bottom: 10px;">
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ng-model="misconceptions">
           <li ng-repeat="misconception in misconceptions"
-              ng-class="{'active': activeMisconceptionIndex === $index}"
+              ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
               class="oppia-rule-block oppia-prevent-selection"
               style="margin-top: 0;">
             <a ng-click="changeActiveMisconceptionIndex($index)"
@@ -42,10 +42,16 @@
         </ul>
       </div>
       <button type="button"
-              class="btn btn-success"
+              class="btn"
+              style="background-color: rgba(5,140,166,0.9); color: white;"
               ng-click="openAddMisconceptionModal()">
         + Add Misconception
       </button>
     </div>
   </div>
 </md-card>
+<style>
+  skill-misconceptions-editor .last-element {
+    border-bottom: 1px solid #ccc;
+  }
+</style>
