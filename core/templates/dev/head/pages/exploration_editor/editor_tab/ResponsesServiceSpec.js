@@ -146,13 +146,13 @@ describe('Responses Service', function() {
     it('should return empty list for answer groups if interaction id is not' +
       'present in answer groups cache service', function() {
       rs.onInteractionIdChanged('GraphInput');
-      expect(rs.getAnswerGroups()).toEqual([])
+      expect(rs.getAnswerGroups()).toEqual([]);
     });
 
     it('should return an answer groups if interaction id is present in' +
       'answer groups cache service', function() {
       rs.onInteractionIdChanged('TextInput');
-      expect(rs.getAnswerGroups()).toEqual(state.interaction.answerGroups)
+      expect(rs.getAnswerGroups()).toEqual(state.interaction.answerGroups);
     });
 
     it('should set new value for answer groups cache service on interaction',
