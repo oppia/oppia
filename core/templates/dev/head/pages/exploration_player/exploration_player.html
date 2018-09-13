@@ -6,7 +6,7 @@
 
 {% block header_js %}
   {{ super() }}
-  <script type="text/javascript">
+  <script ng-if="explorationVersion" type="text/javascript">
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
