@@ -155,6 +155,12 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroups()).toEqual(state.interaction.answerGroups)
     });
 
+    it('should set new value for answer groups cache service on interaction',
+      function() {
+        rs.onInteractionIdChanged('GraphInput');
+        expect(cache.contains('GraphInput')).toEqual(true);
+    });
+
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
     });
