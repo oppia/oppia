@@ -283,24 +283,37 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       custom_landing_pages.FractionLandingPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
-                       library.LibraryIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
-                       library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
+    get_redirect_route(
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_URL,
+        library.LibraryPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
+        library.LibraryIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+        library.LibraryGroupPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_TOP_RATED_URL,
+        library.LibraryGroupPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+        library.LibraryGroupIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_SEARCH_URL,
+        library.LibraryPageHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
-    get_redirect_route(r'/gallery', library.LibraryRedirectPage),
-    get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', library.LibraryRedirectPage),
-    get_redirect_route(r'/playtest', library.LibraryRedirectPage),
+    get_redirect_route(
+        r'/gallery', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/contribute', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/learn', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/playtest', library.LibraryRedirectPageHandler),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
