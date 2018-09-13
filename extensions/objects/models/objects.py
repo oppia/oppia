@@ -48,8 +48,8 @@ class BaseObject(object):
             raw: *. A normalized Python object to be normalized.
 
         Returns:
-          *. A normalized Python object describing the Object specified by this
-            class.
+            *. A normalized Python object describing the Object specified by
+                this class.
 
         Raises:
           TypeError: The Python object cannot be normalized.
