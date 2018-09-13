@@ -277,26 +277,37 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       custom_landing_pages.FractionLandingPageHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL,
-                       library.LibraryPageHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
-                       library.LibraryIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                       library.LibraryGroupPageHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-                       library.LibraryGroupPageHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
-                       library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL,
-                       library.LibraryPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_URL,
+        library.LibraryPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
+        library.LibraryIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+        library.LibraryGroupPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_TOP_RATED_URL,
+        library.LibraryGroupPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+        library.LibraryGroupIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_SEARCH_URL,
+        library.LibraryPageHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
-    get_redirect_route(r'/gallery', library.LibraryRedirectPageHandler),
-    get_redirect_route(r'/contribute', library.LibraryRedirectPageHandler),
-    get_redirect_route(r'/learn', library.LibraryRedirectPageHandler),
-    get_redirect_route(r'/playtest', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/gallery', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/contribute', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/learn', library.LibraryRedirectPageHandler),
+    get_redirect_route(
+        r'/playtest', library.LibraryRedirectPageHandler),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
@@ -304,10 +315,12 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    get_redirect_route(r'/profile/<username>', profile.ProfilePageHandler),
+    get_redirect_route(
+        r'/profile/<username>', profile.ProfilePageHandler),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPageHandler),
+    get_redirect_route(
+        r'/preferences', profile.PreferencesPageHandler),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -315,14 +328,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/preferenceshandler/profile_picture_by_username/<username>',
         profile.ProfilePictureHandlerByUsernameHandler),
-    get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPageHandler),
-    get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPageHandler),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
 
-    get_redirect_route(r'/moderator', moderator.ModeratorPageHandler),
+    get_redirect_route(
+        r'/moderator', moderator.ModeratorPageHandler),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -595,8 +611,10 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.ExplorationMetadataSearchHandler),
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
-    get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-    get_redirect_route(r'/logout', base.LogoutPageHandler),
+    get_redirect_route(
+        r'/frontend_errors', FrontendErrorHandler),
+    get_redirect_route(
+        r'/logout', base.LogoutPageHandler),
     get_redirect_route(
         r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
@@ -625,14 +643,19 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
         not current_user_services.is_current_user_super_admin()):
     # Show only the maintenance mode page.
     URLS_TO_SERVE = [
-        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPageHandler),
-        get_redirect_route(r'/adminhandler', admin.AdminHandler),
-        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
+        get_redirect_route(
+            r'%s' % feconf.ADMIN_URL, admin.AdminPageHandler),
+        get_redirect_route(
+            r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(
+            r'/adminrolehandler', admin.AdminRoleHandler),
+        get_redirect_route(
+            r'/adminjoboutput', admin.AdminJobOutputHandler),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
             admin.AdminTopicsCsvDownloadHandler),
-        get_redirect_route(r'/<:.*>', pages.MaintenancePageHandler)]
+        get_redirect_route(
+            r'/<:.*>', pages.MaintenancePageHandler)]
 else:
     URLS_TO_SERVE = URLS
 
