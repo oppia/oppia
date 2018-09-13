@@ -15,6 +15,7 @@ branches:
   - master
   - develop
   - /^release-\d+\.\d+\.\d+$/
+  - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
 
 env:
   matrix:
