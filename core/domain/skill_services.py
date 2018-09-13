@@ -204,7 +204,8 @@ def get_multi_skills(skill_ids):
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
     skills = [
         get_skill_from_model(skill_model)
-        for skill_model in local_skill_models]
+        for skill_model in local_skill_models
+        if skill_model is not None]
     return skills
 
 

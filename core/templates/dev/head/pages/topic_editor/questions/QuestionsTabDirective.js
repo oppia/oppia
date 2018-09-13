@@ -40,7 +40,7 @@ oppia.directive('questionsTab', [
             EVENT_QUESTION_SUMMARIES_INITIALIZED,
             QuestionUndoRedoService, UrlService,
             UndoRedoService) {
-          $scope.QuestionUndoRedoService = QuestionUndoRedoService;
+
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -56,6 +56,10 @@ oppia.directive('questionsTab', [
             $scope.suggestionReviewMessage = null;
             $scope.questionIsBeingUpdated = false;
             $scope.questionIsBeingSaved = false;
+          };
+
+          $scope.hasChanges = function() {
+            return QuestionUndoRedoService.hasChanges();
           };
 
           $scope.saveQuestion = function() {

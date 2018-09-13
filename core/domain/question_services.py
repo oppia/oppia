@@ -214,14 +214,14 @@ def get_question_skill_links_of_skill(skill_id):
 
 
 def get_question_skill_links_of_question(question_id):
-    """Returns a list of QuestionSkillLinkModels of
+    """Returns a list of QuestionSkillLinks of
     a particular question ID.
 
     Args:
         question_id: str. ID of the question.
 
     Returns:
-        list(QuestionSkillLinkModel). The list of question skill link
+        list(QuestionSkillLink). The list of question skill link
         domain objects that are linked to the question ID or an empty list
         if the question does not exist.
     """
