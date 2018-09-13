@@ -1655,7 +1655,7 @@ def save_original_and_compressed_versions_of_image(
         user_id: str. The id of the user who wants to upload the image.
     """
     filepath = (
-        filename if feconf.DEV_MODE else 'image/%s' % filename)
+        filename if constants.DEV_MODE else 'image/%s' % filename)
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
@@ -1663,17 +1663,17 @@ def save_original_and_compressed_versions_of_image(
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
     compressed_image_filepath = (
-        compressed_image_filename if feconf.DEV_MODE
+        compressed_image_filename if constants.DEV_MODE
         else 'image/%s' % compressed_image_filename)
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
     micro_image_filepath = (
-        micro_image_filename if feconf.DEV_MODE
+        micro_image_filename if constants.DEV_MODE
         else 'image/%s' % micro_image_filename)
 
     file_system_class = (
-        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        fs_domain.ExplorationFileSystem if constants.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
