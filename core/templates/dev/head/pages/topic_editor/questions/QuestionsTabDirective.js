@@ -40,7 +40,6 @@ oppia.directive('questionsTab', [
             EVENT_QUESTION_SUMMARIES_INITIALIZED,
             QuestionUndoRedoService, UrlService,
             UndoRedoService) {
-
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
