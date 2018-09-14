@@ -201,6 +201,23 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
+def get_topics_by_ids(topic_ids):
+    """Returns a list of topics matching the IDs provided.
+
+    Args:
+        topic_ids: list(str). List of IDs to get topics for.
+
+    Returns:
+        list(Topic|None). The list of topics corresponding to given ids
+            (with None in place of topic ids corresponding to deleted topics).
+    """
+    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
+    topics = [
+        get_topic_from_model(topic_model) if topic_model is not None else None
+        for topic_model in all_topic_models]
+    return topics
+
+
 def get_topic_by_name(topic_name):
     """Returns a domain object representing a topic.
 

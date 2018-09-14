@@ -86,7 +86,7 @@ oppia.directive('subtopicsListTab', [
                     }
                     if ($scope.subtopicTitles.indexOf(title) !== -1) {
                       $scope.errorMsg =
-                        'Subtopic with this title already exists';
+                        'A subtopic with this title already exists';
                       return;
                     }
                     $scope.editableTitle = title;
@@ -216,7 +216,7 @@ oppia.directive('subtopicsListTab', [
                   $scope.save = function(title) {
                     if ($scope.subtopicTitles.indexOf(title) !== -1) {
                       $scope.errorMsg =
-                        'Subtopic with this title already exists';
+                        'A subtopic with this title already exists';
                       return;
                     }
                     $uibModalInstance.close(title);

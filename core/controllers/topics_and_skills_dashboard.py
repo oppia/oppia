@@ -151,12 +151,12 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
-            for topic_id in linked_topic_ids:
-                topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException
                 topic_services.add_uncategorized_skill(
-                    self.user_id, topic_id, new_skill_id)
+                    self.user_id, topic.id, new_skill_id)
 
         skill_domain.Skill.require_valid_description(description)
 

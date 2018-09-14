@@ -40,13 +40,13 @@ oppia.directive('skillsList', [
             'description', 'worked_examples_count', 'misconception_count'
           ];
 
-          $scope.highlightedIndex = -1;
+          $scope.highlightedIndex = null;
           $scope.highlightColumns = function(index) {
             $scope.highlightedIndex = index;
           };
 
           $scope.unhighlightColumns = function() {
-            $scope.highlightedIndex = -1;
+            $scope.highlightedIndex = null;
           };
 
           $scope.getSkillEditorUrl = function(skillId) {

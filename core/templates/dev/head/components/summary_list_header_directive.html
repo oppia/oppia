@@ -37,7 +37,7 @@
     }
   }
 </style>
-<div class="oppia-example-header-block" ng-class="{'left-padding': !getDisableSorting()}">
+<div class="oppia-example-header-block" ng-class="{'left-padding': !isSortingDisabled()}">
   <div class="oppia-example-header">
     <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
       <[getShortSummary()]>

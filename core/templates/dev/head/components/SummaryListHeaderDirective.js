@@ -21,7 +21,7 @@ oppia.directive('summaryListHeader', [
     return {
       restrict: 'E',
       scope: {
-        getDisableSorting: '&disableSorting',
+        isSortingDisabled: '&disableSorting',
         getIndex: '&index',
         getSummary: '&summary',
         getShortSummary: '&shortSummary',
