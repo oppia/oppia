@@ -156,12 +156,15 @@ describe('Responses Service', function() {
     });
 
     it('should run the callback on interaction', function() {
-      var callback = function() {
-        console.log('callback')
+      var callbackSpy = {
+        callback: function() {
+          console.log('callback')
+        }
       };
+      spyOn(callbackSpy, 'callback');
 
-      rs.onInteractionIdChanged('TextInput', callback);
-      expect(callback).toHaveBeenCalled();
+      rs.onInteractionIdChanged('TextInput', callbackSpy.callback);
+      expect(callbackSpy.callback).toHaveBeenCalled();
     });
 
     it('should set new value for answer groups cache service on interaction',
