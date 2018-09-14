@@ -49,9 +49,13 @@ oppia.factory('UserService', [
       },
       getUserInfoAsync: function() {
         if (_isLoggedIn) {
+          if ($scope.userInfo) {
+            return $q.resolve($scope.userInfo);
+          }
           return $http.get(
             '/userinfohandler'
           ).then(function(response) {
+            $scope.userInfo = response.data;
             return response.data;
           });
         } else {
