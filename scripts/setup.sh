@@ -61,6 +61,7 @@ function maybeInstallDependencies {
     bash scripts/install_frontend_tests_dependencies.sh
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
+    $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
