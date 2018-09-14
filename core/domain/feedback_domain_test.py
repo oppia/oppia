@@ -125,35 +125,6 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
         })
 
 
-class SuggestionDomainUnitTests(test_utils.GenericTestBase):
-    EXP_ID = 'exp0'
-    THREAD_ID = 'exp0.thread0'
-
-    def setUp(self):
-        super(SuggestionDomainUnitTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-    def test_to_dict(self):
-        expected_suggestion_dict = {
-            'author_name': self.OWNER_USERNAME,
-            'exploration_id': self.EXP_ID,
-            'exploration_version': 1,
-            'state_name': 'a state name',
-            'description': 'a description',
-            'suggestion_html': 'suggestion HTML',
-        }
-        observed_suggestion = feedback_domain.Suggestion(
-            self.THREAD_ID, self.owner_id, self.EXP_ID,
-            expected_suggestion_dict['exploration_version'],
-            expected_suggestion_dict['state_name'],
-            expected_suggestion_dict['description'],
-            expected_suggestion_dict['suggestion_html'])
-        self.assertDictEqual(
-            expected_suggestion_dict, observed_suggestion.to_dict())
-
-
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
