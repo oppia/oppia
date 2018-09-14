@@ -36,8 +36,12 @@ oppia.directive('topNavigationBar', [
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             siteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
-          if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-            $translate.use(GLOBALS.preferredSiteLanguageCode);
+          if (GLOBALS.userIsLoggedIn) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              if (userInfo.preferredSiteLanguageCode) {
+                $translate.use(userInfo.preferredSiteLanguageCode);
+              }
+            });
           }
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [

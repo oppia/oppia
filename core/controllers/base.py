@@ -155,7 +155,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
-        self.preferred_site_language_code = None
 
         if self.user_id:
             user_settings = user_services.get_user_settings(
@@ -173,8 +172,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.preferred_site_language_code = (
-                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
@@ -332,7 +329,6 @@ class BaseHandler(webapp2.RequestHandler):
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
