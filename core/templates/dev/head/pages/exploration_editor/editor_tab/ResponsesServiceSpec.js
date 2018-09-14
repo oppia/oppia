@@ -155,6 +155,15 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroups()).toEqual(state.interaction.answerGroups);
     });
 
+    it('should run the callback on interaction', function() {
+      var callback = function() {
+        console.log('callback')
+      };
+
+      rs.onInteractionIdChanged('TextInput', callback);
+      expect(callback).toHaveBeenCalled();
+    });
+
     it('should set new value for answer groups cache service on interaction',
       function() {
         rs.onInteractionIdChanged('GraphInput');
