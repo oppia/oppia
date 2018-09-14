@@ -17,6 +17,7 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import email_manager
+from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
@@ -374,9 +375,12 @@ class UserInfoHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
+        user_actions = user_services.UserActionsInfo(self.user_id).actions
         self.render_json({
             'is_moderator': user_services.is_at_least_moderator(self.user_id),
             'is_admin': user_services.is_admin(self.user_id),
             'is_super_admin': (
-                current_user_services.is_current_user_super_admin())
+                current_user_services.is_current_user_super_admin()),
+            'can_create_collections': bool(
+                role_services.ACTION_CREATE_COLLECTION in user_actions),
         })

@@ -47,25 +47,25 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
-  'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
-  'RatingComputationService', 'ExplorationCreationService',
-  'QuestionObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
-  'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
-  'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+  '$scope', '$rootScope', '$http', '$log', '$uibModal', '$window',
+  'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
+  'ExplorationCreationService', 'QuestionObjectFactory', 'RatingComputationService',
+  'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
+  'ThreadStatusDisplayService','TopicsAndSkillsDashboardBackendApiService',
+  'UrlInterpolationService', 'UserService', 'EXPLORATION_DROPDOWN_STATS',
+  'EXPLORATIONS_SORT_BY_KEYS', 'FATAL_ERROR_CODES',
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window, $log,
-      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
-      RatingComputationService, ExplorationCreationService,
-      QuestionObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
-      ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
-      EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
-      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+    $scope, $rootScope, $http, $log, $uibModal, $window, AlertsService,
+    CreatorDashboardBackendApiService, DateTimeFormatService,
+    ExplorationCreationService, QuestionObjectFactory, RatingComputationService,
+    SuggestionObjectFactory, SuggestionThreadObjectFactory,
+    ThreadStatusDisplayService,TopicsAndSkillsDashboardBackendApiService,
+    UrlInterpolationService, UserService, EXPLORATION_DROPDOWN_STATS,
+    EXPLORATIONS_SORT_BY_KEYS, FATAL_ERROR_CODES,
+    HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
+    HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -83,7 +83,10 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
-    $scope.canCreateCollections = GLOBALS.can_create_collections;
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.canCreateCollections = userInfo.can_create_collections;
+    });
+
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);

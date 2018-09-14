@@ -329,8 +329,6 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'can_create_collections': bool(
-                role_services.ACTION_CREATE_COLLECTION in self.user.actions),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
