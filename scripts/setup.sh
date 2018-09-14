@@ -61,6 +61,11 @@ function maybeInstallDependencies {
     bash scripts/install_frontend_tests_dependencies.sh
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
+    # Start a selenium server using chromedriver 2.41.
+    # The 'detach' option continues the flow once the server is up and runnning.
+    # The 'quiet' option prints only the necessary information about the server start-up
+    # process.
+    $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
