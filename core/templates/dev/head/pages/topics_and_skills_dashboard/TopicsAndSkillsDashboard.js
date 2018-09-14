@@ -49,7 +49,6 @@ oppia.controller('TopicsAndSkillsDashboard', [
       TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
         function(response) {
           $scope.topicSummaries = response.data.topic_summary_dicts;
-          $rootScope.$broadcast('topicSummaries', $scope.topicSummaries);
           $scope.editableTopicSummaries = $scope.topicSummaries.filter(
             function(summary) {
               return summary.can_edit_topic === true;

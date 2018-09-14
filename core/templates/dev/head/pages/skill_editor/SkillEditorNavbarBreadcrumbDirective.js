@@ -27,11 +27,11 @@ oppia.directive('skillEditorNavbarBreadcrumb', [
         function($scope, SkillEditorStateService) {
           var skill = SkillEditorStateService.getSkill();
           $scope.getTruncatedDescription = function() {
-            var truncDescription = skill.getDescription().substr(0, 15);
+            var truncatedDescription = skill.getDescription().substr(0, 15);
             if (skill.getDescription().length > 15) {
-              truncDescription += '...';
+              truncatedDescription += '...';
             }
-            return truncDescription;
+            return truncatedDescription;
           };
         }
       ]
