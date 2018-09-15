@@ -31,7 +31,10 @@
     <div ng-if="isEditable() && nameEditorIsOpen">
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
-        <input class="form-control" type="text" ng-model="container.misconceptionName">
+        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="30">
+        <span ng-if="container.misconceptionName.length === 30" class="help-block" style="color: red; font-size: smaller">
+          <em>Please use at most 30 characters.</em>
+        </span>
       </div>
 
       <div class="oppia-rule-save-cancel-buttons">

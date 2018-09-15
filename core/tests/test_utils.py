@@ -1084,7 +1084,7 @@ tags: []
         examples: '' or 'build/'.
         """
         filepath = ''
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             filepath = os.path.join('build')
 
         return filepath
@@ -1317,10 +1317,7 @@ class AppEngineTestBase(TestBase):
         return state
 
 
-if feconf.PLATFORM == 'gae':
-    GenericTestBase = AppEngineTestBase
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+GenericTestBase = AppEngineTestBase
 
 
 class FunctionWrapper(object):

@@ -1,19 +1,13 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="topic-name">
-      <span ng-if="!topicNameEditorIsShown" ng-click="openTopicNameEditor()"
-            class="oppia-editable-section">
-        <strong class="form-heading"><[topic.getName()]></strong>
-        <i ng-if="topicRights.canEditName()" class="material-icons oppia-editor-edit-icon"
-           title="Edit Topic Name">&#xE254;
-        </i>
-      </span>
-      <span ng-if="topicNameEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateTopicName(editableName)">
-          <input type="text" ng-model="editableName">
-          <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeTopicNameEditor()">Cancel</button>
-        </form>
+      <label for="topicName" class="form-heading">Topic Name</label>
+      <input id="topicName" type="text" class="form-control"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableName" ng-blur="updateTopicName(editableName)"
+             placeholder="Enter a name for the topic." maxlength="20" ng-trim="false">
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableName.length === 20">
+        <em>Please use at most 20 characters for the topic name.</em>
       </span>
     </div>
 
@@ -21,10 +15,14 @@
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
+                maxlength="120"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic">
       </textarea>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 120">
+        <em>Please use at most 120 characters for the topic description.</em>
+      </span>
       <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>
@@ -51,8 +49,8 @@
 <style>
   .topic-editor {
     margin-top: 2%;
-    margin-left: 10%;
-    width: 80%;
+    margin-left: 25%;
+    width: 50%;
   }
 
   .topic-editor .form-heading {
@@ -67,7 +65,7 @@
     margin-top: 2%;
   }
 
-  .topic-editor .topic-description textarea{
-    height: 20vh;
+  .topic-editor .topic-description textarea {
+    height: 7vh;
   }
 </style>

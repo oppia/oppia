@@ -339,25 +339,27 @@ oppia.config([
 ]);
 
 oppia.config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', function($delegate) {
-    var _originalError = $delegate.error;
+  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
+    function($delegate, DEV_MODE) {
+      var _originalError = $delegate.error;
 
-    if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
-      $delegate.log = function() {};
-      $delegate.info = function() {};
-      // TODO(sll): Send errors (and maybe warnings) to the backend.
-      $delegate.warn = function() { };
-      $delegate.error = function(message) {
-        if (String(message).indexOf('$digest already in progress') === -1) {
-          _originalError(message);
-        }
-      };
-      // This keeps angular-mocks happy (in tests).
-      $delegate.error.logs = [];
+      if (!DEV_MODE) {
+        $delegate.log = function() {};
+        $delegate.info = function() {};
+        // TODO(sll): Send errors (and maybe warnings) to the backend.
+        $delegate.warn = function() { };
+        $delegate.error = function(message) {
+          if (String(message).indexOf('$digest already in progress') === -1) {
+            _originalError(message);
+          }
+        };
+        // This keeps angular-mocks happy (in tests).
+        $delegate.error.logs = [];
+      }
+
+      return $delegate;
     }
-
-    return $delegate;
-  }]);
+  ]);
 }]);
 
 oppia.config(['toastrConfig', function(toastrConfig) {

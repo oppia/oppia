@@ -20,6 +20,7 @@ import datetime
 import json
 import os
 
+from constants import constants
 from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import exp_services
@@ -119,7 +120,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
-        with self.swap(feconf, 'DEV_MODE', False):
+        with self.swap(constants, 'DEV_MODE', False):
             self.post_json(
                 '/ml/trainedclassifierhandler', self.payload,
                 expect_errors=True, expected_status_int=401)
@@ -195,7 +196,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
-        with self.swap(feconf, 'DEV_MODE', False):
+        with self.swap(constants, 'DEV_MODE', False):
             self.post_json(
                 '/ml/nextjobhandler', self.payload,
                 expect_errors=True, expected_status_int=401)
