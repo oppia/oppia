@@ -26,7 +26,6 @@ import feconf
 
 (job_models, collection_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.collection])
-search_services = models.Registry.import_search_services()
 
 
 class CollectionMigrationJobTest(test_utils.GenericTestBase):
@@ -49,7 +48,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         """Tests that the collection migration job does not convert an
         collection that is already the latest collection content schema version.
         """
-        # Create a new, collection that should not be affected by the
+        # Create a new collection that should not be affected by the
         # job.
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID, title='A title',
