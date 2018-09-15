@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the header of items in a list.
+ * @fileoverview Controller for the navbar breadcrumb of the skill editor.
  */
-
-oppia.directive('summaryListHeader', [
+oppia.directive('skillEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        isSortingDisabled: '&disableSorting',
-        getIndex: '&index',
-        getSummary: '&summary',
-        getShortSummary: '&shortSummary',
-        isActive: '&isActive',
-        getOnDeleteFn: '&onDeleteFn',
-        isDeleteAvailable: '&isDeleteAvailable',
-        getNumItems: '&numItems',
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_list_header_directive.html'),
-      controller: ['$scope',
-        function($scope) {
-          $scope.deleteItem = function(evt) {
-            $scope.getOnDeleteFn()($scope.getIndex(), evt);
+        '/pages/skill_editor/skill_editor_navbar_breadcrumb_directive.html'),
+      controller: [
+        '$scope', 'SkillEditorStateService',
+        function($scope, SkillEditorStateService) {
+          var skill = SkillEditorStateService.getSkill();
+          $scope.getTruncatedDescription = function() {
+            var truncatedDescription = skill.getDescription().substr(0, 40);
+            if (skill.getDescription().length > 40) {
+              truncatedDescription += '...';
+            }
+            return truncatedDescription;
           };
         }
       ]

@@ -169,7 +169,10 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
             json_response = self.post_json(
                 '%s' % feconf.NEW_SKILL_URL,
-                {'description': 'Skill Description', 'topic_id': 'topic'},
+                {
+                    'description': 'Skill Description',
+                    'linked_topic_ids': ['topic']
+                },
                 csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=400)
             self.assertEqual(json_response['status_code'], 400)
@@ -184,8 +187,15 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
             json_response = self.post_json(
                 '%s' % feconf.NEW_SKILL_URL,
-                {'description': 'Skill Description', 'topic_id': self.topic_id},
-                csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=500)
-            self.assertEqual(json_response['status_code'], 500)
+                {
+                    'description': 'Skill Description',
+                    'linked_topic_ids': [self.topic_id]
+                },
+                csrf_token=csrf_token)
+            skill_id = json_response['skillId']
+            self.assertEqual(len(skill_id), 12)
+            self.assertIsNotNone(
+                skill_services.get_skill_by_id(skill_id, strict=False))
+            topic = topic_services.get_topic_by_id(self.topic_id)
+            self.assertEqual(topic.uncategorized_skill_ids, [skill_id])
             self.logout()
