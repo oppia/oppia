@@ -30,13 +30,15 @@ oppia.directive('cyclicTransitionsIssueDirective', [
         '/pages/exploration_editor/statistics_tab/' +
         'cyclic_transitions_issue_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'IssuesService',
-        function($scope, $uibModal, AlertsService, IssuesService) {
+        '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
+        function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {
           $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();
-          $scope.issueStatement = IssuesService.renderIssueStatement(issue);
-          $scope.suggestions = IssuesService.renderIssueSuggestions(issue);
+          $scope.issueStatement =
+            PlaythroughIssuesService.renderIssueStatement(issue);
+          $scope.suggestions =
+            PlaythroughIssuesService.renderIssueSuggestions(issue);
           $scope.playthroughIds = issue.playthroughIds;
 
           var getPlaythroughIndex = function(playthroughId) {
@@ -50,7 +52,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
           var issueResolved = false;
           $scope.resolveIssue = function() {
             if (!issueResolved) {
-              IssuesService.resolveIssue(issue);
+              PlaythroughIssuesService.resolveIssue(issue);
               AlertsService.addSuccessMessage(
                 'Issue resolved. Refresh the page to view changes.');
               issueResolved = true;
@@ -62,7 +64,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
           };
 
           $scope.showPlaythrough = function(playthroughId) {
-            IssuesService.getPlaythrough(
+            PlaythroughIssuesService.getPlaythrough(
               playthroughId
             ).then(function(playthrough) {
               $uibModal.open({

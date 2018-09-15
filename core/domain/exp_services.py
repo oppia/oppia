@@ -37,12 +37,10 @@ from core.domain import activity_services
 from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
-from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
-from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -1655,7 +1653,7 @@ def save_original_and_compressed_versions_of_image(
         user_id: str. The id of the user who wants to upload the image.
     """
     filepath = (
-        filename if feconf.DEV_MODE else 'image/%s' % filename)
+        filename if constants.DEV_MODE else 'image/%s' % filename)
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
@@ -1663,17 +1661,17 @@ def save_original_and_compressed_versions_of_image(
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
     compressed_image_filepath = (
-        compressed_image_filename if feconf.DEV_MODE
+        compressed_image_filename if constants.DEV_MODE
         else 'image/%s' % compressed_image_filename)
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
     micro_image_filepath = (
-        micro_image_filename if feconf.DEV_MODE
+        micro_image_filename if constants.DEV_MODE
         else 'image/%s' % micro_image_filename)
 
     file_system_class = (
-        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+        fs_domain.ExplorationFileSystem if constants.DEV_MODE
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
@@ -1792,25 +1790,6 @@ def index_explorations_given_ids(exp_ids):
         if exploration_summary is not None])
 
 
-def _is_suggestion_valid(thread_id, exploration_id):
-    """Check if the suggestion is still valid. A suggestion is considered
-    invalid if the name of the state that the suggestion was made for has
-    changed since.
-
-    Args:
-        thread_id: str. Thread id of the feedback thread containing the
-            suggestion.
-        exploration_id: str. The id of the exploration.
-
-    Returns:
-        bool. Whether the suggestion is still valid.
-    """
-
-    states = get_exploration_by_id(exploration_id).states
-    suggestion = feedback_models.SuggestionModel.get_by_id(thread_id)
-    return suggestion.state_name in states
-
-
 def is_translation_change_list(change_list):
     """Checks whether the change list contains only the changes which are
     allowed for translator to do.
@@ -1828,177 +1807,6 @@ def is_translation_change_list(change_list):
                 exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
             return False
     return True
-
-
-def _is_suggestion_handled(thread_id):
-    """Checks if the current suggestion has already been accepted/rejected.
-
-    Args:
-        thread_id: str. Thread id of the feedback thread containing the
-            suggestion.
-
-    Returns:
-        bool. Whether the current suggestion has already been acted upon (i.e.,
-        accepted or rejected).
-    """
-
-    thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
-    return (
-        thread.status in [
-            feedback_models.STATUS_CHOICES_FIXED,
-            feedback_models.STATUS_CHOICES_IGNORED])
-
-
-def _create_change_list_from_suggestion(
-        suggestion, old_content, old_content_ids_to_audio_translations,
-        audio_update_required):
-    """Creates a change list from a suggestion object.
-
-    Args:
-        suggestion: Suggestion. The given Suggestion domain object.
-        old_content: SubtitledHtml. A SubtitledHtml domain object representing
-            the content of the old state.
-        old_content_ids_to_audio_translations: dict. A dict connecting
-            audio translations for SubtitledHtml objects with the help of
-            content_id as key.
-        audio_update_required: bool. Whether the audio for the state content
-            should be marked as needing an update.
-
-    Returns:
-        list(dict). A dict containing a single change that represents an edit to
-        the state's content. The dict contains value and key (str.) pairs as
-        follows:
-            cmd: list(dict). The changelist corresponding to the given
-                suggestion domain object.
-            state_name: str or None. The state name for the thread. If None,
-                this indicates that the thread pertains to the exploration as a
-                whole.
-            new_value: list(str). List of the state content of the suggestion
-                object.
-    """
-    change_list = [exp_domain.ExplorationChange({
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'state_name': suggestion.state_name,
-        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'new_value': {
-            'html': suggestion.suggestion_html,
-            'content_id': old_content.content_id
-        }
-    })]
-
-    if audio_update_required:
-        for _, translation in old_content_ids_to_audio_translations[
-                old_content.content_id].iteritems():
-            translation.needs_update = True
-
-        content_ids_to_audio_translations_dict = {}
-        for content_id, audio_translations in (
-                old_content_ids_to_audio_translations.iteritems()):
-            audio_translations_dict = {}
-            for lang_code, audio_translation in audio_translations.iteritems():
-                audio_translations_dict[lang_code] = (
-                    state_domain.AudioTranslation.to_dict(audio_translation))
-            content_ids_to_audio_translations_dict[content_id] = (
-                audio_translations_dict)
-
-        change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': suggestion.state_name,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
-            'new_value': content_ids_to_audio_translations_dict
-        }))
-
-    return change_list
-
-
-def _get_commit_message_for_suggestion(
-        suggestion_author_username, commit_message):
-    """Returns a modified commit message for an accepted suggestion.
-
-    NOTE TO DEVELOPERS: This should not be changed, since in the future we may
-    want to determine and credit the original authors of suggestions, and in
-    order to do so we will look for commit messages that follow this format.
-
-    Args:
-        suggestion_author_username: str. Username of the suggestion author.
-        commit_message: str. The original commit message submitted by the
-            suggestion author.
-
-    Returns:
-        str. The modified commit message to be used in the exploration commit
-        logs.
-    """
-    return '%s %s: %s' % (
-        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
-        suggestion_author_username, commit_message)
-
-
-def accept_suggestion(
-        editor_id, thread_id, exploration_id, commit_message,
-        audio_update_required):
-    """If the suggestion is valid, accepts it by updating the exploration.
-    Raises an exception if the suggestion is not valid.
-
-    Args:
-        editor_id: str. The user id of the editor.
-        thread_id: str. The id of the suggestion thread.
-        exploration_id: str. The id of the exploration that the suggestion is
-            for.
-        commit_message: str. The commit message.
-        audio_update_required: bool. Whether the audio subtitles for the
-            content need to be updated.
-
-    Raises:
-        Exception: The suggestion is not valid.
-        Exception: The commit message is empty.
-        Exception: The suggestion has already been accepted or rejected.
-    """
-
-    if not commit_message or not commit_message.strip():
-        raise Exception('Commit message cannot be empty.')
-    if _is_suggestion_handled(thread_id):
-        raise Exception('Suggestion has already been accepted/rejected.')
-    elif not _is_suggestion_valid(thread_id, exploration_id):
-        raise Exception('Invalid suggestion: The state for which it was made '
-                        'has been removed/renamed.')
-    else:
-        suggestion = feedback_services.get_suggestion(thread_id)
-        suggestion_author_username = suggestion.get_author_name()
-        exploration = get_exploration_by_id(exploration_id)
-        old_content = exploration.states[suggestion.state_name].content
-        old_content_ids_to_audio_translations = exploration.states[
-            suggestion.state_name].content_ids_to_audio_translations
-        change_list = _create_change_list_from_suggestion(
-            suggestion, old_content, old_content_ids_to_audio_translations,
-            audio_update_required)
-        update_exploration(
-            editor_id, exploration_id, change_list,
-            _get_commit_message_for_suggestion(
-                suggestion_author_username, commit_message),
-            is_suggestion=True)
-        feedback_services.create_message(
-            thread_id, editor_id, feedback_models.STATUS_CHOICES_FIXED, None,
-            'Suggestion accepted.')
-
-
-def reject_suggestion(editor_id, thread_id):
-    """Set the status of a suggestion to REJECTED.
-
-    Args:
-        editor_id: str. User id of the editor.
-        thread_id: str. The id of the suggestion thread.
-
-    Raises:
-        Exception: The suggestion has already been accepted or rejected.
-    """
-    if _is_suggestion_handled(thread_id):
-        raise Exception('Suggestion has already been accepted/rejected.')
-    else:
-        thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
-        feedback_services.create_message(
-            thread_id, editor_id, feedback_models.STATUS_CHOICES_IGNORED,
-            None, 'Suggestion rejected.')
-        thread.put()
 
 
 def is_version_of_draft_valid(exp_id, version):

@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview The controller for the maintenance page.
+ * @fileoverview Service to help identify and manage issues in exploration
+ * states based on statistics.
  */
 
-oppia.controller('Maintenance', [
-  '$scope', '$rootScope', 'UrlInterpolationService', 'DEV_MODE',
-  function($scope, $rootScope, UrlInterpolationService, DEV_MODE) {
-    $scope.currentLang = 'en';
-    $rootScope.DEV_MODE = DEV_MODE;
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-  }
-]);
+oppia.factory('IssuesService', [function() {
+  var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
+
+  return {
+    isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
+      return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
+        state.interaction.id) !== -1;
+    }
+  };
+}]);
