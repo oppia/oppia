@@ -185,15 +185,15 @@ oppia.directive('skillsList', [
               ).then(function() {
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                // Start the transfer of questions from the old skill to
+                // the new one.
+                var mergeSkillUrl = MERGE_SKILL_URL;
+                var mergeSkillData = {
+                  old_skill: skill,
+                  new_skill_id: supersedingSkill.id
+                };
+                $http.post(mergeSkillUrl, mergeSkillData);
               });
-
-              // Start merge question
-              var mergeSkillUrl = MERGE_SKILL_URL;
-              var mergeSkillData = {
-                old_skill: skill,
-                new_skill_id: supersedingSkill.id
-              };
-              $http.post(mergeSkillUrl, mergeSkillData);
             });
           };
         }

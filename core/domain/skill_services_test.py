@@ -239,14 +239,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'id': 0,
                 'old_value': '',
                 'new_value': 'TestSkillId'
-            }),
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'id': 0,
-                'old_value': False,
-                'new_value': True
             })
         ]
         skill_services.update_skill(
