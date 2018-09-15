@@ -27,6 +27,7 @@ import utils
 
 current_user_services = models.Registry.import_current_user_services()
 
+
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
@@ -367,6 +368,7 @@ class SiteLanguageHandler(base.BaseHandler):
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
+
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user."""

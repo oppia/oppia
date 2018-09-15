@@ -29,7 +29,6 @@ import urlparse
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf

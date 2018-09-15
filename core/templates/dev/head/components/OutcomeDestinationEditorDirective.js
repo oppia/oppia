@@ -30,11 +30,11 @@ oppia.directive('outcomeDestinationEditor', [
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'EXPLORATION_AND_SKILL_ID_PATTERN','PLACEHOLDER_OUTCOME_DEST',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-          $scope, EditorFirstTimeEventsService, FocusManagerService,
-          StateEditorService, StateGraphLayoutService, UserService,
-          EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
+            $scope, EditorFirstTimeEventsService, FocusManagerService,
+            StateEditorService, StateGraphLayoutService, UserService,
+            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var currentStateName = null;
           $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
 
