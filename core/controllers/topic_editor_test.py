@@ -118,9 +118,8 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
             self.login(self.TOPIC_MANAGER_EMAIL)
             response = self.testapp.get(
                 '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
+            self.assertEqual(response.status_int, 200)
             self.logout()
 
             topic_services.assign_role(
