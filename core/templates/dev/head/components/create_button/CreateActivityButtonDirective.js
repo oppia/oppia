@@ -31,12 +31,11 @@ oppia.directive('createActivityButton', [
             ExplorationCreationService, CollectionCreationService,
             siteAnalyticsService, UrlService, UserService) {
           $scope.creationInProgress = false;
-
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
 
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.canCreateCollections = userInfo.can_create_collections;
+            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
           });
 
           $scope.showUploadExplorationModal = (

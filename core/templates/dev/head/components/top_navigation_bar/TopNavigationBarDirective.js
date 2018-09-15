@@ -44,6 +44,7 @@ oppia.directive('topNavigationBar', [
             $scope.isAdmin = userInfo.is_admin;
             $scope.isSuperAdmin = userInfo.is_super_admin;
             $scope.username = userInfo.username;
+            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
           });
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             $scope.profilePictureDataUrl = dataUrl;
@@ -164,7 +165,7 @@ oppia.directive('topNavigationBar', [
             }
           });
 
-          if (GLOBALS.userIsLoggedIn) {
+          if ($scope.userIsLoggedIn) {
             // Show the number of unseen notifications in the navbar and page
             // title, unless the user is already on the dashboard page.
             $http.get('/notificationshandler').then(function(response) {

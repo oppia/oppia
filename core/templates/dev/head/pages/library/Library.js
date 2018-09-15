@@ -31,14 +31,14 @@ oppia.controller('Library', [
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
-  'LearnerDashboardIdsBackendApiService',
+  'LearnerDashboardIdsBackendApiService', 'UserService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
       $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
-      LearnerDashboardIdsBackendApiService,
+      LearnerDashboardIdsBackendApiService, UserService,
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
@@ -80,7 +80,9 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+        });
         $scope.activitiesOwned = {explorations: {}, collections: {}};
         if ($scope.userIsLoggedIn) {
           $http.get('/creatordashboardhandler/data')

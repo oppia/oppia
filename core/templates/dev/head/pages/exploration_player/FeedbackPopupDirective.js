@@ -35,18 +35,20 @@ oppia.directive('feedbackPopup', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$log', '$timeout', '$filter',
-        'FocusManagerService', 'AlertsService', 'BackgroundMaskService',
-        'PlayerPositionService', 'WindowDimensionsService',
+        '$scope', '$element', '$filter', '$http', '$log', '$timeout',
+        'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
+        'PlayerPositionService', 'UserService', 'WindowDimensionsService',
         'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
-            $scope, $element, $http, $log, $timeout, $filter,
-            FocusManagerService, AlertsService, BackgroundMaskService,
-            PlayerPositionService, WindowDimensionsService,
+            $scope, $element, $filter, $http, $log, $timeout,
+            AlertsService, BackgroundMaskService, FocusManagerService,
+            PlayerPositionService, UserService, WindowDimensionsService,
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.isLoggedIn = userInfo.user_is_logged_in;
+          });
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.

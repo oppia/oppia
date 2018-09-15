@@ -81,14 +81,16 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http', '$window',
-        'DateTimeFormatService', 'RatingComputationService',
-        'WindowDimensionsService', 'UrlService',
+        '$scope', '$http', '$window', 'DateTimeFormatService',
+        'RatingComputationService', 'UrlService', 'UserService',
+        'WindowDimensionsService',
         function(
-            $scope, $http, $window,
-            DateTimeFormatService, RatingComputationService,
-            WindowDimensionsService, UrlService) {
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+            $scope, $http, $window, DateTimeFormatService,
+            RatingComputationService, UrlService, UserService,
+            WindowDimensionsService) {
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+          });
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
           var contributorsSummary = $scope.getContributorsSummary() || {};

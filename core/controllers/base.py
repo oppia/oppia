@@ -238,9 +238,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error(
-                    '%s: payload %s',
-                    e, self.payload)
+                logging.error('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return

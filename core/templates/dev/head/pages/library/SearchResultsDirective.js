@@ -24,10 +24,14 @@ oppia.directive('searchResults', [
         '/pages/library/search_results_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
-        function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
+        'UserService',
+        function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
+            UserService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+          });
 
           // Called when the first batch of search results is retrieved from the
           // server.

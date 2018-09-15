@@ -21,13 +21,13 @@ oppia.controller('FeedbackTab', [
   'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
       $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
       DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -37,7 +37,9 @@ oppia.controller('FeedbackTab', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
-    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+    });
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
