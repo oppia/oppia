@@ -386,5 +386,6 @@ class UserInfoHandler(base.BaseHandler):
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in user_actions),
             'preferred_site_language_code': (
-                user_settings.preferred_site_language_code)
+                user_settings.preferred_site_language_code),
+            'username': user_settings.username
         })

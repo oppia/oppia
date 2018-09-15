@@ -172,7 +172,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
@@ -326,7 +325,6 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD

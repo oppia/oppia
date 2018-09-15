@@ -20,15 +20,18 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$uibModal', '$http', 'ExplorationEngineService', 'AlertsService',
-  'FocusManagerService', 'UrlInterpolationService',
-  'FLAG_EXPLORATION_URL_TEMPLATE', 'ExplorationPlayerStateService', function(
-      $scope, $uibModal, $http, ExplorationEngineService, AlertsService,
-      FocusManagerService, UrlInterpolationService,
-      FLAG_EXPLORATION_URL_TEMPLATE, ExplorationPlayerStateService) {
+  '$scope', '$http', '$uibModal', 'AlertsService','ExplorationEngineService',
+  'ExplorationPlayerStateService', 'FocusManagerService',
+  'UrlInterpolationService', 'UserService','FLAG_EXPLORATION_URL_TEMPLATE',
+  function(
+      $scope, $http, $uibModal, AlertsService, ExplorationEngineService,
+      ExplorationPlayerStateService, FocusManagerService,
+      UrlInterpolationService, UserService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
-    $scope.username = GLOBALS.username;
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.username = userInfo.username;
+    });
     $scope.showLearnerSuggestionModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

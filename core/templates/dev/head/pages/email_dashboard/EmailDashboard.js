@@ -17,8 +17,12 @@
  */
 
 oppia.controller('EmailDashboard', [
-  '$scope', 'EmailDashboardDataService',
-  function($scope, EmailDashboardDataService) {
+  '$scope', 'EmailDashboardDataService', 'UserService',
+  function($scope, EmailDashboardDataService, UserService) {
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.username = userInfo.username;
+    });
+
     $scope.currentPageOfQueries = [];
 
     $scope.resetForm = function() {
@@ -77,7 +81,7 @@ oppia.controller('EmailDashboard', [
     };
 
     $scope.showLinkToResultPage = function(submitter, status) {
-      return (submitter === GLOBALS.username) && (status === 'completed');
+      return (submitter === $scope.username) && (status === 'completed');
     };
 
     EmailDashboardDataService.getNextQueries().then(function(queries) {

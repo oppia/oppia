@@ -36,13 +36,18 @@ oppia.directive('topNavigationBar', [
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             siteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
-          if (GLOBALS.userIsLoggedIn) {
-            UserService.getUserInfoAsync().then(function(userInfo) {
-              if (userInfo.preferredSiteLanguageCode) {
-                $translate.use(userInfo.preferredSiteLanguageCode);
-              }
-            });
-          }
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            if (userInfo.preferredSiteLanguageCode) {
+              $translate.use(userInfo.preferredSiteLanguageCode);
+            }
+            $scope.isModerator = userInfo.is_moderator;
+            $scope.isAdmin = userInfo.is_admin;
+            $scope.isSuperAdmin = userInfo.is_super_admin;
+            $scope.username = userInfo.username;
+          });
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            $scope.profilePictureDataUrl = dataUrl;
+          });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
@@ -51,15 +56,6 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
-          $scope.username = GLOBALS.username;
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            $scope.profilePictureDataUrl = dataUrl;
-          });
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isModerator = userInfo.is_moderator;
-            $scope.isAdmin = userInfo.is_admin;
-            $scope.isSuperAdmin = userInfo.is_super_admin;
-          });
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.ACTION_OPEN = 'open';
           $scope.ACTION_CLOSE = 'close';

@@ -102,7 +102,9 @@ oppia.controller('LearnerDashboard', [
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       $scope.profilePictureDataUrl = dataUrl;
     });
-    $scope.username = GLOBALS.username;
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.username = userInfo.username;
+    });
     $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
