@@ -272,9 +272,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # IDs of feedback thread ids that this user subscribes to.
+    # DEPRECATED. DO NOT USE. Use general_feedback_thread_ids instead.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # IDs of feedback thread ids (new framework) that this user subscribes to.
+    # IDs of feedback thread ids that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
     # IDs of the learners who have subscribed to this user.
@@ -565,6 +565,118 @@ class CollectionProgressModel(base_models.BaseModel):
             return cls.create(user_id, collection_id)
 
 
+class StoryProgressModel(base_models.BaseModel):
+    """Stores progress a user has made within a story, including all
+    nodes which have been completed within the context of the story.
+
+    Please note instances of this progress model will persist even after a
+    story is deleted.
+
+    ID for this model is of format "{{USER_ID}}.{{STORY_ID}}".
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The story id.
+    story_id = ndb.StringProperty(required=True, indexed=True)
+    # The list of node ids which have been completed within the context of
+    # the story represented by story_id.
+    completed_node_ids = ndb.StringProperty(repeated=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, story_id):
+        """"Generates the id for StoryProgressModel.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            str. The model id corresponding to user_id and story_id.
+        """
+        return '%s.%s' % (user_id, story_id)
+
+    @classmethod
+    def create(cls, user_id, story_id):
+        """Creates a new StoryProgressModel instance and returns it.
+
+        Note: the client is responsible for actually saving this entity to the
+        datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            StoryProgressModel. The newly created StoryProgressModel
+            instance.
+        """
+        instance_id = cls._generate_id(user_id, story_id)
+        return cls(
+            id=instance_id, user_id=user_id, story_id=story_id)
+
+    @classmethod
+    def get(cls, user_id, story_id, strict=True):
+        """Gets the StoryProgressModel for the given user and story
+        id.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+            strict: bool. Whether to fail noisily if no StoryProgressModel
+                with the given id exists in the datastore.
+
+        Returns:
+            StoryProgressModel. The StoryProgressModel instance which
+            matches the given user_id and story_id.
+        """
+        instance_id = cls._generate_id(user_id, story_id)
+        return super(StoryProgressModel, cls).get(
+            instance_id, strict=strict)
+
+    @classmethod
+    def get_multi(cls, user_id, story_ids):
+        """Gets the StoryProgressModels for the given user and story
+        ids.
+
+        Args:
+            user_id: str. The id of the user.
+            story_ids: list(str). The ids of the stories.
+
+        Returns:
+            list(StoryProgressModel). The list of StoryProgressModel
+            instances which matches the given user_id and story_ids.
+        """
+        instance_ids = [cls._generate_id(user_id, story_id)
+                        for story_id in story_ids]
+
+        return super(StoryProgressModel, cls).get_multi(
+            instance_ids)
+
+    @classmethod
+    def get_or_create(cls, user_id, story_id):
+        """Gets the StoryProgressModel for the given user and story
+        ids, or creates a new instance with if no such instance yet exists
+        within the datastore.
+
+        Note: This method is not responsible for creating the instance of
+        the class in the datastore. It just returns an instance of the class.
+
+        Args:
+            user_id: str. The id of the user.
+            story_id: str. The id of the story.
+
+        Returns:
+            StoryProgressModel. Either an existing one which
+            matches the given user_id and story_id, or the newly created
+            one if it does not already exist.
+        """
+        instance_model = cls.get(user_id, story_id, strict=False)
+        if instance_model is not None:
+            return instance_model
+        else:
+            return cls.create(user_id, story_id)
+
+
 class UserQueryModel(base_models.BaseModel):
     """Model for storing result of queries.
 
@@ -691,6 +803,25 @@ class UserContributionScoringModel(base_models.BaseModel):
     score_category = ndb.StringProperty(required=True, indexed=True)
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
+    # Flag to check if email to onboard reviewer has been sent for the category.
+    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+
+    @classmethod
+    def get_all_categories_where_user_can_review(cls, user_id):
+        """Gets all the score categories where the user has a score above the
+        threshold.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            list(str). A list of score_categories where the user has score above
+                the threshold.
+        """
+        scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
+            cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        return (
+            [scoring_model.score_category for scoring_model in scoring_models])
 
     @classmethod
     def get_all_scores_of_user(cls, user_id):

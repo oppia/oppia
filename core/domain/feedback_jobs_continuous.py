@@ -200,10 +200,7 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            return [feedback_models.GeneralFeedbackThreadModel]
-        else:
-            return [feedback_models.FeedbackThreadModel]
+        return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
     def map(item):

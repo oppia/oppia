@@ -14,39 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test for audit models"""
+"""Test for audit models."""
 
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import logging
-logging.basicConfig(filename='debug_logs', level=logging.DEBUG)
 
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
-    """Records the data for query made to the role structure using admin
-    interface.
-
-    Instances of this class are keyed by a custom Id.
-    [user_id].[timestamp_in_sec].[intent].[random_number]
-    """
-
-    def setUp(self):
-        super(RoleQueryAuditModelUnitTests, self).setUp()
+    """Unit tests for the RoleQueryAuditModel class."""
 
     def test_create_and_get_model(self):
         audit_models.RoleQueryAuditModel(
             id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
             role='c', username='d').put()
-        am = audit_models.RoleQueryAuditModel.get_all()
-        i = 0
-        for a in am:
-            logging.debug(a.id)
-            i += 1
-            pass
-        logging.debug(i)
-        self.assertEqual(a.id, 'a')
-        b = audit_models.RoleQueryAuditModel.get(a.id)
-        self.assertEqual(b.id, 'a')
+        audit_model = audit_models.RoleQueryAuditModel.get('a')
+
+        self.assertEqual(audit_model.id, 'a')
+        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
+        self.assertEqual(audit_model.user_id, 'b')
+        self.assertEqual(audit_model.role, 'c')
+        self.assertEqual(audit_model.username, 'd')

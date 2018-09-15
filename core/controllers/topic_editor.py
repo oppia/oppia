@@ -42,7 +42,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     display in topic editor page.
     """
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
@@ -97,7 +97,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     summaries for display in topic editor page.
     """
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
@@ -142,8 +142,7 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -167,7 +166,7 @@ class TopicEditorPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_INTERACTION_CATEGORIES)
+                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
         self.render_template(
@@ -192,7 +191,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (subtopic_page_version, version_from_payload))
 
-    @acl_decorators.can_edit_subtopic_page
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
@@ -322,6 +321,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
+
+        self.render_json(self.values)
 
 
 class TopicRightsHandler(base.BaseHandler):

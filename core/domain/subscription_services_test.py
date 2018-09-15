@@ -63,14 +63,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def _get_thread_ids_subscribed_to(self, user_id):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
-        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            return (
-                subscriptions_model.general_feedback_thread_ids
-                if subscriptions_model else [])
-        else:
-            return (
-                subscriptions_model.feedback_thread_ids
-                if subscriptions_model else [])
+        return (
+            subscriptions_model.general_feedback_thread_ids
+            if subscriptions_model else [])
 
     def _get_exploration_ids_subscribed_to(self, user_id):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -165,7 +160,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # The viewer posts a message to the thread.
         message_text = 'text'
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 'state_name',
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
             self.viewer_id, 'subject', message_text)
 
         thread_ids_subscribed_to = self._get_thread_ids_subscribed_to(

@@ -17,10 +17,16 @@
 """HTML validation service."""
 
 import json
+import logging
 
 import bs4
+from constants import constants
+from core.domain import fs_domain
 from core.domain import rte_component_registry
+from core.platform import models
 import feconf
+
+gae_image_services = models.Registry.import_gae_image_services()
 
 
 def escape_html(unescaped_html_data):
@@ -749,3 +755,83 @@ def _validate_customization_args_in_tag(tag):
                             yield err_msg
     except Exception as e:
         yield str(e)
+
+
+def regenerate_image_filename_using_dimensions(filename, height, width):
+    """Returns the name of the image file with dimensions in it.
+
+    Args:
+        filename: str. The name of the image file to be renamed.
+        height: int. Height of the image.
+        width: int. Width of the image.
+
+    Returns:
+        str. The name of the image file with its dimensions in it.
+    """
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
+    new_filename = '%s%s.%s' % (
+        filename_wo_filetype, dimensions_suffix, filetype)
+    return new_filename
+
+
+def add_dimensions_to_image_tags(exp_id, html_string):
+    """Adds dimensions to all oppia-noninteractive-image tags. Removes image
+    tags that have no filepath.
+
+    Args:
+        html_string: str. HTML string to modify.
+        exp_id: str. Exploration id.
+
+    Returns:
+        str. Updated HTML string with the dimensions for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        if (not image.has_attr('filepath-with-value') or
+                image['filepath-with-value'] == ''):
+            image.decompose()
+            continue
+
+        try:
+            filename = json.loads(unescape_html(image['filepath-with-value']))
+            image['filepath-with-value'] = escape_html(json.dumps(
+                get_filename_with_dimensions(filename, exp_id)))
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed to load image: %s' %
+                (exp_id, image['filepath-with-value'].encode('utf-8')))
+            raise e
+    return unicode(soup).replace('<br/>', '<br>')
+
+
+def get_filename_with_dimensions(old_filename, exp_id):
+    """Gets the filename with dimensions of the image file in it.
+
+    Args:
+        old_filename: str. Name of the file whose dimensions need to be
+            calculated.
+        exp_id: str. Exploration id.
+
+    Returns:
+        str. The new filename of the image file.
+    """
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if constants.DEV_MODE
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
+    filepath = (
+        old_filename if constants.DEV_MODE
+        else ('image/%s' % old_filename))
+    try:
+        content = fs.get(filepath.encode('utf-8'))
+        height, width = gae_image_services.get_image_dimensions(content)
+    except IOError:
+        height = 120
+        width = 120
+    new_filename = regenerate_image_filename_using_dimensions(
+        old_filename, height, width)
+    return new_filename

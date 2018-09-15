@@ -1,18 +1,22 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Astronomy
+correctness_feedback_enabled: false
 init_state_name: First State
 language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
-schema_version: 17
+schema_version: 30
 states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -27,41 +31,60 @@ states:
   Exit:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Do you want to quit?
+      content_id: content
+      html: <p>Do you want to quit?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: END
           feedback:
-          - Thank you for exploring the Solar System!
+            content_id: feedback_1
+            html: <p>Thank you for exploring the Solar System!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Let's learn more about the planets then!
+            content_id: feedback_2
+            html: <p>Let's learn more about the planets then!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - 'Yes'
-          - 'No'
+          - <p>Yes</p>
+          - <p>No</p>
       default_outcome:
         dest: Exit
         feedback:
-        - Try again.
+          content_id: default_outcome
+          html: <p>Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: MultipleChoiceInput
       solution: null
@@ -69,141 +92,198 @@ states:
   First State:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: 'Our Solar System consists of nine planets orbiting around our sun: Mercury,
-        Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto. They range
-        from huge gas giants to small icy dwarf planets.<div><br></div><div>Click
-        on the planets below to find out more about each one!</div>'
+      content_id: content
+      html: "<p>Our Solar System consists of nine planets orbiting around our sun:\
+        \ Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto.\
+        \ They range from huge gas giants to small icy dwarf planets.</p><p>\_</p><p>Click\
+        \ on the planets below to find out more about each one!</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      feedback_6: {}
+      feedback_7: {}
+      feedback_8: {}
+      feedback_9: {}
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: First State
           feedback:
-          - This is Mercury, a small metallic planet closest to the sun. Since it
-            is so near to the sun, it only takes 88 days for it to travel one entire
-            orbit, so a year on Mercury would only be 88 days long.
+            content_id: feedback_1
+            html: <p>This is Mercury, a small metallic planet closest to the sun.
+              Since it is so near to the sun, it only takes 88 days for it to travel
+              one entire orbit, so a year on Mercury would only be 88 days long.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '1'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - This is Venus, the second planet from the sun. It is the brightest planet
-            in the Solar System, and can sometimes even be seen during the day. Though
-            Mercury is nearer to the sun than Venus, Venus is the hottest planet in
-            the Solar System, because its thick atmosphere of carbon dioxide traps
-            heat on its surface.
+            content_id: feedback_2
+            html: <p>This is Venus, the second planet from the sun. It is the brightest
+              planet in the Solar System, and can sometimes even be seen during the
+              day. Though Mercury is nearer to the sun than Venus, Venus is the hottest
+              planet in the Solar System, because its thick atmosphere of carbon dioxide
+              traps heat on its surface.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '2'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Earth! Our home planet is the third planet from the sun. Despite the vastness
-            of the Solar System and the rest of space, it is the only place that we
-            know life exists on. It is at just the right distance from the sun to
-            ensure a comfortable temperature for us to exist in.
+            content_id: feedback_3
+            html: <p>Earth! Our home planet is the third planet from the sun. Despite
+              the vastness of the Solar System and the rest of space, it is the only
+              place that we know life exists on. It is at just the right distance
+              from the sun to ensure a comfortable temperature for us to exist in.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '3'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Mars is the fourth planet from the sun. It is often dubbed the "red planet"
-            due to its color, which is a result of large quantities of iron oxide
-            on its surface. It has a thin atmosphere of carbon dioxide and ice caps
-            on either end, and has two small irregularly-shaped moons called Phobos
-            and Deimos.
+            content_id: feedback_4
+            html: <p>Mars is the fourth planet from the sun. It is often dubbed the
+              "red planet" due to its color, which is a result of large quantities
+              of iron oxide on its surface. It has a thin atmosphere of carbon dioxide
+              and ice caps on either end, and has two small irregularly-shaped moons
+              called Phobos and Deimos.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '4'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Jupiter, the fifth planet from the sun, is a huge planet that is 2.5 times
-            heavier than all of the other planets in our Solar System combined. It
-            is mostly formed out of thick gases around a solid core. One famous feature
-            on it is the "Great Red Spot", which is a huge storm on its surface that
-            has raged for at least 350 years, and is large enough to swallow three
-            entire Earths.
+            content_id: feedback_5
+            html: <p>Jupiter, the fifth planet from the sun, is a huge planet that
+              is 2.5 times heavier than all of the other planets in our Solar System
+              combined. It is mostly formed out of thick gases around a solid core.
+              One famous feature on it is the "Great Red Spot", which is a huge storm
+              on its surface that has raged for at least 350 years, and is large enough
+              to swallow three entire Earths.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '5'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - "Saturn, the sixth planet from the sun, is most well known for its beautiful\
-            \ rings of ice and dust orbiting around it. Like Jupiter, it is a gas\
-            \ giant, mostly made of layers of hydrogen which get progressively denser\
-            \ towards its solid core.\_"
+            content_id: feedback_6
+            html: "<p>Saturn, the sixth planet from the sun, is most well known for\
+              \ its beautiful rings of ice and dust orbiting around it. Like Jupiter,\
+              \ it is a gas giant, mostly made of layers of hydrogen which get progressively\
+              \ denser towards its solid core.\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '6'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Uranus is the seventh planet from the sun. It was the first planet that
-            was discovered using a telescope, since it is normally too dim to be seen
-            with the naked eye. It is the coldest planet, and is formed from layers
-            of hydrogen gas enveloping a frigid core of rock and ice.
+            content_id: feedback_7
+            html: <p>Uranus is the seventh planet from the sun. It was the first planet
+              that was discovered using a telescope, since it is normally too dim
+              to be seen with the naked eye. It is the coldest planet, and is formed
+              from layers of hydrogen gas enveloping a frigid core of rock and ice.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '7'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Neptune is the eighth planet from the sun. It is an "ice giant", like
-            Uranus, with an outer layer of hydrogen, helium, and methane enveloping
-            an icy core. The methane in its atmosphere absorbs red light, giving it
-            a beautiful blue color. It was first predicted to exist from gravitational
-            calculations, and was only discovered by telescope later.
+            content_id: feedback_8
+            html: <p>Neptune is the eighth planet from the sun. It is an "ice giant",
+              like Uranus, with an outer layer of hydrogen, helium, and methane enveloping
+              an icy core. The methane in its atmosphere absorbs red light, giving
+              it a beautiful blue color. It was first predicted to exist from gravitational
+              calculations, and was only discovered by telescope later.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '8'
           rule_type: IsInRegion
-      - correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: First State
           feedback:
-          - Pluto was once considered the ninth planet from the sun, but has now been
-            reclassified as a "dwarf planet". It is formed from ice and rock, and
-            is even smaller than our moon. The first spacecraft to visit Pluto is
-            due to reach in July 2015.
+            content_id: feedback_9
+            html: <p>Pluto was once considered the ninth planet from the sun, but
+              has now been reclassified as a "dwarf planet". It is formed from ice
+              and rock, and is even smaller than our moon. The first spacecraft to
+              visit Pluto is due to reach in July 2015.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '9'
           rule_type: IsInRegion
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         highlightRegionsOnHover:
           value: false
         imageAndRegions:
           value:
-            imagePath: Screen Shot 2015-02-18 at 3.51.49 AM.png
+            imagePath: Screen Shot 2015-02-18 at 3.51.49 AM_height_400_width_816.png
             labeledRegions:
             - label: '1'
               region:
@@ -280,12 +360,16 @@ states:
       default_outcome:
         dest: Exit
         feedback:
-        - Do you want to exit the exploration?
+          content_id: default_outcome
+          html: <p>Do you want to exit the exploration?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: ImageClickInput
       solution: null
     param_changes: []
-states_schema_version: 13
+states_schema_version: 25
 tags: []
 title: The Solar System

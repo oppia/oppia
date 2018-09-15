@@ -16,6 +16,7 @@
 suggestions.
 """
 
+from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
@@ -53,13 +54,11 @@ def create_suggestion(
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
-
+    if description is None:
+        description = DEFAULT_SUGGESTION_THREAD_SUBJECT
     thread_id = feedback_services.create_thread(
-        target_type, target_id, None, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
-
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = '%s.%s' % (feconf.ENTITY_TYPE_EXPLORATION, thread_id)
+        target_type, target_id, author_id, description,
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW
 
@@ -230,10 +229,27 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     mark_review_completed(
         suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
-
+    thread_id = suggestion.suggestion_id
     feedback_services.create_message(
-        suggestion.suggestion_id, reviewer_id,
-        feedback_models.STATUS_CHOICES_FIXED, None, review_message)
+        thread_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
+        None, review_message)
+
+    if feconf.ENABLE_RECORDING_OF_SCORES:
+        increment_score_for_user(
+            suggestion.author_id, suggestion.score_category,
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
+            scores = get_all_scores_of_user(suggestion.author_id)
+            if (
+                    suggestion.score_category in scores and
+                    scores[suggestion.score_category] >=
+                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                if check_if_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category):
+                    email_manager.send_mail_to_onboard_new_reviewers(
+                        suggestion.author_id, suggestion.score_category)
+                    mark_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category)
 
 
 def reject_suggestion(suggestion, reviewer_id, review_message):
@@ -255,9 +271,35 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
 
+    thread_id = suggestion.suggestion_id
     feedback_services.create_message(
-        suggestion.suggestion_id, reviewer_id,
-        feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+        thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        None, review_message)
+
+
+def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
+    """Returns a list of suggestions which need to be reviewed, in categories
+    where the user has crossed the minimum score to review.
+
+    Args:
+        user_id: str. The ID of the user.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
+    """
+    score_categories = (
+        user_models.UserContributionScoringModel
+        .get_all_categories_where_user_can_review(user_id))
+
+    if len(score_categories) == 0:
+        return []
+
+    return (
+        [get_suggestion_from_model(s)
+         for s in suggestion_models.GeneralSuggestionModel
+         .get_in_review_suggestions_in_score_categories(
+             score_categories, user_id)])
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):
@@ -274,7 +316,8 @@ def get_user_contribution_scoring_from_model(userContributionScoringModel):
     return user_domain.UserContributionScoring(
         userContributionScoringModel.user_id,
         userContributionScoringModel.score_category,
-        userContributionScoringModel.score)
+        userContributionScoringModel.score,
+        userContributionScoringModel.has_email_been_sent)
 
 
 def get_all_scores_of_user(user_id):
@@ -312,9 +355,42 @@ def check_user_can_review_in_category(user_id, score_category):
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
             user_id, score_category))
-    if not score:
+    if score is None:
         return False
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+
+def check_if_email_has_been_sent_to_user(user_id, score_category):
+    """Checks if user has already received an email.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The score category.
+
+    Returns:
+        bool. Whether the email has already been sent to the user.
+    """
+    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
+        '%s.%s' % (score_category, user_id))
+    if scoring_model_instance is None:
+        return False
+    return scoring_model_instance.has_email_been_sent
+
+
+def mark_email_has_been_sent_to_user(user_id, score_category):
+    """Marks that the user has already received an email.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The score category.
+    """
+    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
+        '%s.%s' % (score_category, user_id))
+
+    if scoring_model_instance is None:
+        raise Exception('Expected user scoring model to exist for user')
+    scoring_model_instance.has_email_been_sent = True
+    scoring_model_instance.put()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -361,3 +437,60 @@ def create_new_user_contribution_scoring_model(user_id, score_category, score):
     """
     user_models.UserContributionScoringModel.create(
         user_id, score_category, score)
+
+
+def get_next_user_in_rotation(score_category):
+    """Gets the id of the next user in the reviewer rotation for the given
+    score_category. The order is alphabetical, and the next user in the
+    alphabetical order is returned.
+
+    Args:
+        score_category: str. The score category.
+
+    Returns:
+        str|None. The user id of the next user in the reviewer rotation, if
+            there are reviewers for the given category. Else None.
+    """
+    reviewer_ids = get_all_user_ids_who_are_allowed_to_review(score_category)
+    reviewer_ids.sort()
+
+    if len(reviewer_ids) == 0:
+        # No reviewers available for the given category.
+        return None
+
+    position_tracking_model = (
+        suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+            score_category))
+
+    next_user_id = None
+    if position_tracking_model is None:
+        # No rotation has started yet, start rotation at index 0.
+        next_user_id = reviewer_ids[0]
+    else:
+        current_position_user_id = (
+            position_tracking_model.current_position_in_rotation)
+
+        for reviewer_id in reviewer_ids:
+            if reviewer_id > current_position_user_id:
+                next_user_id = reviewer_id
+                break
+
+        if next_user_id is None:
+            # All names are lexicographically smaller than or equal to the
+            # current position username. Hence, Rotating back to the front.
+            next_user_id = reviewer_ids[0]
+
+    update_position_in_rotation(score_category, next_user_id)
+    return next_user_id
+
+
+def update_position_in_rotation(score_category, user_id):
+    """Updates the current position in the rotation to the given user_id.
+
+    Args:
+        score_category: str. The score category.
+        user_id: str. The ID of the user who completed their turn in the
+            rotation for the given category.
+    """
+    suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
+        score_category, user_id)

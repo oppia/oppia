@@ -33,8 +33,8 @@ oppia.factory('SuggestionObjectFactory', [function() {
     this.lastUpdated = lastUpdated;
   };
 
-  Suggestion.prototype.threadId = function() {
-    return this.suggestionId.slice(this.suggestionId.indexOf('.') + 1);
+  Suggestion.prototype.getThreadId = function() {
+    return this.suggestionId;
   };
 
   Suggestion.createFromBackendDict = function(suggestionBackendDict) {
@@ -43,9 +43,9 @@ oppia.factory('SuggestionObjectFactory', [function() {
       suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
       suggestionBackendDict.target_id, suggestionBackendDict.status,
       suggestionBackendDict.author_name,
-      suggestionBackendDict.change_cmd.state_name,
-      suggestionBackendDict.change_cmd.new_value,
-      suggestionBackendDict.change_cmd.old_value,
+      suggestionBackendDict.change.state_name,
+      suggestionBackendDict.change.new_value,
+      suggestionBackendDict.change.old_value,
       suggestionBackendDict.last_updated);
   };
 

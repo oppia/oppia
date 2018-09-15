@@ -51,7 +51,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
-                'a_state_name', self.user_id_a, 'a subject', 'some text')
+                self.user_id_a, 'a subject', 'some text')
 
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
@@ -69,15 +69,15 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             self.assertFalse(messages[0].received_via_email)
 
             # Get reply_to id for user A.
-            model = email_models.FeedbackEmailReplyToIdModel.get(
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
                 self.user_id_a, thread_id)
 
             recipient_email = 'reply+%s@%s' % (
                 model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
             self.post_email(
-                str(recipient_email), self.USER_A_EMAIL, 'feedback email reply',
-                'New reply')
+                str(recipient_email), self.USER_A_EMAIL,
+                'feedback email reply', 'New reply')
 
             # Check that new message is added.
             messages = feedback_services.get_messages(thread_id)

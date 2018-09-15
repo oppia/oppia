@@ -30,13 +30,15 @@ oppia.directive('multipleIncorrectIssueDirective', [
         '/pages/exploration_editor/statistics_tab/' +
         'multiple_incorrect_issue_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'IssuesService',
-        function($scope, $uibModal, AlertsService, IssuesService) {
+        '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
+        function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {
           $scope.currentIssueIdentifier = $scope.index() + 1;
 
           var issue = $scope.issue();
-          $scope.issueStatement = IssuesService.renderIssueStatement(issue);
-          $scope.suggestions = IssuesService.renderIssueSuggestions(issue);
+          $scope.issueStatement =
+            PlaythroughIssuesService.renderIssueStatement(issue);
+          $scope.suggestions =
+            PlaythroughIssuesService.renderIssueSuggestions(issue);
           $scope.playthroughIds = issue.playthroughIds;
 
           var getPlaythroughIndex = function(playthroughId) {
@@ -50,7 +52,7 @@ oppia.directive('multipleIncorrectIssueDirective', [
           var issueResolved = false;
           $scope.resolveIssue = function() {
             if (!issueResolved) {
-              IssuesService.resolveIssue(issue);
+              PlaythroughIssuesService.resolveIssue(issue);
               AlertsService.addSuccessMessage(
                 'Issue resolved. Refresh the page to view changes.');
               issueResolved = true;
@@ -62,7 +64,7 @@ oppia.directive('multipleIncorrectIssueDirective', [
           };
 
           $scope.showPlaythrough = function(playthroughId) {
-            IssuesService.getPlaythrough(
+            PlaythroughIssuesService.getPlaythrough(
               playthroughId
             ).then(function(playthrough) {
               $uibModal.open({
@@ -89,13 +91,16 @@ oppia.directive('multipleIncorrectIssueDirective', [
                     $scope.displayBlocks =
                       LearnerActionRenderService.getDisplayBlocks(
                         playthrough.actions);
+                    $scope.reversedDisplayBlocks =
+                      $scope.displayBlocks.slice().reverse();
 
                     var blockActionIndexMapping = {};
                     $scope.displayBlocks.reduce(
                       function(runningTotal, displayBlock, i) {
-                        blockActionIndexMapping[i] = runningTotal;
-                        return runningTotal + displayBlock.length;
-                      }, 1);
+                        blockActionIndexMapping[i] =
+                          runningTotal - displayBlock.length;
+                        return runningTotal - displayBlock.length;
+                      }, playthrough.actions.length + 1);
 
                     $scope.maxHidden = $scope.displayBlocks.length - 1;
 
@@ -154,15 +159,15 @@ oppia.directive('multipleIncorrectIssueDirective', [
                         }
                         if (currentShown === 0) {
                           getRemainingActionsElements(
-                            pIdx, $scope.maxHidden).style.display = 'block';
+                            pIdx, currentShown + 1).style.display = 'block';
                         } else if (currentShown === $scope.maxHidden - 1) {
                           getRemainingActionsElements(
-                            pIdx, 1).style.display = 'block';
+                            pIdx, $scope.maxHidden).style.display = 'block';
                           document.getElementById(
                             'arrowDiv').style.display = 'none';
                         } else {
                           getRemainingActionsElements(
-                            pIdx, currentShown - 1).style.display = 'block';
+                            pIdx, currentShown + 1).style.display = 'block';
                         }
                       }
                     };

@@ -22,16 +22,27 @@ from core.domain import acl_decorators
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import role_services
 from core.domain import subscription_services
+from core.domain import suggestion_services
 from core.domain import summary_services
+from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+import jinja2
+
+(feedback_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.suggestion])
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
@@ -110,13 +121,35 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
+    ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
+
     @acl_decorators.can_access_creator_dashboard
     def get(self):
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids + self.ADDITIONAL_DEPENDENCY_IDS))
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
+                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'ALLOWED_INTERACTION_CATEGORIES': (
+                feconf.ALLOWED_INTERACTION_CATEGORIES),
+            'additional_angular_modules': additional_angular_modules,
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
         self.render_template(
             'pages/creator_dashboard/creator_dashboard.html',
@@ -177,6 +210,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             exp_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
+
+        if feconf.ENABLE_NEW_STRUCTURES:
+            topic_summaries = topic_services.get_all_topic_summaries()
+            topic_summary_dicts = [
+                summary.to_dict() for summary in topic_summaries]
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
@@ -239,6 +277,39 @@ class CreatorDashboardHandler(base.BaseHandler):
         creator_dashboard_display_pref = (
             user_settings.creator_dashboard_display_pref)
 
+        suggestions_created_by_user = suggestion_services.query_suggestions(
+            [('author_id', self.user_id),
+             (
+                 'suggestion_type',
+                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
+        suggestions_which_can_be_reviewed = (
+            suggestion_services
+            .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
+
+        for s in suggestions_created_by_user:
+            s.populate_old_value_of_change()
+
+        for s in suggestions_which_can_be_reviewed:
+            s.populate_old_value_of_change()
+
+        suggestion_dicts_created_by_user = (
+            [s.to_dict() for s in suggestions_created_by_user])
+        suggestion_dicts_which_can_be_reviewed = (
+            [s.to_dict() for s in suggestions_which_can_be_reviewed])
+
+        ids_of_suggestions_created_by_user = (
+            [s['suggestion_id'] for s in suggestion_dicts_created_by_user])
+        ids_of_suggestions_which_can_be_reviewed = (
+            [s['suggestion_id']
+             for s in suggestion_dicts_which_can_be_reviewed])
+
+        threads_linked_to_suggestions_by_user = (
+            [t.to_dict() for t in feedback_services.get_multiple_threads(
+                ids_of_suggestions_created_by_user)])
+        threads_linked_to_suggestions_which_can_be_reviewed = (
+            [t.to_dict() for t in feedback_services.get_multiple_threads(
+                ids_of_suggestions_which_can_be_reviewed)])
+
         self.values.update({
             'explorations_list': exp_summary_dicts,
             'collections_list': collection_summary_dicts,
@@ -246,7 +317,17 @@ class CreatorDashboardHandler(base.BaseHandler):
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list,
             'display_preference': creator_dashboard_display_pref,
+            'threads_for_created_suggestions_list': (
+                threads_linked_to_suggestions_by_user),
+            'threads_for_suggestions_to_review_list': (
+                threads_linked_to_suggestions_which_can_be_reviewed),
+            'created_suggestions_list': suggestion_dicts_created_by_user,
+            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
         })
+        if feconf.ENABLE_NEW_STRUCTURES:
+            self.values.update({
+                'topic_summary_dicts': topic_summary_dicts
+            })
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard

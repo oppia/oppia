@@ -17,7 +17,9 @@
 */
 
 describe('Suggestion thread object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(function() {
+    module('oppia');
+  });
   var SuggestionThreadObjectFactory = null;
   var SuggestionObjectFactory = null;
 
@@ -36,7 +38,7 @@ describe('Suggestion thread object factory', function() {
       summary: 'sample summary',
       message_count: 10,
       state_name: 'state 1',
-      thread_id: 'exp1.thread1'
+      thread_id: 'exploration.exp1.thread1'
     };
 
     suggestionBackendDict = {
@@ -47,7 +49,7 @@ describe('Suggestion thread object factory', function() {
       target_version_at_submission: 1,
       status: 'accepted',
       author_name: 'author',
-      change_cmd: {
+      change: {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
@@ -68,8 +70,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.originalAuthorName).toEqual('author');
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.messageCount).toEqual(10);
-    expect(suggestionThread.stateName).toEqual('state 1');
-    expect(suggestionThread.threadId).toEqual('exp1.thread1');
+    expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
     expect(suggestionThread.suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
     expect(suggestionThread.suggestion.targetType).toEqual('exploration');
@@ -83,7 +84,8 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.suggestion.oldValue.html).toEqual(
       'old suggestion content');
     expect(suggestionThread.suggestion.lastUpdated).toEqual(1000);
-    expect(suggestionThread.suggestion.threadId()).toEqual('exp1.thread1');
+    expect(suggestionThread.suggestion.getThreadId()).toEqual(
+      'exploration.exp1.thread1');
     expect(suggestionThread.isSuggestionThread()).toEqual(true);
     expect(suggestionThread.isSuggestionHandled()).toEqual(true);
     suggestionThread.suggestion.status = 'review';

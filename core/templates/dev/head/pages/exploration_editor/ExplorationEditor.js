@@ -53,8 +53,8 @@ oppia.controller('ExplorationEditor', [
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService', 'StateClassifierMappingService', 'IssuesService',
-  'ENABLE_PLAYTHROUGH_VIZ',
+  'ThreadDataService', 'StateClassifierMappingService',
+  'PlaythroughIssuesService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, StateEditorService, ExplorationTitleService,
@@ -71,8 +71,8 @@ oppia.controller('ExplorationEditor', [
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService, StateClassifierMappingService, IssuesService,
-      ENABLE_PLAYTHROUGH_VIZ) {
+      ThreadDataService, StateClassifierMappingService,
+      PlaythroughIssuesService) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -133,9 +133,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
-        if (ENABLE_PLAYTHROUGH_VIZ) {
-          IssuesService.initSession(data.exploration_id, data.version);
-        }
+        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;

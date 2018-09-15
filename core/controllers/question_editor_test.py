@@ -190,7 +190,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
@@ -203,7 +203,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            self.testapp.delete(
+            self.delete_json(
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
                     self.skill_id
@@ -271,10 +271,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
     def test_delete(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s' % (
-                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
-            self.assertEqual(response.status_int, 200)
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                expected_status_int=200)
             self.logout()
 
     def test_put(self):

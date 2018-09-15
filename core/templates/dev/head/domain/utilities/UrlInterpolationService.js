@@ -18,7 +18,8 @@
  */
 
 oppia.factory('UrlInterpolationService', [
-  'AlertsService', 'UtilsService', function(AlertsService, UtilsService) {
+  'AlertsService', 'UtilsService', 'DEV_MODE',
+  function(AlertsService, UtilsService, DEV_MODE) {
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
         AlertsService.fatalWarning('Empty path passed in method.');
@@ -37,7 +38,7 @@ oppia.factory('UrlInterpolationService', [
      * returns resource path with cache slug.
      */
     var getUrlWithSlug = function(resourcePath) {
-      if (!GLOBALS.DEV_MODE) {
+      if (!DEV_MODE) {
         if (hashes[resourcePath]) {
           var index = resourcePath.lastIndexOf('.');
           return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
@@ -53,7 +54,7 @@ oppia.factory('UrlInterpolationService', [
      * depending on dev/prod mode.
      */
     var getCompleteUrl = function(prefix, path) {
-      if (GLOBALS.DEV_MODE) {
+      if (DEV_MODE) {
         return prefix + getUrlWithSlug(path);
       } else {
         return '/build' + prefix + getUrlWithSlug(path);
@@ -158,6 +159,22 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
+       * Given an story id returns the complete url path to that image.
+       */
+      getStoryUrl: function(storyId) {
+        validateResourcePath(storyId);
+        return '/story' + storyId;
+      },
+      /**
+       * Given a video path relative to /assets/videos folder,
+       * returns the complete url path to that image.
+       */
+      getStaticVideoUrl: function(videoPath) {
+        validateResourcePath(videoPath);
+        return getCompleteUrl('/assets', '/videos' + videoPath);
+      },
+
+      /**
        * Given a path relative to /assets folder, returns the complete url path
        * to that asset.
        */
@@ -185,7 +202,7 @@ oppia.factory('UrlInterpolationService', [
        */
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
-        if (GLOBALS.DEV_MODE) {
+        if (DEV_MODE) {
           return '/templates/dev/head' + getUrlWithSlug(path);
         } else {
           return '/build/templates/head' + getUrlWithSlug(path);

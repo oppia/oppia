@@ -40,20 +40,13 @@ oppia.factory('PlayerTranscriptService', [
         transcript = [];
         numAnswersSubmitted = 0;
       },
-      getStateHistory: function() {
-        var result = [];
-        transcript.forEach(function(transcriptItem) {
-          result.push(transcriptItem.getStateName());
+      hasEncounteredStateBefore: function(stateName) {
+        return transcript.some(function(transcriptItem) {
+          return transcriptItem.getStateName() === stateName;
         });
-        return result;
       },
-      addNewCard: function(
-          stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
-        transcript.push(
-          StateCardObjectFactory.createNewCard(
-            stateName, params, contentHtml, interactionHtml, leadsToConceptCard
-          )
-        );
+      addNewCard: function(newCard) {
+        transcript.push(newCard);
         numAnswersSubmitted = 0;
       },
       addPreviousCard: function() {
@@ -64,19 +57,10 @@ oppia.factory('PlayerTranscriptService', [
         }
         // TODO(aks681): Once worked examples are introduced, modify the below
         // line to take into account the number of worked examples displayed.
-        var previousCard = angular.copy(transcript[transcript.length - 2]);
-        previousCard.setLeadsToConceptCard(false);
-        transcript.push(previousCard);
-      },
-      setDestination: function(newDestStateName) {
-        var lastCard = this.getLastCard();
-        if (lastCard.getDestStateName()) {
-          throw Error(
-            'Trying to set a destStateName when it has already been set.',
-            transcript);
-        }
-
-        lastCard.setDestStateName(newDestStateName);
+        var copyOfPreviousCard =
+          angular.copy(transcript[transcript.length - 2]);
+        copyOfPreviousCard.markAsNotCompleted();
+        transcript.push(copyOfPreviousCard);
       },
       addNewInput: function(input, isHint) {
         var card = this.getLastCard();
@@ -98,11 +82,6 @@ oppia.factory('PlayerTranscriptService', [
       },
       addNewResponse: function(response) {
         var card = this.getLastCard();
-        if (card.getLastOppiaResponse() !== null) {
-          throw Error(
-            'Trying to add a response when it has already been added.',
-            transcript);
-        }
         card.setLastOppiaResponse(response);
       },
       getNumCards: function() {
@@ -117,14 +96,14 @@ oppia.factory('PlayerTranscriptService', [
         }
         return transcript[index];
       },
-      getLastAnswerOnActiveCard: function(activeCardIndex) {
+      getLastAnswerOnDisplayedCard: function(displayedCardIndex) {
         if (
-          this.isLastCard(activeCardIndex) ||
-          transcript[activeCardIndex].getStateName() === null ||
-          transcript[activeCardIndex].getInputResponsePairs().length === 0) {
+          this.isLastCard(displayedCardIndex) ||
+          transcript[displayedCardIndex].getStateName() === null ||
+          transcript[displayedCardIndex].getInputResponsePairs().length === 0) {
           return null;
         } else {
-          return transcript[activeCardIndex].
+          return transcript[displayedCardIndex].
             getInputResponsePairs().slice(-1)[0].learnerInput;
         }
       },

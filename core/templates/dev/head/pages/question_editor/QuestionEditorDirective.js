@@ -16,7 +16,6 @@
  * @fileoverview Controller for the questions editor directive.
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');
 
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -46,6 +45,8 @@ oppia.directive('questionEditor', [
             SolutionValidityService) {
           if ($scope.canEditQuestion()) {
             EditabilityService.markEditable();
+          } else {
+            EditabilityService.markNotEditable();
           }
           StateEditorService.setActiveStateName('question');
           StateEditorService.setMisconceptions($scope.getMisconceptions());
@@ -53,6 +54,8 @@ oppia.directive('questionEditor', [
             '/avatar/oppia_avatar_100px.svg');
 
           $scope.interactionIsShown = false;
+
+          $scope.stateEditorInitialized = false;
 
           $scope.getStateContentPlaceholder = function() {
             return (
@@ -91,6 +94,7 @@ oppia.directive('questionEditor', [
 
               $rootScope.loadingMessage = '';
             }
+            $scope.stateEditorInitialized = true;
           };
 
           $scope.saveStateContent = function(displayedValue) {
@@ -141,6 +145,8 @@ oppia.directive('questionEditor', [
           $scope.$on('onInteractionIdChanged', function(evt) {
             _init();
           });
+
+          _init();
         }
       ]
     };

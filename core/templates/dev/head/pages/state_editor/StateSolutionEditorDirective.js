@@ -104,11 +104,11 @@ oppia.directive('stateSolutionEditor', [
               controller: [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
                 'StateCustomizationArgsService',
-                'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
+                'CurrentInteractionService', 'INTERACTION_SPECS',
                 'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
                     $scope, $uibModalInstance, StateSolutionService,
                     StateCustomizationArgsService,
-                    EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS,
+                    CurrentInteractionService, INTERACTION_SPECS,
                     COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
@@ -143,17 +143,15 @@ oppia.directive('stateSolutionEditor', [
                   } : angular.copy(EMPTY_SOLUTION_DATA);
 
                   $scope.onSubmitFromSubmitButton = function() {
-                    $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+                    CurrentInteractionService.submitAnswer();
                   };
 
-                  $scope.submitAnswer = function(answer) {
+                  $scope.isSubmitButtonDisabled = (
+                    CurrentInteractionService.isSubmitButtonDisabled);
+
+                  CurrentInteractionService.setOnSubmitFn(function(answer) {
                     $scope.data.correctAnswer = answer;
-                  };
-
-                  $scope.setInteractionAnswerValidity = function(
-                      answerValidity) {
-                    $scope.answerIsValid = answerValidity;
-                  };
+                  });
 
                   $scope.shouldAdditionalSubmitButtonBeShown = function() {
                     var interactionSpecs = INTERACTION_SPECS[

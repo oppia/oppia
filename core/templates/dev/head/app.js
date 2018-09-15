@@ -77,15 +77,12 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
-oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
-oppia.constant('ENABLE_PLAYTHROUGH_VIZ', false);
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
 oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 5);
+oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
 oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
 oppia.constant('MAX_PLAYTHROUGHS_FOR_ISSUE', 5);
-oppia.constant('RECORD_PLAYTHROUGH_PROBABILITY', 0.2);
 
 oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
 oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
@@ -342,25 +339,27 @@ oppia.config([
 ]);
 
 oppia.config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', function($delegate) {
-    var _originalError = $delegate.error;
+  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
+    function($delegate, DEV_MODE) {
+      var _originalError = $delegate.error;
 
-    if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
-      $delegate.log = function() {};
-      $delegate.info = function() {};
-      // TODO(sll): Send errors (and maybe warnings) to the backend.
-      $delegate.warn = function() { };
-      $delegate.error = function(message) {
-        if (String(message).indexOf('$digest already in progress') === -1) {
-          _originalError(message);
-        }
-      };
-      // This keeps angular-mocks happy (in tests).
-      $delegate.error.logs = [];
+      if (!DEV_MODE) {
+        $delegate.log = function() {};
+        $delegate.info = function() {};
+        // TODO(sll): Send errors (and maybe warnings) to the backend.
+        $delegate.warn = function() { };
+        $delegate.error = function(message) {
+          if (String(message).indexOf('$digest already in progress') === -1) {
+            _originalError(message);
+          }
+        };
+        // This keeps angular-mocks happy (in tests).
+        $delegate.error.logs = [];
+      }
+
+      return $delegate;
     }
-
-    return $delegate;
-  }]);
+  ]);
 }]);
 
 oppia.config(['toastrConfig', function(toastrConfig) {
@@ -377,6 +376,13 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     progressBar: false,
     tapToDismiss: true,
     titleClass: 'toast-title'
+  });
+}]);
+
+oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
+  recorderServiceProvider.forceSwf(false);
+  recorderServiceProvider.withMp3Conversion(true, {
+    bitRate: 128
   });
 }]);
 

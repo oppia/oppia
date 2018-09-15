@@ -47,14 +47,4 @@
       <div style="clear: both;"></div>
     </div>
   </div>
-
-  <div ng-if="!questionModeEnabled && StateSolutionService.savedMemento.explanation && !StateSolutionService.savedMemento.explanation.isEmpty()">
-    <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
-                               content-ids-to-audio-translations="StateContentIdsToAudioTranslationsService.displayed"
-                               content-id="StateSolutionService.displayed.explanation.getContentId()"
-                               on-start-edit="onAudioTranslationsStartEditAction"
-                               on-change="onAudioTranslationsEdited"
-                               on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
-    </audio-translations-editor>
-  </div>
 </div>

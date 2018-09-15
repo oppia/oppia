@@ -159,8 +159,6 @@
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
   <script src="/templates/dev/head/components/forms/Select2DropdownDirective.js"></script>
   <script src="/templates/dev/head/components/forms/ImageUploaderDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/AudioPlayerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/AudioTranslationsEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/AudioFileUploaderDirective.js"></script>
 
   <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
@@ -228,6 +226,7 @@
   <script src="/templates/dev/head/services/ComputeGraphService.js"></script>
   <script src="/templates/dev/head/services/EditabilityService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+  <script src="/templates/dev/head/services/IssuesService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
@@ -292,6 +291,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationDirective.js"></script>
+
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationStatusService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
 
@@ -302,7 +302,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/PieChartDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/LearnerActionRenderService.js"></script>
-  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/PlaythroughIssuesService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/IssuesBackendApiService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.js"></script>
@@ -330,6 +330,7 @@
 
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/question/PretestQuestionBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="/templates/dev/head/services/AssetsBackendApiService.js"></script>
   <script src="/templates/dev/head/services/StateTopAnswersStatsBackendApiService.js"></script>
@@ -359,12 +360,15 @@
   <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state_card/StateCardObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/PlaythroughObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/ExplorationIssueObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/statistics/LearnerActionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/feedback_thread/FeedbackThreadObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/suggestion/QuestionSuggestionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/suggestion/SuggestionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/suggestion/SuggestionThreadObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
@@ -386,6 +390,7 @@
   <script src="/templates/dev/head/pages/exploration_player/StateClassifierMappingService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlaythroughService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/CurrentInteractionService.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_player/InputResponsePairDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/CorrectnessFooterDirective.js"></script>
@@ -400,7 +405,9 @@
   <script src="/templates/dev/head/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlayerPositionService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/ExplorationEngineService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/PretestEngineService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/ProgressNavDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/StatsReportingService.js"></script>

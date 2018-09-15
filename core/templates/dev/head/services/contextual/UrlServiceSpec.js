@@ -108,6 +108,17 @@ describe('Url Service', function() {
     }).toThrow();
   });
 
+  it('should correctly retrieve topic name from url', function() {
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(
+      UrlService.getTopicNameFromLearnerUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topc/abcdefgijklm';
+    expect(function(){
+      UrlService.getTopicNameFromLearnerUrl();
+    }).toThrowError('Invalid URL for topic');
+  });
+
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
     expect(function(){
@@ -144,5 +155,16 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getSkillIdFromUrl();
     }).toThrow();
+  });
+
+  it('should correctly retrieve story id from url in player', function() {
+    mockLocation.search = '?story_id=mnopqrstuvwx';
+    expect(
+      UrlService.getStoryIdInPlayer()
+    ).toBe('mnopqrstuvwx');
+    mockLocation.search = '?story=mnopqrstuvwx';
+    expect(
+      UrlService.getStoryIdInPlayer()
+    ).toBe(null);
   });
 });
