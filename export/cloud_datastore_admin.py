@@ -19,13 +19,16 @@ import httplib
 import json
 import logging
 
+from core.domain import acl_decorators
+
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
 import webapp2
 
 
-class Export(webapp2.RequestHandler):
+class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
 
+    @acl_decorators.can_perform_cron_tasks
     def get(self):
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
@@ -34,6 +37,10 @@ class Export(webapp2.RequestHandler):
 
         output_url_prefix = self.request.get('output_url_prefix')
         assert output_url_prefix and output_url_prefix.startswith('gs://')
+
+        # Look for slash in the portion of the bucket URL that comes
+        # after 'gs://'. If not present, then only a bucket name has been
+        # provided and we append a trailing slash.
         if '/' not in output_url_prefix[5:]:
              # Only a bucket name has been provided - no prefix or trailing
              # slash.
@@ -52,7 +59,7 @@ class Export(webapp2.RequestHandler):
         }
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + access_token
+            'Authorization': 'Bearer %s' % access_token
         }
         url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
         try:
@@ -76,5 +83,5 @@ class Export(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication(
     [
-        ('/cloud-datastore-export', Export),
+        ('/cloud_datastore_export', ExportToCloudDatastoreHandler),
     ], debug=True)
