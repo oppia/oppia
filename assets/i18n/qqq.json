@@ -502,6 +502,8 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Text on the Teach page outlining Oppia's Publication Policy.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Text on the tab for Participation Playbook on the Teach page.",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Text on the tab for Teach with Oppia on the Teach page.",
+	"I18N_TOPIC_VIEWER_PRACTICE": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows a list of the subtopics that lie within the topic.\n{{Identical|Practice}}",
+	"I18N_TOPIC_VIEWER_STORY": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows a list of the stories that lie within the topic.\n{{Identical|Story}}",
 	"I18N_TOPNAV_ABOUT": "Text displayed in the navigation bar. - When the user hovers over the button, a list with several information pages is displayed.\n{{Identical|About}}",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the about oppia page is loaded which contains a more general description of the site.",
 	"I18N_TOPNAV_ADMIN_PAGE": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the admin page is loaded.",
@@ -523,6 +525,7 @@
 	"I18N_TOPNAV_SIGN_IN": "Text displayed in the top right corner of the page. - When clicked, the user is redirected to the sign in page where he can access his account.\n{{Identical|Sign in}}",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Text displayed inside the Sign In dropdown. - When clicked, the user is signed in with Google Oauth - The text in the button needs to be less than 25 characters long",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
+	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Text displayed in the dropdown on the navbar for reaching the topics and skills dashboard.",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}",
 	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player."

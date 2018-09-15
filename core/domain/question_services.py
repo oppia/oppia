@@ -16,8 +16,8 @@
 
 import logging
 
-from core.domain import exp_domain
 from core.domain import question_domain
+from core.domain import state_domain
 from core.platform import models
 import feconf
 
@@ -149,7 +149,7 @@ def get_question_from_model(question_model):
     """
     return question_domain.Question(
         question_model.id,
-        exp_domain.State.from_dict(question_model.question_state_data),
+        state_domain.State.from_dict(question_model.question_state_data),
         question_model.question_state_schema_version,
         question_model.language_code, question_model.version,
         question_model.created_on, question_model.last_updated)
@@ -174,6 +174,47 @@ def get_question_by_id(question_id, strict=True):
         return question
     else:
         return None
+
+
+def get_question_skill_links_of_skill(skill_id):
+    """Returns a list of QuestionSkillLinkModels of
+    a particular skill ID.
+
+    Args:
+        skill_id: str. ID of the skill.
+
+    Returns:
+        list(QuestionSkillLinkModel). The list of question skill link
+        domain objects that are linked to the skill ID or an empty list
+         if the skill does not exist.
+    """
+
+    question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+            skill_id)
+    )
+    return question_skill_link_models
+
+
+def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
+    """Updates the skill ID of QuestionSkillLinkModels to the superseding
+    skill ID.
+
+    Args:
+        curr_skill_id: str. ID of the current skill.
+        new_skill_id: str. ID of the superseding skill.
+    """
+    old_question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
+    new_question_skill_links = []
+    for question_skill_link in old_question_skill_links:
+        new_question_skill_links.append(
+            question_models.QuestionSkillLinkModel.create(
+                question_skill_link.question_id, new_skill_id)
+            )
+    question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
+        old_question_skill_links)
+    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        new_question_skill_links)
 
 
 def get_question_summaries_linked_to_skills(

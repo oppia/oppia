@@ -20,29 +20,17 @@ import copy
 import datetime
 import os
 
+from constants import constants  # pylint: disable=relative-import
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform for the storage backend. This is used in the model-switching
-# code in core/platform.
-PLATFORM = 'gae'
-
-# This variable is for serving minified resources
-# when set to True. It reflects we are emulating running Oppia in a production
-# environment.
-FORCE_PROD_MODE = False
-
-# Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment,
-# or if you want to use minified resources in the development environment.
-
-if PLATFORM == 'gae':
-    DEV_MODE = (
-        (not os.environ.get('SERVER_SOFTWARE') or
-         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
-        not FORCE_PROD_MODE)
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+# When DEV_MODE is true check that we are running in development enviroment.
+# The SERVER_SOFTWARE enviroment variable does not exist in Travis thus we need
+# to check it.
+if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
+        not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+    raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -51,7 +39,7 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not DEV_MODE else '')
+    'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -66,7 +54,7 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not DEV_MODE:
+if not constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
@@ -295,6 +283,12 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    """Returns a copy of the empty ratings object.
+
+    Returns:
+        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
+            ratings.
+    """
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
@@ -656,9 +650,6 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GENERAL_SUGGESTION_ACTION_URL_PREFIX = '/generalsuggestionactionhandler'
-GENERAL_SUGGESTION_LIST_URL_PREFIX = '/generalsuggestionlisthandler'
-GENERAL_SUGGESTION_URL_PREFIX = '/generalsuggestionhandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -703,6 +694,8 @@ SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 SUBTOPIC_VIEWER_DATA_URL_PREFIX = '/subtopic_viewer_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/skill'
+TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
@@ -780,9 +773,6 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
-# Whether state id mapping model should be generated and stored when exploration
-# is created or updated.
-ENABLE_STATE_ID_MAPPING = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.

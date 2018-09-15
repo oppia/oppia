@@ -34,6 +34,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
@@ -276,6 +277,7 @@ class ExplorationHandler(EditorHandler):
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
+        self.render_json(self.values)
 
 
 class ExplorationRightsHandler(EditorHandler):
@@ -498,7 +500,8 @@ class StateYamlHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+            'yaml': state_domain.State.convert_state_dict_to_yaml(
+                state_dict, width),
         })
 
 
@@ -757,12 +760,12 @@ class ImageUploadHandler(EditorHandler):
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            fs_domain.ExplorationFileSystem if constants.DEV_MODE
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
         filepath = (
-            filename if feconf.DEV_MODE
+            filename if constants.DEV_MODE
             else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
 
         if fs.isfile(filepath):

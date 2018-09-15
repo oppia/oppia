@@ -71,17 +71,13 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
-        with self.swap(feconf, 'DEV_MODE', True):
+        with self.swap(constants, 'DEV_MODE', True):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'true\')',
-                          response.body)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
-        with self.swap(feconf, 'DEV_MODE', False):
+        with self.swap(constants, 'DEV_MODE', False):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'false\')',
-                          response.body)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 

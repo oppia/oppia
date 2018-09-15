@@ -167,3 +167,4 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
         question_services.delete_question(self.user_id, question_id)
+        self.render_json(self.values)

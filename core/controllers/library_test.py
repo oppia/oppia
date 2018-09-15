@@ -55,6 +55,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.assertEqual({
             'iframed': False,
             'is_admin': False,
+            'is_topic_manager': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],

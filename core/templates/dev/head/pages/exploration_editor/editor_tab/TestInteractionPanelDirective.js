@@ -22,7 +22,6 @@ oppia.directive('testInteractionPanel', [
       scope: {
         getStateName: '&stateName',
         getInputTemplate: '&inputTemplate',
-        onSubmitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
@@ -30,29 +29,22 @@ oppia.directive('testInteractionPanel', [
       controller: [
         '$scope', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'CurrentInteractionService',
         function($scope, ExplorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           var _stateName = $scope.getStateName();
           var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);
-          $scope.interactionAnswerIsValid = true;
-          $scope.submitAnswer = function(answer) {
-            $scope.onSubmitAnswer({
-              answer: answer
-            });
-          };
 
           $scope.onSubmitAnswerFromButton = function() {
-            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+            CurrentInteractionService.submitAnswer();
           };
 
-          $scope.setInteractionAnswerValidity = function(answerValidity) {
-            $scope.interactionAnswerIsValid = answerValidity;
-          };
+          $scope.isSubmitButtonDisabled = (
+            CurrentInteractionService.isSubmitButtonDisabled);
         }
       ]
     };

@@ -133,11 +133,10 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a story.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                    self.story_id))
-            self.assertEqual(response.status_int, 200)
+                    self.story_id), expected_status_int=200)
             self.logout()
 
             # Check that non-admins cannot delete a story.

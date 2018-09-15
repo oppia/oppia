@@ -14,6 +14,8 @@ branches:
   only:
   - master
   - develop
+  - /^release-\d+\.\d+\.\d+$/
+  - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
 
 env:
   matrix:
@@ -124,7 +126,10 @@ cache:
     - $HOME/.cache/TravisChrome/
     - backend_prod_files/templates/head/
     - build/templates/head/
+    - backend_prod_files/extensions/
+    - build/extensions/
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
   - find third_party -name "*.pyc" -print -delete
+  - find backend_prod_files/extensions/ -name "*.pyc" -print -delete
