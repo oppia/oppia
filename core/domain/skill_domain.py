@@ -72,7 +72,8 @@ class SkillChange(object):
     )
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'misconception_id'
+        'property_name', 'new_value', 'old_value', 'misconception_id',
+        'from_version', 'to_version'
     ]
 
     def __init__(self, change_dict):
@@ -124,6 +125,12 @@ class SkillChange(object):
             self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             return
+        elif self.cmd == CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
