@@ -60,11 +60,15 @@
        will break, as this container will not be scrollable when there are a lot
        of draggable items (see issue #5280). So, it has to be set as
        overflow:scroll with a definite max-height.
+
+       touch-action:manipulation is used for fixing the error (see issue #5607) 
+       while also maintaining vertical touch movements and zoom touch actions.
     */
     margin: auto;
     max-height: 400px;
     overflow: scroll;
     padding: 10px;
+    touch-action:manipulation;
   }
 </style>
 
