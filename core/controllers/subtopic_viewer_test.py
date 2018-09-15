@@ -20,17 +20,15 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
-class SubtopicPageViewerTest(test_utils.GenericTestBase):
-    """Manages the data that needs to be displayed to learner on the
-    subtopic viewer page.
-    """
+
+class BaseSubtopicPageTest(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SubtopicPageViewerTest, self).setUp();
+        super(BaseSubtopicPageTest, self).setUp()
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-            'title': 'Title',
+            'title': 'Subtopic Title',
             'subtopic_id': 1
         })]
 
@@ -56,25 +54,54 @@ class SubtopicPageViewerTest(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id_public, changelist, 'Added a subtopic')
         topic_services.update_topic_and_subtopic_pages(
-            self.admin_id, self.topic_id_private, changelist, 'Added a subtopic')
+            self.admin_id,
+            self.topic_id_private,
+            changelist,
+            'Added a subtopic')
 
         topic_services.publish_topic(self.topic_id_public, self.admin_id)
 
-    def test_subtopic_page_in_published_topic_is_viewable_to_guests(self):
-        response = self.testapp.get(
-            '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, self.topic_id_public, 1))
-        self.assertEqual(response.status_int, 200)
 
-    def test_subtopic_page_in_published_topic_is_viewable_to_logged_in_users(self):
+class SubtopicPageViewerTest(BaseSubtopicPageTest):
+    def test_subtopic_page_in_published_topic_is_viewable_to_guests(self):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX,
+                    self.topic_id_public,
+                    1))
+            self.assertEqual(response.status_int, 200)
+
+    def test_subtopic_page_in_published_topic_is_viewable_to_logged_in_users(
+            self):
         self.login(self.NEW_USER_EMAIL)
-        response = self.testapp.get(
-            '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, self.topic_id_public, 1))
-        self.assertEqual(response.status_int, 200)
-        self.logout()
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX,
+                    self.topic_id_public, 1))
+            self.assertEqual(response.status_int, 200)
+            self.logout()
 
     def test_subtopic_page_in_unpublished_topic_is_not_viewable(self):
-        response = self.testapp.get(
-            '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, self.topic_id_private, 1), expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX,
+                    self.topic_id_private, 1),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 404)
 
-class SubtopicPageDataHandlerTest(test_utils.GenericTestBase):
+
+class SubtopicPageDataHandlerTest(BaseSubtopicPageTest):
+    def test_get(self):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_DATA_URL_PREFIX,
+                    self.topic_id_public,
+                    1))
+            self.assertEqual(response['subtopic_title'], 'Subtopic Title')
+            self.assertEqual(response['topic_name'], 'public_topic_name')
+            self.assertEqual(response['language_code'], 'en')
+            self.assertEqual(response['subtopic_html_data'], '')
