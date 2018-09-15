@@ -20,6 +20,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
+from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
@@ -157,7 +158,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             self.user_id, thread_id, message_ids)
 
         message_summary_list = []
-        suggestion = feedback_services.get_suggestion(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:

@@ -23,6 +23,8 @@ oppia.controller('Fractions', [
       siteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
+    $scope.getStaticVideoUrl = UrlInterpolationService.getStaticVideoUrl;
+
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
         subjectName + '.svg');
@@ -39,6 +41,12 @@ oppia.controller('Fractions', [
     $scope.onClickLearnMoreButton = function() {
       $timeout(function() {
         $window.location = '/splash';
+      }, 150);
+    };
+
+    $scope.onClickExploreLessonsButton = function() {
+      $timeout(function() {
+        $window.location = '/library';
       }, 150);
     };
   }

@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
 from core import jobs
 from core.domain import feedback_domain
 from core.platform import models
@@ -201,10 +200,7 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            return [feedback_models.GeneralFeedbackThreadModel]
-        else:
-            return [feedback_models.FeedbackThreadModel]
+        return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
     def map(item):

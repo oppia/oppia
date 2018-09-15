@@ -16,7 +16,7 @@
 
 """Provides app identity services."""
 
-import feconf
+from constants import constants
 
 from google.appengine.api import app_identity
 
@@ -43,7 +43,7 @@ def get_gcs_resource_bucket_name():
         str or None. The bucket name for the application's GCS resources, in
         production mode.
     """
-    if feconf.DEV_MODE:
+    if constants.DEV_MODE:
         return None
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
