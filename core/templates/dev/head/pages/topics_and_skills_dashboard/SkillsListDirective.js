@@ -47,6 +47,15 @@ oppia.directive('skillsList', [
             'description', 'worked_examples_count', 'misconception_count'
           ];
 
+          $scope.highlightedIndex = null;
+          $scope.highlightColumns = function(index) {
+            $scope.highlightedIndex = index;
+          };
+
+          $scope.unhighlightColumns = function() {
+            $scope.highlightedIndex = null;
+          };
+
           $scope.getSkillEditorUrl = function(skillId) {
             if ($scope.isInModal()) {
               return '#';

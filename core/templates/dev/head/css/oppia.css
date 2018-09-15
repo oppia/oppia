@@ -3808,6 +3808,7 @@ span.oppia-issues-learner-action {
 .oppia-issues-playthrough-modal-btn {
   background: transparent;
   border-radius: 0;
+  border: none;
 }
 
 /* Values below were experimentally generated using 'http://csshexagon.com' */
