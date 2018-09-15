@@ -101,9 +101,10 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-
-($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG)&
-
+if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
+    ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
+fi
+(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
