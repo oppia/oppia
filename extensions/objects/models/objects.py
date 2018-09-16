@@ -76,7 +76,7 @@ class Boolean(BaseObject):
                 normalizing if necessary.
 
         Returns:
-            *. The normalized object.
+            bool. The normalized object (or False if the input is None or '').
         """
         if raw is None or raw == '':
             raw = False
@@ -181,7 +181,7 @@ class CodeString(BaseObject):
                 normalizing if necessary.
 
         Returns:
-            *. The normalized object.
+            unicode. The normalized object containing string in unicode format.
         """
         if '\t' in raw:
             raise TypeError(
@@ -595,10 +595,10 @@ class Graph(BaseObject):
                 normalizing if necessary.
 
         Returns:
-            *. The normalized object.
+            *. The normalized object containing the Graph schema.
 
         Raises:
-            TypeError: *. Cannot convert to the Graph schema.
+            TypeError. Cannot convert to the Graph schema.
         """
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
@@ -682,7 +682,8 @@ class NormalizedRectangle2D(BaseObject):
                 necessary.
 
         Returns:
-            *. The normalized object.
+            list(list(float)). The normalized object containing list of lists of
+                float values as coordinates of the rectangle.
 
         Raises:
             TypeError: Cannot convert to the NormalizedRectangle2D schema.
