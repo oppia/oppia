@@ -1500,6 +1500,103 @@ def _check_html_tags_and_attributes(all_files, debug=False):
     return summary_messages
 
 
+def _check_for_unused_dependencies(all_files):
+    """This function is used to check whether there is any unused imports."""
+    print 'Starting unused dependencies check'
+    print '----------------------------------------'
+    print ''
+    print '----------------------------------------'
+    failed = False
+    summary_messages = []
+
+    def get_content_between_brackets(
+            content, bracket_start_index, start_bracket, end_bracket):
+        bracket_content = ''
+        bracket_count = 1
+        for i in content[bracket_start_index:]:
+            if i == start_bracket:
+                bracket_count = bracket_count + 1
+            elif i == end_bracket:
+                bracket_count = bracket_count - 1
+            if bracket_count == 0:
+                break
+            bracket_content = bracket_content + i
+        return bracket_content
+
+    js_files = []
+    for filename in all_files:
+        if filename.endswith(".js"):
+            js_files.append(filename)
+
+    patterns = [r'oppia\.controller\(\'.*?\', \[',
+                r'oppia\.directive\(\'.*?\', \[',
+                r'oppia\.factory\(\'.*?\', \[',
+                r'controller: \[', r'oppia\.config\(\[',
+                r'oppia\.run\(\[']
+    compiled_patterns = []
+    for pattern in patterns:
+        compiled_patterns.append(re.compile(pattern,
+                                            flags=re.MULTILINE | re.DOTALL))
+    compiled_pattern_for_imports = re.compile(r'(.*?)function',
+                                              flags=re.MULTILINE | re.DOTALL)
+    compiled_pattern_for_function_content = re.compile(
+        r'function\(.*?\).*?\{', flags=re.MULTILINE | re.DOTALL)
+    for filename in js_files:
+        with open(filename) as f:
+            content = f.read()
+        unused_imports = []
+        for pattern in compiled_patterns:
+            match_obj_iterator = pattern.finditer(content)
+            for match_obj in match_obj_iterator:
+                bracket_start_index = match_obj.end()
+                bracket_content = (get_content_between_brackets(
+                    content, bracket_start_index, '[', ']'))
+                imports_match_obj = (
+                    compiled_pattern_for_imports.search(bracket_content))
+                if imports_match_obj is not None:
+                    imports_string = imports_match_obj.groups()[0]
+                    imports_string_array = imports_string.split(",")
+                    imports = []
+                    for import_string in imports_string_array:
+                        imports.append(import_string.replace('\'', '').strip())
+                    function_match_obj = (
+                        compiled_pattern_for_function_content.search(
+                            bracket_content)
+                        )
+                    if function_match_obj is not None:
+                        function_bracket_start_index = function_match_obj.end()
+                        function_content = (
+                            get_content_between_brackets(
+                                bracket_content, function_bracket_start_index,
+                                '{', '}')
+                            )
+                        for import_string in imports:
+                            if function_content.find(import_string) == -1:
+                                unused_imports.append(import_string)
+
+        if len(unused_imports) > 0:
+            failed = True
+            print (('" %s " : These files are imported' +
+                    ' but not used anywhere in this file : %s \n')
+                   % (", ".join(unused_imports), filename))
+
+    if failed:
+        summary_message = ('%s Unused dependencies check failed' %
+                           (_MESSAGE_TYPE_FAILED))
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = ('%s Unused dependencies check passed' %
+                           (_MESSAGE_TYPE_SUCCESS))
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    return summary_messages
+
+
 def _check_for_copyright_notice(all_files):
     """This function checks whether the copyright notice
     is present at the beginning of files.
@@ -1573,6 +1670,7 @@ def main():
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
+    unused_dependies_messages = _check_for_unused_dependencies(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
@@ -1580,7 +1678,7 @@ def main():
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        linter_messages + pattern_messages +
+        unused_dependies_messages + linter_messages + pattern_messages +
         copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
