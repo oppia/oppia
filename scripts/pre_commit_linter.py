@@ -204,10 +204,11 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'# pylint: disable=[A-Z][0-9]{4}',
-        'message': "Please remove pylint exculsion if it is unnecessary or "
-                   "make it human readable with a sentence instead of an id. "
-                   "The id to message list can be seen "
-                   "here->http://pylint-messages.wikidot.com/all-codes",
+        'message': "Please remove this pylint pragma if it is unnecessary or "
+                   "make it more readable by using the message name instead "
+                   "of the message code. "
+                   "The message code-to-name list can be found at "
+                   "http://pylint-messages.wikidot.com/all-codes",
         'excluded_files': (),
         'excluded_dirs': ()
     },
