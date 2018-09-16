@@ -148,20 +148,20 @@
 
 <style>
   .oppia-state-translation-page {
-    height: 500px;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
     padding: 0px;
     width: 80%;
   }
   .oppia-translation-tabs {
-    display: -webkit-flex;
     display: flex;
-    height: 10%;
+    height: 50px;
     margin-bottom: 0;
     padding-left: 0px;
     text-align: center;
   }
   .oppia-translation-tabs li {
-    display: -webkit-flex;
     display: flex;
     margin-bottom: 5px;
     width: -webkit-calc(100% / 4);
@@ -196,13 +196,13 @@
   }
   .translation-state-contents {
     border-bottom: 2px solid #eee;
-    display: block;
-    height: 80%;
-    margin: auto;
-    overflow: auto;
-    }
+    min-height: 400px;
+  }
   .translation-state-content {
     margin: auto;
     padding: 20px 30px 20px 30px;
+  }
+  .oppia-audio-translation-bar {
+    height: 50px;
   }
 </style>

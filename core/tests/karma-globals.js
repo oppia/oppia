@@ -91,6 +91,7 @@ var hashes = {
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',
+  '/videos/hash_test.mp4': '12345cxz',
   '/interactions/interTest/static/interTest.png': '123654789'
 };
 

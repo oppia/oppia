@@ -21,7 +21,7 @@
       <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
                  ng-click="onSubmitFromSubmitButton()"
                  ng-if="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
-                 ng-disabled="!answerIsValid">
+                 ng-disabled="isSubmitButtonDisabled()">
         Submit
       </md-button>
       <br>
@@ -40,7 +40,7 @@
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
-          ng-disabled="data.correctAnswer === null || !data.explanationHtml || !answerIsValid">
+          ng-disabled="data.correctAnswer === null || !data.explanationHtml || isSubmitButtonDisabled()">
     Check and Save Solution
   </button>
 </div>

@@ -22,7 +22,6 @@ oppia.directive('topicsList', [
       scope: {
         getTopicSummaries: '&topicSummaries',
         canDeleteTopic: '&userCanDeleteTopic',
-        isInModal: '&inModal',
         selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -40,9 +39,6 @@ oppia.directive('topicsList', [
             'canonical_story_count', 'topic_status'
           ];
           $scope.getTopicEditorUrl = function(topicId) {
-            if ($scope.isInModal()) {
-              return;
-            }
             return '/topic_editor/' + topicId;
           };
 

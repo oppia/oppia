@@ -24,20 +24,16 @@ oppia.directive('oppiaInteractiveSetInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$translate', 'setInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'CurrentInteractionService',
         function(
             $scope, $attrs, $translate, setInputRulesService,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, CurrentInteractionService) {
           $scope.schema = {
             type: 'list',
             items: {
@@ -76,10 +72,8 @@ oppia.directive('oppiaInteractiveSetInput', [
                 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
             } else {
               $scope.errorMessage = '';
-              $scope.onSubmit({
-                answer: answer,
-                rulesService: setInputRulesService
-              });
+              CurrentInteractionService.onSubmit(
+                answer, setInputRulesService);
             }
           };
 
@@ -88,19 +82,12 @@ oppia.directive('oppiaInteractiveSetInput', [
               !hasBlankOption($scope.answer));
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+          var submitAnswerFn = function() {
             $scope.submitAnswer($scope.answer);
-          });
+          };
 
-          // Third parameter is set to true to enable deep watching.
-          // https://stackoverflow.com/questions/14712089/
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid()
-            });
-          }, true);
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, $scope.isAnswerValid);
         }
       ]
     };

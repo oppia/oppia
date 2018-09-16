@@ -118,9 +118,8 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
             self.login(self.TOPIC_MANAGER_EMAIL)
             response = self.testapp.get(
                 '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
+            self.assertEqual(response.status_int, 200)
             self.logout()
 
             topic_services.assign_role(
@@ -384,10 +383,10 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a topic.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expected_status_int=200)
             self.logout()
 
             # Check that non-admins cannot delete a topic.
