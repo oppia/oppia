@@ -193,6 +193,15 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
         'excluded_dirs': ('scripts/',)
+    },
+    {
+        'regexp': r'# pylint: disable=[A-Z][0-9]{4}',
+        'message': "Please remove pylint exculsion if it is unnecessary or "
+                   "make it human readable with a sentence instead of an id. "
+                   "The id to message list can be seen "
+                   "here->http://pylint-messages.wikidot.com/all-codes",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -1049,54 +1058,6 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _check_pylint_disable_message(all_files):
-    """This function ensures that pylint-disable constructs are
-    message sentences instead of id.
-    """
-    print 'Starting pylint disable message checks'
-    print '----------------------------------------'
-    summary_messages = []
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
-    message = (
-        'Please remove pylint exculsion if it is unnecessary or '
-        'make it human readable with a sentence instead of an id.'
-        'The id to message list can be seen '
-        'here->http://pylint-messages.wikidot.com/all-codes')
-    failed = False
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                disable_id_message = r'# pylint: disable=[A-Z][0-9]{4}'
-                # Check that the construct is a message sentence instead of id.
-                if re.match(disable_id_message, line):
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num + 1, message)
-
-
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Pylint disable message check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Pylint disable message check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-
-    return summary_messages
-
-
 def _check_html_directive_name(all_files):
     """This function checks that all HTML directives end
     with _directive.html.
@@ -1602,7 +1563,6 @@ def main():
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
-    pylint_disable_messages = _check_pylint_disable_message(all_files)
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
@@ -1612,9 +1572,8 @@ def main():
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
-        pylint_disable_messages + html_tag_and_attribute_messages +
-        html_linter_messages + linter_messages + pattern_messages +
-        copyright_notice_messages)
+        html_tag_and_attribute_messages + html_linter_messages +
+        linter_messages + pattern_messages + copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
