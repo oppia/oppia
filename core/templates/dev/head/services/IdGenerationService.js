@@ -19,7 +19,7 @@
 oppia.factory('IdGenerationService', [function() {
   return {
     generateNewId: function() {
-      return Math.random().toString(36).slice(2);
+      return Math.random().toString(36).slice(2).substring(0, 10);
     }
   };
 }]);
