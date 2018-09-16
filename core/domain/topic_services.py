@@ -427,6 +427,14 @@ def apply_change_list(topic_id, change_list):
                     topic.update_subtopic_title(change.id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
+            elif (
+                    change.cmd ==
+                    topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
+                # Loading the topic model from the datastore into a
+                # Topic domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # topic is sufficient to apply the schema migration.
+                continue
             else:
                 raise Exception('Invalid change dict.')
         return (
