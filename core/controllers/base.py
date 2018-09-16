@@ -192,10 +192,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.values['additional_angular_modules'] = []
         self.values['iframed'] = False
-        self.values['is_moderator'] = user_services.is_at_least_moderator(
-            self.user_id)
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
-        self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
