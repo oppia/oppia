@@ -55,8 +55,13 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
 
+    Args:
+        obj: *. The object to validate and normalize.
+        schema: str. The schema to validate and normalize the value against.
+        apply_custom_validators: bool. Validate the normalized object.
+
     Returns:
-        the normalized object.
+        *. Returns the normalized object.
 
     Raises:
         AssertionError: if the object fails to validate against the schema.
@@ -169,6 +174,17 @@ class Normalizers(object):
 
     @classmethod
     def get(cls, normalizer_id):
+        """Gets the value of the normalizer_id of the object.
+
+        Args:
+            normalizer_id: str. String that contains the attribute's name.
+
+        Returns:
+            *. Returns the value of the name attribute of an object.
+
+        Raises:
+            Exception: 'normalizer_id' is not valid.
+        """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
@@ -178,11 +194,11 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-          obj: a string.
+            obj: str. String to collapse.
 
         Returns:
-          a string that is the same as `obj`, except that each block of
-          whitespace is collapsed into a single space character.
+            str. A string that is the same as `obj`, except that each block of
+                whitespace is collapsed into a single space character.
         """
         return ' '.join(obj.split())
 
@@ -191,11 +207,14 @@ class Normalizers(object):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-          obj: a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
-          An empty string if the URL does not start with http:// or https://.
-          Otherwise, returns the original URL.
+            str. An empty string if the URL does not start with http:// or
+                https://. Otherwise, returns the original URL.
+
+        Raises:
+            AssertionError: if the URL is invalid.
         """
         url_components = urlparse.urlsplit(obj)
         quoted_url_components = (
@@ -221,6 +240,17 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
+        """Gets the value of the validator_id of the object.
+
+        Args:
+            validator_id: str. That contains the attribute's name.
+
+        Returns:
+            *. Returns the value of the name attribute of an object.
+
+        Raises:
+            Exception: 'validator_id' is not valid.
+        """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
@@ -229,6 +259,14 @@ class _Validators(object):
     def has_length_at_least(obj, min_value):
         """Returns True iff the given object (a list) has at least
         `min_value` elements.
+
+        Args:
+            obj: *. Object to evaluate.
+            min_value: int. Minimum value of elements.
+
+        Returns:
+            bool. True if the number of elements is greater than or equal
+                to min_value.
         """
         return len(obj) >= min_value
 
@@ -236,40 +274,104 @@ class _Validators(object):
     def has_length_at_most(obj, max_value):
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
+
+        Args:
+            obj: *. Object to evaluate.
+            max_value: int. Maximum value of elements.
+
+        Returns:
+            bool. True if the number of elements is less than or equal
+                to min_value.
         """
         return len(obj) <= max_value
 
     @staticmethod
     def is_nonempty(obj):
-        """Returns True iff the given object (a string) is nonempty."""
+        """Returns True iff the given object (a string) is nonempty.
+
+        Args:
+            obj: str. String to evaluate.
+
+        Returns:
+            bool. True if the object is not empty.
+        """
         return bool(obj)
 
     @staticmethod
     def is_uniquified(obj):
-        """Returns True iff the given object (a list) has no duplicates."""
+        """Returns True iff the given object (a list) has no duplicates.
+
+        Args:
+            obj: list. List to evaluate.
+
+        Returns:
+            bool. True if the object has no duplicates.
+        """
         return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
     def is_at_least(obj, min_value):
-        """Ensures that `obj` (an int/float) is at least `min_value`."""
+        """Ensures that `obj` (an int/float) is at least `min_value`.
+
+        Args:
+            obj: int or float. Object to evaluate.
+            min_value: int. Value to compare.
+
+        Returns:
+            bool. True if the object is greater than or equal to min_value.
+        """
         return obj >= min_value
 
     @staticmethod
     def is_at_most(obj, max_value):
-        """Ensures that `obj` (an int/float) is at most `max_value`."""
+        """Ensures that `obj` (an int/float) is at most `max_value`.
+
+        Args:
+            obj: int or float. Object to evaluate.
+            max_value: int. Value to compare.
+
+        Returns:
+            bool. True if the object is less than or equal to max_value.
+        """
         return obj <= max_value
 
     @staticmethod
     def is_regex(obj):
-        """Ensures that `obj` (a string) defines a valid regex."""
-        raise NotImplementedError
+        """Ensures that `obj` (a string) defines a valid regex.
+
+        Args:
+            obj: str. String to evaluate.
+
+        Returns:
+            bool. True if the regular expression is valid.
+
+        """
+        return bool(re.compile(obj))
+
 
     @staticmethod
     def matches_regex(obj, regex):
-        """Ensures that `obj` (a string) matches the given regex."""
-        raise NotImplementedError
+        """Ensures that `obj` (a string) matches the given regex.
+
+        Args:
+            obj: str. String to evaluate.
+            regex: str. Regular expresion.
+
+        Returns:
+            bool. True if the regular expression is valid for the obj.
+
+        """
+        return bool(re.compile(obj).match(regex))
 
     @staticmethod
     def is_valid_email(obj):
-        """Ensures that `obj` (a string) is a valid email."""
+        """Ensures that `obj` (a string) is a valid email.
+
+        Args:
+            obj: str. String to evaluate.
+
+        Returns:
+            bool. True if the email is valid.
+        """
         return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
+        
