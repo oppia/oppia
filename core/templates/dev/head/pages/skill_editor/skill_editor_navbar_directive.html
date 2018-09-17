@@ -1,6 +1,48 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!isLoadingSkill()">
-  <li style="margin-right: 10px; margin-top: 8px;">
-    <button type="button" ng-if="skillRights.isPrivate()"
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-if="!isLoadingSkill()">
+  <li style="margin-right: 5px; margin-top: 8px;">
+    <div uib-dropdown>
+      <button class="btn btn-default oppia-save-draft-button"
+              ng-class="{'btn-success': isSkillSaveable(), 'save-draft-button-padding': getChangeListCount()}"
+              ng-click="saveChanges()"
+              style="float: left;"
+              ng-disabled="!isSkillSaveable()">
+        <span ng-if="!isSaveInProgress()">
+          <span ng-if="skillRights.isPrivate()">
+            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
+              &#xE161;
+            </i>
+            <span class="oppia-save-publish-button-label">Save Draft</span>
+            <span class="hidden-sm hidden-xs" style="opacity:0.5"
+                  ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+            </span>
+          </span>
+          <span ng-if="skillRights.isPublic()" title="Publish Changes">
+            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+               alt="Publish Changes">
+              &#xE2C3;
+            </i>
+            <span class="oppia-save-publish-button-label">Publish Changes</span>
+          </span>
+        </span>
+
+        <span ng-if="isSaveInProgress()">
+          <span ng-if="skillRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+          <span ng-if="skillRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
+          <loading-dots></loading-dots>
+        </span>
+      </button>
+      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle"
+              ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
+        <span class="caret"></span>
+      </button>
+      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() && skillRights.isPublic() ? '150px' : '120px' }">
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}">Discard Draft</a></li>
+      </ul>
+    </div>
+  </li>
+  <li ng-if="skillRights.isPrivate()" style="margin-right: 10px; margin-top: 8px;">
+    <button type="button"
             class="btn btn-default oppia-editor-publish-button protractor-test-editor-publish-button"
             ng-class="{'btn-success': isSkillPublishable()}"
             ng-click="publishSkill()"
@@ -10,37 +52,6 @@
         &#xE2C3;
       </i>
       <span class="oppia-save-publish-button-label">Publish</span>
-    </button>
-
-    <button class="btn btn-default oppia-save-draft-button protractor-test-save-draft-button"
-            ng-class="{'btn-success': isSkillSaveable()}"
-            ng-click="saveChanges()"
-            ng-disabled="!isSkillSaveable()">
-      <span ng-if="!isSaveInProgress()">
-        <span ng-if="skillRights.isPrivate()">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
-            &#xE161;
-          </i>
-          <span class="oppia-save-publish-button-label">Save Draft</span>
-          <span class="hidden-sm hidden-xs" style="opacity:0.5"
-                ng-if="getChangeListCount() > 0">
-            (<[getChangeListCount()]>)
-          </span>
-        </span>
-        <span ng-if="skillRights.isPublic()" title="Publish Changes">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-             alt="Publish Changes">
-            &#xE2C3;
-          </i>
-          <span class="oppia-save-publish-button-label">Publish Changes</span>
-        </span>
-      </span>
-
-      <span ng-if="isSaveInProgress()">
-        <span ng-if="skillRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
-        <span ng-if="skillRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
-        <loading-dots></loading-dots>
-      </span>
     </button>
   </li>
   <li style="width: 40px; margin-right: 20px;" class="active" ng-class="{'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
@@ -63,3 +74,8 @@
     </ul>
   </li>
 </ul>
+<style>
+  skill-editor-navbar .save-draft-button-padding {
+    padding-right: 120px;
+  }
+</style>
