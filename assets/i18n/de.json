@@ -525,6 +525,7 @@
 	"I18N_TOPNAV_SIGN_IN": "Anmelden",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Mit Google anmelden",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Mit Oppia unterrichten",
+	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Verwaltungsseite für Themen und Fähigkeiten",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du hast insgesamt <[totalSubscribers]> Abonnenten.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abmelden",
 	"I18N_WORKED_EXAMPLE": "Gelungenes Beispiel"
