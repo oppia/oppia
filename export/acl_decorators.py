@@ -15,7 +15,8 @@
 # limitations under the License.
 
 """Decorators to provide authorization for the cloud datastore admin
-service."""
+service.
+"""
 
 
 def can_perform_cron_tasks(handler):
