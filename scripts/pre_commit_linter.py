@@ -203,12 +203,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': r'# pylint: disable=[A-Z][0-9]{4}',
-        'message': "Please remove this pylint pragma if it is unnecessary or "
-                   "make it more readable by using the message name instead "
-                   "of the message code. "
-                   "The message code-to-name list can be found at "
-                   "http://pylint-messages.wikidot.com/all-codes",
+        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'message': 'Please remove this pylint pragma if it is unnecessary or '
+                   'make it more readable by using the message name instead '
+                   'of the message code. '
+                   'The message code-to-name list can be found at '
+                   'http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
     },
