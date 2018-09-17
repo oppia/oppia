@@ -24,8 +24,8 @@ describe('IdGenerationService', function() {
     IdGenerationService = $injector.get('IdGenerationService');
   }));
 
-  it('should generate a random id', function() {
-    expect(IdGenerationService.generateNewId()).toMatch(/[a-z 0-9]{10}/);
+  it('should generate a random id of fixed length', function() {
+    expect(IdGenerationService.generateNewId()).toMatch(/^[a-z 0-9]{10}$/);
   });
 
   it('should generate two different ids', function() {
