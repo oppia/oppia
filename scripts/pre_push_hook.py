@@ -59,11 +59,8 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
 class ChangedBranch(object):
-     """class for changing branch in which modified file is present.
-    
-    Attributes:
-      enter: for entering in the desired branch.
-      exit:  for coming out of current branch.
+     """Class for changing branch in which modified file is present by passing new branch name.
+     Not change branch when you are in a dirty state. 
     """
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
