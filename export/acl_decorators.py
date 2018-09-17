@@ -17,6 +17,7 @@
 """Decorators to provide authorization for the cloud datastore admin
 service."""
 
+
 def can_perform_cron_tasks(handler):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
