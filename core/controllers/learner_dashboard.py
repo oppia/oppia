@@ -26,7 +26,7 @@ import feconf
 import utils
 
 
-class LearnerDashboardPageHandler(base.BaseHandler):
+class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 
     @acl_decorators.can_access_learner_dashboard

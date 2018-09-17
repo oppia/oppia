@@ -26,7 +26,7 @@ import utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class CollectionPageHandler(base.BaseHandler):
+class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
     @acl_decorators.can_play_collection

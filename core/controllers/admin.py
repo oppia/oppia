@@ -41,7 +41,7 @@ import jinja2
 current_user_services = models.Registry.import_current_user_services()
 
 
-class AdminPageHandler(base.BaseHandler):
+class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @acl_decorators.can_access_admin_page
     def get(self):

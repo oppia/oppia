@@ -194,7 +194,7 @@ class ExplorationPageEmbedHandler(base.BaseHandler):
             iframe_restriction=None)
 
 
-class ExplorationPageHandler(base.BaseHandler):
+class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
     @acl_decorators.can_play_exploration

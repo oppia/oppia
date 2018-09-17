@@ -526,7 +526,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
 
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
-            if (handler.__name__ == 'LogoutPageHandler' or
+            if (handler.__name__ == 'LogoutPage' or
                     handler.__name__ == 'Error404Handler'):
                 continue
 

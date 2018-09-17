@@ -48,7 +48,7 @@ def _require_valid_version(version_from_payload, skill_version):
             % (skill_version, version_from_payload))
 
 
-class SkillEditorPageHandler(base.BaseHandler):
+class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
     @acl_decorators.can_edit_skill

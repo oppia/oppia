@@ -1051,7 +1051,7 @@ def _check_docstrings(all_files):
 
 def _check_controller_class_names(all_files):
     """This function checks that all controller class names end with
-    'Handler'.
+    either 'Handler' or 'Page'.
     """
     print 'Starting controller class names check...'
     print '----------------------------------------'
@@ -1062,7 +1062,9 @@ def _check_controller_class_names(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py') and not filename.endswith('_test.py')
         and fnmatch.fnmatch(filename, controllers_path)]
-    message = 'Please ensure that the name of this class ends with \'Handler\'.'
+    message = (
+        'Please ensure that the name of this class ends with \'Handler\' '
+        'or \'Page\'.')
     failed = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
@@ -1071,11 +1073,13 @@ def _check_controller_class_names(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 if line.startswith('class '):
-                    # Check that the name of the class ends with 'Handler'.
+                    # Check that the name of the class ends with 'Handler'
+                    # or 'Page'.
                     class_name = line.split(' ')[1].split('(')[0]
                     super_class_name = line.split('(')[1][:-2]
                     if (super_class_name.endswith('Handler') and
-                            not class_name.endswith('Handler')):
+                            not class_name.endswith('Handler')
+                            and not class_name.endswith('Page')):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)

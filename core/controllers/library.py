@@ -67,7 +67,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
     return activity_list, new_search_cursor
 
 
-class LibraryPageHandler(base.BaseHandler):
+class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
     """
@@ -151,7 +151,7 @@ class LibraryIndexHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LibraryGroupPageHandler(base.BaseHandler):
+class LibraryGroupPage(base.BaseHandler):
     """The page for displaying top rated and recently published
     explorations.
     """
@@ -255,7 +255,7 @@ class SearchHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LibraryRedirectPageHandler(base.BaseHandler):
+class LibraryRedirectPage(base.BaseHandler):
     """An old 'gallery' page that should redirect to the library index page."""
 
     @acl_decorators.open_access

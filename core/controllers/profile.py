@@ -24,7 +24,7 @@ import feconf
 import utils
 
 
-class ProfilePageHandler(base.BaseHandler):
+class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
     @acl_decorators.open_access
@@ -94,7 +94,7 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class PreferencesPageHandler(base.BaseHandler):
+class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
     @acl_decorators.can_manage_own_profile
@@ -240,7 +240,7 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SignupPageHandler(base.BaseHandler):
+class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False

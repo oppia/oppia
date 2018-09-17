@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 
 
-class FractionLandingPageHandler(base.BaseHandler):
+class FractionLandingPage(base.BaseHandler):
     """Page showing the landing page for fractions. It will randomly select a
     version out of the four versions of fractions landing page and display it.
     """

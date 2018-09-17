@@ -122,7 +122,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicEditorPageHandler(base.BaseHandler):
+class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
