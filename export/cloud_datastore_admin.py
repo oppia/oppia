@@ -12,14 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Request handler for exporting backups."""
+"""Request handler for exporting backups.
+
+Please see original reference here:
+
+https://cloud.google.com/datastore/docs/schedule-export
+
+"""
 
 import datetime
 import httplib
 import json
 import logging
 
-from core.domain import acl_decorators
+import oppia.export.acl_decorators as acl_decorators
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
