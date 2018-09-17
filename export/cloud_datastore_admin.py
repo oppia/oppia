@@ -36,18 +36,21 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
+        GCS_BUCKET_URL_PREFIX = 'gs://'
+
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         app_id = app_identity.get_application_id()
         timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
         output_url_prefix = self.request.get('output_url_prefix')
-        assert output_url_prefix and output_url_prefix.startswith('gs://')
+        assert output_url_prefix and output_url_prefix.startswith(
+            GCS_BUCKET_URL_PREFIX)
 
         # Look for slash in the portion of the bucket URL that comes
         # after 'gs://'. If not present, then only a bucket name has been
         # provided and we append a trailing slash.
-        if '/' not in output_url_prefix[5:]:
+        if '/' not in output_url_prefix[len(GCS_BUCKET_URL_PREFIX):]:
              # Only a bucket name has been provided - no prefix or trailing
              # slash.
             output_url_prefix += '/' + timestamp
