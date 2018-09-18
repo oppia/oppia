@@ -158,7 +158,7 @@ describe('Responses Service', function() {
     it('should run the callback on interaction', function() {
       var callbackSpy = {
         callback: function() {
-          console.log('callback')
+          return;
         }
       };
       spyOn(callbackSpy, 'callback');
@@ -168,9 +168,9 @@ describe('Responses Service', function() {
     });
 
     it('should set new value for answer groups cache service on interaction',
-      function() {
-        rs.onInteractionIdChanged('GraphInput');
-        expect(cache.contains('GraphInput')).toEqual(true);
+    function() {
+      rs.onInteractionIdChanged('GraphInput');
+      expect(cache.contains('GraphInput')).toEqual(true);
     });
 
     it('should return -1 if no answer group is active', function() {
