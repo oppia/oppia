@@ -127,6 +127,8 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.saveHint = function() {
                     var contentId = GenerateContentIdService.getNextId(
+                      StateContentIdsToAudioTranslationsService
+                        .displayed.getAllContentId(),
                       COMPONENT_NAME_HINT);
                     // Close the modal and save it afterwards.
                     $uibModalInstance.close({

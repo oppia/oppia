@@ -48,8 +48,20 @@ describe('Skill object factory', function() {
       };
 
       skillContentsDict = {
-        explanation: 'test explanation',
-        worked_examples: ['test worked_example 1', 'test worked example 2']
+        explanation: {
+          html: 'test explanation',
+          content_id: 'explanation',
+        },
+        worked_examples: [
+          {
+            html: 'test worked example 1',
+            content_id: 'worked_example_1',
+          },
+          {
+            html: 'test worked example 2',
+            content_id: 'worked_example_2'
+          }
+        ]
       };
 
       skillDict = {
