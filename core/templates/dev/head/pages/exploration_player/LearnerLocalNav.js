@@ -95,7 +95,7 @@ oppia.controller('LearnerLocalNav', [
             }
           }
         };
-        url = '/generalsuggestionhandler/';
+        url = '/suggestionhandler/';
 
         $http.post(url, data).error(function(res) {
           AlertsService.addWarning(res);

@@ -57,6 +57,9 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            $scope.profilePictureDataUrl = dataUrl;
+          });
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.ACTION_OPEN = 'open';
           $scope.ACTION_CLOSE = 'close';

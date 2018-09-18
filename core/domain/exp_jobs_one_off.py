@@ -916,7 +916,7 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(exp_id))
@@ -961,7 +961,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(exp_id))

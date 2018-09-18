@@ -26,11 +26,13 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
         'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'EVENT_TYPE_SKILL_CREATION_ENABLED',
+        'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            EVENT_TYPE_SKILL_CREATION_ENABLED) {
+            EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
@@ -56,7 +58,7 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
                 }
               ]
             }).result.then(function(result) {
-              SkillCreationService.createNewSkill(result.description);
+              SkillCreationService.createNewSkill(result.description, []);
             });
           };
           $rootScope.$on(

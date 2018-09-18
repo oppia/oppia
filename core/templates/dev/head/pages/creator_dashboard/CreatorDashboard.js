@@ -92,9 +92,7 @@ oppia.controller('CreatorDashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-    $scope.enableQuestionSuggestions = (
-      constants.ENABLE_GENERALIZED_FEEDBACK_THREADS &&
-      constants.ENABLE_NEW_STRUCTURES);
+    $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURES;
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
 
@@ -301,7 +299,7 @@ oppia.controller('CreatorDashboard', [
         ]
       }).result.then(function(result) {
         $http.put(
-          '/generalsuggestionactionhandler/' +
+          '/suggestionactionhandler/' +
           $scope.activeThread.suggestion.targetType + '/' +
           $scope.activeThread.suggestion.targetId + '/' +
           $scope.activeThread.suggestion.suggestionId, {
@@ -408,7 +406,7 @@ oppia.controller('CreatorDashboard', [
         if (!topicVersion) {
           $log.error('Unable to match topic id selected with topic choices.');
         }
-        $http.post('/generalsuggestionhandler/', {
+        $http.post('/suggestionhandler/', {
           suggestion_type: 'add_question',
           target_type: 'topic',
           target_id: result.topicId,

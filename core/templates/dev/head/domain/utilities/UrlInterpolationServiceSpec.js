@@ -19,16 +19,13 @@
 describe('URL Interpolation Service', function() {
   var uis = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(module('oppia', function($provide) {
+    $provide.constant('DEV_MODE', false);
+  }));
 
   beforeEach(inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
-    GLOBALS.DEV_MODE = false;
   }));
-
-  afterEach(function() {
-    GLOBALS.DEV_MODE = true;
-  });
 
   it('should add hash to url if hash is set', function() {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(

@@ -472,27 +472,18 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
-    get_redirect_route(
-        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,

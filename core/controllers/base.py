@@ -26,6 +26,7 @@ import time
 import traceback
 import urlparse
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -89,7 +90,7 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
 
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             self.redirect(users.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
@@ -192,6 +193,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.values['additional_angular_modules'] = []
         self.values['iframed'] = False
+        self.values['is_topic_manager'] = (
+            user_services.is_topic_manager(self.user_id))
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
@@ -213,7 +216,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if feconf.DEV_MODE and self.partially_logged_in:
+        if constants.DEV_MODE and self.partially_logged_in:
             self.redirect(users.create_logout_url(self.request.uri))
             return
 
@@ -307,7 +310,7 @@ class BaseHandler(webapp2.RequestHandler):
         values.update({
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'DEV_MODE': feconf.DEV_MODE,
+            'DEV_MODE': constants.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
