@@ -264,7 +264,10 @@ describe('Responses Service', function() {
       expect(rs.getDefaultOutcome().dest).toEqual(destUpdates.dest);
     });
 
-    // updateConfirmedUnclassifiedAnswers
+    it('should update confirmed unclassified answers', function() {
+      rs.updateConfirmedUnclassifiedAnswers('new answers');
+      expect(rs.getConfirmedUnclassifiedAnswers()).toEqual('new answers');
+    });
 
     it('should update the answer choices', function() {
       var updates = [{
