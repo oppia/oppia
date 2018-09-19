@@ -18,9 +18,9 @@
  */
 
 oppia.factory('SkillObjectFactory', [
-  'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
+  'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
   function(
-      ConceptCardObjectFactory, MisconceptionObjectFactory) {
+      ConceptCardObjectFactory, MisconceptionObjectFactory, ValidatorsService) {
     var Skill = function(
         id, description, misconceptions, conceptCard, languageCode, version,
         nextMisconceptionId) {
@@ -31,6 +31,22 @@ oppia.factory('SkillObjectFactory', [
       this._languageCode = languageCode;
       this._version = version;
       this._nextMisconceptionId = nextMisconceptionId;
+    };
+
+    Skill.hasValidDescription = function(description) {
+      var allowDescriptionToBeBlank = false;
+      var showWarnings = true;
+      return ValidatorsService.isValidEntityName(
+        description, showWarnings, allowDescriptionToBeBlank);
+    };
+
+    Skill.prototype.getValidationIssues = function() {
+      var issues = [];
+      if (this.getConceptCard().getExplanation() === '') {
+        issues.push(
+          'There should be review material in the concept card.');
+      }
+      return issues;
     };
 
     Skill.prototype.toBackendDict = function() {

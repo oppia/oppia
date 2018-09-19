@@ -102,6 +102,22 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
 
+    @classmethod
+    def get_by_name(cls, topic_name):
+        """Gets TopicModel by topic_name. Returns None if the topic with
+        name topic_name doesn't exist.
+
+        Args:
+            topic_name: str. The name of the topic.
+
+        Returns:
+            TopicModel|None. The topic model of the topic or None if not
+            found.
+        """
+        return TopicModel.query().filter(
+            cls.name == topic_name).filter(
+                cls.deleted == False).get() #pylint: disable=singleton-comparison
+
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.

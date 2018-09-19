@@ -45,17 +45,16 @@ _MAX_RETRIES = 10
 _RAND_RANGE = 127 * 127
 
 
-class FeedbackThreadModel(base_models.BaseModel):
-    """Threads for each exploration.
+class GeneralFeedbackThreadModel(base_models.BaseModel):
+    """Threads for each entity.
 
     The id of instances of this class has the form
-        [EXPLORATION_ID].[THREAD_ID]
+        [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
-    # ID of the exploration the thread is about.
-    exploration_id = ndb.StringProperty(required=True, indexed=True)
-    # ID of state the thread is for. Does not exist if the thread is about the
-    # entire exploration.
-    state_name = ndb.StringProperty(indexed=True)
+    # The type of entity the thread is linked to.
+    entity_type = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the entity the thread is linked to.
+    entity_id = ndb.StringProperty(required=True, indexed=True)
     # ID of the user who started the thread. This may be None if the feedback
     # was given anonymously by a learner.
     original_author_id = ndb.StringProperty(indexed=True)
@@ -67,11 +66,12 @@ class FeedbackThreadModel(base_models.BaseModel):
         indexed=True,
     )
     # Latest subject of the thread.
-    subject = ndb.StringProperty(indexed=False)
+    subject = ndb.StringProperty(indexed=True, required=True)
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
-    # Specifies whether this thread has a related learner suggestion.
-    has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
+    # Specifies whether this thread has a related suggestion.
+    has_suggestion = ndb.BooleanProperty(
+        indexed=True, default=False, required=True)
     # The number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True)
     # When this thread was last updated. This overrides the field in
@@ -80,7 +80,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     # on running the job for calculating the number of messages in a thread
     # and updating the message_count field we do not wish the last_updated field
     # to be updated.
-    last_updated = ndb.DateTimeProperty(indexed=True)
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
@@ -90,23 +90,25 @@ class FeedbackThreadModel(base_models.BaseModel):
                 last_updated_field of the thread.
 
         Returns:
-            thread. The thread entity.
+            GeneralFeedbackThreadModel. The thread entity.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
 
-        return super(FeedbackThreadModel, self).put()
+        return super(GeneralFeedbackThreadModel, self).put()
+
 
     @classmethod
-    def generate_new_thread_id(cls, exploration_id):
-        """Generates a new thread ID which is unique within the exploration.
+    def generate_new_thread_id(cls, entity_type, entity_id):
+        """Generates a new thread ID which is unique.
 
         Args:
-            exploration_id: str. The ID of the exploration.
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
 
         Returns:
             str. A thread ID that is different from the IDs of all
-                the existing threads within the given exploration.
+                the existing threads within the given entity.
 
         Raises:
            Exception: There were too many collisions with existing thread IDs
@@ -114,7 +116,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         for _ in range(_MAX_RETRIES):
             thread_id = (
-                exploration_id + '.' +
+                entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
                 utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_id(thread_id):
@@ -130,7 +132,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id: str. Thread ID of the newly-created thread.
 
         Returns:
-            FeedbackThreadModel. The newly created FeedbackThreadModel instance.
+            GeneralFeedbackThreadModel. The newly created FeedbackThreadModel
+                instance.
 
         Raises:
             Exception: A thread with the given thread ID exists already.
@@ -140,27 +143,28 @@ class FeedbackThreadModel(base_models.BaseModel):
         return cls(id=thread_id)
 
     @classmethod
-    def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
-        """Returns a list of threads associated with the exploration, ordered
+    def get_threads(
+            cls, entity_type, entity_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+        """Returns a list of threads associated with the entity, ordered
         by their "last updated" field. The number of entities fetched is
         limited by the `limit` argument to this method, whose default
         value is equal to the default query limit.
 
         Args:
-            exploration_id: str.
-            limit: int. The maximum possible number of items
-                in the returned list.
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+            limit: int. The maximum possible number of items in the returned
+                list.
 
         Returns:
-            list(FeedbackThreadModel). List of threads associated with the
-                exploration. Doesn't include deleted entries.
+            list(GeneralFeedbackThreadModel). List of threads associated with
+                the entity. Doesn't include deleted entries.
         """
-        return cls.get_all().filter(
-            cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(limit)
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+            cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
 
 
-class FeedbackMessageModel(base_models.BaseModel):
+class GeneralFeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
     The id of instances of this class has the form [THREAD_ID].[MESSAGE_ID]
@@ -183,7 +187,8 @@ class FeedbackMessageModel(base_models.BaseModel):
     text = ndb.StringProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
-    received_via_email = ndb.BooleanProperty(default=False, indexed=True)
+    received_via_email = ndb.BooleanProperty(
+        default=False, indexed=True, required=True)
 
     @classmethod
     def _generate_id(cls, thread_id, message_id):
@@ -200,34 +205,34 @@ class FeedbackMessageModel(base_models.BaseModel):
         return '.'.join([thread_id, str(message_id)])
 
     @property
-    def exploration_id(self):
-        """Returns the exploration id corresponding to this thread instance.
+    def entity_id(self):
+        """Returns the entity_id corresponding to this thread instance.
 
         Returns:
-            str. The exploration id.
+            str. The entity_id.
+        """
+        return self.id.split('.')[1]
+
+    @property
+    def entity_type(self):
+        """Returns the entity_type corresponding to this thread instance.
+
+        Returns:
+            str. The entity_type.
         """
         return self.id.split('.')[0]
 
-    def get_thread_subject(self):
-        """Returns the subject of the thread corresponding to this
-        FeedbackMessageModel instance.
-
-        Returns:
-            str. The subject of the thread.
-        """
-        return FeedbackThreadModel.get_by_id(self.thread_id).subject
-
     @classmethod
     def create(cls, thread_id, message_id):
-        """Creates a new FeedbackMessageModel entry.
+        """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
             thread_id: str. ID of the thread.
             message_id: int. ID of the message.
 
         Returns:
-            FeedbackMessageModel. Instance of the new FeedbackMessageModel
-                entry.
+            GeneralFeedbackMessageModel. Instance of the new
+                GeneralFeedbackMessageModel entry.
 
         Raises:
             Exception: A message with the same ID already exists
@@ -240,8 +245,8 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, thread_id, message_id, strict=True):
-        """Gets the FeedbackMessageModel entry for the given ID. Raises an
-        error if no undeleted message with the given ID is found and
+        """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
+        an error if no undeleted message with the given ID is found and
         strict == True.
 
         Args:
@@ -251,18 +256,21 @@ class FeedbackMessageModel(base_models.BaseModel):
                 entry is found for the given IDs.
 
         Returns:
-            FeedbackMessageModel or None. If strict == False and no undeleted
-                message with the given message_id exists in the datastore, then
-                returns None. Otherwise, returns the FeedbackMessageModel
-                instance that corresponds to the given ID.
+            GeneralFeedbackMessageModel or None. If strict == False and no
+                undeleted message with the given message_id exists in the
+                datastore, then returns None. Otherwise, returns the
+                GeneralFeedbackMessageModel instance that corresponds to the
+                given ID.
 
         Raises:
-            EntityNotFoundError: If strict == True and message ID is not valid
-                or message is marked as deleted. No error will be raised if
-                strict == False.
+            EntityNotFoundError: strict == True and either
+                    (i) message ID is not valid
+                    (ii) message is marked as deleted.
+                No error will be raised if strict == False.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
+        return super(GeneralFeedbackMessageModel, cls).get(
+            instance_id, strict=strict)
 
     @classmethod
     def get_messages(cls, thread_id):
@@ -273,12 +281,10 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            list(FeedbackMessageModel). A list of messages in the
+            list(GeneralFeedbackMessageModel). A list of messages in the
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
-
         """
-
         return cls.get_all().filter(
             cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
@@ -290,9 +296,9 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            FeedbackMessageModel. Last message in the thread.
+            GeneralFeedbackMessageModel. Last message in the thread.
         """
-        thread = FeedbackThreadModel.get_by_id(thread_id)
+        thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
         if thread.message_count:
             most_recent_message = cls.get(thread_id, thread.message_count - 1)
             return most_recent_message
@@ -311,7 +317,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         Returns:
             int. Number of messages in the thread.
         """
-        thread = FeedbackThreadModel.get_by_id(thread_id)
+        thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
         if thread.message_count:
             return thread.message_count
         else:
@@ -344,7 +350,7 @@ class FeedbackMessageModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
 
-class FeedbackThreadUserModel(base_models.BaseModel):
+class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     """Model for storing the ids of the messages in the thread that are read by
     the user.
 
@@ -380,7 +386,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
                 matches with the given user_id, and thread id.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
-        return super(FeedbackThreadUserModel, cls).get(
+        return super(GeneralFeedbackThreadUserModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
@@ -417,7 +423,8 @@ class FeedbackThreadUserModel(base_models.BaseModel):
             cls.generate_full_id(user_id, thread_id)
             for thread_id in thread_ids]
 
-        return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)
+        return super(GeneralFeedbackThreadUserModel, cls).get_multi(
+            instance_ids)
 
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -447,103 +454,6 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()
-
-
-class SuggestionModel(base_models.BaseModel):
-    """Suggestions made by learners.
-
-    The id of each instance is the id of the corresponding thread.
-    """
-
-    # ID of the user who submitted the suggestion.
-    author_id = ndb.StringProperty(required=True, indexed=True)
-    # ID of the corresponding exploration.
-    exploration_id = ndb.StringProperty(required=True, indexed=True)
-    # The exploration version for which the suggestion was made.
-    exploration_version = ndb.IntegerProperty(required=True, indexed=True)
-    # Name of the corresponding state.
-    state_name = ndb.StringProperty(required=True, indexed=True)
-    # Learner-provided description of suggestion.
-    description = ndb.TextProperty(required=True, indexed=False)
-    # The state's content after the suggested edits.
-    # For legacy reasons, contains keys 'type' (always 'text') and 'value' (the
-    # HTML string representing the actual content).
-    state_content = ndb.JsonProperty(required=True, indexed=False)
-
-    @classmethod
-    def _convert_suggestion_html_to_legacy_state_content(cls, suggestion_html):
-        """Converts a suggestion HTML string to a legacy state content object.
-
-        The state content object is a dict containing two keys, "type" and
-        "value". For historical reasons, the value of "type" is always "text"
-        while the value of "value" is the actual suggestion made by the learner
-        in the form of html content.
-
-        Args:
-            suggestion_html: str. The HTML representing the suggestion.
-
-        Returns:
-            dict. The legacy content object that corresponds to the given
-            suggestion HTML.
-        """
-        return {
-            'type': 'text',
-            'value': suggestion_html,
-        }
-
-    @classmethod
-    def create(
-            cls, exploration_id, thread_id, author_id, exploration_version,
-            state_name, description, suggestion_html):
-        """Creates a new SuggestionModel entry.
-
-        Args:
-            exploration_id: str. ID of the exploration.
-            thread_id: str. ID of the corresponding thread.
-            author_id: str. ID of the user who submitted the suggestion.
-            exploration_version: int. exploration version for which the
-                suggestion was made.
-            state_name: str. ID of the state the suggestion is for.
-            description: str. Learner-provided description of suggestion.
-            suggestion_html: str. The content of the suggestion.
-
-        Raises:
-            Exception: There is already a feedback thread with the same
-                thread_id.
-        """
-        instance_id = thread_id
-        if cls.get_by_id(instance_id):
-            raise Exception('There is already a feedback thread with the given '
-                            'thread id: %s' % instance_id)
-        state_content = cls._convert_suggestion_html_to_legacy_state_content(
-            suggestion_html)
-        cls(id=instance_id, author_id=author_id,
-            exploration_id=exploration_id,
-            exploration_version=exploration_version,
-            state_name=state_name,
-            description=description,
-            state_content=state_content).put()
-
-    def get_suggestion_html(self):
-        """Retrieves the suggestion HTML of this instance as a string.
-
-        Returns:
-            str. The suggested content HTML string.
-        """
-        return self.state_content['value']
-
-    @classmethod
-    def get_by_thread_id(cls, thread_id):
-        """Gets a suggestion by the corresponding thread ID.
-
-        Args:
-            thread_id: str. Thread ID of the suggestion thread.
-
-        Returns:
-            SuggestionModel or None. Suggestion related to the given thread ID,
-                or None if no such SuggestionModel exists.
-        """
-        return cls.get_by_id(thread_id)
 
 
 class UnsentFeedbackEmailModel(base_models.BaseModel):

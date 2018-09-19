@@ -240,7 +240,7 @@ class RecentUpdatesMRJobManager(
 
         exploration_ids_list = item.activity_ids
         collection_ids_list = item.collection_ids
-        feedback_thread_ids_list = item.feedback_thread_ids
+        feedback_thread_ids_list = item.general_feedback_thread_ids
 
         (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
@@ -249,7 +249,8 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
-            threads = feedback_services.get_all_threads(exp_model.id, False)
+            threads = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_model.id, False)
             for thread in threads:
                 if thread.id not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(thread.id)
@@ -267,19 +268,21 @@ class RecentUpdatesMRJobManager(
 
         for feedback_thread_id in feedback_thread_ids_list:
             last_message = (
-                feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    feedback_thread_id))
+                feedback_models.GeneralFeedbackMessageModel
+                .get_most_recent_message(feedback_thread_id))
+            exploration_id = last_message.entity_id
 
             yield (
                 reducer_key, {
                     'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                    'activity_id': last_message.exploration_id,
+                    'activity_id': exploration_id,
                     'activity_title': exp_models.ExplorationModel.get_by_id(
-                        last_message.exploration_id).title,
+                        exploration_id).title,
                     'author_id': last_message.author_id,
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),
-                    'subject': last_message.get_thread_subject(),
+                    'subject': feedback_services.get_thread_subject(
+                        last_message.thread_id),
                 })
 
     @staticmethod

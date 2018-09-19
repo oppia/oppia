@@ -36,12 +36,12 @@
              ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
              ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
             <div class="oppia-navbar-profile-picture-container" ng-cloak>
-              <div ng-if="getProfilePictureDataUrl()">
-                <img ng-src="<[getProfilePictureDataUrl()]>"
+              <div ng-if="profilePictureDataUrl">
+                <img ng-src="<[profilePictureDataUrl]>"
                      class="oppia-navbar-profile-picture img-circle">
                 <span class="caret" style="margin-top: 10px;"></span>
               </div>
-              <div ng-if="!getProfilePictureDataUrl()">
+              <div ng-if="!profilePictureDataUrl">
                 <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
                 <span class="caret" style="margin-top: -26px;"></span>
               </div>

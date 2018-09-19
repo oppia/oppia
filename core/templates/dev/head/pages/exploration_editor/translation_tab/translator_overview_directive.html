@@ -1,25 +1,75 @@
 <div class="oppia-translator-overview">
-  <div class="col-lg-6 col-md-6 col-sm-6">
+  <div>
     <span style="font-size: 16px;">
       <strong>Translation in language:</strong>
     </span>
-  </div>
-  <div class="col-lg-4 col-md-4 col-sm-4">
-    <select id="audioTranslationLanguageCodeField" class="oppia-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+    <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
             ng-options="language.id as language.description for language in languageCodesAndDescriptions">
     </select>
+  </div>
+  <div class="oppia-translation-progress">
+    <div class="oppia-progress-info">
+      <strong>Exploration translation progress:</strong>
+    </div>
+    <div class="progress oppia-translation-progess-bar">
+      <div class="progress-bar progress-bar-success" role="progressbar" ng-style="getTranslationProgressStyle()"></div>
+    </div>
   </div>
 </div>
 
 <style>
   .oppia-translator-overview {
-    width: 400px;
-    height: 35px;
-    padding-top: 5px;
+    height: 45px;
     margin: 0 auto;
+    padding-top: 5px;
+    text-align: center;
+    width: 600px;
   }
-  .oppia-language-selector {
-    padding: 2px;
+  .oppia-progress-info {
+    display: -webkit-flex;
+    display: flex;
+    font-size: 16px;
+    width: 250px;
+  }
+  .oppia-translation-progress {
+    display: -webkit-flex;
+    display: flex;
+    margin-top: 8px;
+  }
+  .oppia-translation-progess-bar {
+    display: -webkit-flex;
+    display: flex;
+    height: 10px;
+    margin-top: 5px;
+    width: 350px;
+  }
+  .oppia-translation-language-selector {
     border-radius: 8px;
+    padding: 2px;
+  }
+  /* Firefox rules */
+  @-moz-document url-prefix() {
+    .oppia-translation-progress {
+      display: inline-flex;
+      margin-top: 8px;
+    }
+    .oppia-translator-overview {
+      height: 45px;
+      margin: 0 auto;
+      padding-top: 5px;
+      text-align: center;
+      width: 650px;
+    }
+    .oppia-progress-info {
+      display: inline-block;
+      font-size: 16px;
+      width: 300px;
+    }
+    .oppia-translation-progess-bar {
+      display: inline-block;
+      height: 10px;
+      margin-top: 5px;
+      width: 350px;
+    }
   }
 </style>

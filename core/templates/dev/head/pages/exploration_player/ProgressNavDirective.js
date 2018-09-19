@@ -24,6 +24,7 @@ oppia.directive('progressNav', [
         onSubmit: '&',
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
+        getDisplayedCard: '&displayedCard',
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
@@ -31,45 +32,52 @@ oppia.directive('progressNav', [
         '/pages/exploration_player/progress_nav_directive.html'),
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
-        'PlayerTranscriptService', 'ExplorationPlayerService',
-        'ExplorationPlayerStateService', 'WindowDimensionsService',
+        'PlayerTranscriptService', 'ExplorationEngineService',
+        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
+        'ExplorationPlayerStateService',
         function($scope, $rootScope, PlayerPositionService, UrlService,
-            PlayerTranscriptService, ExplorationPlayerService,
-            ExplorationPlayerStateService, WindowDimensionsService,
-            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
+            PlayerTranscriptService, ExplorationEngineService,
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
+            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
+            ExplorationPlayerStateService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
-
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
-          var updateActiveCardInfo = function() {
+          var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
-            $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
-            $scope.activeCard = PlayerTranscriptService.getCard(
-              $scope.activeCardIndex);
-            $scope.hasPrevious = $scope.activeCardIndex > 0;
+            $scope.displayedCardIndex =
+              PlayerPositionService.getDisplayedCardIndex();
+            $scope.displayedCard = $scope.getDisplayedCard();
+            $scope.hasPrevious = $scope.displayedCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
-              $scope.activeCardIndex);
-
-            var interaction = ExplorationPlayerService.getInteraction(
-              $scope.activeCard.stateName);
-            interactionIsInline = (
-              ExplorationPlayerStateService.isInteractionInline(
-                $scope.activeCard.stateName));
-            $scope.interactionCustomizationArgs = interaction.customizationArgs;
-            $scope.interactionId = interaction.id;
-            interactionHasNavSubmitButton = (
-              Boolean(interaction.id) &&
-              INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+              $scope.displayedCardIndex);
+            $scope.conceptCardIsBeingShown = (
+              $scope.displayedCard.getStateName() === null &&
+              !ExplorationPlayerStateService.isInPretestMode());
+            var interaction = $scope.displayedCard.getInteraction();
+            if (!$scope.conceptCardIsBeingShown) {
+              interactionIsInline = (
+                $scope.displayedCard.isInteractionInline());
+              $scope.interactionCustomizationArgs =
+                $scope.displayedCard.getInteractionCustomizationArgs();
+              $scope.interactionId = $scope.displayedCard.getInteractionId();
+              if ($scope.interactionId) {
+                interactionHasNavSubmitButton = (
+                  Boolean($scope.interactionId) &&
+                  INTERACTION_SPECS[$scope.interactionId].
+                    show_generic_submit_button);
+              }
+            }
 
             $scope.helpCardHasContinueButton = false;
           };
 
           $scope.$watch(function() {
-            return PlayerPositionService.getActiveCardIndex();
-          }, updateActiveCardInfo);
+            return PlayerPositionService.getDisplayedCardIndex();
+          }, updateDisplayedCardInfo);
 
           $scope.$on('helpCardAvailable', function(evt, helpCard) {
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
@@ -78,12 +86,18 @@ oppia.directive('progressNav', [
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
-              PlayerPositionService.setActiveCardIndex(index);
+              PlayerPositionService.setDisplayedCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
             } else {
               throw Error('Target card index out of bounds.');
             }
+          };
+
+          // Returns whether the screen is wide enough to fit two
+          // cards (e.g., the tutor and supplemental cards) side-by-side.
+          $scope.canWindowShowTwoCards = function() {
+            return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
           };
 
           $scope.shouldGenericSubmitButtonBeShown = function() {
@@ -95,17 +109,18 @@ oppia.directive('progressNav', [
 
             return (interactionHasNavSubmitButton && (
               interactionIsInline ||
-              !ExplorationPlayerService.canWindowShowTwoCards()
+              !$scope.canWindowShowTwoCards()
             ));
           };
 
           $scope.shouldContinueButtonBeShown = function() {
-            var lastPair = $scope.activeCard.inputResponsePairs[
-              $scope.activeCard.inputResponsePairs.length - 1];
+            if ($scope.conceptCardIsBeingShown) {
+              return true;
+            }
             return Boolean(
               interactionIsInline &&
-              $scope.activeCard.destStateName &&
-              lastPair.oppiaResponse);
+              $scope.displayedCard.isCompleted() &&
+              $scope.displayedCard.getLastOppiaResponse());
           };
         }
       ]

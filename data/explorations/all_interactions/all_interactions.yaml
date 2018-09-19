@@ -8,21 +8,25 @@ language_code: en
 objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
-schema_version: 21
+schema_version: 30
 states:
   Code Editor:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Code Editor. Write a program which prints hello to me.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Pencil Code Editor
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Hello! Let's move onto another interaction.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -30,6 +34,8 @@ states:
         - inputs:
             x: Hello Oppia
           rule_type: OutputEquals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         language:
@@ -43,9 +49,10 @@ states:
       default_outcome:
         dest: Code Editor
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>I'm looking for a particular 'Hello Oppia' message. Don't you want
             to say hello?</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -56,8 +63,11 @@ states:
   Continue:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Continue. Please press the continue button.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -67,8 +77,9 @@ states:
       default_outcome:
         dest: Graph Theory
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>Moving onward!</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -76,11 +87,60 @@ states:
       id: Continue
       solution: null
     param_changes: []
+  Drag And Drop Sort:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Sort the following fractions in ascending order.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Set Input
+          feedback:
+            content_id: feedback_1
+            html: <p>Yes, well done!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - Choice 2
+            - - Choice 1
+          rule_type: IsEqualToOrdering
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>Choice 1</p>
+          - <p>Choice 2</p>
+      default_outcome:
+        dest: Drag And Drop Sort
+        feedback:
+          content_id: default_outcome
+          html: <p>No, that's not right.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    param_changes: []
   End Exploration:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -95,16 +155,20 @@ states:
   Fraction Input:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Write 20/50 as a fraction in simplest terms.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Number With Units
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -116,15 +180,24 @@ states:
               numerator: 2
               wholeNumber: 0
           rule_type: IsExactlyEqualTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value: ''
         requireSimplestForm:
           value: true
       default_outcome:
         dest: Fraction Input
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>No, that's not right. The answer is 2/5.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -135,16 +208,23 @@ states:
   Graph Theory:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Graph Theory. Please create a pentagon.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Logic Proof
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Penta-penta-pentagon!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -187,12 +267,14 @@ states:
                 x: 155.0
                 y: 112.5625
           rule_type: IsIsomorphicTo
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Graph Theory
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>That's a triangle. Your shape needs more sides.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -223,12 +305,14 @@ states:
                 x: 132.0
                 y: 204.5625
           rule_type: IsIsomorphicTo
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Graph Theory
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>Your shape is missing one side!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -268,6 +352,8 @@ states:
                 x: 187.0
                 y: 111.5625
           rule_type: IsIsomorphicTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
@@ -309,14 +395,15 @@ states:
       default_outcome:
         dest: Graph Theory
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>That's not quite a pentagon. Please try again!</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: <p>dsf</p>
       id: GraphInput
       solution: null
@@ -324,16 +411,25 @@ states:
   Image Region:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Image Region. Please click on the constructor in the Python code shown.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      feedback_4: {}
+      feedback_5: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Image Region
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>That's the class definition. Try again.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -341,12 +437,14 @@ states:
         - inputs:
             x: classdef
           rule_type: IsInRegion
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Image Region
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>That's the class's docstring. Try again.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -354,13 +452,15 @@ states:
         - inputs:
             x: docstring
           rule_type: IsInRegion
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Image Region
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>That's a function, which is close to what you're looking for.
               Try again!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -368,13 +468,15 @@ states:
         - inputs:
             x: instancefunc
           rule_type: IsInRegion
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Image Region
           feedback:
-            audio_translations: {}
+            content_id: feedback_4
             html: <p>That's a classmethod. It does execute code, but it doesn't construct
               anything. Try again!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -382,13 +484,15 @@ states:
         - inputs:
             x: classfunc
           rule_type: IsInRegion
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Continue
           feedback:
-            audio_translations: {}
+            content_id: feedback_5
             html: <p>You found it! This is the code responsible for constructing a
               new class object.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -396,13 +500,15 @@ states:
         - inputs:
             x: ctor
           rule_type: IsInRegion
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         highlightRegionsOnHover:
           value: true
         imageAndRegions:
           value:
-            imagePath: code_sample.png
+            imagePath: code_sample_height_333_width_466.png
             labeledRegions:
             - label: classdef
               region:
@@ -447,15 +553,16 @@ states:
       default_outcome:
         dest: Image Region
         feedback:
-          audio_translations: {}
-          html: "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
-            \ are also functions themselves.</p>"
+          content_id: default_outcome
+          html: "<p>Constructors <em>initialize</em>\_an object, or <em>init</em>\_\
+            it.Constructors are also functions themselves.</p>"
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: <p>sdf</p>
       id: ImageClickInput
       solution: null
@@ -463,16 +570,23 @@ states:
   Item Selection Multi:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Item selection. Please select the good options.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Image Region
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>That's right!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -482,12 +596,14 @@ states:
             - <p>Good option A.</p>
             - <p>Good option C.</p>
           rule_type: Equals
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Item Selection Multi
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>That's not a good option!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -496,12 +612,14 @@ states:
             x:
             - <p>Bad option B.</p>
           rule_type: ContainsAtLeastOneOf
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Item Selection Multi
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>That's not all of the good options!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -509,6 +627,8 @@ states:
         - inputs:
             x: []
           rule_type: DoesNotContainAtLeastOneOf
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
@@ -523,14 +643,15 @@ states:
       default_outcome:
         dest: Item Selection Multi
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>The two good options actually have the word 'good' in them.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: <p>sdf</p>
       id: ItemSelectionInput
       solution: null
@@ -538,16 +659,22 @@ states:
   Item Selection Single:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Item Selection with one choice. Select "Choice 2" below.<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Item Selection Single
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>No, you want the one below this one.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -556,12 +683,14 @@ states:
             x:
             - <p>Choice 1</p>
           rule_type: Equals
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Item Selection Multi
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>Yes, good choice!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -570,12 +699,14 @@ states:
             x:
             - <p>Choice 2</p>
           rule_type: Equals
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Item Selection Single
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>No, you want the choice above this one.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -584,6 +715,8 @@ states:
             x:
             - <p>Choice 3</p>
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
@@ -598,8 +731,9 @@ states:
       default_outcome:
         dest: Item Selection Single
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -610,22 +744,28 @@ states:
   Logic Proof:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Logic Proof. From p we have what?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Number Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>You proved p!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs: {}
           rule_type: Correct
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         question:
@@ -644,8 +784,9 @@ states:
       default_outcome:
         dest: Logic Proof
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>Given p, we have p. Try again.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -656,18 +797,27 @@ states:
   Math Expression Input:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Math Expression Input. Provide a general equation of a 2D line in a
         2D space. Let y be an independent variable which depends on the dependent
         variable x.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      hint_1: {}
+      hint_2: {}
+      hint_3: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Code Editor
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>That is the normal form of a line. Good job!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -675,12 +825,14 @@ states:
         - inputs:
             x: ax+by+c=0
           rule_type: IsMathematicallyEquivalentTo
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Code Editor
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>That's slope-intercept form. A popular form!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -688,12 +840,14 @@ states:
         - inputs:
             x: y=mx+b
           rule_type: IsMathematicallyEquivalentTo
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Code Editor
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>That's point-slope form! Great!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -701,34 +855,38 @@ states:
         - inputs:
             x: y-y0=m(x-x0)
           rule_type: IsMathematicallyEquivalentTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Math Expression Input
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>There are three specific equations I'm looking for. Be aware that
             these can each be derived from each other.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
-          html: <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you
-            can find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
-            raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
-            combined with one of the points, can create a linear relationship between
-            x and y.</p>
+          content_id: hint_1
+          html: "<p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you\
+            \ can find the slope between them as such:</p><p>\_</p><p><oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;m=\\\\frac{y0-y1}{x0-x1}&amp;quot;\"\
+            ></oppia-noninteractive-math><br></p><p>\_</p><p>This, combined with one\
+            \ of the points, can create a linear relationship between x and y.</p>"
       - hint_content:
-          audio_translations: {}
-          html: <p>It's possible to use the slope and first point of the line to form
-            a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
+          content_id: hint_2
+          html: "<p>It's possible to use the slope and first point of the line to\
+            \ form a relationship:</p><p>\_</p><p><oppia-noninteractive-math raw_latex-with-value=\"\
+            &amp;quot;y-y0=m(x-x0)&amp;quot;\"></oppia-noninteractive-math><br></p>"
       - hint_content:
-          audio_translations: {}
-          html: "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
-            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
-            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
+          content_id: hint_3
+          html: "<p>Which yields a final, common line equation:</p><p>\_</p><p><oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p>\_\
+            </p><p>Where\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
             ></oppia-noninteractive-math></p>"
       id: MathExpressionInput
       solution: null
@@ -736,16 +894,23 @@ states:
   Multiple Choice:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Multiple Choice. Select "Second choice" below.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Item Selection Single
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Nice choice!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -753,12 +918,14 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - labelled_as_correct: false
-        outcome:
-          dest: Multiple Choice
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Drag And Drop Sort
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -766,12 +933,14 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Multiple Choice
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -779,6 +948,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
@@ -789,14 +960,15 @@ states:
       default_outcome:
         dest: Multiple Choice
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: <p>sfd</p>
       id: MultipleChoiceInput
       solution: null
@@ -804,17 +976,22 @@ states:
   Music Notes Input:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Music Notes Input. One C note is given. Can you find the next C in
         the scale?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: World Map
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>You found the next C! Excellent.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -826,6 +1003,8 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
@@ -839,14 +1018,15 @@ states:
       default_outcome:
         dest: Music Notes Input
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>That's not the next C. Try again?</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes
             on the C major scale.</p>'
       id: MusicNotesInput
@@ -855,16 +1035,20 @@ states:
   Number Input:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Number Input. Enter a two or higher digit number.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Fraction Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>That number has more than one digit. Right!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -872,13 +1056,16 @@ states:
         - inputs:
             x: 9.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Number Input
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>That's only one digit! Try again.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -889,38 +1076,49 @@ states:
   Number With Units:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Write 2 km/s in terms of m/s.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Set Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
             f:
-              type: 'real'
-              real: 2000
               fraction:
-                isNegative: false
-                wholeNumber: 0
-                numerator: 0
                 denominator: 1
-              units: [{'unit': 'm', 'exponent': 1}, {'unit': 's', 'exponent': -1}]
+                isNegative: false
+                numerator: 0
+                wholeNumber: 0
+              real: 2000
+              type: real
+              units:
+              - exponent: 1
+                unit: m
+              - exponent: -1
+                unit: s
           rule_type: IsEqualTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Number With Units
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>No, that's not right. The answer is 2000 m/s.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -931,17 +1129,22 @@ states:
   Pencil Code Editor:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
         message to me.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Music Notes Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -949,12 +1152,14 @@ states:
         - inputs:
             x: Bye Oppia
           rule_type: OutputEquals
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: Music Notes Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -962,6 +1167,8 @@ states:
         - inputs:
             x: Goodbye Oppia
           rule_type: CodeEquals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         initial_code:
@@ -969,9 +1176,10 @@ states:
       default_outcome:
         dest: Pencil Code Editor
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>Where are your manners? You should say goodbye to me. We've explored
             so much, together!</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
@@ -982,18 +1190,25 @@ states:
   Set Input:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
         looking for any of three popular ones.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      hint_1: {}
+      hint_2: {}
+      hint_3: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Math Expression Input
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
               hard to use in rhyming devices.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -1004,26 +1219,29 @@ states:
             - purple
             - silver
           rule_type: HasElementsIn
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Set Input
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>Not quite.</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
       - hint_content:
-          audio_translations: {}
+          content_id: hint_2
           html: <p>A third one is both a color and a fruit. This fruit is of particular
             importance to the state of Florida.<br></p>
       - hint_content:
-          audio_translations: {}
+          content_id: hint_3
           html: <p>Try orange. :) There are still two others, however!<br></p>
       id: SetInput
       solution: null
@@ -1031,16 +1249,21 @@ states:
   "Text Input state name with unicode \u0105\u0142":
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Text input. Please add a word containing "ate".</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: Multiple Choice
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>Omnomnom.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -1048,6 +1271,8 @@ states:
         - inputs:
             x: ate
           rule_type: Contains
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -1057,14 +1282,15 @@ states:
       default_outcome:
         dest: "Text Input state name with unicode \u0105\u0142"
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>The answer needs to contain "ate".</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: <p>Hint 1</p>
       id: TextInput
       solution: null
@@ -1072,17 +1298,24 @@ states:
   World Map:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
         States?</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      feedback_3: {}
+      hint_1: {}
     interaction:
       answer_groups:
-      - labelled_as_correct: false
-        outcome:
+      - outcome:
           dest: End Exploration
           feedback:
-            audio_translations: {}
+            content_id: feedback_1
             html: <p>That's Washington, D.C., the capital of the United States.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -1093,12 +1326,14 @@ states:
             - 38.89103282648846
             - -76.90361022949219
           rule_type: Within
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: End Exploration
           feedback:
-            audio_translations: {}
+            content_id: feedback_2
             html: <p>Ottawa, the capital of Canada!</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -1109,12 +1344,14 @@ states:
             - 45.42929873257377
             - -75.62919616699219
           rule_type: Within
-      - labelled_as_correct: false
-        outcome:
+        tagged_misconception_id: null
+        training_data: []
+      - outcome:
           dest: End Exploration
           feedback:
-            audio_translations: {}
+            content_id: feedback_3
             html: <p>Mexico City, Mexico. The capital of Mexico.</p>
+          labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
@@ -1125,6 +1362,8 @@ states:
             - 19.228176737766262
             - -99.13993835449219
           rule_type: Within
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         latitude:
@@ -1136,19 +1375,20 @@ states:
       default_outcome:
         dest: World Map
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: <p>Not quite. Try again!</p>
+        labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
       - hint_content:
-          audio_translations: {}
+          content_id: hint_1
           html: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
             special markings on a map.</p>'
       id: InteractiveMap
       solution: null
     param_changes: []
-states_schema_version: 16
+states_schema_version: 25
 tags: []
 title: Test of all interactions

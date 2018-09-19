@@ -49,9 +49,11 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
 ]
 
 # Defines what is the minimum role required to review suggestions
@@ -63,14 +65,20 @@ SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
 # Constants defining various contribution types.
 SCORE_TYPE_CONTENT = 'content'
 SCORE_TYPE_TRANSLATION = 'translation'
+SCORE_TYPE_QUESTION = 'question'
 
 SCORE_TYPE_CHOICES = [
     SCORE_TYPE_CONTENT,
-    SCORE_TYPE_TRANSLATION
+    SCORE_TYPE_TRANSLATION,
+    SCORE_TYPE_QUESTION
 ]
 
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
+
+ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
+                        'status', 'author_id', 'final_reviewer_id',
+                        'score_category']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -82,6 +90,14 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
 # The default message to be shown when accepting stale suggestions.
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
                                      ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+
+# The amount to increase the score of the author by after successfuly getting an
+# accepted suggestion.
+INCREMENT_SCORE_OF_AUTHOR_BY = 1
+
+# Action types for incoming requests to the suggestion action handlers.
+ACTION_TYPE_ACCEPT = 'accept'
+ACTION_TYPE_REJECT = 'reject'
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -158,79 +174,26 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category=score_category).put()
 
     @classmethod
-    def get_suggestions_by_type(cls, suggestion_type):
-        """Gets all suggestions of a particular type.
+    def query_suggestions(cls, query_fields_and_values):
+        """Queries for suggestions.
 
         Args:
-            suggestion_type: str. The type of the suggestions.
+            query_fields_and_values: list(tuple(str, str)). A list of queries.
+                The first element in each tuple is the field to be queried, and
+                the second element is the corresponding value to query for.
 
         Returns:
-            list(SuggestionModel). A list of suggestions of the given
-                type, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-                suggestions.
+            list(SuggestionModel). A list of suggestions that match the given
+            query values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
+            suggestions.
         """
-        return cls.get_all().filter(
-            cls.suggestion_type == suggestion_type).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
+        query = cls.query()
+        for (field, value) in query_fields_and_values:
+            if field not in ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % field)
+            query = query.filter(getattr(cls, field) == value)
 
-    @classmethod
-    def get_suggestions_by_author(cls, author_id):
-        """Gets all suggestions created by the given author.
-
-        Args:
-            author_id: str. The ID of the author of the suggestion.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions by the given author,
-            up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(
-            cls.author_id == author_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_reviewed_by(cls, final_reviewer_id):
-        """Gets all suggestions that have been reviewed by the given user.
-
-        Args:
-            final_reviewer_id: str. The ID of the reviewer of the suggestion.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions reviewed by the given
-                user, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-                suggestions.
-        """
-        return cls.get_all().filter(
-            cls.final_reviewer_id == final_reviewer_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_by_status(cls, status):
-        """Gets all suggestions with the given status.
-
-        Args:
-            status: str. The status of the suggestion.
-
-        Returns:
-            list(SuggestionModel) or None. A list of suggestions with the given
-            status, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(
-            cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_by_target_id(cls, target_type, target_id):
-        """Gets all suggestions to the target with the given ID.
-
-        Args:
-            target_type: str. The type of target.
-            target_id: str. The ID of the target.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions to the target with the
-            given id, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(cls.target_type == target_type).filter(
-            cls.target_id == target_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_stale_suggestions(cls):
@@ -245,3 +208,84 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.last_updated < threshold_time).fetch()
+
+    @classmethod
+    def get_in_review_suggestions_in_score_categories(
+            cls, score_categories, user_id):
+        """Gets all suggestions which are in review in the given
+        score_categories.
+
+        Args:
+            score_categories: list(str). list of score categories to query for.
+            user_id: list(str). The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are in the given
+                score categories, which are in review, but not created by the
+                given user.
+        """
+        if len(score_categories) == 0:
+            raise Exception('Received empty list of score categories')
+
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.score_category.IN(score_categories)).filter(
+                cls.author_id != user_id).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_all_score_categories(cls):
+        """Gets all the score categories for which suggestions have been
+        created.
+
+        Returns:
+            list(str). A list of all the score categories.
+        """
+        query_set = cls.query(projection=['score_category'], distinct=True)
+        return [data.score_category for data in query_set]
+
+
+class ReviewerRotationTrackingModel(base_models.BaseModel):
+    """Model to keep track of the position in the reviewer rotation. This model
+    is keyed by the score category.
+    """
+
+    # The ID of the user whose turn is just completed in the rotation.
+    current_position_in_rotation = ndb.StringProperty(
+        required=True, indexed=False)
+
+    @classmethod
+    def create(cls, score_category, user_id):
+        """Creates a new ReviewerRotationTrackingModel instance.
+
+        Args:
+            score_category: str. The score category.
+            user_id: str. The ID of the user who completed their turn in the
+                rotation for the given category.
+
+        Raises:
+            Exception: There is already an instance with the given id.
+        """
+        if cls.get_by_id(score_category):
+            raise Exception(
+                'There already exists an instance with the given id: %s' % (
+                    score_category))
+        cls(id=score_category, current_position_in_rotation=user_id).put()
+
+    @classmethod
+    def update_position_in_rotation(cls, score_category, user_id):
+        """Updates current position in rotation for the given score_category.
+
+        Args:
+            score_category: str. The score category.
+            user_id: str. The ID of the user who completed their turn in the
+                rotation for the given category.
+        """
+        instance = cls.get_by_id(score_category)
+
+        if instance is None:
+            cls.create(score_category, user_id)
+        else:
+            instance.current_position_in_rotation = user_id
+            instance.put()

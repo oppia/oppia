@@ -30,8 +30,9 @@ class IncomingReplyEmailHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
-        model = email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
-            reply_to_id)
+        model = (
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_by_reply_to_id(reply_to_id))
 
         if model is None:
             raise self.PageNotFoundException

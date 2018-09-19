@@ -18,6 +18,10 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import dependency_registry
+from core.domain import interaction_registry
+from core.domain import obj_services
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -30,16 +34,20 @@ from core.domain import user_services
 import feconf
 import utils
 
+import jinja2
+
 
 class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
     display in topic editor page.
     """
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
             topic.canonical_story_ids)
@@ -84,8 +92,40 @@ class TopicEditorStoryHandler(base.BaseHandler):
         })
 
 
+class TopicEditorQuestionHandler(base.BaseHandler):
+    """Manages the creation of a question and receiving of all question
+    summaries for display in topic editor page.
+    """
+
+    @acl_decorators.can_view_any_topic_editor
+    def get(self, topic_id):
+        """Handles GET requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        start_cursor = self.request.get('cursor')
+        topic = topic_services.get_topic_by_id(topic_id)
+        skill_ids = topic.get_all_skill_ids()
+
+        question_summaries, next_start_cursor = (
+            question_services.get_question_summaries_linked_to_skills(
+                feconf.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+        )
+        question_summary_dicts = [
+            summary.to_dict() for summary in question_summaries]
+
+        self.values.update({
+            'question_summary_dicts': question_summary_dicts,
+            'next_start_cursor': next_start_cursor
+        })
+        self.render_json(self.values)
+
+
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
+
+    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
@@ -102,10 +142,31 @@ class TopicEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
-            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR
+            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR,
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'additional_angular_modules': additional_angular_modules,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'ALLOWED_INTERACTION_CATEGORIES': (
+                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
         self.render_template(
@@ -130,7 +191,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (subtopic_page_version, version_from_payload))
 
-    @acl_decorators.can_edit_subtopic_page
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
@@ -260,6 +321,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
+
+        self.render_json(self.values)
 
 
 class TopicRightsHandler(base.BaseHandler):

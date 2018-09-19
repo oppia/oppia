@@ -35,7 +35,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var multipleChoiceAnswerOptions = function (optionNum) {
+  var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
   };

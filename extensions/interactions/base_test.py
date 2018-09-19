@@ -23,6 +23,7 @@ import struct
 
 from core.domain import dependency_registry
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -45,6 +46,11 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('description', basestring), ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
+
+
+def mock_get_filename_with_dimensions(filename, unused_exp_id):
+    return html_validation_service.regenerate_image_filename_using_dimensions(
+        filename, 490, 120)
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -328,12 +334,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%s.js">'
                 '</script>' % (interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                '<script src="/extensions/interactions/%s/'
                 'directives/%sValidationService.js"></script>' % (
                     interaction_id, interaction_id),
                 html_file_content)
@@ -479,9 +485,12 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
-        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
-        exploration = exp_services.get_exploration_by_id(
-            self._DEMO_EXPLORATION_ID)
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+            exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+            exploration = exp_services.get_exploration_by_id(
+                self._DEMO_EXPLORATION_ID)
 
         all_interaction_ids = set(
             interaction_registry.Registry.get_all_interaction_ids())

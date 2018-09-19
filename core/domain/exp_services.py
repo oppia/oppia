@@ -37,7 +37,6 @@ from core.domain import activity_services
 from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
-from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
@@ -51,6 +50,7 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+gae_image_services = models.Registry.import_gae_image_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -63,23 +63,24 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 MAX_ITERATIONS = 10
 
 
-def _migrate_states_schema(versioned_exploration_states):
+def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
     found in exp_domain.py and, in fact, many of the conversion functions for
     states are also used in the YAML conversion pipeline. If the current
     exploration states schema version changes
-    (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
+    (feconf.CURRENT_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
 
     Args:
-        versioned_exploration_states: A dict with two keys:
+        versioned_exploration_states: dict. A dict with two keys:
             states_schema_version: int. the states schema version for the
                 exploration.
             states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
+        exploration_id: str. ID of the exploration.
 
     Raises:
         Exception: The given states_schema_version is invalid.
@@ -90,16 +91,17 @@ def _migrate_states_schema(versioned_exploration_states):
         states_schema_version = 0
 
     if not (0 <= states_schema_version
-            <= feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
 
     while (states_schema_version <
-           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+           feconf.CURRENT_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version)
+            versioned_exploration_states, states_schema_version,
+            exploration_id)
         states_schema_version += 1
 
 
@@ -155,8 +157,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states)
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
+        _migrate_states_schema(
+            versioned_exploration_states, exploration_model.id)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -616,7 +619,7 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -631,30 +634,6 @@ def export_to_zip_file(exploration_id, version=None):
             zfile.writestr(unicode_filepath, file_contents)
 
     return memfile.getvalue()
-
-
-def convert_state_dict_to_yaml(state_dict, width):
-    """Converts the given state dict to yaml format.
-
-    Args:
-        state_dict: dict. A dict representing a state in an exploration.
-        width: int. The maximum number of characters in a line for the
-            returned YAML string.
-
-    Returns:
-        str. The YAML version of the state_dict.
-
-    Raises:
-        Exception: The state_dict does not represent a valid state.
-    """
-    try:
-        # Check if the state_dict can be converted to a State.
-        state = exp_domain.State.from_dict(state_dict)
-    except Exception:
-        logging.info('Bad state dict: %s' % str(state_dict))
-        raise Exception('Could not convert state dict to YAML.')
-
-    return utils.yaml_from_dict(state.to_dict(), width=width)
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -874,12 +853,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
     # Trigger statistics model update.
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states, change_list)
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=exp_versions_diff, revert_to_version=None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
@@ -895,11 +876,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exp_versions_diff)
 
     # Trigger exploration issues model updation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
+    stats_services.update_exp_issues_for_new_exp_version(
+        exploration, exp_versions_diff=exp_versions_diff,
+        revert_to_version=None)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -965,9 +944,8 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Trigger exploration issues model creation.
-    if feconf.ENABLE_PLAYTHROUGHS:
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version)
+    stats_services.create_exp_issues_for_new_exploration(
+        exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
@@ -1423,12 +1401,15 @@ def revert_exploration(
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
-    if feconf.ENABLE_PLAYTHROUGHS:
-        current_exploration = get_exploration_by_id(
-            exploration_id, version=current_version)
-        stats_services.update_exp_issues_for_new_exp_version(
-            current_exploration, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        exp_versions_diff=None, revert_to_version=revert_to_version)
+
+    current_exploration = get_exploration_by_id(
+        exploration_id, version=current_version)
+    stats_services.update_exp_issues_for_new_exp_version(
+        current_exploration, exp_versions_diff=None,
+        revert_to_version=revert_to_version)
 
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(
@@ -1492,6 +1473,15 @@ def save_new_exploration_from_yaml_and_assets(
         raise Exception('Invalid YAML file: missing schema version')
     exp_schema_version = yaml_dict['schema_version']
 
+    # The assets are committed before the exploration is created because the
+    # migrating to state schema version 25 involves adding dimensions to
+    # images. So we need to have images in the datastore before we could
+    # perform the migration.
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+        fs.commit(committer_id, asset_filename, asset_content)
+
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
@@ -1520,11 +1510,6 @@ def save_new_exploration_from_yaml_and_assets(
                 'title': exploration.title,
                 'category': exploration.category,
             })])
-
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
 
 
 def delete_demo(exploration_id):
@@ -1657,6 +1642,65 @@ def get_image_filenames_from_exploration(exploration):
     return list(set(filenames))
 
 
+def save_original_and_compressed_versions_of_image(
+        user_id, filename, exp_id, original_image_content):
+    """Saves the three versions of the image file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        filename: str. The name of the image file.
+        original_image_content: str. The content of the original image.
+        user_id: str. The id of the user who wants to upload the image.
+    """
+    filepath = (
+        filename if constants.DEV_MODE else 'image/%s' % filename)
+
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+
+    compressed_image_filename = '%s_compressed.%s' % (
+        filename_wo_filetype, filetype)
+    compressed_image_filepath = (
+        compressed_image_filename if constants.DEV_MODE
+        else 'image/%s' % compressed_image_filename)
+
+    micro_image_filename = '%s_micro.%s' % (
+        filename_wo_filetype, filetype)
+    micro_image_filepath = (
+        micro_image_filename if constants.DEV_MODE
+        else 'image/%s' % micro_image_filename)
+
+    file_system_class = (
+        fs_domain.ExplorationFileSystem if constants.DEV_MODE
+        else fs_domain.GcsFileSystem)
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
+
+    compressed_image_content = gae_image_services.compress_image(
+        original_image_content, 0.8)
+    micro_image_content = gae_image_services.compress_image(
+        original_image_content, 0.7)
+
+    # Because in case of CreateVersionsOfImageJob, the original image is
+    # already there. Also, even if the compressed, micro versions for some
+    # image exists, then this would prevent from creating another copy of
+    # the same.
+    if not fs.isfile(filepath.encode('utf-8')):
+        fs.commit(
+            user_id, filepath.encode('utf-8'), original_image_content,
+            mimetype='image/%s' % filetype)
+
+    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
+        fs.commit(
+            user_id, compressed_image_filepath.encode('utf-8'),
+            compressed_image_content, mimetype='image/%s' % filetype)
+
+    if not fs.isfile(micro_image_filepath.encode('utf-8')):
+        fs.commit(
+            user_id, micro_image_filepath.encode('utf-8'),
+            micro_image_content, mimetype='image/%s' % filetype)
+
+
 def get_number_of_ratings(ratings):
     """Gets the total number of ratings represented by the given ratings
     object.
@@ -1746,25 +1790,6 @@ def index_explorations_given_ids(exp_ids):
         if exploration_summary is not None])
 
 
-def _is_suggestion_valid(thread_id, exploration_id):
-    """Check if the suggestion is still valid. A suggestion is considered
-    invalid if the name of the state that the suggestion was made for has
-    changed since.
-
-    Args:
-        thread_id: str. Thread id of the feedback thread containing the
-            suggestion.
-        exploration_id: str. The id of the exploration.
-
-    Returns:
-        bool. Whether the suggestion is still valid.
-    """
-
-    states = get_exploration_by_id(exploration_id).states
-    suggestion = feedback_models.SuggestionModel.get_by_id(thread_id)
-    return suggestion.state_name in states
-
-
 def is_translation_change_list(change_list):
     """Checks whether the change list contains only the changes which are
     allowed for translator to do.
@@ -1782,177 +1807,6 @@ def is_translation_change_list(change_list):
                 exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
             return False
     return True
-
-
-def _is_suggestion_handled(thread_id):
-    """Checks if the current suggestion has already been accepted/rejected.
-
-    Args:
-        thread_id: str. Thread id of the feedback thread containing the
-            suggestion.
-
-    Returns:
-        bool. Whether the current suggestion has already been acted upon (i.e.,
-        accepted or rejected).
-    """
-
-    thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
-    return (
-        thread.status in [
-            feedback_models.STATUS_CHOICES_FIXED,
-            feedback_models.STATUS_CHOICES_IGNORED])
-
-
-def _create_change_list_from_suggestion(
-        suggestion, old_content, old_content_ids_to_audio_translations,
-        audio_update_required):
-    """Creates a change list from a suggestion object.
-
-    Args:
-        suggestion: Suggestion. The given Suggestion domain object.
-        old_content: SubtitledHtml. A SubtitledHtml domain object representing
-            the content of the old state.
-        old_content_ids_to_audio_translations: dict. A dict connecting
-            audio translations for SubtitledHtml objects with the help of
-            content_id as key.
-        audio_update_required: bool. Whether the audio for the state content
-            should be marked as needing an update.
-
-    Returns:
-        list(dict). A dict containing a single change that represents an edit to
-        the state's content. The dict contains value and key (str.) pairs as
-        follows:
-            cmd: list(dict). The changelist corresponding to the given
-                suggestion domain object.
-            state_name: str or None. The state name for the thread. If None,
-                this indicates that the thread pertains to the exploration as a
-                whole.
-            new_value: list(str). List of the state content of the suggestion
-                object.
-    """
-    change_list = [exp_domain.ExplorationChange({
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'state_name': suggestion.state_name,
-        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'new_value': {
-            'html': suggestion.suggestion_html,
-            'content_id': old_content.content_id
-        }
-    })]
-
-    if audio_update_required:
-        for _, translation in old_content_ids_to_audio_translations[
-                old_content.content_id].iteritems():
-            translation.needs_update = True
-
-        content_ids_to_audio_translations_dict = {}
-        for content_id, audio_translations in (
-                old_content_ids_to_audio_translations.iteritems()):
-            audio_translations_dict = {}
-            for lang_code, audio_translation in audio_translations.iteritems():
-                audio_translations_dict[lang_code] = (
-                    exp_domain.AudioTranslation.to_dict(audio_translation))
-            content_ids_to_audio_translations_dict[content_id] = (
-                audio_translations_dict)
-
-        change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': suggestion.state_name,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
-            'new_value': content_ids_to_audio_translations_dict
-        }))
-
-    return change_list
-
-
-def _get_commit_message_for_suggestion(
-        suggestion_author_username, commit_message):
-    """Returns a modified commit message for an accepted suggestion.
-
-    NOTE TO DEVELOPERS: This should not be changed, since in the future we may
-    want to determine and credit the original authors of suggestions, and in
-    order to do so we will look for commit messages that follow this format.
-
-    Args:
-        suggestion_author_username: str. Username of the suggestion author.
-        commit_message: str. The original commit message submitted by the
-            suggestion author.
-
-    Returns:
-        str. The modified commit message to be used in the exploration commit
-        logs.
-    """
-    return '%s %s: %s' % (
-        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
-        suggestion_author_username, commit_message)
-
-
-def accept_suggestion(
-        editor_id, thread_id, exploration_id, commit_message,
-        audio_update_required):
-    """If the suggestion is valid, accepts it by updating the exploration.
-    Raises an exception if the suggestion is not valid.
-
-    Args:
-        editor_id: str. The user id of the editor.
-        thread_id: str. The id of the suggestion thread.
-        exploration_id: str. The id of the exploration that the suggestion is
-            for.
-        commit_message: str. The commit message.
-        audio_update_required: bool. Whether the audio subtitles for the
-            content need to be updated.
-
-    Raises:
-        Exception: The suggestion is not valid.
-        Exception: The commit message is empty.
-        Exception: The suggestion has already been accepted or rejected.
-    """
-
-    if not commit_message or not commit_message.strip():
-        raise Exception('Commit message cannot be empty.')
-    if _is_suggestion_handled(thread_id):
-        raise Exception('Suggestion has already been accepted/rejected.')
-    elif not _is_suggestion_valid(thread_id, exploration_id):
-        raise Exception('Invalid suggestion: The state for which it was made '
-                        'has been removed/renamed.')
-    else:
-        suggestion = feedback_services.get_suggestion(thread_id)
-        suggestion_author_username = suggestion.get_author_name()
-        exploration = get_exploration_by_id(exploration_id)
-        old_content = exploration.states[suggestion.state_name].content
-        old_content_ids_to_audio_translations = exploration.states[
-            suggestion.state_name].content_ids_to_audio_translations
-        change_list = _create_change_list_from_suggestion(
-            suggestion, old_content, old_content_ids_to_audio_translations,
-            audio_update_required)
-        update_exploration(
-            editor_id, exploration_id, change_list,
-            _get_commit_message_for_suggestion(
-                suggestion_author_username, commit_message),
-            is_suggestion=True)
-        feedback_services.create_message(
-            thread_id, editor_id, feedback_models.STATUS_CHOICES_FIXED, None,
-            'Suggestion accepted.')
-
-
-def reject_suggestion(editor_id, thread_id):
-    """Set the status of a suggestion to REJECTED.
-
-    Args:
-        editor_id: str. User id of the editor.
-        thread_id: str. The id of the suggestion thread.
-
-    Raises:
-        Exception: The suggestion has already been accepted or rejected.
-    """
-    if _is_suggestion_handled(thread_id):
-        raise Exception('Suggestion has already been accepted/rejected.')
-    else:
-        thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
-        feedback_services.create_message(
-            thread_id, editor_id, feedback_models.STATUS_CHOICES_IGNORED,
-            None, 'Suggestion rejected.')
-        thread.put()
 
 
 def is_version_of_draft_valid(exp_id, version):
@@ -2211,9 +2065,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = generate_state_id_mapping_model(
         exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
@@ -2263,9 +2114,6 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     new_state_id_mapping = (
         generate_state_id_mapping_model_for_reverted_exploration(
             exploration_id, current_version, revert_to_version))
@@ -2281,9 +2129,6 @@ def delete_state_id_mapping_model_for_exploration(
         exploration_id: str. Id of the exploration.
         exploration_version: int. Latest version of the exploration.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)

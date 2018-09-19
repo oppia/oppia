@@ -43,7 +43,6 @@ oppia.controller('FeedbackTab', [
       status: null,
       text: ''
     };
-
     var _resetTmpMessageFields = function() {
       $scope.tmpMessage.status = $scope.activeThread ?
         $scope.activeThread.status : null;
@@ -97,19 +96,12 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionHandled = function() {
-      return !($scope.activeThread.status === 'received' ||
-        $scope.activeThread.status === 'review' ||
-        $scope.activeThread.status === 'open');
+      return $scope.activeThread.isSuggestionHandled();
     };
 
     var _isSuggestionValid = function() {
-      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-        return ExplorationStatesService.hasState(
-          $scope.activeThread.change_cmd.state_name);
-      } else {
-        return ExplorationStatesService.hasState(
-          $scope.activeThread.state_name);
-      }
+      return ExplorationStatesService.hasState(
+        $scope.activeThread.getSuggestionStateName());
     };
 
     var _hasUnsavedChanges = function() {
@@ -140,30 +132,18 @@ oppia.controller('FeedbackTab', [
             return _hasUnsavedChanges();
           },
           suggestionStatus: function() {
-            return $scope.activeThread.status;
+            return $scope.activeThread.getSuggestionStatus();
           },
           description: function() {
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.description;
-            } else {
-              return $scope.activeThread.suggestion.description;
-            }
+            return $scope.activeThread.description;
           },
           currentContent: function() {
-            var stateName;
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              stateName = $scope.activeThread.change_cmd.state_name;
-            } else {
-              stateName = $scope.activeThread.state_name;
-            }
+            var stateName = $scope.activeThread.getSuggestionStateName();
             var state = ExplorationStatesService.getState(stateName);
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
-            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.change_cmd.new_value.html;
-            }
-            return $scope.activeThread.suggestion.suggestion_html;
+            return $scope.activeThread.getReplacementHtmlFromSuggestion();
           }
         },
         controller: [
@@ -237,28 +217,21 @@ oppia.controller('FeedbackTab', [
         ]
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
-          $scope.activeThread.thread_id, result.action, result.commitMessage,
+          $scope.activeThread.threadId, result.action, result.commitMessage,
           result.reviewMessage, result.audioUpdateRequired, function() {
             ThreadDataService.fetchThreads(function() {
-              $scope.setActiveThread($scope.activeThread.thread_id);
+              $scope.setActiveThread($scope.activeThread.threadId);
             });
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
-              var suggestion = $scope.activeThread;
-              var stateName;
-              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                stateName = suggestion.change_cmd.state_name;
-              } else {
-                stateName = suggestion.state_name;
-              }
+              var suggestion = $scope.activeThread.getSuggestion();
+
+              var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                state.content.setHtml(suggestion.change_cmd.new_value.html);
-              } else {
-                state.content.setHtml(suggestion.suggestion.suggestion_html);
-              }
+              state.content.setHtml(
+                $scope.activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {
                 state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
                   state.content.getContentId());
@@ -298,11 +271,10 @@ oppia.controller('FeedbackTab', [
     $scope.setActiveThread = function(threadId) {
       ThreadDataService.fetchMessages(threadId);
       ThreadDataService.markThreadAsSeen(threadId);
-
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
-        if (allThreads[i].thread_id === threadId) {
+        if (allThreads[i].threadId === threadId) {
           $scope.activeThread = allThreads[i];
           break;
         }

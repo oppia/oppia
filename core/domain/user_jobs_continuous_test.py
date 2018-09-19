@@ -291,9 +291,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User gives feedback on it.
             feedback_services.create_thread(
-                EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
+                'exploration', EXP_1_ID, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = feedback_services.get_all_threads(EXP_1_ID, False)[0].id
+            thread_id = feedback_services.get_all_threads(
+                'exploration', EXP_1_ID, False)[0].id
             message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
@@ -347,8 +348,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
+            thread_id = feedback_services.get_all_threads(
+                'exploration', EXP_ID, False)[0].id
 
             message = feedback_services.get_messages(thread_id)[0]
 
@@ -409,8 +412,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
+            thread_id = feedback_services.get_all_threads(
+                'exploration', EXP_ID, False)[0].id
             message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
@@ -823,11 +828,11 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats['total_plays'], 0)
-        self.assertEquals(
+        self.assertEqual(
             user_stats['num_ratings'], 0)
-        self.assertEquals(
+        self.assertEqual(
             user_stats['average_ratings'], None)
 
     def test_realtime_layer_batch_job_single_rating(self):
@@ -838,9 +843,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 4)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 4)
 
     def test_realtime_layer_batch_job_single_exploration_one_owner(self):
         exploration = self._create_exploration(
@@ -857,9 +862,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 2)
-        self.assertEquals(user_stats['num_ratings'], 2)
-        self.assertEquals(user_stats['average_ratings'], 3.5)
+        self.assertEqual(user_stats['total_plays'], 2)
+        self.assertEqual(user_stats['num_ratings'], 2)
+        self.assertEqual(user_stats['average_ratings'], 3.5)
 
     def test_realtime_layer_batch_job_single_exploration_multiple_owners(self):
         exploration = self._create_exploration(
@@ -887,22 +892,22 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats_1 = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['total_plays'], expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['num_ratings'], expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['average_ratings'],
             expected_results['average_ratings'])
 
         user_stats_2 = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_b_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['total_plays'], expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['num_ratings'], expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['average_ratings'],
             expected_results['average_ratings'])
 
@@ -918,9 +923,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 5)
-        self.assertEquals(user_stats['average_ratings'], 18 / 5.0)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 5)
+        self.assertEqual(user_stats['average_ratings'], 18 / 5.0)
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -932,18 +937,18 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 5)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 5)
 
         self._record_exploration_rating_for_user(
             exp_id_1, self.user_b_id, 3, old_rating=5)
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 3)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 3)
 
     def test_both_realtime_layer_and_batch_data(self):
         exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
@@ -981,6 +986,6 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 self.user_a_id))
         # After recording two start events, the total plays is now increased by
         # two.
-        self.assertEquals(user_stats['total_plays'], 16)
-        self.assertEquals(user_stats['num_ratings'], 10)
-        self.assertEquals(user_stats['average_ratings'], 32 / 10.0)
+        self.assertEqual(user_stats['total_plays'], 16)
+        self.assertEqual(user_stats['num_ratings'], 10)
+        self.assertEqual(user_stats['average_ratings'], 32 / 10.0)

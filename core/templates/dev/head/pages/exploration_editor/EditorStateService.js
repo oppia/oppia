@@ -17,19 +17,78 @@
  * in the exploration is currently active.
  */
 
-oppia.factory('EditorStateService', ['$log', function($log) {
-  var activeStateName = null;
+oppia.factory('StateEditorService', [
+  '$log', 'SolutionValidityService',
+  function(
+      $log, SolutionValidityService) {
+    var activeStateName = null;
+    var stateNames = [];
+    var correctnessFeedbackEnabled = null;
+    var inQuestionMode = null;
+    // Currently, the only place where this is used in the state editor
+    // is in solution verification. So, once the interaction is set in this
+    // service, the given solutions would be automatically verified for the set
+    // interaction.
+    var interaction = null;
 
-  return {
-    getActiveStateName: function() {
-      return activeStateName;
-    },
-    setActiveStateName: function(newActiveStateName) {
-      if (newActiveStateName === '' || newActiveStateName === null) {
-        $log.error('Invalid active state name: ' + newActiveStateName);
-        return;
+    return {
+      getActiveStateName: function() {
+        return activeStateName;
+      },
+      setActiveStateName: function(newActiveStateName) {
+        if (newActiveStateName === '' || newActiveStateName === null) {
+          $log.error('Invalid active state name: ' + newActiveStateName);
+          return;
+        }
+        activeStateName = newActiveStateName;
+      },
+      setInteraction: function(newInteraction) {
+        interaction = newInteraction;
+      },
+      setInteractionId: function(newId) {
+        interaction.setId(newId);
+      },
+      setInteractionAnswerGroups: function(newAnswerGroups) {
+        interaction.setAnswerGroups(newAnswerGroups);
+      },
+      setInteractionDefaultOutcome: function(newOutcome) {
+        interaction.setDefaultOutcome(newOutcome);
+      },
+      setInteractionCustomizationArgs: function(newArgs) {
+        interaction.setCustomizationArgs(newArgs);
+      },
+      setInteractionSolution: function(solution) {
+        interaction.setSolution(solution);
+      },
+      setInteractionHints: function(hints) {
+        interaction.setHints(hints);
+      },
+      getInteraction: function() {
+        return interaction;
+      },
+      setInQuestionMode: function(newModeValue) {
+        inQuestionMode = newModeValue;
+      },
+      isInQuestionMode: function() {
+        return inQuestionMode;
+      },
+      setCorrectnessFeedbackEnabled: function(newCorrectnessFeedbackEnabled) {
+        correctnessFeedbackEnabled = newCorrectnessFeedbackEnabled;
+      },
+      getCorrectnessFeedbackEnabled: function() {
+        return correctnessFeedbackEnabled;
+      },
+      setStateNames: function(newStateNames) {
+        stateNames = newStateNames;
+      },
+      getStateNames: function() {
+        return stateNames;
+      },
+      isCurrentSolutionValid: function() {
+        return SolutionValidityService.isSolutionValid(activeStateName);
+      },
+      deleteCurrentSolutionValidity: function() {
+        SolutionValidityService.deleteSolutionValidity(activeStateName);
       }
-      activeStateName = newActiveStateName;
-    }
-  };
-}]);
+    };
+  }]);

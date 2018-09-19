@@ -20,29 +20,17 @@ import copy
 import datetime
 import os
 
+from constants import constants  # pylint: disable=relative-import
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform for the storage backend. This is used in the model-switching
-# code in core/platform.
-PLATFORM = 'gae'
-
-# This variable is for serving minified resources
-# when set to True. It reflects we are emulating running Oppia in a production
-# environment.
-FORCE_PROD_MODE = False
-
-# Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment,
-# or if you want to use minified resources in the development environment.
-
-if PLATFORM == 'gae':
-    DEV_MODE = (
-        (not os.environ.get('SERVER_SOFTWARE') or
-         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
-        not FORCE_PROD_MODE)
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+# When DEV_MODE is true check that we are running in development enviroment.
+# The SERVER_SOFTWARE enviroment variable does not exist in Travis thus we need
+# to check it.
+if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
+        not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+    raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -51,7 +39,7 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not DEV_MODE else '')
+    'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -66,7 +54,7 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not DEV_MODE:
+if not constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
@@ -116,6 +104,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+ENTITY_TYPE_EXPLORATION = 'exploration'
+ENTITY_TYPE_TOPIC = 'topic'
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -153,11 +144,13 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
+# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 24
+CURRENT_STATES_SCHEMA_VERSION = 25
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -203,6 +196,10 @@ DEFAULT_EXPLORATION_TITLE = ''
 DEFAULT_EXPLORATION_CATEGORY = ''
 # Default objective for a newly-minted exploration.
 DEFAULT_EXPLORATION_OBJECTIVE = ''
+
+# NOTE TO DEVELOPERS: If any of the 5 constants below are modified, the
+# corresponding field in NEW_STATE_TEMPLATE in constants.js also has to be
+# modified.
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
@@ -286,6 +283,12 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    """Returns a copy of the empty ratings object.
+
+    Returns:
+        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
+            ratings.
+    """
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
@@ -366,6 +369,37 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# The interactions permissible for a question.
+ALLOWED_QUESTION_INTERACTION_IDS = [
+    'TextInput', 'MultipleChoiceInput', 'NumericInput']
+
+ALLOWED_QUESTION_INTERACTION_CATEGORIES = [{
+    'name': 'General',
+    'interaction_ids': [
+        'MultipleChoiceInput',
+        'TextInput'
+    ],
+}, {
+    'name': 'Math',
+    'interaction_ids': [
+        'NumericInput'
+    ]
+}]
+
+# Flag to disable sending emails related to reviews for suggestions. To be
+# flipped after deciding (and implementing) whether a user should be scored
+# only for curated lessons.
+SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
+# To prevent recording scores for users until details like whether to score
+# users for only curated lessons is confirmed.
+ENABLE_RECORDING_OF_SCORES = False
+
+# No. of questions to be displayed on a page in the topic editor.
+NUM_QUESTIONS_PER_PAGE = 10
+
+# No. of pretest questions to display.
+NUM_PRETEST_QUESTIONS = 3
+
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
@@ -380,6 +414,8 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
+EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -475,7 +511,8 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'ImageClickInput',
         'ItemSelectionInput',
         'MultipleChoiceInput',
-        'TextInput'
+        'TextInput',
+        'DragAndDropSortInput'
     ],
 }, {
     'name': 'Math',
@@ -543,10 +580,15 @@ DEMO_EXPLORATIONS = {
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
+    u'22': 'protractor_mobile_test_exploration.yaml',
+    u'23': 'rating_test.yaml',
+    u'24': 'learner_flow_test.yaml',
+    u'25': 'exploration_player_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
-    u'0': 'welcome_to_collections.yaml'
+    u'0': 'welcome_to_collections.yaml',
+    u'1': 'learner_flow_test_collection.yaml'
 }
 
 # IDs of explorations which should not be displayable in either the learner or
@@ -587,6 +629,7 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
@@ -594,6 +637,7 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
+EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
@@ -602,12 +646,10 @@ EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GENERAL_SUGGESTION_ACTION_URL_PREFIX = '/generalsuggestionactionhandler'
-GENERAL_SUGGESTION_LIST_URL_PREFIX = '/generalsuggestionlisthandler'
-GENERAL_SUGGESTION_URL_PREFIX = '/generalsuggestionhandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -623,13 +665,14 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_QUESTION_URL = '/question_editor_handler/create_new'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
+TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
-QUESTION_CREATION_URL = '/question_editor_handler/create_new'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
-QUESTION_MANAGER_URL = '/questionmanagerhandler'
+QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -639,6 +682,8 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -647,6 +692,8 @@ SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
@@ -710,18 +757,8 @@ COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
 COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
-# Whether learner playthroughs visualization framework should be enabled.
-ENABLE_PLAYTHROUGHS = True
-# Threshold for early quit playthrough.
-EARLY_QUIT_THRESHOLD_IN_SECS = 45
-# Threshold for multiple incorrect answers playthrough.
-NUM_INCORRECT_ANSWERS_THRESHOLD = 5
-# Threshold for repeated cyclic state transitions playthrough.
-NUM_REPEATED_CYCLES_THRESHOLD = 3
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
-# Probability of recording a playthrough.
-RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -734,9 +771,15 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
-# Whether state id mapping model should be generated and stored when exploration
-# is created or updated.
-ENABLE_STATE_ID_MAPPING = False
+
+# The regular expression used to identify whether a string contains float value.
+# The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
+# If this regex needs to be modified then first of all shutdown Oppia-ml VM.
+# Then update the regex constant in here and Oppia both.
+# Run any migration job that is required to migrate existing trained models
+# before starting Oppia-ml again.
+FLOAT_VERIFIER_REGEX = (
+    '^([-+]?\\d*\\.\\d+)$|^([-+]?(\\d*\\.?\\d+|\\d+\\.?\\d*)e[-+]?\\d*)$')
 
 # Current event models schema version. All event models with an
 # event_schema_version of 1 are the events collected before the rework of the

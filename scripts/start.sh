@@ -81,25 +81,51 @@ for arg in "$@"; do
   fi
 done
 
-feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
-sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
-# Delete the modified feconf.py file(-i.bak)
-rm feconf.py.bak
-
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  constants_env_variable="\"DEV_MODE\": false"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env
 else
+  constants_env_variable="\"DEV_MODE\": true"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py
 fi
 
+# Delete the modified feconf.py file(-i.bak)
+rm assets/constants.js.bak
+
+# Set up a local dev instance.
+# TODO(sll): do this in a new shell.
+echo Starting GAE development server
+# To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
+# settings in feconf.py. Be careful with this -- you do not want to spam people
+# accidentally!
+
+if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
+fi
+(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
+
+# Wait for the servers to come up.
+while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
+
 # Launch a browser window.
 if [ ${OS} == "Linux" ]; then
-  echo ""
-  echo "  INFORMATION"
-  echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  default browser window pointing to this server."
-  echo ""
-  (sleep 5; xdg-open http://localhost:8181/ )&
+  detect_virtualbox="$(ls -1 /dev/disk/by-id/)"
+  if [[ $detect_virtualbox = *"VBOX"* ]]; then
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server. You can access this server"
+    echo "  by navigating to localhost:8181 in a browser window."
+    echo ""
+  else
+    echo ""
+    echo "  INFORMATION"
+    echo "  Setting up a local development server at localhost:8181. Opening a"
+    echo "  default browser window pointing to this server."
+    echo ""
+    (sleep 5; xdg-open http://localhost:8181/ )&
+  fi
 elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
@@ -115,14 +141,18 @@ else
   echo ""
 fi
 
-# Set up a local dev instance.
-# TODO(sll): do this in a new shell.
-echo Starting GAE development server
-# To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
-# settings in feconf.py. Be careful with this -- you do not want to spam people
-# accidentally!
-
-
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG
-
 echo Done!
+
+# Function for waiting for the servers to go down.
+function cleanup {
+  echo ""
+  echo "  INFORMATION"
+  echo "  Cleaning up the servers."
+  echo ""
+  while ( nc -vz localhost 8181 >/dev/null 2>&1 ); do sleep 1; done
+}
+
+# Runs cleanup function on exit.
+trap cleanup Exit
+
+wait

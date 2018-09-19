@@ -19,13 +19,15 @@
 describe('URL Interpolation Service', function() {
   var uis = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(module('oppia', function($provide) {
+    $provide.constant('DEV_MODE', false);
+  }));
 
   beforeEach(inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
   }));
 
-  it('should add hash to url if hash is set', function () {
+  it('should add hash to url if hash is set', function() {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
       '/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
@@ -37,23 +39,20 @@ describe('URL Interpolation Service', function() {
     );
   });
 
-  it('should build complete URL with prefixes and hash', function () {
+  it('should build complete URL with prefixes and hash', function() {
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/test_folder/hash_test.' +
-      hashes['/hash_test.html'] + '.html'
+      '/build/test_folder/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
     expect(
       uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/test_folder/path_test/hash_test.' +
-        hashes['/path_test/hash_test.html'] + '.html'
+      '/build/test_folder/path_test/hash_test.' +
+      hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/test_folder/hash_test.min.' +
-      hashes['/hash_test.min.js'] + '.js'
+      '/build/test_folder/hash_test.min.' + hashes['/hash_test.min.js'] + '.js'
     );
     expect(uis._getCompleteUrl('', '/hash_test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/hash_test.' +
-      hashes['/hash_test.html'] + '.html'
+      '/build/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
   });
 
@@ -94,6 +93,18 @@ describe('URL Interpolation Service', function() {
     expect(uis.interpolateUrl('/test_url/', {
       param: 'value'
     })).toBe('/test_url/');
+  });
+
+  it('should interpolate URLs when parameters have parentheses', function() {
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value (1'
+    })).toBe('/test_url/value%20(1');
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value 1)'
+    })).toBe('/test_url/value%201)');
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value (1)'
+    })).toBe('/test_url/value%20(1)');
   });
 
   it('should interpolate URLs requiring one or more parameters', function() {
@@ -174,47 +185,26 @@ describe('URL Interpolation Service', function() {
     })).toThrow(new Error(
       'Invalid URL template received: \'/test_url/<<name>>\''));
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<value>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
-      "'<value>'"));
+    })).toEqual('/test_url/%3Cvalue%3E');
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<<value>>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
-      "'<<value>>'"));
+    })).toEqual('/test_url/%3C%3Cvalue%3E%3E');
 
-    expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
+    expect(uis.interpolateUrl('/test_url/<name>', {
       name: '<>'
-    })).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
-      '\'<>\''));
+    })).toEqual('/test_url/%3C%3E');
 
-    // Values cannot contain non-alphanumerical characters or spaces, including
-    // newlines or website symbols.
-    expect(function() {
-      uis.interpolateUrl('/test_url/?<query_name>=<query_value>', {
-        query_name: 'website',
-        query_value: 'https://www.oppia.org/'
-      });
-    }).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
-      '\'https://www.oppia.org/\''));
+    expect(uis.interpolateUrl('/test_url/?<query_name>=<query_value>', {
+      query_name: 'website',
+      query_value: 'https://www.oppia.org/'
+    })).toEqual('/test_url/?website=https%3A%2F%2Fwww.oppia.org%2F');
 
-    expect(function() {
-      uis.interpolateUrl('/test_url/<name>', {
-        name: 'value\nmultiple lines'
-      });
-    }).toThrow(new Error(
-      'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
-      '\'value\nmultiple lines\''));
+    expect(uis.interpolateUrl('/test_url/<name>', {
+      name: 'value\nmultiple lines'
+    })).toEqual('/test_url/value%0Amultiple%20lines');
   });
 
   it('should throw an error for missing parameters', function() {
@@ -247,44 +237,62 @@ describe('URL Interpolation Service', function() {
 
   it('should interpolate correct path', function() {
     expect(uis.getStaticImageUrl('/test.png')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test.png');
+      '/build/assets/images/test.png');
     expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/test.png');
+      '/build/assets/images/test_url/test.png');
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/hash_test.' +
-      hashes['/images/hash_test.png'] + '.png');
+      '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
+      '.png');
+
+    expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
+      '/build/assets/videos/test.mp4');
+    expect(uis.getStaticVideoUrl('/test_url/test.mp4')).toBe(
+      '/build/assets/videos/test_url/test.mp4');
+    expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
+      '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
+      '.mp4');
 
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
-      '/static/LogicProof.png');
+      '/build/extensions/interactions/LogicProof/static/LogicProof.png');
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/interTest' +
-      '/static/interTest.' +
+      '/build/extensions/interactions/interTest/static/interTest.' +
       hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + '/test.html');
+      '/build/templates/head/test.html');
     expect(uis.getDirectiveTemplateUrl('/test_url/test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + '/test_url/test.html');
+      '/build/templates/head/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + '/pages_test/hash_test.' +
+      '/build/templates/head/pages_test/hash_test.' +
       hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/test.json');
+      '/build/assets/test.json');
     expect(uis.getStaticAssetUrl('/test_url/test.json')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/test_url/test.json');
+      '/build/assets/test_url/test.json');
     expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/assets_test/hash_test.' +
+      '/build/assets/assets_test/hash_test.' +
       hashes['/assets_test/hash_test.json'] + '.json');
 
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/test.html');
+      '/build/extensions/test.html');
     expect(uis.getExtensionResourceUrl('/test_url/test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/test_url/test.html');
+      '/build/extensions/test_url/test.html');
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/path_test/hash_test.' +
+      '/build/extensions/path_test/hash_test.' +
       hashes['/path_test/hash_test.html'] + '.html');
+  });
+
+  it('should interpolate URLs not requiring parameters', function() {
+    expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
+    expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
+    expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
+    expect(function(){
+      uis.getStoryUrl('', {});
+    }).toThrowError('Empty path passed in method.');
+    expect(function(){
+      uis.getStoryUrl('storyId', {});
+    }).toThrowError('Path must start with \'/\': \'storyId\'.');
   });
 
   it('should throw an error for empty path', function() {
@@ -292,6 +300,13 @@ describe('URL Interpolation Service', function() {
       new Error(
         'Empty path passed in method.'));
     expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+
+    expect(uis.getStaticVideoUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+    expect(uis.getStaticVideoUrl.bind(null, '')).toThrow(
       new Error(
         'Empty path passed in method.'));
 
@@ -324,6 +339,13 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+
+      expect(uis.getStaticVideoUrl.bind(null, 'test_fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
+      expect(uis.getStaticVideoUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
 

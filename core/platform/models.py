@@ -26,6 +26,8 @@ NAMES = utils.create_enum(
     'recommendations', 'skill', 'statistics', 'story', 'suggestion', 'topic',
     'user')
 
+GAE_PLATFORM = 'gae'
+
 
 class _Platform(object):
     """A base class for platform-specific imports related to GAE."""
@@ -165,6 +167,16 @@ class _Gae(_Platform):
         return gae_app_identity_services
 
     @classmethod
+    def import_gae_image_services(cls):
+        """Imports and returns gae_image_services module.
+
+        Returns:
+            module. The gae_image_services module.
+        """
+        from core.platform.image import gae_image_services
+        return gae_image_services
+
+    @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
 
@@ -239,7 +251,7 @@ class Registry(object):
         Returns:
             class: The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get(feconf.PLATFORM)
+        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
 
     @classmethod
     def import_models(cls, model_names):
@@ -288,6 +300,15 @@ class Registry(object):
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
+
+    @classmethod
+    def import_gae_image_services(cls):
+        """Imports and returns gae_image_services module.
+
+        Returns:
+            module. The gae_image_services module.
+        """
+        return cls._get().import_gae_image_services()
 
     @classmethod
     def import_email_services(cls):

@@ -55,12 +55,12 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.assertEqual({
             'iframed': False,
             'is_admin': False,
+            'is_topic_manager': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'additional_angular_modules': [],
-            'search_cursor': None,
-            'profile_picture_data_url': None,
+            'search_cursor': None
         }, response_dict)
 
         # Load a public demo exploration.
@@ -216,7 +216,6 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],
-            'profile_picture_data_url': None,
         }, response_dict)
 
         # Load a public demo exploration.
@@ -254,7 +253,6 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],
-            'profile_picture_data_url': None,
         }, response_dict)
 
         # Assign rating to exploration to test handler for top rated

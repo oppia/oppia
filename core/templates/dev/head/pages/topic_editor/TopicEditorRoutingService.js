@@ -22,6 +22,7 @@ oppia.factory('TopicEditorRoutingService', [
       $rootScope, $location, $window, $timeout, $interval) {
     var MAIN_TAB = 'main';
     var SUBTOPICS_TAB = 'subtopics';
+    var QUESTIONS_TAB = 'questions';
 
     var _tabs = {
       active: MAIN_TAB
@@ -45,6 +46,8 @@ oppia.factory('TopicEditorRoutingService', [
         _tabs.active = MAIN_TAB;
       } else if (newPath === '/subtopics') {
         _tabs.active = SUBTOPICS_TAB;
+      } else if (newPath === '/questions') {
+        _tabs.active = QUESTIONS_TAB;
       }
     });
 
@@ -57,6 +60,9 @@ oppia.factory('TopicEditorRoutingService', [
       },
       navigateToSubtopicsTab: function() {
         $location.path('/subtopics');
+      },
+      navigateToQuestionsTab: function() {
+        $location.path('/questions');
       }
     };
 

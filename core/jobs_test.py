@@ -255,10 +255,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         DummyJobManager.cancel(job_id, 'admin_user_id')
 
         self.assertFalse(DummyJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_CANCELED)
         self.assertIsNone(DummyJobManager.get_output(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_error(job_id), 'Canceled by admin_user_id')
 
     def test_cancel_kills_started_job(self):
@@ -275,11 +275,11 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             DummyJobManager.register_completion(job_id, ['job_output'])
 
         self.assertFalse(DummyJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_CANCELED)
         # Note that no results are recorded for this job.
         self.assertIsNone(DummyJobManager.get_output(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_error(job_id), 'Canceled by admin_user_id')
 
     def test_cancel_does_not_kill_completed_job(self):
@@ -290,7 +290,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertFalse(DummyJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
         # Cancel the job after it has finished.
@@ -299,10 +299,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         # The job should still have 'completed' status.
         self.assertFalse(DummyJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        self.assertEquals(DummyJobManager.get_output(job_id), ['output'])
+        self.assertEqual(DummyJobManager.get_output(job_id), ['output'])
         self.assertIsNone(DummyJobManager.get_error(job_id))
 
     def test_cancel_does_not_kill_failed_job(self):
@@ -314,7 +314,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
         self.assertFalse(DummyFailingJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyFailingJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_FAILED)
         # Cancel the job after it has finished.
@@ -323,7 +323,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         # The job should still have 'failed' status.
         self.assertFalse(DummyFailingJobManager.is_active(job_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyFailingJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_FAILED)
         self.assertIsNone(DummyFailingJobManager.get_output(job_id))
@@ -342,17 +342,17 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(DummyJobManager.is_active(job1_id))
         self.assertFalse(DummyJobManager.is_active(job2_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job1_id),
             jobs.STATUS_CODE_CANCELED)
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job2_id),
             jobs.STATUS_CODE_CANCELED)
         self.assertIsNone(DummyJobManager.get_output(job1_id))
         self.assertIsNone(DummyJobManager.get_output(job2_id))
-        self.assertEquals(
+        self.assertEqual(
             'Canceled by admin_user_id', DummyJobManager.get_error(job1_id))
-        self.assertEquals(
+        self.assertEqual(
             'Canceled by admin_user_id', DummyJobManager.get_error(job2_id))
 
     def test_cancelling_one_unfinished_job(self):
@@ -370,15 +370,15 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(DummyJobManager.is_active(job1_id))
         self.assertFalse(DummyJobManager.is_active(job2_id))
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job1_id),
             jobs.STATUS_CODE_CANCELED)
-        self.assertEquals(
+        self.assertEqual(
             DummyJobManager.get_status_code(job2_id),
             jobs.STATUS_CODE_COMPLETED)
         self.assertIsNone(DummyJobManager.get_output(job1_id))
-        self.assertEquals(DummyJobManager.get_output(job2_id), ['output'])
-        self.assertEquals(
+        self.assertEqual(DummyJobManager.get_output(job2_id), ['output'])
+        self.assertEqual(
             'Canceled by admin_user_id', DummyJobManager.get_error(job1_id))
         self.assertIsNone(DummyJobManager.get_error(job2_id))
 
@@ -387,34 +387,34 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['1', '2', '3', '<TRUNCATED>']
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=3)
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_multi_char_outputs(self):
         input_list = ['abcd', 'efgh', 'ijkl']
         expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=10)
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_zero_max_output_len(self):
         input_list = [1, 2, 3]
         expected_output = ['<TRUNCATED>']
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=0)
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_exact_max_output_len(self):
         input_list = ['abc']
         expected_output = ['abc']
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=3)
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_empty_outputs(self):
         input_list = []
         expected_output = []
         actual_output = jobs.BaseJobManager._compress_output_list(input_list)  # pylint: disable=protected-access
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_duplicate_outputs(self):
         input_list = ['bar', 'foo'] * 3
@@ -423,14 +423,14 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             input_list,
             # Make sure no output gets truncated.
             test_only_max_output_len_chars=sum(len(s) for s in expected_output))
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
         input_list = ['supercalifragilisticexpialidocious'] * 3
         expected_output = ['(3x) super <TRUNCATED>']
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len_chars=10)
-        self.assertEquals(actual_output, expected_output)
+        self.assertEqual(actual_output, expected_output)
 
 
 SUM_MODEL_ID = 'all_data_id'

@@ -42,6 +42,26 @@ describe('Skill editor state service', function() {
     return self;
   };
 
+  var FakeSkillRightsBackendApiService = function() {
+    var self = {};
+
+    var _fetchSkillRights = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.backendSkillRightsObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
+    self.backendSkillRightsObject = {};
+    self.failure = null;
+    self.fetchSkillRights = _fetchSkillRights;
+
+    return self;
+  };
+
   beforeEach(module('oppia'));
   beforeEach(module('oppia', function($provide) {
     fakeEditableSkillBackendApiService = (
@@ -49,12 +69,19 @@ describe('Skill editor state service', function() {
     $provide.value(
       'EditableSkillBackendApiService',
       [fakeEditableSkillBackendApiService][0]);
+
+    fakeSkillRightsBackendApiService = (
+      new FakeSkillRightsBackendApiService());
+    $provide.value(
+      'SkillRightsBackendApiService',
+      [fakeSkillRightsBackendApiService][0]);
   }));
 
   beforeEach(inject(function($injector) {
     SkillEditorStateService = $injector.get(
       'SkillEditorStateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
+    SkillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
     SkillUpdateService = $injector.get('SkillUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -86,6 +113,15 @@ describe('Skill editor state service', function() {
       language_code: 'en',
       version: 3
     };
+
+    skillRightsObject = {
+      skill_id: '1',
+      creator_id: '0',
+      skill_is_private: true,
+      can_edit_skill_description: true
+    };
+    fakeSkillRightsBackendApiService.backendSkillRightsObject = (
+      skillRightsObject);
 
     fakeEditableSkillBackendApiService.newBackendSkillObject = skillDict;
   }));
@@ -206,4 +242,39 @@ describe('Skill editor state service', function() {
       $rootScope.$apply();
       expect(SkillEditorStateService.isSavingSkill()).toBe(false);
     });
+
+  it('should request to load the skill rights from the backend',
+    function() {
+      spyOn(fakeSkillRightsBackendApiService, 'fetchSkillRights')
+        .and.callThrough();
+
+      SkillEditorStateService.loadSkill('1');
+      expect(fakeSkillRightsBackendApiService.fetchSkillRights)
+        .toHaveBeenCalled();
+    });
+
+  it('should initially return an interstitial skill rights object', function() {
+    var skillRights = SkillEditorStateService.getSkillRights();
+    expect(skillRights.getSkillId()).toEqual(null);
+    expect(skillRights.getCreatorId()).toEqual(null);
+    expect(skillRights.isPrivate()).toEqual(true);
+    expect(skillRights.canEditSkillDescription()).toEqual(false);
+  });
+
+  it('should be able to set a new skill rights with an in-place copy',
+    function() {
+      var previousSkillRights = SkillEditorStateService.getSkillRights();
+      var expectedSkillRights = SkillRightsObjectFactory.createFromBackendDict(
+        skillRightsObject);
+      expect(previousSkillRights).not.toEqual(expectedSkillRights);
+
+      SkillEditorStateService.setSkillRights(expectedSkillRights);
+
+      var actualSkillRights = SkillEditorStateService.getSkillRights();
+      expect(actualSkillRights).toEqual(expectedSkillRights);
+
+      expect(actualSkillRights).toBe(previousSkillRights);
+      expect(actualSkillRights).not.toBe(expectedSkillRights);
+    }
+  );
 });

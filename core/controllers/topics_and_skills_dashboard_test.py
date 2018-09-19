@@ -49,7 +49,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, 'Description')
+        skill_services.publish_skill(skill_id, self.admin_id)
+        self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
@@ -73,10 +76,24 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
+            self.assertEqual(
+                len(json_response['unpublished_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['unpublished_skill_summary_dicts'][0]['id'],
+                skill_id_2)
+            self.assertEqual(
+                json_response['can_delete_topic'], True)
+            self.assertEqual(
+                json_response['can_create_topic'], True)
+            self.assertEqual(
+                json_response['can_delete_skill'], True)
+            self.assertEqual(
+                json_response['can_create_skill'], True)
             self.logout()
 
             # Check that topic managers can access the topics and skills
-            # dashboard editable topic data.
+            # dashboard editable topic data. Topic managers should not have
+            # access to any unpublished skills.
             self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
@@ -93,6 +110,16 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
+            self.assertEqual(
+                len(json_response['unpublished_skill_summary_dicts']), 0)
+            self.assertEqual(
+                json_response['can_delete_topic'], False)
+            self.assertEqual(
+                json_response['can_create_topic'], False)
+            self.assertEqual(
+                json_response['can_delete_skill'], False)
+            self.assertEqual(
+                json_response['can_create_skill'], False)
             self.logout()
 
 
@@ -142,7 +169,10 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
             json_response = self.post_json(
                 '%s' % feconf.NEW_SKILL_URL,
-                {'description': 'Skill Description', 'topic_id': 'topic'},
+                {
+                    'description': 'Skill Description',
+                    'linked_topic_ids': ['topic']
+                },
                 csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=400)
             self.assertEqual(json_response['status_code'], 400)
@@ -157,7 +187,10 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
             json_response = self.post_json(
                 '%s' % feconf.NEW_SKILL_URL,
-                {'description': 'Skill Description', 'topic_id': self.topic_id},
+                {
+                    'description': 'Skill Description',
+                    'linked_topic_ids': [self.topic_id]
+                },
                 csrf_token=csrf_token)
             skill_id = json_response['skillId']
             self.assertEqual(len(skill_id), 12)

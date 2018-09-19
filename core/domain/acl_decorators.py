@@ -21,6 +21,8 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_services
+from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -67,6 +69,33 @@ def can_play_exploration(handler):
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_play.__wrapped__ = True
+
+    return test_can_play
+
+
+def can_view_skill(handler):
+    """Decorator to check whether user can play a given skill."""
+
+    def test_can_play(self, skill_id, **kwargs):
+        """Checks if the user can play the skill.
+
+        Args:
+            skill_id: str. The skill id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given skill.
+        """
+        # This is a temporary check, since a decorator is required for every
+        # method. Once skill publishing is done, whether given skill is
+        # published should be checked here.
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        if skill is not None:
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_play.__wrapped__ = True
@@ -682,11 +711,12 @@ def can_subscribe_to_users(handler):
 def can_edit_exploration(handler):
     """Decorator to check whether the user can edit given exploration."""
 
-    def test_can_edit(self, exploration_id, **kwargs):
+    def test_can_edit(self, exploration_id, *args, **kwargs):
         """Checks if the user can edit the exploration.
 
         Args:
             exploration_id: str. The exploration id.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -708,7 +738,7 @@ def can_edit_exploration(handler):
 
         if rights_manager.check_can_edit_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, *args, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
@@ -1035,6 +1065,40 @@ def can_access_learner_dashboard(handler):
     return test_can_access
 
 
+def can_manage_question_skill_status(handler):
+    """Decorator to check whether the user can publish a question and link it
+    to a skill.
+    """
+
+    def test_can_manage_question_skill_status(self, **kwargs):
+        """Checks if the user can publish a question directly.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to publish a question.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+                role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS in
+                self.user.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish a question.')
+    test_can_manage_question_skill_status.__wrapped__ = True
+
+    return test_can_manage_question_skill_status
+
+
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
@@ -1323,27 +1387,39 @@ def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
     """
-    def test_can_edit_skill(self, **kwargs):
-        """Checks whether the user can edit a skill, which can be
-        independent or belong to a topic.
+    def can_user_edit_skill(user, skill_rights):
+        """Checks whether the user can edit the given skill.
 
         Args:
-            **kwargs: *. Keyword arguments.
+            user: UserActionsInfo. Object having user id, role and actions for
+                given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
 
         Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to edit a given skill.
+            bool. Whether the given user can edit the given skill.
         """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
+            if not skill_rights.is_private():
+                return True
+            if skill_rights.is_private() and skill_rights.is_creator(
+                    user.user_id):
+                return True
+        return False
+
+    def test_can_edit_skill(self, skill_id, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        if role_services.ACTION_EDIT_ANY_SKILL in user_actions_info.actions:
-            return handler(self, **kwargs)
+        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
+        if skill_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if can_user_edit_skill(self.user, skill_rights):
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -1414,6 +1490,47 @@ def can_create_skill(handler):
 
     test_can_create_skill.__wrapped__ = True
     return test_can_create_skill
+
+
+def can_publish_skill(handler):
+
+    def can_user_publish_skill(user, skill_rights):
+        """Checks whether the user can publish the given skill.
+
+        Args:
+            user: UserActionsInfo. Object having user id, role and actions
+                for given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
+
+        Returns:
+            bool. Whether the given user can publish the given skill.
+        """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+            return False
+        if skill_rights.is_creator(user.user_id):
+            return True
+        return False
+
+    def test_can_publish_skill(self, skill_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        skill_rights = skill_services.get_skill_rights(skill_id)
+        if skill_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if can_user_publish_skill(self.user, skill_rights):
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+    test_can_publish_skill.__wrapped__ = True
+
+    return test_can_publish_skill
 
 
 def can_delete_story(handler):
@@ -1663,3 +1780,76 @@ def can_change_topic_publication_status(handler):
     test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
+
+
+def can_access_topic_viewer_page(handler):
+    """Decorator to check whether user can access topic viewer page."""
+
+    def test_can_access(self, topic_name, **kwargs):
+        """Checks if the user can access topic viewer page.
+
+        Args:
+            topic_name: str. The name of the topic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can access topic viewer page.
+        """
+        topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
+            raise self.PageNotFoundException
+
+        topic_id = topic.id
+        topic_rights = topic_services.get_topic_rights(
+            topic_id, strict=False)
+
+        if topic_rights.topic_is_published:
+            return handler(self, topic_name, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def get_decorator_for_accepting_suggestion(decorator):
+    """Function that takes a decorator as an argument and then applies some
+    common checks and then checks the permissions specified by the passed in
+    decorator.
+
+    Args:
+        decorator: function. The decorator to be used to verify permissions
+            for accepting/rejecting suggestions.
+
+    Returns:
+        function. The new decorator which includes all the permission checks for
+            accepting/rejecting suggestions. These permissions include:
+            - Admins can accept/reject any suggestion.
+            - Users with scores above threshold can accept/reject any suggestion
+            in that category.
+            - Any user with edit permissions to the target entity can
+            accept/reject suggestions for that entity.
+    """
+    def generate_decorator_for_handler(handler):
+        def test_can_accept_suggestion(
+                self, target_id, suggestion_id, **kwargs):
+            if not self.user_id:
+                raise base.UserFacingExceptions.NotLoggedInException
+            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            if (
+                    role_services.ACTION_ACCEPT_ANY_SUGGESTION in
+                    user_actions_info.actions):
+                return handler(self, target_id, suggestion_id, **kwargs)
+
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            if suggestion_services.check_user_can_review_in_category(
+                    self.user_id, suggestion.score_category):
+                return handler(self, target_id, suggestion_id, **kwargs)
+
+            return decorator(handler)(self, target_id, suggestion_id, **kwargs)
+
+        test_can_accept_suggestion.__wrapped__ = True
+        return test_can_accept_suggestion
+
+    return generate_decorator_for_handler

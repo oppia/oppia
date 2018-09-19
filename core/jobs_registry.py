@@ -21,7 +21,6 @@ from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
-from core.domain import feedback_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
@@ -34,6 +33,10 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     collection_jobs_one_off.CollectionMigrationJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.ImageDataMigrationJob,
+    exp_jobs_one_off.ValidationOfImagesOnGCSJob,
+    exp_jobs_one_off.ValidationOfImagesOnGCSJobUsingExps,
+    exp_jobs_one_off.DeleteImagesFromGAEJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
@@ -48,15 +51,16 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor,
-    exp_jobs_one_off.ImageDataMigrationJob,
-    feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
-    feedback_jobs_one_off.FeedbackSubjectOneOffJob,
-    feedback_jobs_one_off.SuggestionMigrationOneOffJob,
-    feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob,
+    exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
+    exp_jobs_one_off.CopyToNewDirectoryJob,
+    exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
+    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
+    stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob,
     stats_jobs_one_off.StatisticsAuditV1,
+    stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,

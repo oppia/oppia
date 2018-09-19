@@ -58,20 +58,14 @@ function maybeInstallDependencies {
     echo ""
 
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+    bash scripts/install_frontend_tests_dependencies.sh
 
-    install_node_module jasmine-core 2.5.2
-    install_node_module karma 1.5.0
-    install_node_module karma-jasmine 1.1.0
-    install_node_module karma-jasmine-jquery 0.1.1
-    install_node_module karma-json-fixtures-preprocessor 0.0.6
-    install_node_module karma-coverage 1.1.1
-    install_node_module karma-ng-html2js-preprocessor 1.0.0
-    install_node_module karma-chrome-launcher 2.0.0
-    install_node_module protractor 5.3.1
-    install_node_module protractor-screenshot-reporter 0.0.5
-    install_node_module jasmine-spec-reporter 3.2.0
-
-    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.40
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
+    # Start a selenium server using chromedriver 2.41.
+    # The 'detach' option continues the flow once the server is up and runnning.
+    # The 'quiet' option prints only the necessary information about the server start-up
+    # process.
+    $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
@@ -190,9 +184,9 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ "$TRAVIS" = true ]; then
+if [ "$TRAVIS" == true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
-elif [ "$VAGRANT" = true ] || [ -f "/etc/is_vagrant_vm" ]; then
+elif [ "$VAGRANT" == true ] || [ -f "/etc/is_vagrant_vm" ]; then
   # XVFB is required for headless testing in Vagrant
   sudo apt-get install xvfb chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"

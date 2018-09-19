@@ -15,8 +15,6 @@ var richTextComponents = {
     "frontend_id": "collapsible",
     "tooltip": "Insert collapsible block",
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
-    "preview_url_template_dev": "/rich_text_components/Collapsible/CollapsiblePreview.png",
-    "preview_url_template_prod": "/rich_text_components/Collapsible/CollapsiblePreview.png",
     "is_complex": true,
     "requires_fs": false,
     "is_block_element": true,
@@ -46,8 +44,6 @@ var richTextComponents = {
     "frontend_id": "image",
     "tooltip": "Insert image",
     "icon_data_url": "/rich_text_components/Image/Image.png",
-    "preview_url_template_dev": "/imagehandler/<[explorationId]>/<[filepath]>",
-    "preview_url_template_prod": "https://storage.googleapis.com/<[bucketName]>/<[explorationId]>/assets/image/<[filepath]>",
     "is_complex": false,
     "requires_fs": true,
     "is_block_element": true,
@@ -88,8 +84,6 @@ var richTextComponents = {
     "frontend_id": "link",
     "tooltip": "Insert link",
     "icon_data_url": "/rich_text_components/Link/Link.png",
-    "preview_url_template_dev": "/rich_text_components/Link/LinkPreview.png",
-    "preview_url_template_prod": "/rich_text_components/Link/LinkPreview.png",
     "is_complex": false,
     "requires_fs": false,
     "is_block_element": false,
@@ -117,8 +111,6 @@ var richTextComponents = {
     "frontend_id": "math",
     "tooltip": "Insert mathematical formula",
     "icon_data_url": "/rich_text_components/Math/Math.png",
-    "preview_url_template_dev": "/rich_text_components/Math/MathPreview.png",
-    "preview_url_template_prod": "/rich_text_components/Math/MathPreview.png",
     "is_complex": false,
     "requires_fs": false,
     "is_block_element": false,
@@ -139,8 +131,6 @@ var richTextComponents = {
     "frontend_id": "tabs",
     "tooltip": "Insert tabs (e.g. for hints)",
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
-    "preview_url_template_dev": "/rich_text_components/Tabs/TabsPreview.png",
-    "preview_url_template_prod": "/rich_text_components/Tabs/TabsPreview.png",
     "is_complex": true,
     "requires_fs": false,
     "is_block_element": true,
@@ -148,32 +138,8 @@ var richTextComponents = {
       "name": "tab_contents",
       "description": "The tab titles and contents.",
       "schema": {
-        "type": "list",
-        "items": {
-          "type": "dict",
-          "properties": [{
-            "name": "title",
-            "description": "Tab title",
-            "schema": {
-              "type": "unicode",
-              "validators": [{
-                "id": "is_nonempty"
-              }]
-            }
-          }, {
-            "name": "content",
-            "description": "Tab content",
-            "schema": {
-              "type": "html",
-              "ui_config": {
-                "hide_complex_extensions": true
-              }
-            }
-          }]
-        },
-        "ui_config": {
-          "add_element_text": "Add new tab"
-        }
+        "type": "custom",
+        "obj_type": "ListOfTabs"
       },
       "default_value": [{
         "title": "Hint introduction",
@@ -191,8 +157,6 @@ var richTextComponents = {
     "frontend_id": "video",
     "tooltip": "Insert video",
     "icon_data_url": "/rich_text_components/Video/Video.png",
-    "preview_url_template_dev": "https://img.youtube.com/vi/<[video_id]>/hqdefault.jpg",
-    "preview_url_template_prod": "https://img.youtube.com/vi/<[video_id]>/hqdefault.jpg",
     "is_complex": false,
     "requires_fs": false,
     "is_block_element": true,

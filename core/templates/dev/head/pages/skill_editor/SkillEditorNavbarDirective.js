@@ -25,20 +25,62 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
+        'SkillRightsBackendApiService',
+        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService,
-            UndoRedoService, SkillEditorStateService) {
+            UndoRedoService, SkillEditorStateService,
+            SkillRightsBackendApiService,
+            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.skillRights = (
+            SkillEditorStateService.getSkillRights());
 
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
+          $scope.validationIssues = [];
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
 
           $scope.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
           };
 
+          var _validateSkill = function() {
+            $scope.validationIssues = $scope.skill.getValidationIssues();
+          };
+
+          $scope.getWarningsCount = function() {
+            return $scope.validationIssues.length;
+          };
+
+          $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
+          $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
+          $scope.$on(
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
+
           $scope.isSkillSaveable = function() {
-            return $scope.getChangeListCount() > 0;
+            return (
+              $scope.getChangeListCount() > 0 &&
+              $scope.validationIssues.length === 0);
+          };
+
+          $scope.isSkillPublishable = function() {
+            return (
+              $scope.skillRights.isPrivate() &&
+              $scope.validationIssues.length === 0 &&
+              $scope.getChangeListCount() === 0);
+          };
+
+          var _publishSkill = function() {
+            SkillRightsBackendApiService.setSkillPublic(
+              $scope.skill.getId(), $scope.skill.getVersion()).then(
+              function() {
+                $scope.skillRights.setPublic();
+                SkillEditorStateService.setSkillRights(
+                  $scope.skillRights);
+                AlertsService.addSuccessMessage('Skill Published.');
+              });
           };
 
           $scope.saveChanges = function() {
@@ -62,6 +104,30 @@ oppia.directive('skillEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
+              AlertsService.addSuccessMessage('Changes Saved.');
+            });
+          };
+
+          $scope.publishSkill = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill_editor/' +
+                'skill_editor_pre_publish_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function(
+                    $scope, $uibModalInstance) {
+                  $scope.save = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
+            }).result.then(function() {
+              _publishSkill();
             });
           };
         }]

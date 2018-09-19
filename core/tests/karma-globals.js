@@ -78,11 +78,9 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: '',
+  DEV_MODE: true,
   GCS_RESOURCE_BUCKET_NAME: null,
-  // This prefix is needed to correctly interpolate directive template URLs in
-  // Karma tests. It is referenced by UrlInterpolationService.
-  TEMPLATE_DIR_PREFIX: '/core/templates/dev/head'
+  userIsLoggedIn: true
 };
 
 /* hashes for UrlInterpolationService tests */
@@ -93,6 +91,7 @@ var hashes = {
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',
+  '/videos/hash_test.mp4': '12345cxz',
   '/interactions/interTest/static/interTest.png': '123654789'
 };
 

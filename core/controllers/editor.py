@@ -34,6 +34,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
@@ -48,24 +49,6 @@ import jinja2
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
-
-# The frontend template for a new state. It is sent to the frontend when the
-# exploration editor page is first loaded, so that new states can be
-# added in a way that is completely client-side.
-# IMPORTANT: Before adding this state to an existing exploration, the
-# state name and the destination of the default rule should first be
-# changed to the desired new state name.
-NEW_STATE_TEMPLATE = {
-    'classifier_model_id': None,
-    'content': {
-        'html': '',
-        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
-    },
-    'interaction': exp_domain.State.NULL_INTERACTION_DICT,
-    'param_changes': [],
-    'content_ids_to_audio_translations': (
-        feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
-}
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     'default_twitter_share_message_editor', {
@@ -214,7 +197,6 @@ class ExplorationPage(EditorHandler):
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
-            'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
@@ -295,6 +277,7 @@ class ExplorationHandler(EditorHandler):
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
+        self.render_json(self.values)
 
 
 class ExplorationRightsHandler(EditorHandler):
@@ -517,7 +500,8 @@ class StateYamlHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+            'yaml': state_domain.State.convert_state_dict_to_yaml(
+                state_dict, width),
         })
 
 
@@ -753,6 +737,8 @@ class ImageUploadHandler(EditorHandler):
         # Verify that the file type matches the supplied extension.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
+        if filename.rfind('.') == 0:
+            raise self.InvalidInputException('Invalid filename')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
                 'Filenames should not include slashes (/) or consecutive dot '
@@ -770,18 +756,16 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        mimetype = 'image/%s' % (extension)
 
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = (
-            fs_domain.ExplorationFileSystem if (
-                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            fs_domain.ExplorationFileSystem if constants.DEV_MODE
             else fs_domain.GcsFileSystem)
-        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            'exploration/%s' % exploration_id))
         filepath = (
-            filename if (
-                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            filename if constants.DEV_MODE
             else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
 
         if fs.isfile(filepath):
@@ -789,7 +773,8 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
+        exp_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, exploration_id, raw)
 
         self.render_json({'filepath': filename})
 

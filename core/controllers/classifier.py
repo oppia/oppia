@@ -18,6 +18,7 @@ import hashlib
 import hmac
 import json
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
@@ -52,11 +53,12 @@ def validate_job_result_message_dict(message):
         bool. Whether the payload dict is valid.
     """
     job_id = message.get('job_id')
-    classifier_data = message.get('classifier_data')
+    classifier_data_with_floats_stringified = message.get(
+        'classifier_data_with_floats_stringified')
 
     if not isinstance(job_id, basestring):
         return False
-    if not isinstance(classifier_data, dict):
+    if not isinstance(classifier_data_with_floats_stringified, dict):
         return False
     return True
 
@@ -99,7 +101,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         signature = self.payload.get('signature')
         message = self.payload.get('message')
         vm_id = self.payload.get('vm_id')
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
 
         if not validate_job_result_message_dict(message):
@@ -108,7 +110,15 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.UnauthorizedUserException
 
         job_id = message['job_id']
-        classifier_data = message['classifier_data']
+        # The classifier data received in the payload has all floating point
+        # values stored as strings. This is because floating point numbers
+        # are represented differently on GAE(Oppia) and GCE(Oppia-ml).
+        # Therefore, converting all floating point numbers to string keeps
+        # signature consistent on both Oppia and Oppia-ml.
+        # For more info visit: https://stackoverflow.com/q/40173295
+        classifier_data = (
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+                message['classifier_data_with_floats_stringified']))
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
@@ -139,7 +149,7 @@ class NextJobHandler(base.BaseHandler):
         vm_id = self.payload.get('vm_id')
         message = self.payload.get('message')
 
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
         if not verify_signature(message, vm_id, signature):
             raise self.UnauthorizedUserException

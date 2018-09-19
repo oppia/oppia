@@ -71,17 +71,13 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
-        with self.swap(feconf, 'DEV_MODE', True):
+        with self.swap(constants, 'DEV_MODE', True):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'true\')',
-                          response.body)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
-        with self.swap(feconf, 'DEV_MODE', False):
+        with self.swap(constants, 'DEV_MODE', False):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'false\')',
-                          response.body)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
@@ -99,9 +95,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            if response.status_int not in [200, 302, 400, 401, 404]:
-                print url
-            self.assertIn(response.status_int, [200, 302, 400, 401, 404])
+            self.assertIn(
+                response.status_int, [200, 302, 400, 401, 404], msg=url)
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -562,3 +557,35 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
 
         for (name, method, handler_is_decorated) in handlers_checked:
             self.assertTrue(handler_is_decorated)
+
+
+class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
+    """Test that request.GET.items() correctly retrieves escaped characters."""
+    class MockHandler(base.BaseHandler):
+
+        def get(self):
+            self.values.update(self.request.GET.items())
+            self.render_json(self.values)
+
+    def test_get_items(self):
+        mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        with self.swap(self, 'testapp', mock_testapp):
+            params = {
+                'param1': 'value1',
+                'param2': 'value2'
+            }
+            result = self.get_json('/mock?param1=value1&param2=value2')
+            self.assertDictContainsSubset(params, result)
+            params = {
+                'param1': 'value with space',
+                'param2': 'value with & + - /',
+                'param3': 'value with . % @ 123 = ! <>'
+            }
+            result = self.get_json(
+                r'/mock?param1=value%20with%20space&'
+                'param2=value%20with%20%26%20%2B%20-%20/&'
+                'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
+            self.assertDictContainsSubset(params, result)

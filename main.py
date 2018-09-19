@@ -23,6 +23,7 @@ from core.controllers import base
 from core.controllers import classifier
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import concept_card_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
@@ -43,6 +44,7 @@ from core.controllers import story_editor
 from core.controllers import subscriptions
 from core.controllers import suggestion
 from core.controllers import topic_editor
+from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
 from core.domain import acl_decorators
@@ -217,8 +219,20 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
+        question_editor.QuestionCreationHandler),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
+        topic_viewer.TopicPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
+        topic_editor.TopicEditorQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -321,6 +335,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
+        reader.PretestHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
@@ -445,29 +462,27 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler),
     get_redirect_route(
+        r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+        feedback.ThreadListHandlerForTopics),
+    get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
-    get_redirect_route(
-        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
-        r'%s/exploration/<exploration_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        r'%s/exploration/<target_id>/<suggestion_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        r'%s/topic/<target_id>/<suggestion_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionToTopicActionHandler),
+    get_redirect_route(
+        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
@@ -522,11 +537,23 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.TopicPublishHandler),
 
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        concept_card_viewer.ConceptCardDataHandler),
+    get_redirect_route(
+        r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
+        question_editor.QuestionSkillLinkHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_RIGHTS_URL_PREFIX,
+        skill_editor.SkillRightsHandler),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_PUBLISH_URL_PREFIX,
+        skill_editor.SkillPublishHandler),
 
     get_redirect_route(
         r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,

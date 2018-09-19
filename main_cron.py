@@ -44,6 +44,9 @@ URLS = [
     main.get_redirect_route(
         r'/cron/suggestions/accept_stale_suggestions',
         cron.CronAcceptStaleSuggestionsHandler),
+    main.get_redirect_route(
+        '/cron/suggestions/notify_reviewers',
+        cron.CronMailReviewersInRotationHandler)
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

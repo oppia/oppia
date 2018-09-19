@@ -297,6 +297,66 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
+    def test_correct_rights_are_written_in_translator_role_email_body(self):
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            '<b>editor</b> has granted you translator rights to their '
+            'exploration, '
+            '"<a href="https://www.oppia.org/create/A">Title</a>"'
+            ', on Oppia.org.<br>'
+            '<br>'
+            'This allows you to:<br>'
+            '<ul>'
+            '<li>Translate the exploration</li><br>'
+            '<li>View and playtest the exploration</li><br>'
+            '</ul>'
+            'You can find the exploration '
+            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
+            '<br>'
+            'Thanks, and happy collaborating!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has granted you translator rights to their '
+            'exploration, "Title", on Oppia.org.\n'
+            '\n'
+            'This allows you to:\n'
+            '- Translate the exploration\n'
+            '- View and playtest the exploration\n'
+            'You can find the exploration here.\n'
+            '\n'
+            'Thanks, and happy collaborating!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that correct email content is sent for Translator.
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id,
+                rights_manager.ROLE_TRANSLATOR, self.exploration.id,
+                self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
     def test_correct_rights_are_written_in_playtester_role_email_body(self):
         expected_email_html_body = (
             'Hi newuser,<br>'
@@ -1554,6 +1614,132 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+
+
+class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
+    """Test that correct email is sent while onboarding reviewers.
+    """
+    REVIEWER_USERNAME = 'reviewer'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    def setUp(self):
+        super(OnboardingReviewerInstantEmailTests, self).setUp()
+        self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_completion_email_is_sent(self):
+        expected_email_subject = 'Invitation to review suggestions'
+        expected_email_html_body = (
+            'Hi reviewer,<br><br>'
+            'Thank you for actively contributing high-quality suggestions for '
+            'Oppia\'s lessons in Algebra, and for helping to make these lessons'
+            ' better for students around the world!<br><br>'
+            'In recognition of your contributions, we would like to invite you'
+            ' to become one of Oppia\'s reviewers. As a reviewer, you will be '
+            'able to review suggestions in Algebra, and contribute to helping '
+            'ensure that any edits made to lessons preserve the lessons\' '
+            'quality and are beneficial for students.<br><br>'
+            'If you\'d like to help out as a reviewer, please visit your '
+            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
+            'and set your review preferences accordingly. Note that, if you '
+            'accept,you will receive occasional emails inviting you to review '
+            'incoming suggestions by others.<br><br>'
+            'Again, thank you for your contributions to the Oppia '
+            'community!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_onboard_new_reviewers(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+
+
+class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
+    """Test that correct email is sent while notifying reviewers.
+    """
+    REVIEWER_USERNAME = 'reviewer'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    def setUp(self):
+        super(NotifyReviewerInstantEmailTests, self).setUp()
+        self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_completion_email_is_sent(self):
+        expected_email_subject = 'Notification to review suggestions'
+        expected_email_html_body = (
+            'Hi reviewer,<br><br>'
+            'Just a heads-up that there are new suggestions to '
+            'review in Algebra, which you are registered as a reviewer for.'
+            '<br><br>Please take a look at and accept/reject these suggestions '
+            'at your earliest convenience. You can visit your '
+            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+            'to view the list of suggestions that need a review.<br><br>'
+            'Thank you for helping improve Oppia\'s lessons!'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_users_to_review(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
 
 
 class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):

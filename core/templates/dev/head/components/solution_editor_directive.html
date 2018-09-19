@@ -12,7 +12,7 @@
           </i>
         </div>
         <strong>
-          <[stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
+          <[StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
         <span>
           <angular-html-bind html-data="getAnswerHtml()">
@@ -22,5 +22,7 @@
     </div>
   </div>
   <br>
-  <solution-explanation-editor></solution-explanation-editor>
+  <solution-explanation-editor on-save-solution="onSaveSolution"
+                               on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
+  </solution-explanation-editor>
 </div>

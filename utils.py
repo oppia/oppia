@@ -626,6 +626,19 @@ def get_thumbnail_icon_url_for_category(category):
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
+def is_valid_language_code(language_code):
+    """Checks if the given language code is a valid language code.
+
+    Args:
+        language_code: str. The language code.
+
+    Returns:
+        bool. Whether the language code is valid or not.
+    """
+    language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
+    return language_code in language_codes
+
+
 def _get_short_language_description(full_language_description):
     """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
     the corresponding short description.
@@ -667,20 +680,10 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
     """
     asset_dir_prefix = ''
-    if not feconf.DEV_MODE:
+    if not constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
-
-
-def get_template_dir_prefix():
-    """Returns prefix for template directory depending whether dev or prod.
-    It is used as a prefix in urls for js script files under the templates
-    directory.
-    """
-    template_path = (
-        '/templates/head' if not feconf.DEV_MODE else '/templates/dev/head')
-    return '%s%s' % (get_asset_dir_prefix(), template_path)
 
 
 def convert_to_str(string_to_convert):

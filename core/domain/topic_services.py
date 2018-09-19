@@ -201,6 +201,41 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
+def get_topics_by_ids(topic_ids):
+    """Returns a list of topics matching the IDs provided.
+
+    Args:
+        topic_ids: list(str). List of IDs to get topics for.
+
+    Returns:
+        list(Topic|None). The list of topics corresponding to given ids
+            (with None in place of topic ids corresponding to deleted topics).
+    """
+    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
+    topics = [
+        get_topic_from_model(topic_model) if topic_model is not None else None
+        for topic_model in all_topic_models]
+    return topics
+
+
+def get_topic_by_name(topic_name):
+    """Returns a domain object representing a topic.
+
+    Args:
+        topic_name: str. The name of the topic.
+
+    Returns:
+        Topic or None. The domain object representing a topic with the
+        given id, or None if it does not exist.
+    """
+    topic_model = topic_models.TopicModel.get_by_name(topic_name)
+    if topic_model is None:
+        return None
+
+    topic = get_topic_from_model(topic_model)
+    return topic
+
+
 def get_topic_summary_by_id(topic_id, strict=True):
     """Returns a domain object representing a topic summary.
 
@@ -268,7 +303,14 @@ def save_new_topic(committer_id, topic):
     Args:
         committer_id: str. ID of the committer.
         topic: Topic. Topic to be saved.
+
+    Raises:
+        Exception. Topic with same name already exists.
     """
+    existing_topic = get_topic_by_name(topic.name)
+    if existing_topic is not None:
+        raise Exception('Topic with name \'%s\' already exists' % topic.name)
+
     commit_message = (
         'New topic created with name \'%s\'.' % topic.name)
     _create_topic(
@@ -600,6 +642,9 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
 
+    # Delete the summary of the topic (regardless of whether
+    # force_deletion is True or not).
+    delete_topic_summary(topic_id)
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
@@ -612,10 +657,6 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # key will be reinstated.
     topic_memcache_key = _get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
-
-    # Delete the summary of the topic (regardless of whether
-    # force_deletion is True or not).
-    delete_topic_summary(topic_id)
 
 
 def delete_topic_summary(topic_id):

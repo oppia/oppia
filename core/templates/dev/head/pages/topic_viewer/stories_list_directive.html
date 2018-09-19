@@ -1,0 +1,98 @@
+<div ng-if="canonicalStories.length === 0">
+  <em>There are no stories to display.</em>
+</div>
+
+<div ng-if="!topicViewerWindowIsNarrow">
+  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
+             ng-click="scroll(true)"
+             ng-hide="leftmostCardIndices == 0">
+    <i class="material-icons">&#xE314;</i>
+  </md-button>
+  <div class="oppia-topic-viewer-carousel-scroller" ng-if="leftmostCardIndices == 0" aria-hidden="true">
+  </div>
+
+  <div class="oppia-topic-viewer-carousel"
+       ng-swipe-right="scroll(true)"
+       ng-swipe-left="scroll(false)">
+    <div class="oppia-topic-viewer-carousel-tiles">
+      <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
+        <story-summary-tile story-id="canonicalStory.id"
+                            title="canonicalStory.title"
+                            description="canonicalStory.description">
+        </story-summary-tile>
+      </md-card>
+    </div>
+  </div>
+
+  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
+             ng-click="scroll(false)"
+             ng-hide="(canonicalStories.length - tileDisplayCount) <= leftmostCardIndices"
+             aria-hidden="true">
+    <i class="material-icons">&#xE315;</i>
+  </md-button>
+  <div class="oppia-topic-viewer-carousel-scroller"
+       ng-if="(canonicalStories.length - tileDisplayCount) <= leftmostCardIndices">
+  </div>
+</div>
+
+<div ng-if="topicViewerWindowIsNarrow" class="oppia-topic-viewer-low-width">
+  <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
+    <canonical-story-summary-tile story-id="canonicalStory.id"
+                                  title="canonicalStory.title"
+                                  description="canonicalStory.description">
+    </canonical-story-summary-tile>
+  </md-card>
+</div>
+
+<style>
+  stories-list .oppia-topic-viewer-low-width {
+    margin: 0 auto;
+    width: min-content;
+  }
+  .oppia-story-tab .oppia-story-summary-tile {
+    background-color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    height: 400px;
+    margin: 25px;
+    padding: 0;
+    position: relative;
+    text-align: left;
+    transition: all 300ms;
+    vertical-align: top;
+    -webkit-transition: all 300ms;
+    white-space: normal;
+    width: 308px;
+  }
+  stories-list div .oppia-topic-viewer-carousel-scroller {
+    color: #2c4841;
+    cursor: default;
+    float: left;
+    height: 60px;
+    margin-top: 200px;
+    max-width: 40px;
+    padding: 0;
+    position: relative;
+    width: 10vw;
+  }
+  .md-button.oppia-topic-viewer-carousel-scroller {
+    cursor: pointer;
+  }
+  stories-list div .oppia-topic-viewer-carousel-scroller i {
+    font-size: 36px;
+    margin: 0;
+    padding: 0;
+    top: 50%;
+  }
+  .oppia-topic-viewer-carousel .oppia-topic-viewer-carousel-tiles {
+    white-space: nowrap;
+  }
+  stories-list div .oppia-topic-viewer-carousel {
+    float: left;
+    height: 430px;
+    max-width: 1070px;
+    overflow: hidden;
+    position: relative;
+    width: auto;
+  }
+</style>

@@ -964,8 +964,7 @@ class Collection(object):
             raise utils.ValidationError(
                 'A language must be specified (in the \'Settings\' tab).')
 
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+        if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 

@@ -18,7 +18,6 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var until = protractor.ExpectedConditions;
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -43,5 +42,15 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Cache Slugs', function() {
+  it('should check that errors get logged for missing resources', function() {
+    browser.get('/console_errors');
+    var expectedErrors = [
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
+    ];
+    general.checkConsoleErrorsExist(expectedErrors);
   });
 });

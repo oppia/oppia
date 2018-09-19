@@ -59,6 +59,8 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+        feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+        feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
         feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
@@ -286,7 +288,7 @@ class BulkEmailModel(base_models.BaseModel):
 REPLY_TO_ID_LENGTH = 84
 
 
-class FeedbackEmailReplyToIdModel(base_models.BaseModel):
+class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     """This model stores unique_id for each <user, thread>
     combination.
 
@@ -366,10 +368,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             str or None. The FeedbackEmailReplyToIdModel instance corresponding
                 to the given 'reply-to' id if it is fetched else None.
         """
-        model = cls.query(cls.reply_to_id == reply_to_id).fetch()
-        if not model:
-            return None
-        return model[0]
+        model = cls.query(cls.reply_to_id == reply_to_id).get()
+        return model
 
     @classmethod
     def get(cls, user_id, thread_id, strict=True):
@@ -388,7 +388,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         instance_id = cls._generate_id(user_id, thread_id)
         return super(
-            FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
+            GeneralFeedbackEmailReplyToIdModel, cls).get(
+                instance_id, strict=strict)
 
     @classmethod
     def get_multi_by_user_ids(cls, user_ids, thread_id):
@@ -421,14 +422,25 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         """
         return self.id.split('.')[0]
 
+
     @property
-    def exploration_id(self):
-        """Returns the exploration id extracted from the unique id.
+    def entity_type(self):
+        """Returns the entity type extracted from the unique id.
 
         Returns:
-            str. The exploration id.
+            str. The entity type.
         """
         return self.id.split('.')[1]
+
+
+    @property
+    def entity_id(self):
+        """Returns the entity id extracted from the unique id.
+
+        Returns:
+            str. The entity id.
+        """
+        return self.id.split('.')[2]
 
     @property
     def thread_id(self):
@@ -437,4 +449,5 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The thread id.
         """
-        return self.id[self.id.find('.') + 1:]
+        return '.'.join(
+            [self.entity_type, self.entity_id, self.id.split('.')[3]])

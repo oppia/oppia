@@ -56,6 +56,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
 
+    def test_to_human_readable_dict(self):
+        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        expected_dict = {
+            'id': self.STORY_ID,
+            'title': 'Title',
+            'description': 'Description'
+        }
+
+        self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
+
     def test_defaults(self):
         """Test the create_default_story and create_default_story_node
         method of class Story.
@@ -84,6 +94,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
+
+    def test_get_prerequisite_skill_ids(self):
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
+        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
+        self.assertEqual(
+            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id'),
+            ['skill_1'])
+        self.assertIsNone(
+            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id_2'))
+
+    def test_has_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
+        self.assertTrue(self.story.has_exploration('exp_id'))
+        self.assertFalse(self.story.has_exploration('exp_id_2'))
 
     def test_title_validation(self):
         self.story.title = 1

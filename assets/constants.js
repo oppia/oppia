@@ -441,12 +441,6 @@ var constants = {
 
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
-  "WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS": [
-    "umPkwp0L1M0-", "MjZzEVOG47_1", "9trAQhj6uUC2", "rfX8jNkPnA-1",
-    "0FBWxCE5egOw", "670bU6d9JGBh", "aHikhPlxYgOH", "-tMgcP1i_4au",
-    "zW39GLG_BdN2", "Xa3B_io-2WI5", "6Q6IyIDkjpYC", "osw1m5Q3jK41"
-  ],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "ACTIVITY_STATUS_PRIVATE": "private",
@@ -470,9 +464,41 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
+  "ENABLE_NEW_STRUCTURES": false,
 
-  "USE_NEW_SUGGESTION_FRAMEWORK": false,
+  "NEW_STATE_TEMPLATE": {
+      "classifier_model_id": null,
+      "content": {
+          "html": "",
+          "content_id": "content"
+      },
+      "interaction": {
+            "id": null,
+            "customization_args": {},
+            "answer_groups": [],
+            "default_outcome": {
+                "dest": "Introduction",
+                "feedback": {
+                    "content_id": "default_outcome",
+                    "html": ""
+                },
+                "labelled_as_correct": false,
+                "param_changes": [],
+                "refresher_exploration_id": null,
+                "missing_prerequisite_skill_id": null
+            },
+            "confirmed_unclassified_answers": [],
+            "hints": [],
+            "solution": null
+        },
+      "param_changes": [],
+      "content_ids_to_audio_translations": {
+          "content": {},
+          "default_outcome": {}
+      }
+  },
 
-  "ENABLE_NEW_STRUCTURES": false
+  "CURRENT_STATES_SCHEMA_VERSION": 25,
+
+  "DEV_MODE": true
 };

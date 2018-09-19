@@ -116,8 +116,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     # Whether the submitted answer received useful feedback.
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -144,7 +143,8 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
-            is_feedback_useful=is_feedback_useful)
+            is_feedback_useful=is_feedback_useful,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         answer_submitted_event_entity.put()
         return entity_id
 
@@ -163,8 +163,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -187,7 +186,8 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             exp_id=exp_id,
             exp_version=exp_version,
             state_name=state_name,
-            session_id=session_id)
+            session_id=session_id,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         actual_start_event_entity.put()
         return entity_id
 
@@ -205,8 +205,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -232,7 +231,8 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             exp_version=exp_version,
             state_name=state_name,
             session_id=session_id,
-            time_spent_in_state_secs=time_spent_in_state_secs)
+            time_spent_in_state_secs=time_spent_in_state_secs,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         solution_hit_event_entity.put()
         return entity_id
 
@@ -275,8 +275,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -330,7 +329,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             client_time_spent_in_secs=0.0,
             params=params,
-            play_type=play_type)
+            play_type=play_type,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         start_event_entity.put()
         return entity_id
 
@@ -389,8 +389,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -442,7 +441,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             client_time_spent_in_secs=client_time_spent_in_secs,
             params=params,
-            play_type=play_type)
+            play_type=play_type,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.put()
 
 
@@ -494,8 +494,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -546,7 +545,8 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             client_time_spent_in_secs=client_time_spent_in_secs,
             params=params,
-            play_type=play_type)
+            play_type=play_type,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         complete_event_entity.put()
         return entity_id
 
@@ -571,8 +571,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     # user rates an exploration for the first time.
     old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -606,11 +605,14 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
-        cls(id=entity_id,
+        cls(
+            id=entity_id,
             event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
             exploration_id=exp_id,
             rating=rating,
-            old_rating=old_rating).put()
+            old_rating=old_rating,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ).put()
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
@@ -650,8 +652,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -702,7 +703,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             params=params,
-            play_type=play_type)
+            play_type=play_type,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         state_event_entity.put()
         return entity_id
 
@@ -720,8 +722,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -747,7 +748,8 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             exp_version=exp_version,
             state_name=state_name,
             session_id=session_id,
-            time_spent_in_state_secs=time_spent_in_state_secs)
+            time_spent_in_state_secs=time_spent_in_state_secs,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         state_finish_event_entity.put()
         return entity_id
 
@@ -767,8 +769,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+    event_schema_version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -795,7 +796,8 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             exp_version=exp_version,
             state_name=state_name,
             session_id=session_id,
-            time_spent_in_state_secs=time_spent_in_state_secs)
+            time_spent_in_state_secs=time_spent_in_state_secs,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_for_refresher_exp_entity.put()
         return entity_id
 

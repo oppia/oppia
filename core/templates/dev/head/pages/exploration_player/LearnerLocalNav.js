@@ -20,13 +20,13 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$uibModal', '$http', 'ExplorationPlayerService', 'AlertsService',
+  '$scope', '$uibModal', '$http', 'ExplorationEngineService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
-  'FLAG_EXPLORATION_URL_TEMPLATE', function(
-      $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
+  'FLAG_EXPLORATION_URL_TEMPLATE', 'ExplorationPlayerStateService', function(
+      $scope, $uibModal, $http, ExplorationEngineService, AlertsService,
       FocusManagerService, UrlInterpolationService,
-      FLAG_EXPLORATION_URL_TEMPLATE) {
-    $scope.explorationId = ExplorationPlayerService.getExplorationId();
+      FLAG_EXPLORATION_URL_TEMPLATE, ExplorationPlayerStateService) {
+    $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = GLOBALS.username;
     $scope.showLearnerSuggestionModal = function() {
@@ -38,13 +38,14 @@ oppia.controller('LearnerLocalNav', [
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationPlayerService',
+          'ExplorationEngineService', 'PlayerTranscriptService',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationPlayerService) {
+              ExplorationEngineService, PlayerTranscriptService) {
             var stateName = PlayerPositionService.getCurrentStateName();
-            $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
-              stateName);
+            var displayedCard = PlayerTranscriptService.getCard(
+              PlayerPositionService.getDisplayedCardIndex());
+            $scope.originalHtml = displayedCard.getContentHtml();
             $scope.description = '';
             // ng-model needs to bind to a property of an object on
             // the scope (the property cannot sit directly on the scope)
@@ -61,55 +62,38 @@ oppia.controller('LearnerLocalNav', [
             };
 
             $scope.submitSuggestion = function() {
-              var data = {
-                id: ExplorationPlayerService.getExplorationId(),
-                version: ExplorationPlayerService.getExplorationVersion(),
+              data = {
+                target_id: ExplorationEngineService.getExplorationId(),
+                version: ExplorationEngineService.getExplorationVersion(),
                 stateName: stateName,
+                suggestion_type: 'edit_exploration_state_content',
+                target_type: 'exploration',
                 description: $scope.description,
-                suggestionHtml: $scope.suggestionData.suggestionHtml
+                suggestionHtml: $scope.suggestionData.suggestionHtml,
               };
-              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                data = {
-                  target_id: ExplorationPlayerService.getExplorationId(),
-                  version: ExplorationPlayerService.getExplorationVersion(),
-                  stateName: stateName,
-                  suggestion_type: 'edit_exploration_state_content',
-                  target_type: 'exploration',
-                  description: $scope.description,
-                  suggestionHtml: $scope.suggestionData.suggestionHtml,
-                };
-              }
               $uibModalInstance.close(data);
             };
           }]
       }).result.then(function(result) {
-        var data = {
-          exploration_version: result.version,
-          state_name: result.stateName,
+        data = {
+          suggestion_type: result.suggestion_type,
+          target_type: result.target_type,
+          target_id: result.target_id,
+          target_version_at_submission: result.version,
+          assigned_reviewer_id: null,
+          final_reviewer_id: null,
           description: result.description,
-          suggestion_html: result.suggestionHtml
-        };
-        url = '/suggestionhandler/' + result.id;
-        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          data = {
-            suggestion_type: result.suggestion_type,
-            target_type: result.target_type,
-            target_id: result.target_id,
-            target_version_at_submission: result.version,
-            assigned_reviewer_id: null,
-            final_reviewer_id: null,
-            description: result.description,
-            change_cmd: {
-              cmd: 'edit_state_property',
-              property_name: 'content',
-              state_name: result.stateName,
-              new_value: {
-                html: result.suggestionHtml
-              }
+          change: {
+            cmd: 'edit_state_property',
+            property_name: 'content',
+            state_name: result.stateName,
+            new_value: {
+              html: result.suggestionHtml
             }
-          };
-          url = '/generalsuggestionhandler/';
-        }
+          }
+        };
+        url = '/suggestionhandler/';
+
         $http.post(url, data).error(function(res) {
           AlertsService.addWarning(res);
         });

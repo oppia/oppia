@@ -54,6 +54,28 @@ describe('HTML to text', function() {
       expect(fn).toThrow();
     });
   }));
+
+  var validUnicodeStrings = [
+    '{{}}',
+    '{{abc}}',
+    '\\\\{{abc}}',
+    '\\{{{abc}}'
+  ];
+
+  it('should detect valid unicode strings', inject(function($filter) {
+    var results = [
+      '<oppia-parameter></oppia-parameter>',
+      '<oppia-parameter>abc</oppia-parameter>',
+      '\\<oppia-parameter>abc</oppia-parameter>',
+      '{<oppia-parameter>abc</oppia-parameter>',
+    ];
+    validUnicodeStrings.forEach(function(s, i) {
+      var fn = (function() {
+        return $filter('convertUnicodeWithParamsToHtml')(s);
+      })();
+      expect(fn).toEqual(results[i]);
+    });
+  }));
 });
 
 describe('Normalizer tests', function() {
@@ -103,6 +125,7 @@ describe('Normalizer tests', function() {
     expect(filter('2+3')).toBeUndefined();
     expect(filter('--1.23')).toBeUndefined();
     expect(filter('=1.23')).toBeUndefined();
+    expect(filter(undefined)).toBeUndefined();
   }));
 
   it('should impose minimum bounds', inject(function($filter) {
@@ -146,55 +169,273 @@ describe('Normalizer tests', function() {
   }));
 });
 
-describe('RTE helper service', function() {
-  var _IMAGE_URL = '/rich_text_components/Some/Some.png';
-  var _INTERPOLATED_IMAGE_URL = '/extensions' + _IMAGE_URL;
-  var rhs;
+describe('Testing requireIsFloat directive', function() {
+  var $compile, scope, testInput;
 
   beforeEach(module('oppia'));
 
-  beforeEach(function() {
-    module(function($provide) {
-      $provide.constant('RTE_COMPONENT_SPECS', [{
-        frontend_id: 'image',
-        backend_id: 'Image',
-        tooltip: 'Insert image',
-        icon_data_url: _IMAGE_URL,
-        preview_url_template_dev: _IMAGE_URL
-      }]);
-    });
-  });
-
-  beforeEach(inject(function($injector) {
-    rhs = $injector.get('RteHelperService');
+  beforeEach(inject(function($compile, $rootScope) {
+    scope = $rootScope.$new();
+    var element = '<form name="testForm">' +
+      '<input name="floatValue" type="number" ng-model="localValue" ' +
+      'require-is-float apply-validation>' +
+      '</form>';
+    $compile(element)(scope);
+    testInput = scope.testForm.floatValue;
   }));
 
-  it('should convert correctly between HTML and RTE', function() {
-    var testData = [[
-      '<div></div>', '<div></div>'
-    ], [
-      '<div>abc</div>', '<div>abc</div>'
-    ], [
-      '<div>abc<span>def</span></div><b>ghi</b>',
-      '<div>abc<span>def</span></div><b>ghi</b>'
-    ], [
-      '<oppia-noninteractive-image></oppia-noninteractive-image>',
-      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
-           'class="oppia-noninteractive-image">'
-    ], [
-      '<oppia-noninteractive-image ' +
-        'image_id-with-value="&amp;quot;T&amp;quot;">' +
-      '</oppia-noninteractive-image>',
-      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
-           'class="oppia-noninteractive-image" ' +
-           'image_id-with-value="&amp;quot;T&amp;quot;">'
-    ]];
+  it('should validate if value is a float', function() {
+    testInput.$setViewValue('2');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
 
-    for (var i = 0; i < testData.length; i++) {
-      expect(rhs.convertHtmlToRte(testData[i][0]))
-        .toEqual(testData[i][1]);
-      expect(rhs.convertRteToHtml(testData[i][1]))
-        .toEqual(testData[i][0]);
-    }
+    testInput.$setViewValue('2.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('-3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
   });
+
+  it('should invalidate if value is not a float', function() {
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('3..5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('-2.abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('0.3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue(undefined);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  });
+});
+
+describe('Testing apply-validation directive', function() {
+  var $compile, element, scope, testInput;
+
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($rootScope) {
+    scope = $rootScope.$new();
+    element = '<form name="testForm">' +
+      '<input name="inputValue" type="number" ng-model="localValue" ' +
+      'apply-validation>' +
+      '</form>';
+  }));
+
+  it('should apply isAtLeast validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isAtLeast',
+        minValue: -2.5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(-2.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('-3');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isAtMost validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isAtMost',
+        maxValue: 5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(6);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('10');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isNonempty validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isNonempty'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isInteger validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isInteger'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('3.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('O');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
+
+  it('should apply isFloat validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isFloat'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('0.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(2);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(4);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('abc');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+
+    testInput.$setViewValue('1.2.3');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+
+    testInput.$setViewValue('-3..5');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
+
+  it('should not apply nonexistent validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'testFilterFilter'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
 });

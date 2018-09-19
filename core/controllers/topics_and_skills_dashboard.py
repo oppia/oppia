@@ -74,10 +74,26 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
+        skill_ids_for_private_skills_by_user = [
+            skill_rights.id for skill_rights in (
+                skill_services.get_unpublished_skill_rights_by_creator(
+                    self.user_id))]
+
+        skill_ids_for_unpublished_skills = [
+            skill_rights.id for skill_rights in (
+                skill_services.get_all_unpublished_skill_rights())]
+
         untriaged_skill_summary_dicts = []
-        for skill_summary in skill_summary_dicts:
-            if skill_summary['id'] not in skill_ids_assigned_to_some_topic:
-                untriaged_skill_summary_dicts.append(skill_summary)
+        for skill_summary_dict in skill_summary_dicts:
+            skill_id = skill_summary_dict['id']
+            if (skill_id not in skill_ids_assigned_to_some_topic) and (
+                    skill_id not in skill_ids_for_unpublished_skills):
+                untriaged_skill_summary_dicts.append(skill_summary_dict)
+
+        unpublished_skill_summary_dicts = [
+            summary.to_dict() for summary in (
+                skill_services.get_multi_skill_summaries(
+                    skill_ids_for_private_skills_by_user))]
 
         can_delete_topic = (
             role_services.ACTION_DELETE_TOPIC in self.user.actions)
@@ -85,14 +101,19 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         can_create_topic = (
             role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
+        can_delete_skill = (
+            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+
         can_create_skill = (
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'unpublished_skill_summary_dicts': unpublished_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
+            'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill
         })
         self.render_json(self.values)
@@ -125,25 +146,23 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        topic_id = self.payload.get('topic_id')
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.InvalidInputException
 
         description = self.payload.get('description')
+        linked_topic_ids = self.payload.get('linked_topic_ids')
+        new_skill_id = skill_services.get_new_skill_id()
+        if linked_topic_ids is not None:
+            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            for topic in topics:
+                if topic is None:
+                    raise self.InvalidInputException
+                topic_services.add_uncategorized_skill(
+                    self.user_id, topic.id, new_skill_id)
 
         skill_domain.Skill.require_valid_description(description)
 
-        new_skill_id = skill_services.get_new_skill_id()
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description)
         skill_services.save_new_skill(self.user_id, skill)
-
-        if topic_id is not None:
-            topic_services.add_uncategorized_skill(
-                self.user_id, topic_id, new_skill_id)
 
         self.render_json({
             'skillId': new_skill_id

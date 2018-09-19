@@ -16,10 +16,6 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-// TODO(brianrodri): Add all other interaction IDs to this list, then remove
-// the list altogether.
-oppia.constant('SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS', ['TextInput']);
-
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -29,50 +25,37 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'EditorStateService',
-        'ExplorationStatesService', 'StateRulesStatsService',
-        'ExplorationRightsService', 'stateInteractionIdService',
-        'INTERACTION_SPECS', 'EditabilityService',
-        'StateTopAnswersStatsService',
-        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
+        '$rootScope', '$scope', '$uibModal', 'EditabilityService',
+        'ExplorationRightsService', 'ExplorationStatesService', 'IssuesService',
+        'StateEditorService', 'StateInteractionIdService',
+        'StateTopAnswersStatsService', 'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, EditorStateService,
-            ExplorationStatesService, StateRulesStatsService,
-            ExplorationRightsService, stateInteractionIdService,
-            INTERACTION_SPECS, EditabilityService,
-            StateTopAnswersStatsService,
-            SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
+            $rootScope, $scope, $uibModal, EditabilityService,
+            ExplorationRightsService, ExplorationStatesService, IssuesService,
+            StateEditorService, StateInteractionIdService,
+            StateTopAnswersStatsService, INTERACTION_SPECS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
-          $scope.unresolvedAnswersData = null;
-          $scope.latestRefreshDate = new Date();
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
-          /**
-           * @returns {boolean} - answers from this state can be rendered with
-           * HTML.
-           */
-          var isStateInteractionIdHtmlRenderable = function() {
-            var state = ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName());
-            return (!!state &&
-              SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS.indexOf(
-                state.interaction.id) !== -1);
+          var isStateRequiredToBeResolved = function(stateName) {
+            return (
+              IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+                ExplorationStatesService.getState(stateName)));
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
-            return (
-              StateTopAnswersStatsService.hasStateStats(
-                EditorStateService.getActiveStateName()) &&
-              isStateInteractionIdHtmlRenderable());
+            var activeStateName = StateEditorService.getActiveStateName();
+            return StateTopAnswersStatsService.hasStateStats(activeStateName) &&
+              isStateRequiredToBeResolved(activeStateName);
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isCurrentInteractionLinear = function() {
@@ -100,30 +83,30 @@ oppia.directive('unresolvedAnswersOverview', [
                 'teach_oppia_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
-                'ExplorationHtmlFormatterService', 'TrainingModalService',
-                'stateInteractionIdService', 'stateCustomizationArgsService',
-                'ContextService', 'EditorStateService',
-                'ExplorationStatesService', 'TrainingDataService',
-                'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
-                'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
-                'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-                'AlertsService',
+                '$filter', '$http', '$injector', '$scope', '$uibModalInstance',
+                'AlertsService', 'AngularNameService',
+                'AnswerClassificationService', 'ContextService',
+                'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+                'StateCustomizationArgsService', 'StateEditorService',
+                'StateInteractionIdService', 'TrainingDataService',
+                'TrainingModalService', 'UrlInterpolationService',
+                'DEFAULT_OUTCOME_CLASSIFICATION', 'EXPLICIT_CLASSIFICATION',
+                'TRAINING_DATA_CLASSIFICATION',
                 function(
-                    $scope, $injector, $uibModalInstance, $http, $filter,
-                    ExplorationHtmlFormatterService, TrainingModalService,
-                    stateInteractionIdService, stateCustomizationArgsService,
-                    ContextService, EditorStateService,
-                    ExplorationStatesService, TrainingDataService,
-                    AnswerClassificationService, EXPLICIT_CLASSIFICATION,
-                    UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
-                    AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION,
-                    AlertsService) {
+                    $filter, $http, $injector, $scope, $uibModalInstance,
+                    AlertsService, AngularNameService,
+                    AnswerClassificationService, ContextService,
+                    ExplorationHtmlFormatterService, ExplorationStatesService,
+                    StateCustomizationArgsService, StateEditorService,
+                    StateInteractionIdService, TrainingDataService,
+                    TrainingModalService, UrlInterpolationService,
+                    DEFAULT_OUTCOME_CLASSIFICATION, EXPLICIT_CLASSIFICATION,
+                    TRAINING_DATA_CLASSIFICATION) {
                   var _explorationId = (
                     ContextService.getExplorationId());
-                  var _stateName = EditorStateService.getActiveStateName();
+                  var _stateName = StateEditorService.getActiveStateName();
                   var _state = ExplorationStatesService.getState(_stateName);
-                  var interactionId = stateInteractionIdService.savedMemento;
+                  var interactionId = StateInteractionIdService.savedMemento;
 
                   var rulesServiceName = (
                     AngularNameService.getNameOfInteractionRulesService(
@@ -168,7 +151,7 @@ oppia.directive('unresolvedAnswersOverview', [
                       var answer = item.answer;
                       var classificationResult = (
                         acs.getMatchingClassificationResult(
-                          _explorationId, _stateName, _state, answer,
+                          _stateName, _state.interaction, answer,
                           rulesService));
                       var classificationType = (
                         classificationResult.classificationCategorization);
@@ -178,8 +161,8 @@ oppia.directive('unresolvedAnswersOverview', [
                           answer)) {
                         var answerTemplate = (
                           ExplorationHtmlFormatterService.getAnswerHtml(
-                            answer, stateInteractionIdService.savedMemento,
-                            stateCustomizationArgsService.savedMemento));
+                            answer, StateInteractionIdService.savedMemento,
+                            StateCustomizationArgsService.savedMemento));
                         var feedbackHtml = (
                           classificationResult.outcome.feedback.getHtml());
                         $scope.unresolvedAnswers.push({
@@ -254,7 +237,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
-              EditorStateService.getActiveStateName());
+              StateEditorService.getActiveStateName());
           };
         }
       ]

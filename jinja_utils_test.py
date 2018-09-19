@@ -17,9 +17,7 @@
 # pylint: disable=relative-import
 
 from core.tests import test_utils
-import feconf
 import jinja_utils
-import utils
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
@@ -64,6 +62,17 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         # Integer parameters are used.
         parsed_str = jinja_utils.parse_string('int {{i}}', {'i': 2})
         self.assertEqual(parsed_str, 'int 2')
+
+        # Invalid input string is used.
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unable to parse string with Jinja: {{'
+        ):
+            jinja_utils.parse_string('{{', {'a': 3, 'b': 0})
+
+        # Invalid expression is used.
+        parsed_str = jinja_utils.parse_string('{{ a/b }}', {'a': 1, 'b': 0})
+        self.assertEqual(parsed_str, unicode('[CONTENT PARSING ERROR]'))
 
     def test_evaluate_object(self):
         parsed_object = jinja_utils.evaluate_object('abc', {})
@@ -111,25 +120,13 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
 
-    def test_interpolate_cache_slug(self):
-        with self.swap(feconf, 'DEV_MODE', True):
-            utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
-            self.assertEqual(parsed_str, '%s' % cache_slug)
+        # Test that int type input is used.
+        parsed_object = jinja_utils.evaluate_object(34, {})
+        self.assertEqual(parsed_object, 34)
 
-        with self.swap(feconf, 'DEV_MODE', False):
-            utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
-            self.assertEqual(parsed_str, '%s' % cache_slug)
+    def test__log2_floor_filter(self):
+        log_value = jinja_utils.JINJA_FILTERS['log2_floor'](10)
+        self.assertEqual(log_value, 3)
 
-        cache_slug = utils.get_asset_dir_prefix()
-        parsed_str = jinja_utils.interpolate_cache_slug(
-            '{{cache_slug}}/test/test.css')
-        self.assertEqual(parsed_str, '%s/test/test.css' % cache_slug)
-
-        # cache slug parameter is missing.
-        parsed_str = jinja_utils.interpolate_cache_slug(
-            '{{invalid_test}}/test/test.css')
-        self.assertEqual(parsed_str, '/test/test.css')
+        log_value = jinja_utils.JINJA_FILTERS['log2_floor'](0.0001)
+        self.assertEqual(log_value, -13)

@@ -48,31 +48,27 @@ oppia.factory('StateRulesStatsService', [
         var explorationId = ContextService.getExplorationId();
 
         return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
-            {exploration_id: explorationId, state_name: state.name})
+          '/createhandler/state_rules_stats/' + [
+            encodeURIComponent(explorationId),
+            encodeURIComponent(state.name)
+          ].join('/')
         ).then(function(response) {
           return {
             state_name: state.name,
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
-                var vizInfoDataWithAddressedInfo = {};
-                if (vizInfo.addressed_info_is_supported) {
-                  vizInfoDataWithAddressedInfo = {
-                    data: vizInfo.data.map(function(vizInfoDatum) {
-                      return Object.assign({
-                        is_addressed: (
-                          AnswerClassificationService
-                            .isClassifiedExplicitlyOrGoesToNewState(
-                              explorationId, state.name, state,
-                              vizInfoDatum.answer, interactionRulesService))
-                      }, vizInfoDatum);
-                    })
-                  };
+                var newVizInfo = angular.copy(vizInfo);
+                if (newVizInfo.addressed_info_is_supported) {
+                  newVizInfo.data.forEach(function(vizInfoDatum) {
+                    vizInfoDatum.is_addressed =
+                      AnswerClassificationService
+                        .isClassifiedExplicitlyOrGoesToNewState(
+                          state.name, state, vizInfoDatum.answer,
+                          interactionRulesService);
+                  });
                 }
-
-                return Object.assign({}, vizInfo, vizInfoDataWithAddressedInfo);
+                return newVizInfo;
               })
           };
         });

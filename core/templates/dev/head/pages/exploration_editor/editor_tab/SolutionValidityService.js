@@ -23,6 +23,11 @@ oppia.factory('SolutionValidityService', [
           self.solutionValidities[stateName] = true;
         });
       },
+      onRenameState: function(newStateName, oldStateName) {
+        this.solutionValidities[newStateName] =
+          this.solutionValidities[oldStateName];
+        this.deleteSolutionValidity(oldStateName);
+      },
       updateValidity: function(stateName, solutionIsValid) {
         this.solutionValidities[stateName] = solutionIsValid;
       },

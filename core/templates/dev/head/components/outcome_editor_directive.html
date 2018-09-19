@@ -19,13 +19,13 @@
 
       <strong>Oppia tells the learner...</strong>
       <div style="position: relative;">
-        <span ng-if="isSelfLoopWithNoFeedback(outcome) && !suppressWarnings()">
+        <span ng-if="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed()">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && suppressWarnings())"
+        <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed())"
               style="color: #888">
           <em>Nothing</em>
         </span>
@@ -67,16 +67,9 @@
   </div>
 </div>
 
-<div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
-  <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
-                             content-id="outcome.feedback.getContentId()"
-                             on-start-edit="onAudioTranslationsStartEditAction">
-  </audio-translations-editor>
-</div>
-
 <br ng-if="displayFeedback">
 
-<div ng-if="!destinationEditorIsOpen"
+<div ng-if="!destinationEditorIsOpen && !isInQuestionMode()"
      style="height: 100%;"
      title="<[isEditable() ? 'Change the destination card' : '']>">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
@@ -111,12 +104,14 @@
   </div>
 </div>
 
-<div ng-if="isEditable() && destinationEditorIsOpen">
+<div ng-if="isEditable() && destinationEditorIsOpen && !isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"
         ng-submit="saveThisDestination()">
-    <outcome-destination-editor outcome="outcome" outcome-has-feedback="displayFeedback">
+    <outcome-destination-editor outcome="outcome"
+                                outcome-has-feedback="displayFeedback"
+                                add-state="addState">
     </outcome-destination-editor>
   </form>
 

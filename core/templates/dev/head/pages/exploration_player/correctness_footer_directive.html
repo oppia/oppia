@@ -35,22 +35,26 @@
   .inner-container {
     opacity: 0;
     -webkit-animation-name: fadein;
-    -webkit-animation-duration: 1.5s;
+    -webkit-animation-duration: 2s;
     -webkit-animation-timing-function: linear;
     -webkit-animation-iteration-count: 1;
     -webkit-animation-direction: normal;
-    -webkit-animation-delay: 0.8s;
+    -webkit-animation-delay: 0.5s;
     -webkit-animation-play-state: running;
     -webkit-animation-fill-mode: forwards;
 
     -ms-animation-name: fadein;
-    -ms-animation-duration: 1.5s;
+    -ms-animation-duration: 2s;
     -ms-animation-timing-function: linear;
     -ms-animation-iteration-count: 1;
     -ms-animation-direction: normal;
-    -ms-animation-delay: 0.8s;
+    -ms-animation-delay: 0.5s;
     -ms-animation-play-state: running;
     -ms-animation-fill-mode: forwards;
+  }
+
+  .inner-container-fade-out {
+    animation: fadeout 5s 1;
   }
 
   correctness-footer .sprinkle-dot {
@@ -168,6 +172,14 @@
     -webkit-animation: flashri 2s 1;
   }
 
+  @keyframes fadeout {
+    50%  {opacity: 1;}
+    100% {opacity: 0;}
+  }
+  @-webkit-keyframes fadeout {
+    50%  {opacity: 1;}
+    100% {opacity: 0;}
+  }
   @keyframes flasha {
     0% {opacity:0;}
     49% {opacity:0;}
@@ -404,7 +416,7 @@
 
 </style>
 <div class="inner-container-alignment">
-  <div class="inner-container">
+  <div class="inner-container inner-container-fade-out">
     <div class="sprinkle-dot dot1"></div>
     <div class="sprinkle-dot dot2"></div>
     <div class="sprinkle-dot dot3"></div>

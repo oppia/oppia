@@ -114,7 +114,7 @@
 
     <md-card class="oppia-profile-content-card">
       <md-content class="oppia-profile-portfolio-container">
-        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
+        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay() track by $index"
                                   exploration-id="expl.id"
                                   exploration-title="expl.title"
                                   last-updated-msec="expl.last_updated_msec"
@@ -134,12 +134,17 @@
       </md-content>
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
-        <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
+        <i class="material-icons md-18 oppia-navigation-button"
+           ng-disabled="startingExplorationNumber === 1"
            ng-click="goToPreviousPage()">
           &#xE5C4;
         </i>
-        Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
-        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
+        Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
+        <i class="material-icons md-18 oppia-navigation-button"
+           ng-disabled="endingExplorationNumber >= numUserPortfolioExplorations"
+           ng-click="goToNextPage()">
+          &#xE5C8;
+        </i>
       </span>
     </md-card>
   </div>
@@ -298,7 +303,6 @@
       float: right;
       min-height: 630px;
       padding: 0 30px 30px 30px;
-      position: relative;
       width: -webkit-calc(100% - 280px);
       width: -moz-calc(100% - 280px);
       width: -o-calc(100% - 280px);
@@ -327,14 +331,9 @@
     }
 
     .oppia-profile-portfolio-pages {
-      bottom: 0;
       display: block;
       font-size: .9em;
       font-weight: bold;
-      margin-bottom: 60px;
-      margin-right: 65px;
-      position: absolute;
-      right: 0;
       text-align: right;
     }
 
@@ -416,7 +415,10 @@
       top: 50%;
       transform: translate(-50%, -50%);
     }
-
+    .oppia-navigation-button[disabled] {
+      cursor: default;
+      color: #bdc3c7;
+    }
   </style>
 {% endblock %}
 
@@ -426,10 +428,10 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/profile/Profile.js"></script>
+  <script src="/templates/dev/head/pages/profile/Profile.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/templates/dev/head/components/RatingComputationService.js"></script>
+  <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}

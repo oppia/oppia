@@ -29,7 +29,7 @@ oppia.factory('PlaythroughService', [
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
-  'PAGE_CONTEXT', 'RECORD_PLAYTHROUGH_PROBABILITY', 'STORE_PLAYTHROUGH_URL',
+  'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
   function(
       $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
       StopwatchObjectFactory, UrlInterpolationService,
@@ -39,34 +39,56 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      PAGE_CONTEXT, RECORD_PLAYTHROUGH_PROBABILITY, STORE_PLAYTHROUGH_URL) {
+      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
+    var whitelistedExpIds = null;
 
     var multipleIncorrectStateName = {};
 
     var cycleIdentifier = {};
     var visitedStates = [];
 
-    var _determineIfPlayerIsInSamplePopulation = function() {
-      return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
+    var misTracker = false;
+    var cstTracker = false;
+
+    var removeOldQuitAction = function() {
+      var quitAction = playthrough.actions[playthrough.actions.length - 1];
+      // After the second quit action is recorded, the first quit is removed
+      // using this method. This ensures that there are only two quit actions
+      // in the playthrough actions list at a time.
+      playthrough.actions = playthrough.actions.filter(function(action) {
+        return action.actionType !== ACTION_TYPE_EXPLORATION_QUIT;
+      });
+      playthrough.actions.push(quitAction);
+    };
+
+    var _determineIfPlayerIsInSamplePopulation = function(probability) {
+      return Math.random() < probability;
     };
 
     var createMultipleIncorrectIssueTracker = function(initStateName) {
+      if (misTracker) {
+        return;
+      }
       multipleIncorrectStateName = {
         state_name: initStateName,
         num_times_incorrect: 0
       };
+      misTracker = true;
     };
 
     var createCyclicIssueTracker = function(initStateName) {
+      if (cstTracker) {
+        return;
+      }
       cycleIdentifier = {
         cycle: '',
         num_cycles: 0
       };
-
-      visitedStates.push(initStateName);
+      visitedStates.unshift(initStateName);
+      cstTracker = true;
     };
 
     var incrementIncorrectAnswerInMultipleIncorrectIssueTracker = function() {
@@ -164,9 +186,11 @@ oppia.factory('PlaythroughService', [
     };
 
     var storePlaythrough = function(isNewPlaythrough) {
+      var playthroughId = isNewPlaythrough ? null : playthrough.playthroughId;
       var promise = $http.post(getFullPlaythroughUrl(), {
         playthrough_data: playthrough.toBackendDict(),
-        issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+        issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION,
+        playthrough_id: playthroughId
       });
       if (isNewPlaythrough) {
         promise.then(function(response) {
@@ -186,41 +210,47 @@ oppia.factory('PlaythroughService', [
         });
     };
 
+    var isPlayerExcludedFromSamplePopulation = function() {
+      return !isPlayerInSamplePopulation;
+    };
+
+    var isExplorationWhitelisted = function() {
+      return whitelistedExpIds.indexOf(playthrough.expId) !== -1;
+    };
+
+    var isPlaythroughDiscarded = function() {
+      return (
+        isPlayerExcludedFromSamplePopulation() || !isExplorationWhitelisted());
+    };
+
     return {
-      initSession: function(newExplorationId, newExplorationVersion) {
-        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation();
+      initSession: function(
+          explorationId, explorationVersion, playthroughProbability,
+          whitelistedExplorationIds) {
+        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
+          playthroughProbability);
+        whitelistedExpIds = whitelistedExplorationIds;
         playthrough = PlaythroughObjectFactory.createNew(
-          null, newExplorationId, newExplorationVersion, null, {}, []);
+          null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
-      },
-      isPlayerExcludedFromSamplePopulation: function() {
-        return !isPlayerInSamplePopulation;
-      },
-      isExplorationWhitelisted: function(expId) {
-        var whiteListedExpIds =
-          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS;
-        if (whiteListedExpIds.indexOf(expId) !== -1) {
-          return true;
-        }
-        return false;
       },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.expId)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
-        playthrough.actions.push(LearnerActionObjectFactory.createNew(
+        var expStartLearnerAction = LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_START,
           {
             state_name: {
               value: initStateName
             }
           },
-          CURRENT_ACTION_SCHEMA_VERSION
-        ));
+          CURRENT_ACTION_SCHEMA_VERSION);
+
+        playthrough.actions.unshift(expStartLearnerAction);
 
         createMultipleIncorrectIssueTracker(initStateName);
 
@@ -231,9 +261,14 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+        if (isPlaythroughDiscarded()) {
           return;
+        }
+        if (!cstTracker) {
+          createCyclicIssueTracker(stateName);
+        }
+        if (!misTracker) {
+          createMultipleIncorrectIssueTracker(stateName);
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_ANSWER_SUBMIT,
@@ -247,13 +282,13 @@ oppia.factory('PlaythroughService', [
             interaction_id: {
               value: interactionId
             },
-            answer: {
+            submitted_answer: {
               value: answer
             },
             feedback: {
               value: feedback
             },
-            time_spent_in_state_secs: {
+            time_spent_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -271,8 +306,7 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -281,7 +315,7 @@ oppia.factory('PlaythroughService', [
             state_name: {
               value: stateName
             },
-            time_spent_in_state_secs: {
+            time_spent_in_state_in_msecs: {
               value: timeSpentInStateSecs
             }
           },
@@ -289,8 +323,7 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
-        if (this.isPlayerExcludedFromSamplePopulation() ||
-            !this.isExplorationWhitelisted(playthrough.explorationId)) {
+        if (isPlaythroughDiscarded()) {
           return;
         }
         if (isExplorationComplete) {
@@ -299,6 +332,7 @@ oppia.factory('PlaythroughService', [
         }
         if (playthrough.playthroughId) {
           // Playthrough ID exists, so issue has already been identified.
+          removeOldQuitAction();
           if (playthrough.issueType === ISSUE_TYPE_EARLY_QUIT) {
             // If the existing issue is of type early quit, and some other issue
             // can be identified, update the issue since early quit has lower

@@ -75,6 +75,7 @@ oppia.controller('LearnerDashboard', [
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
   'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
+  'UserService',
   function(
       $scope, $rootScope, $window, $http, $uibModal, AlertsService,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -83,7 +84,8 @@ oppia.controller('LearnerDashboard', [
       LEARNER_DASHBOARD_SECTION_I18N_IDS,
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
       DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-      FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory) {
+      FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
+      UserService) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -97,7 +99,9 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
-    $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
+    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+      $scope.profilePictureDataUrl = dataUrl;
+    });
     $scope.username = GLOBALS.username;
     $scope.loadingFeedbacks = false;
     var threadIndex = null;
@@ -266,7 +270,7 @@ oppia.controller('LearnerDashboard', [
           ui.placeholder.height(ui.item.height());
           $scope.$apply();
         },
-        sort: function (e, ui) {
+        sort: function(e, ui) {
           /* eslint-disable quote-props */
           // Reset the position of the window on scrolling. This keeps the mouse
           // position and elements in sync.

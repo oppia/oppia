@@ -14,7 +14,6 @@
 
 """Tests for question domain objects."""
 
-from core.domain import exp_domain
 from core.domain import question_domain
 from core.tests import test_utils
 import feconf
@@ -30,16 +29,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION, 'en', 1)
+            feconf.CURRENT_STATES_SCHEMA_VERSION, 'en', 1)
 
     def test_to_and_from_dict(self):
         default_question_state_data = (
-            exp_domain.State.create_default_state(None))
+            question_domain.Question.create_default_question_state())
         question_dict = {
             'id': 'col1.random',
             'question_state_data': default_question_state_data.to_dict(),
             'question_state_schema_version': (
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION),
+                feconf.CURRENT_STATES_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1
         }
@@ -53,28 +52,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.question.validate()
 
-    def _assert_strict_validation_error(self, expected_error_substring):
-        """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            self.question.validate(strict=True)
-
     def test_strict_validation(self):
         """Test to verify validate method of Question domain object with
         strict as True.
         """
         state = self.question.question_state_data
         state.interaction.solution = None
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected the question to have a solution')
         state.interaction.hints = []
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected the question to have at least one hint')
         state.interaction.default_outcome.dest = 'abc'
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
         state.interaction.default_outcome.labelled_as_correct = False
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected at least one answer group to have a correct answer')
 
     def test_not_strict_validation(self):
@@ -92,11 +85,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
-        self.question.version = 'abc'
-        self._assert_validation_error('Expected version to be an integer')
-
         self.question.language_code = 1
         self._assert_validation_error('Expected language_code to be a string')
+
+        self.question.version = 'abc'
+        self._assert_validation_error('Expected version to be an integer')
 
         self.question.id = 123
         self._assert_validation_error('Expected ID to be a string')
@@ -108,30 +101,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_id = 'col1.random'
         question = question_domain.Question.create_default_question(
             question_id)
-        default_question_data = exp_domain.State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+        default_question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
             question.question_state_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
-
-
-class QuestionSummaryDomainTest(test_utils.GenericTestBase):
-    """Test for Question Summary Domain object."""
-
-    def test_to_dict(self):
-        expected_object_dict = {
-            'id': 'abc',
-            'creator_id': 'creator_id',
-            'last_updated': None,
-            'created_on': None,
-            'question_content': 'Question 1'
-        }
-        observed_object = question_domain.QuestionSummary(
-            'creator_id', 'abc', 'Question 1')
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
@@ -144,6 +121,16 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         }
         observed_object = question_domain.QuestionSkillLink(
             'testquestion', 'testskill')
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+    def test_update_skill_id(self):
+        expected_object_dict = {
+            'question_id': 'testquestion',
+            'skill_id': 'testskill2',
+        }
+        observed_object = question_domain.QuestionSkillLink(
+            'testquestion', 'testskill')
+        observed_object.update_skill_id('testskill2')
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 

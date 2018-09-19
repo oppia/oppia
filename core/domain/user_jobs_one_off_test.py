@@ -435,10 +435,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
+                'exploration', self.EXP_ID_1, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
             thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0].id
+                'exploration', self.EXP_ID_1, False)[0].id
             feedback_services.create_message(
                 thread_id, self.user_c_id, None, None, 'more text')
 
@@ -453,9 +453,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
         self.assertEqual(
-            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_b_subscriptions_model.general_feedback_thread_ids, [thread_id])
         self.assertEqual(
-            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_c_subscriptions_model.general_feedback_thread_ids, [thread_id])
 
     def test_exploration_subscription(self):
         with self.swap(
@@ -754,7 +754,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
@@ -772,7 +772,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
         self.assertEqual(weekly_stats, expected_results_list)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id),
             expected_results_list[0])
 
@@ -951,7 +951,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         ]
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, expected_results_list)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id),
             expected_results_list[1])
 
