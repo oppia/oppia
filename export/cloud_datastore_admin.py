@@ -25,7 +25,7 @@ import httplib
 import json
 import logging
 
-import oppia.export.acl_decorators as acl_decorators
+from oppia.export import acl_decorators
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch

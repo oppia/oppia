@@ -5,7 +5,7 @@ service: cloud-datastore-admin
 
 libraries:
 - name: webapp2
-  version: "latest"
+  version: '2.5.2'
 
 handlers:
 - url: /cloud_datastore_export
