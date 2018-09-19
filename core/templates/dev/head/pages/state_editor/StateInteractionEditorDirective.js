@@ -38,25 +38,25 @@ oppia.directive('stateInteractionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_interaction_editor_directive.html'),
       controller: [
-        '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
-        'AlertsService', 'HtmlEscaperService',
+        '$scope', '$rootScope', '$uibModal', '$injector',
+        'AlertsService',
         'INTERACTION_SPECS', 'StateInteractionIdService',
-        'GenerateContentIdService', 'StateCustomizationArgsService',
+        'StateCustomizationArgsService',
         'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'StateContentIdsToAudioTranslationsService',
-        'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
-        'StateSolutionService', 'StateHintsService',
+        'ExplorationHtmlFormatterService',
+        'StateSolutionService',
         'StateContentService', function(
-            $scope, $http, $rootScope, $uibModal, $injector, $filter,
-            AlertsService, HtmlEscaperService,
+            $scope, $rootScope, $uibModal, $injector,
+            AlertsService,
             INTERACTION_SPECS, StateInteractionIdService,
-            GenerateContentIdService, StateCustomizationArgsService,
+            StateCustomizationArgsService,
             EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             StateContentIdsToAudioTranslationsService,
-            ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
-            StateSolutionService, StateHintsService,
+            ExplorationHtmlFormatterService,
+            StateSolutionService,
             StateContentService) {
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
@@ -179,13 +179,13 @@ oppia.directive('stateInteractionEditor', [
                 resolve: {},
                 controller: [
                   '$scope', '$uibModalInstance', '$injector',
-                  'StateSolutionService', 'StateInteractionIdService',
+                  'StateInteractionIdService',
                   'StateCustomizationArgsService',
                   'InteractionDetailsCacheService', 'INTERACTION_SPECS',
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
                   function(
                       $scope, $uibModalInstance, $injector,
-                      StateSolutionService, StateInteractionIdService,
+                      StateInteractionIdService,
                       StateCustomizationArgsService,
                       InteractionDetailsCacheService, INTERACTION_SPECS,
                       UrlInterpolationService, EditorFirstTimeEventsService) {

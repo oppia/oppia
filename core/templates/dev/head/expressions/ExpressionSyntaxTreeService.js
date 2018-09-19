@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 oppia.factory('ExpressionSyntaxTreeService', [
-  '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
-  function($log, ExpressionParserService, PARAMETER_TYPES) {
+  'ExpressionParserService', 'PARAMETER_TYPES',
+  function(ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
-    var ExpressionError = function() {
-    };
+    var ExpressionError = function() {};
     ExpressionError.prototype = new Error();
     ExpressionError.prototype.constructor = ExpressionError;
 
@@ -55,7 +54,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
     ExprWrongArgTypeError.prototype.toString = function() {
       if (this.arg === null) {
         return this.name + ': Type ' + this.actualType +
-        ' does not match expected type ' + this.expectedType;
+          ' does not match expected type ' + this.expectedType;
       }
       return this.name + ': ' + this.arg + ' has type ' + this.actualType +
         ' which does not match expected type ' + this.expectedType;

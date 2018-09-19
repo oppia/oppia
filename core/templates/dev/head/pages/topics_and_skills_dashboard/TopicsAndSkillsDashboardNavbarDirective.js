@@ -26,13 +26,11 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
         'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'EVENT_TYPE_SKILL_CREATION_ENABLED',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            EVENT_TYPE_SKILL_CREATION_ENABLED) {
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };

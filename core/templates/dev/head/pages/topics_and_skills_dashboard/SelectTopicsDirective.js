@@ -26,9 +26,8 @@ oppia.directive('selectTopics', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/select_topics_directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope',
-        function(
-            $scope, $uibModal, $rootScope) {
+        '$scope', function(
+            $scope) {
           $scope.topicSummaries = $scope.getTopicSummaries();
           $scope.selectOrDeselectTopic = function(topicId, index) {
             if (!$scope.topicSummaries[index].isSelected) {

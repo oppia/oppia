@@ -17,8 +17,8 @@
 // in via initArgs.
 
 oppia.directive('unicodeStringEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -82,4 +82,5 @@ oppia.directive('unicodeStringEditor', [
         }
       }]
     };
-  }]);
+  }
+]);

@@ -16,9 +16,9 @@
  * @fileoverview Validator service for the interaction.
  */
 
-oppia.factory('MultipleChoiceInputValidationService', [
-  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+oppia.factory('MultipleChoiceInputValidationService', ['WARNING_TYPES',
+  'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];

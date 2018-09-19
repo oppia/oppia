@@ -18,12 +18,10 @@
 
 oppia.factory('HintsAndSolutionManagerService', [
   '$timeout', '$rootScope',
-  'DELAY_FOR_HINT_FEEDBACK_MSEC', 'HINT_REQUEST_STRING_I18N_IDS',
   'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
       $timeout, $rootScope,
-      DELAY_FOR_HINT_FEEDBACK_MSEC, HINT_REQUEST_STRING_I18N_IDS,
       WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC,
       EVENT_NEW_CARD_AVAILABLE) {
     var timeout = null;

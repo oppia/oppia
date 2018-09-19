@@ -25,8 +25,8 @@ oppia.constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
 
 oppia.controller('Admin', [
-  '$scope', '$http', '$location', 'AdminRouterService', 'DEV_MODE',
-  function($scope, $http, $location, AdminRouterService, DEV_MODE) {
+  '$scope', '$location', 'AdminRouterService', 'DEV_MODE',
+  function($scope, $location, AdminRouterService, DEV_MODE) {
     $scope.username = GLOBALS.USERNAME;
     $scope.userEmail = GLOBALS.USER_EMAIL;
     $scope.isModerator = GLOBALS.IS_MODERATOR;

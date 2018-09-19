@@ -29,9 +29,9 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
         '/interactions/DragAndDropSortInput/directives/' +
         'drag_and_drop_sort_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'UrlService', 'CurrentInteractionService',
+        '$scope', '$attrs', 'CurrentInteractionService',
         function(
-            $scope, $attrs, UrlService, CurrentInteractionService) {
+            $scope, $attrs, CurrentInteractionService) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
 

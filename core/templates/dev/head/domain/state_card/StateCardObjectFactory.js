@@ -19,10 +19,10 @@
 
 oppia.factory('StateCardObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'ExplorationHtmlFormatterService', 'AudioTranslationLanguageService',
+  'AudioTranslationLanguageService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-      ExplorationHtmlFormatterService, AudioTranslationLanguageService) {
+      AudioTranslationLanguageService) {
     var StateCard = function(
         stateName, contentHtml, interactionHtml, interaction,
         inputResponsePairs, contentIdsToAudioTranslations, contentId) {
@@ -87,8 +87,7 @@ oppia.factory('StateCardObjectFactory', [
 
     StateCard.prototype.doesInteractionSupportHints = function() {
       var interactionId = this.getInteractionId();
-      return (
-        !INTERACTION_SPECS[interactionId].is_terminal &&
+      return (!INTERACTION_SPECS[interactionId].is_terminal &&
         !INTERACTION_SPECS[interactionId].is_linear);
     };
 
@@ -120,10 +119,9 @@ oppia.factory('StateCardObjectFactory', [
 
     StateCard.prototype.isInteractionInline = function() {
       var interactionId = this.getInteractionId();
-      return (
-        !interactionId ||
+      return (!interactionId ||
         INTERACTION_SPECS[interactionId].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
+        INTERACTION_DISPLAY_MODE_INLINE);
     };
 
     StateCard.prototype.getContentHtml = function() {
@@ -189,8 +187,8 @@ oppia.factory('StateCardObjectFactory', [
         stateName, contentHtml, interactionHtml, interaction,
         contentIdsToAudioTranslations, contentId) {
       return new StateCard(
-        stateName, contentHtml, interactionHtml, interaction,
-        [], contentIdsToAudioTranslations, contentId);
+        stateName, contentHtml, interactionHtml, interaction, [],
+        contentIdsToAudioTranslations, contentId);
     };
 
     return StateCard;

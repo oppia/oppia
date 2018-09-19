@@ -27,10 +27,10 @@ oppia.directive('explorationFooter', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/exploration_footer_directive.html'),
       controller: [
-        '$scope', '$http', '$log', 'ContextService',
+        '$scope', 'ContextService',
         'ExplorationSummaryBackendApiService', 'WindowDimensionsService',
         function(
-            $scope, $http, $log, ContextService,
+            $scope, ContextService,
             ExplorationSummaryBackendApiService, WindowDimensionsService) {
           $scope.explorationId = ContextService.getExplorationId();
 

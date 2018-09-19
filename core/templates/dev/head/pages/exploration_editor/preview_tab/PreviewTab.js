@@ -20,20 +20,16 @@
 oppia.controller('PreviewTab', [
   '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
-  'ExplorationCategoryService', 'StateEditorService', 'ContextService',
-  'ExplorationInitStateNameService', 'ExplorationParamChangesService',
-  'ExplorationParamSpecsService', 'ExplorationStatesService',
-  'ExplorationTitleService', 'ExplorationEngineService',
+  'StateEditorService', 'ContextService',
+  'ExplorationInitStateNameService', 'ExplorationEngineService',
   'ParameterMetadataService', 'ParamChangeObjectFactory',
   'NumberAttemptsService', 'EditableExplorationBackendApiService',
   'UrlInterpolationService', 'PlayerCorrectnessFeedbackEnabledService',
   function(
       $scope, $uibModal, $q, $timeout, LearnerParamsService,
       ExplorationDataService, ExplorationAdvancedFeaturesService,
-      ExplorationCategoryService, StateEditorService, ContextService,
-      ExplorationInitStateNameService, ExplorationParamChangesService,
-      ExplorationParamSpecsService, ExplorationStatesService,
-      ExplorationTitleService, ExplorationEngineService,
+      StateEditorService, ContextService,
+      ExplorationInitStateNameService, ExplorationEngineService,
       ParameterMetadataService, ParamChangeObjectFactory,
       NumberAttemptsService, EditableExplorationBackendApiService,
       UrlInterpolationService, PlayerCorrectnessFeedbackEnabledService) {
@@ -44,7 +40,7 @@ oppia.controller('PreviewTab', [
 
       // Show a warning message if preview doesn't start from the first state
       if (initStateNameForPreview !==
-          ExplorationInitStateNameService.savedMemento) {
+        ExplorationInitStateNameService.savedMemento) {
         $scope.previewWarning =
           'Preview started from \"' + initStateNameForPreview + '\"';
       } else {
@@ -86,7 +82,7 @@ oppia.controller('PreviewTab', [
 
     $scope.showParameterSummary = function() {
       return (ExplorationAdvancedFeaturesService.areParametersEnabled() &&
-              !angular.equals({}, $scope.allParams));
+        !angular.equals({}, $scope.allParams));
     };
 
     $scope.showSetParamsModal = function(manualParamChanges, callback) {

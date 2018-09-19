@@ -15,10 +15,8 @@
 
 oppia.directive('fractionEditor', [
   'FractionObjectFactory', 'UrlInterpolationService',
-  'OBJECT_EDITOR_URL_PREFIX',
   function(
-      FractionObjectFactory, UrlInterpolationService,
-      OBJECT_EDITOR_URL_PREFIX) {
+      FractionObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {

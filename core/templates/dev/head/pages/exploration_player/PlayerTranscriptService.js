@@ -21,7 +21,7 @@
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
 oppia.factory('PlayerTranscriptService', [
-  '$log', 'StateCardObjectFactory', function($log, StateCardObjectFactory) {
+  '$log', function($log) {
     // Each element of this array represents a 'StateCard' domain object.
     //
     // Note that every card in this transcript is visible on the screen. The

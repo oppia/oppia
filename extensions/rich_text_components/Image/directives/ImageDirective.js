@@ -19,14 +19,11 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'ContextService',
-  'UrlInterpolationService', 'ImagePreloaderService',
+oppia.directive('oppiaNoninteractiveImage', ['HtmlEscaperService',
+  'ContextService', 'UrlInterpolationService', 'ImagePreloaderService',
   'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
-  function(
-      $rootScope, $sce, HtmlEscaperService, ContextService,
-      UrlInterpolationService, ImagePreloaderService, AssetsBackendApiService,
-      LOADING_INDICATOR_URL) {
+  function(HtmlEscaperService, ContextService, UrlInterpolationService,
+    ImagePreloaderService, AssetsBackendApiService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},

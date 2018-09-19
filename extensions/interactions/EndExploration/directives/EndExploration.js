@@ -28,11 +28,11 @@ oppia.directive('oppiaInteractiveEndExploration', [
         '/interactions/EndExploration/directives/' +
         'end_exploration_interaction_directive.html'),
       controller: [
-        '$scope', '$http', '$attrs', '$q', 'UrlService',
+        '$scope', '$http', '$attrs', 'UrlService',
         'ContextService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
-            $scope, $http, $attrs, $q, UrlService,
+            $scope, $http, $attrs, UrlService,
             ContextService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var authorRecommendedExplorationIds = (

@@ -60,8 +60,8 @@
 
 // Service for expression evaluation.
 oppia.factory('ExpressionEvaluatorService', [
-  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
-  function($log, ExpressionParserService, ExpressionSyntaxTreeService) {
+  'ExpressionParserService', 'ExpressionSyntaxTreeService',
+  function(ExpressionParserService, ExpressionSyntaxTreeService) {
     var evaluateExpression = function(expression, envs) {
       return ExpressionSyntaxTreeService.applyFunctionToParseTree(
         ExpressionParserService.parse(expression), envs, evaluate);

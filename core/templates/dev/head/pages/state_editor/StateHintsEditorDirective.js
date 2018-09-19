@@ -30,14 +30,14 @@ oppia.directive('stateHintsEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'StateHintsService', 'COMPONENT_NAME_HINT', 'StateEditorService',
+        'StateHintsService', 'COMPONENT_NAME_HINT',
         'StateContentIdsToAudioTranslationsService', 'EditabilityService',
         'StateInteractionIdService', 'UrlInterpolationService',
         'HintObjectFactory', 'StateSolutionService',
         function(
             $scope, $rootScope, $uibModal, $filter,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
+            StateHintsService, COMPONENT_NAME_HINT,
             StateContentIdsToAudioTranslationsService, EditabilityService,
             StateInteractionIdService, UrlInterpolationService,
             HintObjectFactory, StateSolutionService) {

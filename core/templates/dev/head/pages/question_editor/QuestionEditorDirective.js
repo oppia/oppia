@@ -30,19 +30,11 @@ oppia.directive('questionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'AlertsService', 'QuestionCreationService',
-        'EditabilityService', 'EditableQuestionBackendApiService',
-        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        'StateContentService', 'StateContentIdsToAudioTranslationsService',
-        'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
-        'SolutionValidityService',
+        '$scope', '$rootScope', 'EditabilityService',
+        'StateEditorService', 'SolutionValidityService',
         function(
-            $scope, $rootScope, AlertsService, QuestionCreationService,
-            EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            StateContentService, StateContentIdsToAudioTranslationsService,
-            INTERACTION_SPECS, StateEditorService, ResponsesService,
-            SolutionValidityService) {
+            $scope, $rootScope, EditabilityService,
+            StateEditorService, SolutionValidityService) {
           if ($scope.canEditQuestion()) {
             EditabilityService.markEditable();
           } else {

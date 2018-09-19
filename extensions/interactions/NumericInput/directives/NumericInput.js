@@ -28,11 +28,11 @@ oppia.directive('oppiaInteractiveNumericInput', [
         '/interactions/NumericInput/directives/' +
         'numeric_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$scope', '$attrs', 'numericInputRulesService',
+        'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, numericInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $scope, $attrs, numericInputRulesService,
+            CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

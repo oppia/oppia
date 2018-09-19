@@ -23,8 +23,8 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story_editor/story_editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'FocusManagerService', 'StoryEditorStateService',
-        function($scope, FocusManagerService, StoryEditorStateService) {
+        '$scope', 'StoryEditorStateService',
+        function($scope, StoryEditorStateService) {
           $scope.story = StoryEditorStateService.getStory();
         }
       ]

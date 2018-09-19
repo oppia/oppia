@@ -14,8 +14,8 @@
 
 
 oppia.directive('listOfSetsOfHtmlStringsEditor', [
-  'OBJECT_EDITOR_URL_PREFIX', 'UrlInterpolationService',
-  function(OBJECT_EDITOR_URL_PREFIX, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {

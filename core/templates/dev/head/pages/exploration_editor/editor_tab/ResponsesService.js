@@ -22,7 +22,7 @@ oppia.factory('ResponsesService', [
   'AnswerGroupsCacheService', 'StateEditorService',
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ContextService', 'StateContentIdsToAudioTranslationsService',
+  'StateContentIdsToAudioTranslationsService',
   'SolutionValidityService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -31,7 +31,7 @@ oppia.factory('ResponsesService', [
       AnswerGroupsCacheService, StateEditorService,
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, StateContentIdsToAudioTranslationsService,
+      StateContentIdsToAudioTranslationsService,
       SolutionValidityService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {

@@ -17,12 +17,12 @@
  */
 
 oppia.factory('CompareVersionsService', [
-  '$http', '$q', 'VersionTreeService', 'ExplorationDataService',
-  'ExplorationDiffService', 'StateObjectFactory', 'StatesObjectFactory',
+  '$q', 'VersionTreeService', 'ExplorationDataService',
+  'ExplorationDiffService', 'StatesObjectFactory',
   'ReadOnlyExplorationBackendApiService',
   function(
-      $http, $q, VersionTreeService, ExplorationDataService,
-      ExplorationDiffService, StateObjectFactory, StatesObjectFactory,
+      $q, VersionTreeService, ExplorationDataService,
+      ExplorationDiffService, StatesObjectFactory,
       ReadOnlyExplorationBackendApiService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.

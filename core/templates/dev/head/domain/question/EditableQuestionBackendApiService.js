@@ -28,11 +28,9 @@ oppia.constant(
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   'UrlInterpolationService', 'QUESTION_CREATION_URL',
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
   function(
       $http, $q, EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-      UrlInterpolationService, QUESTION_CREATION_URL,
-      QUESTION_SKILL_LINK_URL_TEMPLATE) {
+      UrlInterpolationService, QUESTION_CREATION_URL) {
     var _createQuestion = function(
         skillId, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(

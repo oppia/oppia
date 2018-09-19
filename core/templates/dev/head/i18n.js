@@ -38,8 +38,8 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-  '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
-  function($http, $rootScope, $scope, $translate, $timeout, $cookies) {
+  '$http', '$scope', '$translate', '$timeout',
+  function($http, $scope, $translate, $timeout) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';

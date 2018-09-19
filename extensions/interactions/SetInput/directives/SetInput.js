@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveSetInput', [
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$translate', 'setInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$scope', '$translate', 'setInputRulesService',
+        'CurrentInteractionService',
         function(
-            $scope, $attrs, $translate, setInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $scope, $translate, setInputRulesService,
+            CurrentInteractionService) {
           $scope.schema = {
             type: 'list',
             items: {

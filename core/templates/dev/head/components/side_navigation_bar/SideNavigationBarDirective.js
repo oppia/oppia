@@ -17,17 +17,19 @@
  */
 
 oppia.directive('sideNavigationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/side_navigation_bar/' +
         'side_navigation_bar_directive.html'),
-      controller: ['$scope', '$timeout', function(
-          $scope, $timeout) {
+      controller: ['$scope', function(
+          $scope) {
         $scope.NAV_MODE = GLOBALS.NAV_MODE;
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
-  }]);
+  }
+]);

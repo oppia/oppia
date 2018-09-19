@@ -17,7 +17,8 @@
  */
 
 oppia.directive('collectionEditorNavbar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -27,7 +28,6 @@ oppia.directive('collectionEditorNavbar', [
         'UndoRedoService', 'CollectionEditorStateService',
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
-        'EditableCollectionBackendApiService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
@@ -35,7 +35,6 @@ oppia.directive('collectionEditorNavbar', [
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
-            EditableCollectionBackendApiService,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.collectionId = GLOBALS.collectionId;
@@ -137,8 +136,7 @@ oppia.directive('collectionEditorNavbar', [
           };
 
           $scope.publishCollection = function() {
-            var additionalMetadataNeeded = (
-              !$scope.collection.getTitle() ||
+            var additionalMetadataNeeded = (!$scope.collection.getTitle() ||
               !$scope.collection.getObjective() ||
               !$scope.collection.getCategory());
 
@@ -159,9 +157,11 @@ oppia.directive('collectionEditorNavbar', [
 
                     $scope.requireTitleToBeSpecified = !collection.getTitle();
                     $scope.requireObjectiveToBeSpecified = (
-                      !collection.getObjective());
+                      !collection.getObjective()
+                    );
                     $scope.requireCategoryToBeSpecified = (
-                      !collection.getCategory());
+                      !collection.getCategory()
+                    );
 
                     $scope.newTitle = collection.getTitle();
                     $scope.newObjective = collection.getObjective();
@@ -241,7 +241,8 @@ oppia.directive('collectionEditorNavbar', [
                 $scope.collectionRights.setPrivate();
                 CollectionEditorStateService.setCollectionRights(
                   $scope.collectionRights);
-              }, function() {
+              },
+              function() {
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');
               });
@@ -249,4 +250,5 @@ oppia.directive('collectionEditorNavbar', [
         }
       ]
     };
-  }]);
+  }
+]);

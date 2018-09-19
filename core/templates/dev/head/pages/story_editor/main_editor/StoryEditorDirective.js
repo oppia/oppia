@@ -26,11 +26,11 @@ oppia.directive('storyEditor', [
         '/pages/story_editor/main_editor/story_editor_directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR',
+        'EVENT_VIEW_STORY_NODE_EDITOR',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
+            EVENT_VIEW_STORY_NODE_EDITOR,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();

@@ -48,13 +48,11 @@ oppia.constant('STATS_REPORTING_URLS', {
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'siteAnalyticsService', 'StopwatchObjectFactory',
-  'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
+  'UrlInterpolationService', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
       PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
-      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
-      PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
+      UrlInterpolationService, STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;

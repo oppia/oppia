@@ -22,13 +22,13 @@ oppia.directive('oppiaInteractiveFractionInput', [
         '/interactions/FractionInput/directives/' +
         'fraction_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'fractionInputRulesService',
+        '$scope', '$attrs', 'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, fractionInputRulesService,
+            $scope, $attrs, fractionInputRulesService,
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
-            WindowDimensionsService, CurrentInteractionService) {
+            CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

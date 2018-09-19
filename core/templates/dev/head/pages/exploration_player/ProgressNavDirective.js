@@ -32,12 +32,12 @@ oppia.directive('progressNav', [
         '/pages/exploration_player/progress_nav_directive.html'),
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
-        'PlayerTranscriptService', 'ExplorationEngineService',
+        'PlayerTranscriptService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         'ExplorationPlayerStateService',
         function($scope, $rootScope, PlayerPositionService, UrlService,
-            PlayerTranscriptService, ExplorationEngineService,
+            PlayerTranscriptService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
             ExplorationPlayerStateService) {

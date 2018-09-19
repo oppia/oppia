@@ -27,19 +27,13 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$log', '$uibModal', '$rootScope', '$window', '$timeout',
-  'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
+  '$scope', '$http', '$log', '$rootScope', '$window', '$timeout',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
-  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
-  'LearnerDashboardIdsBackendApiService',
-  'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
-      $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
-      ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
+      $scope, $http, $log, $rootScope, $window, $timeout,
       SearchService, WindowDimensionsService, UrlInterpolationService,
-      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
-      LearnerDashboardIdsBackendApiService,
-      LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
+      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];

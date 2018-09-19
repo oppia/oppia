@@ -13,10 +13,10 @@
 // limitations under the License.
 
 oppia.factory('ExpressionTypeParserService', [
-  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
+  'ExpressionParserService', 'ExpressionSyntaxTreeService',
   'PARAMETER_TYPES',
   function(
-      $log, ExpressionParserService, ExpressionSyntaxTreeService,
+      ExpressionParserService, ExpressionSyntaxTreeService,
       PARAMETER_TYPES) {
     var getExpressionOutputType = function(expression, envs) {
       return ExpressionSyntaxTreeService.applyFunctionToParseTree(
@@ -59,8 +59,8 @@ oppia.factory('ExpressionTypeParserService', [
       // actual value.
       return (
         isNaN(+parsed) ?
-          PARAMETER_TYPES.UNICODE_STRING :
-          PARAMETER_TYPES.REAL);
+        PARAMETER_TYPES.UNICODE_STRING :
+        PARAMETER_TYPES.REAL);
     };
 
     return {

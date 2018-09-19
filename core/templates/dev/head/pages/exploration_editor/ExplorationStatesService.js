@@ -19,18 +19,18 @@
  */
 
 oppia.factory('ExplorationStatesService', [
-  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
+  '$uibModal', '$filter', '$location', '$rootScope', '$injector',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService',
+  'AnswerClassificationService',
   'UrlInterpolationService',
   function(
-      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
+      $uibModal, $filter, $location, $rootScope, $injector,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       StateEditorService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ContextService,
+      AnswerClassificationService,
       UrlInterpolationService) {
     var _states = null;
 

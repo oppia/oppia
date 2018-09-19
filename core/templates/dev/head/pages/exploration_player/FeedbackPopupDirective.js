@@ -36,12 +36,12 @@ oppia.directive('feedbackPopup', [
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
         '$scope', '$element', '$http', '$log', '$timeout', '$filter',
-        'FocusManagerService', 'AlertsService', 'BackgroundMaskService',
+        'FocusManagerService', 'BackgroundMaskService',
         'PlayerPositionService', 'WindowDimensionsService',
         'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
             $scope, $element, $http, $log, $timeout, $filter,
-            FocusManagerService, AlertsService, BackgroundMaskService,
+            FocusManagerService, BackgroundMaskService,
             PlayerPositionService, WindowDimensionsService,
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';

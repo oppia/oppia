@@ -19,12 +19,11 @@
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
-  '$filter', '$log', '$uibModal', '$interpolate', '$document',
-  'ContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  '$log', '$uibModal', '$document',
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   'UrlInterpolationService', 'FocusManagerService',
   function(
-      $filter, $log, $uibModal, $interpolate, $document,
-      ContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      $log, $uibModal, $document, RTE_COMPONENT_SPECS, HtmlEscaperService,
       UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 

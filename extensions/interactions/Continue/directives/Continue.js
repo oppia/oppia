@@ -29,10 +29,10 @@ oppia.directive('oppiaInteractiveContinue', [
         '/interactions/Continue/directives/' +
         'continue_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
+        '$scope', '$attrs',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
+            $scope, $attrs,
             CurrentInteractionService) {
           $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
             $attrs.buttonTextWithValue);

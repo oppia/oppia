@@ -17,13 +17,13 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
+  '$scope', '$log', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
   'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
+      $scope, $log, $uibModal, $timeout, $rootScope, AlertsService,
       DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
@@ -88,7 +88,8 @@ oppia.controller('FeedbackTab', [
         }]
       }).result.then(function(result) {
         ThreadDataService.createNewThread(
-          result.newThreadSubject, result.newThreadText, function() {
+          result.newThreadSubject, result.newThreadText,
+          function() {
             $scope.clearActiveThread();
             AlertsService.addSuccessMessage('Feedback thread created.');
           });
@@ -110,7 +111,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.getSuggestionButtonType = function() {
       return (!_isSuggestionHandled() && _isSuggestionValid() &&
-              !_hasUnsavedChanges() ? 'primary' : 'default');
+        !_hasUnsavedChanges() ? 'primary' : 'default');
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
@@ -147,11 +148,11 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
+          '$scope', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
           'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-              $scope, $log, $uibModalInstance, suggestionIsHandled,
+              $scope, $uibModalInstance, suggestionIsHandled,
               suggestionIsValid, unsavedChangesExist, suggestionStatus,
               description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
@@ -173,7 +174,7 @@ oppia.controller('FeedbackTab', [
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
               $scope.errorMessage = (suggestionStatus === 'accepted' ||
-                suggestionStatus === 'fixed') ?
+                  suggestionStatus === 'fixed') ?
                 SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
             } else if (!suggestionIsValid) {
               $scope.errorMessage = SUGGESTION_INVALID_MSG;
@@ -218,7 +219,8 @@ oppia.controller('FeedbackTab', [
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
           $scope.activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
+          result.reviewMessage, result.audioUpdateRequired,
+          function() {
             ThreadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.threadId);
             });
@@ -243,7 +245,8 @@ oppia.controller('FeedbackTab', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-          }, function() {
+          },
+          function() {
             $log.error('Error resolving suggestion');
           });
       });

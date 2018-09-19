@@ -26,12 +26,12 @@ oppia.directive('subtopicsListTab', [
         'subtopics_list_tab_directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'SubtopicPageObjectFactory',
+        'SubtopicPageObjectFactory',
         'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, SubtopicPageObjectFactory,
+            SubtopicPageObjectFactory,
             UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
           var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';

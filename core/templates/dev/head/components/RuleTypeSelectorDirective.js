@@ -25,10 +25,10 @@ oppia.directive('ruleTypeSelector', [function() {
     },
     template: '<select></select>',
     controller: [
-      '$scope', '$element', '$rootScope', '$filter',
+      '$scope', '$element', '$filter',
       'StateInteractionIdService', 'INTERACTION_SPECS',
       function(
-          $scope, $element, $rootScope, $filter,
+          $scope, $element, $filter,
           StateInteractionIdService, INTERACTION_SPECS) {
         var choices = [];
         var numberOfRuleTypes = 0;

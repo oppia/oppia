@@ -13,8 +13,8 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveNumberWithUnits', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -23,10 +23,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
+        'numberWithUnitsRulesService',
         'CurrentInteractionService', function(
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
+            numberWithUnitsRulesService,
             CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -160,8 +160,8 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 
 // Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
-  function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+  'NumberWithUnitsObjectFactory',
+  function(NumberWithUnitsObjectFactory) {
     try {
       NumberWithUnitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}

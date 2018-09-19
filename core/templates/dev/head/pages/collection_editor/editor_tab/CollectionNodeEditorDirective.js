@@ -31,10 +31,10 @@ oppia.directive('collectionNodeEditor', [
         'collection_node_editor_directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
-        'CollectionUpdateService', 'AlertsService',
+        'AlertsService',
         function(
             $scope, CollectionEditorStateService, CollectionLinearizerService,
-            CollectionUpdateService, AlertsService) {
+            AlertsService) {
           $scope.collection = CollectionEditorStateService.getCollection();
 
           // Deletes this collection node from the frontend collection

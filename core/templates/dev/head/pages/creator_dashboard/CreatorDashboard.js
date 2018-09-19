@@ -47,25 +47,25 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
+  '$scope', '$rootScope', '$http', '$uibModal', '$window',
   'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
   'QuestionObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
+  'SuggestionThreadObjectFactory',
   'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', '$log',
   function(
-      $scope, $rootScope, $http, $uibModal, $window, $log,
+      $scope, $rootScope, $http, $uibModal, $window,
       DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       QuestionObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
+      SuggestionThreadObjectFactory,
       ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, $log) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -158,7 +158,8 @@ oppia.controller('CreatorDashboard', [
     $scope.setSubscriptionSortingOptions = function(sortType) {
       if (sortType === $scope.currentSubscribersSortType) {
         $scope.isCurrentSubscriptionSortDescending = (
-          !$scope.isCurrentSubscriptionSortDescending);
+          !$scope.isCurrentSubscriptionSortDescending
+        );
       } else {
         $scope.currentSubscribersSortType = sortType;
       }
@@ -169,7 +170,7 @@ oppia.controller('CreatorDashboard', [
       // so that special cases can be handled while sorting subscriptions.
       var value = entity[$scope.currentSubscribersSortType];
       if ($scope.currentSubscribersSortType ===
-          SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
+        SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
         value = (value || 0);
       }
       return value;
@@ -214,7 +215,7 @@ oppia.controller('CreatorDashboard', [
 
     $scope.showSuggestionModal = function() {
       if ($scope.activeThread.suggestion.suggestionType ===
-          'edit_exploration_state_content') {
+        'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/' +
           'view_suggestion_edit_exploration_state_content_modal.html');
@@ -245,10 +246,11 @@ oppia.controller('CreatorDashboard', [
           }
         },
         controller: [
-          '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
+          '$scope', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionStatus', 'description', 'oldContent',
-          'newContent', 'canReviewActiveThread', function(
-              $scope, $log, $uibModalInstance, suggestionIsHandled,
+          'newContent', 'canReviewActiveThread',
+          function(
+              $scope, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
               newContent, canReviewActiveThread) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
@@ -326,7 +328,7 @@ oppia.controller('CreatorDashboard', [
         if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
           value = (value || $scope.DEFAULT_EMPTY_TITLE);
         } else if ($scope.currentSortType !==
-                   EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
+          EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
           value = 0;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
@@ -351,7 +353,8 @@ oppia.controller('CreatorDashboard', [
         size: 'lg',
         resolve: {},
         controller: [
-          '$scope', '$uibModalInstance', function(
+          '$scope', '$uibModalInstance',
+          function(
               $scope, $uibModalInstance) {
             $scope.question = question;
             $scope.topicId = null;
@@ -442,9 +445,9 @@ oppia.controller('CreatorDashboard', [
         $scope.mySuggestionsList = [];
         for (var i = 0; i < numberOfCreatedSuggestions; i++) {
           if (responseData.created_suggestions_list.length !==
-              numberOfCreatedSuggestions) {
+            numberOfCreatedSuggestions) {
             $log.error('Number of suggestions does not match number of ' +
-                       'suggestion threads');
+              'suggestion threads');
           }
           for (var j = 0; j < numberOfCreatedSuggestions; j++) {
             var suggestion = SuggestionObjectFactory.createFromBackendDict(
@@ -462,9 +465,9 @@ oppia.controller('CreatorDashboard', [
         $scope.suggestionsToReviewList = [];
         for (var i = 0; i < numberOfSuggestionsToReview; i++) {
           if (responseData.suggestions_to_review_list.length !==
-              numberOfSuggestionsToReview) {
+            numberOfSuggestionsToReview) {
             $log.error('Number of suggestions does not match number of ' +
-                       'suggestion threads');
+              'suggestion threads');
           }
           for (var j = 0; j < numberOfSuggestionsToReview; j++) {
             var suggestion = SuggestionObjectFactory.createFromBackendDict(
@@ -491,7 +494,7 @@ oppia.controller('CreatorDashboard', [
           $scope.activeTab = 'myCollections';
         } else if ($scope.explorationsList.length === 0 && (
           $scope.mySuggestionsList.length > 0 ||
-          $scope.suggestionsToReviewList.length > 0)) {
+            $scope.suggestionsToReviewList.length > 0)) {
           $scope.activeTab = 'suggestions';
         } else {
           $scope.activeTab = 'myExplorations';

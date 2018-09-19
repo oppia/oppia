@@ -28,10 +28,10 @@
 
 oppia.factory('LearnerActionRenderService', [
   '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'ACTION_TYPE_EXPLORATION_QUIT',
   function(
       $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
-      ACTION_TYPE_EXPLORATION_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      ACTION_TYPE_EXPLORATION_QUIT) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
         '<span class="oppia-issues-learner-action">' + actionIndex +
@@ -251,4 +251,5 @@ oppia.factory('LearnerActionRenderService', [
         return groupedDisplayBlocks.displayBlocks;
       }
     };
-  }]);
+  }
+]);

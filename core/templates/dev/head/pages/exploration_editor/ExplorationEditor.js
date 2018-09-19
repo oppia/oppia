@@ -38,7 +38,7 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
+  '$scope', '$rootScope', '$timeout',
   'ExplorationDataService', 'StateEditorService', 'ExplorationTitleService',
   'ExplorationCategoryService', 'ExplorationObjectiveService',
   'ExplorationLanguageCodeService', 'ExplorationRightsService',
@@ -56,7 +56,7 @@ oppia.controller('ExplorationEditor', [
   'ThreadDataService', 'StateClassifierMappingService',
   'PlaythroughIssuesService',
   function(
-      $scope, $http, $window, $rootScope, $log, $timeout,
+      $scope, $rootScope, $timeout,
       ExplorationDataService, StateEditorService, ExplorationTitleService,
       ExplorationCategoryService, ExplorationObjectiveService,
       ExplorationLanguageCodeService, ExplorationRightsService,
@@ -91,12 +91,13 @@ oppia.controller('ExplorationEditor', [
     $scope.getTabStatuses = RouterService.getTabStatuses;
 
     /** ******************************************
-    * Methods affecting the graph visualization.
-    ********************************************/
+     * Methods affecting the graph visualization.
+     ********************************************/
     $scope.areExplorationWarningsVisible = false;
     $scope.toggleExplorationWarningVisibility = function() {
       $scope.areExplorationWarningsVisible = (
-        !$scope.areExplorationWarningsVisible);
+        !$scope.areExplorationWarningsVisible
+      );
     };
 
     $scope.$on('refreshGraph', function() {
@@ -169,15 +170,15 @@ oppia.controller('ExplorationEditor', [
         GraphDataService.recompute();
 
         if (!StateEditorService.getActiveStateName() ||
-            !ExplorationStatesService.getState(
-              StateEditorService.getActiveStateName())) {
+          !ExplorationStatesService.getState(
+            StateEditorService.getActiveStateName())) {
           StateEditorService.setActiveStateName(
             ExplorationInitStateNameService.displayed);
         }
 
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
-            !data.states.hasOwnProperty(
-              RouterService.getCurrentStateFromLocationPath('gui'))) {
+          !data.states.hasOwnProperty(
+            RouterService.getCurrentStateFromLocationPath('gui'))) {
           if (ThreadDataService.getOpenThreadsCount() > 0) {
             RouterService.navigateToFeedbackTab();
           } else {
@@ -193,8 +194,8 @@ oppia.controller('ExplorationEditor', [
         }
 
         if (data.is_version_of_draft_valid === false &&
-            data.draft_changes !== null &&
-            data.draft_changes.length > 0) {
+          data.draft_changes !== null &&
+          data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           AutosaveInfoModalsService.showVersionMismatchModal(

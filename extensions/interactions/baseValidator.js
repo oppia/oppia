@@ -16,8 +16,8 @@
  * @fileoverview Base validation service for interactions.
  */
 
-oppia.factory('baseInteractionValidationService', [
-  '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.factory('baseInteractionValidationService', ['WARNING_TYPES',
+  function(WARNING_TYPES) {
     return {
       // 'argNames' is an array of top-level customization argument names (such
       // as 'chocies') used to verify the basic structure of the input

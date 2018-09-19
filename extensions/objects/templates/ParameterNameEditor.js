@@ -16,8 +16,8 @@
 // available in the context in which it is used.
 
 oppia.directive('parameterNameEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -26,8 +26,8 @@ oppia.directive('parameterNameEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/parameter_name_editor_directive.html'),
       controller: [
-        '$scope', '$attrs', 'ExplorationParamSpecsService',
-        function($scope, $attrs, ExplorationParamSpecsService) {
+        '$scope', 'ExplorationParamSpecsService',
+        function($scope, ExplorationParamSpecsService) {
           $scope.availableParamNames =
             ExplorationParamSpecsService.savedMemento.getParamNames();
 

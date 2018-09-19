@@ -24,10 +24,10 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      UrlService, EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -37,10 +37,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs', 'WindowDimensionsService',
+        '$scope', '$attrs',
         'CurrentInteractionService',
         function(
-            $scope, $element, $attrs, WindowDimensionsService,
+            $scope, $attrs,
             CurrentInteractionService) {
           $scope.errorMessage = '';
           $scope.graph = {
@@ -253,11 +253,11 @@ oppia.directive('graphViz', [
         '/interactions/GraphInput/directives/' +
         'graph_viz_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs', '$document', '$timeout',
+        '$scope', '$element', '$document',
         'FocusManagerService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
-            $scope, $element, $attrs, $document, $timeout,
+            $scope, $element, $document,
             FocusManagerService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var _MODES = {

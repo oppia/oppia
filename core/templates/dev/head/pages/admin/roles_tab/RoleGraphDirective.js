@@ -17,7 +17,8 @@
  */
 
 oppia.directive('roleGraph', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -36,10 +37,10 @@ oppia.directive('roleGraph', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/role_graph_directive.html'),
       controller: [
-        '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
+        '$scope', '$element', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $scope, $element, $timeout, $filter, StateGraphLayoutService,
+            $scope, $element, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var getElementDimensions = function() {
             return {
@@ -95,4 +96,5 @@ oppia.directive('roleGraph', [
         }
       ]
     };
-  }]);
+  }
+]);

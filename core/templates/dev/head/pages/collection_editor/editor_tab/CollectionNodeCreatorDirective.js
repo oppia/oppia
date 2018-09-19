@@ -24,17 +24,17 @@ oppia.directive('collectionNodeCreator', [
         '/pages/collection_editor/editor_tab/' +
         'collection_node_creator_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$filter', 'AlertsService',
+        '$scope', '$http', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',
-        'CollectionLinearizerService', 'CollectionUpdateService',
-        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        'CollectionLinearizerService',
+        'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'siteAnalyticsService',
         'INVALID_NAME_CHARS',
         function(
-            $scope, $http, $window, $filter, AlertsService,
+            $scope, $http, $filter, AlertsService,
             ValidatorsService, CollectionEditorStateService,
-            CollectionLinearizerService, CollectionUpdateService,
-            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            CollectionLinearizerService,
+            ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, siteAnalyticsService,
             INVALID_NAME_CHARS) {
           $scope.collection = CollectionEditorStateService.getCollection();

@@ -14,14 +14,10 @@
 
 // This directive can only be used in the context of an exploration.
 
-oppia.directive('filepathEditor', [
-  '$http', '$sce', 'AlertsService', 'ContextService',
+oppia.directive('filepathEditor', ['$sce', 'AlertsService', 'ContextService',
   'UrlInterpolationService', 'AssetsBackendApiService',
-  'OBJECT_EDITOR_URL_PREFIX',
-  function(
-      $http, $sce, AlertsService, ContextService,
-      UrlInterpolationService, AssetsBackendApiService,
-      OBJECT_EDITOR_URL_PREFIX) {
+  function($sce, AlertsService, ContextService,
+      UrlInterpolationService, AssetsBackendApiService) {
     return {
       restrict: 'E',
       scope: {

@@ -79,12 +79,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'CurrentInteractionService', 'WindowDimensionsService',
+  'CurrentInteractionService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      CurrentInteractionService, WindowDimensionsService) {
+      CurrentInteractionService) {
     return {
       restrict: 'E',
       scope: {

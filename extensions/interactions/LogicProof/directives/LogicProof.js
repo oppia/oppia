@@ -26,11 +26,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
         'logic_proof_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
-        'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
-        function(
-            $scope, $attrs, $uibModal, logicProofRulesService,
-            WindowDimensionsService, UrlService,
+        function($scope, $attrs, $uibModal, logicProofRulesService,
             CurrentInteractionService) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
@@ -205,14 +202,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
             }
             // We split incorrect proofs into three parts so that response.html
             // can make the invalid line bold.
-            return (errorLineNum === undefined) ?
-              [numberedLines.join('\n')] :
-              [
-                numberedLines.slice(0, errorLineNum).join('\n'),
-                numberedLines[errorLineNum],
-                numberedLines.slice(
-                  errorLineNum + 1, numberedLines.length).join('\n')
-              ];
+            return (errorLineNum === undefined) ? [numberedLines.join('\n')] : [
+              numberedLines.slice(0, errorLineNum).join('\n'),
+              numberedLines[errorLineNum],
+              numberedLines.slice(
+                errorLineNum + 1, numberedLines.length).join('\n')
+            ];
           };
 
           // NOTE: proof_num_lines, displayed_question and displayed_proof are
@@ -274,7 +269,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
               ]
             }).result.then(function() {});
           };
-        }]
+        }
+      ]
     };
   }
 ]);

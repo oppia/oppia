@@ -21,13 +21,13 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'ContextService',
+  'HtmlEscaperService', 'ContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
   'ImagePreloaderService', 'AssetsBackendApiService',
   'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
   'LOADING_INDICATOR_URL',
   function(
-      $sce, HtmlEscaperService, ContextService,
+      HtmlEscaperService, ContextService,
       imageClickInputRulesService, UrlInterpolationService,
       ImagePreloaderService, AssetsBackendApiService,
       EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
@@ -104,9 +104,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               var labeledRegion = imageAndRegions.labeledRegions[i];
               var regionArea = labeledRegion.region.area;
               if (regionArea[0][0] <= $scope.mouseX &&
-                  $scope.mouseX <= regionArea[1][0] &&
-                  regionArea[0][1] <= $scope.mouseY &&
-                  $scope.mouseY <= regionArea[1][1]) {
+                $scope.mouseX <= regionArea[1][0] &&
+                regionArea[0][1] <= $scope.mouseY &&
+                $scope.mouseY <= regionArea[1][1]) {
                 $scope.currentlyHoveredRegions.push(labeledRegion.label);
               }
             }
@@ -142,7 +142,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.getDotDisplay = function() {
             if (ContextService.getEditorTabContext() ===
-                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
+              EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }
             return 'inline';
@@ -200,7 +200,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
 ]);
 
 oppia.directive('oppiaResponseImageClickInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -221,7 +222,7 @@ oppia.directive('oppiaResponseImageClickInput', [
           if (_answer.clickedRegions) {
             $scope.clickRegionLabel = '(Clicks on ' + (
               _answer.clickedRegions.length > 0 ?
-                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
           }
         }
       ]

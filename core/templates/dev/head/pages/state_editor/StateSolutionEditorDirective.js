@@ -33,7 +33,7 @@ oppia.directive('stateSolutionEditor', [
         'SolutionVerificationService', 'SolutionValidityService',
         'ExplorationHtmlFormatterService', 'StateInteractionIdService',
         'StateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
-        'ContextService', 'StateCustomizationArgsService',
+        'StateCustomizationArgsService',
         'EditabilityService', 'StateContentIdsToAudioTranslationsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID',
         function(
@@ -42,7 +42,7 @@ oppia.directive('stateSolutionEditor', [
             SolutionVerificationService, SolutionValidityService,
             ExplorationHtmlFormatterService, StateInteractionIdService,
             StateHintsService, UrlInterpolationService, SolutionObjectFactory,
-            ContextService, StateCustomizationArgsService,
+            StateCustomizationArgsService,
             EditabilityService, StateContentIdsToAudioTranslationsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID) {
           $scope.EditabilityService = EditabilityService;
@@ -105,11 +105,11 @@ oppia.directive('stateSolutionEditor', [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
                 'StateCustomizationArgsService',
                 'CurrentInteractionService', 'INTERACTION_SPECS',
-                'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
+                'COMPONENT_NAME_SOLUTION', function(
                     $scope, $uibModalInstance, StateSolutionService,
                     StateCustomizationArgsService,
                     CurrentInteractionService, INTERACTION_SPECS,
-                    COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
+                    COMPONENT_NAME_SOLUTION) {
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
                     ExplorationHtmlFormatterService.getInteractionHtml(

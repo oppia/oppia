@@ -19,7 +19,8 @@
 oppia.constant('RECORDING_TIME_LIMIT', 300);
 
 oppia.directive('audioTranslationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -62,14 +63,14 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$uibModal', '$rootScope',
+        '$scope', '$filter', '$uibModal', '$rootScope',
         'StateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService', 'AlertsService',
         'StateEditorService', 'ExplorationStatesService', 'EditabilityService',
         'AssetsBackendApiService', 'recorderService', 'ContextService',
         'RECORDING_TIME_LIMIT',
         function(
-            $scope, $filter, $timeout, $uibModal, $rootScope,
+            $scope, $filter, $uibModal, $rootScope,
             StateContentIdsToAudioTranslationsService, IdGenerationService,
             AudioPlayerService, TranslationLanguageService, AlertsService,
             StateEditorService, ExplorationStatesService, EditabilityService,
@@ -210,7 +211,7 @@ oppia.directive('audioTranslationBar', [
             var contentId = $scope.contentId;
             var languageCode = $scope.languageCode;
             var recordedAudioFile = new File(
-              [$scope.audioBlob], filename, {type: fileType});
+              [$scope.audioBlob], filename, { type: fileType });
             $scope.showRecorderWarning = false;
             AssetsBackendApiService.saveAudio(
               ContextService.getExplorationId(), filename,
@@ -270,7 +271,7 @@ oppia.directive('audioTranslationBar', [
               },
               controller: [
                 '$scope', '$uibModalInstance', 'message',
-                function( $scope, $uibModalInstance, message) {
+                function($scope, $uibModalInstance, message) {
                   $scope.busyMessage = message;
                   $scope.gotIt = function() {
                     $uibModalInstance.dismiss('cancel');
@@ -383,7 +384,7 @@ oppia.directive('audioTranslationBar', [
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
-                function( $scope, $uibModalInstance) {
+                function($scope, $uibModalInstance) {
                   $scope.reallyDelete = function() {
                     $uibModalInstance.close();
                   };
@@ -505,6 +506,8 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.initAudioBar();
-        }]
+        }
+      ]
     };
-  }]);
+  }
+]);

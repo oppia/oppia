@@ -50,19 +50,14 @@ oppia.factory('CollectionUpdateService', [
   'CMD_EDIT_COLLECTION_NODE_PROPERTY', 'COLLECTION_PROPERTY_TITLE',
   'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_LANGUAGE_CODE', 'COLLECTION_PROPERTY_TAGS',
-  'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
-  'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
-  'CMD_ADD_COLLECTION_SKILL', 'CMD_DELETE_COLLECTION_SKILL', function(
+  function(
       CollectionNodeObjectFactory,
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE, CMD_SWAP_COLLECTION_NODES,
       CMD_DELETE_COLLECTION_NODE, CMD_EDIT_COLLECTION_PROPERTY,
       CMD_EDIT_COLLECTION_NODE_PROPERTY, COLLECTION_PROPERTY_TITLE,
       COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_OBJECTIVE,
-      COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
-      COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-      COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-      CMD_ADD_COLLECTION_SKILL, CMD_DELETE_COLLECTION_SKILL) {
+      COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // collection.
@@ -195,7 +190,8 @@ oppia.factory('CollectionUpdateService', [
             // Apply
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTitle(title);
-          }, function(changeDict, collection) {
+          },
+          function(changeDict, collection) {
             // Undo.
             collection.setTitle(oldTitle);
           });
@@ -213,7 +209,8 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var category = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setCategory(category);
-          }, function(changeDict, collection) {
+          },
+          function(changeDict, collection) {
             // Undo.
             collection.setCategory(oldCategory);
           });
@@ -231,7 +228,8 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var objective = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setObjective(objective);
-          }, function(changeDict, collection) {
+          },
+          function(changeDict, collection) {
             // Undo.
             collection.setObjective(oldObjective);
           });
@@ -250,7 +248,8 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setLanguageCode(languageCode);
-          }, function(changeDict, collection) {
+          },
+          function(changeDict, collection) {
             // Undo.
             collection.setLanguageCode(oldLanguageCode);
           });
@@ -268,7 +267,8 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var tags = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTags(tags);
-          }, function(changeDict, collection) {
+          },
+          function(changeDict, collection) {
             // Undo.
             collection.setTags(oldTags);
           });
@@ -294,4 +294,5 @@ oppia.factory('CollectionUpdateService', [
           changeObject.getBackendChangeObject());
       }
     };
-  }]);
+  }
+]);

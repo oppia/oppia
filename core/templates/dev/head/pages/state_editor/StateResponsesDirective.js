@@ -282,12 +282,12 @@ oppia.directive('stateResponses', [
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'ResponsesService',
+                '$scope', '$uibModalInstance',
                 'EditorFirstTimeEventsService', 'StateEditorService',
                 'RuleObjectFactory', 'OutcomeObjectFactory',
                 'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
                 function(
-                    $scope, $uibModalInstance, ResponsesService,
+                    $scope, $uibModalInstance,
                     EditorFirstTimeEventsService, StateEditorService,
                     RuleObjectFactory, OutcomeObjectFactory,
                     COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {

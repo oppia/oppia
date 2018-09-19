@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ImageClickInputValidationService', [
-  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         baseInteractionValidationService.requireCustomizationArguments(
@@ -133,4 +133,5 @@ oppia.factory('ImageClickInputValidationService', [
         return warningsList;
       }
     };
-  }]);
+  }
+]);

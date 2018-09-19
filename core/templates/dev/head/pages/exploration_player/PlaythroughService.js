@@ -29,7 +29,7 @@ oppia.factory('PlaythroughService', [
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
-  'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
+  'STORE_PLAYTHROUGH_URL',
   function(
       $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
       StopwatchObjectFactory, UrlInterpolationService,
@@ -39,7 +39,7 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
+      STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;

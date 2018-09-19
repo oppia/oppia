@@ -24,17 +24,17 @@ oppia.directive('hintAndSolutionButtons', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_and_solution_buttons_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'HintsAndSolutionManagerService',
+        '$scope', 'HintsAndSolutionManagerService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
-        'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
+        'HintAndSolutionModalService', 'ContextService',
         'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS', 'StatsReportingService',
+        'EVENT_NEW_CARD_OPENED', 'StatsReportingService',
         function(
-            $scope, $rootScope, HintsAndSolutionManagerService,
+            $scope, HintsAndSolutionManagerService,
             PlayerTranscriptService, ExplorationPlayerStateService,
-            HintAndSolutionModalService, DeviceInfoService, ContextService,
+            HintAndSolutionModalService, ContextService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
+            EVENT_NEW_CARD_OPENED, StatsReportingService) {
           $scope.hintIndexes = [];
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           // Represents the index of the currently viewed hint.

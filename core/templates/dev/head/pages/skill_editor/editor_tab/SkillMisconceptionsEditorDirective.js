@@ -27,10 +27,10 @@ oppia.directive('skillMisconceptionsEditor', [
         '/pages/skill_editor/editor_tab/' +
         'skill_misconceptions_editor_directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
+        '$scope', '$uibModal',
         'MisconceptionObjectFactory',
         function(
-            $scope, $filter, $uibModal, $rootScope,
+            $scope, $uibModal,
             MisconceptionObjectFactory) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.misconceptions = $scope.skill.getMisconceptions();

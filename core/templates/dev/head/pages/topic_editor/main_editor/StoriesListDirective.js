@@ -26,15 +26,13 @@ oppia.directive('storiesList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/stories_list_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$window',
-        'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
+        '$scope', '$uibModal', '$window',
+        'UrlService', 'UndoRedoService',
         'UrlInterpolationService', 'TopicUpdateService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED',
         function(
-            $scope, $rootScope, $uibModal, $window,
-            EditableTopicBackendApiService, UrlService, UndoRedoService,
-            UrlInterpolationService, TopicUpdateService,
-            EVENT_STORY_SUMMARIES_INITIALIZED) {
+            $scope, $uibModal, $window,
+            UrlService, UndoRedoService,
+            UrlInterpolationService, TopicUpdateService) {
           var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
           $scope.STORY_TABLE_COLUMN_HEADINGS = ['title', 'node_count'];

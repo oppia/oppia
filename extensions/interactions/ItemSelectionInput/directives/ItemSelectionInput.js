@@ -33,11 +33,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
-        'UrlService', 'CurrentInteractionService',
+        '$scope', '$attrs', 'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
-            UrlService, CurrentInteractionService) {
+            $scope, $attrs, CurrentInteractionService) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
           $scope.maxAllowableSelectionCount = (
@@ -142,9 +140,9 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
       var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
       return normalizedAnswer.length === normalizedInput.length &&
-          normalizedAnswer.every(function(val) {
-            return normalizedInput.indexOf(val) !== -1;
-          });
+        normalizedAnswer.every(function(val) {
+          return normalizedInput.indexOf(val) !== -1;
+        });
     },
     ContainsAtLeastOneOf: function(answer, inputs) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);

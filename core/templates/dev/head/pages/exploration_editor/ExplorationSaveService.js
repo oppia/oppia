@@ -49,12 +49,11 @@ oppia.factory('ExplorationSaveService', [
     var diffData = null;
 
     var isAdditionalMetadataNeeded = function() {
-      return (
-        !ExplorationTitleService.savedMemento ||
+      return (!ExplorationTitleService.savedMemento ||
         !ExplorationObjectiveService.savedMemento ||
         !ExplorationCategoryService.savedMemento ||
         ExplorationLanguageCodeService.savedMemento ===
-          constants.DEFAULT_LANGUAGE_CODE ||
+        constants.DEFAULT_LANGUAGE_CODE ||
         ExplorationTagsService.savedMemento.length === 0);
     };
 
@@ -124,7 +123,8 @@ oppia.factory('ExplorationSaveService', [
           'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+          '$scope', '$uibModalInstance',
+          function($scope, $uibModalInstance) {
             $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
@@ -182,8 +182,8 @@ oppia.factory('ExplorationSaveService', [
         changeList, commitMessage,
         function(isDraftVersionValid, draftChanges) {
           if (isDraftVersionValid === false &&
-              draftChanges !== null &&
-              draftChanges.length > 0) {
+            draftChanges !== null &&
+            draftChanges.length > 0) {
             AutosaveInfoModalsService.showVersionMismatchModal(changeList);
             return;
           }
@@ -196,7 +196,8 @@ oppia.factory('ExplorationSaveService', [
           AlertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
           whenSavingDone.resolve();
-        }, function() {
+        },
+        function() {
           saveIsInProgress = false;
           whenSavingDone.resolve();
         }
@@ -225,7 +226,8 @@ oppia.factory('ExplorationSaveService', [
           backdrop: 'static',
           keyboard: false,
           controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.cancel = function() {
                 $uibModalInstance.dismiss();
               };
@@ -245,8 +247,8 @@ oppia.factory('ExplorationSaveService', [
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$uibModalInstance',
-              function($scope, $uibModalInstance) {
+              '$uibModalInstance',
+              function($uibModalInstance) {
                 $timeout(function() {
                   $uibModalInstance.dismiss('cancel');
                 }, 2500);
@@ -306,11 +308,13 @@ oppia.factory('ExplorationSaveService', [
                   ExplorationObjectiveService.savedMemento.length > 0);
 
                 $scope.requireTitleToBeSpecified = (
-                  !ExplorationTitleService.savedMemento);
+                  !ExplorationTitleService.savedMemento
+                );
                 $scope.requireObjectiveToBeSpecified = (
                   ExplorationObjectiveService.savedMemento.length < 15);
                 $scope.requireCategoryToBeSpecified = (
-                  !ExplorationCategoryService.savedMemento);
+                  !ExplorationCategoryService.savedMemento
+                );
                 $scope.askForLanguageCheck = (
                   ExplorationLanguageCodeService.savedMemento ===
                   constants.DEFAULT_LANGUAGE_CODE);
@@ -333,14 +337,14 @@ oppia.factory('ExplorationSaveService', [
                     .some(
                       function(categoryItem) {
                         return categoryItem.id ===
-                      ExplorationCategoryService.savedMemento;
+                          ExplorationCategoryService.savedMemento;
                       }
                     );
 
                   // If the current category is not in the dropdown, add it
                   // as the first option.
                   if (!categoryIsInSelect2 &&
-                      ExplorationCategoryService.savedMemento) {
+                    ExplorationCategoryService.savedMemento) {
                     $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
                       id: ExplorationCategoryService.savedMemento,
                       text: ExplorationCategoryService.savedMemento
@@ -466,7 +470,7 @@ oppia.factory('ExplorationSaveService', [
         RouterService.savePendingChanges();
 
         if (!ExplorationRightsService.isPrivate() &&
-            ExplorationWarningsService.countWarnings() > 0) {
+          ExplorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
           AlertsService.addWarning(ExplorationWarningsService.getWarnings()[0]);

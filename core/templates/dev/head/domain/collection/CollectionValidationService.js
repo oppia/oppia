@@ -20,8 +20,7 @@
  */
 
 oppia.factory('CollectionValidationService', [
-  'CollectionLinearizerService',
-  function(CollectionLinearizerService) {
+  function() {
     var _getNonexistentExplorationIds = function(collection) {
       return collection.getCollectionNodes().filter(function(collectionNode) {
         return !collectionNode.doesExplorationExist();
@@ -125,4 +124,5 @@ oppia.factory('CollectionValidationService', [
           validateTagsNormalized(tags);
       }
     };
-  }]);
+  }
+]);

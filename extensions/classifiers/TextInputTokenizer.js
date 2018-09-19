@@ -27,7 +27,7 @@
 
 // TODO(anmol): Add functionality to add n_grams, remove stop words.
 oppia.factory('TextInputTokenizer', [
-  '$log', function($log) {
+  function() {
     return {
       generateTokens: function(textInput) {
         var tokenizedTextInput;

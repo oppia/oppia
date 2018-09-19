@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveTextInput', [
         '/interactions/TextInput/directives/' +
         'text_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$scope', '$attrs', 'textInputRulesService',
+        'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, textInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $scope, $attrs, textInputRulesService,
+            CurrentInteractionService) {
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
           $scope.rows = (

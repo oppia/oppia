@@ -21,10 +21,8 @@
 // editor and player.
 oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
-  'INTERACTION_SPECS',
   function(
-      $filter, extensionTagAssemblerService, HtmlEscaperService,
-      INTERACTION_SPECS) {
+      $filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
        * @param {string} interactionId - The interaction id.

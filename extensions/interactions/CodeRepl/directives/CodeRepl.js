@@ -34,10 +34,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
+        '$scope', '$attrs',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
+            $scope, $attrs,
             CurrentInteractionService) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 

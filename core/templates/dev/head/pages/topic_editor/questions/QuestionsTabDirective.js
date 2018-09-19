@@ -25,17 +25,17 @@ oppia.directive('questionsTab', [
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'TopicEditorStateService', 'QuestionCreationService',
+        'TopicEditorStateService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
+        'SuggestionThreadObjectFactory',
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
-            TopicEditorStateService, QuestionCreationService,
+            TopicEditorStateService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService) {
+            SuggestionThreadObjectFactory,
+            EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;

@@ -20,7 +20,8 @@
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
 oppia.directive('translatorOverview', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,10 +31,11 @@ oppia.directive('translatorOverview', [
         '/pages/exploration_editor/translation_tab/' +
         'translator_overview_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$window', 'SUPPORTED_AUDIO_LANGUAGES',
+        '$scope', '$rootScope', '$window',
         'LanguageUtilService', 'TranslationLanguageService',
-        'TranslationStatusService', 'DEFAULT_AUDIO_LANGUAGE', function(
-            $scope, $rootScope, $window, SUPPORTED_AUDIO_LANGUAGES,
+        'TranslationStatusService', 'DEFAULT_AUDIO_LANGUAGE',
+        function(
+            $scope, $rootScope, $window,
             LanguageUtilService, TranslationLanguageService,
             TranslationStatusService, DEFAULT_AUDIO_LANGUAGE) {
           var LAST_SELECTED_TRANSLATION_LANGUAGE = (
@@ -44,7 +46,7 @@ oppia.directive('translatorOverview', [
             .getAllAudioLanguageCodes();
           $scope.languageCode =
             allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-              prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
+            prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
           TranslationLanguageService.setActiveLanguageCode(
             $scope.languageCode);
           $scope.languageCodesAndDescriptions = (
@@ -63,7 +65,7 @@ oppia.directive('translatorOverview', [
               .getExplorationAudioNotAvailableCount();
             var progressPercent = (
               100 - (notAvailable / numberRequiredAudio) * 100);
-            return {width: progressPercent + '%'};
+            return { width: progressPercent + '%' };
           };
 
           $scope.changeTranslationLanguage = function() {
@@ -82,4 +84,5 @@ oppia.directive('translatorOverview', [
         }
       ]
     };
-  }]);
+  }
+]);

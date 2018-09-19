@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ContinueValidationService', [
-  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];

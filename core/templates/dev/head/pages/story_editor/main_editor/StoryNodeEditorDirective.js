@@ -29,12 +29,12 @@ oppia.directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story_editor/main_editor/story_node_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
+        '$scope', '$rootScope', 'StoryEditorStateService',
+        'StoryUpdateService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         function(
-            $scope, $rootScope, $uibModal, StoryEditorStateService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
+            $scope, $rootScope, StoryEditorStateService,
+            StoryUpdateService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR) {
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();

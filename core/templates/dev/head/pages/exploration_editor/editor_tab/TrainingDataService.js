@@ -19,10 +19,10 @@
  */
 
 oppia.factory('TrainingDataService', [
-  '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
+  'ResponsesService',
   'ExplorationStatesService', 'StateEditorService', 'GraphDataService',
   function(
-      $rootScope, $http, ResponsesService, RuleObjectFactory,
+      ResponsesService,
       ExplorationStatesService, StateEditorService, GraphDataService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
@@ -63,7 +63,7 @@ oppia.factory('TrainingDataService', [
         var rules = answerGroup.rules;
         var trainingData = answerGroup.trainingData;
         if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
+          _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
           updatedAnswerGroups = true;
         }
       }

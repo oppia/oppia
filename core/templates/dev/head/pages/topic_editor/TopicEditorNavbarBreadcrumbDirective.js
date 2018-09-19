@@ -24,10 +24,8 @@ oppia.directive('topicEditorNavbarBreadcrumb', [
         '/pages/topic_editor/topic_editor_navbar_breadcrumb_directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService',
-        'FocusManagerService', 'TOPIC_NAME_INPUT_FOCUS_LABEL',
         function(
-            $scope, TopicEditorStateService,
-            FocusManagerService, TOPIC_NAME_INPUT_FOCUS_LABEL) {
+            $scope, TopicEditorStateService) {
           $scope.topic = TopicEditorStateService.getTopic();
         }
       ]

@@ -20,10 +20,9 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMathExpressionInput', [
-  'HtmlEscaperService', 'mathExpressionInputRulesService',
+  'mathExpressionInputRulesService',
   'UrlInterpolationService',
-  function(
-      HtmlEscaperService, mathExpressionInputRulesService,
+  function(mathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -33,11 +32,11 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
         'math_expression_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
+        'DebouncerService', 'DeviceInfoService',
         'CurrentInteractionService',
         function(
             $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
-            DebouncerService, DeviceInfoService, WindowDimensionsService,
+            DebouncerService, DeviceInfoService,
             CurrentInteractionService) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 

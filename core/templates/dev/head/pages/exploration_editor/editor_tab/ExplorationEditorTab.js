@@ -18,16 +18,14 @@
 
 oppia.controller('ExplorationEditorTab', [
   '$scope', '$rootScope', 'StateEditorService', 'ExplorationStatesService',
-  'ExplorationAdvancedFeaturesService', 'UrlInterpolationService',
+  'ExplorationAdvancedFeaturesService',
   'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
-  'ExplorationCorrectnessFeedbackService', 'AlertsService',
-  'ContextService', 'ExplorationWarningsService',
+  'ExplorationCorrectnessFeedbackService', 'ExplorationWarningsService',
   function(
       $scope, $rootScope, StateEditorService, ExplorationStatesService,
-      ExplorationAdvancedFeaturesService, UrlInterpolationService,
+      ExplorationAdvancedFeaturesService,
       ExplorationInitStateNameService, GraphDataService, RouterService,
-      ExplorationCorrectnessFeedbackService, AlertsService,
-      ContextService, ExplorationWarningsService) {
+      ExplorationCorrectnessFeedbackService, ExplorationWarningsService) {
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 
@@ -159,7 +157,8 @@ oppia.controller('ExplorationEditorTab', [
 ]);
 
 oppia.directive('trainingPanel', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -186,18 +185,16 @@ oppia.directive('trainingPanel', [
         '$scope', 'ExplorationHtmlFormatterService',
         'StateEditorService', 'ExplorationStatesService',
         'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
+        'StateCustomizationArgsService',
         'OutcomeObjectFactory', 'GenerateContentIdService',
         'COMPONENT_NAME_FEEDBACK',
-        'StateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
             StateEditorService, ExplorationStatesService,
             TrainingDataService, ResponsesService, StateInteractionIdService,
-            StateCustomizationArgsService, AnswerGroupObjectFactory,
+            StateCustomizationArgsService,
             OutcomeObjectFactory, GenerateContentIdService,
-            COMPONENT_NAME_FEEDBACK,
-            StateContentIdsToAudioTranslationsService) {
+            COMPONENT_NAME_FEEDBACK) {
           $scope.addingNewResponse = false;
 
           var _stateName = StateEditorService.getActiveStateName();
@@ -253,5 +250,5 @@ oppia.directive('trainingPanel', [
         }
       ]
     };
-  }]
-);
+  }
+]);

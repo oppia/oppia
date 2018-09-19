@@ -15,10 +15,8 @@
 /**
  * @fileoverview Controller for the skills list viewer.
  */
-oppia.directive('skillsList', [
-  'AlertsService', 'UrlInterpolationService',
-  function(
-      AlertsService, UrlInterpolationService) {
+oppia.directive('skillsList', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {

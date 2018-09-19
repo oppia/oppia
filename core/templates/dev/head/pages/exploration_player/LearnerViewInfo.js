@@ -57,9 +57,9 @@ oppia.controller('LearnerViewInfo', [
           }
         },
         controller: [
-          '$scope', '$window', '$uibModalInstance', 'DateTimeFormatService',
+          '$scope', '$uibModalInstance', 'DateTimeFormatService',
           'RatingComputationService', 'expInfo', 'UrlInterpolationService',
-          function($scope, $window, $uibModalInstance, DateTimeFormatService,
+          function($scope, $uibModalInstance, DateTimeFormatService,
               RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];

@@ -1508,6 +1508,7 @@ def _check_for_unused_dependencies(all_files):
     print '----------------------------------------'
     failed = False
     summary_messages = []
+    count = 0
 
     def get_content_between_brackets(
             content, bracket_start_index, start_bracket, end_bracket):
@@ -1579,6 +1580,7 @@ def _check_for_unused_dependencies(all_files):
             print (('" %s " : These files are imported' +
                     ' but not used anywhere in this file : %s \n')
                    % (", ".join(unused_imports), filename))
+            count = count + 1
 
     if failed:
         summary_message = ('%s Unused dependencies check failed' %

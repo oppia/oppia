@@ -17,12 +17,12 @@
  */
 
 oppia.factory('AudioPreloaderService', [
-  '$uibModal', 'ContextService', 'AssetsBackendApiService',
-  'UrlInterpolationService', 'ComputeGraphService',
-  'AudioTranslationLanguageService', 'LanguageUtilService',
-  function($uibModal, ContextService, AssetsBackendApiService,
-      UrlInterpolationService, ComputeGraphService,
-      AudioTranslationLanguageService, LanguageUtilService) {
+  'ContextService', 'AssetsBackendApiService',
+  'ComputeGraphService',
+  'AudioTranslationLanguageService',
+  function(ContextService, AssetsBackendApiService,
+      ComputeGraphService,
+      AudioTranslationLanguageService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfAudioCurrentlyDownloading = [];
@@ -59,10 +59,9 @@ oppia.factory('AudioPreloaderService', [
       AssetsBackendApiService.loadAudio(
         ContextService.getExplorationId(), audioFilename
       ).then(function(loadedAudio) {
-        for (var i = 0;
-          i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
+        for (var i = 0; i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
           if (_filenamesOfAudioCurrentlyDownloading[i] ===
-              loadedAudio.filename) {
+            loadedAudio.filename) {
             _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
             break;
           }
@@ -82,8 +81,8 @@ oppia.factory('AudioPreloaderService', [
       _filenamesOfAudioToBeDownloaded =
         _getAudioFilenamesInBfsOrder(sourceStateName);
       while (_filenamesOfAudioCurrentlyDownloading.length <
-          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
-          _filenamesOfAudioToBeDownloaded.length > 0) {
+        MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
+        _filenamesOfAudioToBeDownloaded.length > 0) {
         var audioFilename = _filenamesOfAudioToBeDownloaded.shift();
         _filenamesOfAudioCurrentlyDownloading.push(audioFilename);
         _loadAudio(audioFilename);

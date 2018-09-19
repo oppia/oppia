@@ -17,10 +17,10 @@
  */
 
 oppia.factory('SearchExplorationsBackendApiService', [
-  '$http', '$q', 'AlertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
+  '$http', '$q', 'SEARCH_EXPLORATION_URL_TEMPLATE',
   'UrlInterpolationService',
   function(
-      $http, $q, AlertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
+      $http, $q, SEARCH_EXPLORATION_URL_TEMPLATE,
       UrlInterpolationService) {
     var _fetchExplorations = function(
         searchQuery, successCallback, errorCallback) {
@@ -47,4 +47,5 @@ oppia.factory('SearchExplorationsBackendApiService', [
         });
       }
     };
-  }]);
+  }
+]);

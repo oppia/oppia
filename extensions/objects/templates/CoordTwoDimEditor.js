@@ -13,8 +13,8 @@
 // limitations under the License.
 
 oppia.directive('coordTwoDimEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       controller: ['$scope', '$timeout', function($scope, $timeout) {
         $scope.schemaLatitude = {

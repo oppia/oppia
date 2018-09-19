@@ -17,8 +17,8 @@
  */
 
 oppia.directive('outcomeFeedbackEditor', [
-  'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
-  function(UrlInterpolationService, SubtitledHtmlObjectFactory) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -33,4 +33,5 @@ oppia.directive('outcomeFeedbackEditor', [
         };
       }]
     };
-  }]);
+  }
+]);

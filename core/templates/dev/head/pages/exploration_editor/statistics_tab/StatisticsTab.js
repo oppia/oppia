@@ -146,15 +146,13 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
+            '$scope', '$uibModalInstance', '$filter', 'stateName',
             'stateStats', 'improvementType', 'visualizationsInfo',
-            'HtmlEscaperService', 'AngularNameService',
-            'AnswerClassificationService',
+            'HtmlEscaperService',
             function(
-                $scope, $uibModalInstance, $filter, $injector, stateName,
+                $scope, $uibModalInstance, $filter, stateName,
                 stateStats, improvementType, visualizationsInfo,
-                HtmlEscaperService, AngularNameService,
-                AnswerClassificationService) {
+                HtmlEscaperService) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,

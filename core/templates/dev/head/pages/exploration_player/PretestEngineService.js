@@ -18,14 +18,14 @@
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-oppia.factory('PretestEngineService', [
-  '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
+oppia.factory('PretestEngineService', ['AlertsService',
+  'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'INTERACTION_SPECS',
   'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
   'FocusManagerService', 'StateCardObjectFactory',
   function(
-      $http, $rootScope, $q, AlertsService, AnswerClassificationService,
+      AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, INTERACTION_SPECS,
       QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
