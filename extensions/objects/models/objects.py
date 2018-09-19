@@ -438,7 +438,18 @@ class CheckedProof(BaseObject):
                 normalizing if necessary.
 
         Returns:
-            *. The normalized object.
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions_string: basestring. The string containing the
+                        assumptions.
+                    target_string: basestring. The target string of the proof.
+                    proof_string: basestring. The proof string.
+                    correct: bool. The proof is correct or not.
+                    error_category: basestring. The category of the error.
+                    error_code: basestring. The error code.
+                    error_message: basestring. The error message.
+                    error_line_number: basestring. The line number at which the
+                        error has occurred.
 
         Raises:
             TypeError: Cannot convert to the CheckedProof schema.
@@ -473,7 +484,11 @@ class LogicQuestion(BaseObject):
                 normalizing if necessary.
 
         Returns:
-            *. The normalized object.
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions: list. The list containing all the assumptions.
+                    results: list. The list containing the final results of the
+                        required proof.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.
