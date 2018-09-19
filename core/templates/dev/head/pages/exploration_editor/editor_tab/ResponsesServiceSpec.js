@@ -57,7 +57,7 @@ describe('Responses Service', function() {
     beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
-      siis = $injector.get('stateInteractionIdService');
+      siis = $injector.get('StateInteractionIdService');
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
       rs = $injector.get('ResponsesService');
@@ -67,7 +67,7 @@ describe('Responses Service', function() {
       oof = $injector.get('OutcomeObjectFactory');
       cache = $injector.get('AnswerGroupsCacheService');
       aud = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-      saud = $injector.get('stateContentIdsToAudioTranslationsService');
+      saud = $injector.get('StateContentIdsToAudioTranslationsService');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
