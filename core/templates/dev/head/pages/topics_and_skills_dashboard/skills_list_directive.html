@@ -37,7 +37,7 @@
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
-      <td ng-if="getEditableTopicSummaries().length > 0">
+      <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
