@@ -60,7 +60,12 @@ describe('Skill update service', function() {
           html: 'test worked example 2',
           content_id: 'worked_example_2'
         }
-      ]
+      ],
+      content_ids_to_audio_translations: {
+        explanation: {},
+        worked_example_1: {},
+        worked_example_2: {}
+      }
     };
 
     skillDict = {
@@ -95,10 +100,14 @@ describe('Skill update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'explanation',
-      old_value: SubtitledHtmlObjectFactory.createDefault(
-        'test explanation', 'explanation'),
-      new_value: SubtitledHtmlObjectFactory.createDefault(
-        'new explanation', 'explanation')
+      old_value: {
+        html: 'test explanation',
+        content_id: 'explanation'
+      },
+      new_value: {
+        html: 'new explanation',
+        content_id: 'explanation'
+      }
     }]);
     expect(skill.getConceptCard().getExplanation()).toEqual(
       SubtitledHtmlObjectFactory.createDefault(
@@ -203,17 +212,27 @@ describe('Skill update service', function() {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 1', 'worked_example_1'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2')],
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1',
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }],
       new_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 1', 'worked_example_1'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'a new worked example', 'worked_example_3')]
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1',
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        },
+        {
+          html: 'a new worked example',
+          content_id: 'worked_example_3'
+        }]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       SubtitledHtmlObjectFactory.createDefault(
@@ -237,13 +256,21 @@ describe('Skill update service', function() {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 1', 'worked_example_1'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2')],
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1',
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }
+      ],
       new_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2')]
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }
+      ]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       SubtitledHtmlObjectFactory.createDefault(
@@ -263,15 +290,23 @@ describe('Skill update service', function() {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 1', 'worked_example_1'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2')],
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1',
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }],
       new_value: [
-        SubtitledHtmlObjectFactory.createDefault(
-          'new content', 'worked_example_1'),
-        SubtitledHtmlObjectFactory.createDefault(
-          'test worked example 2', 'worked_example_2')]
+        {
+          html: 'new content',
+          content_id: 'worked_example_1',
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       SubtitledHtmlObjectFactory.createDefault(

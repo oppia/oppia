@@ -61,7 +61,12 @@ describe('Skill object factory', function() {
             html: 'test worked example 2',
             content_id: 'worked_example_2'
           }
-        ]
+        ],
+        content_ids_to_audio_translations: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
       };
 
       skillDict = {

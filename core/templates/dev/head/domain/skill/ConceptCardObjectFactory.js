@@ -35,7 +35,9 @@ oppia.factory('ConceptCardObjectFactory', [
         explanation: this._explanation.toBackendDict(),
         worked_examples: this._workedExamples.map(function(workedExample) {
           return workedExample.toBackendDict();
-        })
+        }),
+        content_ids_to_audio_translations:
+          this._contentIdsToAudioTranslations.toBackendDict()
       };
     };
 
