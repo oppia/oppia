@@ -1009,7 +1009,7 @@ def _check_docstrings(all_files):
 
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
-                
+
                 # Check for space after """ in the docstring
                 if line.startswith('""" '):
                     failed = True
