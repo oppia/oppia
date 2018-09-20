@@ -68,7 +68,8 @@ oppia.controller('CreatorDashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    var currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+    var currentViewType =
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
 
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -109,10 +110,13 @@ oppia.controller('CreatorDashboard', [
       }).then(function() {
         $scope.myExplorationsView = viewType;
       });
-      if (viewType === constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD) {
-        currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+      if (viewType ===
+              constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD) {
+        currentViewType =
+              constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
       } else {
-        currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST;
+        currentViewType =
+                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST;
       }
     };
 
