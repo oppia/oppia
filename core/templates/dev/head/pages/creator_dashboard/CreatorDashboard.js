@@ -68,7 +68,7 @@ oppia.controller('CreatorDashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    var CurrentView = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+    var currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
 
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -110,9 +110,9 @@ oppia.controller('CreatorDashboard', [
         $scope.myExplorationsView = viewType;
       });
       if (viewType === constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD) {
-        CurrentView = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+        currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
       } else {
-        CurrentView = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST;
+        currentViewType = constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST;
       }
     };
 
@@ -137,7 +137,7 @@ oppia.controller('CreatorDashboard', [
           constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
-        if (CurrentView ===
+        if (currentViewType ===
           constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD){
           $scope.myExplorationsView = (
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
