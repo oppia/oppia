@@ -180,6 +180,7 @@ class TranslatorAutosaveHandler(base.BaseHandler):
 
 class ExplorationTranslationHandler(base.BaseHandler):
 
+    #Json type response returned by the handler when an exception is raised.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_translate_exploration
@@ -204,6 +205,8 @@ class ExplorationTranslationHandler(base.BaseHandler):
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id)
         except:
+            # If the description of the exploration is not found for the given
+            # exploration id then PageNotFoundException is raised.
             raise self.PageNotFoundException
 
         self.values.update(exploration_data)
