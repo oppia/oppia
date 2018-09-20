@@ -1672,7 +1672,7 @@ def main():
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
-    unused_dependies_messages = _check_for_unused_dependencies(all_files)
+    unused_dependencies_messages = _check_for_unused_dependencies(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
@@ -1680,7 +1680,7 @@ def main():
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        unused_dependies_messages + linter_messages + pattern_messages +
+        unused_dependencies_messages + linter_messages + pattern_messages +
         copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
