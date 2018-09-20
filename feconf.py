@@ -25,8 +25,10 @@ from constants import constants  # pylint: disable=relative-import
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE = true check that we are running in development enviroment.
-if (constants.DEV_MODE and
+# When DEV_MODE is true check that we are running in development enviroment.
+# The SERVER_SOFTWARE enviroment variable does not exist in Travis thus we need
+# to check it.
+if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
         not os.environ['SERVER_SOFTWARE'].startswith('Development')):
     raise Exception('DEV_MODE can\'t be true on production.')
 
@@ -648,9 +650,6 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GENERAL_SUGGESTION_ACTION_URL_PREFIX = '/generalsuggestionactionhandler'
-GENERAL_SUGGESTION_LIST_URL_PREFIX = '/generalsuggestionlisthandler'
-GENERAL_SUGGESTION_URL_PREFIX = '/generalsuggestionhandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
