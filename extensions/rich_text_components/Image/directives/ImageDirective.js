@@ -23,7 +23,7 @@ oppia.directive('oppiaNoninteractiveImage', ['HtmlEscaperService',
   'ContextService', 'UrlInterpolationService', 'ImagePreloaderService',
   'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
   function(HtmlEscaperService, ContextService, UrlInterpolationService,
-    ImagePreloaderService, AssetsBackendApiService, LOADING_INDICATOR_URL) {
+      ImagePreloaderService, AssetsBackendApiService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
