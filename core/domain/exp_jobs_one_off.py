@@ -58,9 +58,6 @@ ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
-FILE_MODEL_ID_REGEX = re.compile(
-    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
@@ -665,57 +662,6 @@ class ExplorationMigrationValidationJobForCKEditor(
         yield (key, list(set().union(*final_values)))
 
 
-class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for migrating the images in the exploration
-    from the GAE to GCS.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
-
-    @staticmethod
-    def map(file_model):
-        # This job is allowed to run only in Production environment since it
-        # uses GcsFileSystem which can't be used in Development environment.
-        if feconf.DEV_MODE:
-            return
-
-        instance_id = file_model.id
-        filetype = instance_id[instance_id.rfind('.') + 1:]
-        # To separate the image entries from the audio entries we get from the
-        # FileSnapshotContentModel.
-        if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
-            if not catched_groups:
-                yield (WRONG_INSTANCE_ID, instance_id)
-            else:
-                filename = catched_groups.group(2)
-                exploration_id = catched_groups.group(1)
-                content = file_model.content
-                fs = fs_domain.AbstractFileSystem(
-                    fs_domain.GcsFileSystem(exploration_id))
-                if fs.isfile('image/%s' % filename):
-                    yield (FILE_ALREADY_EXISTS, file_model.id)
-                else:
-                    fs.commit(
-                        'ADMIN', 'image/%s' % filename,
-                        content, mimetype='image/%s' % filetype)
-                    if not fs.isfile('image/%s' % filename):
-                        yield ('Failed to commit file', instance_id)
-                    else:
-                        yield (FILE_COPIED, 1)
-        else:
-            yield ('Invalid filetype', filetype)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_COPIED or status == FILE_ALREADY_EXISTS:
-            yield (status, len(values))
-        else:
-            yield (status, '%s' % set(values))
-
-
 class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for checking that all the images in the GAE are there in
     the GCS or not, using file models as the source of truth.
@@ -736,7 +682,7 @@ class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
         # To separate the image entries from the audio entries we get from
         # the FileSnapshotContentModel.
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
+            catched_groups = GCS_IMAGE_ID_REGEX.match(instance_id)
             if not catched_groups:
                 yield (WRONG_INSTANCE_ID, instance_id)
             else:
@@ -789,118 +735,6 @@ class ValidationOfImagesOnGCSJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, '%s' % set(values))
-
-
-class ValidationOfImagesOnGCSJobUsingExps(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for checking that all the images in the GAE are there in
-    the GCS or not, using exploration models as the source of truth.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        # This job is allowed to run only in Production environment since it
-        # uses GcsFileSystem which can't be used in Development environment.
-        if feconf.DEV_MODE:
-            return
-
-        exp_id = exp_model.id
-        fs_old = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exp_id))
-        fs_new = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem('exploration/%s' % exp_id))
-        # We have to make sure we pass the dir name without starting or
-        # ending with '/'.
-        image_urls = fs_old.listdir('image')
-        for url in image_urls:
-            catched_groups = GCS_IMAGE_ID_REGEX.match(url)
-            if not catched_groups:
-                yield (INVALID_GCS_URL, url.encode('utf-8'))
-            else:
-                try:
-                    filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
-                except Exception:
-                    yield (ERROR_IN_FILENAME, url.encode('utf-8'))
-
-                raw_image = fs_old.get(
-                    'image/%s' % filename.encode('utf-8'))
-                height, width = gae_image_services.get_image_dimensions(
-                    raw_image)
-                filename_with_dimensions = (
-                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                        filename, height, width))
-
-                filename_wo_filetype = filename_with_dimensions[
-                    :filename_with_dimensions.rfind('.')]
-                filetype = filename_with_dimensions[
-                    filename_with_dimensions.rfind('.') + 1:]
-                filepath = 'image/%s' % filename_with_dimensions
-                compressed_image_filepath = (
-                    'image/%s_compressed.%s' % (filename_wo_filetype, filetype))
-                micro_image_filepath = (
-                    'image/%s_micro.%s' % (filename_wo_filetype, filetype))
-
-                if not fs_new.isfile(filepath.encode('utf-8')):
-                    yield (FILE_IS_NOT_IN_GCS, url.encode('utf-8'))
-                elif not fs_new.isfile(
-                        compressed_image_filepath.encode('utf-8')):
-                    yield ('Compressed file not in GCS', url.encode('utf-8'))
-                elif not fs_new.isfile(micro_image_filepath.encode('utf-8')):
-                    yield ('Micro file not in GCS', url.encode('utf-8'))
-                else:
-                    yield (FILE_FOUND_IN_GCS, 1)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_FOUND_IN_GCS:
-            yield (status, len(values))
-        else:
-            yield (status, '%s' % set(values))
-
-
-class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for deleting the images in the exploration
-    from the GAE.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
-
-    @staticmethod
-    def map(file_model):
-        instance_id = file_model.id
-        filetype = instance_id[instance_id.rfind('.') + 1:]
-        # To separate the image entries from the audio entries we get from
-        # the FileSnapshotContentModel.
-        if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
-            if not catched_groups:
-                yield (WRONG_INSTANCE_ID, instance_id)
-            else:
-                filename = catched_groups.group(2)
-                filepath = 'assets/' + filename
-                exploration_id = catched_groups.group(1)
-                filemetadata_model = (
-                    file_models.FileMetadataModel.get_model(
-                        exploration_id, filepath, False))
-
-                file_model.delete(
-                    'ADMIN',
-                    'Deleting file_model for image from GAE',
-                    force_deletion=True)
-                filemetadata_model.delete(
-                    'ADMIN',
-                    'Deleting filemetamodel for image from GAE',
-                    force_deletion=True)
-                yield (FILE_DELETED, 1)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_DELETED:
-            yield (NUMBER_OF_FILES_DELETED, len(values))
-        else:
-            yield (status, values)
 
 
 class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
