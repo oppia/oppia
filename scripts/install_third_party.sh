@@ -121,7 +121,7 @@ fi
 
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-quotes-0.1.9" ]; then
-  echo Installing pycodestyle
+  echo Installing pylint-quotes
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
   curl -o pylint-quotes-0.1.9.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.1.9.tar.gz
   tar xzf pylint-quotes-0.1.9.tar.gz -C $TOOLS_DIR

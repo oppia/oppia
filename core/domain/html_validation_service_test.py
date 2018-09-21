@@ -852,7 +852,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
             )],
-            'Missing attributes: [u\'text-with-value\'], Extra attributes: []': [( # pylint: disable=line-too-long
+            'Missing attributes: [u\'text-with-value\'], Extra attributes: []':
+            [(
                 '<oppia-noninteractive-collapsible content-with-value'
                 '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
                 'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
@@ -917,7 +918,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Missing attributes: [u\'alt-with-value\'], Extra attributes: []': [( # pylint: disable=line-too-long
+            'Missing attributes: [u\'alt-with-value\'], Extra attributes: []':
+            [(
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
                 '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
                 'quot;"></oppia-noninteractive-image>'
