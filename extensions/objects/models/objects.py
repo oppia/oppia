@@ -444,7 +444,7 @@ class CheckedProof(BaseObject):
                         assumptions.
                     target_string: basestring. The target string of the proof.
                     proof_string: basestring. The proof string.
-                    correct: bool. The proof is correct or not.
+                    correct: bool. Whether the proof is correct.
                     error_category: basestring. The category of the error.
                     error_code: basestring. The error code.
                     error_message: basestring. The error message.
@@ -486,9 +486,25 @@ class LogicQuestion(BaseObject):
         Returns:
             dict. The normalized object containing the following key-value
                 pairs:
-                    assumptions: list. The list containing all the assumptions.
-                    results: list. The list containing the final results of the
-                        required proof.
+                    assumptions: list(dict(str, *)). The list containing all the
+                        assumptions in the dict format containing following
+                        key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    results: list(dict(str, *)). The list containing the final
+                        results of the required proof in the dict format
+                        containing following key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    default_proof_string: basestring. The default proof string.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.
