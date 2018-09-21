@@ -57,7 +57,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
 
     Args:
         obj: *. The object to validate and normalize.
-        schema: str. The schema to validate and normalize the value against.
+        schema: dict. The schema to validate and normalize the value against.
         apply_custom_validators: bool. Validate the normalized object.
 
     Returns:
@@ -214,7 +214,7 @@ class Normalizers(object):
                 https://. Otherwise, returns the original URL.
 
         Raises:
-            AssertionError: if the URL is invalid.
+            AssertionError: The URL is invalid.
         """
         url_components = urlparse.urlsplit(obj)
         quoted_url_components = (
@@ -240,13 +240,16 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
-        """Gets the value of the validator_id of the object.
+        """Gets the validation method corresponding to the given validator ID.
 
         Args:
-            validator_id: str. That contains the attribute's name.
+            validator_id: str. The validator ID.
 
         Returns:
-            *. Returns the value of the name attribute of an object.
+            *. Return the value of the named attribute of object.
+                Name must be a string. If the string is the name of
+                one of the object attributes, the result is the
+                value of that attribute.
 
         Raises:
             Exception: 'validator_id' is not valid.
@@ -261,7 +264,7 @@ class _Validators(object):
         `min_value` elements.
 
         Args:
-            obj: *. Object to evaluate.
+            obj: *. Object to compare with min_value.
             min_value: int. Minimum value of elements.
 
         Returns:
@@ -276,12 +279,12 @@ class _Validators(object):
         `max_value` elements.
 
         Args:
-            obj: *. Object to evaluate.
+            obj: *. Object to compare with max_value.
             max_value: int. Maximum value of elements.
 
         Returns:
             bool. True if the number of elements is less than or equal
-                to min_value.
+                to max_value.
         """
         return len(obj) <= max_value
 
@@ -290,10 +293,10 @@ class _Validators(object):
         """Returns True iff the given object (a string) is nonempty.
 
         Args:
-            obj: str. String to evaluate.
+            obj: str. String to evaluate if it is not empty.
 
         Returns:
-            bool. True if the object is not empty.
+            bool. Whether the object is non-empty.
         """
         return bool(obj)
 
@@ -302,10 +305,10 @@ class _Validators(object):
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
-            obj: list. List to evaluate.
+            obj: list. List to evaluate if you do not have duplicate elements.
 
         Returns:
-            bool. True if the object has no duplicates.
+            bool. Whether the object has no duplicates.
         """
         return sorted(list(set(obj))) == sorted(obj)
 
@@ -314,7 +317,8 @@ class _Validators(object):
         """Ensures that `obj` (an int/float) is at least `min_value`.
 
         Args:
-            obj: int or float. Object to evaluate.
+            obj: int or float. Number to evaluate if it is greater
+                than or equal to min_value.
             min_value: int. Value to compare.
 
         Returns:
@@ -327,7 +331,8 @@ class _Validators(object):
         """Ensures that `obj` (an int/float) is at most `max_value`.
 
         Args:
-            obj: int or float. Object to evaluate.
+            obj: int or float. Number to evaluate if it is less
+                than or equal to max_value.
             max_value: int. Value to compare.
 
         Returns:
@@ -340,7 +345,7 @@ class _Validators(object):
         """Ensures that `obj` (a string) defines a valid regex.
 
         Args:
-            obj: str. String to evaluate.
+            obj: str. String to evaluate and know if it's a regular expression.
 
         Returns:
             bool. True if the regular expression is valid.
@@ -354,8 +359,8 @@ class _Validators(object):
         """Ensures that `obj` (a string) matches the given regex.
 
         Args:
-            obj: str. String to evaluate.
-            regex: str. Regular expresion.
+            obj: str. String to evaluate and know if it matches regex.
+            regex: str. The regex to compare the given string against.
 
         Returns:
             bool. True if the regular expression is valid for the obj.
@@ -368,7 +373,7 @@ class _Validators(object):
         """Ensures that `obj` (a string) is a valid email.
 
         Args:
-            obj: str. String to evaluate.
+            obj: str. String to evaluate if it is an email.
 
         Returns:
             bool. True if the email is valid.
