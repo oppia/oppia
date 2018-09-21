@@ -852,7 +852,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
             )],
-            "Missing attributes: [u'text-with-value'], Extra attributes: []": [(
+            'Missing attributes: [u\'text-with-value\'], Extra attributes: []': [( # pylint: disable=line-too-long
                 '<oppia-noninteractive-collapsible content-with-value'
                 '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
                 'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
@@ -868,16 +868,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-video>'
             )],
             (
-                "Invalid URL: Sanitized URL should start with 'http://' or "
-                "'https://'; received htt://link.com"
+                'Invalid URL: Sanitized URL should start with \'http://\' or '
+                '\'https://\'; received htt://link.com'
             ): [(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
                 'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
                 'link.com&amp;quot;"></oppia-noninteractive-link></p>'
             )],
             (
-                "Missing attributes: [u'video_id-with-value'], "
-                "Extra attributes: []"
+                'Missing attributes: [u\'video_id-with-value\'], '
+                'Extra attributes: []'
             ): [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="0">'
@@ -894,7 +894,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            "Missing keys: ['title'], Extra keys: [u'url']": [(
+            'Missing keys: [\'title\'], Extra keys: [u\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
@@ -903,7 +903,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            "invalid literal for int() with base 10: 'Hello'": [(
+            'invalid literal for int() with base 10: \'Hello\'': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -917,7 +917,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            "Missing attributes: [u'alt-with-value'], Extra attributes: []": [(
+            'Missing attributes: [u\'alt-with-value\'], Extra attributes: []': [( # pylint: disable=line-too-long
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
                 '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
                 'quot;"></oppia-noninteractive-image>'
@@ -960,8 +960,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         expected_output = [
             [],
             [(
-                "Invalid URL: Sanitized URL should start with 'http://' "
-                "or 'https://'; received htt://link.com"
+                'Invalid URL: Sanitized URL should start with \'http://\' '
+                'or \'https://\'; received htt://link.com'
             )],
             ['Missing attributes: [u\'alt-with-value\'], Extra attributes: []']
         ]

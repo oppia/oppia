@@ -45,7 +45,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
         def function(posarg, kwarg):
-            order.append("call")
+            order.append('call')
             return posarg + kwarg
 
         wrapped = MyWrapper(function)

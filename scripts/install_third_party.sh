@@ -119,6 +119,15 @@ if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
   touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
 fi
 
+echo Checking if pylint-quotes is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/pylint-quotes-0.1.9" ]; then
+  echo Installing pycodestyle
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pylint-quotes-0.1.9.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.1.9.tar.gz
+  tar xzf pylint-quotes-0.1.9.tar.gz -C $TOOLS_DIR
+  rm pylint-quotes-0.1.9.tar.gz
+fi
+
 # Install webtest.
 echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
