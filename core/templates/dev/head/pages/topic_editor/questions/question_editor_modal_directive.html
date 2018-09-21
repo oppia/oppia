@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h3>
-    Select the skill to link the question to:
+    Question Editor
   </h3>
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
@@ -9,8 +9,16 @@
                    question-state-data="questionStateData"
                    can-edit-question="canEditQuestion">
   </question-editor>
+  <div class="alert alert-danger" ng-if="validationError">
+    <[validationError]>
+    <span class="oppia-transition-200"
+          ng-click="removeErrors()"
+          style="float: right;">
+      <i class="material-icons md-18">&#xE5CD;</i>
+    </span>
+  </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success" ng-disabled="selectedSkillId === null" ng-click="done()"> Save and Publish Question </button>
+  <button class="btn btn-success" ng-click="done()"> Save and Publish Question </button>
 </div>

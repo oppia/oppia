@@ -89,8 +89,12 @@ oppia.directive('questionsTab', [
                   $scope.selectedSkillId = null;
                   $scope.skillSummaries = allSkillSummaries;
 
-                  $scope.selectSkill = function(skillId) {
-                    $scope.selectedSkillId = skillId;
+                  $scope.selectOrDeselectSkill = function(skillId) {
+                    if (skillId === $scope.selectedSkillId) {
+                      $scope.selectedSkillId = null;
+                    } else {
+                      $scope.selectedSkillId = skillId;
+                    }
                   };
 
                   $scope.done = function() {
@@ -136,7 +140,8 @@ oppia.directive('questionsTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
                 'question_editor_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
+              keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -145,7 +150,15 @@ oppia.directive('questionsTab', [
                   $scope.questionId = questionId;
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.misconceptions = misconceptions;
+                  $scope.removeErrors = function() {
+                    $scope.validationError = null;
+                  };
                   $scope.done = function() {
+                    $scope.validationError = $scope.question.validate(
+                      $scope.misconceptions);
+                    if ($scope.validationError) {
+                      return;
+                    }
                     $uibModalInstance.close();
                   };
 

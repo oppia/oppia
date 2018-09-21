@@ -35,12 +35,16 @@ oppia.directive('skillConceptCardEditor', [
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
-          $scope.bindableFieldsDict = {
-            displayedConceptCardExplanation:
-              $scope.skill.getConceptCard().getExplanation(),
-            displayedWorkedExamples:
-              $scope.skill.getConceptCard().getWorkedExamples()
+
+          var initBindableFieldsDict = function() {
+            $scope.bindableFieldsDict = {
+              displayedConceptCardExplanation:
+                $scope.skill.getConceptCard().getExplanation(),
+              displayedWorkedExamples:
+                $scope.skill.getConceptCard().getWorkedExamples()
+            };
           };
+
           var explanationMemento = null;
           var workedExamplesMemento = null;
 
@@ -48,13 +52,9 @@ oppia.directive('skillConceptCardEditor', [
             return true;
           };
 
+          initBindableFieldsDict();
           $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-            $scope.bindableFieldsDict = {
-              displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation(),
-              displayedWorkedExamples:
-                $scope.skill.getConceptCard().getWorkedExamples()
-            };
+            initBindableFieldsDict();
           });
 
           // When the page is scrolled so that the top of the page is above the
