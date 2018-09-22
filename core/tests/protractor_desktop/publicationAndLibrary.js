@@ -187,7 +187,7 @@ describe('Library index page', function() {
 
     libraryPage.get();
     libraryPage.expectMainHeaderTextToBe(
-      'Imagina lo que podrías aprender hoy...');
+      'Imagine what you could learn today...');
     general.ensurePageHasNoTranslationIds();
 
     // Filter library explorations
