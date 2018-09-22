@@ -1010,12 +1010,25 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
-                # Check for space after """ in the docstring
+                # Check for space after """ in the single line docstring
                 if line.startswith('""" ') and line.endswith('"""'):
                     failed = True
                     print'%s --> Line %s: %s' % (
                         filename, line_num + 1, extra_space_message)
 
+                # Check for space after """ in the multi-line docstring
+                if line.startswith('""" '):
+                    line = file_content[line_num - 1].lstrip().rstrip()
+                    last_char_is_invalid = line[-1] not in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    no_word_is_present_in_excluded_phrases = not any(
+                        word in line for word in EXCLUDED_PHRASES)
+                    if last_char_is_invalid and (
+                            no_word_is_present_in_excluded_phrases):
+                        failed = True
+                    print'%s --> Line %s: %s' % (
+                        filename, line_num + 1, extra_space_message)
+                    
                 # Check for single line docstring.
                 if line.startswith('"""') and line.endswith('"""'):
                     # Check for punctuation at line[-4] since last three
