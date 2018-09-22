@@ -17,6 +17,7 @@
 import logging
 import random
 
+from constants import constants
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -195,7 +196,7 @@ class AdminHandler(base.BaseHandler):
             raise
 
     def _reload_exploration(self, exploration_id):
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
@@ -206,7 +207,7 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload an exploration in production.')
 
     def _reload_collection(self, collection_id):
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
@@ -230,7 +231,7 @@ class AdminHandler(base.BaseHandler):
             Exception: Environment is not DEVMODE.
         """
 
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
                 (self.user_id, num_dummy_exps_to_generate))

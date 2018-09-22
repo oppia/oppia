@@ -87,9 +87,17 @@ BAD_PATTERNS = {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
         'excluded_dirs': (
-            'assets/i18n/',)},
+            'assets/i18n/', 'core/tests/build_sources/assets/')},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    '<<<<<<<': {
+        'message': 'Please fully resolve existing merge conflicts.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    '>>>>>>>': {
+        'message': 'Please fully resolve existing merge conflicts.',
         'excluded_files': (),
         'excluded_dirs': ()},
     'glyphicon': {
@@ -202,13 +210,21 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'self.assertEquals\(',
+        'message': "Please do not use self.assertEquals method. " +
+                   "This method has been deprecated. Instead use " +
+                   "self.assertEqual method.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
-REQUIRED_STRINGS_FECONF = {
-    'FORCE_PROD_MODE = False': {
-        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
-                   'to False before committing.',
+REQUIRED_STRINGS_CONSTANTS = {
+    'DEV_MODE: true': {
+        'message': 'Please set the DEV_MODE variable in constants.js'
+                   'to true before committing.',
         'excluded_files': ()
     }
 }
@@ -222,7 +238,7 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+    'assets/scripts/*', 'core/tests/data/*', '*.mp3', '*.mp4')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -858,13 +874,13 @@ def _check_bad_patterns(all_files):
                         failed = True
                         total_error_count += 1
 
-            if filename == 'feconf.py':
-                for pattern in REQUIRED_STRINGS_FECONF:
+            if filename == 'constants.js':
+                for pattern in REQUIRED_STRINGS_CONSTANTS:
                     if pattern not in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            REQUIRED_STRINGS_FECONF[pattern]['message'])
+                            REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED

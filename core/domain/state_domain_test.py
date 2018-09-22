@@ -459,7 +459,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         # Add hint and delete hint.
         init_state.add_hint(state_domain.SubtitledHtml('hint_2', 'new hint'))
-        self.assertEquals(
+        self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             'new hint')
         init_state.add_hint(
@@ -472,7 +472,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'hint_3': {},
             'solution': {}
         })
-        self.assertEquals(len(init_state.interaction.hints), 2)
+        self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
     def test_solution_validation(self):
@@ -484,7 +484,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Solution should be set to None as default.
-        self.assertEquals(init_state.interaction.solution, None)
+        self.assertEqual(init_state.interaction.solution, None)
 
         init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
         solution = {

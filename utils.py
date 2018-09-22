@@ -680,20 +680,10 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
     """
     asset_dir_prefix = ''
-    if not feconf.DEV_MODE:
+    if not constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
-
-
-def get_template_dir_prefix():
-    """Returns prefix for template directory depending whether dev or prod.
-    It is used as a prefix in urls for js script files under the templates
-    directory.
-    """
-    template_path = (
-        '/templates/head' if not feconf.DEV_MODE else '/templates/dev/head')
-    return '%s%s' % (get_asset_dir_prefix(), template_path)
 
 
 def convert_to_str(string_to_convert):

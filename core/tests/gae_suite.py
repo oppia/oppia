@@ -27,8 +27,6 @@ import os
 import sys
 import unittest
 
-import feconf
-
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
@@ -88,8 +86,6 @@ def main():
             for test in suite:
                 for subtest in _iterate(test):
                     yield subtest
-
-    feconf.PLATFORM = 'gae'
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):

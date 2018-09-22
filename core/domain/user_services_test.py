@@ -46,7 +46,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.create_new_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
-        self.assertEquals(username, user_services.get_username(user_id))
+        self.assertEqual(username, user_services.get_username(user_id))
 
     def test_get_username_for_system_user(self):
         self.assertEqual(
@@ -83,7 +83,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_username_none(self):
         user_services.create_new_user('fakeUser', 'user@example.com')
-        self.assertEquals(None, user_services.get_username('fakeUser'))
+        self.assertEqual(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
         self.assertFalse(user_services.is_username_taken('fakeUsername'))
@@ -137,14 +137,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
-        self.assertEquals(user_services.get_username(user_id), username)
+        self.assertEqual(user_services.get_username(user_id), username)
 
         # Handle usernames that exist.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_email_from_username(username), user_email)
 
         # Handle usernames in the same equivalence class correctly.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_email_from_username('USERNAME'), user_email)
 
         # Return None for usernames which don't exist.
@@ -158,14 +158,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
-        self.assertEquals(user_services.get_username(user_id), username)
+        self.assertEqual(user_services.get_username(user_id), username)
 
         # Handle usernames that exist.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_user_id_from_username(username), user_id)
 
         # Handle usernames in the same equivalence class correctly.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_user_id_from_username('USERNAME'), user_id)
 
         # Return None for usernames which don't exist.
@@ -249,12 +249,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # When UserEmailPreferencesModel is yet to be created,
         # the value returned by get_email_preferences() should be True.
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.can_receive_editor_role_email,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
@@ -267,10 +267,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.can_receive_editor_role_email,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
@@ -303,10 +303,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exploration_user_model)
         email_preferences = user_services.get_email_preferences_for_exploration(
             user_id, exploration_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.mute_feedback_notifications,
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.mute_suggestion_notifications,
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
 
@@ -321,10 +321,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         email_preferences = user_services.get_email_preferences_for_exploration(
             user_id, exploration_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.mute_feedback_notifications,
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.mute_suggestion_notifications,
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
 
@@ -335,7 +335,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         email_preferences = user_services.get_email_preferences_for_exploration(
             user_id, exploration_id)
-        self.assertEquals(
+        self.assertEqual(
             email_preferences.mute_feedback_notifications,
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
         self.assertTrue(email_preferences.mute_suggestion_notifications)
@@ -759,7 +759,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'num_completions': 0,
                 'state_stats_mapping': {}
             })
-        self.assertEquals(
+        self.assertEqual(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
             {
@@ -770,7 +770,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
         self.process_and_flush_pending_tasks()
-        self.assertEquals(
+        self.assertEqual(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
             {
@@ -786,9 +786,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
@@ -797,7 +797,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 0,
@@ -821,18 +821,18 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
         self.process_and_flush_pending_tasks()
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
@@ -841,7 +841,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 1,
