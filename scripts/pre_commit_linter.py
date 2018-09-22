@@ -1036,7 +1036,7 @@ def _check_docstrings(all_files):
 
                 # Check for multiline docstring.
                 elif line.endswith('"""'):
-                    # Ignore regular expression, i.e. lines end with r"""
+                    # Ignore regular expression, i.e. lines end with r""".
                     if line.endswith('r"""'):
                         continue
                     # Case 1: line is """. This is correct for multiline
