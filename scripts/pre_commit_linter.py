@@ -1036,6 +1036,9 @@ def _check_docstrings(all_files):
 
                 # Check for multiline docstring.
                 elif line.endswith('"""'):
+                    # Ignore regular expression, i.e. lines end with r"""
+                    if line.endswith('r"""'):
+                        continue
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
@@ -1054,7 +1057,6 @@ def _check_docstrings(all_files):
                     # Case 2: line contains some words before """. """ should
                     # shift to next line.
                     elif not any(word in line for word in EXCLUDED_PHRASES):
-                        failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
 
