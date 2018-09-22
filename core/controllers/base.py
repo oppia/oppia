@@ -172,6 +172,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
+                self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
@@ -193,8 +194,12 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.values['additional_angular_modules'] = []
         self.values['iframed'] = False
+        self.values['is_moderator'] = user_services.is_at_least_moderator(
+            self.user_id)
+        self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
+        self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
