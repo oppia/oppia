@@ -21,15 +21,17 @@ oppia.factory('UserService', [
   function($http, $q, UrlInterpolationService, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
+    var userInfo;
+
     var getUserInfoAsync = function() {
       if (GLOBALS.userIsLoggedIn) {
-        if (this.userInfo) {
-          return $q.resolve(this.userInfo);
+        if (userInfo) {
+          return $q.resolve(userInfo);
         }
         return $http.get(
           '/userinfohandler'
         ).then(function(response) {
-          this.userInfo = response.data;
+          userInfo = response.data;
           return response.data;
         });
       } else {
