@@ -45,6 +45,14 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
 
 class SkillEditorTest(BaseSkillEditorControllerTest):
 
+    def _get_csrf_token_for_put(self):
+        csrf_token = None
+        url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get('%s/%s' % (url_prefix, self.skill_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+        return csrf_token
+
     def test_access_skill_editor_page(self):
         """Test access to editor pages for the sample skill."""
 
@@ -65,23 +73,57 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             self.assertEqual(response.status_int, 200)
             self.logout()
 
+    def test_skill_editor_page_not_enable_new_structures(self):
+        # Check that the skill editor cannot be accessed when new structures'
+        # pages are not enabled.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+            self.logout()
+
+    def test_skill_rights_handler(self):
+        """Test access to editor pages for the sample skill."""
+
+        url_prefix = feconf.SKILL_RIGHTS_URL_PREFIX
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            # Check that non-admins cannot access the editor page.
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (url_prefix, self.skill_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that admins can access and edit in the editor page.
+            self.login(self.ADMIN_EMAIL)
+            self.get_json('%s/%s' % (url_prefix, self.skill_id))
+            self.logout()
+
     def test_editable_skill_handler_get(self):
+        url_prefix = feconf.SKILL_EDITOR_DATA_URL_PREFIX
         # Check that non-admins cannot access the editable skill data.
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
-                expect_errors=True)
+                '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access the editable skill data.
             self.login(self.ADMIN_EMAIL)
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
+            json_response = self.get_json('%s/%s' % (url_prefix, self.skill_id))
             self.assertEqual(self.skill_id, json_response['skill']['id'])
+            self.logout()
+
+        # Check GET returns 404 when new strutures' pages are not enabled.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
+            self.assertEqual(response.status_int, 404)
             self.logout()
 
     def test_editable_skill_handler_put(self):
@@ -96,16 +138,20 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
                 'new_value': 'New Description'
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        url_prefix = feconf.SKILL_EDITOR_DATA_URL_PREFIX
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id))
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.login(self.ADMIN_EMAIL)
+            csrf_token = self._get_csrf_token_for_put()
+
+            # Check PUT returns 404 when new strutures' pages are not enabled.
+            with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+                self.put_json(
+                    '%s/%s' % (url_prefix, self.skill_id),
+                    change_cmd, csrf_token=csrf_token, expect_errors=True,
+                    expected_status_int=404)
 
             json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
+                '%s/%s' % (url_prefix, self.skill_id),
                 change_cmd, csrf_token=csrf_token)
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.assertEqual(
@@ -115,28 +161,64 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that non-admins cannot edit a skill.
             self.login(self.NEW_USER_EMAIL)
             json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
+                '%s/%s' % (url_prefix, self.skill_id),
                 change_cmd, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
             self.logout()
 
     def test_editable_skill_handler_delete(self):
+        url_prefix = feconf.SKILL_EDITOR_DATA_URL_PREFIX
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a skill.
             self.login(self.ADMIN_EMAIL)
-            self.delete_json(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
-                expected_status_int=200)
+            self.delete_json('%s/%s' % (url_prefix, self.skill_id))
             self.logout()
 
             # Check that non-admins cannot delete a skill.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.delete(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
-                expect_errors=True)
+                '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
             self.assertEqual(response.status_int, 401)
+            self.logout()
+
+        # Check DELETE returns 404 when new strutures' pages are not enabled.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            self.login(self.ADMIN_EMAIL)
+            self.delete_json('%s/%s' % (url_prefix, self.skill_id),
+                             expect_errors=True, expected_status_int=404)
+            self.logout()
+
+    def test_skill_publish_handler(self):
+        """Test access to editor pages for the sample skill."""
+        self.login(self.ADMIN_EMAIL)
+        url_prefix = feconf.SKILL_PUBLISH_URL_PREFIX
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            csrf_token = self._get_csrf_token_for_put()
+            payload = {'version': 1}
+            # Check that an admin can publish a skill.
+            self.put_json(
+                '%s/%s' % (url_prefix, self.skill_id), payload,
+                csrf_token=csrf_token)
+
+            # Check that a non-existing skill cannot be published.
+            self.put_json(
+                '%s/%s' % (url_prefix, 'non-existing-id'), payload,
+                csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=500)
+
+            # Check that a skill cannot be published when the payload has no
+            # version.
+            self.put_json(
+                '%s/%s' % (url_prefix, self.skill_id), {},
+                csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=400)
+
+            # Check that a skill cannot be published when the payload's version
+            # is different from the skill's version.
+            self.put_json(
+                '%s/%s' % (url_prefix, self.skill_id),
+                {'version': -1}, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=400)
+
             self.logout()
