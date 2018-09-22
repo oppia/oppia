@@ -186,7 +186,8 @@ describe('Library index page', function() {
     users.logout();
 
     libraryPage.get();
-    expect(browser.getTitle()).toEqual('Exploration Library - Oppia');
+    libraryPage.expectMainHeaderTextToBe(
+      'Imagina lo que podrías aprender hoy...');
     general.ensurePageHasNoTranslationIds();
 
     // Filter library explorations
