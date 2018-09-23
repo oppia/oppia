@@ -83,10 +83,11 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
-        self.subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-            subtopic_id='subtopic_id',
-            topic_id='topic_id'
-        )
+        self.subtopic_page =
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id='subtopic_id',
+                topic_id='topic_id'
+            )
         subtopic_page_services.save_subtopic_page(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             subtopic_page=self.subtopic_page,
@@ -97,7 +98,8 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test__trusted_commit(self):
-        # Compares subtopic page model class variable (version) assigned in _trusted_commit method
+        # Compares subtopic page model class variable (version)
+        # assigned in _trusted_commit method
         self.assertEqual(self.subtopic_page.version, 1)
 
 
