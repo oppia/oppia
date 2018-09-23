@@ -14,11 +14,13 @@
 
 """Tests for the skill editor page."""
 
+from core.controllers import skill_editor
 from core.domain import skill_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
@@ -42,8 +44,11 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)
 
+    def _mock_get_skill_by_id(self, skill_id, strict=True, version=None):
+        return None
 
-class SkillEditorTest(BaseSkillEditorControllerTest):
+    def _mock_update_skill(committer_id, skill_id, change_list, commit_message):
+        raise utils.ValidationError()
 
     def _get_csrf_token_for_put(self):
         csrf_token = None
@@ -53,23 +58,25 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
+
+class SkillEditorTest(BaseSkillEditorControllerTest):
+
     def test_access_skill_editor_page(self):
         """Test access to editor pages for the sample skill."""
 
+        url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id),
-                expect_errors=True)
+                '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access and edit in the editor page.
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
-                '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id))
+                '%s/%s' % (url_prefix, self.skill_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
@@ -84,51 +91,70 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             self.assertEqual(response.status_int, 404)
             self.logout()
 
-    def test_skill_rights_handler(self):
-        """Test access to editor pages for the sample skill."""
+    def test_skill_editor_page_skill_is_none(self):
+        """TODO"""
 
-        url_prefix = feconf.SKILL_RIGHTS_URL_PREFIX
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            # Check that non-admins cannot access the editor page.
-            self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (url_prefix, self.skill_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
+        url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
 
-            # Check that admins can access and edit in the editor page.
-            self.login(self.ADMIN_EMAIL)
-            self.get_json('%s/%s' % (url_prefix, self.skill_id))
-            self.logout()
-
-    def test_editable_skill_handler_get(self):
-        url_prefix = feconf.SKILL_EDITOR_DATA_URL_PREFIX
-        # Check that non-admins cannot access the editable skill data.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
-
-            # Check that admins can access the editable skill data.
-            self.login(self.ADMIN_EMAIL)
-            json_response = self.get_json('%s/%s' % (url_prefix, self.skill_id))
-            self.assertEqual(self.skill_id, json_response['skill']['id'])
-            self.logout()
-
-        # Check GET returns 404 when new strutures' pages are not enabled.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+        with feconf_swap, skill_services_swap:
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (url_prefix, self.skill_id), expect_errors=True)
             self.assertEqual(response.status_int, 404)
             self.logout()
 
-    def test_editable_skill_handler_put(self):
-        # Check that admins can edit a skill.
-        change_cmd = {
+
+class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
+
+    def setUp(self):
+        """"""
+
+        super(SkillRightsHandlerTest, self).setUp()
+        self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
+
+    def test_skill_rights_handler(self):
+        """TODO."""
+
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            # Check that non-admins cannot access the editor page.
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that admins can access and edit in the editor page.
+            self.login(self.ADMIN_EMAIL)
+            self.get_json(self.url)
+            self.logout()
+
+    def test_skill_rights_handler_skill_rights_is_none(self):
+        """TODO."""
+
+        def mock_get_skill_rights(skill_id, strict=True):
+            return None
+
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'get_skill_rights', mock_get_skill_rights)
+        with feconf_swap, skill_services_swap:
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+            self.logout()
+
+
+class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
+
+    def setUp(self):
+        """"""
+
+        super(EditableSkillDataHandlerTest, self).setUp()
+        self.url = \
+            '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
+        self.put_payload = {
             'version': 1,
             'commit_message': 'changed description',
             'change_dicts': [{
@@ -138,21 +164,56 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
                 'new_value': 'New Description'
             }]
         }
-        url_prefix = feconf.SKILL_EDITOR_DATA_URL_PREFIX
+
+    def test_editable_skill_handler_get(self):
+        """"""
+
+        # Check that non-admins cannot access the editable skill data.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that admins can access the editable skill data.
+            self.login(self.ADMIN_EMAIL)
+            json_response = self.get_json(self.url)
+            self.assertEqual(self.skill_id, json_response['skill']['id'])
+            self.logout()
+
+        # Check GET returns 404 when new strutures' pages are not enabled.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+            self.logout()
+
+    def test_editable_skill_handler_get_skill_is_none(self):
+        """TODO"""
+
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
+        with feconf_swap, skill_services_swap:
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+            self.logout()
+
+    def test_editable_skill_handler_put(self):
+        """"""
+
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
             csrf_token = self._get_csrf_token_for_put()
 
             # Check PUT returns 404 when new strutures' pages are not enabled.
             with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
-                self.put_json(
-                    '%s/%s' % (url_prefix, self.skill_id),
-                    change_cmd, csrf_token=csrf_token, expect_errors=True,
-                    expected_status_int=404)
+                self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
+                    expect_errors=True, expected_status_int=404)
 
             json_response = self.put_json(
-                '%s/%s' % (url_prefix, self.skill_id),
-                change_cmd, csrf_token=csrf_token)
+                self.url, self.put_payload, csrf_token=csrf_token)
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.assertEqual(
                 'New Description', json_response['skill']['description'])
@@ -161,10 +222,36 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that non-admins cannot edit a skill.
             self.login(self.NEW_USER_EMAIL)
             json_response = self.put_json(
-                '%s/%s' % (url_prefix, self.skill_id),
-                change_cmd, csrf_token=csrf_token, expect_errors=True,
+                self.url, self.put_payload, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
+            self.logout()
+
+    def test_editable_skill_handler_put_skill_is_none(self):
+        """TODO"""
+
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
+        with feconf_swap:
+            self.login(self.ADMIN_EMAIL)
+            csrf_token = self._get_csrf_token_for_put()
+            with skill_services_swap:
+                self.put_json(self.url, {}, csrf_token=csrf_token,
+                    expect_errors=True, expected_status_int=404)
+            self.logout()
+
+    def test_editable_skill_handler_put_raise_utils_validation_error(self):
+        """TODO"""
+
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'update_skill', self._mock_update_skill)
+        with feconf_swap, skill_services_swap:
+            self.login(self.ADMIN_EMAIL)
+            csrf_token = self._get_csrf_token_for_put()
+            self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=500)
             self.logout()
 
     def test_editable_skill_handler_delete(self):
@@ -187,6 +274,20 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             self.login(self.ADMIN_EMAIL)
             self.delete_json('%s/%s' % (url_prefix, self.skill_id),
                              expect_errors=True, expected_status_int=404)
+            self.logout()
+
+    def test_editable_skill_handler_delete_skill_has_associated_questions(self):
+        """TODO"""
+
+        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        skill_services_swap = self.swap(
+            skill_services, 'skill_has_associated_questions', lambda x: True)
+
+        with feconf_swap, skill_services_swap:
+            self.login(self.ADMIN_EMAIL)
+            self.delete_json(
+                '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
+                expect_errors=True, expected_status_int=500)
             self.logout()
 
     def test_skill_publish_handler(self):
