@@ -118,7 +118,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             title='subtopic_page'
         )
         self.subtopics_page = self.topic.subtopics
-                self.subtopic_page_test_index = self.topic.get_subtopic_index(1)
+        self.subtopic_page_test_index = self.topic.get_subtopic_index(1)
         self.subtopic_page_test_instance_id = 'subtopicpage-%s-%s' % (
             self.subtopics_page[self.subtopic_page_test_index].id,
             1
