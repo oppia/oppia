@@ -74,7 +74,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel._get_instance_id(
                 topic_id=self.topic.id,
                 version=self.topic.version
-            ), # pylint: disable=W021
+            ), # pylint: disable=W0212
             self.topic_test_instance_id
         )
 
