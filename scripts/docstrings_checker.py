@@ -51,12 +51,12 @@ def get_setters_property_name(node):
         str|None. The name of the property that the node is a setter for,
             or None if one could not be found.
     """
-    decorators = node.decorators.nodes if node.decorators else []
-    for decorator in decorators:
-        if (isinstance(decorator, astroid.Attribute) and
-                decorator.attrname == 'setter' and
-                isinstance(decorator.expr, astroid.Name)):
-            return decorator.expr.name
+    decorator_nodes = node.decorators.nodes if node.decorators else []
+    for decorator_node in decorator_nodes:
+        if (isinstance(decorator_node, astroid.Attribute) and
+                decorator_node.attrname == 'setter' and
+                isinstance(decorator_node.expr, astroid.Name)):
+            return decorator_node.expr.name
     return None
 
 
