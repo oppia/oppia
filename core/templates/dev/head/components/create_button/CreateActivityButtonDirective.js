@@ -72,6 +72,11 @@ oppia.directive('createActivityButton', [
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
+                    UserService.getUserInfoAsync().then(function(userInfo) {
+                      $scope.canCreateCollections = (
+                        userInfo.can_create_collections);
+                    });
+
                     $scope.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
                       $uibModalInstance.close();
@@ -81,11 +86,6 @@ oppia.directive('createActivityButton', [
                       CollectionCreationService.createNewCollection();
                       $uibModalInstance.close();
                     };
-
-                    UserService.getUserInfoAsync().then(function(userInfo) {
-                      $scope.canCreateCollections = (
-                        userInfo.can_create_collections);
-                    });
 
                     $scope.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
