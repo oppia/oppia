@@ -71,7 +71,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.TopicCommitLogEntryModel._get_instance_id(# pylint: disable=W0212
+            topic_models.TopicCommitLogEntryModel._get_instance_id(# pylint: disable=Access to a protected member %s of a client class
                 topic_id=self.topic.id,
                 version=self.topic.version
             ),
@@ -128,7 +128,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(# pylint: disable=W0212
+            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(# pylint: disable=Access to a protected member %s of a client class
                 subtopic_page_id=self.subtopics_page[
                     self.subtopic_page_test_index
                 ].id,
