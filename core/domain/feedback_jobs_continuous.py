@@ -53,8 +53,10 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _get_realtime_datastore_class(cls):
-        """Returns the datastore class used by the realtime layer, which should
-        subclass BaseRealtimeDatastoreClassForContinuousComputations.
+        """Get the realtime datastore class used by the realtime layer.
+        Returns:
+            class. Datastore class used by the realtime layer, which should
+            subclass BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
 
