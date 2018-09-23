@@ -203,6 +203,15 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
+        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'message': 'Please remove pylint exculsion if it is unnecessary or '
+                   'make it human readable with a sentence instead of an id. '
+                   'The id to message list can be seen '
+                   'here->http://pylint-messages.wikidot.com/all-codes',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'self.assertEquals\(',
         'message': "Please do not use self.assertEquals method. " +
                    "This method has been deprecated. Instead use " +
