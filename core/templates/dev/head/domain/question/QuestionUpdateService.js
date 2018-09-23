@@ -66,11 +66,15 @@ oppia.factory('QuestionUpdateService', [
             question.setLanguageCode(oldLanguageCode);
           });
       },
-      setQuestionStateData: function(question, oldStateData, newStateData) {
+      setQuestionStateData: function(question, oldStateData, updateFunction) {
+        updateFunction();
+        var newStateData = question.getStateData();
         _applyPropertyChange(
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
-          newStateData.toBackendDict(), oldStateData.toBackendDict(),
+          newStateData.toBackendDict(),
+          oldStateData.toBackendDict(),
           function(changeDict, question) {
+            updateFunction();
             question.setStateData(newStateData);
           }, function(changeDict, question) {
             question.setStateData(oldStateData);

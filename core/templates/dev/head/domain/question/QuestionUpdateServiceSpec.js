@@ -31,11 +31,15 @@ describe('Question update service', function() {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
     StateObjectFactory = $injector.get('StateObjectFactory');
+    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
     var sampleStateDict = {
       name: 'question',
       classifier_model_id: 0,
-      content: '<p>Hello World</p>',
+      content: {
+        html: 'old content',
+        content_id: 'content'
+      },
       param_changes: [],
       interaction: {
         answer_groups: [{
@@ -57,22 +61,25 @@ describe('Question update service', function() {
       content_ids_to_audio_translations: {}
     };
 
-    var sampleStateDictTwo = {
+    var expectedOutputStateDict = {
       name: 'question',
       classifier_model_id: 0,
-      content: '<p>Hello World!!!</p>',
+      content: {
+        html: 'test content',
+        content_id: 'content'
+      },
       param_changes: [],
       interaction: {
         answer_groups: [{
           rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
           outcome: {
-            dest: 'My name is...',
-            feedback: {html: 'good job!'},
+            dest: 'Me Llamo',
+            feedback: {html: 'buen trabajo!'},
             labelled_as_correct: true
           }
         }],
         default_outcome: {
-          dest: 'Hello',
+          dest: 'Hola',
           feedback: {html: 'try again!'},
           labelled_as_correct: false
         },
@@ -82,8 +89,8 @@ describe('Question update service', function() {
       content_ids_to_audio_translations: {}
     };
 
-    sampleStateTwo = StateObjectFactory.createFromBackendDict(
-      'question', sampleStateDictTwo);
+    expectedOutputState = StateObjectFactory.createFromBackendDict(
+      'question', expectedOutputStateDict);
 
     var sampleQuestionBackendObject = {
       id: '0',
@@ -105,10 +112,14 @@ describe('Question update service', function() {
 
   it('should update the state data of the question', function() {
     var oldStateData = angular.copy(sampleQuestion.getStateData());
-    var newStateData = angular.copy(sampleStateTwo);
+    var updateFunction = function() {
+      var stateData = sampleQuestion.getStateData();
+      stateData.content = SubtitledHtmlObjectFactory.createDefault(
+        'test content', 'content');
+    };
     QuestionUpdateService.setQuestionStateData(
-      sampleQuestion, oldStateData, newStateData);
-    expect(sampleQuestion.getStateData()).toEqual(newStateData);
+      sampleQuestion, oldStateData, updateFunction);
+    expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
     QuestionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
   });
