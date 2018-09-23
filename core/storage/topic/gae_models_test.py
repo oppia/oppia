@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Test for Topic model. """
+"""Test for Topic model."""
 
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
