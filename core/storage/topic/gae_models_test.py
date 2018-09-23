@@ -28,7 +28,7 @@ import feconf
 
 
 class TopicModelUnitTest(test_utils.GenericTestBase):
-    """ Test the TopicModel class. """
+    """Test the TopicModel class."""
 
     def setUp(self):
         super(TopicModelUnitTest, self).setUp()
@@ -40,7 +40,7 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
 
     def test__trusted_commit(self):
         # Compares topic model class variable (version)
-        # assigned in _trusted_commit method
+        # assigned in _trusted_commit method.
         self.assertEqual(self.topic.version, 1)
 
     def test_get_by_name(self):
@@ -55,7 +55,7 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """ Test the TopicCommitLogEntryModel class. """
+    """Test the TopicCommitLogEntryModel class."""
 
     def setUp(self):
         super(TopicCommitLogEntryModelUnitTest, self).setUp()
@@ -80,7 +80,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """ Test the SubtopicPageModelUnitTest class. """
+    """Test the SubtopicPageModelUnitTest class."""
 
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
@@ -101,12 +101,12 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     def test__trusted_commit(self):
         # Compares subtopic page model class variable (version)
-        # assigned in _trusted_commit method
+        # assigned in _trusted_commit method.
         self.assertEqual(self.subtopic_page.version, 1)
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """ Test the SubtopicPageCommitLogEntryModel class. """
+    """Test the SubtopicPageCommitLogEntryModel class."""
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelUnitTest, self).setUp()
