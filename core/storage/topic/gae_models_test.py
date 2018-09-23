@@ -44,11 +44,11 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_by_name(self):
         self.assertEqual(
-            topic_models.TopicModel.get_by_name(self.topic.name).name, 
+            topic_models.TopicModel.get_by_name(self.topic.name).name,
             self.topic.name
         )
         self.assertEqual(
-            topic_models.TopicModel.get_by_name(self.topic.name).id, 
+            topic_models.TopicModel.get_by_name(self.topic.name).id,
             self.topic.id
         )
 
@@ -71,7 +71,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """ Test the SubtopicPageModelUnitTest class. """
-    
+
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
         self.subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
