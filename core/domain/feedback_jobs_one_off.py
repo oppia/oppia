@@ -61,7 +61,7 @@ class ValidateLastUpdatedFieldOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.last_updated is None:
-            yield ('count', 1)
+            yield (type(item).__name__, 1)
 
     @staticmethod
     def reduce(key, value):
