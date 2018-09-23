@@ -1028,7 +1028,7 @@ def _check_docstrings(all_files):
                         failed = True
                         print'%s --> Line %s: %s' % (
                             filename, line_num + 1, extra_space_message)
-                    
+
                 # Check for single line docstring.
                 if line.startswith('"""') and line.endswith('"""'):
                     # Check for punctuation at line[-4] since last three
