@@ -71,7 +71,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.TopicCommitLogEntryModel._get_instance_id(
+            topic_models.TopicCommitLogEntryModel._get_instance_id(# pylint: disable=W0212
                 topic_id=self.topic.id,
                 version=self.topic.version
             ), # pylint: disable=W0212
