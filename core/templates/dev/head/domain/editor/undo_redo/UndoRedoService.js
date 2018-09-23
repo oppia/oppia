@@ -25,13 +25,13 @@ oppia.constant(
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
-oppia.factory('UndoRedoService', [
+oppia.factory('BaseUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-    var UndoRedoService = {};
+    var BaseUndoRedoService = {};
 
-    var _appliedChanges = [];
-    var _undoneChanges = [];
+    this._appliedChanges = [];
+    this._undoneChanges = [];
 
     var _dispatchMutation = function() {
       $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
@@ -45,16 +45,21 @@ oppia.factory('UndoRedoService', [
       _dispatchMutation();
     };
 
+    BaseUndoRedoService.init = function() {
+      this._appliedChanges = [];
+      this._undoneChanges = [];
+    };
+
     /**
      * Pushes a change domain object onto the change stack and applies it to the
      * provided domain object. When a new change is applied, all undone changes
      * are lost and cannot be redone. This will fire an event as defined by the
      * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    UndoRedoService.applyChange = function(changeObject, domainObject) {
+    BaseUndoRedoService.applyChange = function(changeObject, domainObject) {
       _applyChange(changeObject, domainObject);
-      _appliedChanges.push(changeObject);
-      _undoneChanges = [];
+      this._appliedChanges.push(changeObject);
+      this._undoneChanges = [];
     };
 
     /**
@@ -63,10 +68,10 @@ oppia.factory('UndoRedoService', [
      * will fire an event as defined by the constant
      * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    UndoRedoService.undoChange = function(domainObject) {
-      if (_appliedChanges.length !== 0) {
-        var change = _appliedChanges.pop();
-        _undoneChanges.push(change);
+    BaseUndoRedoService.undoChange = function(domainObject) {
+      if (this._appliedChanges.length !== 0) {
+        var change = this._appliedChanges.pop();
+        this._undoneChanges.push(change);
         _reverseChange(change, domainObject);
         return true;
       }
@@ -78,10 +83,10 @@ oppia.factory('UndoRedoService', [
      * if there are no changes to redo, and true if otherwise. This will fire an
      * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    UndoRedoService.redoChange = function(domainObject) {
-      if (_undoneChanges.length !== 0) {
-        var change = _undoneChanges.pop();
-        _appliedChanges.push(change);
+    BaseUndoRedoService.redoChange = function(domainObject) {
+      if (this._undoneChanges.length !== 0) {
+        var change = this._undoneChanges.pop();
+        this._appliedChanges.push(change);
         _applyChange(change, domainObject);
         return true;
       }
@@ -93,11 +98,11 @@ oppia.factory('UndoRedoService', [
      * object. This list will not contain undone actions. Changes to the
      * returned list will not be reflected in this service.
      */
-    UndoRedoService.getChangeList = function() {
+    BaseUndoRedoService.getChangeList = function() {
       // TODO(bhenning): Consider integrating something like Immutable.js to
       // avoid the slice here and ensure the returned object is truly an
       // immutable copy.
-      return _appliedChanges.slice();
+      return this._appliedChanges.slice();
     };
 
     /**
@@ -105,31 +110,32 @@ oppia.factory('UndoRedoService', [
      * this service. Changes to the returned list will not affect this service.
      * Furthermore, the returned list is ready to be sent to the backend.
      */
-    UndoRedoService.getCommittableChangeList = function() {
+    BaseUndoRedoService.getCommittableChangeList = function() {
       var committableChangeList = [];
-      for (var i = 0; i < _appliedChanges.length; i++) {
-        committableChangeList[i] = _appliedChanges[i].getBackendChangeObject();
+      for (var i = 0; i < this._appliedChanges.length; i++) {
+        committableChangeList[i] =
+          this._appliedChanges[i].getBackendChangeObject();
       }
       return committableChangeList;
     };
 
-    UndoRedoService.setChangeList = function(changeList) {
-      _appliedChanges = angular.copy(changeList);
+    BaseUndoRedoService.setChangeList = function(changeList) {
+      this._appliedChanges = angular.copy(changeList);
     };
 
     /**
      * Returns the number of changes that have been applied to the domain
      * object.
      */
-    UndoRedoService.getChangeCount = function() {
-      return _appliedChanges.length;
+    BaseUndoRedoService.getChangeCount = function() {
+      return this._appliedChanges.length;
     };
 
     /**
      * Returns whether this service has any applied changes.
      */
-    UndoRedoService.hasChanges = function() {
-      return _appliedChanges.length !== 0;
+    BaseUndoRedoService.hasChanges = function() {
+      return this._appliedChanges.length !== 0;
     };
 
     /**
@@ -137,136 +143,28 @@ oppia.factory('UndoRedoService', [
      * applied from applyChange() or redoChange(). This will fire an event as
      * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    UndoRedoService.clearChanges = function() {
-      _appliedChanges = [];
-      _undoneChanges = [];
+    BaseUndoRedoService.clearChanges = function() {
+      this._appliedChanges = [];
+      this._undoneChanges = [];
       _dispatchMutation();
     };
 
-    return UndoRedoService;
+    return BaseUndoRedoService;
   }
 ]);
 
-// TODO(tjiang11): Figure out way to create new instance of service without
-// code duplication.
+oppia.factory('UndoRedoService', [
+  'BaseUndoRedoService', function(BaseUndoRedoService) {
+    var child = Object.create(BaseUndoRedoService);
+    child.init();
+    return child;
+  }
+]);
+
 oppia.factory('QuestionUndoRedoService', [
-  '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-    var QuestionUndoRedoService = {};
-
-    var _appliedChanges = [];
-    var _undoneChanges = [];
-
-    var _dispatchMutation = function() {
-      $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
-    };
-    var _applyChange = function(changeObject, domainObject) {
-      changeObject.applyChange(domainObject);
-      _dispatchMutation();
-    };
-    var _reverseChange = function(changeObject, domainObject) {
-      changeObject.reverseChange(domainObject);
-      _dispatchMutation();
-    };
-
-    /**
-     * Pushes a change domain object onto the change stack and applies it to the
-     * provided domain object. When a new change is applied, all undone changes
-     * are lost and cannot be redone. This will fire an event as defined by the
-     * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
-     */
-    QuestionUndoRedoService.applyChange = function(changeObject, domainObject) {
-      _applyChange(changeObject, domainObject);
-      _appliedChanges.push(changeObject);
-      _undoneChanges = [];
-    };
-
-    /**
-     * Undoes the last change to the provided domain object. This function
-     * returns false if there are no changes to undo, and true otherwise. This
-     * will fire an event as defined by the constant
-     * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
-     */
-    QuestionUndoRedoService.undoChange = function(domainObject) {
-      if (_appliedChanges.length !== 0) {
-        var change = _appliedChanges.pop();
-        _undoneChanges.push(change);
-        _reverseChange(change, domainObject);
-        return true;
-      }
-      return false;
-    };
-
-    /**
-     * Reverses an undo for the given domain object. This function returns false
-     * if there are no changes to redo, and true if otherwise. This will fire an
-     * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
-     */
-    QuestionUndoRedoService.redoChange = function(domainObject) {
-      if (_undoneChanges.length !== 0) {
-        var change = _undoneChanges.pop();
-        _appliedChanges.push(change);
-        _applyChange(change, domainObject);
-        return true;
-      }
-      return false;
-    };
-
-    /**
-     * Returns the current list of changes applied to the provided domain
-     * object. This list will not contain undone actions. Changes to the
-     * returned list will not be reflected in this service.
-     */
-    QuestionUndoRedoService.getChangeList = function() {
-      // TODO(bhenning): Consider integrating something like Immutable.js to
-      // avoid the slice here and ensure the returned object is truly an
-      // immutable copy.
-      return _appliedChanges.slice();
-    };
-
-    /**
-     * Returns a list of commit dict updates representing all chosen changes in
-     * this service. Changes to the returned list will not affect this service.
-     * Furthermore, the returned list is ready to be sent to the backend.
-     */
-    QuestionUndoRedoService.getCommittableChangeList = function() {
-      var committableChangeList = [];
-      for (var i = 0; i < _appliedChanges.length; i++) {
-        committableChangeList[i] = _appliedChanges[i].getBackendChangeObject();
-      }
-      return committableChangeList;
-    };
-
-    QuestionUndoRedoService.setChangeList = function(changeList) {
-      _appliedChanges = angular.copy(changeList);
-    };
-
-    /**
-     * Returns the number of changes that have been applied to the domain
-     * object.
-     */
-    QuestionUndoRedoService.getChangeCount = function() {
-      return _appliedChanges.length;
-    };
-
-    /**
-     * Returns whether this service has any applied changes.
-     */
-    QuestionUndoRedoService.hasChanges = function() {
-      return _appliedChanges.length !== 0;
-    };
-
-    /**
-     * Clears the change history. This does not reverse any of the changes
-     * applied from applyChange() or redoChange(). This will fire an event as
-     * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
-     */
-    QuestionUndoRedoService.clearChanges = function() {
-      _appliedChanges = [];
-      _undoneChanges = [];
-      _dispatchMutation();
-    };
-
-    return QuestionUndoRedoService;
+  'BaseUndoRedoService', function(BaseUndoRedoService) {
+    var child = Object.create(BaseUndoRedoService);
+    child.init();
+    return child;
   }
 ]);
