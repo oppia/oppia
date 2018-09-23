@@ -38,14 +38,19 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
 
     def test__trusted_commit(self):
-        # Compares topic model class variable (version) assigned in _trusted_commit method
+        # Compares topic model class variable (version)
+        # assigned in _trusted_commit method
         self.assertEqual(self.topic.version, 1)
 
     def test_get_by_name(self):
         self.assertEqual(
-            topic_models.TopicModel.get_by_name(self.topic.name).name, self.topic.name)
+            topic_models.TopicModel.get_by_name(self.topic.name).name, 
+            self.topic.name
+        )
         self.assertEqual(
-            topic_models.TopicModel.get_by_name(self.topic.name).id, self.topic.id)
+            topic_models.TopicModel.get_by_name(self.topic.name).id, 
+            self.topic.id
+        )
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
