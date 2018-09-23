@@ -74,7 +74,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel._get_instance_id(# pylint: disable=W0212
                 topic_id=self.topic.id,
                 version=self.topic.version
-            ), # pylint: disable=W0212
+            ),
             self.topic_test_instance_id
         )
 
@@ -128,7 +128,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(
+            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(# pylint: disable=W0212
                 subtopic_page_id=self.subtopics_page[
                     self.subtopic_page_test_index
                 ].id,
