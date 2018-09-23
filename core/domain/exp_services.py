@@ -1654,23 +1654,18 @@ def save_original_and_compressed_versions_of_image(
         original_image_content: str. The content of the original image.
         user_id: str. The id of the user who wants to upload the image.
     """
-    filepath = (
-        filename if feconf.DEV_MODE else 'image/%s' % filename)
+    filepath = 'image/%s' % filename
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
 
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
-    compressed_image_filepath = (
-        compressed_image_filename if feconf.DEV_MODE
-        else 'image/%s' % compressed_image_filename)
+    compressed_image_filepath = 'image/%s' % compressed_image_filename
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
-    micro_image_filepath = (
-        micro_image_filename if feconf.DEV_MODE
-        else 'image/%s' % micro_image_filename)
+    micro_image_filepath = 'image/%s' % micro_image_filename
 
     file_system_class = (
         fs_domain.ExplorationFileSystem if feconf.DEV_MODE

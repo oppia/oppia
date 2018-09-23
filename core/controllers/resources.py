@@ -40,7 +40,11 @@ class ValueGeneratorHandler(base.BaseHandler):
 
 
 class ImageHandler(base.BaseHandler):
-    """Handles image retrievals."""
+    """Handles image retrievals (only in dev -- in production, image files are
+    served from GCS).
+    """
+
+    _IMAGE_PATH_PREFIX = 'image'
 
     @acl_decorators.open_access
     def get(self, exploration_id, encoded_filepath):
@@ -62,7 +66,7 @@ class ImageHandler(base.BaseHandler):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(
                     'exploration/%s' % exploration_id))
-            raw = fs.get(filepath)
+            raw = fs.get('%s/%s' % (self._IMAGE_PATH_PREFIX, filepath))
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True

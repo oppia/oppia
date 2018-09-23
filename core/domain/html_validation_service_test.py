@@ -1039,9 +1039,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % EXP_ID))
-        fs.commit(OWNER_ID, 'abc1.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'abc2.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
@@ -1102,8 +1102,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % EXP_ID))
-        fs.commit(OWNER_ID, 'img.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'abc3.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'image/img.png', raw_image, mimetype='image/png')
+        fs.commit(OWNER_ID, 'image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(

@@ -764,9 +764,7 @@ class ImageUploadHandler(EditorHandler):
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
-        filepath = (
-            filename if feconf.DEV_MODE
-            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(

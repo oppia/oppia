@@ -822,9 +822,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
         else fs_domain.GcsFileSystem)
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
-    filepath = (
-        old_filename if feconf.DEV_MODE
-        else ('image/%s' % old_filename))
+    filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)
