@@ -65,8 +65,17 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
 
     def test__get_instance_id(self):
-        self.topic_test_instance_id = 'topic-%s-%s' % (self.topic.id, self.topic.version)
-        self.assertEqual(topic_models.TopicCommitLogEntryModel._get_instance_id(topic_id=self.topic.id, version=self.topic.version), self.topic_test_instance_id)
+        self.topic_test_instance_id = 'topic-%s-%s' % (
+            self.topic.id,
+            self.topic.version
+        )
+        self.assertEqual(
+            topic_models.TopicCommitLogEntryModel._get_instance_id(
+                topic_id=self.topic.id,
+                version=self.topic.version
+            ),
+            self.topic_test_instance_id
+        )
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
@@ -115,9 +124,11 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             1
         )
         self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(subtopic_page_id=self.subtopics_page[
+            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(
+                subtopic_page_id=self.subtopics_page[
                     self.subtopic_page_test_index
-                ].id, version=1
+                ].id,
+                version=1
             ),
             self.subtopic_page_test_instance_id
         )
