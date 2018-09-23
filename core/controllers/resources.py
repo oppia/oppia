@@ -17,6 +17,7 @@
 import logging
 import urllib
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
@@ -55,6 +56,8 @@ class ImageHandler(base.BaseHandler):
             encoded_filepath: a string representing the image filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
         try:
             filepath = urllib.unquote(encoded_filepath)
             file_format = filepath[(filepath.rfind('.') + 1):]
@@ -91,6 +94,9 @@ class AudioHandler(base.BaseHandler):
             encoded_filepath: a string representing the audio filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
+
         file_format = filename[(filename.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.

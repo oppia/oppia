@@ -38,6 +38,7 @@ from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
@@ -1665,9 +1666,7 @@ def save_original_and_compressed_versions_of_image(
         filename_wo_filetype, filetype)
     micro_image_filepath = 'image/%s' % micro_image_filename
 
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if constants.DEV_MODE
-        else fs_domain.GcsFileSystem)
+    file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
 

@@ -20,8 +20,8 @@ import json
 import logging
 
 import bs4
-from constants import constants
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
@@ -818,9 +818,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
     Returns:
         str. The new filename of the image file.
     """
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if constants.DEV_MODE
-        else fs_domain.GcsFileSystem)
+    file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
     filepath = 'image/%s' % old_filename
