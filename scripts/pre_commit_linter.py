@@ -203,6 +203,15 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
+        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'message': 'Please remove pylint exculsion if it is unnecessary or '
+                   'make it human readable with a sentence instead of an id. '
+                   'The id to message list can be seen '
+                   'here->http://pylint-messages.wikidot.com/all-codes',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'self.assertEquals\(',
         'message': "Please do not use self.assertEquals method. " +
                    "This method has been deprecated. Instead use " +
@@ -1580,8 +1589,7 @@ def main():
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        linter_messages + pattern_messages +
-        copyright_notice_messages)
+        linter_messages + pattern_messages + copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
