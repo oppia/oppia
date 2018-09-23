@@ -25,6 +25,7 @@ oppia.directive('skillsList', [
         getSkillSummaries: '&skillSummaries',
         getEditableTopicSummaries: '&editableTopicSummaries',
         canDeleteSkill: '&userCanDeleteSkill',
+        isUnpublishedSkill: '&unpublishedSkill'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
@@ -39,6 +40,15 @@ oppia.directive('skillsList', [
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
           ];
+
+          $scope.highlightedIndex = null;
+          $scope.highlightColumns = function(index) {
+            $scope.highlightedIndex = index;
+          };
+
+          $scope.unhighlightColumns = function() {
+            $scope.highlightedIndex = null;
+          };
 
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;

@@ -13,35 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview We use this file to start GAE devserver, watch over third party
+ * @fileoverview We use this file to watch over third party
  * related folders and files and to start rebuild process if needed. This file
- * should be only used for the mentioned purposes until we devise a way to start
- * devserver and watch folders from Python, then it should be removed.
+ * should be only used for the mentioned purposes until we devise a way
+ * to watch folders from Python, then it should be removed.
  */
 
-var fs = require('fs');
 var yargs = require('yargs');
 var argv = yargs
   .usage('Usage: $0 <command> [<options>]')
-  .command('start_devserver', 'start GAE development server',
+  .command('watch', 'watch files in nonprod mode',
     function(yargs) {
       argv = yargs
-        .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
-         '[--clear_datastore] [--enable_sendmail]' +
-         '[--prod_env]')
-        .option('gae_devserver_path', {
-          describe: 'A path to app engine'
-        })
-        .option('enable_sendmail', {
-          describe: 'Whether to send emails'
-        })
-        .option('clear_datastore', {
-          describe: 'Whether to clear all data storage'
-        })
-        .option('prod_env', {
-          describe: 'Whether to run server in prod mode'
-        })
-        .demand(['gae_devserver_path'])
+        .usage('Usage: $0 watch')
         .argv;
     }).argv;
 
@@ -50,32 +34,10 @@ var concat = require('gulp-concat');
 var childProcess = require('child_process');
 var path = require('path');
 
-var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
 var manifest = require('./manifest.json');
 
 var thirdPartyCssFiles = path.join('third_party', 'static', '**', '*.css');
 var thirdPartyJsFiles = path.join('third_party', 'static', '**', '*.js');
-
-var isProdMode = argv.prod_env === 'True';
-var gaeDevserverPath = argv.gae_devserver_path;
-var params = {
-  admin_host: '0.0.0.0',
-  admin_port: 8000,
-  host: '0.0.0.0',
-  port: 8181,
-  skip_sdk_update_check: true
-};
-if (argv.clear_datastore) {
-  params.clear_datastore = true;
-}
-
-if (argv.enable_console) {
-  params.enable_console = true;
-}
-
-if (argv.enable_sendmail) {
-  params.enable_sendmail = argv.enable_sendmail;
-}
 
 // Check if there are enough commands/actions/tasks to run gulp.
 var checkCommands = function(yargs, argv, numRequired) {
@@ -88,11 +50,6 @@ var checkCommands = function(yargs, argv, numRequired) {
 };
 // There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
-
-gulp.task('gulpStartGae', function() {
-  gulp.src('app.yaml')
-    .pipe(gulpStartGae(gaeDevserverPath, [], params));
-});
 
 gulp.task('build', function() {
   childProcess.exec(['$PYTHON_CMD scripts/build.py']);
@@ -109,8 +66,4 @@ gulp.task('watch', function() {
   }
 });
 
-if (isProdMode) {
-  gulp.task('start_devserver', ['gulpStartGae']);
-} else {
-  gulp.task('start_devserver', ['gulpStartGae', 'watch']);
-}
+gulp.task('watch', ['watch']);
