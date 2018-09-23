@@ -45,6 +45,28 @@ oppia.directive('topNavigationBar', [
             $scope.isSuperAdmin = userInfo.is_super_admin;
             $scope.username = userInfo.username;
             $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+            if ($scope.username) {
+              $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
+                '/profile/<username>', {
+                  username: $scope.username
+                });
+            }
+
+            if ($scope.userIsLoggedIn) {
+              // Show the number of unseen notifications in the navbar and page
+              // title, unless the user is already on the dashboard page.
+              $http.get('/notificationshandler').then(function(response) {
+                var data = response.data;
+                if ($window.location.pathname !== '/') {
+                  $scope.numUnseenNotifications = data.num_unseen_notifications;
+                  if ($scope.numUnseenNotifications > 0) {
+                    $window.document.title = (
+                      '(' + $scope.numUnseenNotifications + ') ' +
+                      $window.document.title);
+                  }
+                }
+              });
+            }
           });
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             $scope.profilePictureDataUrl = dataUrl;
@@ -57,9 +79,6 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            $scope.profilePictureDataUrl = dataUrl;
-          });
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.ACTION_OPEN = 'open';
           $scope.ACTION_CLOSE = 'close';
@@ -77,12 +96,6 @@ oppia.directive('topNavigationBar', [
               keyCode: 9
             }
           };
-          if ($scope.username) {
-            $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
-              '/profile/<username>', {
-                username: $scope.username
-              });
-          }
           $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
@@ -130,7 +143,21 @@ oppia.directive('topNavigationBar', [
             }
             $scope.closeSubmenu(evt);
           };
-          /**
+          /**if ($scope.userIsLoggedIn) {
+            // Show the number of unseen notifications in the navbar and page
+            // title, unless the user is already on the dashboard page.
+            $http.get('/notificationshandler').then(function(response) {
+              var data = response.data;
+              if ($window.location.pathname !== '/') {
+                $scope.numUnseenNotifications = data.num_unseen_notifications;
+                if ($scope.numUnseenNotifications > 0) {
+                  $window.document.title = (
+                    '(' + $scope.numUnseenNotifications + ') ' +
+                    $window.document.title);
+                }
+              }
+            });
+          }
            * Handles keydown events on menus.
            * @param {object} evt
            * @param {String} menuName - name of menu to perform action
@@ -167,22 +194,6 @@ oppia.directive('topNavigationBar', [
               $scope.$apply();
             }
           });
-
-          if ($scope.userIsLoggedIn) {
-            // Show the number of unseen notifications in the navbar and page
-            // title, unless the user is already on the dashboard page.
-            $http.get('/notificationshandler').then(function(response) {
-              var data = response.data;
-              if ($window.location.pathname !== '/') {
-                $scope.numUnseenNotifications = data.num_unseen_notifications;
-                if ($scope.numUnseenNotifications > 0) {
-                  $window.document.title = (
-                    '(' + $scope.numUnseenNotifications + ') ' +
-                    $window.document.title);
-                }
-              }
-            });
-          }
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
