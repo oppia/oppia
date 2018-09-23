@@ -256,6 +256,26 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
         self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
 
+    def test_get_multi_skills(self):
+        self.save_new_skill(
+            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
+        self.save_new_skill(
+            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
+        try:
+            skill_services.get_multi_skills(['skill_a', 'skill_b'])
+        except Exception:
+            self.fail(msg='Unexpected exception raised.')
+
+        try:
+            skill_services.get_multi_skills(['skill_a', 'skill_c'])
+            self.assertFail()
+        except Exception as e:
+            self.assertEqual(e.message, 'No skill exists for ID skill_c')
+
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill mastery services module."""

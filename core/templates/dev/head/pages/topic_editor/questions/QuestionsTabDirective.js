@@ -55,6 +55,7 @@ oppia.directive('questionsTab', [
             $scope.suggestionReviewMessage = null;
             $scope.questionIsBeingUpdated = false;
             $scope.questionIsBeingSaved = false;
+            $scope.emptyMisconceptionsList = [];
           };
 
           $scope.hasChanges = function() {
