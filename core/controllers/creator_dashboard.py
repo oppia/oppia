@@ -303,14 +303,6 @@ class CreatorDashboardHandler(base.BaseHandler):
             [s['suggestion_id']
              for s in suggestion_dicts_which_can_be_reviewed])
 
-        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            ids_of_suggestions_created_by_user = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_created_by_user])
-            ids_of_suggestions_which_can_be_reviewed = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_which_can_be_reviewed])
-
         threads_linked_to_suggestions_by_user = (
             [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_created_by_user)])

@@ -760,7 +760,7 @@ class ImageUploadHandler(EditorHandler):
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            fs_domain.ExplorationFileSystem if constants.DEV_MODE
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))

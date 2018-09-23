@@ -128,7 +128,7 @@ oppia.directive('questionsTab', [
           loadSuggestedQuestionsAsync = function() {
             $scope.questionSuggestionThreads = [];
             var suggestionsPromise = $http.get(
-              '/generalsuggestionlisthandler', {
+              '/suggestionlisthandler', {
                 params: {
                   target_type: 'topic',
                   target_id: $scope.topic.getId(),
@@ -232,8 +232,7 @@ oppia.directive('questionsTab', [
           $scope.acceptQuestion = function(suggestionId, reviewMessage) {
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
-                '/generalsuggestionactionhandler/topic/<topic_id>/' +
-                '<suggestion_id>', {
+                '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
                   topic_id: $scope.topic.getId(),
                   suggestion_id: suggestionId
                 }));
@@ -251,8 +250,7 @@ oppia.directive('questionsTab', [
           $scope.rejectQuestion = function(suggestionId, reviewMessage) {
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
-                '/generalsuggestionactionhandler/topic/<topic_id>/' +
-                '<suggestion_id>', {
+                '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
                   topic_id: $scope.topic.getId(),
                   suggestion_id: suggestionId
                 }));

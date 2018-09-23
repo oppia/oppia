@@ -1,30 +1,26 @@
-<div class="oppia-editor-header">
-  <span>
-    <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="canEditSkillDescription()">
-      <strong style="font-size: 1.2em;"><[skill.getDescription()]></strong>
-      <i ng-if="canEditSkillDescription()"
-         class="material-icons oppia-skill-description-edit-icon"
-         title="Edit Skill Description">&#xE254;
-      </i>
-    </span>
-    <span ng-if="skillDescriptionEditorIsShown">
-      <form class="form-horizontal" role="form" ng-submit="saveSkillDescription($parent.tmpSkillDescription)">
-        <input type="text" ng-model="$parent.tmpSkillDescription" focus-on="skillDescriptionEditorOpened">
-        <button type="submit" class="btn btn-success btn-sm">Save</button>
-        <button class="btn btn-default btn-sm" ng-click="closeSkillDescriptionEditor()">Cancel</button>
-      </form>
-    </span>
-  </span>
-</div>
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section">
+      <strong style="font-size: 1.4em;">Skill Description</strong>
+      <div class="description-subtitle">
+        This is the name of the skill as visible to learners and other creators.
+      </div>
+      <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
+        <input type="text" class="form-control" ng-disabled="!canEditSkillDescription()"
+               ng-model="tmpSkillDescription" ng-blur="saveSkillDescription(tmpSkillDescription)"
+               maxlength="40" ng-trim="false">
+        <span ng-if="tmpSkillDescription.length === 40" class="help-block" style="color: red; font-size: smaller">
+          <em>Please use at most 40 characters.</em>
+        </span>
+      </p>
+    </div>
+  </div>
+</md-card>
 <style>
-  skill-description-editor .oppia-editor-header {
-    margin-left: 12vw;
-  }
-
-  skill-description-editor .oppia-skill-description-edit-icon {
-    font-size: 16px;
-    opacity: 0.2;
-    -webkit-transition: all 200ms;
-    transition: all 200ms;
+  skill-description-editor .description-subtitle {
+    padding-bottom: 20px;
+    color: #595959;
+    font-size: 0.8em;
+    font-style: italic;
   }
 </style>

@@ -6,10 +6,10 @@
 <div class="modal-body new-topic-name-editor" ng-class="{'has-error': isTopicNameEmpty(topicName)}">
   <p>
     Enter the name for the topic: &nbsp;
-    <input class="form-group" ng-model="topicName">
-    <span ng-if="isTopicNameEmpty(topicName)" class="help-block" style="font-size: smaller">
-     A name is required to create a topic.
-    </span>
+    <input class="form-group" ng-model="topicName" maxlength="20">
+    <p style="color: red;" ng-if="topicName.length === 20">
+      Topic name should be less than 20 characters.
+    </p>
   </p>
 </div>
 <div class="modal-footer">
