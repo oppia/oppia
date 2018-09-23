@@ -83,7 +83,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
-        self.subtopic_page =
+        self.subtopic_page = 
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 subtopic_id='subtopic_id',
                 topic_id='topic_id'
