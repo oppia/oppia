@@ -82,49 +82,50 @@ oppia.controller('Library', [
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           $scope.userIsLoggedIn = userInfo.user_is_logged_in;
-        });
-        $scope.activitiesOwned = {explorations: {}, collections: {}};
-        if ($scope.userIsLoggedIn) {
-          $http.get('/creatordashboardhandler/data')
-            .then(function(response) {
-              $scope.libraryGroups.forEach(function(libraryGroup) {
-                var activitySummaryDicts = libraryGroup.activity_summary_dicts;
+          $scope.activitiesOwned = {explorations: {}, collections: {}};
+          if ($scope.userIsLoggedIn) {
+            $http.get('/creatordashboardhandler/data')
+              .then(function(response) {
+                $scope.libraryGroups.forEach(function(libraryGroup) {
+                  var activitySummaryDicts = (
+                    libraryGroup.activity_summary_dicts);
 
-                var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                var ACTIVITY_TYPE_COLLECTION = 'collection';
-                activitySummaryDicts.forEach(function(activitySummaryDict) {
-                  if (activitySummaryDict.activity_type === (
-                    ACTIVITY_TYPE_EXPLORATION)) {
-                    $scope.activitiesOwned.explorations[
-                      activitySummaryDict.id] = false;
-                  } else if (activitySummaryDict.activity_type === (
-                    ACTIVITY_TYPE_COLLECTION)) {
-                    $scope.activitiesOwned.collections[
-                      activitySummaryDict.id] = false;
-                  } else {
-                    $log.error('INVALID ACTIVITY TYPE: Activity' +
-                    '(id: ' + activitySummaryDict.id +
-                    ', name: ' + activitySummaryDict.title +
-                    ', type: ' + activitySummaryDict.activity_type +
-                    ') has an invalid activity type, which could ' +
-                    'not be recorded as an exploration or a collection.');
-                  }
+                  var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                  var ACTIVITY_TYPE_COLLECTION = 'collection';
+                  activitySummaryDicts.forEach(function(activitySummaryDict) {
+                    if (activitySummaryDict.activity_type === (
+                      ACTIVITY_TYPE_EXPLORATION)) {
+                      $scope.activitiesOwned.explorations[
+                        activitySummaryDict.id] = false;
+                    } else if (activitySummaryDict.activity_type === (
+                      ACTIVITY_TYPE_COLLECTION)) {
+                      $scope.activitiesOwned.collections[
+                        activitySummaryDict.id] = false;
+                    } else {
+                      $log.error('INVALID ACTIVITY TYPE: Activity' +
+                      '(id: ' + activitySummaryDict.id +
+                      ', name: ' + activitySummaryDict.title +
+                      ', type: ' + activitySummaryDict.activity_type +
+                      ') has an invalid activity type, which could ' +
+                      'not be recorded as an exploration or a collection.');
+                    }
+                  });
+
+                  response.data.explorations_list
+                    .forEach(function(ownedExplorations) {
+                      $scope.activitiesOwned.explorations[
+                        ownedExplorations.id] = true;
+                    });
+
+                  response.data.collections_list
+                    .forEach(function(ownedCollections) {
+                      $scope.activitiesOwned.collections[
+                        ownedCollections.id] = true;
+                    });
                 });
-
-                response.data.explorations_list
-                  .forEach(function(ownedExplorations) {
-                    $scope.activitiesOwned.explorations[
-                      ownedExplorations.id] = true;
-                  });
-
-                response.data.collections_list
-                  .forEach(function(ownedCollections) {
-                    $scope.activitiesOwned.collections[
-                      ownedCollections.id] = true;
-                  });
               });
-            });
-        }
+          }
+        });
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
