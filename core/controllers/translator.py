@@ -179,8 +179,8 @@ class TranslatorAutosaveHandler(base.BaseHandler):
 
 
 class ExplorationTranslationHandler(base.BaseHandler):
+    """Handles given exploration."""
 
-    #Json type response returned by the handler when an exception is raised.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_translate_exploration
