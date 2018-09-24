@@ -176,7 +176,7 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished()
 
         page_session_timings = (
-            driver.execute_script("return window.performance"))
+            driver.execute_script('return window.performance'))
 
         self._stop_driver(driver)
 
@@ -198,7 +198,7 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished()
 
         page_session_timings = (
-            driver.execute_script("return window.performance"))
+            driver.execute_script('return window.performance'))
 
         self._stop_driver(driver)
 
@@ -245,13 +245,13 @@ class SeleniumPerformanceDataFetcher(object):
             # background. This helps reduce noise when measuring network
             # performance. Also, disable prerendering by chrome which renders
             # a page in the background leading to wrong test results.
-            chrome_options.add_argument("--disable-background-networking")
-            chrome_options.add_argument("--prerender=disabled")
-            chrome_options.add_argument("--prerender-from-omnibox=disabled")
+            chrome_options.add_argument('--disable-background-networking')
+            chrome_options.add_argument('--prerender=disabled')
+            chrome_options.add_argument('--prerender-from-omnibox=disabled')
 
             if use_proxy:
                 proxy_url = urlparse.urlparse(proxy.proxy).path
-                proxy_argument = "--proxy-server={0}".format(proxy_url)
+                proxy_argument = '--proxy-server={0}'.format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
 
             driver = webdriver.Chrome(
