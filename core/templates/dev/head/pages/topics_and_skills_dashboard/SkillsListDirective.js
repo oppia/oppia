@@ -188,9 +188,10 @@ oppia.directive('skillsList', [
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 // Start the transfer of questions from the old skill to
                 // the new one.
+                console.log(skill.id, supersedingSkill.id);
                 var mergeSkillUrl = MERGE_SKILL_URL;
                 var mergeSkillData = {
-                  old_skill: skill.id,
+                  old_skill_id: skill.id,
                   new_skill_id: supersedingSkill.id
                 };
                 $http.post(mergeSkillUrl, mergeSkillData);
