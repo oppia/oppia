@@ -62,9 +62,7 @@ oppia.directive('questionsTab', [
               $scope.skillId, $scope.question.toBackendDict(true)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId(), function() {
-                  _initTab();
-                }
+                $scope.topic.getId()
               );
             });
           };
