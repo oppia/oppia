@@ -16,6 +16,9 @@
 
 """Tests for one off statistics jobs."""
 
+import datetime
+
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs_one_off
@@ -27,6 +30,81 @@ import feconf
 
 (exp_models, stats_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.statistics])
+
+
+class RemoveBadPlaythroughsOneOffJobTest(test_utils.GenericTestBase):
+    exp_id1 = 'exp_id1'
+
+    def setUp(self):
+        super(RemoveBadPlaythroughsOneOffJobTest, self).setUp()
+        config_services.set_property(
+            'committer_id1', 'whitelisted_exploration_ids_for_playthroughs',
+            [self.exp_id1])
+        self.model_id = (
+            stats_models.PlaythroughModel.create(
+                self.exp_id1, 1, 'EarlyQuit', {}, []))
+        playthrough_instance = stats_models.PlaythroughModel.get(self.model_id)
+        playthrough_instance.created_on = datetime.datetime(
+            2018, 9, 1, 7, 47, 0, 0)
+        playthrough_instance.put()
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id1, 1,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [self.model_id],
+                'schema_version': 1,
+                'is_valid': True
+            }]
+        )
+
+    def test_playthrough_is_deleted(self):
+        job_id = (
+            stats_jobs_one_off.RemoveBadPlaythroughsOneOffJob.create_new())
+        stats_jobs_one_off.RemoveBadPlaythroughsOneOffJob.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        playthrough = stats_services.get_playthrough_by_id(self.model_id)
+        self.assertEqual(playthrough, None)
+
+        exp_issues = stats_services.get_exp_issues(self.exp_id1, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_playthrough_created_later_is_not_deleted(self):
+        model_id = (
+            stats_models.PlaythroughModel.create(
+                self.exp_id1, 1, 'EarlyQuit', {}, []))
+        playthrough_instance = stats_models.PlaythroughModel.get(self.model_id)
+        playthrough_instance.created_on = datetime.datetime(
+            2018, 9, 7, 7, 47, 0, 0)
+        playthrough_instance.put()
+
+        exp_issues = stats_services.get_exp_issues(self.exp_id1, 1)
+        exp_issues.unresolved_issues[0].playthrough_ids.append(model_id)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        job_id = (
+            stats_jobs_one_off.RemoveBadPlaythroughsOneOffJob.create_new())
+        stats_jobs_one_off.RemoveBadPlaythroughsOneOffJob.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        playthrough = stats_services.get_playthrough_by_id(model_id)
+        self.assertTrue(playthrough)
 
 
 class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):

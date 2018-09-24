@@ -19,8 +19,10 @@
 import ast
 import collections
 import copy
+import datetime
 
 from core import jobs
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -32,6 +34,46 @@ import feconf
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
+
+
+class RemoveBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for removing all playthroughs created between the July 2018
+    release and the August 2018 release.
+    """
+
+    AUGUST_RELEASE_DATETIME = datetime.datetime(2018, 9, 3, 7, 47, 0, 0)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.ExplorationIssuesModel]
+
+    @staticmethod
+    def map(exp_issues_model):
+        whitelisted_exp_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+        if exp_issues_model.exp_id not in whitelisted_exp_ids:
+            return
+        for e_idx, exp_issue in enumerate(exp_issues_model.unresolved_issues):
+            playthroughs_to_remove = []
+            playthrough_instances = stats_models.PlaythroughModel.get_multi(
+                exp_issue['playthrough_ids'])
+            for playthrough_instance in playthrough_instances:
+                if playthrough_instance.created_on < (
+                        RemoveBadPlaythroughsOneOffJob.AUGUST_RELEASE_DATETIME):
+                    playthroughs_to_remove.append(playthrough_instance)
+            stats_models.PlaythroughModel.delete_multi(
+                playthroughs_to_remove)
+            if len(playthroughs_to_remove) == len(exp_issue['playthrough_ids']):
+                exp_issues_model.unresolved_issues.pop(e_idx)
+        exp_issues_model.put()
+        yield(
+            exp_issues_model.id,
+            'Exploration Issues cleaned for exp_version %s' % (
+                exp_issues_model.exp_version))
+
+    @staticmethod
+    def reduce(exp_id, values):
+        yield '%s: %s' % (exp_id, values)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(

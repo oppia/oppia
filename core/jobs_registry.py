@@ -58,6 +58,7 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.PopulateLastUpdatedFieldOneOffJob,
     feedback_jobs_one_off.ValidateLastUpdatedFieldOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    stats_jobs_one_off.RemoveBadPlaythroughsOneOffJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
