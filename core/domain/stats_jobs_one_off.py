@@ -70,7 +70,7 @@ class ExplorationIssuesModelCreatorOneOffJob(
 
     @staticmethod
     def reduce(exp_id, values):
-        yield "%s: %s" % (exp_id, values)
+        yield '%s: %s' % (exp_id, values)
 
 
 class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
