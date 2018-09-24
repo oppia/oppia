@@ -284,8 +284,8 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
 
     if error_versions:
         raise Exception(
-            "Exploration %s, versions [%s] could not be converted to latest"
-            "schema version." % (exp_id, ', '.join(map(str, error_versions))))
+            'Exploration %s, versions [%s] could not be converted to latest'
+            'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
     return explorations
 
 
@@ -1597,7 +1597,7 @@ def get_next_page_of_all_non_private_commits(
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
-            "max_age must be a datetime.timedelta instance. or None.")
+            'max_age must be a datetime.timedelta instance. or None.')
 
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(

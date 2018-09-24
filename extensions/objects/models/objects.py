@@ -788,7 +788,7 @@ class ImageWithRegions(BaseObject):
 class ClickOnImage(BaseObject):
     """A click on an image and the clicked regions."""
 
-    description = "Position of a click and a list of regions clicked."
+    description = 'Position of a click and a list of regions clicked.'
 
     SCHEMA = {
         'type': 'dict',
@@ -825,7 +825,7 @@ class ParameterName(BaseObject):
 class SetOfHtmlString(BaseObject):
     """A Set of Html Strings."""
 
-    description = "A list of Html strings."
+    description = 'A list of Html strings.'
     default_value = []
 
     SCHEMA = {
