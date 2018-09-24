@@ -89,20 +89,6 @@ describe('Skill update service', function() {
     expect(skill.getConceptCard().getExplanation()).toEqual('test explanation');
   });
 
-  it('should set/unset superseding skill id', function() {
-    var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-    SkillUpdateService.setSupersedingSkillId(skill, '2');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'update_skill_property',
-      property_name: 'superseding_skill_id',
-      old_value: undefined,
-      new_value: '2'
-    }]);
-    expect(skill.getSupersedingSkillId()).toEqual('2');
-    UndoRedoService.undoChange(skill);
-    expect(skill.getSupersedingSkillId()).toEqual(undefined);
-  });
-
   it('should add a misconception', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     var aNewMisconceptionDict = {

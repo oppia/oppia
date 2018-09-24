@@ -159,7 +159,7 @@ oppia.directive('skillsList', [
                   $scope.done = function() {
                     $uibModalInstance.close(
                       {skill: skill,
-                        superseding_skill: $scope.selectedSkill
+                        supersedingSkill: $scope.selectedSkill
                       });
                   };
                   $scope.cancel = function() {
@@ -171,7 +171,7 @@ oppia.directive('skillsList', [
 
             modalInstance.result.then(function(result) {
               var skill = result.skill;
-              var supersedingSkill = result.superseding_skill;
+              var supersedingSkill = result.supersedingSkill;
               var changeList = [{
                 cmd: 'update_skill_property',
                 property_name: 'superseding_skill_id',
@@ -190,7 +190,7 @@ oppia.directive('skillsList', [
                 // the new one.
                 var mergeSkillUrl = MERGE_SKILL_URL;
                 var mergeSkillData = {
-                  old_skill: skill,
+                  old_skill: skill.id,
                   new_skill_id: supersedingSkill.id
                 };
                 $http.post(mergeSkillUrl, mergeSkillData);

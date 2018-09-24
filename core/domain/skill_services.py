@@ -113,7 +113,7 @@ def get_merged_skill_ids():
     """Returns the skill IDs of skills that have been merged.
 
     Returns:
-        list(str). List of skill IDs of merged skills
+        list(str). List of skill IDs of merged skills.
     """
     return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 

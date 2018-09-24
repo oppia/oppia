@@ -188,10 +188,10 @@ class MergeSkillHandler(base.BaseHandler):
         """Handles the POST request."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        old_skill = self.payload.get('old_skill')
+        old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
         question_services.update_skill_ids_of_questions(
-            old_skill['id'], new_skill_id)
+            old_skill_id, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -202,9 +202,9 @@ class MergeSkillHandler(base.BaseHandler):
             })
         ]
         skill_services.update_skill(
-            self.user_id, old_skill['id'], changelist,
+            self.user_id, old_skill_id, changelist,
             'Setting merge complete for skill.')
 
         self.render_json({
             'merged_into_skill': new_skill_id
-            })
+        })

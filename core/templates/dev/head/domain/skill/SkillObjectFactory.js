@@ -23,7 +23,7 @@ oppia.factory('SkillObjectFactory', [
       ConceptCardObjectFactory, MisconceptionObjectFactory, ValidatorsService) {
     var Skill = function(
         id, description, misconceptions, conceptCard, languageCode, version,
-        nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
+        nextMisconceptionId) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
@@ -31,8 +31,6 @@ oppia.factory('SkillObjectFactory', [
       this._languageCode = languageCode;
       this._version = version;
       this._nextMisconceptionId = nextMisconceptionId;
-      this._supersedingSkillId = supersedingSkillId;
-      this._allQuestionsMerged = allQuestionsMerged;
     };
 
     Skill.hasValidDescription = function(description) {
@@ -62,8 +60,6 @@ oppia.factory('SkillObjectFactory', [
         language_code: this._languageCode,
         version: this._version,
         next_misconception_id: this._nextMisconceptionId,
-        superseding_skill_id: this._supersedingSkillId,
-        all_questions_merged: this._allQuestionsMerged
       };
     };
 
@@ -75,8 +71,6 @@ oppia.factory('SkillObjectFactory', [
       this._languageCode = skill.getLanguageCode();
       this._version = skill.getVersion();
       this._nextMisconceptionId = skill.getNextMisconceptionId();
-      this._supersedingSkillId = skill.getSupersedingSkillId();
-      this._allQuestionsMerged = skill.getAllQuestionsMerged();
     };
 
     Skill.createFromBackendDict = function(skillBackendDict) {
@@ -88,9 +82,7 @@ oppia.factory('SkillObjectFactory', [
           skillBackendDict.skill_contents),
         skillBackendDict.language_code,
         skillBackendDict.version,
-        skillBackendDict.next_misconception_id,
-        skillBackendDict.superseding_skill_id,
-        skillBackendDict.all_questions_merged);
+        skillBackendDict.next_misconception_id);
     };
 
 
@@ -99,7 +91,7 @@ oppia.factory('SkillObjectFactory', [
     Skill.createInterstitialSkill = function() {
       return new Skill(null, 'Skill description loading',
         [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
-        0, null, false);
+        0);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -117,22 +109,6 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getDescription = function() {
       return this._description;
-    };
-
-    Skill.prototype.setSupersedingSkillId = function(skillId) {
-      this._supersedingSkillId = skillId;
-    };
-
-    Skill.prototype.getSupersedingSkillId = function() {
-      return this._supersedingSkillId;
-    };
-
-    Skill.prototype.setAllQuestionsMerged = function(isAllQuestionsMerged) {
-      this._allQuestionsMerged = isAllQuestionsMerged;
-    };
-
-    Skill.prototype.getAllQuestionsMerged = function() {
-      return this._allQuestionsMerged;
     };
 
     Skill.prototype.getId = function() {
