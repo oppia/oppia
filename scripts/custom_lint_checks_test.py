@@ -60,7 +60,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_one,
                 args=(
-                    "'test_var_two'",
+                    '\'test_var_two\'',
                     'function',
                     'test'
                 )
@@ -78,7 +78,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_three,
                 args=(
-                    "'test_var_three'",
+                    '\'test_var_three\'',
                     'function',
                     'test'
                 )

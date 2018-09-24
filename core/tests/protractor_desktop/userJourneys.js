@@ -268,15 +268,19 @@ describe('Site language', function() {
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About us - Oppia');
+    libraryPage.get();
+    libraryPage.expectMainHeaderTextToBe(
+      'Imagine what you could learn today...');
   });
 
   it('should change after selecting a different language', function() {
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('Español');
+
     libraryPage.get();
-    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
+    libraryPage.expectMainHeaderTextToBe(
+      'Imagina lo que podrías aprender hoy...');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -298,27 +302,16 @@ describe('Site language', function() {
       waitFor.pageToFullyLoad();
       _selectLanguage('Español');
       libraryPage.get();
-      expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
+      libraryPage.expectMainHeaderTextToBe(
+        'Imagina lo que podrías aprender hoy...');
 
       // The preference page shows the last selected language
       preferencesPage.get();
       preferencesPage.expectPreferredSiteLanguageToBe('Español');
-      expect(browser.getTitle()).toEqual(
-        'Cambiar sus preferencias de perfil - Oppia');
       general.ensurePageHasNoTranslationIds();
       users.logout();
     }
   );
-
-  it('should be used in titles of pages without controllers', function() {
-    browser.get('/about');
-    waitFor.pageToFullyLoad();
-    _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About us - Oppia');
-    _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Acerca de nosotros - Oppia');
-    general.ensurePageHasNoTranslationIds();
-  });
 
   it('should not change in an exploration', function() {
     users.login('langCreator@explorations.com', true);

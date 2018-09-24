@@ -79,7 +79,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
+        return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
     def _validate_customization_arg_specs(self, customization_args):
         for ca_spec in customization_args:
