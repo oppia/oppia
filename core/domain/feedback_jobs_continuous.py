@@ -45,6 +45,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def get_event_types_listened_to(cls):
         """Get the event types that this class suscribe to.
+
         Returns:
                list. List of event types that this class subscribe to.
         """
@@ -54,6 +55,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def _get_realtime_datastore_class(cls):
         """Get the realtime datastore class used by the realtime layer.
+
         Returns:
             class. Datastore class used by the realtime layer, which should
             subclass BaseRealtimeDatastoreClassForContinuousComputations.
@@ -63,6 +65,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def _get_batch_job_manager_class(cls):
         """Get manager class.
+
         Returns:
             class. Manager class for continuous-running batch job.
         """
