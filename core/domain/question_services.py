@@ -173,23 +173,12 @@ def delete_question(
         force_deletion=force_deletion)
 
 
-def get_question_from_model(question_model, run_conversion=True):
+def get_question_from_model(question_model):
     """Returns domain object representing the given question model.
-
-    If run_conversion is True, then the question's state schema version
-    will be checked against the current state schema version. If they do not
-    match, the question will be automatically updated to the latest state
-    schema version.
-
-    IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
-    False. This option is only used for testing that the state schema version
-    migration works correctly, and it should never be changed otherwise.
 
     Args:
         question_model: QuestionModel. The question model loaded from the
             datastore.
-        run_conversion: bool. When True, updates the question to the latest
-            states_schema_version if necessary.
 
     Returns:
         Question. The domain object representing the question model.
@@ -203,7 +192,7 @@ def get_question_from_model(question_model, run_conversion=True):
     }
 
     # Migrate the question if it is not using the latest schema version.
-    if (run_conversion and question_model.question_state_schema_version !=
+    if (question_model.question_state_schema_version !=
             feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 

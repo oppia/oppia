@@ -80,17 +80,13 @@ def _get_topic_memcache_key(topic_id, version=None):
         return 'topic:%s' % topic_id
 
 
-def get_topic_from_model(topic_model, run_conversion=True):
+def get_topic_from_model(topic_model):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
 
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
-        run_conversion: bool. If true, the the topic's schema version will
-            be checked against the current schema version. If they do not match,
-            the topic will be automatically updated to the latest schema
-            version.
 
     Returns:
         topic. A Topic domain object corresponding to the given
@@ -100,7 +96,7 @@ def get_topic_from_model(topic_model, run_conversion=True):
         'schema_version': topic_model.subtopic_schema_version,
         'subtopics': copy.deepcopy(topic_model.subtopics)
     }
-    if (run_conversion and topic_model.subtopic_schema_version !=
+    if (topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics)
     return topic_domain.Topic(
