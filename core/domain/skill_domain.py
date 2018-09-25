@@ -84,12 +84,19 @@ class SkillChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_skill_misconception' (with new_misconception_dict)
+                - 'delete_skill_misconception' (with id)
+                - 'create_new'
                 - 'update_skill_property' (with property_name, new_value
                 and old_value)
                 - 'update_skill_contents_property' (with property_name,
                 new_value and old_value)
                 - 'update_skill_misconceptions_property' (with property_name,
                 new_value and old_value)
+                - 'migrate_contents_schema_to_latest_version' (with
+                from_version and to_version)
+                - 'migrate_misconceptions_schema_to_latest_version' (with
+                from_version and to_version)
 
         Raises:
             Exception: The given change dict is not valid.

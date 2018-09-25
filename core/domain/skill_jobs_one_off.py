@@ -73,8 +73,7 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds.append(skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': item.skill_contents_schema_version,
-                'to_version': str(
-                    feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             }))
         if (
                 item.misconceptions_schema_version <=
@@ -82,8 +81,7 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds.append(skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': item.misconceptions_schema_version,
-                'to_version': str(
-                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             }))
 
         if commit_cmds:
