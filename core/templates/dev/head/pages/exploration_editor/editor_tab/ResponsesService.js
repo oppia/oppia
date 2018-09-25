@@ -23,8 +23,8 @@ oppia.factory('ResponsesService', [
   'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, StateInteractionIdService, INTERACTION_SPECS,
@@ -32,8 +32,8 @@ oppia.factory('ResponsesService', [
       OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
       StateSolutionService, SolutionVerificationService, AlertsService,
       ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
+      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -81,7 +81,8 @@ oppia.factory('ResponsesService', [
           AlertsService.addInfoMessage(
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
         } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
+          AlertsService.addInfoMessage(
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
         }
       }
     };
