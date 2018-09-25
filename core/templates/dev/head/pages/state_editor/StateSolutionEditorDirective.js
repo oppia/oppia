@@ -35,7 +35,7 @@ oppia.directive('stateSolutionEditor', [
         'StateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
         'ContextService', 'StateCustomizationArgsService',
         'EditabilityService', 'StateContentIdsToAudioTranslationsService',
-        'INFO_MESSAGE_SOLUTION_IS_INVALID',
+        'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
         function(
             $scope, $rootScope, $uibModal, $filter, StateEditorService,
@@ -45,7 +45,7 @@ oppia.directive('stateSolutionEditor', [
             StateHintsService, UrlInterpolationService, SolutionObjectFactory,
             ContextService, StateCustomizationArgsService,
             EditabilityService, StateContentIdsToAudioTranslationsService,
-            INFO_MESSAGE_SOLUTION_IS_INVALID,
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
           $scope.EditabilityService = EditabilityService;
           $scope.correctAnswer = null;
@@ -213,7 +213,7 @@ oppia.directive('stateSolutionEditor', [
                     INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION, 4000);
                 } else {
                   AlertsService.addInfoMessage(
-                    INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
+                    INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
                 }
               }
             });
