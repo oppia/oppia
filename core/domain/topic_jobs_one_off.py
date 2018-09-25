@@ -72,8 +72,7 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': item.subtopic_schema_version,
-                'to_version': str(
-                    feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION
             })]
             topic_services.update_topic_and_subtopic_pages(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,

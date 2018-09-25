@@ -81,10 +81,23 @@ class TopicChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_subtopic' (with title)
+                - 'delete_subtopic' (with subtopic_id)
+                - 'add_uncategorized_skill_id' (with
+                new_uncategorized_skill_id)
+                - 'remove_uncategorized_skill_id' (with subtopic_id
+                and skill_id)
+                - 'move_skill_id_to_subtopic' (with old_subtopic_id,
+                new_subtopic_id and skill_id)
+                - 'remove_skill_id_from_subtopic' (with subtopic_id and
+                skill_id)
                 - 'update_topic_property' (with property_name, new_value
                 and old_value)
                 - 'update_subtopic_property' (with property_name, new_value
                 and old_value)
+                - 'migrate_subtopic_schema_to_latest_version' (with
+                from_version and to_version)
+                - 'create_new' (with name)
 
         Raises:
             Exception: The given change dict is not valid.
