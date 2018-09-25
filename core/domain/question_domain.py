@@ -70,6 +70,8 @@ class QuestionChange(object):
                 and old_value)
                 - 'create_new_fully_specified_question' (with question_dict,
                 skill_id)
+                - 'migrate_state_schema_to_latest_version' (with from_version
+                and to_version)
 
         Raises:
             Exception: The given change dict is not valid.

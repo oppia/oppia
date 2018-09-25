@@ -71,8 +71,7 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [question_domain.QuestionChange({
                 'cmd': question_domain.CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': item.question_state_schema_version,
-                'to_version': str(
-                    feconf.CURRENT_STATES_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_STATES_SCHEMA_VERSION
             })]
             question_services.update_question(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,

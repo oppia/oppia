@@ -174,7 +174,7 @@ def delete_question(
 
 
 def get_question_from_model(question_model, run_conversion=True):
-    """Returns domain object repersenting the given question model.
+    """Returns domain object representing the given question model.
 
     If run_conversion is True, then the question's state schema version
     will be checked against the current state schema version. If they do not
