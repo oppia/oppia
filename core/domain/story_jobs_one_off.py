@@ -70,8 +70,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [story_domain.StoryChange({
                 'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': item.schema_version,
-                'to_version': str(
-                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
             })]
             story_services.update_story(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
