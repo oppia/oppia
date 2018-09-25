@@ -36,6 +36,7 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     improving the load time of new skills.
     """
 
+    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'skill_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'skill_migrated'
@@ -46,6 +47,12 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            yield (
+                SkillMigrationJob._DISABLED_KEY,
+                'Encountered disabled structure.')
+            return
+
         if item.deleted:
             yield (
                 SkillMigrationJob._DELETED_KEY,

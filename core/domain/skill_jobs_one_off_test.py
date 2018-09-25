@@ -36,6 +36,8 @@ class SkillMigrationJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillMigrationJobTest, self).setUp()
 
+        self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+
         # Setup user who will own the test skills.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)

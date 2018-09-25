@@ -36,6 +36,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     improving the load time of new stories.
     """
 
+    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'story_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'story_migrated'
@@ -46,6 +47,12 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            yield (
+                StoryMigrationJob._DISABLED_KEY,
+                'Encountered disabled structure.')
+            return
+
         if item.deleted:
             yield (
                 StoryMigrationJob._DELETED_KEY,

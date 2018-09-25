@@ -22,9 +22,13 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
+from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
+from core.domain import skill_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
+from core.domain import story_jobs_one_off
+from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 
@@ -53,7 +57,9 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     feedback_jobs_one_off.PopulateLastUpdatedFieldOneOffJob,
     feedback_jobs_one_off.ValidateLastUpdatedFieldOneOffJob,
+    question_jobs_one_off.QuestionMigrationJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    skill_jobs_one_off.SkillMigrationJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -61,6 +67,8 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
+    story_jobs_one_off.StoryMigrationJob,
+    topic_jobs_one_off.TopicMigrationJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,

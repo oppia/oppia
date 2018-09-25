@@ -36,6 +36,7 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     up-to-date and improving the load time of new topics.
     """
 
+    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'topic_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'topic_migrated'
@@ -46,6 +47,12 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            yield (
+                TopicMigrationJob._DISABLED_KEY,
+                'Encountered disabled structure.')
+            return
+
         if item.deleted:
             yield (
                 TopicMigrationJob._DELETED_KEY,
