@@ -71,8 +71,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': item.schema_version,
-                'to_version': str(
-                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+                'to_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION
             }]
             collection_services.update_collection(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,

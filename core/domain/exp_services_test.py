@@ -3131,9 +3131,8 @@ title: Old Title
                 feconf.CURRENT_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '0',
-                'to_version': str(
-                    feconf.CURRENT_STATES_SCHEMA_VERSION)
+                'from_version': 0,
+                'to_version': feconf.CURRENT_STATES_SCHEMA_VERSION
             }],
             'version_number': 4,
         }
