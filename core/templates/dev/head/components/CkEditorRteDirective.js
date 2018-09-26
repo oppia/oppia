@@ -93,7 +93,7 @@ oppia.directive('ckEditorRte', [
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
         var setFocus = true;
-        if (scope.uiConfig().setFocus !== undefined) {
+        if (scope.uiConfig() && scope.uiConfig().setFocus !== undefined) {
           setFocus = scope.uiConfig().setFocus;
         }
         // Initialize CKEditor.
