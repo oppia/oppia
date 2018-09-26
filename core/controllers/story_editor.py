@@ -90,7 +90,8 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'story': story.to_dict()
+            'story': story.to_dict(),
+            'topic_name': topic.name
         })
 
         self.render_json(self.values)

@@ -34,7 +34,7 @@
       </md-card>
       <md-card class="subtopic new" ng-click="createSubtopic()">
         <span>
-          <i class="material-icons">add</i> Add Subtopic
+          <i class="material-icons">add</i> <span class="add-subtopic-text">Add Subtopic</span>
         </span>
       </md-card>
     </div>
@@ -112,6 +112,7 @@
     background-color: #f6f6f6;
   }
   subtopics-list-tab .new {
+    background-color: white;
     border-width: 3px;
     border-style: dotted;
     border-color: #a4a4a4;
@@ -120,8 +121,8 @@
     background-color: #f1f1f1;
   }
   subtopics-list-tab .new span {
-    position: absolute;
-    bottom: 50%;
+    position: sticky;
+    top: 40%;
     left: 20%;
   }
   subtopics-list-tab .subtopics {
@@ -145,11 +146,17 @@
 
   subtopics-list-tab .skill-id {
     background-color: #efefef;
-    cursor: pointer;
+    cursor: move;
     padding-left: 1vw;
     text-align: left;
   }
   subtopics-list-tab .skill-id:hover {
     background-color: #e0e0e0;
+  }
+
+  @media (max-width: 830px) {
+    subtopics-list-tab .add-subtopic-text {
+      display: none;
+    }
   }
 </style>

@@ -2,14 +2,16 @@
   <h3>Create New Skill</h3>
 </div>
 
-<div class="modal-body">
-  <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-    <strong>New Skill Description</strong>
+<form ng-submit="createNewSkill()">
+  <div class="modal-body">
+    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+      <strong>New Skill Description</strong>
+    </div>
+    <input type="text" class="form-control" placeholder="eg: Adding Fractions" ng-model="newSkillDescription">
   </div>
-  <input type="text" class="form-control" placeholder="eg: Adding Fractions" ng-model="newSkillDescription">
-</div>
 
-<div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success" ng-click="createNewSkill()" ng-disabled="newSkillDescription.length === 0">Save</button>
-</div>
+  <div class="modal-footer">
+    <button class="btn btn-success" type="submit" ng-disabled="newSkillDescription.length === 0">Save</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</form>
