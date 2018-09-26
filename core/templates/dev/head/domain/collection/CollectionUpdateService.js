@@ -294,5 +294,4 @@ oppia.factory('CollectionUpdateService', [
           changeObject.getBackendChangeObject());
       }
     };
-  }
-]);
+  }]);

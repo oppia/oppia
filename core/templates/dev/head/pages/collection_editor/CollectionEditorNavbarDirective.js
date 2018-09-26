@@ -157,11 +157,9 @@ oppia.directive('collectionEditorNavbar', [
 
                     $scope.requireTitleToBeSpecified = !collection.getTitle();
                     $scope.requireObjectiveToBeSpecified = (
-                      !collection.getObjective()
-                    );
+                      !collection.getObjective());
                     $scope.requireCategoryToBeSpecified = (
-                      !collection.getCategory()
-                    );
+                      !collection.getCategory());
 
                     $scope.newTitle = collection.getTitle();
                     $scope.newObjective = collection.getObjective();
@@ -250,5 +248,4 @@ oppia.directive('collectionEditorNavbar', [
         }
       ]
     };
-  }
-]);
+  }]);

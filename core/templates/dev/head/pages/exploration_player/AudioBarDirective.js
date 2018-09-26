@@ -281,8 +281,7 @@ oppia.directive('audioBar', [
               }
             }
           };
-        }
-      ]
+        }]
     };
   }
 ]);

@@ -33,5 +33,4 @@ oppia.directive('outcomeFeedbackEditor', [
         };
       }]
     };
-  }
-]);
+  }]);

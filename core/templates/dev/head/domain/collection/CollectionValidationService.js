@@ -124,5 +124,4 @@ oppia.factory('CollectionValidationService', [
           validateTagsNormalized(tags);
       }
     };
-  }
-]);
+  }]);

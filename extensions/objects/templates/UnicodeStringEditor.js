@@ -82,5 +82,4 @@ oppia.directive('unicodeStringEditor', [
         }
       }]
     };
-  }
-]);
+  }]);

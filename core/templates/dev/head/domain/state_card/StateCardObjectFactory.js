@@ -120,7 +120,7 @@ oppia.factory('StateCardObjectFactory', [
     StateCard.prototype.isInteractionInline = function() {
       var interactionId = this.getInteractionId();
       return (!interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
+          INTERACTION_SPECS[interactionId].display_mode ===
         INTERACTION_DISPLAY_MODE_INLINE);
     };
 

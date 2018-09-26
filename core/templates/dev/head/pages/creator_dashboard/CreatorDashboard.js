@@ -158,8 +158,7 @@ oppia.controller('CreatorDashboard', [
     $scope.setSubscriptionSortingOptions = function(sortType) {
       if (sortType === $scope.currentSubscribersSortType) {
         $scope.isCurrentSubscriptionSortDescending = (
-          !$scope.isCurrentSubscriptionSortDescending
-        );
+          !$scope.isCurrentSubscriptionSortDescending);
       } else {
         $scope.currentSubscribersSortType = sortType;
       }
@@ -170,7 +169,7 @@ oppia.controller('CreatorDashboard', [
       // so that special cases can be handled while sorting subscriptions.
       var value = entity[$scope.currentSubscribersSortType];
       if ($scope.currentSubscribersSortType ===
-        SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
+          SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
         value = (value || 0);
       }
       return value;
@@ -215,7 +214,7 @@ oppia.controller('CreatorDashboard', [
 
     $scope.showSuggestionModal = function() {
       if ($scope.activeThread.suggestion.suggestionType ===
-        'edit_exploration_state_content') {
+          'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/' +
           'view_suggestion_edit_exploration_state_content_modal.html');
@@ -445,7 +444,7 @@ oppia.controller('CreatorDashboard', [
         $scope.mySuggestionsList = [];
         for (var i = 0; i < numberOfCreatedSuggestions; i++) {
           if (responseData.created_suggestions_list.length !==
-            numberOfCreatedSuggestions) {
+              numberOfCreatedSuggestions) {
             $log.error('Number of suggestions does not match number of ' +
               'suggestion threads');
           }
@@ -465,7 +464,7 @@ oppia.controller('CreatorDashboard', [
         $scope.suggestionsToReviewList = [];
         for (var i = 0; i < numberOfSuggestionsToReview; i++) {
           if (responseData.suggestions_to_review_list.length !==
-            numberOfSuggestionsToReview) {
+              numberOfSuggestionsToReview) {
             $log.error('Number of suggestions does not match number of ' +
               'suggestion threads');
           }

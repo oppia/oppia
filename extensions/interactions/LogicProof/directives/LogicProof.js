@@ -269,8 +269,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               ]
             }).result.then(function() {});
           };
-        }
-      ]
+        }]
     };
   }
 ]);

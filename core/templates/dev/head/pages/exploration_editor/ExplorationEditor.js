@@ -170,8 +170,8 @@ oppia.controller('ExplorationEditor', [
         GraphDataService.recompute();
 
         if (!StateEditorService.getActiveStateName() ||
-          !ExplorationStatesService.getState(
-            StateEditorService.getActiveStateName())) {
+            !ExplorationStatesService.getState(
+              StateEditorService.getActiveStateName())) {
           StateEditorService.setActiveStateName(
             ExplorationInitStateNameService.displayed);
         }
@@ -194,8 +194,8 @@ oppia.controller('ExplorationEditor', [
         }
 
         if (data.is_version_of_draft_valid === false &&
-          data.draft_changes !== null &&
-          data.draft_changes.length > 0) {
+            data.draft_changes !== null &&
+            data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           AutosaveInfoModalsService.showVersionMismatchModal(

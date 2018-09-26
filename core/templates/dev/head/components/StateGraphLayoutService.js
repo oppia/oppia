@@ -34,7 +34,7 @@ oppia.factory('StateGraphLayoutService', [
       }
       for (var i = 0; i < links.length; i++) {
         if (links[i].source !== links[i].target &&
-          adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
+            adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
           adjacencyLists[links[i].source].push(links[i].target);
         }
       }
@@ -53,7 +53,7 @@ oppia.factory('StateGraphLayoutService', [
       // NOTE: this mutates indentationLevels as a side-effect.
       var indentLongestShortcut = function(startInd, endInd) {
         if (startInd >= endInd ||
-          indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
+           indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
           return;
         }
 
@@ -227,9 +227,9 @@ oppia.factory('StateGraphLayoutService', [
             // depth to process now, we ignore it for now and stick it back in
             // the queue to be processed later.
             if (bestPath.indexOf(linkTarget) !== -1 &&
-              nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
+                nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
               if (seenNodes.indexOf(linkTarget) === -1 &&
-                queue.indexOf(linkTarget) === -1) {
+                  queue.indexOf(linkTarget) === -1) {
                 queue.push(linkTarget);
               }
               continue;
@@ -417,7 +417,7 @@ oppia.factory('StateGraphLayoutService', [
 
           for (var i = 0; i < links.length; i++) {
             if (links[i].target === currNodeId &&
-              !nodeData[links[i].source].reachableFromEnd) {
+                !nodeData[links[i].source].reachableFromEnd) {
               nodeData[links[i].source].reachableFromEnd = true;
               queue.push(links[i].source);
             }

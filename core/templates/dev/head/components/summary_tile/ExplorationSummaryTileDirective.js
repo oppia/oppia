@@ -150,7 +150,7 @@ oppia.directive('explorationSummaryTile', [
               // Replace the collection ID with the one in the URL if it exists
               // in urlParams.
               if (parentExplorationIds &&
-                urlParams.hasOwnProperty('collection_id')) {
+                  urlParams.hasOwnProperty('collection_id')) {
                 collectionIdToAdd = urlParams.collection_id;
               }
 
@@ -187,5 +187,4 @@ oppia.directive('explorationSummaryTile', [
         }
       ]
     };
-  }
-]);
+  }]);

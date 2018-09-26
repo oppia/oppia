@@ -21,8 +21,7 @@
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
 oppia.directive('ruleEditor', [
-  '$log', 'UrlInterpolationService',
-  function($log, UrlInterpolationService) {
+  '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -257,5 +256,4 @@ oppia.directive('ruleEditor', [
         }
       ]
     };
-  }
-]);
+  }]);

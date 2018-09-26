@@ -84,5 +84,4 @@ oppia.directive('translatorOverview', [
         }
       ]
     };
-  }
-]);
+  }]);

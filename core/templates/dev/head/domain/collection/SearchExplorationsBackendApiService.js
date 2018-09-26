@@ -47,5 +47,4 @@ oppia.factory('SearchExplorationsBackendApiService', [
         });
       }
     };
-  }
-]);
+  }]);
