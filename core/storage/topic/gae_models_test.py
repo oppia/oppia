@@ -133,9 +133,11 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 community_owned=True
             )
         )
-        self.subtopic_page_commit_log_entry_test_instance_id = 'subtopicpage-%s-%s' % (
-            'entity_id',
-            self.subtopic_page_commit_log_entry.version
+        self.subtopic_page_commit_log_entry_test_instance_id = (
+            'subtopicpage-%s-%s' % (
+                'entity_id',
+                self.subtopic_page_commit_log_entry.version
+            )
         )
 
     def test__get_instance_id(self):
