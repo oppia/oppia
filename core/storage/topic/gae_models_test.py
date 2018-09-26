@@ -16,6 +16,7 @@
 
 """Test for Topic model."""
 
+from constants import constants
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -59,23 +60,30 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicCommitLogEntryModelUnitTest, self).setUp()
-        self.topic = topic_domain.Topic.create_default_topic(
-            topic_id='topic_id',
-            name='topic_test'
+        # Calling create() method calls _get_instance (a protected method)
+        # and set the instance id equal to the result of calling that method.
+        self.topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.create(
+                entity_id='entity_id',
+                version=1,
+                committer_id='committer_id',
+                committer_username='committer_username',
+                commit_type='create',
+                commit_message='Created new TopicCommitLogEntry',
+                commit_cmds=[{'cmd': 'create_new'}],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=True
+            )
         )
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
-        self.topic_test_instance_id = 'topic-%s-%s' % (
-            self.topic.id,
-            self.topic.version
+        self.topic_commit_log_entry_test_instance_id = 'topic-%s-%s' % (
+            'entity_id',
+            self.topic_commit_log_entry.version
         )
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.TopicCommitLogEntryModel._get_instance_id(# pylint: disable=protected-access
-                topic_id=self.topic.id,
-                version=self.topic.version
-            ),
-            self.topic_test_instance_id
+            self.topic_commit_log_entry.id,
+            self.topic_commit_log_entry_test_instance_id
         )
 
 
@@ -110,29 +118,28 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelUnitTest, self).setUp()
-        self.topic = topic_domain.Topic.create_default_topic(
-            topic_id='topic_id',
-            name='topic_test'
+        # Calling create() method calls _get_instance (a protected method)
+        # and set the instance id equal to the result of calling that method.
+        self.subtopic_page_commit_log_entry = (
+            topic_models.SubtopicPageCommitLogEntryModel.create(
+                entity_id='entity_id',
+                version=1,
+                committer_id='committer_id',
+                committer_username='committer_username',
+                commit_type='create',
+                commit_message='Created new SubtopicPageCommitLogEntry',
+                commit_cmds=[{'cmd': 'create_new'}],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=True
+            )
         )
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
-        self.topic.add_subtopic(
-            new_subtopic_id=1,
-            title='subtopic_page'
-        )
-        self.subtopics_page = self.topic.subtopics
-        self.subtopic_page_test_index = self.topic.get_subtopic_index(1)
-        self.subtopic_page_test_instance_id = 'subtopicpage-%s-%s' % (
-            self.subtopics_page[self.subtopic_page_test_index].id,
-            1
+        self.subtopic_page_commit_log_entry_test_instance_id = 'subtopicpage-%s-%s' % (
+            'entity_id',
+            self.subtopic_page_commit_log_entry.version
         )
 
     def test__get_instance_id(self):
         self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel._get_instance_id(# pylint: disable=protected-access
-                subtopic_page_id=self.subtopics_page[
-                    self.subtopic_page_test_index
-                ].id,
-                version=1
-            ),
-            self.subtopic_page_test_instance_id
+            self.subtopic_page_commit_log_entry.id,
+            self.subtopic_page_commit_log_entry_test_instance_id
         )
