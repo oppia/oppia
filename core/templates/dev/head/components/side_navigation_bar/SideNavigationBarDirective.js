@@ -30,12 +30,10 @@ oppia.directive('sideNavigationBar', [
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
         $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
 
-
         WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.$apply();  
+          $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+          $scope.$apply();
         });
-
       }]
     };
   }]);
