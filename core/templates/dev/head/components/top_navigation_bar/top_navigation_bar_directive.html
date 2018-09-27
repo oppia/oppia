@@ -124,7 +124,7 @@
           </a>
         </li>
         <li>
-          <a ng-if="isAdmin || isTopicManager" ng-click="closeSubmenuIfNotMobile($event)" href="/topics_and_skills_dashboard"
+          <a ng-if="(isAdmin || isTopicManager) && newStructuresEnabled" ng-click="closeSubmenuIfNotMobile($event)" href="/topics_and_skills_dashboard"
              class="protractor-test-dashboard-link">
             <span translate="I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD"></span>
           </a>
