@@ -46,7 +46,7 @@ oppia.factory('SkillCreationService', [
           }, 150);
         }, function() {
           $rootScope.loadingMessage = '';
-        });
+        }); 
       }
     };
   }
