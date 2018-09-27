@@ -125,7 +125,8 @@ def authorization_wrapper(self, *args, **kwargs):
     Refer
     https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers
     for reason why.
-    TLDR:Requests from Task Queue will always contain header "X-AppEngine-TaskName"
+    TLDR:Requests from Task Queue will always contain header 
+        "X-AppEngine-TaskName"
     """
 
     if 'X-AppEngine-TaskName' not in self.request.headers:
