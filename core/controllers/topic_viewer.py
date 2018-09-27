@@ -19,7 +19,6 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import topic_services
-import feconf
 
 
 class TopicViewerPage(base.BaseHandler):
