@@ -32,6 +32,91 @@ import feconf
     [models.NAMES.exploration, models.NAMES.statistics])
 
 
+class IdentifyBadPlaythroughsOneOffJobTest(test_utils.GenericTestBase):
+    exp_id1 = 'exp_id1'
+
+    def setUp(self):
+        super(IdentifyBadPlaythroughsOneOffJobTest, self).setUp()
+        config_services.set_property(
+            'committer_id1', 'whitelisted_exploration_ids_for_playthroughs',
+            [self.exp_id1])
+        playthrough_id1 = stats_models.PlaythroughModel.create(
+            self.exp_id1, 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [{
+                'action_type': 'ExplorationQuit',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'New state'
+                    },
+                    'time_spent_in_state_in_msecs': {
+                        'value': 0
+                    }
+                },
+                'schema_version': 1
+            }])
+
+        playthrough_instance = stats_models.PlaythroughModel.get(
+            playthrough_id1)
+        playthrough_instance.created_on = datetime.datetime(
+            2018, 9, 1, 7, 47, 0, 0)
+        playthrough_instance.put()
+
+        playthrough_id2 = stats_models.PlaythroughModel.create(
+            self.exp_id1, 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [{
+                'action_type': 'AnswerSubmit',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'New state'
+                    },
+                    'dest_state_name': {
+                        'value': 'Another new state'
+                    },
+                    'interaction_id': {
+                        'value': 'TextInput'
+                    },
+                    'submitted_answer': {
+                        'value': ''
+                    },
+                    'feedback': {
+                        'value': {}
+                    },
+                    'time_spent_state_in_msecs': {
+                        'value': 0
+                    }
+                },
+                'schema_version': 1
+            }])
+
+        playthrough_instance = stats_models.PlaythroughModel.get(
+            playthrough_id2)
+        playthrough_instance.created_on = datetime.datetime(
+            2018, 9, 4, 7, 47, 0, 0)
+        playthrough_instance.put()
+
+    def test_correct_latest_affected_date_is_returned(self):
+        job_id = (
+            stats_jobs_one_off.IdentifyBadPlaythroughsOneOffJob.create_new())
+        stats_jobs_one_off.IdentifyBadPlaythroughsOneOffJob.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+
 class RemoveBadPlaythroughsOneOffJobTest(test_utils.GenericTestBase):
     exp_id1 = 'exp_id1'
 

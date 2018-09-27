@@ -36,12 +36,42 @@ import feconf
 ])
 
 
+class IdentifyBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for identifying the bad playthroughs in production along
+    with their date of creation.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.PlaythroughModel]
+
+    @staticmethod
+    def map(playthrough_model):
+        for action in playthrough_model.actions:
+            if action['action_type'] == 'AnswerSubmit':
+                answer = action['action_customization_args'][
+                    'submitted_answer']['value']
+                time = action['action_customization_args'][
+                    'time_spent_state_in_msecs']['value']
+                if answer == '' or time == 0:
+                    yield (0, playthrough_model.created_on)
+            elif action['action_type'] == 'ExplorationQuit':
+                time = action['action_customization_args'][
+                    'time_spent_in_state_in_msecs']['value']
+                if time == 0:
+                    yield (0, playthrough_model.created_on)
+
+    @staticmethod
+    def reduce(default_param, values):
+        yield 'Latest affected playthrough created on %s' % max(values)
+
+
 class RemoveBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for removing all playthroughs created between the July 2018
     release and the August 2018 release.
     """
 
-    AUGUST_RELEASE_DATETIME = datetime.datetime(2018, 9, 3, 7, 47, 0, 0)
+    AUGUST_RELEASE_DATETIME = datetime.datetime(2018, 9, 5, 7, 47, 0, 0)
 
     @classmethod
     def entity_classes_to_map_over(cls):
