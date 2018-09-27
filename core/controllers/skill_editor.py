@@ -14,6 +14,7 @@
 
 """Controllers for the skill editor."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
@@ -55,7 +56,7 @@ class SkillEditorPage(base.BaseHandler):
     def get(self, skill_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -124,7 +125,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -142,7 +143,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -177,7 +178,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)

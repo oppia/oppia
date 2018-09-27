@@ -14,6 +14,7 @@
 
 """Tests for the handler that returns concept card for a skill."""
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import user_services
@@ -42,7 +43,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             skill_contents=self.skill_contents)
 
     def test_get_concept_card(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
