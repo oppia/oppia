@@ -190,8 +190,7 @@ oppia.factory('CollectionUpdateService', [
             // Apply
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTitle(title);
-          },
-          function(changeDict, collection) {
+          }, function(changeDict, collection) {
             // Undo.
             collection.setTitle(oldTitle);
           });
@@ -209,8 +208,7 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var category = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setCategory(category);
-          },
-          function(changeDict, collection) {
+          }, function(changeDict, collection) {
             // Undo.
             collection.setCategory(oldCategory);
           });
@@ -228,8 +226,7 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var objective = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setObjective(objective);
-          },
-          function(changeDict, collection) {
+          }, function(changeDict, collection) {
             // Undo.
             collection.setObjective(oldObjective);
           });
@@ -248,8 +245,7 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setLanguageCode(languageCode);
-          },
-          function(changeDict, collection) {
+          }, function(changeDict, collection) {
             // Undo.
             collection.setLanguageCode(oldLanguageCode);
           });
@@ -267,8 +263,7 @@ oppia.factory('CollectionUpdateService', [
             // Apply.
             var tags = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTags(tags);
-          },
-          function(changeDict, collection) {
+          }, function(changeDict, collection) {
             // Undo.
             collection.setTags(oldTags);
           });

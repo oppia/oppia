@@ -53,7 +53,7 @@ oppia.factory('StateGraphLayoutService', [
       // NOTE: this mutates indentationLevels as a side-effect.
       var indentLongestShortcut = function(startInd, endInd) {
         if (startInd >= endInd ||
-           indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
+            indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
           return;
         }
 

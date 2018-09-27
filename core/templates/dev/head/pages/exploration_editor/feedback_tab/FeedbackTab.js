@@ -245,8 +245,7 @@ oppia.controller('FeedbackTab', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-          },
-          function() {
+          }, function() {
             $log.error('Error resolving suggestion');
           });
       });

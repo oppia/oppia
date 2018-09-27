@@ -239,8 +239,7 @@ oppia.directive('collectionEditorNavbar', [
                 $scope.collectionRights.setPrivate();
                 CollectionEditorStateService.setCollectionRights(
                   $scope.collectionRights);
-              },
-              function() {
+              }, function() {
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');
               });

@@ -509,5 +509,4 @@ oppia.directive('audioTranslationBar', [
         }
       ]
     };
-  }
-]);
+  }]);

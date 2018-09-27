@@ -31,5 +31,4 @@ oppia.directive('sideNavigationBar', [
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
-  }
-]);
+  }]);

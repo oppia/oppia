@@ -1055,5 +1055,4 @@ oppia.directive('conversationSkin', [
         }
       ]
     };
-  }
-]);
+  }]);
