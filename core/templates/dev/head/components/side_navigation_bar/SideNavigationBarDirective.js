@@ -24,10 +24,18 @@ oppia.directive('sideNavigationBar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/side_navigation_bar/' +
         'side_navigation_bar_directive.html'),
-      controller: ['$scope', '$timeout', function(
-          $scope, $timeout) {
+      controller: ['$scope', '$timeout', 'WindowDimensionsService', function(
+          $scope, $timeout, WindowDimensionsService) {
         $scope.NAV_MODE = GLOBALS.NAV_MODE;
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+
+
+        WindowDimensionsService.registerOnResizeHook(function() {
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            $scope.$apply();  
+        });
+
       }]
     };
   }]);
