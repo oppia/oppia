@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test for Topic model."""
+"""Tests for Topic model."""
 
 from constants import constants
 from core.domain import subtopic_page_domain
@@ -29,7 +29,7 @@ import feconf
 
 
 class TopicModelUnitTest(test_utils.GenericTestBase):
-    """Test the TopicModel class."""
+    """Tests the TopicModel class."""
 
     def setUp(self):
         super(TopicModelUnitTest, self).setUp()
@@ -56,7 +56,7 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Test the TopicCommitLogEntryModel class."""
+    """Tests the TopicCommitLogEntryModel class."""
 
     def setUp(self):
         super(TopicCommitLogEntryModelUnitTest, self).setUp()
@@ -88,7 +88,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """Test the SubtopicPageModelUnitTest class."""
+    """Tests the SubtopicPageModelUnitTest class."""
 
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
@@ -114,7 +114,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Test the SubtopicPageCommitLogEntryModel class."""
+    """Tests the SubtopicPageCommitLogEntryModel class."""
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelUnitTest, self).setUp()
