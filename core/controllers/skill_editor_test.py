@@ -52,6 +52,15 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
+    def _mock_get_skill_by_id(self, unused_skill_id, **unused_kwargs):
+        return None
+
+
+    def _mock_update_skill(
+            self, unused_committer_id, unused_skill_id, unused_change_list,
+            unused_commit_message):
+        raise utils.ValidationError()
+
 
 class SkillEditorTest(BaseSkillEditorControllerTest):
     """Tests for SkillEditorPage."""
@@ -87,7 +96,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         # Check GET returns 404 when cannot get skill by id.
         feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
         skill_services_swap = self.swap(
-            skill_services, 'get_skill_by_id', _get_skill_by_id)
+            skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
         with feconf_swap, skill_services_swap:
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(self.url, expect_errors=True)
@@ -155,7 +164,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
         # Check GET returns 404 when cannot get skill by id.
         feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
         skill_services_swap = self.swap(
-            skill_services, 'get_skill_by_id', _get_skill_by_id)
+            skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
         with feconf_swap, skill_services_swap:
             response = self.testapp.get(self.url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
@@ -182,15 +191,15 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
                 self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=404)
             # Check PUT returns 404 when cannot get skill by id.
-            get_skill_by_id_swap = \
-                self.swap(skill_services, 'get_skill_by_id', _get_skill_by_id)
+            get_skill_by_id_swap = self.swap(
+                skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
             with get_skill_by_id_swap:
                 self.put_json(self.url, {}, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=404)
             # Check PUT returns 400 when an exception is raised updating the
             # skill.
-            update_skill_swap = \
-                self.swap(skill_services, 'update_skill', _update_skill)
+            update_skill_swap = self.swap(
+                skill_services, 'update_skill', self._mock_update_skill)
             with update_skill_swap:
                 self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=400)
@@ -267,11 +276,3 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTest):
                 self.put_json(self.url, {'version': 1}, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=401)
         self.logout()
-
-
-def _get_skill_by_id(*_args, **_kwargs):
-    return None
-
-
-def _update_skill(*_args, **_kwargs):
-    raise utils.ValidationError()
