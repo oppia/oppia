@@ -118,10 +118,15 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 
 def authorization_wrapper(self, *args, **kwargs):
-    # developers.google.com/appengine/docs/python/taskqueue/overview-push
-    # promises that this header cannot be set by external callers. If this
-    # is present, we can be certain that the request is internal and from
-    # the task queue worker.
+    """This request handler looks for "X-AppEngine-TaskName" header; 
+    If successful, it can trust that the request is a Task Queue request. 
+    Otherwise, we assume the header is set by an external caller, and respond
+    with 403 Error
+    
+    Refer https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers
+    for reason why. TLDR: Requests from Task Queue will always contain header "X-AppEngine-TaskName"
+    """
+
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
         self.response.set_status(403)
@@ -130,6 +135,10 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
+    """This is a request handler for ui_access
+
+    """
+
     self.real_dispatch(*args, **kwargs)
 
 
