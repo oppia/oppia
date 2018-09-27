@@ -62,7 +62,7 @@ class IdentifyBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     yield (0, playthrough_model.created_on)
 
     @staticmethod
-    def reduce(default_param, values):
+    def reduce(unused_param, values):
         yield 'Latest affected playthrough created on %s' % max(values)
 
 
