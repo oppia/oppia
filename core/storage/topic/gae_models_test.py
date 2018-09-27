@@ -29,7 +29,7 @@ import feconf
 
 
 class TopicModelUnitTest(test_utils.GenericTestBase):
-    """Tests the TopicModel class."""
+    """Test the TopicModel class."""
 
     def setUp(self):
         super(TopicModelUnitTest, self).setUp()
@@ -56,7 +56,7 @@ class TopicModelUnitTest(test_utils.GenericTestBase):
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Tests the TopicCommitLogEntryModel class."""
+    """Test the TopicCommitLogEntryModel class."""
 
     def setUp(self):
         super(TopicCommitLogEntryModelUnitTest, self).setUp()
@@ -88,7 +88,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """Tests the SubtopicPageModelUnitTest class."""
+    """Test the SubtopicPageModelUnitTest class."""
 
     def setUp(self):
         super(SubtopicPageModelUnitTest, self).setUp()
@@ -114,7 +114,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Tests the SubtopicPageCommitLogEntryModel class."""
+    """Test the SubtopicPageCommitLogEntryModel class."""
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelUnitTest, self).setUp()
