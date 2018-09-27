@@ -61,6 +61,9 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
             unused_commit_message):
         raise utils.ValidationError()
 
+    def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
+        return None
+
 
 class SkillEditorTest(BaseSkillEditorControllerTest):
     """Tests for SkillEditorPage."""
@@ -113,18 +116,27 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
 
     def test_skill_rights_handler_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            # Check that admins can access and edit in the editor page.
-            self.get_json(self.url)
-            # Check GET returns JSON object with can_edit_skill_description set
-            # to False if the user is not allowed to edit the skill description.
-            def _get_all_actions(*_args):
-                actions = list(self.admin.actions)
-                actions.remove(role_services.ACTION_EDIT_SKILL_DESCRIPTION)
-                return actions
-            with self.swap(role_services, 'get_all_actions', _get_all_actions):
-                json_resp = self.get_json(self.url)
-                self.assertEqual(json_resp['can_edit_skill_description'], False)
+        # Check that admins can access and edit in the editor page.
+        self.get_json(self.url)
+        # Check GET returns JSON object with can_edit_skill_description set
+        # to False if the user is not allowed to edit the skill description.
+        def _get_all_actions(*_args):
+            actions = list(self.admin.actions)
+            actions.remove(role_services.ACTION_EDIT_SKILL_DESCRIPTION)
+            return actions
+        with self.swap(role_services, 'get_all_actions', _get_all_actions):
+            json_resp = self.get_json(self.url)
+            self.assertEqual(json_resp['can_edit_skill_description'], False)
+        self.logout()
+
+    def test_skill_rights_handler_fails(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check GET returns 404 when the returned skill rights is None.
+        skill_services_swap = self.swap(
+            skill_services, 'get_skill_rights', self._mock_get_skill_rights)
+        with skill_services_swap:
+            response = self.testapp.get(self.url, expect_errors=True)
+            self.assertEqual(response.status_int, 404)
         self.logout()
 
 
