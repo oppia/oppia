@@ -16,6 +16,7 @@
 
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -38,6 +39,19 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.story = self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
 
     def test_compute_summary(self):
         story_summary = story_services.compute_summary_of_story(self.story)
@@ -189,6 +203,132 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_services.get_story_summary_by_id(
                 self.STORY_ID, strict=False), None)
+
+    def test_admin_can_manage_story(self):
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+
+        self.assertTrue(story_services.check_can_edit_story(
+            self.user_admin, story_rights))
+
+    def test_publish_and_unpublish_story(self):
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertFalse(story_rights.story_is_published)
+        story_services.publish_story(self.STORY_ID, self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to unpublish the story.'):
+            story_services.unpublish_story(self.STORY_ID, self.user_id_a)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertTrue(story_rights.story_is_published)
+
+        story_services.unpublish_story(self.STORY_ID, self.user_id_admin)
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertFalse(story_rights.story_is_published)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to publish the story.'):
+            story_services.publish_story(self.STORY_ID, self.user_id_a)
+
+    def test_create_new_story_rights(self):
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+
+        self.assertTrue(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+    def test_non_admin_cannot_assign_roles(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'):
+            story_services.assign_role(
+                self.user_b, self.user_a,
+                story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+    def test_role_cannot_be_assigned_to_non_story_manager(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'The assignee doesn\'t have enough rights to become a manager.'):
+            story_services.assign_role(
+                self.user_admin, self.user_b,
+                story_domain.ROLE_MANAGER, self.STORY_ID)
+
+    def test_manager_cannot_assign_roles(self):
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'):
+            story_services.assign_role(
+                self.user_a, self.user_b,
+                story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertTrue(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+    def test_reassigning_manager_role_to_same_user(self):
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_MANAGER, self.STORY_ID)
+        with self.assertRaisesRegexp(
+            Exception, 'This user already is a manager for this story'):
+            story_services.assign_role(
+                self.user_admin, self.user_a,
+                story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+        self.assertTrue(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+    def test_deassigning_manager_role(self):
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_MANAGER, self.STORY_ID)
+
+        story_rights = story_services.get_story_rights(self.STORY_ID)
+
+        self.assertTrue(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_NONE, self.STORY_ID)
+
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
+
+        story_services.assign_role(
+            self.user_admin, self.user_a,
+            story_domain.ROLE_NONE, self.STORY_ID)
+
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_a, story_rights))
+        self.assertFalse(story_services.check_can_edit_story(
+            self.user_b, story_rights))
 
 
 class StoryProgressUnitTests(StoryServicesUnitTests):

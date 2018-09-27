@@ -32,6 +32,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     SKILL_ID_2 = 'skill_id_2'
     EXP_ID = 'exp_id'
     USER_ID = 'user'
+    USER_ID_1 = 'user1'
 
     def setUp(self):
         super(StoryDomainUnitTests, self).setUp()
@@ -39,6 +40,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story = self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
+        self.signup('user@example.com', 'user')
+        self.signup('user1@example.com', 'user1')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the story passes validation."""
@@ -432,3 +435,21 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
+
+    def test_to_dict(self):
+        user_ids = [self.USER_ID, self.USER_ID_1]
+        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
+        expected_dict = {
+            'story_id': self.STORY_ID,
+            'manager_names': ['user', 'user1'],
+            'story_is_published': False
+        }
+
+        self.assertEqual(expected_dict, story_rights.to_dict())
+
+    def test_is_manager(self):
+        user_ids = [self.USER_ID, self.USER_ID_1]
+        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
+        self.assertTrue(story_rights.is_manager(self.USER_ID))
+        self.assertTrue(story_rights.is_manager(self.USER_ID_1))
+        self.assertFalse(story_rights.is_manager('fakeuser'))
