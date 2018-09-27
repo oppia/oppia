@@ -82,9 +82,8 @@ oppia.directive('skillsList', [
               );
             }).then(function(){
               var successToast = ('The skill has been deleted.');
-              AlertsService.addSuccessMessage(
-                successToast, 1000);
-              });
+              AlertsService.addSuccessMessage(successToast, 1000);
+            });
           };
 
           $scope.assignSkillToTopic = function(skillId) {
