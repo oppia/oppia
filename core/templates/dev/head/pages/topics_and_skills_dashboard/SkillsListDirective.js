@@ -127,7 +127,8 @@ oppia.directive('skillsList', [
                       $rootScope.$broadcast(
                         EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                     }).then(function(){
-                      var successToast = ('The skill has been successfully assigned to the topic.');
+                      var successToast = (
+                        'The skill has been assigned to the topic.');
                       AlertsService.addSuccessMessage(successToast, 1000);
                     });
                   }
