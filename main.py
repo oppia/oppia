@@ -122,9 +122,9 @@ def authorization_wrapper(self, *args, **kwargs):
     If successful, it can trust that the request is a Task Queue request.
     Otherwise, we assume the header is set by an external caller, and respond
     with 403 Error.
-    Refer 
+    Refer
     https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers
-    for reason why. 
+    for reason why.
     TLDR: Requests from Task Queue will always contain header "X-AppEngine-TaskName"
     """
 
