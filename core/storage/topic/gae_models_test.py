@@ -32,7 +32,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     """Test the TopicModel class."""
 
     def setUp(self):
-        super(TopicModelUnitTest, self).setUp()
+        super(TopicModelUnitTests, self).setUp()
         self.topic = topic_domain.Topic.create_default_topic(
             topic_id='topic_id',
             name='topic_test'
