@@ -14,7 +14,7 @@
 
 """Tests for the skill editor page."""
 
-from core.domain import role_services
+from constants import constants
 from core.domain import skill_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -75,7 +75,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
     def test_access_skill_editor_page(self):
         """Test access to editor pages for the sample skill."""
 
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
