@@ -104,7 +104,7 @@ echo Starting GAE development server
 if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
   ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
 fi
-(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
+(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 192.168.0.43 --admin_port 8000 --host 192.168.0.43 --port 8181 --skip_sdk_update_check true app.yaml)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done

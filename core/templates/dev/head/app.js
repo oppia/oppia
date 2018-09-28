@@ -607,23 +607,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   };
 }]);
 
-// Service for assembling extension tags (for interactions).
-oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
-    return {
-      formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
-        for (var caSpecName in customizationArgSpecs) {
-          var caSpecValue = customizationArgSpecs[caSpecName].value;
-          element.attr(
-            $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            HtmlEscaperService.objToEscapedJson(caSpecValue));
-        }
-        return element;
-      }
-    };
-  }
-]);
-
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
