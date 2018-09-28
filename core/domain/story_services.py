@@ -657,7 +657,7 @@ def publish_story(story_id, committer_id):
     for node in story.story_contents.nodes:
         if not node.exploration_id:
             raise Exception('Story node does not contain an exploration id.')
-        if exp_services.get_exploration_by_id(
+        if not exp_services.get_exploration_by_id(
                 node.exploration_id, strict=False):
             raise Exception(
                 'Story node with exploration id %s doesn\'t exist.'

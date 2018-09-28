@@ -16,6 +16,7 @@
 
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import exp_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -219,7 +220,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.publish_story(self.STORY_ID, self.user_id_admin)
 
     def test_publish_story_with_private_exploration(self):
-        self.story = self.save_new_story(
+        self.save_new_story(
             'private_story', self.USER_ID, 'Title', 'Description', 'Notes'
         )
         self.save_new_default_exploration(
@@ -228,11 +229,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': 'node_1',
+            'node_id': self.NODE_ID_1,
             'old_value': None,
             'new_value': 'exp_id'
         })]
-
         story_services.update_story(
             self.USER_ID, 'private_story', change_list, 'Updated story node.')
         story_rights = story_services.get_story_rights('private_story')
@@ -240,10 +240,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Story node with exploration id exp_id isn\'t published.'):
-            story_services.publish_story(self.STORY_ID, self.user_id_admin)
+            story_services.publish_story('private_story', self.user_id_admin)
 
     def test_publish_and_unpublish_story(self):
-        self.story = self.save_new_story(
+        self.save_new_story(
             'public_story', self.USER_ID, 'Title', 'Description', 'Notes'
         )
         self.save_new_default_exploration(
@@ -257,29 +257,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'old_value': None,
             'new_value': 'exp_id'
         })]
-
         story_services.update_story(
             self.USER_ID, 'public_story', change_list, 'Updated story node.')
-        story_rights = story_services.get_story_rights(self.STORY_ID)
+        story_rights = story_services.get_story_rights('public_story')
         self.assertFalse(story_rights.story_is_published)
         story_services.publish_story('public_story', self.user_id_admin)
 
         with self.assertRaisesRegexp(
             Exception,
             'The user does not have enough rights to unpublish the story.'):
-            story_services.unpublish_story(self.STORY_ID, self.user_id_a)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertTrue(story_rights.story_is_published)
-
-        story_services.unpublish_story(self.STORY_ID, self.user_id_admin)
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertFalse(story_rights.story_is_published)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to publish the story.'):
-            story_services.publish_story(self.STORY_ID, self.user_id_a)
+            story_services.unpublish_story('public_story', self.user_id_a)
 
     def test_create_new_story_rights(self):
         story_services.assign_role(
