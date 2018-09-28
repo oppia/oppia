@@ -59,7 +59,7 @@ oppia.directive('createActivityButton', [
 
             $scope.creationInProgress = true;
 
-            if ($scope.canCreateCollections) {
+            if (!$scope.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
