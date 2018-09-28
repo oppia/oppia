@@ -31,22 +31,20 @@ import feconf
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Test the TopicModel class."""
 
+    def setUp(self):
+        super(TopicModelUnitTest, self).setUp()
+        self.topic = topic_domain.Topic.create_default_topic(
+            topic_id='topic_id',
+            name='topic_test'
+        )
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
+
     def test__trusted_commit(self):
         # Compares topic model class variable (version)
         # assigned in _trusted_commit method.
-        self.topic = topic_domain.Topic.create_default_topic(
-            topic_id='topic_id',
-            name='topic_test'
-        )
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
         self.assertEqual(self.topic.version, 1)
 
     def test_get_by_name(self):
-        self.topic = topic_domain.Topic.create_default_topic(
-            topic_id='topic_id',
-            name='topic_test'
-        )
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, self.topic)
         self.assertEqual(
             topic_models.TopicModel.get_by_name(self.topic.name).name,
             self.topic.name
@@ -60,10 +58,11 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the TopicCommitLogEntryModel class."""
 
-    def test__get_instance_id(self):
+    def setUp(self):
+        super(TopicCommitLogEntryModelUnitTest, self).setUp()
         # Calling create() method calls _get_instance (a protected method)
         # and set the instance id equal to the result of calling that method.
-        topic_commit_log_entry = (
+        self.topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.create(
                 entity_id='entity_id',
                 version=1,
@@ -76,13 +75,15 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 community_owned=True
             )
         )
-        topic_commit_log_entry_test_instance_id = 'topic-%s-%s' % (
+        self.topic_commit_log_entry_test_instance_id = 'topic-%s-%s' % (
             'entity_id',
-            topic_commit_log_entry.version
+            self.topic_commit_log_entry.version
         )
+
+    def test__get_instance_id(self):
         self.assertEqual(
-            topic_commit_log_entry.id,
-            topic_commit_log_entry_test_instance_id
+            self.topic_commit_log_entry.id,
+            self.topic_commit_log_entry_test_instance_id
         )
 
 
