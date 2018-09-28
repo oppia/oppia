@@ -49,8 +49,7 @@ oppia.directive('storyEditor', [
             }
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
-            $scope.notes = $scope.story.getNotes();
-            $scope.notesEditorIsShown = false;
+            $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -79,19 +78,7 @@ oppia.directive('storyEditor', [
 
           $scope.NOTES_SCHEMA = {
             type: 'html',
-            ui_config: {
-              rows: 100
-            }
-          };
-
-          $scope.openPreviewNotes = function(notes) {
-            $scope.notesEditorIsShown = false;
-            $scope.notes = notes;
-          };
-
-          $scope.closePreviewNotes = function(previewNotes) {
-            $scope.notesEditorIsShown = true;
-            $scope.editableNotes = previewNotes;
+            ui_config: {}
           };
 
           $scope.updateNotes = function(newNotes) {
@@ -99,7 +86,6 @@ oppia.directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryNotes($scope.story, newNotes);
-            $scope.openPreviewNotes(newNotes);
           };
 
           $scope.updateStoryDescriptionStatus = function(description) {

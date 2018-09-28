@@ -66,27 +66,7 @@
   </div>
 </md-card>
 
-<div ng-if="questionEditorIsShown">
-  <div style="padding-left: 45%;">
-    <button type="button"
-            class="btn btn-success oppia-editor-publish-button"
-            ng-click="saveAndPublishQuestion()">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-         alt="Publish to Oppia Library">
-        &#xE2C3;
-      </i>
-      <span class="oppia-save-publish-button-label">Save and Publish Question</span>
-    </button>
-  </div>
-  <question-editor question-id="questionId"
-                   misconceptions="misconceptions"
-                   question-state-data="questionStateData"
-                   can-edit-question="canEditQuestion">
-  </question-editor>
-</div>
-
 <div ng-if="activeQuestion">
-
   <question-editor question-id="activeQuestion.getId()"
                    misconceptions="emptyMisconceptionsList"
                    question-state-data="activeQuestion.getStateData()"

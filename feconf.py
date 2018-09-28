@@ -366,9 +366,6 @@ ENABLE_PROMO_BAR = True
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
