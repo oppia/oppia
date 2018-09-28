@@ -95,7 +95,7 @@ oppia.directive('skillMisconceptionsEditor', [
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {
-                      setFocus: false
+                      startupFocusEnabled: false
                     }
                   };
 
@@ -103,7 +103,7 @@ oppia.directive('skillMisconceptionsEditor', [
                     type: 'html',
                     ui_config: {
                       hide_complex_extensions: true,
-                      setFocus: false
+                      startupFocusEnabled: false
                     }
                   };
 
