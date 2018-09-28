@@ -15,6 +15,7 @@
 """Tests for the skill editor page."""
 
 from constants import constants
+from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -47,7 +48,7 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
     def _get_csrf_token_for_put(self):
         csrf_token = None
         url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get('%s/%s' % (url_prefix, self.skill_id))
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
@@ -55,14 +56,17 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
     def _mock_get_skill_by_id(self, unused_skill_id, **unused_kwargs):
         return None
 
-
-    def _mock_update_skill(
+    def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,
             unused_commit_message):
         raise utils.ValidationError()
 
     def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
         return None
+
+    def _mock_publish_skill_raise_exception(
+            self, unused_skill_id, unused_committer_id):
+        raise Exception()
 
 
 class SkillEditorTest(BaseSkillEditorControllerTest):
@@ -92,15 +96,15 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
     def test_skill_editor_page_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when new strutures' pages are not enabled.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             response = self.testapp.get(self.url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
 
         # Check GET returns 404 when cannot get skill by id.
-        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        constants_swap = self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
         skill_services_swap = self.swap(
             skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
-        with feconf_swap, skill_services_swap:
+        with constants_swap, skill_services_swap:
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(self.url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
@@ -120,13 +124,13 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
         self.get_json(self.url)
         # Check GET returns JSON object with can_edit_skill_description set
         # to False if the user is not allowed to edit the skill description.
-        def _get_all_actions(*_args):
+        def _mock_get_all_actions(*_args):
             actions = list(self.admin.actions)
             actions.remove(role_services.ACTION_EDIT_SKILL_DESCRIPTION)
             return actions
-        with self.swap(role_services, 'get_all_actions', _get_all_actions):
-            json_resp = self.get_json(self.url)
-            self.assertEqual(json_resp['can_edit_skill_description'], False)
+        with self.swap(role_services, 'get_all_actions', _mock_get_all_actions):
+            json_response = self.get_json(self.url)
+            self.assertEqual(json_response['can_edit_skill_description'], False)
         self.logout()
 
     def test_skill_rights_handler_fails(self):
@@ -158,10 +162,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
             }]
         }
 
-
     def test_editable_skill_handler_get_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can access the editable skill data.
             json_response = self.get_json(self.url)
             self.assertEqual(self.skill_id, json_response['skill']['id'])
@@ -170,21 +173,21 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
     def test_editable_skill_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when new strutures' pages are not enabled.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             response = self.testapp.get(self.url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
         # Check GET returns 404 when cannot get skill by id.
-        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        constants_swap = self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
         skill_services_swap = self.swap(
             skill_services, 'get_skill_by_id', self._mock_get_skill_by_id)
-        with feconf_swap, skill_services_swap:
+        with constants_swap, skill_services_swap:
             response = self.testapp.get(self.url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_editable_skill_handler_put_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             csrf_token = self._get_csrf_token_for_put()
             # Check that admins can edit a skill.
             json_response = self.put_json(
@@ -196,10 +199,10 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
 
     def test_editable_skill_handler_put_fails(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             csrf_token = self._get_csrf_token_for_put()
             # Check PUT returns 404 when new strutures' pages are not enabled.
-            with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
                 self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=404)
             # Check PUT returns 404 when cannot get skill by id.
@@ -211,7 +214,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
             # Check PUT returns 400 when an exception is raised updating the
             # skill.
             update_skill_swap = self.swap(
-                skill_services, 'update_skill', self._mock_update_skill)
+                skill_services, 'update_skill',
+                self._mock_update_skill_raise_exception)
             with update_skill_swap:
                 self.put_json(self.url, self.put_payload, csrf_token=csrf_token,
                               expect_errors=True, expected_status_int=400)
@@ -219,25 +223,25 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
 
     def test_editable_skill_handler_delete_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a skill.
             self.delete_json(self.url)
         self.logout()
 
     def test_editable_skill_handler_delete_fails(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check DELETE returns 404 when new strutures' pages are not
             # enabled.
-            with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', False):
+            with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
                 self.delete_json(self.url, expect_errors=True,
                                  expected_status_int=404)
         # Check DELETE returns 500 when the skill still has associated
         # questions.
-        feconf_swap = self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        constants_swap = self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
-        with feconf_swap, skill_has_questions_swap:
+        with constants_swap, skill_has_questions_swap:
             self.delete_json(self.url, expect_errors=True,
                              expected_status_int=500)
         self.logout()
@@ -252,7 +256,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTest):
 
     def test_skill_publish_handler_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that an admin can publish a skill.
             csrf_token = self._get_csrf_token_for_put()
             self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
@@ -260,11 +264,8 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTest):
 
     def test_skill_publish_handler_fails(self):
 
-        def _publish_skill(*_args):
-            raise Exception()
-
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             csrf_token = self._get_csrf_token_for_put()
             # Check that a skill cannot be published when the payload has no
             # version.
@@ -282,7 +283,8 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTest):
             # Check that the status is 401 when call to publish_skill raises an
             # exception.
             skill_services_swap = self.swap(
-                skill_services, 'publish_skill', _publish_skill)
+                skill_services, 'publish_skill',
+                self._mock_publish_skill_raise_exception)
             with skill_services_swap:
                 csrf_token = self._get_csrf_token_for_put()
                 self.put_json(self.url, {'version': 1}, csrf_token=csrf_token,
