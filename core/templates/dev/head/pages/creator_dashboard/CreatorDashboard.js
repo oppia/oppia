@@ -83,8 +83,15 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
+    $rootScope.loadingMessage = 'Loading';
+    $scope.userInfoLoaded = false;
+    $scope.dashboardDataLoaded = false;
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.canCreateCollections = userInfo.can_create_collections;
+      $scope.userInfoLoaded = true;
+      if ($scope.dashboardDataLoaded) {
+        $rootScope.loadingMessage = '';
+      }
     });
 
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -423,7 +430,6 @@ oppia.controller('CreatorDashboard', [
       });
     };
 
-    $rootScope.loadingMessage = 'Loading';
     CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
         var responseData = response.data;
@@ -499,7 +505,10 @@ oppia.controller('CreatorDashboard', [
         } else {
           $scope.activeTab = 'myExplorations';
         }
-        $rootScope.loadingMessage = '';
+        $scope.dashboardDataLoaded = true;
+        if ($scope.userInfoLoaded) {
+          $rootScope.loadingMessage = '';
+        }
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

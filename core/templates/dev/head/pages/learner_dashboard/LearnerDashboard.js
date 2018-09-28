@@ -102,9 +102,18 @@ oppia.controller('LearnerDashboard', [
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       $scope.profilePictureDataUrl = dataUrl;
     });
+
+    $rootScope.loadingMessage = 'Loading';
+    $scope.userInfoLoaded = false;
+    $scope.learnerDashboardDataLoaded = false;
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.username = userInfo.username;
+      $scope.userInfoLoaded = true;
+      if ($scope.learnerDashboardDataLoaded) {
+        $rootScope.loadingMessage = '';
+      }
     });
+
     $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
@@ -506,7 +515,6 @@ oppia.controller('LearnerDashboard', [
       });
     };
 
-    $rootScope.loadingMessage = 'Loading';
     LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
       function(response) {
         var responseData = response.data;
@@ -584,7 +592,10 @@ oppia.controller('LearnerDashboard', [
           ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&
           ($scope.explorationPlaylist.length === 0) &&
           ($scope.collectionPlaylist.length === 0));
-        $rootScope.loadingMessage = '';
+        $scope.learnerDashboardDataLoaded = true;
+        if ($scope.userInfoLoaded) {
+          $rootScope.loadingMessage = '';
+        }
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

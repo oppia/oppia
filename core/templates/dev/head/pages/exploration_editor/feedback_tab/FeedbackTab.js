@@ -37,10 +37,16 @@ oppia.controller('FeedbackTab', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $rootScope.loadingMessage = 'Loading';
+    $scope.userInfoLoaded = false;
+    $scope.threadsLoaded = false;
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+      $scope.userInfoLoaded = true;
+      if ($scope.threadsLoaded) {
+        $rootScope.loadingMessage = '';
+      }
     });
-    $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
       text: ''
@@ -289,7 +295,10 @@ oppia.controller('FeedbackTab', [
     ThreadDataService.fetchFeedbackStats();
     ThreadDataService.fetchThreads(function() {
       $timeout(function() {
-        $rootScope.loadingMessage = '';
+        $scope.threadsLoaded = true;
+        if ($scope.userInfoLoaded) {
+          $rootScope.loadingMessage = '';
+        }
       }, 500);
     });
   }

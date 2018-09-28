@@ -25,12 +25,19 @@ oppia.controller('Preferences', [
       AlertsService, UrlInterpolationService, UserService, UtilsService,
       DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
     $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
+
+    $rootScope.loadingMessage = 'Loading';
+    $scope.userInfoLoaded = false;
+    $scope.preferencesLoaded = false;
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.username = userInfo.username;
+      $scope.userInfoLoaded = true;
+      if ($scope.preferencesLoaded) {
+        $rootScope.loadingMessage = '';
+      }
     });
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -215,7 +222,10 @@ oppia.controller('Preferences', [
     $scope.hasPageLoaded = false;
     $http.get(_PREFERENCES_DATA_URL).then(function(response) {
       var data = response.data;
-      $rootScope.loadingMessage = '';
+      $scope.preferencesLoaded = true;
+      if ($scope.userInfoLoaded) {
+        $rootScope.loadingMessage = '';
+      }
       $scope.userBio = data.user_bio;
       $scope.subjectInterests = data.subject_interests;
       $scope.preferredLanguageCodes = data.preferred_language_codes;

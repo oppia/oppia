@@ -17,12 +17,14 @@
  */
 
 oppia.controller('Splash', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
   'UrlInterpolationService', 'UserService',
-  function($scope, $timeout, $window, siteAnalyticsService,
+  function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
       UrlInterpolationService, UserService) {
+    $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+      $rootScope.loadingMessage = '';
     });
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {

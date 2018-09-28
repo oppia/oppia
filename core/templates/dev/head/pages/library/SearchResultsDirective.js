@@ -27,10 +27,17 @@ oppia.directive('searchResults', [
         'UserService',
         function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
             UserService) {
-          $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
+
+          $rootScope.loadingMessage = 'Loading';
+          $scope.userInfoLoaded = false;
+          $scope.searchResultsLoaded = false;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+            $scope.userInfoLoaded = true;
+            if ($scope.searchResultsLoaded) {
+              $rootScope.loadingMessage = '';
+            }
           });
 
           // Called when the first batch of search results is retrieved from the
@@ -38,7 +45,10 @@ oppia.directive('searchResults', [
           $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
               $scope.someResultsExist = activityList.length > 0;
-              $rootScope.loadingMessage = '';
+              $scope.searchResultsLoaded = true;
+              if ($scope.userInfoLoaded) {
+                $rootScope.loadingMessage = '';
+              }
             }
           );
 

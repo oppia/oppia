@@ -123,14 +123,13 @@ oppia.controller('Library', [
                         ownedCollections.id] = true;
                     });
                 });
+                $rootScope.loadingMessage = '';
               });
           }
         });
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-        $rootScope.loadingMessage = '';
 
         // Initialize the carousel(s) on the library index page.
         // Pause is necessary to ensure all elements have loaded.

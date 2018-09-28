@@ -143,21 +143,7 @@ oppia.directive('topNavigationBar', [
             }
             $scope.closeSubmenu(evt);
           };
-          /**if ($scope.userIsLoggedIn) {
-            // Show the number of unseen notifications in the navbar and page
-            // title, unless the user is already on the dashboard page.
-            $http.get('/notificationshandler').then(function(response) {
-              var data = response.data;
-              if ($window.location.pathname !== '/') {
-                $scope.numUnseenNotifications = data.num_unseen_notifications;
-                if ($scope.numUnseenNotifications > 0) {
-                  $window.document.title = (
-                    '(' + $scope.numUnseenNotifications + ') ' +
-                    $window.document.title);
-                }
-              }
-            });
-          }
+          /**
            * Handles keydown events on menus.
            * @param {object} evt
            * @param {String} menuName - name of menu to perform action
