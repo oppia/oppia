@@ -14,10 +14,10 @@
 
 """Controllers for the Oppia skill's concept card viewer."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import skill_services
-import feconf
 
 
 class ConceptCardDataHandler(base.BaseHandler):
@@ -27,7 +27,7 @@ class ConceptCardDataHandler(base.BaseHandler):
     def get(self, skill_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
