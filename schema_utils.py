@@ -58,7 +58,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     Args:
         obj: *. The object to validate and normalize.
         schema: dict. The schema to validate and normalize the value against.
-        apply_custom_validators: bool. Validate the normalized object.
+        apply_custom_validators: bool. Whether to validate the normalized
+            object using the validators defined in the schema.
+
 
     Returns:
         *. Returns the normalized object.
@@ -265,7 +267,7 @@ class _Validators(object):
 
         Args:
             obj: *. Object to compare with min_value.
-            min_value: int. Minimum value of elements.
+            min_value: int. Required minimum number of elements.
 
         Returns:
             bool. True if the number of elements is greater than or equal
@@ -280,7 +282,7 @@ class _Validators(object):
 
         Args:
             obj: *. Object to compare with max_value.
-            max_value: int. Maximum value of elements.
+            max_value: int. Required maximum number of elements.
 
         Returns:
             bool. True if the number of elements is less than or equal
