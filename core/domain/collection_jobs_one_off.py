@@ -67,6 +67,9 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new collection into the datastore if it's different from
         # the old version.
+        #
+        # Note: to_version really should be int, but left as str to conform
+        # with legacy data
         if item.schema_version <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
