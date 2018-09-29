@@ -194,8 +194,8 @@ class ExplorationTranslationHandler(base.BaseHandler):
         Raises:
             InvalidInputException: If inputs are invalid for exploration
             updation.
-            PageNotFoundException: If no exploration data exist for given user_id
-            and exploration_id.
+            PageNotFoundException: If no exploration data exist for given
+            user_id and exploration_id.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
