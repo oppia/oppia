@@ -243,8 +243,9 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # exp_services.apply_change_list for more information.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': item.states_schema_version,
-                'to_version': feconf.CURRENT_STATES_SCHEMA_VERSION
+                'from_version': str(item.states_schema_version),
+                'to_version': str(
+                    feconf.CURRENT_STATES_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
