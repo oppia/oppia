@@ -50,6 +50,11 @@ oppia.directive('skillEditorNavbar', [
             $scope.validationIssues = $scope.skill.getValidationIssues();
           };
 
+          $scope.discardChanges = function() {
+            UndoRedoService.clearChanges();
+            SkillEditorStateService.loadSkill($scope.skill.getId());
+          };
+
           $scope.getWarningsCount = function() {
             return $scope.validationIssues.length;
           };

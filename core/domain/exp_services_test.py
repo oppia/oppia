@@ -3440,13 +3440,13 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.2 not found"):
+            'Entity for class StateIdMappingModel with id eid.2 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version)
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.1 not found"):
+            'Entity for class StateIdMappingModel with id eid.1 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version - 1)
 

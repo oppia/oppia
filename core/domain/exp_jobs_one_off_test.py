@@ -864,9 +864,9 @@ class ExplorationContentValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'br', [u'[document]']]",
-            "[u'invalidTags', [u'span']]",
-            "[u'oppia-noninteractive-link', [u'[document]']]",
+            '[u\'br\', [u\'[document]\']]',
+            '[u\'invalidTags\', [u\'span\']]',
+            '[u\'oppia-noninteractive-link\', [u\'[document]\']]',
             (
                 '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
                 'like your <span>program </span>prints output</p>.<blockquote>'
@@ -976,7 +976,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'oppia-noninteractive-image', [u'ol']]",
+            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
@@ -1219,10 +1219,10 @@ class ExplorationContentValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'invalidTags', [u'span', u'code', u'b']]",
-            "[u'ol', [u'ol']]",
-            "[u'oppia-noninteractive-image', [u'p', u'b']]",
-            "[u'p', [u'pre']]",
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
+            '[u\'ol\', [u\'ol\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
+            '[u\'p\', [u\'pre\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1348,9 +1348,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'invalidTags', [u'code', u'span']]",
-            "[u'strings', [u'<p>Lorem <span>ipsum </span>"
-            "</p> Hello this is <code>oppia </code>']]"
+            '[u\'invalidTags\', [u\'code\', u\'span\']]',
+            '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
+            '</p> Hello this is <code>oppia </code>\']]'
         ]
 
         self.assertEqual(actual_output, expected_output)

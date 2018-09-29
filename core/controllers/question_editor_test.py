@@ -14,6 +14,7 @@
 
 """Tests for the Question Editor controller."""
 
+from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import user_services
@@ -68,7 +69,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
 
     def test_post(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.post(
                 '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id),
@@ -128,7 +129,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self._create_valid_question_data('ABC'))
 
     def test_post(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -179,7 +180,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.question_id, self.skill_id)
         question_services.create_new_question_skill_link(
             self.question_id_2, self.skill_id)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.delete(
                 '%s/%s/%s' % (
@@ -220,7 +221,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
     """
 
     def test_get(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admin and topic_manager cannot access the editor
             # data.
             self.login(self.NEW_USER_EMAIL)
@@ -270,7 +271,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
 
     def test_delete(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.delete_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
@@ -278,7 +279,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
     def test_put(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             payload = {}
             new_question_data = self._create_valid_question_data('DEF')
             change_list = [{

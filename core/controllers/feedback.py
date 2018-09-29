@@ -14,6 +14,7 @@
 
 """Controllers for the feedback thread page."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import feedback_services
@@ -63,7 +64,7 @@ class ThreadListHandlerForTopics(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         self.values.update({
