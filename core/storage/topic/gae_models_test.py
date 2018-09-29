@@ -89,9 +89,8 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Test the SubtopicPageModelUnitTest class."""
 
-    def setUp(self):
-        super(SubtopicPageModelUnitTest, self).setUp()
-        self.subtopic_page = (
+    def test__trusted_commit(self):
+        subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 subtopic_id='subtopic_id',
                 topic_id='topic_id'
@@ -99,27 +98,24 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
-            subtopic_page=self.subtopic_page,
+            subtopic_page=subtopic_page,
             commit_message='Created new subtopic page',
             change_list=[subtopic_page_domain.SubtopicPageChange(
                 {'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                 'topic_id': self.subtopic_page.topic_id})]
+                 'topic_id': subtopic_page.topic_id})]
         )
-
-    def test__trusted_commit(self):
         # Compares subtopic page model class variable (version)
         # assigned in _trusted_commit method.
-        self.assertEqual(self.subtopic_page.version, 1)
+        self.assertEqual(subtopic_page.version, 1)
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the SubtopicPageCommitLogEntryModel class."""
 
-    def setUp(self):
-        super(SubtopicPageCommitLogEntryModelUnitTest, self).setUp()
+    def test__get_instance_id(self):
         # Calling create() method calls _get_instance (a protected method)
         # and set the instance id equal to the result of calling that method.
-        self.subtopic_page_commit_log_entry = (
+        subtopic_page_commit_log_entry = (
             topic_models.SubtopicPageCommitLogEntryModel.create(
                 entity_id='entity_id',
                 version=1,
@@ -132,15 +128,13 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 community_owned=True
             )
         )
-        self.subtopic_page_commit_log_entry_test_instance_id = (
+        subtopic_page_commit_log_entry_test_instance_id = (
             'subtopicpage-%s-%s' % (
                 'entity_id',
-                self.subtopic_page_commit_log_entry.version
+                subtopic_page_commit_log_entry.version
             )
         )
-
-    def test__get_instance_id(self):
         self.assertEqual(
-            self.subtopic_page_commit_log_entry.id,
-            self.subtopic_page_commit_log_entry_test_instance_id
+            subtopic_page_commit_log_entry.id,
+            subtopic_page_commit_log_entry_test_instance_id
         )
