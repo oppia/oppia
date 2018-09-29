@@ -35,7 +35,7 @@ oppia.factory('AssetsBackendApiService', [
     var ASSET_TYPE_AUDIO = 'audio';
     var ASSET_TYPE_IMAGE = 'image';
 
-    GCS_PREFIX = ('https://storage.googleapis.com/' +
+    var GCS_PREFIX = ('https://storage.googleapis.com/' +
       GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration/');
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/audiohandler' : GCS_PREFIX) +
