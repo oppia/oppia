@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domains for continuous-computation."""
+"""continuous-computation jobs for feedback sysstem."""
 
 from core import jobs
 from core.domain import feedback_domain
@@ -46,10 +46,10 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_event_types_listened_to(cls):
-        """Get the event types that this class subscribe to.
+        """Get the event types that this class is subscribed to.
 
         Returns:
-               list. List of event types that this class subscribe to.
+            list(str). List of event types that this class is subscribed to.
         """
         return [feconf.EVENT_TYPE_NEW_THREAD_CREATED,
                 feconf.EVENT_TYPE_THREAD_STATUS_CHANGED]
