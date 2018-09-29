@@ -50,7 +50,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         if not feconf.ENABLE_NEW_STRUCTURES:
             yield (
                 StoryMigrationJob._DISABLED_KEY,
-                'Encountered disabled structure.')
+                'New structures framework is disabled.')
             return
 
         if item.deleted:
