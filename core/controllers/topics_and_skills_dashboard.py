@@ -33,7 +33,6 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
-
         if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
@@ -187,7 +186,7 @@ class MergeSkillHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles the POST request."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')

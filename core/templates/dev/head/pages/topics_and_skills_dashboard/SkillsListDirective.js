@@ -58,9 +58,6 @@ oppia.directive('skillsList', [
           };
 
           $scope.getSkillEditorUrl = function(skillId) {
-            if ($scope.isInModal()) {
-              return '#';
-            }
             return '/skill_editor/' + skillId;
           };
 
