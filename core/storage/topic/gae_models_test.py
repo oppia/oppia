@@ -17,8 +17,6 @@
 """Tests for Topic model."""
 
 from constants import constants
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -31,15 +29,29 @@ import feconf
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Test the TopicModel class."""
 
-    def test__trusted_commit(self):
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id='topic_id',
-            name='topic_test'
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
+        """Test the _trusted_commit() method."""
+
+        # Topic is created but not committed/saved.
+        topic = topic_models.TopicModel(
+            id='topic_id',
+            name='topic_name',
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            next_subtopic_id=1,
+            language_code='en'
         )
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-        # Compares topic model class variable (version)
-        # assigned in _trusted_commit method.
-        self.assertEqual(topic.version, 1)
+        # We check that topic has not been saved before calling commit().
+        self.assertIsNone(topic_models.TopicModel.get_by_name('topic_name'))
+        # We call commit() expecting that _trusted_commit works fine
+        # and saves topic to datastore.
+        topic.commit(
+            committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_message='Created new topic',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
+        # Now we check that topic is not None and that actually
+        # now topic exists, that means that commit() worked fine.
+        self.assertIsNotNone(topic_models.TopicModel.get_by_name('topic_name'))
 
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
@@ -89,24 +101,38 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Test the SubtopicPageModelUnitTest class."""
 
-    def test__trusted_commit(self):
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                subtopic_id='subtopic_id',
-                topic_id='topic_id'
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
+        """Test the _trusted_commit() method."""
+
+        # SubtopicPage is created but not committed/saved.
+        subtopic_page = topic_models.SubtopicPageModel(
+            id='subtopic_page_id',
+            topic_id='topic_id',
+            html_data='',
+            language_code='en'
+        )
+        # We check that subtopic page has not been saved before calling commit().
+        self.assertIsNone(
+            topic_models.SubtopicPageModel.get(
+                entity_id='subtopic_page_id',
+                strict=False
             )
         )
-        subtopic_page_services.save_subtopic_page(
+        # We call commit() expecting that _trusted_commit works fine
+        # and saves subtopic page to datastore.
+        subtopic_page.commit(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
-            subtopic_page=subtopic_page,
-            commit_message='Created new subtopic page',
-            change_list=[subtopic_page_domain.SubtopicPageChange(
-                {'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                 'topic_id': subtopic_page.topic_id})]
+            commit_message='Created new topic',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
         )
-        # Compares subtopic page model class variable (version)
-        # assigned in _trusted_commit method.
-        self.assertEqual(subtopic_page.version, 1)
+        # Now we check that subtopic page is not None and that actually
+        # now subtopic page exists, that means that commit() worked fine.
+        self.assertIsNotNone(
+            topic_models.SubtopicPageModel.get(
+                entity_id='subtopic_page_id',
+                strict=False
+            )
+        )
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
