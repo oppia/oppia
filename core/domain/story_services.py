@@ -299,7 +299,7 @@ def apply_change_list(story_id, change_list):
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
                     story.update_node_outline(change.node_id, change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_NODE_PROPERTY_TITLE):
+                      story_domain.STORY_NODE_PROPERTY_TITLE):
                     story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):

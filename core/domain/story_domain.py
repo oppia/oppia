@@ -464,13 +464,14 @@ class StoryContents(object):
                             'Loops are not allowed in stories.')
                     destination_node = self.nodes[node_index]
                     if not (
-                        set(destination_node.prerequisite_skill_ids).issubset(
-                            simulated_skill_ids)):
+                            set(
+                                destination_node.prerequisite_skill_ids
+                            ).issubset(simulated_skill_ids)):
                         raise utils.ValidationError(
                             'The prerequisite skills ' +
                             ' '.join(
                                 set(destination_node.prerequisite_skill_ids) -
-                                    set(simulated_skill_ids)) +
+                                set(simulated_skill_ids)) +
                             ' were not completed before the node with id %s'
                             ' was unlocked.' % node_id)
                     nodes_queue.append(node_id)
