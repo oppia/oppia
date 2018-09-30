@@ -111,7 +111,8 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             html_data='',
             language_code='en'
         )
-        # We check that subtopic page has not been saved before calling commit().
+        # We check that subtopic page has not been saved before calling
+        # commit().
         self.assertIsNone(
             topic_models.SubtopicPageModel.get(
                 entity_id='subtopic_page_id',
