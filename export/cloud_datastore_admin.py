@@ -33,9 +33,19 @@ import webapp2
 
 
 class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
+    """Request handler which supports triggering automatic exports of the
+    entities that application stores in Google Cloud Datastore.
+    """
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
+        """Triggers an export of Google Cloud Datastore.
+
+        Export data described in request parameters.
+
+        Raises:
+            AssertionError: Bucket url exists and doesn't start with 'gs://'
+        """
         GCS_BUCKET_URL_PREFIX = 'gs://'
 
         access_token, _ = app_identity.get_access_token(

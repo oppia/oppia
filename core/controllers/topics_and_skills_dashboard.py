@@ -16,6 +16,7 @@
 are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
@@ -33,7 +34,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         self.values.update({
@@ -135,7 +136,7 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         name = self.payload.get('name')
 
@@ -154,7 +155,7 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         description = self.payload.get('description')
