@@ -110,7 +110,7 @@ oppia.controller('CreatorDashboard', [
       }).then(function() {
         $scope.myExplorationsView = newViewType;
       });
-      userDashboardDisplayPreference=newViewType;
+      userDashboardDisplayPreference = newViewType;
     };
 
     $scope.checkMobileView = function() {
@@ -136,7 +136,7 @@ oppia.controller('CreatorDashboard', [
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
         // Displays as per the users choice card or list view
-        $scope.myExplorationsView=userDashboardDisplayPreference;
+        $scope.myExplorationsView = userDashboardDisplayPreference;
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
     };
