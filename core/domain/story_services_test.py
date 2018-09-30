@@ -35,9 +35,20 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
-        self.story = self.save_new_story(
+        self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist,
+            'Added node.')
+        self.story = story_services.get_story_by_id(self.STORY_ID)
 
     def test_compute_summary(self):
         story_summary = story_services.compute_summary_of_story(self.story)
@@ -111,7 +122,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_services.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
-        self.assertEqual(story.version, 2)
+        self.assertEqual(story.version, 3)
 
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
@@ -121,7 +132,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_2
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -153,9 +165,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             [self.NODE_ID_1])
         self.assertEqual(
             story.story_contents.nodes[1].outline_is_finalized, True)
+        self.assertEqual(story.story_contents.nodes[1].title, 'Title 2')
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
-        self.assertEqual(story.version, 2)
+        self.assertEqual(story.version, 3)
 
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 2)
@@ -171,6 +184,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': True,
                 'new_value': False
             }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_TITLE),
+                'node_id': self.NODE_ID_2,
+                'old_value': 'Title 2',
+                'new_value': 'Modified title 2'
+            }),
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
@@ -178,6 +199,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
         story = story_services.get_story_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(
+            story.story_contents.nodes[0].title, 'Modified title 2')
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
@@ -218,6 +241,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         story.description = ('Description')
         self.node_1 = {
             'id': self.NODE_ID_1,
+            'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -227,6 +251,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         }
         self.node_2 = {
             'id': self.NODE_ID_2,
+            'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
