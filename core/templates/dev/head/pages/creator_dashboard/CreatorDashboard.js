@@ -69,7 +69,7 @@ oppia.controller('CreatorDashboard', [
     };
 
     var userDashboardDisplayPreference =
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+      constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
 
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -104,20 +104,13 @@ oppia.controller('CreatorDashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.setMyExplorationsView = function(viewType) {
+    $scope.setMyExplorationsView = function(newViewType) {
       $http.post('/creatordashboardhandler/data', {
-        display_preference: viewType,
+        display_preference: newViewType,
       }).then(function() {
-        $scope.myExplorationsView = viewType;
+        $scope.myExplorationsView = newViewType;
       });
-      if (viewType ===
-              constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD) {
-        userDashboardDisplayPreference =
-              constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
-      } else {
-        userDashboardDisplayPreference =
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST;
-      }
+      userDashboardDisplayPreference=newViewType;
     };
 
     $scope.checkMobileView = function() {
@@ -137,19 +130,13 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
-        // Display preference is not valid for Mobile view
+        // Display is fixed to card in mobile view (no users choice)
         $scope.myExplorationsView = (
           constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
-        if (userDashboardDisplayPreference ===
-          constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD){
-          $scope.myExplorationsView = (
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
-        } else {
-          $scope.myExplorationsView = (
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.LIST);
-        }
+        // Displays as per the users choice card or list view
+        $scope.myExplorationsView=userDashboardDisplayPreference;
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
     };
