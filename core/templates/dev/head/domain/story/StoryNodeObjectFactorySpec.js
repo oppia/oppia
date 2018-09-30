@@ -27,6 +27,7 @@ describe('Story node object factory', function() {
 
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
+      title: 'Title 1',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
@@ -39,8 +40,10 @@ describe('Story node object factory', function() {
   }));
 
   it('should correctly create a node from node id alone', function() {
-    var storyNode = StoryNodeObjectFactory.createFromId('node_1');
+    var storyNode = StoryNodeObjectFactory.createFromIdAndTitle(
+      'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
+    expect(storyNode.getTitle()).toEqual('Title 1');
     expect(storyNode.getDestinationNodeIds()).toEqual([]);
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
     expect(storyNode.getAcquiredSkillIds()).toEqual([]);

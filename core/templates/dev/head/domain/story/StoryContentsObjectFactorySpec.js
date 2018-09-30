@@ -30,6 +30,7 @@ describe('Story contents object factory', function() {
       nodes: [
         {
           id: 'node_1',
+          title: 'Title 1',
           prerequisite_skill_ids: ['skill_1'],
           acquired_skill_ids: ['skill_2'],
           destination_node_ids: ['node_2'],
@@ -38,6 +39,7 @@ describe('Story contents object factory', function() {
           outline_is_finalized: false
         }, {
           id: 'node_2',
+          title: 'Title 2',
           prerequisite_skill_ids: ['skill_2'],
           acquired_skill_ids: ['skill_3', 'skill_4'],
           destination_node_ids: [],
@@ -61,9 +63,23 @@ describe('Story contents object factory', function() {
     expect(_sampleStoryContents.validate()).toEqual([]);
   });
 
+  it('should correctly set initial node id when first node is ' +
+    'created', function() {
+    var sampleStoryContentsBackendDict = {
+      initial_node_id: null,
+      nodes: [],
+      next_node_id: 'node_1'
+    };
+    storyContents = StoryContentsObjectFactory.createFromBackendDict(
+      sampleStoryContentsBackendDict);
+    storyContents.addNode('Title 1');
+    expect(storyContents.getInitialNodeId()).toEqual('node_1');
+    expect(storyContents.getNodes()[0].getTitle()).toEqual('Title 1');
+  });
+
   it('should correctly correctly validate case where prerequisite skills ' +
      'are not acquired by the user', function() {
-    _sampleStoryContents.addNode();
+    _sampleStoryContents.addNode('Title 2');
     _sampleStoryContents.addDestinationNodeIdToNode('node_1', 'node_3');
     _sampleStoryContents.addPrerequisiteSkillIdToNode('node_3', 'skill_3');
     expect(_sampleStoryContents.validate()).toEqual([
@@ -74,7 +90,7 @@ describe('Story contents object factory', function() {
 
   it('should correctly correctly validate the case where the story graph ' +
     'has loops', function() {
-    _sampleStoryContents.addNode();
+    _sampleStoryContents.addNode('Title 2');
     _sampleStoryContents.addDestinationNodeIdToNode('node_2', 'node_3');
     _sampleStoryContents.addDestinationNodeIdToNode('node_3', 'node_1');
     expect(_sampleStoryContents.validate()).toEqual([
@@ -84,7 +100,7 @@ describe('Story contents object factory', function() {
 
   it('should correctly correctly validate the case where the story graph is' +
     ' disconnected.', function() {
-    _sampleStoryContents.addNode();
+    _sampleStoryContents.addNode('Title 2');
     expect(_sampleStoryContents.validate()).toEqual([
       'The node with id node_3 is disconnected from the graph'
     ]);
@@ -109,6 +125,9 @@ describe('Story contents object factory', function() {
       }).toThrow();
       expect(function() {
         _sampleStoryContents.markNodeOutlineAsNotFinalized('node_5');
+      }).toThrow();
+      expect(function() {
+        _sampleStoryContents.setNodeTitle('node_5', 'Title 3');
       }).toThrow();
       expect(function() {
         _sampleStoryContents.addPrerequisiteSkillIdToNode('node_5', 'skill_1');

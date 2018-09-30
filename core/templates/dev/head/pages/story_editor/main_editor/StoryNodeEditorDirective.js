@@ -70,9 +70,9 @@ oppia.directive('storyNodeEditor', [
               $scope.story, $scope.getId());
           };
 
-          $scope.addNewDestinationNode = function() {
+          $scope.addNewDestinationNode = function(title) {
             var nextNodeId = $scope.story.getStoryContents().getNextNodeId();
-            StoryUpdateService.addStoryNode($scope.story);
+            StoryUpdateService.addStoryNode($scope.story, title);
             StoryUpdateService.addDestinationNodeIdToNode(
               $scope.story, $scope.getId(), nextNodeId);
           };
