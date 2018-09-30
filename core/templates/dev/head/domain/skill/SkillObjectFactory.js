@@ -32,7 +32,7 @@ oppia.factory('SkillObjectFactory', [
       this._version = version;
       this._nextMisconceptionId = nextMisconceptionId;
       this._supersedingSkillId = supersedingSkillId;
-      this._allQuestionsMerged = allQuestionsMerged
+      this._allQuestionsMerged = allQuestionsMerged;
     };
 
     Skill.hasValidDescription = function(description) {
@@ -62,7 +62,7 @@ oppia.factory('SkillObjectFactory', [
         language_code: this._languageCode,
         version: this._version,
         next_misconception_id: this._nextMisconceptionId,
-        superseding_skill_id: this._supersedingSkillId, 
+        superseding_skill_id: this._supersedingSkillId,
         all_questions_merged: this._allQuestionsMerged
       };
     };
@@ -75,7 +75,7 @@ oppia.factory('SkillObjectFactory', [
       this._languageCode = skill.getLanguageCode();
       this._version = skill.getVersion();
       this._nextMisconceptionId = skill.getNextMisconceptionId();
-      this._supersedingSkillId = skill.getSupersedingSkillId();  
+      this._supersedingSkillId = skill.getSupersedingSkillId();
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
     };
 
@@ -89,7 +89,7 @@ oppia.factory('SkillObjectFactory', [
         skillBackendDict.language_code,
         skillBackendDict.version,
         skillBackendDict.next_misconception_id,
-        skillBackendDict.superseding_skill_id,  
+        skillBackendDict.superseding_skill_id,
         skillBackendDict.all_questions_merged);
     };
 
@@ -153,20 +153,20 @@ oppia.factory('SkillObjectFactory', [
       return id + 1;
     };
 
-    Skill.prototype.setSupersedingSkillId = function(skillId) {  
-      this._supersedingSkillId = skillId; 
+    Skill.prototype.setSupersedingSkillId = function(skillId) {
+      this._supersedingSkillId = skillId;
     };
 
-    Skill.prototype.getSupersedingSkillId = function() { 
-      return this._supersedingSkillId;  
+    Skill.prototype.getSupersedingSkillId = function() {
+      return this._supersedingSkillId;
     };
 
-    Skill.prototype.setAllQuestionsMerged = function(isAllQuestionsMerged) { 
-      this._allQuestionsMerged = isAllQuestionsMerged;  
+    Skill.prototype.setAllQuestionsMerged = function(isAllQuestionsMerged) {
+      this._allQuestionsMerged = isAllQuestionsMerged;
     };
 
-    Skill.prototype.getAllQuestionsMerged = function() { 
-      return this._allQuestionsMerged;  
+    Skill.prototype.getAllQuestionsMerged = function() {
+      return this._allQuestionsMerged;
     };
 
     Skill.prototype.findMisconceptionById = function(id) {
