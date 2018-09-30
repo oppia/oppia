@@ -59,7 +59,9 @@ describe('Skill object factory', function() {
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
-        next_misconception_id: 6
+        next_misconception_id: 6,
+        superseding_skill_id: '2',  
+        all_questions_merged: false
       };
     }));
 
@@ -76,6 +78,8 @@ describe('Skill object factory', function() {
         ConceptCardObjectFactory.createFromBackendDict(skillContentsDict));
       expect(skill.getLanguageCode()).toEqual('en');
       expect(skill.getVersion()).toEqual(3);
+      expect(skill.getSupersedingSkillId()).toEqual('2'); 
+      expect(skill.getAllQuestionsMerged()).toEqual(false);
     });
 
     it('should delete a misconception given its id', function() {
@@ -120,6 +124,22 @@ describe('Skill object factory', function() {
         ConceptCardObjectFactory.createInterstitialConceptCard());
       expect(skill.getLanguageCode()).toEqual('en');
       expect(skill.getVersion()).toEqual(1);
+      expect(skill.getSupersedingSkillId()).toEqual(null);  
+      expect(skill.getAllQuestionsMerged()).toEqual(false);
+    });
+
+    it('should set all questions merged', function() {  
+      var skill = SkillObjectFactory.createFromBackendDict(skillDict);  
+      expect(skill.getAllQuestionsMerged()).toEqual(false); 
+      skill.setAllQuestionsMerged(true);  
+      expect(skill.getAllQuestionsMerged()).toEqual(true);  
+    }); 
+
+    it('should set superseding skill id', function() { 
+      var skill = SkillObjectFactory.createInterstitialSkill(); 
+      expect(skill.getSupersedingSkillId()).toEqual(null);  
+      skill.setSupersedingSkillId('5'); 
+      expect(skill.getSupersedingSkillId()).toEqual('5'); 
     });
   });
 });
