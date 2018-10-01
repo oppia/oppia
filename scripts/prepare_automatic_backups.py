@@ -35,11 +35,13 @@ _OMITTED_MODELS = [
 
 def generate_backup_url(cloud_storage_bucket_name, module_class_names):
     """Generating backup url of update content.
-    Parameter:
-      cloud_storage_bucket_name:  Name of cloud storage bucket name
-      module_class_names:  List of contaning modules class names
+
+    Args:
+        cloud_storage_bucket_name:  str. Name of cloud storage bucket name
+        module_class_names:  list. List of contaning modules class names
+
     Returns:
-      Returning url of backup.
+        str. Returning url of backup.
     """
     return (
         '/_ah/datastore_admin/backup.create?name=%s&kind=%s&queue=%s'
@@ -51,10 +53,11 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
 
 
 def update_cron_dict(cron_dict):
-    """Update yaml file content by updating argument passed content which is having yaml 
-    file content. 
-    Parameter:
-      cron_dict: Content of yaml file in dictionary type 
+    """Update yaml file content by updating argument passed content which is
+    having yaml file content.
+
+    Args:
+        cron_dict: dictionary. Content of yaml file in dictionary type
     """
     sys_args = sys.argv
     cloud_storage_bucket_name = sys_args[1]
@@ -93,16 +96,18 @@ def update_cron_dict(cron_dict):
 
 def get_cron_dict():
     """Converting yaml file content that is yaml type into dictionary type.
+
     Returns:
-      Returning yaml file content in dictionary content
+        dictionary. Returning yaml file content in dictionary content
     """
     return utils.dict_from_yaml(utils.get_file_contents(_CRON_YAML_FILE_NAME))
 
 
 def save_cron_dict(cron_dict):
     """Converting dictionary content into yaml and saving into a yaml file.
-    Parameter:
-      cron_dict: It is the content of updated yaml file 
+
+    Args:
+        cron_dict: dictionary. It is the content of updated yaml file
     """
     with open(_CRON_YAML_FILE_NAME, 'wt') as cron_yaml_file:
         cron_yaml_file.write(utils.yaml_from_dict(cron_dict))
