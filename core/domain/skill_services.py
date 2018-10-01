@@ -233,6 +233,7 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         [skill_memcache_key]).get(skill_memcache_key)
 
     if memcached_skill is not None:
+        print('memcached_skill', memcached_skill)
         return memcached_skill
     else:
         skill_model = skill_models.SkillModel.get(
