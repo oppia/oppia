@@ -59,8 +59,9 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
 class ChangedBranch(object):
-    """Class for changing branch in which modified file is present by passing new branch name.
-    Not change branch when you are in dirty state.
+    """Class for changing branch in which modified file is present by passing
+    new branch name.
+    Does not change branch when you are in dirty state.
     """
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
@@ -261,7 +262,7 @@ def _install_hook():
 
 
 def main():
-    """Main method for pre-push hook that executes the Python/JS linters on all 
+    """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """
     parser = argparse.ArgumentParser()
