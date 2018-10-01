@@ -89,7 +89,6 @@ class HomePageRedirectHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
-
     @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
@@ -118,17 +117,13 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 
 def authorization_wrapper(self, *args, **kwargs):
-    """This request handler looks for "X-AppEngine-TaskName" header;
-    If successful, it can trust that the request is a Task Queue request.
-    Otherwise, we assume the header is set by an external caller, and respond
-    with 403 Error.
-    Refer
-    https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers
-    for reason why.
-    TLDR:Requests from Task Queue will always contain header
-        "X-AppEngine-TaskName"
+    """A request handler to determine if request is internal and from
+    Task Queue request.If any external callers try to do so, respond with 403 Error.
+    
+    "X-AppEnginer-TaskName" header can be set by internal requests only.
+    For more information refer:
+    https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers .
     """
-
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
         self.response.set_status(403)
@@ -137,9 +132,8 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
-    """This is a request handler for ui_access
+    """A request handler for ui_access.
     """
-
     self.real_dispatch(*args, **kwargs)
 
 
