@@ -121,7 +121,7 @@ export OPPIA_DIR=`pwd`
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
-export NODE_MODULE_DIR=$COMMON_DIR/node_modules
+export NODE_MODULE_DIR=$OPPIA_DIR/node_modules
 export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
@@ -182,6 +182,7 @@ if [ ! -d "$NODE_PATH" ]; then
   chown -R $ME $NODE_MODULE_DIR
   chmod -R 744 $NODE_MODULE_DIR
 fi
+$NPM_INSTALL
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" == true ]; then
@@ -256,30 +257,5 @@ export PYTHON_CMD
 
 # List all node modules that are currently installed. The "npm list" command is
 # slow, so we precompute this here and refer to it as needed.
-echo "Generating list of installed node modules..."
-NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-export NPM_INSTALLED_MODULES
 echo "Generation completed."
-
-install_node_module() {
-  # Usage: install_node_module [module_name] [module_version]
-  #
-  # module_name: the name of the node module
-  # module_version: the expected version of the module
-
-  echo Checking whether $1 is installed
-  if [ ! -d "$NODE_MODULE_DIR/$1" ]; then
-    echo installing $1
-    $NPM_INSTALL $1@$2
-  else
-    if [[ $NPM_INSTALLED_MODULES != *"$1@$2"* ]]; then
-      echo Version of $1 does not match $2. Reinstalling $1...
-      $NPM_INSTALL $1@$2
-      # Regenerate the list of installed modules.
-      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-    fi
-  fi
-}
-export -f install_node_module
-
 export SETUP_DONE=true
