@@ -101,10 +101,6 @@ class SkillRightsHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        if skill_rights is None:
-            raise self.InvalidInputException(
-                'Could not find skill rights associated with the provided '
-                'skill id')
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
@@ -182,9 +178,6 @@ class EditableSkillDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        if not skill_id:
-            raise self.PageNotFoundException
-
         if skill_services.skill_has_associated_questions(skill_id):
             raise Exception(
                 'Please delete all questions associated with this skill '
