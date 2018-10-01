@@ -121,8 +121,8 @@ def authorization_wrapper(self, *args, **kwargs):
     Task Queue request.
     If any external callers try to do so, respond with 403 Error.
     "X-AppEnginer-TaskName" header can be set by internal requests only.
-    For more information refer:
-    cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers .
+    For more information refer creating-handlers at:
+    cloud.google.com/appengine/docs/standard/python/taskqueue/push/ .
     """
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
