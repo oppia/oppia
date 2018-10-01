@@ -130,12 +130,16 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
-        // Display is fixed to card in mobile view (no users choice)
+        // For mobile users, the view of the creators
+        // exploration list is shown only in
+        // the card view and can't be switched to list view.
         $scope.myExplorationsView = (
           constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
-        // Displays as per the users choice card or list view
+        // For computer users or users operating in larger screen size
+        // the creator exploration list will come back to its previously
+        // selected view (card or list) when resized from mobile view
         $scope.myExplorationsView = userDashboardDisplayPreference;
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
