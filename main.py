@@ -118,11 +118,11 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 def authorization_wrapper(self, *args, **kwargs):
     """A request handler to determine if request is internal and from
-    Task Queue request.If any external callers try to do so, respond with 403 Error.
-    
+    Task Queue request.
+    If any external callers try to do so, respond with 403 Error.
     "X-AppEnginer-TaskName" header can be set by internal requests only.
     For more information refer:
-    https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers .
+    cloud.google.com/appengine/docs/standard/python/taskqueue/push/creating-handlers .
     """
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
