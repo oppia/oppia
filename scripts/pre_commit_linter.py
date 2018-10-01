@@ -1572,7 +1572,8 @@ def _check_for_copyright_notice(all_files):
 
 
 def main():
-    """Main method for pre commit linter script that lints Python and JavaScript code.
+    """Main method for pre commit linter script that lints Python and JavaScript
+    files.
     """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
