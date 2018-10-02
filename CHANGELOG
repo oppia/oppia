@@ -1,6 +1,6 @@
 This file contains a summary of changes to the Oppia code base.
 
-v2.6.8 (1 Oct 2018)
+v2.6.8 (2 Oct 2018)
 -------------------
 Bug fixes:
 * Fix persistent answer even after submit bug (#5696)
