@@ -28,7 +28,7 @@ oppia.directive('skillMisconceptionsEditor', [
         'skill_misconceptions_editor_directive.html'),
       controller: [
         '$scope', '$uibModal',
-        'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED'
+        'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
         function(
             $scope, $uibModal,
             MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED) {

@@ -25,7 +25,7 @@ oppia.directive('questionsTab', [
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'TopicEditorStateService', 'UrlService'
+        'TopicEditorStateService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'SuggestionThreadObjectFactory',
