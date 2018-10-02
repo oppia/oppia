@@ -37,7 +37,7 @@ class StoryModelTest(test_utils.GenericTestBase):
             description='description',
             notes='notes',
             language_code='language_code')
-            
+
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
         self.assertEqual(story_by_id.description, "description")
