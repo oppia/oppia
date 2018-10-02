@@ -60,7 +60,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
         Returns:
             FeedbackAnalyticsRealtimeModel. Datastore class used by the
-            realtime layer, which should subclass of
+            realtime layer, which should be a subclass of
             BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
@@ -71,7 +71,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
         Returns:
             FeedbackAnalyticsMRJobManager. Manager class for continuous-running
-            batch job.
+                batch job.
         """
         return FeedbackAnalyticsMRJobManager
 

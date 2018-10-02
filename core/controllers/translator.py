@@ -190,12 +190,12 @@ class ExplorationTranslationHandler(base.BaseHandler):
         """Updates properties of the given exploration.
 
         Args:
-            exploration_id: str. Id of exploration to be update.
+            exploration_id: str. Id of exploration to be updated.
 
         Raises:
             InvalidInputException: Inputs are invalid for exploration update.
             PageNotFoundException: No exploration data exist for given user id
-            and exploration id.
+                and exploration id.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
