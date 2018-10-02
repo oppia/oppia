@@ -26,7 +26,12 @@ import feconf
 class ImageHandlerTest(test_utils.GenericTestBase):
 
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
-    IMAGE_VIEW_URL_PREFIX = '/imagehandler'
+    ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
+
+    def _get_image_url(self, exp_id, filename):
+        return str(
+            '%s/%s/assets/image/%s' %
+            (self.ASSET_HANDLER_URL_PREFIX, exp_id, filename))
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
@@ -60,8 +65,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, filepath)))
+        response = self.testapp.get(self._get_image_url('0', filepath))
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 
@@ -97,12 +101,11 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         # Test that neither form of the image is stored.
         response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, supplied_filename)),
+            self._get_image_url('0', supplied_filename),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
         response = self.testapp.get(
-            str('%s/0/%s' % (
-                self.IMAGE_VIEW_URL_PREFIX, filename_with_correct_extension)),
+            self._get_image_url('0', filename_with_correct_extension),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
@@ -152,7 +155,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         """Test retrieval of invalid images."""
 
         response = self.testapp.get(
-            '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
+            self._get_image_url('0', 'bad_image'),
+            expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_bad_filenames_are_detected(self):
