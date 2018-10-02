@@ -122,18 +122,8 @@ oppia.directive('oppiaResponseNumberWithUnits', [
         'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // Sometimes, it was found that in the time it takes for this
-        // interaction to load, it used the learner input for the previous
-        // interaction which threw a console error. Though, this doesn't
-        // affect user experience as, as soon as the new card was recorded in
-        // the transcript, this starts taking the right value. this is a
-        // temporary fix until the issue is resolved.
-        if (!answer.type) {
-          $scope.answer = null;
-        } else {
-          $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-            answer).toString();
-        }
+        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+          answer).toString();
       }]
     };
   }

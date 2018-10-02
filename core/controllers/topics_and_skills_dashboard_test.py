@@ -14,6 +14,7 @@
 
 """Tests for the topics and skills dashboard page."""
 
+from constants import constants
 from core.domain import skill_services
 from core.domain import topic_services
 from core.tests import test_utils
@@ -53,7 +54,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         self.save_new_skill(skill_id, self.admin_id, 'Description')
         skill_services.publish_skill(skill_id, self.admin_id)
         self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -127,7 +128,7 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -146,7 +147,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -162,7 +163,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation_in_invalid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -180,7 +181,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)

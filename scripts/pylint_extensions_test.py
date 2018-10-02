@@ -32,7 +32,7 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=relative-import
 import astroid  # isort:skip
-import custom_lint_checks  # isort:skip
+import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
@@ -43,7 +43,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
     def test_finds_non_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            custom_lint_checks.ExplicitKeywordArgsChecker)
+            pylint_extensions.ExplicitKeywordArgsChecker)
         checker_test_object.setup_method()
         func_call_node_one, func_call_node_two, func_call_node_three = (
             astroid.extract_node("""
@@ -60,7 +60,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_one,
                 args=(
-                    "'test_var_two'",
+                    '\'test_var_two\'',
                     'function',
                     'test'
                 )
@@ -78,7 +78,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_three,
                 args=(
-                    "'test_var_three'",
+                    '\'test_var_three\'',
                     'function',
                     'test'
                 )
@@ -93,7 +93,7 @@ class HangingIndentCheckerTest(unittest.TestCase):
     def test_finds_hanging_indent(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            custom_lint_checks.HangingIndentChecker)
+            pylint_extensions.HangingIndentChecker)
         checker_test_object.setup_method()
         node1 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -140,7 +140,7 @@ class DocstringParameterCheckerTest(unittest.TestCase):
     def test_finds_docstring_parameter(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            custom_lint_checks.DocstringParameterChecker)
+            pylint_extensions.DocstringParameterChecker)
         checker_test_object.setup_method()
         func_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
@@ -165,7 +165,7 @@ class ImportOnlyModulesCheckerTest(unittest.TestCase):
     def test_finds_import_from(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            custom_lint_checks.ImportOnlyModulesChecker)
+            pylint_extensions.ImportOnlyModulesChecker)
         checker_test_object.setup_method()
         importfrom_node1 = astroid.extract_node("""
             from os import path #@

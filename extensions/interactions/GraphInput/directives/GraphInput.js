@@ -183,27 +183,18 @@ oppia.directive('oppiaResponseGraphInput', [
         'graph_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
+        $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
-        // Sometimes, it was found that in the time it takes for this
-        // interaction to load, it used the learner input for the previous
-        // interaction which threw a console error. Though, this doesn't affect
-        // user experience as, as soon as the new card was recorded in the
-        // transcript, this starts taking the right value. this is a temporary
-        // fix until the issue is resolved.
-        if ($scope.graph.edges) {
-          $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
-          $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
-          $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
+        $scope.getDirectedEdgeArrowPoints = function(index) {
+          return graphDetailService.getDirectedEdgeArrowPoints(
+            $scope.graph, index);
+        };
 
-          $scope.getDirectedEdgeArrowPoints = function(index) {
-            return graphDetailService.getDirectedEdgeArrowPoints(
-              $scope.graph, index);
-          };
-
-          $scope.getEdgeCentre = function(index) {
-            return graphDetailService.getEdgeCentre($scope.graph, index);
-          };
-        }
+        $scope.getEdgeCentre = function(index) {
+          return graphDetailService.getEdgeCentre($scope.graph, index);
+        };
       }]
     };
   }

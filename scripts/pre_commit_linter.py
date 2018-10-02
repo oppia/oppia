@@ -110,44 +110,44 @@ BAD_PATTERNS = {
 BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
-        'message': "In tests, please do not use browser.explore().",
+        'message': 'In tests, please do not use browser.explore().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.pause)\(',
-        'message': "In tests, please do not use browser.pause().",
+        'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.sleep)\(',
-        'message': "In tests, please do not use browser.sleep().",
+        'message': 'In tests, please do not use browser.sleep().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.waitForAngular)\(',
-        'message': "In tests, please do not use browser.waitForAngular().",
+        'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(ddescribe|fdescribe)\(',
-        'message': "In tests, please use 'describe' instead of 'ddescribe'"
-                   "or 'fdescribe'",
+        'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
+                   'or \'fdescribe\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(iit|fit)\(',
-        'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
+        'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'templateUrl: \'',
-        'message': "The directives must be directly referenced.",
+        'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
             'FeedbackPopupDirective.js'
@@ -161,9 +161,9 @@ BAD_PATTERNS_JS_REGEXP = [
     },
     {
         'regexp': r'\$parent',
-        'message': "Please do not access parent properties " +
-                   "using $parent. Use the scope object" +
-                   "for this purpose.",
+        'message': 'Please do not access parent properties ' +
+                   'using $parent. Use the scope object' +
+                   'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -172,7 +172,7 @@ BAD_PATTERNS_JS_REGEXP = [
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
-        'message': "The directives must be directly referenced.",
+        'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
             'feedback_popup_container_directive.html',
@@ -187,7 +187,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     },
     {
         'regexp': r'[ \t]+$',
-        'message': "There should not be any trailing whitespaces.",
+        'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -196,7 +196,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': r'print ',
-        'message': "Please do not use print statement.",
+        'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
@@ -213,9 +213,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'self.assertEquals\(',
-        'message': "Please do not use self.assertEquals method. " +
-                   "This method has been deprecated. Instead use " +
-                   "self.assertEqual method.",
+        'message': 'Please do not use self.assertEquals method. ' +
+                   'This method has been deprecated. Instead use ' +
+                   'self.assertEqual method.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -284,6 +284,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
@@ -893,7 +894,7 @@ def _check_bad_patterns(all_files):
     print '----------------------------------------'
     print ''
     if total_files_checked == 0:
-        print "There are no files to be checked."
+        print 'There are no files to be checked.'
     else:
         print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
@@ -1035,6 +1036,9 @@ def _check_docstrings(all_files):
 
                 # Check for multiline docstring.
                 elif line.endswith('"""'):
+                    # Ignore regular expression, i.e. lines end with r""".
+                    if line.endswith('r"""'):
+                        continue
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
@@ -1292,7 +1296,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
             stringfied_dependencies, function_parameters = matched_pattern
             stringfied_dependencies = (
                 stringfied_dependencies.strip().replace(
-                    "'", '').replace(' ', ''))[:-1]
+                    '\'', '').replace(' ', ''))[:-1]
             function_parameters = function_parameters.strip().replace(' ', '')
             if stringfied_dependencies != function_parameters:
                 failed = True

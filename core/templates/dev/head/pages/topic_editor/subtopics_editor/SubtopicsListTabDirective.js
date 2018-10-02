@@ -43,7 +43,6 @@ oppia.directive('subtopicsListTab', [
               function(subtopic) {
                 return $scope.subtopicTitles.push(subtopic.getTitle());
               });
-            $scope.subtopicEditorIsShown = false;
             $scope.uncategorizedSkillSummaries =
               $scope.topic.getUncategorizedSkillSummaries();
           };
@@ -99,15 +98,6 @@ oppia.directive('subtopicsListTab', [
                   $scope.updateHtmlData = function(htmlData) {
                     $scope.htmlData = htmlData;
                     $scope.openPreviewSubtopicPage(htmlData);
-                  };
-
-                  $scope.openPreviewSubtopicPage = function(htmlData) {
-                    $scope.subtopicEditorIsShown = false;
-                  };
-
-                  $scope.closePreviewSubtopicPage = function(previewHtmlData) {
-                    $scope.subtopicEditorIsShown = true;
-                    $scope.htmlData = previewHtmlData;
                   };
 
                   $scope.save = function() {

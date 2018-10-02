@@ -61,7 +61,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
         response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, filepath)))
+            str('%s/0/assets/image/%s' %
+                (self.IMAGE_VIEW_URL_PREFIX, filepath)))
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 
@@ -97,11 +98,12 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         # Test that neither form of the image is stored.
         response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, supplied_filename)),
+            str('%s/0/assets/image/%s' %
+                (self.IMAGE_VIEW_URL_PREFIX, supplied_filename)),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
         response = self.testapp.get(
-            str('%s/0/%s' % (
+            str('%s/0/assets/image/%s' % (
                 self.IMAGE_VIEW_URL_PREFIX, filename_with_correct_extension)),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
@@ -152,7 +154,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         """Test retrieval of invalid images."""
 
         response = self.testapp.get(
-            '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
+            '%s/0/assets/image/bad_image' % self.IMAGE_VIEW_URL_PREFIX,
+            expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_bad_filenames_are_detected(self):

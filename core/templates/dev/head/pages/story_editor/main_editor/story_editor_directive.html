@@ -31,25 +31,11 @@
     </div>
 
     <div class="story-notes">
-      <label for="storyNotes" class="form-heading">Notes</label>
-      <div ng-if="!notesEditorIsShown" class="preview">
-        <angular-html-bind html-data="notes">
-        </angular-html-bind>
-        <button type="button"
-                class="btn btn-default save-button"
-                ng-click="closePreviewNotes(notes)">
-          Edit
-        </button>
-      </div>
-      <div ng-if="notesEditorIsShown" class="oppia-editor-card-body">
+      <label class="form-heading">Notes</label>
+      <div class="oppia-editor-card-body">
         <schema-based-editor schema="NOTES_SCHEMA"
                              local-value="editableNotes">
         </schema-based-editor>
-        <button type="button"
-                class="btn btn-default save-button"
-                ng-click="openPreviewNotes(editableNotes)">
-          Preview
-        </button>
         <button type="button"
                 class="btn btn-success save-button"
                 ng-disabled="!editableNotes"
@@ -179,7 +165,6 @@
 
   story-editor .story-notes {
     margin-top: 1.5%;
-    height: auto;
     margin-bottom: 2%;
   }
 
