@@ -25,7 +25,6 @@ oppia.factory('ResponsesService', [
   'StateContentIdsToAudioTranslationsService',
   'SolutionValidityService',
   'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
@@ -36,7 +35,6 @@ oppia.factory('ResponsesService', [
       StateContentIdsToAudioTranslationsService,
       SolutionValidityService,
       INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
