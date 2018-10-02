@@ -31,10 +31,10 @@ import urllib
 import urlparse
 import zipfile
 
-from constants import constants  # pylint: disable=relative-import
-import feconf  # pylint: disable=relative-import
-
 import yaml
+
+from . import feconf
+from .constants import constants
 
 
 class InvalidInputException(Exception):

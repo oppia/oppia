@@ -16,13 +16,12 @@
 
 """Tests for object schema definitions."""
 
-# pylint: disable=relative-import
 
 import inspect
 
-from core.domain import email_manager
-from core.tests import test_utils
-import schema_utils
+from . import schema_utils
+from .core.domain import email_manager
+from .core.tests import test_utils
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN

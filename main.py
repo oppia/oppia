@@ -16,49 +16,45 @@
 
 import logging
 
-# pylint: disable=relative-import
-from constants import constants
-from core.controllers import admin
-from core.controllers import base
-from core.controllers import classifier
-from core.controllers import collection_editor
-from core.controllers import collection_viewer
-from core.controllers import concept_card_viewer
-from core.controllers import creator_dashboard
-from core.controllers import custom_landing_pages
-from core.controllers import editor
-from core.controllers import email_dashboard
-from core.controllers import feedback
-from core.controllers import learner_dashboard
-from core.controllers import learner_playlist
-from core.controllers import library
-from core.controllers import moderator
-from core.controllers import pages
-from core.controllers import profile
-from core.controllers import question_editor
-from core.controllers import reader
-from core.controllers import recent_commits
-from core.controllers import resources
-from core.controllers import skill_editor
-from core.controllers import story_editor
-from core.controllers import subscriptions
-from core.controllers import suggestion
-from core.controllers import topic_editor
-from core.controllers import topic_viewer
-from core.controllers import topics_and_skills_dashboard
-from core.controllers import translator
-from core.domain import acl_decorators
-from core.domain import user_services
-from core.platform import models
-import feconf
-
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-# pylint: enable=relative-import
-
+from . import feconf
+from .constants import constants
+from .core.controllers import admin
+from .core.controllers import base
+from .core.controllers import classifier
+from .core.controllers import collection_editor
+from .core.controllers import collection_viewer
+from .core.controllers import concept_card_viewer
+from .core.controllers import creator_dashboard
+from .core.controllers import custom_landing_pages
+from .core.controllers import editor
+from .core.controllers import email_dashboard
+from .core.controllers import feedback
+from .core.controllers import learner_dashboard
+from .core.controllers import learner_playlist
+from .core.controllers import library
+from .core.controllers import moderator
+from .core.controllers import pages
+from .core.controllers import profile
+from .core.controllers import question_editor
+from .core.controllers import reader
+from .core.controllers import recent_commits
+from .core.controllers import resources
+from .core.controllers import skill_editor
+from .core.controllers import story_editor
+from .core.controllers import subscriptions
+from .core.controllers import suggestion
+from .core.controllers import topic_editor
+from .core.controllers import topic_viewer
+from .core.controllers import topics_and_skills_dashboard
+from .core.controllers import translator
+from .core.domain import acl_decorators
+from .core.domain import user_services
+from .core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()

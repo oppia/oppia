@@ -29,7 +29,7 @@ import re
 import urllib
 import urlparse
 
-from core.domain import html_cleaner  # pylint: disable=relative-import
+from .core.domain import html_cleaner
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'

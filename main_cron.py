@@ -14,16 +14,12 @@
 
 """Main package for URL routing and the index page."""
 
-# pylint: disable=relative-import
-from core.controllers import cron
-from core.platform import models
-import feconf
-import main
-
 import webapp2
 
-# pylint: enable=relative-import
-
+from . import feconf
+from . import main
+from .core.controllers import cron
+from .core.platform import models
 
 transaction_services = models.Registry.import_transaction_services()
 

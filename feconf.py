@@ -20,7 +20,7 @@ import copy
 import datetime
 import os
 
-from constants import constants  # pylint: disable=relative-import
+from .constants import constants
 
 # Whether to unconditionally log info messages.
 DEBUG = False

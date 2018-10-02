@@ -17,12 +17,9 @@
 import copy
 import datetime
 
-# pylint: disable=relative-import
-from core.tests import test_utils
-import feconf
-import utils
-
-# pylint: enable=relative-import
+from . import feconf
+from . import utils
+from .core.tests import test_utils
 
 
 class UtilsTests(test_utils.GenericTestBase):
