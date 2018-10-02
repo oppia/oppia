@@ -17,6 +17,7 @@
 import logging
 import urllib
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
@@ -40,7 +41,11 @@ class ValueGeneratorHandler(base.BaseHandler):
 
 
 class ImageHandler(base.BaseHandler):
-    """Handles image retrievals."""
+    """Handles image retrievals (only in dev -- in production, image files are
+    served from GCS).
+    """
+
+    _IMAGE_PATH_PREFIX = 'image'
 
     @acl_decorators.open_access
     def get(self, exploration_id, filename):
@@ -51,6 +56,8 @@ class ImageHandler(base.BaseHandler):
             filename: a string representing the image filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
         try:
             filepath = urllib.unquote(filename)
             file_format = filepath[(filepath.rfind('.') + 1):]
@@ -62,7 +69,7 @@ class ImageHandler(base.BaseHandler):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(
                     'exploration/%s' % exploration_id))
-            raw = fs.get(filepath)
+            raw = fs.get('%s/%s' % (self._IMAGE_PATH_PREFIX, filepath))
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
@@ -87,6 +94,9 @@ class AudioHandler(base.BaseHandler):
             filename: a string representing the audio filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
+
         file_format = filename[(filename.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.
