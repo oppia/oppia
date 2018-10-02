@@ -22,7 +22,10 @@
           <span class="oppia-editor-description">Use a name that will be easy for question creators to understand.</span>
         </div>
         <div>
-          <input class="form-control" type="text" ng-model="misconceptionName">
+          <input class="form-control" type="text" ng-model="misconceptionName" maxlength="30" autofocus>
+          <span ng-if="misconceptionName.length === 30" class="help-block" style="color: red; font-size: smaller">
+            <em>Please use at most 30 characters.</em>
+          </span>
         </div>
       </div>
       <div class="oppia-misconception-editor-section">
@@ -38,7 +41,7 @@
         <div>
           <span class="oppia-editor-description">This is the default feedback given to learners when they have this misconception. Question creators may override this feedback.</span>
         </div>
-        <schema-based-editor schema="MISCONCEPTION_PROPERTY_FORM_SCHEMA" local-value="misconceptionFeedback">
+        <schema-based-editor schema="MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA" local-value="misconceptionFeedback">
         </schema-based-editor>
       </div>
     </div>

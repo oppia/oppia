@@ -75,23 +75,10 @@ oppia.directive('topicMainEditor', [
             $scope.topicDescriptionChanged = true;
           };
 
-          $scope.openTopicNameEditor = function() {
-            if (!$scope.topicRights.canEditName()) {
-              return;
-            }
-            $scope.topicNameEditorIsShown = true;
-            $scope.editableName = $scope.topic.getName();
-          };
-
-          $scope.closeTopicNameEditor = function() {
-            if (!$scope.topicRights.canEditName()) {
-              return;
-            }
-            $scope.topicNameEditorIsShown = false;
-            $scope.editableName = $scope.topic.getName();
-          };
-
           $scope.updateTopicName = function(newName) {
+            if (newName === $scope.topic.getName()) {
+              return;
+            }
             TopicUpdateService.setTopicName($scope.topic, newName);
             $scope.topicNameEditorIsShown = false;
           };

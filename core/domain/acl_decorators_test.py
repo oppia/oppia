@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
@@ -218,9 +217,18 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
-    def test_guest_is_redirected_to_login_page(self):
-        response = self.mock_testapp.get(
-            '/mock/%s' % self.published_col_id, expect_errors=True)
+    def test_guest_cannot_edit_collection_via_json_handler(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.published_col_id, expect_errors=True,
+                expected_status_int=401)
+
+    def test_guest_is_redirected_when_using_html_handler(self):
+        with self.swap(
+            self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
+            feconf.HANDLER_TYPE_HTML):
+            response = self.mock_testapp.get(
+                '/mock/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
     def test_normal_user_cannot_edit_collection(self):
@@ -298,8 +306,16 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
         self.logout()
 
-    def test_guest_user_is_redirected_to_login_page(self):
-        response = self.mock_testapp.get('/mock/create', expect_errors=True)
+    def test_guest_cannot_create_exploration_via_json_handler(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/create', expect_errors=True,
+                          expected_status_int=401)
+
+    def test_guest_is_redirected_when_using_html_handler(self):
+        with self.swap(
+            self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
+            feconf.HANDLER_TYPE_HTML):
+            response = self.mock_testapp.get('/mock/create', expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
 
@@ -328,8 +344,16 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_guest_user_is_redirected_to_login_page(self):
-        response = self.mock_testapp.get('/mock/create', expect_errors=True)
+    def test_guest_cannot_create_collection_via_json_handler(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/create', expect_errors=True, expected_status_int=401)
+
+    def test_guest_is_redirected_when_using_html_handler(self):
+        with self.swap(
+            self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
+            feconf.HANDLER_TYPE_HTML):
+            response = self.mock_testapp.get('/mock/create', expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
     def test_normal_user_cannot_create_collection(self):
@@ -424,8 +448,19 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_comment_on_feedback_threads(self):
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+    def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id,
+                expect_errors=True, expected_status_int=401)
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id,
+                expect_errors=True, expected_status_int=401)
+
+    def test_guest_is_redirected_when_using_html_handler(self):
+        with self.swap(
+            self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
+            feconf.HANDLER_TYPE_HTML):
             response = self.mock_testapp.get(
                 '/mock/exploration.%s.thread1' % self.private_exp_id,
                 expect_errors=True)
@@ -437,27 +472,24 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
 
     def test_owner_can_comment_on_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id)
+        self.logout()
 
     def test_moderator_can_comment_on_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
+        self.logout()
 
     def test_admin_can_comment_on_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id)
+        self.logout()
 
 
 class CreateFeedbackThreadTest(test_utils.GenericTestBase):
@@ -550,33 +582,27 @@ class ViewFeedbackThreadTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
 
     def test_owner_cannot_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/exploration.%s.thread1' % self.private_exp_id)
         self.logout()
 
     def test_moderator_can_view_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
         self.logout()
 
     def test_admin_can_view_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/exploration.%s.thread1' % self.private_exp_id)
         self.logout()
 
 
@@ -1443,8 +1469,9 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
 
     def test_banned_user_is_redirected(self):
         self.login(self.banned_user_email)
-        response = self.mock_testapp.get('/mock/', expect_errors=True)
-        self.assertEqual(response.status_int, 302)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/', expect_errors=True, expected_status_int=401)
         self.logout()
 
     def test_exploration_editor_can_access_learner_dashboard(self):

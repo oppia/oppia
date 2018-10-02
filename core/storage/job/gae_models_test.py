@@ -52,14 +52,14 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             status_code=job_models.STATUS_CODE_COMPLETED).put()
 
     def test_get_all_unfinished_jobs(self):
-        self.assertEquals(
+        self.assertEqual(
             job_models.JobModel.get_all_unfinished_jobs(3),
             [job_models.JobModel.get_by_id('MyJobId2')])
 
     def test_get_unfinished_jobs(self):
-        self.assertEquals(
+        self.assertEqual(
             job_models.JobModel.get_unfinished_jobs('JobType1').fetch(1), [])
-        self.assertEquals(
+        self.assertEqual(
             job_models.JobModel.get_unfinished_jobs('JobType2').fetch(1),
             [job_models.JobModel.get_by_id('MyJobId2')])
 

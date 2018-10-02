@@ -119,6 +119,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.to_dict(), expected_topic)
 
+    def test_get_topics_by_id(self):
+        expected_topic = self.topic.to_dict()
+        topics = topic_services.get_topics_by_ids([self.TOPIC_ID])
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertEqual(len(topics), 1)
+
+        topics = topic_services.get_topics_by_ids([self.TOPIC_ID, 'topic'])
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertIsNone(topics[1])
+        self.assertEqual(len(topics), 2)
+
     def test_commit_log_entry(self):
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)

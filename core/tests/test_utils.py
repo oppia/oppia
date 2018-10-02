@@ -466,6 +466,24 @@ tags: []
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
+    def delete_json(self, url, params='', expect_errors=False,
+                    expected_status_int=200):
+        """Delete object on the server using a JSON call."""
+        json_response = self.testapp.delete(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
+
     def _send_post_request(
             self, app, url, data, expect_errors=False, expected_status_int=200,
             upload_files=None, headers=None):
@@ -1066,7 +1084,7 @@ tags: []
         examples: '' or 'build/'.
         """
         filepath = ''
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             filepath = os.path.join('build')
 
         return filepath
@@ -1299,10 +1317,7 @@ class AppEngineTestBase(TestBase):
         return state
 
 
-if feconf.PLATFORM == 'gae':
-    GenericTestBase = AppEngineTestBase
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+GenericTestBase = AppEngineTestBase
 
 
 class FunctionWrapper(object):

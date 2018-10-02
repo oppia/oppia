@@ -16,6 +16,7 @@
 are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import dependency_registry
@@ -42,11 +43,11 @@ class TopicEditorStoryHandler(base.BaseHandler):
     display in topic editor page.
     """
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
@@ -71,7 +72,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
@@ -97,10 +98,10 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     summaries for display in topic editor page.
     """
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -131,7 +132,7 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -191,11 +192,11 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (subtopic_page_version, version_from_payload))
 
-    @acl_decorators.can_edit_subtopic_page
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -234,7 +235,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -266,7 +267,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -312,7 +313,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -321,6 +322,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
+
+        self.render_json(self.values)
 
 
 class TopicRightsHandler(base.BaseHandler):

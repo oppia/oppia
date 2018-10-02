@@ -31,20 +31,17 @@ oppia.directive('oppiaInteractiveGraphInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'CurrentInteractionService',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -55,12 +52,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
           };
           $scope.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
-            $scope.onSubmit({
-              answer: angular.copy($scope.graph),
-              rulesService: graphInputRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              angular.copy($scope.graph), graphInputRulesService);
           };
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
@@ -114,13 +108,12 @@ oppia.directive('oppiaInteractiveGraphInput', [
             return Boolean(graph);
           };
 
-          $scope.$watch(function() {
-            return $scope.graph;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: checkValidGraph($scope.graph)
-            });
-          });
+          var validityCheckFn = function() {
+            return checkValidGraph($scope.graph);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitGraph, validityCheckFn);
 
           init();
         }
@@ -190,27 +183,18 @@ oppia.directive('oppiaResponseGraphInput', [
         'graph_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
+        $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
-        // Sometimes, it was found that in the time it takes for this
-        // interaction to load, it used the learner input for the previous
-        // interaction which threw a console error. Though, this doesn't affect
-        // user experience as, as soon as the new card was recorded in the
-        // transcript, this starts taking the right value. this is a temporary
-        // fix until the issue is resolved.
-        if ($scope.graph.edges) {
-          $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
-          $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
-          $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
+        $scope.getDirectedEdgeArrowPoints = function(index) {
+          return graphDetailService.getDirectedEdgeArrowPoints(
+            $scope.graph, index);
+        };
 
-          $scope.getDirectedEdgeArrowPoints = function(index) {
-            return graphDetailService.getDirectedEdgeArrowPoints(
-              $scope.graph, index);
-          };
-
-          $scope.getEdgeCentre = function(index) {
-            return graphDetailService.getEdgeCentre($scope.graph, index);
-          };
-        }
+        $scope.getEdgeCentre = function(index) {
+          return graphDetailService.getEdgeCentre($scope.graph, index);
+        };
       }]
     };
   }

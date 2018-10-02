@@ -45,6 +45,7 @@ oppia.directive('topNavigationBar', [
             'topic_editor', 'story_editor'];
           $scope.NAV_MODE = GLOBALS.NAV_MODE;
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
           $scope.username = GLOBALS.username;
@@ -52,6 +53,7 @@ oppia.directive('topNavigationBar', [
             $scope.profilePictureDataUrl = dataUrl;
           });
           $scope.isAdmin = GLOBALS.isAdmin;
+          $scope.isTopicManager = GLOBALS.isTopicManager;
           $scope.isModerator = GLOBALS.isModerator;
           $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
           $scope.logoutUrl = GLOBALS.logoutUrl;

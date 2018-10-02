@@ -16,6 +16,7 @@
 are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
@@ -32,7 +33,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         self.values.update({
@@ -101,6 +102,9 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         can_create_topic = (
             role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
+        can_delete_skill = (
+            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+
         can_create_skill = (
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
@@ -110,6 +114,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
+            'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill
         })
         self.render_json(self.values)
@@ -121,7 +126,7 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         name = self.payload.get('name')
 
@@ -140,27 +145,25 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        topic_id = self.payload.get('topic_id')
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.InvalidInputException
 
         description = self.payload.get('description')
+        linked_topic_ids = self.payload.get('linked_topic_ids')
+        new_skill_id = skill_services.get_new_skill_id()
+        if linked_topic_ids is not None:
+            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            for topic in topics:
+                if topic is None:
+                    raise self.InvalidInputException
+                topic_services.add_uncategorized_skill(
+                    self.user_id, topic.id, new_skill_id)
 
         skill_domain.Skill.require_valid_description(description)
 
-        new_skill_id = skill_services.get_new_skill_id()
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description)
         skill_services.save_new_skill(self.user_id, skill)
-
-        if topic_id is not None:
-            topic_services.add_uncategorized_skill(
-                self.user_id, topic_id, new_skill_id)
 
         self.render_json({
             'skillId': new_skill_id

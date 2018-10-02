@@ -712,7 +712,6 @@ class ReaderFeedbackHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        state_name = self.payload.get('state_name')
         subject = self.payload.get('subject', 'Feedback from a learner')
         feedback = self.payload.get('feedback')
         include_author = self.payload.get('include_author')
@@ -720,7 +719,6 @@ class ReaderFeedbackHandler(base.BaseHandler):
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
             exploration_id,
-            state_name,
             self.user_id if include_author else None,
             subject,
             feedback)

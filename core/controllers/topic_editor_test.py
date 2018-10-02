@@ -14,6 +14,7 @@
 
 """Tests for the topic editor page."""
 
+from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_services
@@ -65,7 +66,7 @@ class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
@@ -92,7 +93,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
             question_services.create_new_question_skill_link(
                 question_id, self.skill_id)
 
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
             with self.swap(feconf, 'NUM_QUESTIONS_PER_PAGE', 1):
                 json_response = self.get_json(
@@ -118,9 +119,8 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
             self.login(self.TOPIC_MANAGER_EMAIL)
             response = self.testapp.get(
                 '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
+            self.assertEqual(response.status_int, 200)
             self.logout()
 
             topic_services.assign_role(
@@ -150,7 +150,7 @@ class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
         # editable subtopic data.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s/%s' % (
@@ -198,7 +198,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
 
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admin and topic_manager cannot access the editor
             # page.
             self.login(self.NEW_USER_EMAIL)
@@ -226,7 +226,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
 
     def test_editable_topic_handler_get(self):
         # Check that non-admins cannot access the editable topic data.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (
@@ -280,7 +280,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
@@ -366,7 +366,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
@@ -381,13 +381,13 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.logout()
 
     def test_editable_topic_handler_delete(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a topic.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expected_status_int=200)
             self.logout()
 
             # Check that non-admins cannot delete a topic.
@@ -405,7 +405,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
@@ -445,7 +445,7 @@ class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
     def test_get_topic_rights(self):
         """Test the get topic rights functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Test whether admin can access topic rights.
             json_response = self.get_json(
                 '%s/%s' % (
@@ -469,7 +469,7 @@ class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)

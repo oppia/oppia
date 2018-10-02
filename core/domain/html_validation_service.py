@@ -17,9 +17,11 @@
 """HTML validation service."""
 
 import json
+import logging
 
 import bs4
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
@@ -775,7 +777,8 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
 
 
 def add_dimensions_to_image_tags(exp_id, html_string):
-    """Adds dimensions to all oppia-noninteractive-image tags.
+    """Adds dimensions to all oppia-noninteractive-image tags. Removes image
+    tags that have no filepath.
 
     Args:
         html_string: str. HTML string to modify.
@@ -787,9 +790,20 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        filename = json.loads(unescape_html(image['filepath-with-value']))
-        image['filepath-with-value'] = escape_html(json.dumps(
-            get_filename_with_dimensions(filename, exp_id)))
+        if (not image.has_attr('filepath-with-value') or
+                image['filepath-with-value'] == ''):
+            image.decompose()
+            continue
+
+        try:
+            filename = json.loads(unescape_html(image['filepath-with-value']))
+            image['filepath-with-value'] = escape_html(json.dumps(
+                get_filename_with_dimensions(filename, exp_id)))
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed to load image: %s' %
+                (exp_id, image['filepath-with-value'].encode('utf-8')))
+            raise e
     return unicode(soup).replace('<br/>', '<br>')
 
 
@@ -804,15 +818,12 @@ def get_filename_with_dimensions(old_filename, exp_id):
     Returns:
         str. The new filename of the image file.
     """
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-        else fs_domain.GcsFileSystem)
-    fs = fs_domain.AbstractFileSystem(file_system_class(exp_id))
-    filepath = (
-        old_filename if feconf.DEV_MODE
-        else ('image/%s' % old_filename))
+    file_system_class = fs_services.get_exploration_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        'exploration/%s' % exp_id))
+    filepath = 'image/%s' % old_filename
     try:
-        content = fs.get(filepath)
+        content = fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)
     except IOError:
         height = 120

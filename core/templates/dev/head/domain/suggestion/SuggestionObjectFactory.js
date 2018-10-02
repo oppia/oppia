@@ -34,11 +34,7 @@ oppia.factory('SuggestionObjectFactory', [function() {
   };
 
   Suggestion.prototype.getThreadId = function() {
-    if (constants.ENABLE_GENERALIZED_FEEDBACK_THREADS) {
-      return this.suggestionId;
-    } else {
-      return this.suggestionId.slice(this.suggestionId.indexOf('.') + 1);
-    }
+    return this.suggestionId;
   };
 
   Suggestion.createFromBackendDict = function(suggestionBackendDict) {

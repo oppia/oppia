@@ -46,8 +46,10 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+  'The current solution does not correspond to a correct answer.');
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   'The solution is now valid!');
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -339,25 +341,27 @@ oppia.config([
 ]);
 
 oppia.config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', function($delegate) {
-    var _originalError = $delegate.error;
+  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
+    function($delegate, DEV_MODE) {
+      var _originalError = $delegate.error;
 
-    if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
-      $delegate.log = function() {};
-      $delegate.info = function() {};
-      // TODO(sll): Send errors (and maybe warnings) to the backend.
-      $delegate.warn = function() { };
-      $delegate.error = function(message) {
-        if (String(message).indexOf('$digest already in progress') === -1) {
-          _originalError(message);
-        }
-      };
-      // This keeps angular-mocks happy (in tests).
-      $delegate.error.logs = [];
+      if (!DEV_MODE) {
+        $delegate.log = function() {};
+        $delegate.info = function() {};
+        // TODO(sll): Send errors (and maybe warnings) to the backend.
+        $delegate.warn = function() { };
+        $delegate.error = function(message) {
+          if (String(message).indexOf('$digest already in progress') === -1) {
+            _originalError(message);
+          }
+        };
+        // This keeps angular-mocks happy (in tests).
+        $delegate.error.logs = [];
+      }
+
+      return $delegate;
     }
-
-    return $delegate;
-  }]);
+  ]);
 }]);
 
 oppia.config(['toastrConfig', function(toastrConfig) {

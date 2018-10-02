@@ -35,7 +35,8 @@ oppia.directive('stateSolutionEditor', [
         'StateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
         'ContextService', 'StateCustomizationArgsService',
         'EditabilityService', 'StateContentIdsToAudioTranslationsService',
-        'INFO_MESSAGE_SOLUTION_IS_INVALID',
+        'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+        'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
         function(
             $scope, $rootScope, $uibModal, $filter, StateEditorService,
             AlertsService, INTERACTION_SPECS, StateSolutionService,
@@ -44,7 +45,8 @@ oppia.directive('stateSolutionEditor', [
             StateHintsService, UrlInterpolationService, SolutionObjectFactory,
             ContextService, StateCustomizationArgsService,
             EditabilityService, StateContentIdsToAudioTranslationsService,
-            INFO_MESSAGE_SOLUTION_IS_INVALID) {
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
           $scope.EditabilityService = EditabilityService;
           $scope.correctAnswer = null;
           $scope.correctAnswerEditorHtml = '';
@@ -104,11 +106,11 @@ oppia.directive('stateSolutionEditor', [
               controller: [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
                 'StateCustomizationArgsService',
-                'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
+                'CurrentInteractionService', 'INTERACTION_SPECS',
                 'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
                     $scope, $uibModalInstance, StateSolutionService,
                     StateCustomizationArgsService,
-                    EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS,
+                    CurrentInteractionService, INTERACTION_SPECS,
                     COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
@@ -143,17 +145,15 @@ oppia.directive('stateSolutionEditor', [
                   } : angular.copy(EMPTY_SOLUTION_DATA);
 
                   $scope.onSubmitFromSubmitButton = function() {
-                    $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+                    CurrentInteractionService.submitAnswer();
                   };
 
-                  $scope.submitAnswer = function(answer) {
+                  $scope.isSubmitButtonDisabled = (
+                    CurrentInteractionService.isSubmitButtonDisabled);
+
+                  CurrentInteractionService.setOnSubmitFn(function(answer) {
                     $scope.data.correctAnswer = answer;
-                  };
-
-                  $scope.setInteractionAnswerValidity = function(
-                      answerValidity) {
-                    $scope.answerIsValid = answerValidity;
-                  };
+                  });
 
                   $scope.shouldAdditionalSubmitButtonBeShown = function() {
                     var interactionSpecs = INTERACTION_SPECS[
@@ -208,8 +208,13 @@ oppia.directive('stateSolutionEditor', [
                 StateEditorService.getActiveStateName(), solutionIsValid);
               $scope.refreshWarnings()();
               if (!solutionIsValid) {
-                AlertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
+                if (StateEditorService.isInQuestionMode()) {
+                  AlertsService.addInfoMessage(
+                    INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION, 4000);
+                } else {
+                  AlertsService.addInfoMessage(
+                    INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
+                }
               }
             });
           };

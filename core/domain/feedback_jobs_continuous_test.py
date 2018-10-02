@@ -16,7 +16,6 @@
 
 """Tests for continuous computations relating to feedback analytics."""
 
-from constants import constants
 from core import jobs_registry
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
@@ -113,7 +112,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             })
 
             feedback_services.create_thread(
-                'exploration', exp_id_1, None, 'owner', 'subject', 'text')
+                'exploration', exp_id_1, 'owner', 'subject', 'text')
             self.process_and_flush_pending_tasks()
             feedback_threads = (
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
@@ -163,13 +162,11 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.entity_id = exp_id
             thread.subject = 'subject'
             thread.put()
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 1,
-                        'num_total_threads': 1,
-                    })
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
 
     def test_multiple_threads_single_exp(self):
         with self._get_swap_context():
@@ -190,13 +187,11 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_2.subject = 'subject'
             thread_2.put()
 
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 2,
-                        'num_total_threads': 2,
-                    })
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 2,
+                    'num_total_threads': 2,
+                })
 
     def test_multiple_threads_multiple_exp(self):
         with self._get_swap_context():
@@ -228,18 +223,16 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_3.entity_id = exp_id_3
             thread_3.subject = 'subject'
             thread_3.put()
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                self.process_and_flush_pending_tasks()
-                ModifiedFeedbackAnalyticsAggregator.start_computation()
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-                self.process_and_flush_pending_tasks()
-                # Do a multi call for all explorations and check for stats.
-                feedback_analytics_multi = (
-                    ModifiedFeedbackAnalyticsAggregator
-                    .get_thread_analytics_multi([exp_id_1, exp_id_2, exp_id_3]))
+            self.process_and_flush_pending_tasks()
+            ModifiedFeedbackAnalyticsAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            # Do a multi call for all explorations and check for stats.
+            feedback_analytics_multi = (
+                ModifiedFeedbackAnalyticsAggregator
+                .get_thread_analytics_multi([exp_id_1, exp_id_2, exp_id_3]))
             self.assertEqual(
                 feedback_analytics_multi[0].to_dict(),
                 {
@@ -295,32 +288,30 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.subject = 'subject'
             thread_1.put()
 
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                # Start job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 1,
-                        'num_total_threads': 1,
-                    })
+            # Start job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
 
-                # Stop job.
-                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            # Stop job.
+            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-                # Close thread.
-                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                    thread_id_1)
-                thread.status = feedback_models.STATUS_CHOICES_FIXED
-                thread.put()
+            # Close thread.
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_1)
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
 
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 0,
-                        'num_total_threads': 1,
-                    })
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 1,
+                })
 
     def test_thread_closed_reopened_again(self):
         with self._get_swap_context():
@@ -336,52 +327,50 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.subject = 'subject'
             thread_1.put()
 
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                # Start job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 1,
-                        'num_total_threads': 1,
-                    })
+            # Start job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
 
-                # Stop job.
-                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            # Stop job.
+            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-                # Close thread.
-                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                    thread_id_1)
-                thread.status = feedback_models.STATUS_CHOICES_FIXED
-                thread.put()
+            # Close thread.
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_1)
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
 
-                # Restart job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 0,
-                        'num_total_threads': 1,
-                    })
+            # Restart job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 1,
+                })
 
-                # Stop job.
-                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            # Stop job.
+            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-                # Reopen thread.
-                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                    thread_id_1)
-                thread.status = feedback_models.STATUS_CHOICES_OPEN
-                thread.put()
+            # Reopen thread.
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_1)
+            thread.status = feedback_models.STATUS_CHOICES_OPEN
+            thread.put()
 
-                # Restart job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 1,
-                        'num_total_threads': 1,
-                    })
+            # Restart job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
 
     def test_thread_closed_status_changed(self):
         with self._get_swap_context():
@@ -397,51 +386,48 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.subject = 'subject'
             thread_1.put()
 
-            # Start job.
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 1,
-                        'num_total_threads': 1,
-                    })
-                # Stop job.
-                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+            # Stop job.
+            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-                # Close thread.
-                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                    thread_id_1)
-                thread.status = feedback_models.STATUS_CHOICES_FIXED
-                thread.put()
+            # Close thread.
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_1)
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
 
-                # Restart job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 0,
-                        'num_total_threads': 1,
-                    })
+            # Restart job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 1,
+                })
 
-                # Stop job.
-                ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            # Stop job.
+            ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-                # Change thread status.
-                thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                    thread_id_1)
-                thread.status = feedback_models.STATUS_CHOICES_IGNORED
-                thread.put()
+            # Change thread status.
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_1)
+            thread.status = feedback_models.STATUS_CHOICES_IGNORED
+            thread.put()
 
-                # Restart job.
-                self._run_job_and_check_results(
-                    exp_id, {
-                        'num_open_threads': 0,
-                        'num_total_threads': 1,
-                    })
+            # Restart job.
+            self._run_job_and_check_results(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 1,
+                })
 
 
 class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
@@ -481,8 +467,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation event.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -499,11 +484,9 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -522,17 +505,13 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id_1, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_1, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_1, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_1, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_2, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_2, None, 'a subject', 'some text')
             feedback_services.create_thread(
-                'exploration', exp_id_2, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id_2, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id_1, {
@@ -554,8 +533,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
                     'num_open_threads': 1,
@@ -584,8 +562,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -628,8 +605,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -670,8 +646,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
 
             # Start job.
             self.process_and_flush_pending_tasks()
@@ -695,8 +670,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Create another thread but don't start job.
             feedback_services.create_thread(
-                'exploration', exp_id, 'a_state_name', None, 'a subject',
-                'some text')
+                'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
                     'num_open_threads': 2,
