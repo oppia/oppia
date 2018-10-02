@@ -25,7 +25,7 @@ from core.tests import test_utils
 class StoryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story models."""
     def test_story_model(self):
-        """Method to test the story model"""
+        """Method to test the story model."""
 
         committer_id = "test_committer_id"
         commit_message = "test_commit_message"
@@ -51,7 +51,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story summary models."""
 
     def test_story_summary_model(self):
-        """Method to test the story_summary_model"""
+        """Method to test the story_summary_model."""
 
         story_summary = story_models.StorySummaryModel(
             id='id',
