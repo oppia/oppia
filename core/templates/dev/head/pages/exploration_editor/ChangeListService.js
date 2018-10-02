@@ -29,7 +29,7 @@ oppia.factory('ChangeListService', [
     // well as the list of changes in the undo stack.
 
     // Temporary buffer for changes made to the exploration.
-    var explorationChangeList = [];
+    var explorationChange = [];
     // Stack for storing undone changes. The last element is the most recently
     // undone change.
     var undoneChangeStack = [];
@@ -70,7 +70,7 @@ oppia.factory('ChangeListService', [
       widget_id: true
     };
 
-    var autosaveChangeListOnChange = function(explorationChangeList) {
+    var autosaveChangeListOnChange = function(explorationChange) {
       // Asynchronously send an autosave request, and check for errors in the
       // response:
       // If error is present -> Check for the type of error occurred
@@ -79,12 +79,12 @@ oppia.factory('ChangeListService', [
       // - Version Mismatch.
       // - Non-strict Validation Fail.
       ExplorationDataService.autosaveChangeList(
-        explorationChangeList,
+        explorationChange,
         function(response) {
           if (!response.data.is_version_of_draft_valid) {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showVersionMismatchModal(
-                explorationChangeList);
+                explorationChange);
             }
           }
         },
@@ -92,7 +92,7 @@ oppia.factory('ChangeListService', [
           AlertsService.clearWarnings();
           $log.error(
             'nonStrictValidationFailure: ' +
-            JSON.stringify(explorationChangeList));
+            JSON.stringify(explorationChange));
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
@@ -100,13 +100,13 @@ oppia.factory('ChangeListService', [
       );
     };
 
-    var addChange = function(changeDict) {
+    var addChange = function(change) {
       if ($rootScope.loadingMessage) {
         return;
       }
-      explorationChangeList.push(changeDict);
+      explorationChange.push(change);
       undoneChangeStack = [];
-      autosaveChangeListOnChange(explorationChangeList);
+      autosaveChangeListOnChange(explorationChange);
     };
 
     return {
@@ -136,7 +136,7 @@ oppia.factory('ChangeListService', [
         });
       },
       discardAllChanges: function() {
-        explorationChangeList = [];
+        explorationChange = [];
         undoneChangeStack = [];
         ExplorationDataService.discardDraft();
       },
@@ -187,10 +187,10 @@ oppia.factory('ChangeListService', [
         });
       },
       getChangeList: function() {
-        return angular.copy(explorationChangeList);
+        return angular.copy(explorationChange);
       },
       isExplorationLockedForEditing: function() {
-        return explorationChangeList.length > 0;
+        return explorationChange.length > 0;
       },
       /**
        * Initializes the current changeList with the one received from backend.
@@ -198,8 +198,8 @@ oppia.factory('ChangeListService', [
        *
        * @param {object} changeList - Autosaved changeList data
        */
-      loadAutosavedChangeList: function(changeList) {
-        explorationChangeList = changeList;
+      loadAutosavedChangeList: function(change) {
+        explorationChange = change;
       },
       /**
        * Saves a change dict that represents the renaming of a state. This
@@ -219,13 +219,13 @@ oppia.factory('ChangeListService', [
         });
       },
       undoLastChange: function() {
-        if (explorationChangeList.length === 0) {
+        if (explorationChange.length === 0) {
           AlertsService.addWarning('There are no changes to undo.');
           return;
         }
-        var lastChange = explorationChangeList.pop();
+        var lastChange = explorationChange.pop();
         undoneChangeStack.push(lastChange);
-        autosaveChangeListOnChange(explorationChangeList);
+        autosaveChangeListOnChange(explorationChange);
       }
     };
   }
