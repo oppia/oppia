@@ -27,8 +27,8 @@ class StoryModelTest(test_utils.GenericTestBase):
     def test_story_model(self):
         """Method to test the story model."""
 
-        committer_id = "test_committer_id"
-        commit_message = "test_commit_message"
+        committer_id = 'test_committer_id'
+        commit_message = 'test_commit_message'
         commit_cmds = [{'cmd': 'test_command'}]
 
         story_instance = story_models.StoryModel(
@@ -40,10 +40,10 @@ class StoryModelTest(test_utils.GenericTestBase):
 
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
-        self.assertEqual(story_by_id.description, "description")
-        self.assertEqual(story_by_id.id, "id")
-        self.assertEqual(story_by_id.notes, "notes")
-        self.assertEqual(story_by_id.language_code, "language_code")
+        self.assertEqual(story_by_id.description, 'description')
+        self.assertEqual(story_by_id.id, 'id')
+        self.assertEqual(story_by_id.notes, 'notes')
+        self.assertEqual(story_by_id.language_code, 'language_code')
         self.assertEqual(story_by_id.title, 'title')
 
 
@@ -65,7 +65,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
 
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
-        self.assertEqual(story_summary_by_id.description, "description")
+        self.assertEqual(story_summary_by_id.description, 'description')
         self.assertEqual(story_summary_by_id.title, 'title')
         self.assertEqual(story_summary_by_id.language_code, 'language_code')
         self.assertEqual(story_summary_by_id.node_count, 2)
