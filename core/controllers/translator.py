@@ -179,9 +179,10 @@ class TranslatorAutosaveHandler(base.BaseHandler):
 
 
 class ExplorationTranslationHandler(base.BaseHandler):
-    """Handles requests for exploration updation."""
+    """Handles requests for exploration translations. It returns json format
+    response when an exception is raised.
+    """
 
-    # Json format response by the handler when exception raised.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_translate_exploration
@@ -189,13 +190,12 @@ class ExplorationTranslationHandler(base.BaseHandler):
         """Updates properties of the given exploration.
 
         Args:
-            exploration_id: str. Id of exploration to be updated.
+            exploration_id: str. Id of exploration to be update.
 
         Raises:
-            InvalidInputException: If inputs are invalid for exploration
-            updation.
-            PageNotFoundException: If no exploration data exist for given
-            user_id and exploration_id.
+            InvalidInputException: Inputs are invalid for exploration update.
+            PageNotFoundException: No exploration data exist for given user id
+            and exploration id.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')

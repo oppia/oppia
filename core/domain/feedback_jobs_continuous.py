@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""continuous-computation jobs for feedback sysstem."""
+"""Continuous computation jobs for feedback system."""
 
 from core import jobs
 from core.domain import feedback_domain
@@ -59,17 +59,19 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """Get the realtime datastore class used by the realtime layer.
 
         Returns:
-            class. Datastore class used by the realtime layer, which should
-            subclass BaseRealtimeDatastoreClassForContinuousComputations.
+            FeedbackAnalyticsRealtimeModel. Datastore class used by the
+            realtime layer, which should subclass of
+            BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        """Get manager class.
+        """Get manager class for the continuously-running batch job.
 
         Returns:
-            class. Manager class for continuous-running batch job.
+            FeedbackAnalyticsMRJobManager. Manager class for continuous-running
+            batch job.
         """
         return FeedbackAnalyticsMRJobManager
 
