@@ -63,10 +63,10 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             node_count=2,
             version=1)
 
-        story_summary.put()
-        story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
-        self.assertEqual(story_summary_by_id.description, "description")
-        self.assertEqual(story_summary_by_id.title, 'title')
-        self.assertEqual(story_summary_by_id.language_code, 'language_code')
-        self.assertEqual(story_summary_by_id.node_count, 2)
-        self.assertEqual(story_summary_by_id.version, 1)
+        story_summary_model.put()
+        story_summary_model_by_id = story_models.StorySummaryModel.get_by_id('id')
+        self.assertEqual(story_summary_model_by_id.description, "description")
+        self.assertEqual(story_summary_model_by_id.title, 'title')
+        self.assertEqual(story_summary_model_by_id.language_code, 'language_code')
+        self.assertEqual(story_summary_model_by_id.node_count, 2)
+        self.assertEqual(story_summary_model_by_id.version, 1)
