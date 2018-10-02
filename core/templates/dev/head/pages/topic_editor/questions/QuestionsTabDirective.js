@@ -31,7 +31,7 @@ oppia.directive('questionsTab', [
         'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
-            TopicEditorStateService, UrlService
+            TopicEditorStateService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             SuggestionThreadObjectFactory,
