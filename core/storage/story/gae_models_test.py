@@ -53,7 +53,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     def test_story_summary_model(self):
         """Method to test the story_summary_model."""
 
-        story_summary = story_models.StorySummaryModel(
+        story_summary_model = story_models.StorySummaryModel(
             id='id',
             title='title',
             description='description',
