@@ -166,6 +166,9 @@ oppia.directive('storyNodeEditor', [
                 'chapter', 3000);
               return;
             }
+            $scope.nodeIdToTitleMap =
+              $scope.story.getStoryContents().getNodeIdsToTitleMap(
+                $scope.getDestinationNodeIds());
             $scope.newDestinationNodeTitle = '';
             $scope.closeNodeTitleEditor();
           };
