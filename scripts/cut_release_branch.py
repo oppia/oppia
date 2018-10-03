@@ -35,7 +35,7 @@ import common  # pylint: disable=relative-import
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
-    """Checks that the new version name matches the expected pattern.
+    r"""Checks that the new version name matches the expected pattern.
 
     Args:
         arg: str. The new version name.
