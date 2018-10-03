@@ -292,21 +292,18 @@ describe('Story update service', function() {
   );
 
   it('should remove/add a story node', function() {
+    expect(function() {
+      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    }).toThrow();
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
     StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
-    expect(function() {
-      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
-    }).toThrow();
-    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(1);
-    expect(
-      _sampleStory.getStoryContents().getNodes()[0].getId()).toEqual('node_2');
-    expect(
-      _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
-    ).toEqual([]);
+    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(function() {
       UndoRedoService.undoChange(_sampleStory);

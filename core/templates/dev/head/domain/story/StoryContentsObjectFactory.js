@@ -215,7 +215,11 @@ oppia.factory('StoryContentsObjectFactory', [
         throw Error('The node does not exist');
       }
       if (nodeId === this._initialNodeId) {
-        this._initialNodeId = null;
+        if (this._nodes.length === 1) {
+          this._initialNodeId = null;
+        } else {
+          throw Error('Cannot delete initial story node');          
+        }
       }
       for (var i = 0; i < this._nodes.length; i++) {
         if (this._nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
