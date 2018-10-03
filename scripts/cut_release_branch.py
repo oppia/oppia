@@ -39,7 +39,7 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
 
     Args:
         arg: str. The new version name.
-        pattern: RegularExpression: The pattern that release version should
+        pattern: RegularExpression. The pattern that release version should
         match. Default is re.compile(re'\d\.\d\.\d').
 
     Raises:
