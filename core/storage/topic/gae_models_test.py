@@ -27,10 +27,10 @@ import feconf
 
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
-    """Test the TopicModel class."""
+    """Tests the TopicModel class."""
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
-        """Test the _trusted_commit() method."""
+        """Tests the _trusted_commit() method."""
 
         # Topic is created but not committed/saved.
         topic = topic_models.TopicModel(
@@ -70,7 +70,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Test the TopicCommitLogEntryModel class."""
+    """Tests the TopicCommitLogEntryModel class."""
 
     def test__get_instance_id(self):
         # Calling create() method calls _get_instance (a protected method)
@@ -99,10 +99,10 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """Test the SubtopicPageModelUnitTest class."""
+    """Tests the SubtopicPageModelUnitTest class."""
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
-        """Test the _trusted_commit() method."""
+        """Tests the _trusted_commit() method."""
 
         # SubtopicPage is created but not committed/saved.
         subtopic_page = topic_models.SubtopicPageModel(
@@ -137,7 +137,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Test the SubtopicPageCommitLogEntryModel class."""
+    """Tests the SubtopicPageCommitLogEntryModel class."""
 
     def test__get_instance_id(self):
         # Calling create() method calls _get_instance (a protected method)
