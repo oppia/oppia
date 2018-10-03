@@ -11,8 +11,8 @@
   -->
 
 ## Checklist
-- [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes.
-- [ ] The PR explanation includes the words "Fixes #bugnum: ...". If this PR fixes part of an issue, prefix the title with "Fix part of #bugnum: ...".
+- [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes. (If this PR fixes part of an issue, prefix the title with "Fix part of #bugnum: ...".)
+- [ ] The PR explanation includes the words "Fixes #bugnum: ..." (or "Fixes part of #bugnum" if the PR only partially fixes an issue).
 - [ ] The linter/Karma presubmit checks have passed.
   - These should run automatically, but if not, you can manually trigger them locally using `python scripts/pre_commit_linter.py` and `bash scripts/run_frontend_tests.sh`.
 - [ ] The PR is made from a branch that's **not** called "develop".
