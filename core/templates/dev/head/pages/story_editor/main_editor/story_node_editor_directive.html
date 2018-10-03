@@ -42,7 +42,7 @@
   <md-card class="destination-node-id"
            ng-repeat="nodeId in getDestinationNodeIds()"
            ng-click="viewNodeEditor(nodeId)">
-    <[nodeId]>
+    <[nodeIdToTitleMap[nodeId]]>
     <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
       <i class="material-icons md-18">&#xE14C;</i>
     </span>
@@ -51,8 +51,8 @@
     + Add existing node.
   </md-card>
   <md-card class="destination-node-id" ng-if="nodeIdEditorIsShown" ng-click="openNodeIdEditor()">
-    <input type="text" ng-model="newDestinationNodeId">
-    <button class="btn btn-success" ng-click="addExistingDestinationNode(newDestinationNodeId)">
+    <input type="text" ng-model="newDestinationNodeTitle">
+    <button class="btn btn-success" ng-click="addExistingDestinationNode(newDestinationNodeTitle)">
       Save
     </button>
     <button class="btn btn-default" ng-click="closeNodeIdEditor()">

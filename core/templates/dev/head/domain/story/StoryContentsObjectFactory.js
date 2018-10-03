@@ -46,6 +46,27 @@ oppia.factory('StoryContentsObjectFactory', [
       return this._nodes;
     };
 
+    StoryContents.prototype.getNodeIdCorrespondingToTitle = function(title) {
+      var nodes = this._nodes;
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].getTitle() === title) {
+          return nodes[i].getId();
+        }
+      }
+      return null;
+    };
+
+    StoryContents.prototype.getNodeIdsToTitleMap = function(nodeIds) {
+      var nodes = this._nodes;
+      var nodeTitles = {};
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodeIds.indexOf(nodes[i].getId()) !== -1) {
+          nodeTitles[nodes[i].getId()] = nodes[i].getTitle();
+        }
+      }
+      return nodeTitles;
+    };
+
     StoryContents.prototype.validate = function() {
       var issues = [];
       var nodes = this._nodes;

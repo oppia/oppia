@@ -46,18 +46,15 @@
     </div>
     <div class="story-nodes-title">
       <label for="storyNodes" class="form-heading">Story Nodes</label>
-      <br>
-      Click on the check box to mark it as initial node
     </div>
-    <div class="story-node-editor">
-      <br>
+    <div class="story-node-editor" ng-if="nodes.length > 0">
       <div class="story-nodes-container">
         <div ng-repeat="node in nodes">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <[node.getId()]>
+              <[node.getTitle()]>
             </div>
             <span class="story-editor-initial-node">
               <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
@@ -74,7 +71,7 @@
         </div>
       </div>
       <div class="node-editor">
-        <div ng-repeat="node in nodes">
+        <div ng-if="nodes.length > 0" ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              outline="node.getOutline()"
@@ -85,6 +82,16 @@
         </div>
       </div>
     </div>
+    <div ng-if="nodes.length === 0" style="text-align: center;">
+      <p class="no-chapters-message" style="padding-top: 6px;">
+        This story has no chapters.
+      </p>
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+              style="color: white; text-decoration: none;"
+              ng-click="createNode()">
+        Create Chapter
+      </button>
+    </div>
   </md-card>
 </div>
 
@@ -93,6 +100,12 @@
     margin-left: 10%;
     margin-top: -1%;
     width: 80%;
+  }
+
+  story-editor .no-chapters-message {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
   }
 
   story-editor .story-editor-node {

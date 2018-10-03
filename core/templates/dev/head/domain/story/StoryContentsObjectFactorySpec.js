@@ -59,6 +59,16 @@ describe('Story contents object factory', function() {
     expect(_sampleStoryContents.getNodeIndex('node_10')).toEqual(-1);
   });
 
+  it('should correctly correctly return the id to title map for story ' +
+    'nodes', function() {
+    expect(
+      _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2'])
+    ).toEqual({
+      node_1: 'Title 1',
+      node_2: 'Title 2'
+    });
+  });
+
   it('should correctly correctly validate valid story contents', function() {
     expect(_sampleStoryContents.validate()).toEqual([]);
   });

@@ -26,11 +26,11 @@ oppia.directive('storyEditor', [
         '/pages/story_editor/main_editor/story_editor_directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR',
+        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
+            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -76,9 +76,54 @@ oppia.directive('storyEditor', [
             StoryUpdateService.deleteStoryNode($scope.story, nodeId);
           };
 
+          $scope.createNode = function() {
+            var nodeTitles = $scope.nodes.map(function(node) {
+              return node.getTitle();
+            });
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story_editor/main_editor/' +
+                'new_chapter_title_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.nodeTitle = '';
+                  $scope.nodeTitles = nodeTitles;
+                  $scope.errorMsg = null;
+
+                  $scope.resetErrorMsg = function() {
+                    $scope.errorMsg = null;
+                  };
+                  $scope.isNodeTitleEmpty = function(nodeTitle) {
+                    return (nodeTitle === '');
+                  };
+                  $scope.save = function(title) {
+                    if ($scope.nodeTitles.indexOf(title) !== -1) {
+                      $scope.errorMsg =
+                        'A chapter with this title already exists';
+                      return;
+                    }
+                    $uibModalInstance.close(title);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(title) {
+              StoryUpdateService.addStoryNode($scope.story, title);
+              _initEditor();
+            });
+          };
+
           $scope.NOTES_SCHEMA = {
             type: 'html',
-            ui_config: {}
+            ui_config: {
+              startupFocusEnabled: false
+            }
           };
 
           $scope.updateNotes = function(newNotes) {
