@@ -8,7 +8,11 @@ init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/g
 [MASTER]
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, scripts.custom_lint_checks
+load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.pylint_extensions
+
+string-quote=single
+triple-quote=double
+docstring-quote=double
 
 [BASIC]
 
