@@ -179,7 +179,7 @@ class TranslatorAutosaveHandler(base.BaseHandler):
 
 
 class ExplorationTranslationHandler(base.BaseHandler):
-    """Handles requests for exploration translations. It returns json format
+    """Handles updates to exploration translations. It returns json format
     response when an exception is raised.
     """
 
@@ -193,7 +193,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
             exploration_id: str. Id of exploration to be updated.
 
         Raises:
-            InvalidInputException: Inputs are invalid for exploration update.
+            InvalidInputException: The exploration update operation failed.
             PageNotFoundException: No exploration data exist for given user id
                 and exploration id.
         """
