@@ -132,7 +132,7 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
-    """This request handler wrapper directly serves UI pages 
+    """This request handler wrapper directly serves UI pages
     for MapReduce dashboards.
     """
     self.real_dispatch(*args, **kwargs)
