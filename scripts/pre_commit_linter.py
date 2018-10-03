@@ -1539,7 +1539,7 @@ def _check_for_unused_dependencies(all_files):
 
     js_files = []
     for filename in all_files:
-        if filename.endswith(".js"):
+        if filename.endswith('.js'):
             js_files.append(filename)
 
     patterns = [r'oppia\.controller\(\'.*?\', \[',
@@ -1569,7 +1569,7 @@ def _check_for_unused_dependencies(all_files):
                     compiled_pattern_for_imports.search(bracket_content))
                 if imports_match_obj is not None:
                     imports_string = imports_match_obj.groups()[0]
-                    imports_string_array = imports_string.split(",")
+                    imports_string_array = imports_string.split(',')
                     imports = []
                     for import_string in imports_string_array:
                         imports.append(import_string.replace('\'', '').strip())
@@ -1592,7 +1592,7 @@ def _check_for_unused_dependencies(all_files):
             failed = True
             print (('" %s " : These files are imported' +
                     ' but not used anywhere in this file : %s \n')
-                   % (", ".join(unused_imports), filename))
+                   % (', '.join(unused_imports), filename))
             count = count + 1
 
     if failed:
