@@ -1,18 +1,18 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
-    <div class="story-title">
-      <span ng-if="!storyTitleEditorIsShown" ng-click="openStoryTitleEditor()"
+    <div class="node-title">
+      <span ng-if="!nodeTitleEditorIsShown" ng-click="openNodeTitleEditor()"
             class="oppia-editable-section">
-        <strong class="form-heading"><[story.getTitle()]></strong>
+        <strong class="form-heading"><[currentTitle]></strong>
         <i class="material-icons oppia-editor-edit-icon"
-           title="Edit Story Title">&#xE254;
+           title="Edit Chapter Title">&#xE254;
         </i>
       </span>
-      <span ng-if="storyTitleEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateStoryTitle(editableTitle)">
+      <span ng-if="nodeTitleEditorIsShown">
+        <form class="form-horizontal" role="form" ng-submit="updateNodeTitle(editableTitle)">
           <input type="text" ng-model="editableTitle">
           <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeStoryTitleEditor()">Cancel</button>
+          <button class="btn btn-default btn-sm" ng-click="closeNodeTitleEditor()">Cancel</button>
         </form>
       </span>
     </div>
@@ -46,6 +46,7 @@
     </div>
     <div class="story-nodes-title">
       <label for="storyNodes" class="form-heading">Story Nodes</label>
+      <span ng-if="nodes.length > 0"> <i> (Click on check box to mark as initial node.)</i> </span>
     </div>
     <div class="story-node-editor" ng-if="nodes.length > 0">
       <div class="story-nodes-container">
@@ -71,7 +72,7 @@
         </div>
       </div>
       <div class="node-editor">
-        <div ng-if="nodes.length > 0" ng-repeat="node in nodes">
+        <div ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              outline="node.getOutline()"

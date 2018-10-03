@@ -47,17 +47,34 @@ oppia.directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap([
                 $scope.getId()
               ])[$scope.getId()];
+            $scope.titleEditorIsShown = false;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
-            $scope.outlineEditorIsShown = false;
-            $scope.nodeIdEditorIsShown = false;
+            $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
               ui_config: {
                 rows: 100
               }
             };
+          };
+
+          $scope.openTitleEditor = function() {
+            $scope.titleEditorIsShown = true;
+            $scope.editableTitle = $scope.currentTitle;
+          };
+
+          $scope.closeTitleEditor = function() {
+            $scope.titleEditorIsShown = false;
+            $scope.editableTitle = $scope.currentTitle;
+          };
+
+          $scope.updateTitle = function(newTitle) {
+            StoryUpdateService.setStoryNodeTitle(
+              $scope.story, $scope.getId(), newTitle);
+            $scope.currentTitle = newTitle;
+            $scope.closeTitleEditor();
           };
 
           $scope.viewNodeEditor = function(nodeId) {
@@ -150,7 +167,7 @@ oppia.directive('storyNodeEditor', [
               return;
             }
             $scope.newDestinationNodeTitle = '';
-            $scope.closeNodeIdEditor();
+            $scope.closeNodeTitleEditor();
           };
 
           $scope.removeDestinationNodeId = function(nodeId) {
@@ -158,22 +175,12 @@ oppia.directive('storyNodeEditor', [
               $scope.story, $scope.getId(), nodeId);
           };
 
-          $scope.openNodeIdEditor = function() {
-            $scope.nodeIdEditorIsShown = true;
+          $scope.openNodeTitleEditor = function() {
+            $scope.nodeTitleEditorIsShown = true;
           };
 
-          $scope.closeNodeIdEditor = function() {
-            $scope.nodeIdEditorIsShown = false;
-          };
-
-          $scope.openPreviewOutline = function(outline) {
-            $scope.outlineEditorIsShown = false;
-            $scope.editableOutline = outline;
-          };
-
-          $scope.closePreviewOutline = function(outline) {
-            $scope.outlineEditorIsShown = true;
-            $scope.editableOutline = outline;
+          $scope.closeNodeTitleEditor = function() {
+            $scope.nodeTitleEditorIsShown = false;
           };
 
           $scope.isOutlineModified = function(outline) {
@@ -186,7 +193,6 @@ oppia.directive('storyNodeEditor', [
             }
             StoryUpdateService.setStoryNodeOutline(
               $scope.story, $scope.getId(), newOutline);
-            $scope.openPreviewOutline(newOutline);
           };
 
           $scope.$on(EVENT_STORY_INITIALIZED, _init);

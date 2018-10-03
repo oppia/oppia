@@ -816,9 +816,7 @@ class Story(object):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         if node_id == self.story_contents.initial_node_id:
-            raise ValueError(
-                'The node with id %s is the starting node for the story, '
-                'change the starting node before deleting it.' % node_id)
+            self.story_contents.initial_node_id = None
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
                 node.destination_node_ids.remove(node_id)

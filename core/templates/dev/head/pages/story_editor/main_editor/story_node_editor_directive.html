@@ -1,70 +1,71 @@
 <div class="node-field">
+  <div class="story-node-title">
+    <span ng-if="!titleEditorIsShown" ng-click="openTitleEditor()"
+          class="oppia-editable-section">
+      <strong class="form-heading"><[currentTitle]></strong>
+      <i class="material-icons oppia-editor-edit-icon"
+         title="Edit Chapter Title">&#xE254;
+      </i>
+    </span>
+    <span ng-if="titleEditorIsShown">
+      <form class="form-horizontal" role="form" ng-submit="updateTitle(editableTitle)">
+        <input type="text" ng-model="editableTitle">
+        <button type="submit" class="btn btn-success btn-sm">Save</button>
+        <button class="btn btn-default btn-sm" ng-click="closeTitleEditor()">Cancel</button>
+      </form>
+    </span>
+  </div>
   <label> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input type="text" ng-model="explorationId">
     <button type="submit" class="btn btn-success btn-sm">Save</button>
   </form>
-  <label style="padding-top: 2em;"> Node Outline </label>
-  <div style="float: right;">
-     Outline Finalized
-    <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
-    <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+  <div class="node-field">
+    <label> Next Chapters </label>
+    <md-card class="destination-node-id"
+             ng-repeat="nodeId in getDestinationNodeIds()"
+             ng-click="viewNodeEditor(nodeId)">
+      <[nodeIdToTitleMap[nodeId]]>
+      <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+        <i class="material-icons md-18">&#xE14C;</i>
+      </span>
+    </md-card>
+    <md-card class="destination-node-id" ng-if="!nodeTitleEditorIsShown" ng-click="openNodeTitleEditor()">
+      + Add existing chapter.
+    </md-card>
+    <md-card class="destination-node-id" ng-if="nodeTitleEditorIsShown" ng-click="openNodeTitleEditor()">
+      <input type="text" ng-model="newDestinationNodeTitle" placeholder="Enter chapter title" autofocus>
+      <button class="btn btn-success" ng-click="addExistingDestinationNode(newDestinationNodeTitle)">
+        Save
+      </button>
+      <button class="btn btn-default" ng-click="closeNodeTitleEditor()">
+        Cancel
+      </button>
+    </md-card>
+    <md-card class="destination-node-id" ng-click="addNewDestinationNode()">
+      + Add a new chapter.
+    </md-card>
   </div>
-  <div ng-if="!outlineEditorIsShown">
-    <angular-html-bind html-data="editableOutline">
-    </angular-html-bind>
-    <button type="button"
-            class="btn btn-default save-button"
-            ng-click="closePreviewOutline(editableOutline)">
-      Edit
-    </button>
-  </div>
-  <div ng-if="outlineEditorIsShown">
-    <schema-based-editor schema="OUTLINE_SCHEMA"
-                         local-value="editableOutline">
-    </schema-based-editor>
-    <button type="button"
-            class="btn btn-success save-button"
-            ng-if="isOutlineModified(editableOutline)"
-            ng-click="updateOutline(editableOutline)">
-      Save
-    </button>
-    <button type="button"
-            class="btn btn-default save-button"
-            ng-if="!isOutlineModified(editableOutline)"
-            ng-click="openPreviewOutline(editableOutline)">
-      Preview
-    </button>
-  </div>
-</div>
-<div class="node-field">
-  <label> Destination Nodes </label>
-  <md-card class="destination-node-id"
-           ng-repeat="nodeId in getDestinationNodeIds()"
-           ng-click="viewNodeEditor(nodeId)">
-    <[nodeIdToTitleMap[nodeId]]>
-    <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-      <i class="material-icons md-18">&#xE14C;</i>
-    </span>
-  </md-card>
-  <md-card class="destination-node-id" ng-if="!nodeIdEditorIsShown" ng-click="openNodeIdEditor()">
-    + Add existing node.
-  </md-card>
-  <md-card class="destination-node-id" ng-if="nodeIdEditorIsShown" ng-click="openNodeIdEditor()">
-    <input type="text" ng-model="newDestinationNodeTitle">
-    <button class="btn btn-success" ng-click="addExistingDestinationNode(newDestinationNodeTitle)">
-      Save
-    </button>
-    <button class="btn btn-default" ng-click="closeNodeIdEditor()">
-      Cancel
-    </button>
-  </md-card>
-  <md-card class="destination-node-id" ng-click="addNewDestinationNode()">
-    + Create a new destination node.
-  </md-card>
+  <label style="padding-top: 2em;"> Node Outline </label> <br>
+  Outline Finalized
+  <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+  <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+  <schema-based-editor schema="OUTLINE_SCHEMA"
+                       local-value="editableOutline">
+  </schema-based-editor>
+  <button type="button"
+          class="btn btn-success save-button"
+          ng-disabled="!isOutlineModified(editableOutline)"
+          ng-click="updateOutline(editableOutline)">
+    Save
+  </button>
 </div>
 
 <style>
+  story-editor .story-node-title {
+    margin-bottom: 3%;
+  }
+
   story-editor .node-field {
     margin-top: 3%;
     height: auto;
