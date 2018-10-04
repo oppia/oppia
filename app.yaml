@@ -29,6 +29,13 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /sitemap.xml
+  static_files: assets/sitemap.xml
+  upload: assets/sitemap.xml
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=2592000'
+    Vary: Accept-Encoding
 - url: /build
   static_dir: build
   secure: always

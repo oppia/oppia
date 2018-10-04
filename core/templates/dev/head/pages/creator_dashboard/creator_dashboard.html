@@ -38,7 +38,12 @@
           <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <p ng-hide="!dashboardStats.num_ratings">
-            (by <[dashboardStats.num_ratings]> users)
+            <p ng-if="dashboardStats.num_ratings === 1">
+              (by <[dashboardStats.num_ratings]> user)
+            </p>
+            <p ng-if="dashboardStats.num_ratings > 1">
+              (by <[dashboardStats.num_ratings]> users)
+            </p>
           </p>
         </div>
         <div class="total-plays stats-card">
