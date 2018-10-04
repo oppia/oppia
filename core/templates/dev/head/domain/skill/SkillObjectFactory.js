@@ -153,22 +153,6 @@ oppia.factory('SkillObjectFactory', [
       return id + 1;
     };
 
-    Skill.prototype.setSupersedingSkillId = function(skillId) {
-      this._supersedingSkillId = skillId;
-    };
-
-    Skill.prototype.getSupersedingSkillId = function() {
-      return this._supersedingSkillId;
-    };
-
-    Skill.prototype.setAllQuestionsMerged = function(isAllQuestionsMerged) {
-      this._allQuestionsMerged = isAllQuestionsMerged;
-    };
-
-    Skill.prototype.getAllQuestionsMerged = function() {
-      return this._allQuestionsMerged;
-    };
-
     Skill.prototype.findMisconceptionById = function(id) {
       for (var idx in this._misconceptions) {
         if (this._misconceptions[idx].getId() === id) {
