@@ -38,9 +38,13 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
+        self.linked_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.linked_skill_id, self.admin_id, 'Description 3')
+        skill_services.publish_skill(self.linked_skill_id, self.admin_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
-            [], 1)
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
+            [self.linked_skill_id], [], 1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTest(
@@ -75,6 +79,11 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
             self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['mergeable_skill_summary_dicts'][0]['id'],
+                self.linked_skill_id)
+            self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
             self.assertEqual(
@@ -108,6 +117,11 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 json_response['topic_summary_dicts'][0]['id'], self.topic_id)
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
+            self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['mergeable_skill_summary_dicts'][0]['id'],
+                self.linked_skill_id)
             self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
@@ -198,5 +212,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
             topic = topic_services.get_topic_by_id(self.topic_id)
-            self.assertEqual(topic.uncategorized_skill_ids, [skill_id])
+            self.assertEqual(
+                topic.uncategorized_skill_ids,
+                [self.linked_skill_id, skill_id])
             self.logout()
