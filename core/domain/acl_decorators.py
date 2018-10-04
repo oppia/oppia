@@ -27,6 +27,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import urllib
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -1795,6 +1796,7 @@ def can_access_topic_viewer_page(handler):
         Returns:
             bool. Whether the user can access topic viewer page.
         """
+        topic_name = urllib.unquote(urllib.unquote(topic_name))
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:
