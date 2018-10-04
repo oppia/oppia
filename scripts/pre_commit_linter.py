@@ -1010,13 +1010,13 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
-                # Check for space after """ in the single line docstring
+                # Check for space after """ in the single line docstring.
                 if line.startswith('""" ') and line.endswith('"""'):
                     failed = True
                     print'%s --> Line %s: %s' % (
                         filename, line_num + 1, extra_space_message)
 
-                # Check for space after """ in the multi-line docstring
+                # Check for space after """ in the multi-line docstring.
                 elif line.endswith('""" '):
                     line = file_content[line_num - 1].lstrip().rstrip()
                     last_char_is_invalid = line[-1] not in (
