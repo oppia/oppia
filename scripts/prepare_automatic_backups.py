@@ -37,8 +37,8 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
     """Generating backup url of update content.
 
     Args:
-        cloud_storage_bucket_name.:  str. Name of cloud storage bucket name
-        module_class_names:  list. List of contaning modules class names
+        cloud_storage_bucket_name:  str. Name of cloud storage bucket name.
+        module_class_names:  list(str). List of module class names.
 
     Returns:
         str. Returns backup url.
@@ -57,7 +57,7 @@ def update_cron_dict(cron_dict):
     having yaml file content.
 
     Args:
-        cron_dict: dictionary. Content of yaml file in dictionary type
+        cron_dict: dict(str, str). Content of yaml file in dictionary type.
     """
     sys_args = sys.argv
     cloud_storage_bucket_name = sys_args[1]
@@ -95,7 +95,7 @@ def update_cron_dict(cron_dict):
 
 
 def get_cron_dict():
-    """Converts yaml file content from yaml to dict type..
+    """Converts yaml file content from yaml to dict type.
 
     Returns:
         dict(str, str). Returns yaml file content in dict format.
@@ -107,7 +107,7 @@ def save_cron_dict(cron_dict):
     """Converting dictionary content into yaml and saving into a yaml file.
 
     Args:
-        cron_dict: dictionary. It is the content of updated yaml file
+        cron_dict: dictionary. It is the content of updated yaml file.
     """
     with open(_CRON_YAML_FILE_NAME, 'wt') as cron_yaml_file:
         cron_yaml_file.write(utils.yaml_from_dict(cron_dict))
