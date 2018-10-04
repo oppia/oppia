@@ -156,7 +156,7 @@ oppia.directive('skillsList', [
                   $scope.done = function() {
                     $uibModalInstance.close(
                       {skill: skill,
-                        supersedingSkill: $scope.selectedSkill
+                        supersedingSkillId: $scope.selectedSkill.id
                       });
                   };
                   $scope.cancel = function() {
@@ -168,19 +168,21 @@ oppia.directive('skillsList', [
 
             modalInstance.result.then(function(result) {
               var skill = result.skill;
-              var supersedingSkill = result.supersedingSkill;
+              var supersedingSkillId = result.supersedingSkillId;
               var changeList = [{
                 cmd: 'update_skill_property',
                 property_name: 'superseding_skill_id',
                 old_value: '',
-                new_value: supersedingSkill.id
+                new_value: supersedingSkillId
               }];
               EditableSkillBackendApiService.updateSkill(
                 skill.id, skill.version,
                 'Added superseding skill id ' +
-                 supersedingSkill.id + ' to skill.',
+                 supersedingSkillId + ' to skill.',
                 changeList
               ).then(function() {
+                // Broadcast will update the skills so it will get the skill
+                // with updated superseding skill id 
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 // Start the transfer of questions from the old skill to
@@ -188,7 +190,7 @@ oppia.directive('skillsList', [
                 var mergeSkillUrl = MERGE_SKILL_URL;
                 var mergeSkillData = {
                   old_skill_id: skill.id,
-                  new_skill_id: supersedingSkill.id
+                  new_skill_id: supersedingSkillId
                 };
                 $http.post(mergeSkillUrl, mergeSkillData);
               });
