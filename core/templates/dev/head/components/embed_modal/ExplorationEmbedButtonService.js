@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-  '$uibModal', 'siteAnalyticsService', 'UrlInterpolationService',
-  function($uibModal, siteAnalyticsService, UrlInterpolationService) {
+  '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',
+  function($uibModal, SiteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
         $uibModal.open({
@@ -55,7 +55,7 @@ oppia.factory('ExplorationEmbedButtonService', [
           ]
         });
 
-        siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
+        SiteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
       }
     };
   }

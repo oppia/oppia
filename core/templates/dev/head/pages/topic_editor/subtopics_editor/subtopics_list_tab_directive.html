@@ -9,11 +9,18 @@
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
-        <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 20" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
-        <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 20" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,17)]>...</strong>
-        <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
-          <i class="material-icons md-18">&#xE14C;</i>
-        </span>
+        <div class="subtopic-header">
+          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
+          <div style="float: right;">
+            <span style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
+              <i class="material-icons md-18">edit</i>
+            </span>
+            <span style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+              <i class="material-icons md-18">&#xE14C;</i>
+            </span>
+          </div>
+        </div>
         <div style="min-height: 30vh; max-height: 30vh; overflow-y: auto;">
           <md-card class="skill-id"
                    ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
@@ -30,7 +37,6 @@
             </span>
           </md-card>
         </div>
-        <button class="btn btn-success" ng-click="editSubtopic(subtopic)"> Edit </button>
       </md-card>
       <md-card class="subtopic new" ng-click="createSubtopic()">
         <span>
@@ -108,6 +114,9 @@
     flex: 0 0 auto;
     position: relative;
   }
+  subtopics-list-tab .subtopic-header {
+    text-align: left;
+  }
   subtopics-list-tab .subtopic:hover {
     background-color: #f6f6f6;
   }
@@ -115,7 +124,7 @@
     background-color: white;
     border-width: 3px;
     border-style: dotted;
-    border-color: #a4a4a4;
+    border-color: #c3c3c3;
   }
   subtopics-list-tab .new:hover {
     background-color: #f1f1f1;
@@ -123,7 +132,6 @@
   subtopics-list-tab .new span {
     position: sticky;
     top: 40%;
-    left: 20%;
   }
   subtopics-list-tab .subtopics {
     background-color: white;

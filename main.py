@@ -256,6 +256,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
+        r'%s' % feconf.MERGE_SKILL_URL,
+        topics_and_skills_dashboard.MergeSkillHandler),
+    get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
 
@@ -269,10 +272,10 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        r'/imagehandler/<exploration_id>/assets/image/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
-        r'/audiohandler/<exploration_id>/audio/<filename>',
+        r'/audiohandler/<exploration_id>/assets/audio/<filename>',
         resources.AudioHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
