@@ -182,7 +182,7 @@ oppia.directive('skillsList', [
                 changeList
               ).then(function() {
                 // Broadcast will update the skills so it will get the skill
-                // with updated superseding skill id 
+                // with updated superseding skill id
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 // Start the transfer of questions from the old skill to
