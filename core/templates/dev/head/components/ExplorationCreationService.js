@@ -19,10 +19,10 @@
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$uibModal', '$timeout', '$rootScope', '$window',
-  'AlertsService', 'siteAnalyticsService', 'UrlInterpolationService',
+  'AlertsService', 'SiteAnalyticsService', 'UrlInterpolationService',
   function(
       $http, $uibModal, $timeout, $rootScope, $window,
-      AlertsService, siteAnalyticsService, UrlInterpolationService) {
+      AlertsService, SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -39,7 +39,7 @@ oppia.factory('ExplorationCreationService', [
 
         $http.post('/contributehandler/create_new', {
         }).then(function(response) {
-          siteAnalyticsService.registerCreateNewExplorationEvent(
+          SiteAnalyticsService.registerCreateNewExplorationEvent(
             response.data.explorationId);
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(

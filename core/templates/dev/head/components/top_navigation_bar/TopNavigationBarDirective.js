@@ -29,12 +29,12 @@ oppia.directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
+        'SiteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         'DeviceInfoService',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            siteAnalyticsService, WindowDimensionsService, DebouncerService,
+            SiteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
             $translate.use(GLOBALS.preferredSiteLanguageCode);
@@ -84,7 +84,7 @@ oppia.directive('topNavigationBar', [
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
 
           $scope.onLoginButtonClicked = function() {
-            siteAnalyticsService.registerStartLoginEvent('loginButton');
+            SiteAnalyticsService.registerStartLoginEvent('loginButton');
             $timeout(function() {
               $window.location = GLOBALS.loginUrl;
             }, 150);
