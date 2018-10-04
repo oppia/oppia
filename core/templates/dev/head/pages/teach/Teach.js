@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Teach', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      $scope, $timeout, $window, siteAnalyticsService,
+      $scope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService) {
     // Define constants
     $scope.TAB_ID_TEACH = 'teach';
@@ -64,7 +64,7 @@ oppia.controller('Teach', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.onApplyToTeachWithOppia = function() {
-      siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+      SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
       $timeout(function() {
         $window.location = $scope.TEACH_FORM_URL;
       }, 150);

@@ -18,16 +18,16 @@
 
 oppia.controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
-  'siteAnalyticsService', 'WindowDimensionsService',
+  'SiteAnalyticsService', 'WindowDimensionsService',
   function(
       $http, $scope, $timeout, $window, UrlInterpolationService,
-      siteAnalyticsService, WindowDimensionsService) {
+      SiteAnalyticsService, WindowDimensionsService) {
     $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
     $scope.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
 
     $scope.onDonateThroughAmazon = function() {
-      siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
+      SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
       $timeout(function() {
         $window.location = 'https://smile.amazon.com/ch/81-1740068';
       }, 150);
@@ -41,7 +41,7 @@ oppia.controller('Donate', [
       // a delay because cross-site POSTing is not permitted in scripts; see
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
       // for more information.
-      siteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+      SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
     };
   }
 ]);
