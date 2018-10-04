@@ -424,7 +424,7 @@ def _lint_css_files(
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        for error in stdout_list: 
+        for error in stdout_list:
             stdout.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
@@ -541,7 +541,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
     if are_there_errors:
         for error in pylint_list:
-            print(error)
+            print error
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
     else:
         result.put('%s   %s Python files linted (%.1f secs)' % (
