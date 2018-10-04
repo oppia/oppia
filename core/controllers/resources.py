@@ -40,7 +40,7 @@ class ValueGeneratorHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ImageHandler(base.BaseHandler):
+class ImageDevHandler(base.BaseHandler):
     """Handles image retrievals (only in dev -- in production, image files are
     served from GCS).
     """
@@ -48,18 +48,18 @@ class ImageHandler(base.BaseHandler):
     _IMAGE_PATH_PREFIX = 'image'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, filename):
+    def get(self, exploration_id, encoded_filepath):
         """Returns an image.
 
         Args:
             exploration_id: the id of the exploration.
-            filename: a string representing the image filepath. This
+            encoded_filepath: a string representing the image filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
         try:
-            filepath = urllib.unquote(filename)
+            filepath = urllib.unquote(encoded_filepath)
             file_format = filepath[(filepath.rfind('.') + 1):]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
@@ -79,7 +79,7 @@ class ImageHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class AudioHandler(base.BaseHandler):
+class AudioDevHandler(base.BaseHandler):
     """Handles audio retrievals (only in dev -- in production, audio files are
     served from GCS).
     """
@@ -87,17 +87,18 @@ class AudioHandler(base.BaseHandler):
     _AUDIO_PATH_PREFIX = 'audio'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, filename):
+    def get(self, exploration_id, encoded_filepath):
         """Returns an audio file.
 
         Args:
-            filename: a string representing the audio filepath. This
+            encoded_filepath: a string representing the audio filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
 
-        file_format = filename[(filename.rfind('.') + 1):]
+        filepath = urllib.unquote(encoded_filepath)
+        file_format = filepath[(filepath.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.
         self.response.headers['Content-Type'] = str(
@@ -107,7 +108,7 @@ class AudioHandler(base.BaseHandler):
             fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
 
         try:
-            raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filename))
+            raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filepath))
         except:
             raise self.PageNotFoundException
 
