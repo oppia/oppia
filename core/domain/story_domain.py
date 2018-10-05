@@ -273,7 +273,7 @@ class StoryNode(object):
 
         Args:
             node_id: str. The id of the node.
-            title:str. The title of the node.
+            title: str. The title of the node.
 
         Returns:
             StoryNode. The StoryNode domain object with default

@@ -15,7 +15,22 @@
       </form>
     </span>
   </div>
-  <label> Exploration ID </label>
+  <div>
+    <label> Chapter Outline </label> <br>
+    Outline Finalized
+    <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+    <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+    <schema-based-editor schema="OUTLINE_SCHEMA"
+                         local-value="editableOutline">
+    </schema-based-editor>
+    <button type="button"
+            class="btn btn-success save-button"
+            ng-disabled="!isOutlineModified(editableOutline)"
+            ng-click="updateOutline(editableOutline)">
+      Save
+    </button>
+  </div>
+  <label style="padding-top: 2em;"> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input type="text" ng-model="explorationId">
     <button type="submit" class="btn btn-success btn-sm">Save</button>
@@ -46,19 +61,6 @@
       + Add a new chapter.
     </md-card>
   </div>
-  <label style="padding-top: 2em;"> Node Outline </label> <br>
-  Outline Finalized
-  <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
-  <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
-  <schema-based-editor schema="OUTLINE_SCHEMA"
-                       local-value="editableOutline">
-  </schema-based-editor>
-  <button type="button"
-          class="btn btn-success save-button"
-          ng-disabled="!isOutlineModified(editableOutline)"
-          ng-click="updateOutline(editableOutline)">
-    Save
-  </button>
 </div>
 
 <style>

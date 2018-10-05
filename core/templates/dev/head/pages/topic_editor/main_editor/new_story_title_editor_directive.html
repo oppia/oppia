@@ -14,7 +14,7 @@
     </p>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-success" type="submit" ng-disabled="isStoryTitleEmpty(storyTitle)">
+    <button class="btn btn-success" type="submit" ng-disabled="isStoryTitleEmpty(storyTitle) || storyTitle.length >= 20">
       <span>Create Story</span>
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
