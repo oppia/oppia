@@ -40,11 +40,11 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
     Args:
         arg: str. The new version name.
         pattern: RegularExpression. The pattern that release version should
-        match. Default is re.compile(re'\d\.\d\.\d').
+            match. Default is re.compile(r'\d\.\d\.\d').
 
     Raises:
         argparse.ArgumentTypeError: The new version name does not match
-        the pattern.
+            the pattern.
 
     Returns:
         str. The new version name with correct pattern.
@@ -76,12 +76,12 @@ def _verify_target_branch_does_not_already_exist(remote_alias):
     remotely.
 
     Args:
-        remote_alias: The alias that points to the remote oppia repository.
+        remote_alias: str. The alias that points to the remote oppia repository.
 
     Raises:
         Exception: The target branch name already exists locally.
         Exception: The target branch name already exists on the remote
-        oppia repository.
+            oppia repository.
     """
 
     git_branch_output = subprocess.check_output(['git', 'branch'])
@@ -106,10 +106,10 @@ def _verify_target_version_is_consistent_with_latest_released_version():
         Exception: Could not parse version number of latest GitHub release.
         AssertionError: The previous and the current version are not the same.
         AssertionError: The current patch and the previous one plus one are not
-        the same.
+            the same.
         AssertionError: The current patch is greater or equal to 10.
         AssertionError: The current minor and the previous one plus one are not
-        the same.
+            the same.
         AssertionError: The current patch is different than 0.
     """
     response = urllib.urlopen(
