@@ -119,14 +119,6 @@ oppia.factory('SkillObjectFactory', [
       return this._description;
     };
 
-    Skill.prototype.getSupersedingSkillId = function() {
-      return this._supersedingSkillId;
-    };
-
-    Skill.prototype.getAllQuestionsMerged = function() {
-      return this._allQuestionsMerged;
-    };
-
     Skill.prototype.getId = function() {
       return this._id;
     };
