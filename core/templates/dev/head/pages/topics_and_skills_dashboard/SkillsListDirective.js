@@ -159,7 +159,7 @@ oppia.directive('skillsList', [
                   $scope.done = function() {
                     $uibModalInstance.close(
                       {skill: skill,
-                       supersedingSkillId: $scope.selectedSkill.id
+                        supersedingSkillId: $scope.selectedSkill.id
                       });
                   };
                   $scope.cancel = function() {
