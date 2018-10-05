@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <h3>Select the skill to merge into</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Merging into skill: <[selectedSkill.description]>
+  </p>
+  <div class="skills">
+    <skills-list skill-summaries="skillSummaries" in-modal="true"
+                 selected-skill="selectedSkill">
+    </skills-list>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-click="done()">Save</button>
+</div>

@@ -25,13 +25,13 @@ oppia.directive('questionsTab', [
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'TopicEditorStateService', 'QuestionCreationService',
+        'TopicEditorStateService', 'QuestionCreationService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
-            TopicEditorStateService, QuestionCreationService,
+            TopicEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
@@ -62,9 +62,7 @@ oppia.directive('questionsTab', [
               $scope.skillId, $scope.question.toBackendDict(true)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId(), function() {
-                  _initTab();
-                }
+                $scope.topic.getId()
               );
             });
           };
@@ -89,8 +87,12 @@ oppia.directive('questionsTab', [
                   $scope.selectedSkillId = null;
                   $scope.skillSummaries = allSkillSummaries;
 
-                  $scope.selectSkill = function(skillId) {
-                    $scope.selectedSkillId = skillId;
+                  $scope.selectOrDeselectSkill = function(skillId) {
+                    if (skillId === $scope.selectedSkillId) {
+                      $scope.selectedSkillId = null;
+                    } else {
+                      $scope.selectedSkillId = skillId;
+                    }
                   };
 
                   $scope.done = function() {
@@ -118,10 +120,55 @@ oppia.directive('questionsTab', [
                     QuestionObjectFactory.createDefaultQuestion();
                   $scope.questionId = $scope.question.getId();
                   $scope.questionStateData = $scope.question.getStateData();
-                  $scope.questionEditorIsShown = true;
+                  $scope.openQuestionEditor();
                 }, function(error) {
                   AlertsService.addWarning();
                 });
+            });
+          };
+
+          $scope.openQuestionEditor = function() {
+            var question = $scope.question;
+            var questionStateData = $scope.questionStateData;
+            var questionId = $scope.questionId;
+            var canEditQuestion = $scope.canEditQuestion;
+            var misconceptions = $scope.misconceptions;
+
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/questions/' +
+                'question_editor_modal_directive.html'),
+              backdrop: 'static',
+              keyboard: false,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.question = question;
+                  $scope.questionStateData = questionStateData;
+                  $scope.questionId = questionId;
+                  $scope.canEditQuestion = canEditQuestion;
+                  $scope.misconceptions = misconceptions;
+                  $scope.removeErrors = function() {
+                    $scope.validationError = null;
+                  };
+                  $scope.done = function() {
+                    $scope.validationError = $scope.question.validate(
+                      $scope.misconceptions);
+                    if ($scope.validationError) {
+                      return;
+                    }
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function() {
+              $scope.saveAndPublishQuestion();
             });
           };
 
@@ -131,7 +178,7 @@ oppia.directive('questionsTab', [
               '/suggestionlisthandler', {
                 params: {
                   target_type: 'topic',
-                  target_id: $scope.topic.getId(),
+                  target_id: UrlService.getTopicIdFromUrl(),
                   suggestion_type: 'add_question'
                 }
               }
@@ -139,7 +186,7 @@ oppia.directive('questionsTab', [
             var threadsPromise = $http.get(
               UrlInterpolationService.interpolateUrl(
                 '/threadlisthandlerfortopic/<topic_id>', {
-                  topic_id: $scope.topic.getId()
+                  topic_id: UrlService.getTopicIdFromUrl()
                 }));
             $q.all([suggestionsPromise, threadsPromise]).then(function(res) {
               var suggestionThreads = res[1].data.suggestion_thread_dicts;

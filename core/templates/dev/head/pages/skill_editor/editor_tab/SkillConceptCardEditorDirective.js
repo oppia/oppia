@@ -27,26 +27,35 @@ oppia.directive('skillConceptCardEditor', [
         '/pages/skill_editor/editor_tab/' +
         'skill_concept_card_editor_directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal',
-        function($scope, $filter, $uibModal) {
+        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
+        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
-          $scope.bindableFieldsDict = {
-            displayedConceptCardExplanation:
-              $scope.skill.getConceptCard().getExplanation(),
-            displayedWorkedExamples:
-              $scope.skill.getConceptCard().getWorkedExamples()
+
+          var initBindableFieldsDict = function() {
+            $scope.bindableFieldsDict = {
+              displayedConceptCardExplanation:
+                $scope.skill.getConceptCard().getExplanation(),
+              displayedWorkedExamples:
+                $scope.skill.getConceptCard().getWorkedExamples()
+            };
           };
+
           var explanationMemento = null;
           var workedExamplesMemento = null;
 
           $scope.isEditable = function() {
             return true;
           };
+
+          initBindableFieldsDict();
+          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+            initBindableFieldsDict();
+          });
 
           // When the page is scrolled so that the top of the page is above the
           // browser viewport, there are some bugs in the positioning of the
