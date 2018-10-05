@@ -18,8 +18,6 @@
 
 oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
 oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('SKILL_PROPERTY_SUPERSEDING_SKILL_ID', 'superseding_skill_id');
-oppia.constant('SKILL_PROPERTY_ALL_QUESTIONS_MERGED', 'all_questions_merged');
 oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
 oppia.constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
 oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
@@ -41,8 +39,7 @@ oppia.constant('CMD_DELETE_SKILL_MISCONCEPTION',
 oppia.factory('SkillUpdateService', [
   'SkillObjectFactory', 'ChangeObjectFactory',
   'UndoRedoService', 'SKILL_PROPERTY_DESCRIPTION',
-  'SKILL_PROPERTY_LANGUAGE_CODE', 'SKILL_PROPERTY_SUPERSEDING_SKILL_ID',
-  'SKILL_PROPERTY_ALL_QUESTIONS_MERGED', 'SKILL_CONTENTS_PROPERTY_EXPLANATION',
+  'SKILL_PROPERTY_LANGUAGE_CODE',  'SKILL_CONTENTS_PROPERTY_EXPLANATION',
   'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES',
@@ -53,8 +50,7 @@ oppia.factory('SkillUpdateService', [
   function(
       SkillObjectFactory, ChangeObjectFactory,
       UndoRedoService, SKILL_PROPERTY_DESCRIPTION,
-      SKILL_PROPERTY_LANGUAGE_CODE, SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
-      SKILL_PROPERTY_ALL_QUESTIONS_MERGED, SKILL_CONTENTS_PROPERTY_EXPLANATION,
+      SKILL_PROPERTY_LANGUAGE_CODE, SKILL_CONTENTS_PROPERTY_EXPLANATION,
       SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
       SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
@@ -116,34 +112,6 @@ oppia.factory('SkillUpdateService', [
             skill.setDescription(description);
           }, function(changeDict, skill) {
             skill.setDescription(oldDescription);
-          });
-      },
-
-      setSupersedingSkillId: function(skill, newSupersedingSkillId) {
-        var oldSuperSedingSkillId = skill.getSupersedingSkillId();
-        _applyPropertyChange(
-          skill, SKILL_PROPERTY_SUPERSEDING_SKILL_ID, newSupersedingSkillId,
-          oldSuperSedingSkillId,
-          function(changeDict, skill) {
-            var supersedingSkillId =
-              _getNewPropertyValueFromChangeDict(changeDict);
-            skill.setSupersedingSkillId(supersedingSkillId);
-          }, function(changeDict, skill) {
-            skill.setSupersedingSkillId(oldSuperSedingSkillId);
-          });
-      },
-
-      setAllQuestionsMerged: function(skill, newIsAllQuestionsMerged) {
-        var oldIsAllQuestionsMerged = skill.getAllQuestionsMerged();
-        _applyPropertyChange(
-          skill, SKILL_PROPERTY_ALL_QUESTIONS_MERGED, newIsAllQuestionsMerged,
-          oldIsAllQuestionsMerged,
-          function(changeDict, skill) {
-            var isAllQuestionsMerged =
-              _getNewPropertyValueFromChangeDict(changeDict);
-            skill.setIsAllQuestionsMerged(isAllQuestionsMerged);
-          }, function(changeDict, skill) {
-            skill.setIsAllQuestionsMerged(oldIsAllQuestionsMerged);
           });
       },
 

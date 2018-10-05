@@ -204,7 +204,7 @@ class MergeSkillHandler(base.BaseHandler):
         ]
         skill_services.update_skill(
             self.user_id, old_skill_id, changelist,
-            'Setting merge complete for skill.')
+            'Marking the skill as having being merged successfully.')
         self.render_json({
             'merged_into_skill': new_skill_id
         })

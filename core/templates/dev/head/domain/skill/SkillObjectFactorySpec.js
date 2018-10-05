@@ -115,20 +115,6 @@ describe('Skill object factory', function() {
       expect(skill.toBackendDict()).toEqual(skillDict);
     });
 
-    it('should set all questions merged', function() {
-      var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getAllQuestionsMerged()).toEqual(false);
-      skill.setAllQuestionsMerged(true);
-      expect(skill.getAllQuestionsMerged()).toEqual(true);
-    });
-
-    it('should set superseding skill id', function() {
-      var skill = SkillObjectFactory.createInterstitialSkill();
-      expect(skill.getSupersedingSkillId()).toEqual(null);
-      skill.setSupersedingSkillId('5');
-      expect(skill.getSupersedingSkillId()).toEqual('5');
-    });
-
     it('should be able to create an interstitial skill', function() {
       var skill = SkillObjectFactory.createInterstitialSkill();
       expect(skill.getId()).toEqual(null);
