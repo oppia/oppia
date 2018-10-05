@@ -25,7 +25,7 @@ from core.tests import test_utils
 class StoryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story models."""
     def test_story_model(self):
-        """Method to test the story model."""
+        """Method to test the StoryModel."""
 
         committer_id = 'test_committer_id'
         commit_message = 'test_commit_message'
@@ -37,9 +37,9 @@ class StoryModelTest(test_utils.GenericTestBase):
             description='description',
             notes='notes',
             language_code='language_code')
-
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
+
         self.assertEqual(story_by_id.description, 'description')
         self.assertEqual(story_by_id.id, 'id')
         self.assertEqual(story_by_id.notes, 'notes')
@@ -51,7 +51,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story summary models."""
 
     def test_story_summary_model(self):
-        """Method to test the story_summary_model."""
+        """Method to test the StorySummaryModel."""
 
         story_summary_model = story_models.StorySummaryModel(
             id='id',
@@ -62,9 +62,9 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             language_code='language_code',
             node_count=2,
             version=1)
-
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
+
         self.assertEqual(story_summary_by_id.description, 'description')
         self.assertEqual(story_summary_by_id.title, 'title')
         self.assertEqual(story_summary_by_id.language_code, 'language_code')
