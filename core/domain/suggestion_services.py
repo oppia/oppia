@@ -184,6 +184,7 @@ def mark_review_completed(suggestion, status, reviewer_id):
     _update_suggestion(suggestion)
 
 
+
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -275,6 +276,37 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)
+
+
+def reopen_rejected_suggestion(suggestion, summary_message, author_id):
+    """Resubmit the rejected suggestion.
+
+     Args:
+        suggestion: Suggestion. The rejected suggestion.
+        summary_message: str. The message provided by the author to
+            summarize new suggestion.
+        author_id: str. The ID of the author creating the suggestion.
+
+
+    Raises:
+        Exception: rejected suggestions can resubmit.
+    """
+    if not suggestion.is_handled:
+        raise Exception('The suggestion is not yet handled.')
+    if not suggestion.status != suggestion_models.STATUS_ACCEPTED:
+        raise Exception('The suggestion was accepted.' +
+                        'only rejected suggestions can resubmit')
+    if not summary_message:
+        raise Exception('Review message cannot be empty.')
+
+    suggestion.status = suggestion_models.STATUS_IN_REVIEW
+
+    _update_suggestion(suggestion)
+
+    thread_id = suggestion.suggestion_id
+    feedback_services.create_message(
+        thread_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
+        None, summary_message)
 
 
 def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
@@ -494,3 +526,11 @@ def update_position_in_rotation(score_category, user_id):
     """
     suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
         score_category, user_id)
+
+
+def check_can_edit_suggestion(suggestion_id, user_id):
+    """Checks whether the given user can edit the suggestion."""
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    return suggestion.author_id == user_id

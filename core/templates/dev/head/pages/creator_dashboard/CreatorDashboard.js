@@ -257,13 +257,20 @@ oppia.controller('CreatorDashboard', [
               'rejected.';
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
+            var ACTION_REOPEN_SUGGESTION = 'reopen';
+            var SUGGESTION_ACCEPTED = 'accepted';
+            var SUGGESTION_REJECTED = 'rejected';
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canReject = $scope.isNotHandled;
             $scope.canAccept = $scope.isNotHandled;
-
             if (!$scope.isNotHandled) {
-              $scope.errorMessage = (suggestionStatus === 'accepted') ?
-                SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
+              if (suggestionStatus === SUGGESTION_ACCEPTED){
+                $scope.errorMessage = SUGGESTION_ACCEPTED_MSG;
+                $scope.isSuggestionRejected = false;
+              } else {
+                $scope.errorMessage = SUGGESTION_REJECTED_MSG;
+                $scope.isSuggestionRejected = true;
+              }
             } else {
               $scope.errorMessage = '';
             }
@@ -272,7 +279,13 @@ oppia.controller('CreatorDashboard', [
             $scope.newContent = newContent;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
+            $scope.summaryMessage = null;
             $scope.canReviewActiveThread = canReviewActiveThread;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {newSuggestionHtml: newContent.html};
+            $scope.showEditor = false;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -288,22 +301,59 @@ oppia.controller('CreatorDashboard', [
                 reviewMessage: $scope.reviewMessage
               });
             };
-
+            $scope.editSuggestion = function(){
+              $scope.showEditor = true;
+            };
             $scope.cancelReview = function() {
               $uibModalInstance.dismiss();
+            };
+            $scope.showEditButton = function(){
+              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
+                !$scope.showEditor);
+            };
+            $scope.showResubmitButton = function(){
+              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
+                $scope.showEditor);
+            };
+            $scope.disableResubmitButton = function(){
+              return !($scope.summaryMessage &&
+                ($scope.suggestionData.newSuggestionHtml.trim() !==
+                  newContent.html.trim()));
+            };
+            $scope.cancelEditMode = function(){
+              $scope.showEditor = false;
+            };
+            $scope.submitChanges = function(){
+              $uibModalInstance.close({
+                action: ACTION_REOPEN_SUGGESTION,
+                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                summaryMessage: $scope.summaryMessage
+              });
             };
           }
         ]
       }).result.then(function(result) {
-        $http.put(
-          '/suggestionactionhandler/' +
-          $scope.activeThread.suggestion.targetType + '/' +
-          $scope.activeThread.suggestion.targetId + '/' +
-          $scope.activeThread.suggestion.suggestionId, {
+        var url, data;
+        if (result.action === 'reopen'){
+          url = '/suggestionactionhandler/reopen/' +
+            $scope.activeThread.suggestion.suggestionId;
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            new_suggestion_html: result.newSuggestionHtml
+          };
+        } else {
+          url = '/suggestionactionhandler/' +
+            $scope.activeThread.suggestion.targetType + '/' +
+            $scope.activeThread.suggestion.targetId + '/' +
+            $scope.activeThread.suggestion.suggestionId;
+          data = {
             action: result.action,
             commit_message: result.commitMessage,
             review_message: result.reviewMessage
-          }
+          };
+        }
+        $http.put(url, data
         ).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {

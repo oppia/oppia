@@ -876,6 +876,35 @@ def can_suggest_changes(handler):
     return test_can_suggest
 
 
+def can_edit_suggestion(handler):
+    """Decorator to check whether a use can edit a suggestion."""
+
+    def test_can_edit_suggestion(self, suggestion_id, **kwargs):
+        """Checks if the use can edit the given suggestion.
+
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to edit this suggestion.
+        """
+        if suggestion_services.check_can_edit_suggestion(
+                suggestion_id, self.user_id):
+            return handler(self, suggestion_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this suggestion.')
+    test_can_edit_suggestion.__wrapped__ = True
+
+    return test_can_edit_suggestion
+
+
 def can_publish_exploration(handler):
     """Decorator to check whether user can publish exploration."""
 

@@ -83,6 +83,36 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ReOpenSuggestionHandler(base.BaseHandler):
+    """Handler to Reopen a rejected suggestion."""
+
+    @acl_decorators.can_edit_suggestion
+    def put(self, suggestion_id):
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException('Invalid format for suggestion_id.'
+                                             ' It must contain 3 parts'
+                                             ' separated by \'.\'')
+
+        if (
+                suggestion_id.split('.')[0] !=
+                suggestion_models.TARGET_TYPE_EXPLORATION):
+            raise self.InvalidInputException('This handler allows actions only'
+                                             ' on suggestions to explorations.')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if not suggestion:
+            raise self.InvalidInputException(
+                'No suggestion found with given suggestion id')
+
+        change = suggestion.change
+        change.new_value['html'] = self.payload.get('new_suggestion_html')
+        suggestion.change = change
+        summary_message = self.payload.get('summary_message')
+        suggestion_services.reopen_rejected_suggestion(
+            suggestion, summary_message, self.user_id)
+        self.render_json(self.values)
+
+
 class SuggestionToTopicActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to topics."""
 
