@@ -181,6 +181,7 @@ class NewSkillHandler(base.BaseHandler):
 
 class MergeSkillHandler(base.BaseHandler):
     """Handles merging of the skills."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topics_and_skills_dashboard

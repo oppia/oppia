@@ -18,16 +18,10 @@
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
       </th>
     </tr>
-<<<<<<< HEAD
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
-        ng-click="isInModal() && selectSkill(skill)"
-        class="list-item">
-=======
-    <tr ng-repeat="skill in getSkillSummaries()"
         ng-click="isInModal() && selectSkill(skill)"
         class="list-item"
         ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
->>>>>>> upstream/develop
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
@@ -54,11 +48,7 @@
           <span> Merge Skill </span>
         </button>
       </td>
-<<<<<<< HEAD
-      <td ng-if="getEditableTopicSummaries().length > 0">
-=======
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
->>>>>>> upstream/develop
         <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
@@ -81,7 +71,7 @@
   skills-list .dashboard-table {
     display: block;
     font-size: 15px;
-    height: 250px;
+    max-height: 250px;
     overflow-y: scroll;
     width: 100%;
   }
