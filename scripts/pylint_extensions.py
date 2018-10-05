@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Implements custom pylint checkers for explicit keyword args, hanging
+indent, docstring parameters and import only modules.
+"""
+
 import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
