@@ -16,6 +16,8 @@
 
 """Decorators to provide authorization across the site."""
 
+import urllib
+
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -27,7 +29,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import urllib
 
 current_user_services = models.Registry.import_current_user_services()
 
