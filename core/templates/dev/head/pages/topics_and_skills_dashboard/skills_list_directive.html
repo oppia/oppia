@@ -18,27 +18,34 @@
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
       </th>
     </tr>
+<<<<<<< HEAD
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
         ng-click="isInModal() && selectSkill(skill)"
         class="list-item">
+=======
+    <tr ng-repeat="skill in getSkillSummaries()"
+        ng-click="isInModal() && selectSkill(skill)"
+        class="list-item"
+        ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
+>>>>>>> upstream/develop
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
@@ -47,7 +54,11 @@
           <span> Merge Skill </span>
         </button>
       </td>
+<<<<<<< HEAD
       <td ng-if="getEditableTopicSummaries().length > 0">
+=======
+      <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+>>>>>>> upstream/develop
         <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>

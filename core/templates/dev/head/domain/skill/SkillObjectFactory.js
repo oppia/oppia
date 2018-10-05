@@ -169,6 +169,14 @@ oppia.factory('SkillObjectFactory', [
       return id + 1;
     };
 
+    Skill.prototype.getSupersedingSkillId = function() {
+      return this._supersedingSkillId;
+    };
+
+    Skill.prototype.getAllQuestionsMerged = function() {
+      return this._allQuestionsMerged;
+    };
+
     Skill.prototype.findMisconceptionById = function(id) {
       for (var idx in this._misconceptions) {
         if (this._misconceptions[idx].getId() === id) {

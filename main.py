@@ -272,10 +272,10 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        r'/imagehandler/<exploration_id>/assets/image/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
-        r'/audiohandler/<exploration_id>/audio/<filename>',
+        r'/audiohandler/<exploration_id>/assets/audio/<filename>',
         resources.AudioHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',

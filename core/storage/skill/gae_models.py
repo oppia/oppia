@@ -71,13 +71,14 @@ class SkillModel(base_models.VersionedModel):
 
     @classmethod
     def get_merged_skills(cls):
-        """Returns the skills which have been merged.
+        """Returns the skill models which have been merged.
 
-        Returns: list(SkillModel). List of skills which have been merged
+        Returns: list(SkillModel). List of skill models which have been merged.
         """
 
-        return cls.query(
-            cls.all_questions_merged == True) # pylint: disable=singleton-comparison
+        return [skill for skill in cls.query() if (
+            skill.superseding_skill_id is not None and (
+                len(skill.superseding_skill_id) > 0))]
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

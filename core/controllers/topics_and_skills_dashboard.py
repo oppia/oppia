@@ -16,6 +16,7 @@
 are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
@@ -32,8 +33,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
-
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         self.values.update({
@@ -135,7 +135,7 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
         name = self.payload.get('name')
 
@@ -154,7 +154,7 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         description = self.payload.get('description')
@@ -186,12 +186,12 @@ class MergeSkillHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles the POST request."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        old_skill = self.payload.get('old_skill')
+        old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
         question_services.update_skill_ids_of_questions(
-            old_skill['id'], new_skill_id)
+            old_skill_id, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -202,9 +202,8 @@ class MergeSkillHandler(base.BaseHandler):
             })
         ]
         skill_services.update_skill(
-            self.user_id, old_skill['id'], changelist,
-            'Marking the skill as having being merged successfully.')
-
+            self.user_id, old_skill_id, changelist,
+            'Setting merge complete for skill.')
         self.render_json({
             'merged_into_skill': new_skill_id
         })

@@ -46,12 +46,12 @@ PADDING = 1
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
-    TEST_LEARNER_EMAIL = "test.learner@example.com"
-    TEST_LEARNER_USERNAME = "testlearneruser"
-    TEST_CREATOR_EMAIL = "test.creator@example.com"
-    TEST_CREATOR_USERNAME = "testcreatoruser"
-    TEST_EDITOR_EMAIL = "test.editor@example.com"
-    TEST_EDITOR_USERNAME = "testeditoruser"
+    TEST_LEARNER_EMAIL = 'test.learner@example.com'
+    TEST_LEARNER_USERNAME = 'testlearneruser'
+    TEST_CREATOR_EMAIL = 'test.creator@example.com'
+    TEST_CREATOR_USERNAME = 'testcreatoruser'
+    TEST_EDITOR_EMAIL = 'test.editor@example.com'
+    TEST_EDITOR_USERNAME = 'testeditoruser'
 
     def setUp(self):
         super(BaseHandlerTest, self).setUp()
