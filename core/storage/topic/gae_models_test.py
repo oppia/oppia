@@ -53,7 +53,9 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         )
         # Now we check that topic is not None and that actually
         # now topic exists, that means that commit() worked fine.
-        self.assertIsNotNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
+        self.assertIsNotNone(
+            topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
+        )
 
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
@@ -98,7 +100,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModelUnitTest class."""
-    SUBTOPIC_PAGE_ID='subtopic_page_id'
+    SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
