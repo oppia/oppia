@@ -40,7 +40,7 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
     Args:
         arg: str. The new version name.
         pattern: RegularExpression. The pattern that release version should
-            match. Default is re.compile(r'\d\.\d\.\d').
+            match. Default is r'\d\.\d\.\d'.
 
     Raises:
         argparse.ArgumentTypeError: The new version name does not match
@@ -105,11 +105,11 @@ def _verify_target_version_is_consistent_with_latest_released_version():
         Exception: Failed to fetch latest release info from GitHub.
         Exception: Could not parse version number of latest GitHub release.
         AssertionError: The previous and the current version are not the same.
-        AssertionError: The current patch and the previous one plus one are not
-            the same.
+        AssertionError: The current patch is not equal to previous patch plus
+            one.
         AssertionError: The current patch is greater or equal to 10.
-        AssertionError: The current minor and the previous one plus one are not
-            the same.
+        AssertionError: The current minor is not equal to previous minor plus
+            one.
         AssertionError: The current patch is different than 0.
     """
     response = urllib.urlopen(
@@ -141,7 +141,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
-    """Prepares, cuts, creates and pushes to GitHub the new release branch.
+    """Pushes the new release branch to Github.
 
     Raises:
          AssertionError: 'version: default' was not found in app.yaml
