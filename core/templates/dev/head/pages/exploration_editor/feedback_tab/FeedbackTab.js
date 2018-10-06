@@ -42,14 +42,8 @@ oppia.controller('FeedbackTab', [
     userInfoPromise.then(function(userInfo) {
       $scope.userIsLoggedIn = userInfo.user_is_logged_in;
     });
-    // Initial load of the thread list on page load.
-    $scope.clearActiveThread();
-    ThreadDataService.fetchFeedbackStats();
-    var threadPromise = ThreadDataService.fetchThreads();
-    $q.all(userInfoPromise, threadPromise).then(function() {
-      $rootScope.loadingMessage = '';
-    });
 
+    // Initial load of the thread list on page load.
     $scope.tmpMessage = {
       status: null,
       text: ''
@@ -59,11 +53,16 @@ oppia.controller('FeedbackTab', [
         $scope.activeThread.status : null;
       $scope.tmpMessage.text = '';
     };
-
     $scope.clearActiveThread = function() {
       $scope.activeThread = null;
       _resetTmpMessageFields();
     };
+    $scope.clearActiveThread();
+    ThreadDataService.fetchFeedbackStats();
+    var threadPromise = ThreadDataService.fetchThreads();
+    $q.all(userInfoPromise, threadPromise).then(function() {
+      $rootScope.loadingMessage = '';
+    });
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({

@@ -17,9 +17,9 @@
  */
 
 oppia.controller('Splash', [
-  '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UserService',
-  function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
+  function($scope, $rootScope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService, UserService) {
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
