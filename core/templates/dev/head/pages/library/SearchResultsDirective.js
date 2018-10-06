@@ -48,7 +48,7 @@ oppia.directive('searchResults', [
           });
 
           $scope.onRedirectToLogin = function(destinationUrl) {
-            siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+            SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
             $timeout(function() {
               $window.location = destinationUrl;
             }, 150);

@@ -14,6 +14,7 @@
 
 """Tests for the topic viewer page."""
 
+from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -57,14 +58,14 @@ class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
 class TopicViewerPage(BaseTopicViewerControllerTest):
 
     def test_any_user_can_access_topic_viewer_page(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
             self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
@@ -76,7 +77,7 @@ class TopicViewerPage(BaseTopicViewerControllerTest):
 class TopicPageDataHandler(BaseTopicViewerControllerTest):
 
     def test_get(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
             expected_dict = {

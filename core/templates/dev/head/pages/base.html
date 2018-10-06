@@ -40,6 +40,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Oppia is a free site for sharing knowledge via interactive lessons called explorations. Learn from user-created explorations, or teach and create your own.">
 
     <!-- Tiles for Internet Explorer. -->
     <meta name="application-name" content="<[siteName]>">
@@ -62,13 +63,11 @@
 
     <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
 
-    <!-- The title is bound to the rootScope. The content of the block
-    maintitle can be a string or a translation id. If it is a translation it
-    will be replaced by its translation when the page is loading. If it is a
-    string it would be displayed as is. This is the only way to translate
-    the page title because the head of the file is outside the scope of
-    any other controller. -->
-    <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
+    <title itemprop="name">
+      {% block maintitle %}
+        Oppia
+      {% endblock maintitle %}
+    </title>
     {% block base_url %}
     {% endblock base_url %}
 
@@ -199,6 +198,7 @@
     <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
     <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
     <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
+    <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 
     <script src="/templates/dev/head/components/alerts/AlertMessageDirective.js"></script>
     <script src="/templates/dev/head/components/create_button/CreateActivityButtonDirective.js"></script>

@@ -72,6 +72,9 @@ oppia.controller('CreatorDashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
+    var userDashboardDisplayPreference =
+      constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
+
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
@@ -203,12 +206,13 @@ oppia.controller('CreatorDashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.setMyExplorationsView = function(viewType) {
+    $scope.setMyExplorationsView = function(newViewType) {
       $http.post('/creatordashboardhandler/data', {
-        display_preference: viewType,
+        display_preference: newViewType,
       }).then(function() {
-        $scope.myExplorationsView = viewType;
+        $scope.myExplorationsView = newViewType;
       });
+      userDashboardDisplayPreference = newViewType;
     };
 
     $scope.checkMobileView = function() {
@@ -228,10 +232,17 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
+        // For mobile users, the view of the creators
+        // exploration list is shown only in
+        // the card view and can't be switched to list view.
         $scope.myExplorationsView = (
           constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
+        // For computer users or users operating in larger screen size
+        // the creator exploration list will come back to its previously
+        // selected view (card or list) when resized from mobile view
+        $scope.myExplorationsView = userDashboardDisplayPreference;
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
     };

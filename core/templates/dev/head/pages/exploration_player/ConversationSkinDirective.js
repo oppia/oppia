@@ -254,7 +254,7 @@ oppia.directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'LearnerParamsService', 'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
-        'StatsReportingService', 'siteAnalyticsService',
+        'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
@@ -280,7 +280,7 @@ oppia.directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             LearnerParamsService, ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
-            StatsReportingService, siteAnalyticsService,
+            StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
@@ -1035,7 +1035,7 @@ oppia.directive('conversationSkin', [
           }
 
           $scope.onNavigateFromIframe = function() {
-            siteAnalyticsService.registerVisitOppiaFromIframeEvent(
+            SiteAnalyticsService.registerVisitOppiaFromIframeEvent(
               $scope.explorationId);
           };
 

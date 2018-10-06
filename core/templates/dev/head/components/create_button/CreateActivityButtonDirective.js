@@ -42,7 +42,7 @@ oppia.directive('createActivityButton', [
             ExplorationCreationService.showUploadExplorationModal);
 
           $scope.onRedirectToLogin = function(destinationUrl) {
-            siteAnalyticsService.registerStartLoginEvent(
+            SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
             $timeout(function() {
               $window.location = destinationUrl;
