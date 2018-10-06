@@ -17,11 +17,11 @@
  */
 
 oppia.controller('Preferences', [
-  '$scope', '$http', '$rootScope', '$uibModal', '$timeout', '$translate',
+  '$scope', '$http', '$q', '$rootScope', '$uibModal', '$timeout', '$translate',
   'AlertsService', 'UrlInterpolationService', 'UserService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
-      $scope, $http, $rootScope, $uibModal, $timeout, $translate,
+      $scope, $http, $q, $rootScope, $uibModal, $timeout, $translate,
       AlertsService, UrlInterpolationService, UserService, UtilsService,
       DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
@@ -30,14 +30,34 @@ oppia.controller('Preferences', [
     $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
     $rootScope.loadingMessage = 'Loading';
-    $scope.userInfoLoaded = false;
-    $scope.preferencesLoaded = false;
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    var userInfoPromise = UserService.getUserInfoAsync();
+    userInfoPromise.then(function(userInfo) {
       $scope.username = userInfo.username;
-      $scope.userInfoLoaded = true;
-      if ($scope.preferencesLoaded) {
-        $rootScope.loadingMessage = '';
-      }
+    });
+
+    $scope.hasPageLoaded = false;
+    var preferencesPromise = $http.get(_PREFERENCES_DATA_URL);
+    preferencesPromise.then(function(response) {
+      var data = response.data;
+      $scope.userBio = data.user_bio;
+      $scope.subjectInterests = data.subject_interests;
+      $scope.preferredLanguageCodes = data.preferred_language_codes;
+      $scope.profilePictureDataUrl = data.profile_picture_data_url;
+      $scope.defaultDashboard = data.default_dashboard;
+      $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
+      $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+      $scope.canReceiveSubscriptionEmail = data.can_receive_subscription_email;
+      $scope.canReceiveFeedbackMessageEmail = (
+        data.can_receive_feedback_message_email);
+      $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+      $scope.preferredAudioLanguageCode = data.preferred_audio_language_code;
+      $scope.subscriptionList = data.subscription_list;
+      $scope.hasPageLoaded = true;
+      _forceSelect2Refresh();
+    });
+
+    $q.all(userInfoPromise, preferencesPromise).then(function() {
+      $rootScope.loadingMessage = '';
     });
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -218,29 +238,5 @@ oppia.controller('Preferences', [
 
     $scope.SITE_LANGUAGE_CHOICES = constants.SUPPORTED_SITE_LANGUAGES;
     $scope.AUDIO_LANGUAGE_CHOICES = constants.SUPPORTED_AUDIO_LANGUAGES;
-
-    $scope.hasPageLoaded = false;
-    $http.get(_PREFERENCES_DATA_URL).then(function(response) {
-      var data = response.data;
-      $scope.preferencesLoaded = true;
-      if ($scope.userInfoLoaded) {
-        $rootScope.loadingMessage = '';
-      }
-      $scope.userBio = data.user_bio;
-      $scope.subjectInterests = data.subject_interests;
-      $scope.preferredLanguageCodes = data.preferred_language_codes;
-      $scope.profilePictureDataUrl = data.profile_picture_data_url;
-      $scope.defaultDashboard = data.default_dashboard;
-      $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
-      $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
-      $scope.canReceiveSubscriptionEmail = data.can_receive_subscription_email;
-      $scope.canReceiveFeedbackMessageEmail = (
-        data.can_receive_feedback_message_email);
-      $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
-      $scope.preferredAudioLanguageCode = data.preferred_audio_language_code;
-      $scope.subscriptionList = data.subscription_list;
-      $scope.hasPageLoaded = true;
-      _forceSelect2Refresh();
-    });
   }
 ]);

@@ -17,14 +17,14 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
-  'DateTimeFormatService', 'ThreadStatusDisplayService',
+  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
+  'AlertsService', 'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
-      DateTimeFormatService, ThreadStatusDisplayService,
+      $scope, $http, $q, $uibModal, $timeout, $rootScope,
+      AlertsService, DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
       UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
@@ -38,15 +38,18 @@ oppia.controller('FeedbackTab', [
 
     $scope.activeThread = null;
     $rootScope.loadingMessage = 'Loading';
-    $scope.userInfoLoaded = false;
-    $scope.threadsLoaded = false;
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    var userInfoPromise = UserService.getUserInfoAsync();
+    userInfoPromise.then(function(userInfo) {
       $scope.userIsLoggedIn = userInfo.user_is_logged_in;
-      $scope.userInfoLoaded = true;
-      if ($scope.threadsLoaded) {
-        $rootScope.loadingMessage = '';
-      }
     });
+    // Initial load of the thread list on page load.
+    $scope.clearActiveThread();
+    ThreadDataService.fetchFeedbackStats();
+    var threadPromise = ThreadDataService.fetchThreads();
+    $q.all(userInfoPromise, threadPromise).then(function() {
+      $rootScope.loadingMessage = '';
+    });
+
     $scope.tmpMessage = {
       status: null,
       text: ''
@@ -289,17 +292,5 @@ oppia.controller('FeedbackTab', [
       }
       $scope.tmpMessage.status = $scope.activeThread.status;
     };
-
-    // Initial load of the thread list on page load.
-    $scope.clearActiveThread();
-    ThreadDataService.fetchFeedbackStats();
-    ThreadDataService.fetchThreads(function() {
-      $timeout(function() {
-        $scope.threadsLoaded = true;
-        if ($scope.userInfoLoaded) {
-          $rootScope.loadingMessage = '';
-        }
-      }, 500);
-    });
   }
 ]);

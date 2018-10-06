@@ -125,6 +125,8 @@ oppia.controller('Library', [
                 });
                 $rootScope.loadingMessage = '';
               });
+          } else {
+            $rootScope.loadingMessage = '';
           }
         });
 

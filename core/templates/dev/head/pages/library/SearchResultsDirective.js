@@ -17,40 +17,35 @@
  */
 
 oppia.directive('searchResults', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', '$q', function(UrlInterpolationService, $q) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/search_results_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
-        'UserService',
-        function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
-            UserService) {
+        '$scope', '$rootScope', '$q', '$timeout', '$window',
+        'siteAnalyticsService', 'UserService',
+        function($scope, $rootScope, $q, $timeout, $window,
+            siteAnalyticsService, UserService) {
           $scope.someResultsExist = true;
 
           $rootScope.loadingMessage = 'Loading';
-          $scope.userInfoLoaded = false;
-          $scope.searchResultsLoaded = false;
-          UserService.getUserInfoAsync().then(function(userInfo) {
+          var userInfoPromise = UserService.getUserInfoAsync();
+          userInfoPromise.then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.user_is_logged_in;
-            $scope.userInfoLoaded = true;
-            if ($scope.searchResultsLoaded) {
-              $rootScope.loadingMessage = '';
-            }
           });
 
           // Called when the first batch of search results is retrieved from the
           // server.
-          $scope.$on(
+          var searchResultsPromise = $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
               $scope.someResultsExist = activityList.length > 0;
-              $scope.searchResultsLoaded = true;
-              if ($scope.userInfoLoaded) {
-                $rootScope.loadingMessage = '';
-              }
             }
           );
+
+          $q.all(userInfoPromise, searchResultsPromise).then(function() {
+            $rootScope.loadingMessage = '';
+          });
 
           $scope.onRedirectToLogin = function(destinationUrl) {
             siteAnalyticsService.registerStartLoginEvent('noSearchResults');
