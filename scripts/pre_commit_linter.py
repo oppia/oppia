@@ -1016,7 +1016,7 @@ def _check_docstrings(all_files):
                     print'%s --> Line %s: %s' % (
                         filename, line_num + 1, extra_space_message)
 
-                # Check for space after """ in the multi-line docstring.
+                # Check for space before  """ in the multi-line docstring.
                 elif line.endswith(' """'):
                     print'%s --> Line %s: %s' % (
                         filename, line_num + 1, extra_space_message)
