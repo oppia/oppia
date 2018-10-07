@@ -215,6 +215,17 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def prepare_map(cls, item):
         # pylint: disable=too-many-return-statements
+        """Prepares the map for different statistic models.
+
+        Args:
+            item: StateCompleteEventLogEntryModel. The model instance for
+                StateCompleteEventLogEntryModel class.
+
+        Returns:
+            str. The exploration id corresponding to the item.
+            dict(str, str). The dict containing information about the event
+                associated with the map.
+        """
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -303,6 +314,22 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def prepare_reduce(cls, exp_id, values):
+        """Prepares the reduce for different statistic models of the given
+        exploration id.
+
+        Args:
+            exp_id: str. The exploration id.
+            values: list(dict(str, str)). List of dicts of of events for
+                preparing the reduce.
+
+        Returns:
+            list(dict(str, str)). List of dicts of different version-wise
+                ExplorationStats.
+            list(ExplorationStats). List of ExplorationStats domain class
+                instances.
+            list(str). All the errors that occured during the preparation of
+                reduce.
+        """
         values = map(ast.literal_eval, values)
         error_messages = []
 
