@@ -3,7 +3,7 @@
 </div>
 
 <div class="modal-body">
-  <section ng-class="['oppia-suggestion-review-container',{'oppia-edit-mode':showEditor}]">
+  <section ng-class="['oppia-suggestion-review-container',{'oppia-edit-mode':showSuggestionEditor}]">
     <div class="oppia-suggestion-review-panel-container" style="float: left;">
       <strong>Current:</strong>
       <div class="oppia-suggestion-review-panel">
@@ -14,11 +14,11 @@
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel" ng-show="!showEditor">
+      <div class="oppia-suggestion-review-panel" ng-show="!showSuggestionEditor">
         <angular-html-bind html-data="newContent.html">
         </angular-html-bind>
       </div>
-      <div ng-show="showEditor">
+      <div ng-show="showSuggestionEditor">
         <ck-editor-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-rte>
         <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
@@ -38,7 +38,7 @@
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
   <button class="btn btn-info" ng-if="showEditButton()" ng-click="editSuggestion()">Edit</button>
-  <button class="btn btn-primary" ng-disabled="disableResubmitButton()" ng-if="showResubmitButton()" ng-click="submitChanges()">Submit Changes</button>
+  <button class="btn btn-primary" ng-disabled="disableResubmitButton()" ng-if="showResubmitButton()" ng-click="resubmitChanges()">Submit Changes</button>
   <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
 </div>

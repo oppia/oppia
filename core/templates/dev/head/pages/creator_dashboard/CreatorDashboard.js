@@ -242,22 +242,25 @@ oppia.controller('CreatorDashboard', [
           },
           canReviewActiveThread: function() {
             return $scope.canReviewActiveThread;
+          },
+          stateName: function(){
+            return $scope.activeThread.suggestion.stateName;
           }
         },
         controller: [
           '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionStatus', 'description', 'oldContent',
-          'newContent', 'canReviewActiveThread', function(
+          'newContent', 'canReviewActiveThread', 'stateName', function(
               $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
-              newContent, canReviewActiveThread) {
+              newContent, canReviewActiveThread, stateName) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
               'rejected.';
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
-            var ACTION_REOPEN_SUGGESTION = 'reopen';
+            var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
             var SUGGESTION_ACCEPTED = 'accepted';
             var SUGGESTION_REJECTED = 'rejected';
             $scope.isNotHandled = !suggestionIsHandled;
@@ -277,6 +280,7 @@ oppia.controller('CreatorDashboard', [
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
+            $scope.stateName = stateName;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
             $scope.summaryMessage = null;
@@ -285,7 +289,7 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $scope.showEditor = false;
+            $scope.showSuggestionEditor = false;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -302,18 +306,18 @@ oppia.controller('CreatorDashboard', [
               });
             };
             $scope.editSuggestion = function(){
-              $scope.showEditor = true;
+              $scope.showSuggestionEditor = true;
             };
             $scope.cancelReview = function() {
               $uibModalInstance.dismiss();
             };
             $scope.showEditButton = function(){
               return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                !$scope.showEditor);
+                !$scope.showSuggestionEditor);
             };
             $scope.showResubmitButton = function(){
               return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                $scope.showEditor);
+                $scope.showSuggestionEditor);
             };
             $scope.disableResubmitButton = function(){
               return !($scope.summaryMessage &&
@@ -321,26 +325,36 @@ oppia.controller('CreatorDashboard', [
                   newContent.html.trim()));
             };
             $scope.cancelEditMode = function(){
-              $scope.showEditor = false;
+              $scope.showSuggestionEditor = false;
             };
-            $scope.submitChanges = function(){
+            $scope.resubmitChanges = function(){
               $uibModalInstance.close({
-                action: ACTION_REOPEN_SUGGESTION,
+                action: ACTION_RESUBMIT_SUGGESTION,
                 newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
-                summaryMessage: $scope.summaryMessage
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                oldContent: $scope.oldContent
               });
             };
           }
         ]
       }).result.then(function(result) {
         var url, data;
-        if (result.action === 'reopen'){
-          url = '/suggestionactionhandler/reopen/' +
+        if (result.action === 'resubmit'){
+          url = '/suggestionactionhandler/resubmit/' +
             $scope.activeThread.suggestion.suggestionId;
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
-            new_suggestion_html: result.newSuggestionHtml
+            change: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: result.stateName,
+              old_value: result.oldContent,
+              new_value: {
+                html: result.newSuggestionHtml
+              }
+            }
           };
         } else {
           url = '/suggestionactionhandler/' +
@@ -353,8 +367,7 @@ oppia.controller('CreatorDashboard', [
             review_message: result.reviewMessage
           };
         }
-        $http.put(url, data
-        ).then(function() {
+        $http.put(url, data).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
               $scope.suggestionsToReviewList.splice(i, 1);

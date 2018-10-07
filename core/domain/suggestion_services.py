@@ -184,7 +184,6 @@ def mark_review_completed(suggestion, status, reviewer_id):
     _update_suggestion(suggestion)
 
 
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -278,8 +277,8 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         None, review_message)
 
 
-def reopen_rejected_suggestion(suggestion, summary_message, author_id):
-    """Resubmit the rejected suggestion.
+def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
+    """Resubmit a rejected suggestion.
 
      Args:
         suggestion: Suggestion. The rejected suggestion.
@@ -289,18 +288,17 @@ def reopen_rejected_suggestion(suggestion, summary_message, author_id):
 
 
     Raises:
-        Exception: rejected suggestions can resubmit.
+        Exception: Only rejected suggestions can be resubmitted.
     """
+    if not summary_message:
+        raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
         raise Exception('The suggestion is not yet handled.')
-    if not suggestion.status != suggestion_models.STATUS_ACCEPTED:
+    if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception('The suggestion was accepted.' +
-                        'only rejected suggestions can resubmit')
-    if not summary_message:
-        raise Exception('Review message cannot be empty.')
+                        'only rejected suggestions can be resubmitted.')
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
-
     _update_suggestion(suggestion)
 
     thread_id = suggestion.suggestion_id
@@ -528,8 +526,8 @@ def update_position_in_rotation(score_category, user_id):
         score_category, user_id)
 
 
-def check_can_edit_suggestion(suggestion_id, user_id):
-    """Checks whether the given user can edit the suggestion."""
+def check_can_resubmit_suggestion(suggestion_id, user_id):
+    """Checks whether the given user can resubmit the suggestion."""
 
     suggestion = get_suggestion_by_id(suggestion_id)
 

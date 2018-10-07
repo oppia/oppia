@@ -876,10 +876,10 @@ def can_suggest_changes(handler):
     return test_can_suggest
 
 
-def can_edit_suggestion(handler):
+def can_resubmit_suggestion(handler):
     """Decorator to check whether a use can edit a suggestion."""
 
-    def test_can_edit_suggestion(self, suggestion_id, **kwargs):
+    def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
         """Checks if the use can edit the given suggestion.
 
 
@@ -894,15 +894,15 @@ def can_edit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit this suggestion.
         """
-        if suggestion_services.check_can_edit_suggestion(
+        if suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this suggestion.')
-    test_can_edit_suggestion.__wrapped__ = True
+    test_can_resubmit_suggestion.__wrapped__ = True
 
-    return test_can_edit_suggestion
+    return test_can_resubmit_suggestion
 
 
 def can_publish_exploration(handler):

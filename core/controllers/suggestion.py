@@ -19,6 +19,7 @@
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import exp_domain
 from core.domain import suggestion_services
 from core.platform import models
 
@@ -83,10 +84,10 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ReOpenSuggestionHandler(base.BaseHandler):
+class ReSubmitSuggestionHandler(base.BaseHandler):
     """Handler to Reopen a rejected suggestion."""
 
-    @acl_decorators.can_edit_suggestion
+    @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException('Invalid format for suggestion_id.'
@@ -103,12 +104,16 @@ class ReOpenSuggestionHandler(base.BaseHandler):
         if not suggestion:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
-
-        change = suggestion.change
-        change.new_value['html'] = self.payload.get('new_suggestion_html')
-        suggestion.change = change
+        old_change = suggestion.change.__dict__
+        new_change = self.payload.get('change')
+        if (
+                new_change['cmd'] != old_change['cmd'] or
+                old_change['property_name'] != new_change['property_name'] or
+                old_change['state_name'] != new_change['state_name']):
+            raise self.InvalidInputException('Invalid change dict.')
+        suggestion.change = exp_domain.ExplorationChange(new_change)
         summary_message = self.payload.get('summary_message')
-        suggestion_services.reopen_rejected_suggestion(
+        suggestion_services.resubmit_rejected_suggestion(
             suggestion, summary_message, self.user_id)
         self.render_json(self.values)
 
