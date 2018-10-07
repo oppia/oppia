@@ -181,6 +181,7 @@ class NewSkillHandler(base.BaseHandler):
 
 class MergeSkillHandler(base.BaseHandler):
     """Handles merging of the skills."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topics_and_skills_dashboard
@@ -203,8 +204,7 @@ class MergeSkillHandler(base.BaseHandler):
         ]
         skill_services.update_skill(
             self.user_id, old_skill_id, changelist,
-            'Setting merge complete for skill.')
-
+            'Marking the skill as having being merged successfully.')
         self.render_json({
             'merged_into_skill': new_skill_id
         })
