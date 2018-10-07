@@ -877,7 +877,7 @@ def can_suggest_changes(handler):
 
 
 def can_resubmit_suggestion(handler):
-    """Decorator to check whether a use can edit a suggestion."""
+    """Decorator to check whether a user can resubmit a suggestion."""
 
     def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
         """Checks if the use can edit the given suggestion.
@@ -899,7 +899,7 @@ def can_resubmit_suggestion(handler):
             return handler(self, suggestion_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to edit this suggestion.')
+                'You do not have credentials to resubmit this suggestion.')
     test_can_resubmit_suggestion.__wrapped__ = True
 
     return test_can_resubmit_suggestion
