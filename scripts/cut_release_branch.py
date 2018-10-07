@@ -35,12 +35,12 @@ import common  # pylint: disable=relative-import
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
-    r"""Checks that the new version name matches the expected pattern.
+    """Checks that the new version name matches the expected pattern.
 
     Args:
         arg: str. The new version name.
         pattern: RegularExpression. The pattern that release version should
-            match. Default is r'\d\.\d\.\d'.
+            match.
 
     Raises:
         argparse.ArgumentTypeError: The new version name does not match
@@ -76,7 +76,11 @@ def _verify_target_branch_does_not_already_exist(remote_alias):
     remotely.
 
     Args:
-        remote_alias: str. The alias that points to the remote oppia repository.
+        remote_alias: str. The alias that points to the remote oppia
+            repository. Example: When calling git remote -v, you get:
+            upstream    https://github.com/oppia/oppia.git (fetch),
+            where 'upstream' is the alias that points to the remote oppia
+            repository.
 
     Raises:
         Exception: The target branch name already exists locally.
@@ -104,13 +108,14 @@ def _verify_target_version_is_consistent_with_latest_released_version():
     Raises:
         Exception: Failed to fetch latest release info from GitHub.
         Exception: Could not parse version number of latest GitHub release.
-        AssertionError: The previous and the current version are not the same.
-        AssertionError: The current patch is not equal to previous patch plus
-            one.
-        AssertionError: The current patch is greater or equal to 10.
-        AssertionError: The current minor is not equal to previous minor plus
-            one.
-        AssertionError: The current patch is different than 0.
+        AssertionError: The previous and the current major version are not the
+            same.
+        AssertionError: The current patch version is not equal to previous patch
+            version plus one.
+        AssertionError: The current patch version is greater or equal to 10.
+        AssertionError: The current minor version is not equal to previous
+            minor version plus one.
+        AssertionError: The current patch version is different than 0.
     """
     response = urllib.urlopen(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
