@@ -201,6 +201,23 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
+def get_topics_by_ids(topic_ids):
+    """Returns a list of topics matching the IDs provided.
+
+    Args:
+        topic_ids: list(str). List of IDs to get topics for.
+
+    Returns:
+        list(Topic|None). The list of topics corresponding to given ids
+            (with None in place of topic ids corresponding to deleted topics).
+    """
+    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
+    topics = [
+        get_topic_from_model(topic_model) if topic_model is not None else None
+        for topic_model in all_topic_models]
+    return topics
+
+
 def get_topic_by_name(topic_name):
     """Returns a domain object representing a topic.
 
@@ -212,7 +229,6 @@ def get_topic_by_name(topic_name):
         given id, or None if it does not exist.
     """
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
-
     if topic_model is None:
         return None
 
@@ -626,6 +642,9 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
 
+    # Delete the summary of the topic (regardless of whether
+    # force_deletion is True or not).
+    delete_topic_summary(topic_id)
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
@@ -638,10 +657,6 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # key will be reinstated.
     topic_memcache_key = _get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
-
-    # Delete the summary of the topic (regardless of whether
-    # force_deletion is True or not).
-    delete_topic_summary(topic_id)
 
 
 def delete_topic_summary(topic_id):

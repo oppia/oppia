@@ -256,6 +256,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
+        r'%s' % feconf.MERGE_SKILL_URL,
+        topics_and_skills_dashboard.MergeSkillHandler),
+    get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
 
@@ -269,10 +272,10 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        r'/imagehandler/<exploration_id>/assets/image/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
-        r'/audiohandler/<exploration_id>/audio/<filename>',
+        r'/audiohandler/<exploration_id>/assets/audio/<filename>',
         resources.AudioHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
@@ -471,27 +474,18 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
-    get_redirect_route(
-        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,

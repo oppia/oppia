@@ -28,20 +28,16 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'UrlService', 'CurrentInteractionService',
         function(
             $scope, $attrs, WindowDimensionsService,
-            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            UrlService, CurrentInteractionService) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
           $scope.maxAllowableSelectionCount = (
@@ -67,9 +63,6 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           // The following indicates that the number of answers is less than
           // minAllowableSelectionCount.
           $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
-          $scope.setAnswerValidity({
-            answerValidity: !$scope.notEnoughSelections
-          });
 
           $scope.onToggleCheckbox = function() {
             $scope.newQuestion = false;
@@ -82,9 +75,6 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
               $scope.selectionCount >= $scope.maxAllowableSelectionCount);
             $scope.notEnoughSelections = (
               $scope.selectionCount < $scope.minAllowableSelectionCount);
-            $scope.setAnswerValidity({
-              answerValidity: !$scope.notEnoughSelections
-            });
           };
 
           $scope.submitMultipleChoiceAnswer = function(index) {
@@ -99,13 +89,15 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
               }
             );
 
-            $scope.onSubmit({
-              answer: answers,
-              rulesService: itemSelectionInputRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              answers, itemSelectionInputRulesService);
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          var validityCheckFn = function() {
+            return !$scope.notEnoughSelections;
+          };
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitAnswer, validityCheckFn);
         }
       ]
     };

@@ -24,7 +24,7 @@ oppia.factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
   'ExplorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
+  'FocusManagerService', 'ChangeListService', 'SiteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   'AutosaveInfoModalsService',
   function(
@@ -35,7 +35,7 @@ oppia.factory('ExplorationSaveService', [
       ExplorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
       ExplorationInitStateNameService, RouterService,
-      FocusManagerService, ChangeListService, siteAnalyticsService,
+      FocusManagerService, ChangeListService, SiteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService,
       AutosaveInfoModalsService) {
     // Whether or not a save action is currently in progress
@@ -148,7 +148,7 @@ oppia.factory('ExplorationSaveService', [
             }
 
             showCongratulatorySharingModal();
-            siteAnalyticsService.registerPublishExplorationEvent(
+            SiteAnalyticsService.registerPublishExplorationEvent(
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
@@ -165,15 +165,15 @@ oppia.factory('ExplorationSaveService', [
       var changeList = ChangeListService.getChangeList();
 
       if (ExplorationRightsService.isPrivate()) {
-        siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
+        SiteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
           ExplorationDataService.explorationId);
       } else {
-        siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+        SiteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
           ExplorationDataService.explorationId);
       }
 
       if (ExplorationWarningsService.countWarnings() === 0) {
-        siteAnalyticsService.registerSavePlayableExplorationEvent(
+        SiteAnalyticsService.registerSavePlayableExplorationEvent(
           ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
@@ -272,7 +272,7 @@ oppia.factory('ExplorationSaveService', [
         // so we can remove the loading-dots.
         var whenModalsClosed = $q.defer();
 
-        siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+        SiteAnalyticsService.registerOpenPublishExplorationModalEvent(
           ExplorationDataService.explorationId);
         AlertsService.clearWarnings();
 

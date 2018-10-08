@@ -441,10 +441,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def _create_fraction_dict(
             self, is_negative, whole_number, numerator, denominator):
         return {
-            "isNegative": is_negative,
-            "wholeNumber": whole_number,
-            "numerator": numerator,
-            "denominator": denominator
+            'isNegative': is_negative,
+            'wholeNumber': whole_number,
+            'numerator': numerator,
+            'denominator': denominator
         }
 
 
@@ -458,7 +458,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 38)
+        self.assertEqual(count, 38)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

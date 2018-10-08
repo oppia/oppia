@@ -20,10 +20,10 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('ExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
+  '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
   'INTERACTION_SPECS',
   function(
-      $filter, extensionTagAssemblerService, HtmlEscaperService,
+      $filter, ExtensionTagAssemblerService, HtmlEscaperService,
       INTERACTION_SPECS) {
     return {
       /**
@@ -34,7 +34,7 @@ oppia.factory('ExplorationHtmlFormatterService', [
        *   called in the exploration_player view (including the preview mode),
        *   callers should ensure that parentHasLastAnswerProperty is set to
        *   true and $scope.lastAnswer =
-       *   PlayerTranscriptService.getLastAnswerOnActiveCard(index) is set on
+       *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
        *   the parent controller of the returned tag.
        *   Otherwise, parentHasLastAnswerProperty should be set to false.
        * @param {string} labelForFocusTarget - The label for setting focus on
@@ -47,27 +47,12 @@ oppia.factory('ExplorationHtmlFormatterService', [
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
         element = (
-          extensionTagAssemblerService.formatCustomizationArgAttrs(
+          ExtensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
-        element.attr('on-submit', 'submitAnswer(answer, rulesService);');
         element.attr('last-answer', parentHasLastAnswerProperty ?
           'lastAnswer' : 'null');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
-        }
-        // answerValidity is a boolean, used to enable/disable the progress
-        // nav Submit button. Parent directive should define the
-        // setInteractionAnswerValidity function.
-        // Note that ItemSelectionInput is a special
-        // case which has a special interaction-specific Submit
-        // button, not covered by show_generic_submit_button.
-        var navSubmitButtonExists = (
-          INTERACTION_SPECS[interactionId].show_generic_submit_button ||
-          interactionId === 'ItemSelectionInput');
-        if (navSubmitButtonExists) {
-          element.attr(
-            'set-answer-validity',
-            'setInteractionAnswerValidity(answerValidity)');
         }
         return element.get(0).outerHTML;
       },

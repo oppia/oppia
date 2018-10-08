@@ -1,4 +1,4 @@
-<md-card layout="row" ng-class="{'list-view-item': !isInModal()}">
+<md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
       <col style="width: 25%;">
@@ -17,8 +17,7 @@
         <p ng-if="key === 'topic_status'"> Topic Status </p>
       </th>
     </tr>
-    <tr ng-repeat="topic in getTopicSummaries()"
-        ng-class="{'list-item': !isInModal()}">
+    <tr ng-repeat="topic in getTopicSummaries()" class="list-item">
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.name]> </span>
@@ -30,12 +29,15 @@
         </a>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary" uib-dropdown>
           <span> <[topic.total_skill_count]> </span>
-          <span class="additional-text"
-                ng-if="topic.uncategorized_skill_count > 0 && isInModal() === false">
-            ( <[topic.uncategorized_skill_count]> uncategorized )
-          </span>
+          <div ng-show="topic.uncategorized_skill_count"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
+            <span class="oppia-editor-warnings-count">
+              &nbsp;!
+            </span>
+          </div>
         </a>
       </td>
       <td>
@@ -49,7 +51,7 @@
           <span ng-if="!topic.is_published"> Not Published </span>
         </a>
       </td>
-      <td ng-if="canDeleteTopic()">
+      <td ng-if="canDeleteTopic()" class="delete-icon">
         <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
       </td>
     </tr>
@@ -87,6 +89,19 @@
     text-decoration: none;
   }
 
+  topics-list .list-item {
+    height: 2.5em;
+  }
+
+  topics-list .delete-icon {
+    border-bottom: 1px solid #fff;
+    padding-left: 0.8vw;
+  }
+
+  topics-list .list-item:hover .delete-icon {
+    background-color: #fff;
+  }
+
   topics-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
@@ -95,15 +110,25 @@
     background-color: #ededed;
   }
 
+  topics-list .oppia-editor-warnings-indicator {
+    left: 15px;
+    bottom: 13px;
+  }
+
+  topics-list .oppia-editor-warnings-error-color {
+    border-color: transparent transparent #ffbe63 transparent;
+  }
+
   topics-list .list-summary span {
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
   }
 
-  @media(max-width: 815px) {
-    topics-list .list-summary .additional-text{
-      display: none;
+  @media (max-width: 768px) {
+    topics-list .list-view-item {
+      width: 100%;
+      margin: 0;
     }
   }
 </style>

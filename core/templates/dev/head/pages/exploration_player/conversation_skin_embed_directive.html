@@ -5,7 +5,8 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content" html-data="upcomingContentHtml">
+      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+                         html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
     <div ng-if="upcomingInlineInteractionHtml">
@@ -24,17 +25,17 @@
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
            style="margin-bottom: 100px">
-        <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
-                    start-card-change-animation="startCardChangeAnimation"
-                    on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
+        <tutor-card displayed-card="displayedCard"
+                    start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
           <supplemental-card on-click-continue-button="showUpcomingCard()"
-                             on-submit-answer="submitAnswer(answer, rulesService)">
+                             displayed-card="displayedCard">
           </supplemental-card>
         </div>
         <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      submit-button-is-disabled="!interactionAnswerIsValid"
+                      submit-button-is-disabled="submitButtonIsDisabled()"
+                      displayed-card="displayedCard"
                       submit-button-is-shown="!answerIsBeingProcessed"
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
@@ -43,7 +44,7 @@
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           on-submit-answer="submitAnswer(answer, rulesService)">
+                           displayed-card="displayedCard">
         </supplemental-card>
       </div>
     </div>
@@ -112,7 +113,7 @@ directive. -->
     height: 50px;
   }
 
-  .grid-container{
+  .grid-container {
     bottom: 0;
     position: fixed;
     width: 100%;
@@ -139,7 +140,7 @@ directive. -->
   .col-1-2 {
     width: 50%;
   }
-  .col-1-4{
+  .col-1-4 {
     width: 25%;
   }
   .col-lg-12,
@@ -236,6 +237,7 @@ directive. -->
   }
 
   .conversation-skin-responses-dropdown-icon {
+    transition: all 0.2s;
     -moz-transition: all 0.2s;
     -o-transition: all 0.2s;
     -webkit-transition: all 0.2s;
@@ -663,7 +665,7 @@ directive. -->
     .col-1-2 {
       width: 60%;
     }
-    .col-1-4{
+    .col-1-4 {
       width: 20%;
     }
     .replay-nav-icon {

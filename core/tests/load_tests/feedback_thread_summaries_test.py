@@ -31,7 +31,6 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT = {
         'status': u'open',
-        'state_name': u'a_state_name',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject'
@@ -61,7 +60,6 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
         for _ in range(100):
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'],
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
         threadlist = feedback_services.get_all_threads(

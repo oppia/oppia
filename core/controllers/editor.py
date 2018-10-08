@@ -30,6 +30,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -277,6 +278,7 @@ class ExplorationHandler(EditorHandler):
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
+        self.render_json(self.values)
 
 
 class ExplorationRightsHandler(EditorHandler):
@@ -755,17 +757,10 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-
-        # Image files are stored to the datastore in the dev env, and to GCS
-        # in production.
-        file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-            else fs_domain.GcsFileSystem)
+        file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
-        filepath = (
-            filename if feconf.DEV_MODE
-            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(

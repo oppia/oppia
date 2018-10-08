@@ -24,20 +24,16 @@ oppia.directive('oppiaInteractiveTextInput', [
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
         'text_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'CurrentInteractionService',
         function(
             $scope, $attrs, FocusManagerService, textInputRulesService,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, CurrentInteractionService) {
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
           $scope.rows = (
@@ -61,23 +57,19 @@ oppia.directive('oppiaInteractiveTextInput', [
               return;
             }
 
-            $scope.onSubmit({
-              answer: answer,
-              rulesService: textInputRulesService
-            });
+            CurrentInteractionService.onSubmit(answer, textInputRulesService);
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+          var submitAnswerFn = function() {
             $scope.submitAnswer($scope.answer);
-          });
+          };
 
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function(answer) {
-            $scope.setAnswerValidity({
-              answerValidity: (answer.length > 0)
-            });
-          });
+          var validityCheckFn = function() {
+            return $scope.answer.length > 0;
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, validityCheckFn);
         }
       ]
     };
