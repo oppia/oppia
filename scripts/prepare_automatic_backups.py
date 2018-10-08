@@ -104,7 +104,7 @@ def get_cron_dict():
 
 
 def save_cron_dict(cron_dict):
-    """Converting dicti into yaml and saving into a yaml file.
+    """Converting dict into yaml and saving into a yaml file.
 
     Args:
         cron_dict: dict. It is the content of updated yaml file.
