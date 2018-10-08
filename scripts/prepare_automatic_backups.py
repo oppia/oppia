@@ -114,7 +114,7 @@ def save_cron_dict(cron_dict):
 
 
 def update_yaml_files():
-    """Adding new urls in cron file for backup"""
+    """Adding new urls in cron file for backup."""
     cron_dict = get_cron_dict()
     update_cron_dict(cron_dict)
     save_cron_dict(cron_dict)
