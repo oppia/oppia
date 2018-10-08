@@ -4,6 +4,10 @@
   </h3>
 </div>
 <div class="modal-body select-skill-modal">
+  <div ng-if="skillSummaries.length == 0">
+    You can only create questions for topics that have atleast one skill 
+    attached to it. Please link a skill to this topic before adding questions.
+  </div>
   <div class="list-group">
     <a class="list-group-item"
        ng-repeat="skillSummary in skillSummaries track by $index"
@@ -13,7 +17,12 @@
     </a>
   </div>
 </div>
-<div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
+<div class="modal-footer" ng-switch="skillSummaries.length > 0">
+  <div ng-switch-when="true">
+    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-success" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
+  </div>
+  <div ng-switch-when="false">
+    <button class="btn btn-default" ng-click="ok()"> Ok </button>
+  </div>
 </div>
