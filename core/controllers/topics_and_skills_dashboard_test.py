@@ -15,6 +15,7 @@
 """Tests for the topics and skills dashboard page."""
 
 from constants import constants
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_services
 from core.tests import test_utils
@@ -256,18 +257,46 @@ class MergeSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
         super(MergeSkillHandlerTest, self).setUp()
         self.url = feconf.MERGE_SKILL_URL
 
+        self.question_id = question_services.get_new_question_id()
+        self.question = self.save_new_question(
+            self.question_id, self.admin_id,
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            self.question_id, self.linked_skill_id)
+
     def test_merge_skill(self):
         self.login(self.ADMIN_EMAIL)
+
+        old_skill_id = self.linked_skill_id
+        new_skill_id = skill_services.get_new_skill_id()
+        old_links = question_services.get_question_skill_links_of_skill(
+            old_skill_id)
+        new_links = question_services.get_question_skill_links_of_skill(
+            new_skill_id)
+
+        self.assertEqual(len(old_links), 1)
+        self.assertEqual(old_links[0].skill_id, old_skill_id)
+        self.assertEqual(len(new_links), 0)
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             csrf_token = self._get_csrf_token_for_put()
-            new_skill_id = skill_services.get_new_skill_id()
             payload = {
-                'old_skill_id': self.linked_skill_id,
+                'old_skill_id': old_skill_id,
                 'new_skill_id': new_skill_id
             }
             json_response = self.post_json(
                 self.url, payload, csrf_token=csrf_token)
+
+            old_links = question_services.get_question_skill_links_of_skill(
+                old_skill_id)
+            new_links = question_services.get_question_skill_links_of_skill(
+                new_skill_id)
+
             self.assertEqual(json_response['merged_into_skill'], new_skill_id)
+            self.assertEqual(len(old_links), 0)
+            self.assertEqual(len(new_links), 1)
+            self.assertEqual(new_links[0].skill_id, new_skill_id)
+
         self.logout()
 
     def test_merge_skill_fails_when_new_structures_not_enabled(self):
