@@ -34,11 +34,11 @@ _OMITTED_MODELS = [
 
 
 def generate_backup_url(cloud_storage_bucket_name, module_class_names):
-    """Generates backup url of update content.
+    """Generates backup url of new added urls in cron file.
 
     Args:
         cloud_storage_bucket_name: str. Name of cloud storage bucket.
-        module_class_names: list(str). List of module class names.
+        module_class_names: list(str). List of newly added module and class names.
 
     Returns:
         str. Returns backup url.
@@ -53,8 +53,7 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
 
 
 def update_cron_dict(cron_dict):
-    """Update yaml file content by updating argument passed content which is
-    having yaml file content.
+    """Adding new urls in dict for backup.
 
     Args:
         cron_dict: dict(str, str). Content of yaml file in dictionary type.
@@ -104,7 +103,7 @@ def get_cron_dict():
 
 
 def save_cron_dict(cron_dict):
-    """Converting dictionary content into yaml and saving into a yaml file.
+    """Converting dicti into yaml and saving into a yaml file.
 
     Args:
         cron_dict: dict. It is the content of updated yaml file.
@@ -114,7 +113,7 @@ def save_cron_dict(cron_dict):
 
 
 def update_yaml_files():
-    """Updates yaml files."""
+    """Adding new urls in cron file for backup"""
     cron_dict = get_cron_dict()
     update_cron_dict(cron_dict)
     save_cron_dict(cron_dict)
