@@ -33,9 +33,6 @@ class TopicViewerPage(base.BaseHandler):
 
         topic = topic_services.get_topic_by_name(topic_name)
 
-        if topic is None:
-            raise self.PageNotFoundException
-
         self.values.update({
             'topic_name': topic.name
         })
