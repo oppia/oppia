@@ -58,7 +58,6 @@ function maybeInstallDependencies {
     echo ""
 
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
-    bash scripts/install_frontend_tests_dependencies.sh
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
     # Start a selenium server using chromedriver 2.41.
@@ -182,6 +181,8 @@ if [ ! -d "$NODE_PATH" ]; then
   chown -R $ME $NODE_MODULE_DIR
   chmod -R 744 $NODE_MODULE_DIR
 fi
+
+# Install the dependencies listed in package.json
 $NPM_INSTALL
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
@@ -254,8 +255,4 @@ if ! test_python_version $PYTHON_CMD; then
   fi
 fi
 export PYTHON_CMD
-
-# List all node modules that are currently installed. The "npm list" command is
-# slow, so we precompute this here and refer to it as needed.
-echo "Generation completed."
 export SETUP_DONE=true
