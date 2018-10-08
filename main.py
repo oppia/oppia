@@ -120,7 +120,8 @@ def authorization_wrapper(self, *args, **kwargs):
     """This request handler wrapper only admits internal requests from
     taskqueue workers. If the request is invalid, it leads to a 403 Error page.
     """
-    # Internal requests should have an "X-AppEngine-TaskName" header (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
+    # Internal requests should have an "X-AppEngine-TaskName" header 
+    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
         self.response.set_status(403)
