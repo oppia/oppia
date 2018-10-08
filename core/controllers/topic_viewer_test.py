@@ -57,44 +57,36 @@ class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
 
 class TopicViewerPage(BaseTopicViewerControllerTest):
 
-    def setUp(self):
-        super(TopicViewerPage, self).setUp()
-        self.url = feconf.TOPIC_VIEWER_URL_PREFIX
-
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (self.url, 'public_topic_name'))
+                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
             self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (self.url, 'private_topic_name'),
+                '%s/%s' % (
+                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
                 expect_errors=True)
 
             self.assertEqual(response.status_int, 404)
 
-    def test_user_cannot_access_new_structures_not_enabled(self):
+    def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             response = self.testapp.get(
-                '%s/%s' % (self.url, 'public_topic_name'),
+                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
                 expect_errors=True)
-
             self.assertEqual(response.status_int, 404)
 
 
 class TopicPageDataHandler(BaseTopicViewerControllerTest):
 
-    def setUp(self):
-        super(TopicPageDataHandler, self).setUp()
-        self.url = feconf.TOPIC_DATA_HANDLER
-
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
-                '%s/%s' % (self.url, 'public_topic_name'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'canonical_story_dicts': [{
@@ -106,9 +98,9 @@ class TopicPageDataHandler(BaseTopicViewerControllerTest):
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_user_cannot_access_new_structures_not_enabled(self):
+    def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             response = self.testapp.get(
-                '%s/%s' % (self.url, 'public_topic_name'),
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
                 expect_errors=True)
             self.assertEqual(response.status_int, 404)
