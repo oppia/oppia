@@ -103,6 +103,7 @@ oppia.controller('LearnerViewInfo', [
                 return commitsOfContributor2 - commitsOfContributor1;
               }
             );
+            $scope.version = GLOBALS.explorationVersion;
             $scope.explorationId = expInfo.id;
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
