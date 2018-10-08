@@ -60,7 +60,7 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 class ChangedBranch(object):
     """Class contaning methods for changing branch in which modified file is 
-    present by passing new branch name. It does not change branch when you are
+    present by passing new branch name. It does not change branch when you are 
     in dirty state.
     """
     def __init__(self, new_branch):
