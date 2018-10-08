@@ -38,7 +38,8 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
 
     Args:
         cloud_storage_bucket_name: str. Name of cloud storage bucket.
-        module_class_names: list(str). List of newly added module and class names.
+        module_class_names: list(str). List of newly added module and class 
+        names.
 
     Returns:
         str. Returns backup url.
