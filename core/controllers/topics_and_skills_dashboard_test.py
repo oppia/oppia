@@ -270,7 +270,7 @@ class MergeSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.assertEqual(json_response['merged_into_skill'], new_skill_id)
         self.logout()
 
-    def test_merge_skill_fails_new_structures_not_enabled(self):
+    def test_merge_skill_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             csrf_token = self._get_csrf_token_for_put()
