@@ -57,7 +57,7 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
 
 class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
 
-    def test_get_fails_new_structures_not_enabled(self):
+    def test_get_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
@@ -175,7 +175,7 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
                 topic_services.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
-    def test_topic_creation_fails_new_structures_not_enabled(self):
+    def test_topic_creation_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             csrf_token = self._get_csrf_token_for_put()
@@ -206,7 +206,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
                 skill_services.get_skill_by_id(skill_id, strict=False))
             self.logout()
 
-    def test_skill_creation_fails_new_structures_not_enabled(self):
+    def test_skill_creation_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             csrf_token = self._get_csrf_token_for_put()
