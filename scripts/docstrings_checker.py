@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Utility methods for docstring checking."""
+
 import os
 import re
 import sys
@@ -153,6 +155,16 @@ def possible_exc_types(node):
 
 
 def docstringify(docstring):
+    """Converts a docstring to its Docstring object as defined in the
+    pylint library.
+
+    Args:
+        docstring: Docstring for a particular class or function
+
+    Returns:
+        Docstring. A Docstring object as defined in the
+           pylint library.
+    """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
         if instance.is_valid():
