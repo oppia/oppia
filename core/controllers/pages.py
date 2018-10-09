@@ -82,6 +82,15 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about/about.html')
 
 
+class StaticAbout(base.BaseHandler):
+    """ serves just the base.html which will fetch about info."""
+
+    @acl_decorators.open_access
+    def get(self):
+
+        self.render_template('pages/static_base.html')
+
+
 class GetStartedPage(base.BaseHandler):
     """Page with information about how to get started using Oppia."""
 

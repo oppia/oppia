@@ -175,6 +175,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
+    get_redirect_route(r'/static_about', pages.StaticAbout),
     get_redirect_route(r'/get_started', pages.GetStartedPage),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),

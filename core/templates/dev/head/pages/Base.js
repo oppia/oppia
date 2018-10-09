@@ -49,6 +49,40 @@ oppia.controller('Base', [
       $scope.$apply();
     });
 
+    $scope.getCurrentContentTemplate = function() {
+      var currentUrl = window.location.href.split('/');
+      // assuming url has no parameters for now (because it's just done for
+      // about page for now)
+      if(currentUrl[currentUrl.length - 1] === 'static_about') {
+        return '/templates/dev/head/pages/about/about_content.html';
+      }
+    }
+
+    $scope.getCurrentFooterTemplate = function() {
+      var currentUrl = window.location.href.split('/');
+      // assuming url has no parameters for now (because it's just done for
+      // about page for now)
+      if(currentUrl[currentUrl.length - 1] === 'static_about') {
+        return '/templates/dev/head/pages/footer.html';
+      }
+    }    
+
+    $scope.getCurrentUrl = function() {
+      var currentUrl = window.location.href.split('/');
+      // assuming url has no parameters for now (because it's just done for
+      // about page for now)
+      return currentUrl[currentUrl.length - 1];
+    }
+
+    $scope.getCurrentNavbarBreadcrumbTemplate = function() {
+      var currentUrl = window.location.href.split('/');
+      // assuming url has no parameters for now (because it's just done for
+      // about page for now)
+      if(currentUrl[currentUrl.length - 1] === 'static_about') {
+        return '/templates/dev/head/pages/about/about_navbar_breadcrumb.html';
+      }
+    }
+
     $scope.skipToMainContent = function() {
       var mainContentElement = document.getElementById('oppia-main-content');
 
