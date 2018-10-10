@@ -155,15 +155,15 @@ def possible_exc_types(node):
 
 
 def docstringify(docstring):
-    """Converts a docstring to its Docstring object as defined in the
-    pylint library.
+    """Converts a docstring in its str form to its Docstring object
+    as defined in the pylint library.
 
     Args:
-        docstring: Docstring for a particular class or function
+        docstring: str. Docstring for a particular class or function.
 
     Returns:
-        Docstring. A Docstring object as defined in the
-           pylint library.
+        Docstring. Pylint Docstring class instance representing
+            a node's docstring.
     """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
