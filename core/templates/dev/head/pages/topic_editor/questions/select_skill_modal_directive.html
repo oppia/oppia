@@ -1,5 +1,8 @@
 <div class="modal-header">
-  <h3>
+  <h3 ng-if="skillSummaries.length == 0">
+    No skills linked to topic
+  </h3>
+  <h3 ng-if="skillSummaries.length > 0">
     Select the skill to link the question to:
   </h3>
 </div>
