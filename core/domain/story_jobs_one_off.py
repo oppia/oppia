@@ -28,7 +28,7 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate story schema
     versions. This job will load all existing story from the data store
     and immediately store them back into the data store. The loading process of
@@ -50,12 +50,12 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
             yield (
-                StoryMigrationJob._DISABLED_KEY,
+                StoryMigrationOneOffJob._DISABLED_KEY,
                 'New structures framework is disabled.')
             return
 
         if item.deleted:
-            yield (StoryMigrationJob._DELETED_KEY, 1)
+            yield (StoryMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the story up to the newest version.
@@ -66,7 +66,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Story %s failed validation: %s' % (item.id, e))
             yield (
-                StoryMigrationJob._ERROR_KEY,
+                StoryMigrationOneOffJob._ERROR_KEY,
                 'Story %s failed validation: %s' % (item.id, e))
             return
 
@@ -83,12 +83,12 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'Update story schema version to %d.' % (
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
             yield (
-                StoryMigrationJob._MIGRATED_KEY,
+                StoryMigrationOneOffJob._MIGRATED_KEY,
                 'Story successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
-        if key == StoryMigrationJob._DELETED_KEY:
+        if key == StoryMigrationOneOffJob._DELETED_KEY:
             all_deleted = 0
             for value in values:
                 all_deleted += int(value)

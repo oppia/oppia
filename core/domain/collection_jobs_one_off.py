@@ -28,7 +28,7 @@ import feconf
     models.NAMES.base_model, models.NAMES.collection])
 
 
-class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate collection schema
     versions. This job will load all existing collections from the data store
     and immediately store them back into the data store. The loading process of
@@ -48,7 +48,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (CollectionMigrationJob._DELETED_KEY, 1)
+            yield (CollectionMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the collection up to the newest version.
@@ -59,7 +59,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (
-                CollectionMigrationJob._ERROR_KEY,
+                CollectionMigrationOneOffJob._ERROR_KEY,
                 'Collection %s failed validation: %s' % (item.id, e))
             return
 
@@ -67,7 +67,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         # the old version.
         #
         # Note: to_version really should be int, but left as str to conform
-        # with legacy data
+        # with legacy data.
         if item.schema_version <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
@@ -80,12 +80,12 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'Update collection schema version to %d.' % (
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
             yield (
-                CollectionMigrationJob._MIGRATED_KEY,
+                CollectionMigrationOneOffJob._MIGRATED_KEY,
                 'Collection successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
-        if key == CollectionMigrationJob._DELETED_KEY:
+        if key == CollectionMigrationOneOffJob._DELETED_KEY:
             all_deleted = 0
             for value in values:
                 all_deleted += int(value)

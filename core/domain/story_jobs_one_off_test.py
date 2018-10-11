@@ -27,7 +27,7 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class StoryMigrationJobTest(test_utils.GenericTestBase):
+class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -35,7 +35,7 @@ class StoryMigrationJobTest(test_utils.GenericTestBase):
     STORY_ID = 'story_id'
 
     def setUp(self):
-        super(StoryMigrationJobTest, self).setUp()
+        super(StoryMigrationOneOffJobTest, self).setUp()
 
         self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
@@ -59,8 +59,8 @@ class StoryMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            story_jobs_one_off.StoryMigrationJob.create_new())
-        story_jobs_one_off.StoryMigrationJob.enqueue(job_id)
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the story is exactly the same after migration.
@@ -88,8 +88,8 @@ class StoryMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample story.
         job_id = (
-            story_jobs_one_off.StoryMigrationJob.create_new())
-        story_jobs_one_off.StoryMigrationJob.enqueue(job_id)
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted story is
         # being ignored.

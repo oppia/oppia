@@ -27,7 +27,7 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-class TopicMigrationJobTest(test_utils.GenericTestBase):
+class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -35,7 +35,7 @@ class TopicMigrationJobTest(test_utils.GenericTestBase):
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(TopicMigrationJobTest, self).setUp()
+        super(TopicMigrationOneOffJobTest, self).setUp()
 
         self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
@@ -60,8 +60,8 @@ class TopicMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            topic_jobs_one_off.TopicMigrationJob.create_new())
-        topic_jobs_one_off.TopicMigrationJob.enqueue(job_id)
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
@@ -91,8 +91,8 @@ class TopicMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample topic.
         job_id = (
-            topic_jobs_one_off.TopicMigrationJob.create_new())
-        topic_jobs_one_off.TopicMigrationJob.enqueue(job_id)
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted topic is
         # being ignored.

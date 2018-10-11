@@ -26,7 +26,7 @@ import feconf
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
-class QuestionMigrationJobTest(test_utils.GenericTestBase):
+class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -34,7 +34,7 @@ class QuestionMigrationJobTest(test_utils.GenericTestBase):
     QUESTION_ID = 'question_id'
 
     def setUp(self):
-        super(QuestionMigrationJobTest, self).setUp()
+        super(QuestionMigrationOneOffJobTest, self).setUp()
 
         self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
@@ -62,8 +62,8 @@ class QuestionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            question_jobs_one_off.QuestionMigrationJob.create_new())
-        question_jobs_one_off.QuestionMigrationJob.enqueue(job_id)
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the question is exactly the same after migration.
@@ -89,8 +89,8 @@ class QuestionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample question.
         job_id = (
-            question_jobs_one_off.QuestionMigrationJob.create_new())
-        question_jobs_one_off.QuestionMigrationJob.enqueue(job_id)
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted question is
         # being ignored.

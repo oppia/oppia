@@ -28,7 +28,7 @@ import feconf
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate skill schema
     versions. This job will load all existing skills from the data store
     and immediately store them back into the data store. The loading process of
@@ -50,12 +50,12 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
             yield (
-                SkillMigrationJob._DISABLED_KEY,
+                SkillMigrationOneOffJob._DISABLED_KEY,
                 'New structures framework is disabled.')
             return
 
         if item.deleted:
-            yield (SkillMigrationJob._DELETED_KEY, 1)
+            yield (SkillMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the skill up to the newest version.
@@ -66,7 +66,7 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Skill %s failed validation: %s' % (item.id, e))
             yield (
-                SkillMigrationJob._ERROR_KEY,
+                SkillMigrationOneOffJob._ERROR_KEY,
                 'Skill %s failed validation: %s' % (item.id, e))
             return
 
@@ -98,12 +98,12 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
                     feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION))
             yield (
-                SkillMigrationJob._MIGRATED_KEY,
+                SkillMigrationOneOffJob._MIGRATED_KEY,
                 'Skill successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
-        if key == SkillMigrationJob._DELETED_KEY:
+        if key == SkillMigrationOneOffJob._DELETED_KEY:
             all_deleted = 0
             for value in values:
                 all_deleted += int(value)

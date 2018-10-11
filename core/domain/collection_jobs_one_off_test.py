@@ -28,7 +28,7 @@ import feconf
     models.NAMES.job, models.NAMES.collection])
 
 
-class CollectionMigrationJobTest(test_utils.GenericTestBase):
+class CollectionMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -37,7 +37,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(CollectionMigrationJobTest, self).setUp()
+        super(CollectionMigrationOneOffJobTest, self).setUp()
 
         # Setup user who will own the test collections.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -61,8 +61,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the collection is exactly the same after migration.
@@ -98,8 +98,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample collection.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted collection is
         # being ignored.
@@ -141,8 +141,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample collection.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the collection is migrated.
         self.process_and_flush_pending_tasks()
@@ -198,8 +198,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Run the job. This should populate collection_contents.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)

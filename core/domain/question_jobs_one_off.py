@@ -28,7 +28,7 @@ import feconf
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
-class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate question schema
     versions. This job will load all existing questions from the data store
     and immediately store them back into the data store. The loading process of
@@ -50,12 +50,12 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
             yield (
-                QuestionMigrationJob._DISABLED_KEY,
+                QuestionMigrationOneOffJob._DISABLED_KEY,
                 'New structures framework is disabled.')
             return
 
         if item.deleted:
-            yield (QuestionMigrationJob._DELETED_KEY, 1)
+            yield (QuestionMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the question up to the newest version.
@@ -66,7 +66,7 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Question %s failed validation: %s' % (item.id, e))
             yield (
-                QuestionMigrationJob._ERROR_KEY,
+                QuestionMigrationOneOffJob._ERROR_KEY,
                 'Question %s failed validation: %s' % (item.id, e))
             return
 
@@ -84,12 +84,12 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'Update question state schema version to %d.' % (
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
             yield (
-                QuestionMigrationJob._MIGRATED_KEY,
+                QuestionMigrationOneOffJob._MIGRATED_KEY,
                 'Question successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
-        if key == QuestionMigrationJob._DELETED_KEY:
+        if key == QuestionMigrationOneOffJob._DELETED_KEY:
             all_deleted = 0
             for value in values:
                 all_deleted += int(value)

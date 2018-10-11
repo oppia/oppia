@@ -27,7 +27,7 @@ import feconf
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-class SkillMigrationJobTest(test_utils.GenericTestBase):
+class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -35,7 +35,7 @@ class SkillMigrationJobTest(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id'
 
     def setUp(self):
-        super(SkillMigrationJobTest, self).setUp()
+        super(SkillMigrationOneOffJobTest, self).setUp()
 
         self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
@@ -62,8 +62,8 @@ class SkillMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            skill_jobs_one_off.SkillMigrationJob.create_new())
-        skill_jobs_one_off.SkillMigrationJob.enqueue(job_id)
+            skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the skill is exactly the same after migration.
@@ -94,8 +94,8 @@ class SkillMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample skill.
         job_id = (
-            skill_jobs_one_off.SkillMigrationJob.create_new())
-        skill_jobs_one_off.SkillMigrationJob.enqueue(job_id)
+            skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted skill is
         # being ignored.

@@ -28,7 +28,7 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate subtopic schema
     versions in the topic schema. This job will load all existing topics
     from the data store and immediately store them back into the data store.
@@ -50,12 +50,12 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
             yield (
-                TopicMigrationJob._DISABLED_KEY,
+                TopicMigrationOneOffJob._DISABLED_KEY,
                 'New structures framework is disabled.')
             return
 
         if item.deleted:
-            yield (TopicMigrationJob._DELETED_KEY, 1)
+            yield (TopicMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the topic up to the newest version.
@@ -66,7 +66,7 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Topic %s failed validation: %s' % (item.id, e))
             yield (
-                TopicMigrationJob._ERROR_KEY,
+                TopicMigrationOneOffJob._ERROR_KEY,
                 'Topic %s failed validation: %s' % (item.id, e))
             return
 
@@ -85,12 +85,12 @@ class TopicMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'Update topic\'s subtopic schema version to %d.' % (
                     feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION))
             yield (
-                TopicMigrationJob._MIGRATED_KEY,
+                TopicMigrationOneOffJob._MIGRATED_KEY,
                 'Topic successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
-        if key == TopicMigrationJob._DELETED_KEY:
+        if key == TopicMigrationOneOffJob._DELETED_KEY:
             all_deleted = 0
             for value in values:
                 all_deleted += int(value)
