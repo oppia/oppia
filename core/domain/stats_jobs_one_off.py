@@ -214,18 +214,19 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def prepare_map(cls, item):
-        # pylint: disable=too-many-return-statements
-        """Prepares the map for different statistic models.
+        """Returns a dict that represents the given model instance, so that it
+        can be processed by the MapReduce pipeline.
 
         Args:
-            item: StateCompleteEventLogEntryModel. The model instance for
-                StateCompleteEventLogEntryModel class.
+            item: *. The model instance for different statistics models.
 
         Returns:
-            str. The exploration id corresponding to the item.
-            dict(str, str). The dict containing information about the event
+            tuple(str, dict(str, str)). The first element of the tuple is the
+                exploration id corresponding to the item. The second element of
+                the tuple is the dict containing information about the event
                 associated with the map.
         """
+        # pylint: disable=too-many-return-statements
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -314,21 +315,24 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def prepare_reduce(cls, exp_id, values):
-        """Prepares the reduce for different statistic models of the given
-        exploration id.
+        """Runs the reduce step to extract aggregate exploration statistics from
+        the dicts passed in by the mapping function.
 
         Args:
             exp_id: str. The exploration id.
-            values: list(dict(str, str)). List of dicts of of events for
-                preparing the reduce.
+            values: list(dict(str, str)). List of dicts of events for preparing
+                the reduce.
 
         Returns:
-            list(dict(str, str)). List of dicts of different version-wise
-                ExplorationStats.
-            list(ExplorationStats). List of ExplorationStats domain class
-                instances.
-            list(str). All the errors that occured during the preparation of
-                reduce.
+            tuple(list(dict), list(ExplorationStats), list(str)). 3-tuple where:
+            - The first element is the list of dicts of different version-wise
+                ExplorationStats. Each dict contains the following key-value
+                pairs:
+            - The second element is the list of ExplorationStats domain class
+                instances of the corrupted statistics models corresponding to
+                the specified version.
+            - The third element is the list of all the errors that occured
+                during the preparation of reduce.
         """
         values = map(ast.literal_eval, values)
         error_messages = []
