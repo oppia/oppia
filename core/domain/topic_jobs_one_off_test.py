@@ -101,3 +101,29 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             topic_services.get_topic_by_id(self.TOPIC_ID)
+
+    def test_migration_job_converts_old_topic(self):
+        """Tests that the schema conversion functions work
+        correctly and an old topic is converted to new
+        version.
+        """
+        # Generate topic with old(v1) subtopic data.
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', '',
+            [], [], [], 2)
+        topic = (
+            topic_services.get_topic_by_id(self.TOPIC_ID))
+        self.assertEqual(topic.subtopic_schema_version, 1)
+
+        # Start migration job.
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the topic migrates correctly.
+        updated_topic = (
+            topic_services.get_topic_by_id(self.TOPIC_ID))
+        self.assertEqual(
+            updated_topic.subtopic_schema_version,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)

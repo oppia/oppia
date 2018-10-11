@@ -99,3 +99,28 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             question_services.get_question_by_id(self.QUESTION_ID)
+
+    def test_migration_job_converts_old_question(self):
+        """Tests that the schema conversion functions work
+        correctly and an old question is converted to new
+        version.
+        """
+        # Generate question with old(v25) state data.
+        self.save_new_question_with_state_data_schema_v25(
+            self.QUESTION_ID, self.albert_id)
+        question = (
+            question_services.get_question_by_id(self.QUESTION_ID))
+        self.assertEqual(question.question_state_schema_version, 25)
+
+        # Start migration job.
+        job_id = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the question migrates correctly.
+        updated_question = (
+            question_services.get_question_by_id(self.QUESTION_ID))
+        self.assertEqual(
+            updated_question.question_state_schema_version,
+            feconf.CURRENT_STATES_SCHEMA_VERSION)

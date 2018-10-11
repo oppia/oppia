@@ -98,3 +98,29 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             story_services.get_story_by_id(self.STORY_ID)
+
+    def test_migration_job_converts_old_story(self):
+        """Tests that the schema conversion functions work
+        correctly and an old story is converted to new
+        version.
+        """
+        # Generate story with old(v1) story contents data.
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, self.albert_id, 'A title',
+            'A description', 'A note')
+        story = (
+            story_services.get_story_by_id(self.STORY_ID))
+        self.assertEqual(story.schema_version, 1)
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the story migrates correctly.
+        updated_story = (
+            story_services.get_story_by_id(self.STORY_ID))
+        self.assertEqual(
+            updated_story.schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)

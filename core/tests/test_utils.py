@@ -53,7 +53,9 @@ from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
 import webtest
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, question_models, skill_models, story_models, topic_models,) = models.Registry.import_models([ # pylint: disable=line-too-long
+    models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.topic])
 current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
@@ -174,6 +176,71 @@ class TestBase(unittest.TestCase):
                 }]
             },
         }
+    }
+
+    VERSION_25_STATE_DICT = {
+        'content': {'content_id': u'content', 'html': u''},
+        'param_changes': [],
+        'content_ids_to_audio_translations': {
+            u'content': {},
+            u'default_outcome': {},
+            u'hint_1': {},
+            u'solution': {}
+        },
+        'interaction': {
+            'solution': {
+                'correct_answer': u'Solution',
+                'explanation': {
+                    'content_id': u'solution',
+                    'html': u'Solution explanation'
+                },
+                'answer_is_exclusive': False
+            },
+            'answer_groups': [],
+            'default_outcome': {
+                'param_changes': [],
+                'feedback': {
+                    'content_id': u'default_outcome',
+                    'html': u''
+                },
+                'dest': None,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'labelled_as_correct': True
+            },
+            'customization_args': {
+                u'rows': 1,
+                u'placeholder': u'Enter text here'
+            },
+            'confirmed_unclassified_answers': [],
+            'id': u'TextInput',
+            'hints': [{
+                'hint_content': {
+                    'content_id': u'hint_1',
+                    'html': u'Hint 1'
+                }
+            }]
+        },
+        'classifier_model_id': None
+    }
+
+    VERSION_1_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'prerequisite_skill_ids': []}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
+    VERSION_1_SUBTOPIC_DICT = {
+        'skill_ids': [],
+        'id': 1,
+        'title': 'A subtitle'
     }
 
     # Dictionary-like data structures within sample YAML must be formatted
@@ -974,6 +1041,48 @@ tags: []
         story_services.save_new_story(owner_id, story)
         return story
 
+    def save_new_story_with_story_contents_schema_v1(
+            self, story_id, owner_id, title, description, notes,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new skill with a default version 1 story contents
+        data dictionary.
+
+        This function should only be used for creating stories in tests
+        involving migration of datastore stories that use an old story
+        contents schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating stories. This is
+        because the latter approach would result in a story with the
+        *current* story contents schema version.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters,
+                main storyline, and setting.
+            language_code: str. The ISO 639-1 code for the language this
+                story is written in.
+        """
+        story_model = story_models.StoryModel(
+            id=story_id,
+            description=description,
+            title=title,
+            language_code=language_code,
+            schema_version=1,
+            notes=notes,
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+        )
+        commit_message = (
+            'New story created with title \'%s\'.' % title)
+        story_model.commit(
+            owner_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': title
+            }])
+
     def save_new_topic(
             self, topic_id, owner_id, name, description,
             canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
@@ -1010,6 +1119,58 @@ tags: []
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
+    def save_new_topic_with_subtopic_schema_v1(
+            self, topic_id, owner_id, name, description,
+            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
+            next_subtopic_id, language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new topic with a default version 1 subtopic
+        data dictionary.
+
+        This function should only be used for creating topics in tests
+        involving migration of datastore topics that use an old subtopic
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating topics. This is
+        because the latter approach would result in a topic with the
+        *current* subtopic schema version.
+
+        Args:
+            topic_id: str. ID for the topic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            name: str. The name of the topic.
+            description: str. The desscription of the topic.
+            canonical_story_ids: list(str). The list of ids of canonical stories
+                that are part of the topic.
+            additional_story_ids: list(str). The list of ids of additional
+                stories that are part of the topic.
+            uncategorized_skill_ids: list(str). The list of ids of skills that
+                are not part of any subtopic.
+            next_subtopic_id: int. The id for the next subtopic.
+            language_code: str. The ISO 639-1 code for the language this
+                topic is written in.
+
+        """
+        topic_model = topic_models.TopicModel(
+            id=topic_id,
+            name=name,
+            description=description,
+            language_code=language_code,
+            canonical_story_ids=canonical_story_ids,
+            additional_story_ids=additional_story_ids,
+            uncategorized_skill_ids=uncategorized_skill_ids,
+            subtopic_schema_version=1,
+            next_subtopic_id=next_subtopic_id,
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+        )
+        commit_message = (
+            'New topic created with name \'%s\'.' % name)
+        topic_model.commit(
+            owner_id, commit_message, [{
+                'cmd': topic_domain.CMD_CREATE_NEW,
+                'name': name
+            }])
+
     def save_new_question(
             self, question_id, owner_id, question_state_data,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1030,6 +1191,39 @@ tags: []
             feconf.CURRENT_STATES_SCHEMA_VERSION, language_code, 0)
         question_services.add_question(owner_id, question)
         return question
+
+    def save_new_question_with_state_data_schema_v25(
+            self, question_id, owner_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new default question with a default version 25 state
+        data dictionary.
+
+        This function should only be used for creating questions in tests
+        involving migration of datastore questions that use an old state
+        data schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating questions. This is
+        because the latter approach would result in an question with the
+        *current* state data schema version.
+
+        Args:
+            question_id: str. ID for the question to be created.
+            owner_id: str. The id of the user creating the question.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
+        """
+        question_services.create_new_question_rights(question_id, owner_id)
+        question_model = question_models.QuestionModel(
+            id=question_id,
+            question_state_data=self.VERSION_25_STATE_DICT,
+            language_code=language_code,
+            version=1,
+            question_state_schema_version=25
+        )
+        question_model.commit(
+            owner_id, 'New question created',
+            [{'cmd': question_domain.CMD_CREATE_NEW}])
 
     def save_new_skill(
             self, skill_id, owner_id,
@@ -1060,6 +1254,58 @@ tags: []
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
+
+    def save_new_skill_with_story_and_skill_contents_schema_version(
+            self, skill_id, owner_id,
+            description, next_misconception_id, misconceptions=None,
+            skill_contents=None, misconceptions_schema_version=1,
+            skill_contents_schema_version=1,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new default skill with a default version 1 misconceptions
+        and skill contents.
+
+        This function should only be used for creating skills in tests
+        involving migration of datastore skills that use an old
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating skills. This is
+        because the latter approach would result in a skill with the
+        *current* schema version.
+
+        Args:
+            skill_id: str. ID for the skill to be created.
+            owner_id: str. The user_id of the creator of the skill.
+            description: str. The description of the skill.
+            next_misconception_id: int. The misconception id to be used by
+                the next misconception added.
+            misconceptions: list(Misconception.to_dict()). The list
+                of misconception dicts associated with the skill.
+            skill_contents: SkillContents.to_dict(). A SkillContents dict
+                containing the explanation and examples of the skill.
+            misconceptions_schema_version: int. The schema version for the
+                misconceptions object.
+            skill_contents_schema_version: int. The schema version for the
+                skill_contents object.
+            language_code: str. The ISO 639-1 code for the language this
+                skill is written in.
+        """
+        skill_services.create_new_skill_rights(skill_id, owner_id)
+        skill_model = skill_models.SkillModel(
+            id=skill_id,
+            description=description,
+            language_code=language_code,
+            misconceptions=misconceptions,
+            skill_contents=skill_contents,
+            next_misconception_id=next_misconception_id,
+            misconceptions_schema_version=misconceptions_schema_version,
+            skill_contents_schema_version=skill_contents_schema_version,
+            superseding_skill_id=None,
+            all_questions_merged=False
+        )
+        skill_model.commit(
+            owner_id, 'New skill created.',
+            [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):

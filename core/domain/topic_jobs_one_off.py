@@ -72,8 +72,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new topic into the datastore if it's different from
         # the old version.
-        if (
-                item.subtopic_schema_version <=
+        if (item.subtopic_schema_version <=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
