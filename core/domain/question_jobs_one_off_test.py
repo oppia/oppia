@@ -16,6 +16,7 @@
 
 """Tests for Question-related one-off jobs."""
 
+from constants import constants
 from core.domain import question_jobs_one_off
 from core.domain import question_services
 from core.platform import models
@@ -35,7 +36,7 @@ class QuestionMigrationJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(QuestionMigrationJobTest, self).setUp()
 
-        self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
         # Setup user who will own the test questions.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

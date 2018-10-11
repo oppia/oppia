@@ -18,6 +18,7 @@
 
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import story_domain
 from core.domain import story_services
@@ -47,7 +48,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             yield (
                 StoryMigrationJob._DISABLED_KEY,
                 'New structures framework is disabled.')

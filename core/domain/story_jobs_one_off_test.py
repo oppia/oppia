@@ -16,6 +16,7 @@
 
 """Tests for Story-related one-off jobs."""
 
+from constants import constants
 from core.domain import story_domain
 from core.domain import story_jobs_one_off
 from core.domain import story_services
@@ -36,7 +37,7 @@ class StoryMigrationJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryMigrationJobTest, self).setUp()
 
-        self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

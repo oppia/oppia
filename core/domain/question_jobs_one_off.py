@@ -18,6 +18,7 @@
 
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import question_domain
 from core.domain import question_services
@@ -47,7 +48,7 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             yield (
                 QuestionMigrationJob._DISABLED_KEY,
                 'New structures framework is disabled.')

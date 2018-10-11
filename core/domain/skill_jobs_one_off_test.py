@@ -16,6 +16,7 @@
 
 """Tests for Skill-related one-off jobs."""
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
@@ -36,7 +37,7 @@ class SkillMigrationJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillMigrationJobTest, self).setUp()
 
-        self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True)
+        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
         # Setup user who will own the test skills.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
