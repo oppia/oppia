@@ -48,12 +48,13 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ContextService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
-  'AutosaveInfoModalsService', 'siteAnalyticsService',
+  'AutosaveInfoModalsService', 'SiteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService', 'StateClassifierMappingService', 'IssuesService',
+  'ThreadDataService', 'StateClassifierMappingService',
+  'PlaythroughIssuesService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, StateEditorService, ExplorationTitleService,
@@ -65,12 +66,13 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationParamChangesService,
       ExplorationWarningsService, $templateCache, ContextService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
-      AutosaveInfoModalsService, siteAnalyticsService,
+      AutosaveInfoModalsService, SiteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService, StateClassifierMappingService, IssuesService) {
+      ThreadDataService, StateClassifierMappingService,
+      PlaythroughIssuesService) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -131,7 +133,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
-        IssuesService.initSession(data.exploration_id, data.version);
+        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -381,12 +383,12 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.onSkipTutorial = function() {
-      siteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
+      SiteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
       leaveTutorial();
     };
 
     $scope.onFinishTutorial = function() {
-      siteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
+      SiteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
       leaveTutorial();
     };
 
@@ -409,22 +411,22 @@ oppia.controller('ExplorationEditor', [
           'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$uibModalInstance', 'siteAnalyticsService',
+          '$scope', '$uibModalInstance', 'SiteAnalyticsService',
           'ContextService',
-          function($scope, $uibModalInstance, siteAnalyticsService,
+          function($scope, $uibModalInstance, SiteAnalyticsService,
               ContextService) {
             var explorationId = ContextService.getExplorationId();
 
-            siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
+            SiteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
             $scope.beginTutorial = function() {
-              siteAnalyticsService.registerAcceptTutorialModalEvent(
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
               $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              siteAnalyticsService.registerDeclineTutorialModalEvent(
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
               $uibModalInstance.dismiss('cancel');
             };

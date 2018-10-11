@@ -126,14 +126,27 @@ oppia.controller('Profile', [
           $log.error('Error: cannot decrement page');
         } else {
           $scope.currentPageNumber--;
+          $scope.startingExplorationNumber = (
+            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
+          );
+          $scope.endingExplorationNumber = (
+            ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE
+          );
         }
       };
       $scope.goToNextPage = function() {
-        if ($scope.currentPageNumber * $scope.PAGE_SIZE >= (
+        if (($scope.currentPageNumber + 1) * $scope.PAGE_SIZE >= (
           data.edited_exp_summary_dicts.length)) {
           $log.error('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
+          $scope.startingExplorationNumber = (
+            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
+          );
+          $scope.endingExplorationNumber = (
+            Math.min($scope.numUserPortfolioExplorations,
+              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE)
+          );
         }
       };
 

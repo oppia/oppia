@@ -17,14 +17,15 @@
  */
 
 oppia.controller('Teach', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      $scope, $timeout, $window, siteAnalyticsService,
+      $scope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService) {
     // Define constants
     $scope.TAB_ID_TEACH = 'teach';
     $scope.TAB_ID_PLAYBOOK = 'playbook';
+    $scope.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
 
     var activeTabClass = 'oppia-about-tabs-active';
     var hash = window.location.hash.slice(1);
@@ -63,9 +64,9 @@ oppia.controller('Teach', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.onApplyToTeachWithOppia = function() {
-      siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+      SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
       $timeout(function() {
-        $window.location = 'https://goo.gl/forms/tDUx4TS6B8Apkqhq2';
+        $window.location = $scope.TEACH_FORM_URL;
       }, 150);
       return false;
     };

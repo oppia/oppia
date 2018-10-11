@@ -25,7 +25,20 @@ describe('Story editor state service', function() {
   var FakeEditableStoryBackendApiService = function() {
     var self = {};
 
-    var _fetchOrUpdateStory = function() {
+    var _fetchStory = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve({
+            story: self.newBackendStoryObject,
+            topicName: 'Topic Name'
+          });
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _updateStory = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendStoryObject);
@@ -37,8 +50,8 @@ describe('Story editor state service', function() {
 
     self.newBackendStoryObject = {};
     self.failure = null;
-    self.fetchStory = _fetchOrUpdateStory;
-    self.updateStory = _fetchOrUpdateStory;
+    self.fetchStory = _fetchStory;
+    self.updateStory = _updateStory;
     return self;
   };
 
@@ -100,13 +113,14 @@ describe('Story editor state service', function() {
     expect(fakeEditableStoryBackendApiService.fetchStory).toHaveBeenCalled();
   });
 
-  it('should fire an init event after loading the first story',
-    function() {
+  it(
+    'should fire an init event and set the topic name after loading the ' +
+    'first story', function() {
       spyOn($rootScope, '$broadcast').and.callThrough();
 
       StoryEditorStateService.loadStory('topicId', 'storyId_0');
       $rootScope.$apply();
-
+      expect(StoryEditorStateService.getTopicName()).toEqual('Topic Name');
       expect($rootScope.$broadcast).toHaveBeenCalledWith('storyInitialized');
     }
   );

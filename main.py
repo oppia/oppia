@@ -89,7 +89,6 @@ class HomePageRedirectHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
-
     @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
@@ -118,10 +117,11 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 
 def authorization_wrapper(self, *args, **kwargs):
-    # developers.google.com/appengine/docs/python/taskqueue/overview-push
-    # promises that this header cannot be set by external callers. If this
-    # is present, we can be certain that the request is internal and from
-    # the task queue worker.
+    """This request handler wrapper only admits internal requests from
+    taskqueue workers. If the request is invalid, it leads to a 403 Error page.
+    """
+    # Internal requests should have an "X-AppEngine-TaskName" header
+    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
         self.response.set_status(403)
@@ -130,6 +130,9 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
+    """This request handler wrapper directly serves UI pages
+    for MapReduce dashboards.
+    """
     self.real_dispatch(*args, **kwargs)
 
 
@@ -256,6 +259,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
+        r'%s' % feconf.MERGE_SKILL_URL,
+        topics_and_skills_dashboard.MergeSkillHandler),
+    get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
 
@@ -269,10 +275,10 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        r'/imagehandler/<exploration_id>/assets/image/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
-        r'/audiohandler/<exploration_id>/audio/<filename>',
+        r'/audiohandler/<exploration_id>/assets/audio/<filename>',
         resources.AudioHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
@@ -471,27 +477,18 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
-    get_redirect_route(
-        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
-        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,

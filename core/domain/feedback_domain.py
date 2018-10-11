@@ -218,56 +218,6 @@ class FeedbackAnalytics(object):
         }
 
 
-class Suggestion(object):
-    """Domain object for a suggestion.
-
-    Attributes:
-        thread_id: str. The ID of the suggestion thread.
-        author_id: str. The ID of the message's author.
-        exploration_id: str. The ID of the associated exploration.
-        exploration_version: int. The version of the exploration associated
-            with the suggestion.
-        state_name: str. The name of the state associated with the suggestion.
-        description: str. A description of the suggestion.
-        suggestion_html: str. The state's suggested content.
-        """
-
-    def __init__(
-            self, thread_id, author_id, exploration_id,
-            exploration_version, state_name, description, suggestion_html):
-        """Initializes a Suggestion object."""
-        self.id = thread_id
-        self.author_id = author_id
-        self.exploration_id = exploration_id
-        self.exploration_version = exploration_version
-        self.state_name = state_name
-        self.description = description
-        self.suggestion_html = suggestion_html
-
-    def get_author_name(self):
-        """Returns the author's username.
-
-        Returns:
-            str. The username of the author of the suggestion.
-        """
-        return user_services.get_username(self.author_id)
-
-    def to_dict(self):
-        """Returns a dict representation of the Suggestion object.
-
-        Returns:
-            dict. Dict representation of the Suggestion object.
-        """
-        return {
-            'author_name': self.get_author_name(),
-            'exploration_id': self.exploration_id,
-            'exploration_version': self.exploration_version,
-            'state_name': self.state_name,
-            'description': self.description,
-            'suggestion_html': self.suggestion_html
-        }
-
-
 class FeedbackMessageReference(object):
     """Domain object for feedback message references.
 

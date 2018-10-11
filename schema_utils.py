@@ -372,6 +372,7 @@ class _Validators(object):
 
     @staticmethod
     def is_valid_email(obj):
+<<<<<<< HEAD
         """Ensures that `obj` (a string) is a valid email.
 
         Args:
@@ -382,3 +383,7 @@ class _Validators(object):
         """
         return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
         
+=======
+        """Ensures that `obj` (a string) is a valid email."""
+        return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
+>>>>>>> upstream/develop

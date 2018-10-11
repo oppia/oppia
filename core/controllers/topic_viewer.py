@@ -14,11 +14,11 @@
 
 """Controllers for the topic viewer page."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import topic_services
-import feconf
 
 
 class TopicViewerPage(base.BaseHandler):
@@ -28,13 +28,10 @@ class TopicViewerPage(base.BaseHandler):
     def get(self, topic_name):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
-
-        if topic is None:
-            raise self.PageNotFoundException
 
         self.values.update({
             'topic_name': topic.name
@@ -51,7 +48,7 @@ class TopicPageDataHandler(base.BaseHandler):
     def get(self, topic_name):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
