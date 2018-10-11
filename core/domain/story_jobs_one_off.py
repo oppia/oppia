@@ -55,9 +55,7 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if item.deleted:
-            yield (
-                StoryMigrationJob._DELETED_KEY,
-                'Encountered deleted story.')
+            yield (StoryMigrationJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the story up to the newest version.
@@ -90,4 +88,11 @@ class StoryMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == StoryMigrationJob._DELETED_KEY:
+            all_deleted = 0
+            for value in values:
+                all_deleted += int(value)
+            yield (key, ['Encountered %d deleted stories.' % (
+                all_deleted)])
+        else:
+            yield (key, values)

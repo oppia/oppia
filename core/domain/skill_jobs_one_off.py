@@ -55,9 +55,7 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if item.deleted:
-            yield (
-                SkillMigrationJob._DELETED_KEY,
-                'Encountered deleted skill.')
+            yield (SkillMigrationJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the skill up to the newest version.
@@ -105,4 +103,11 @@ class SkillMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == SkillMigrationJob._DELETED_KEY:
+            all_deleted = 0
+            for value in values:
+                all_deleted += int(value)
+            yield (key, ['Encountered %d deleted skills.' % (
+                all_deleted)])
+        else:
+            yield (key, values)

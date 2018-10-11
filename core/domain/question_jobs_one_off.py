@@ -55,9 +55,7 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if item.deleted:
-            yield (
-                QuestionMigrationJob._DELETED_KEY,
-                'Encountered deleted question.')
+            yield (QuestionMigrationJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the question up to the newest version.
@@ -91,4 +89,11 @@ class QuestionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == QuestionMigrationJob._DELETED_KEY:
+            all_deleted = 0
+            for value in values:
+                all_deleted += int(value)
+            yield (key, ['Encountered %d deleted questions.' % (
+                all_deleted)])
+        else:
+            yield (key, values)

@@ -48,9 +48,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (
-                CollectionMigrationJob._DELETED_KEY,
-                'Encountered deleted collection.')
+            yield (CollectionMigrationJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the collection up to the newest version.
@@ -87,4 +85,11 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == CollectionMigrationJob._DELETED_KEY:
+            all_deleted = 0
+            for value in values:
+                all_deleted += int(value)
+            yield (key, ['Encountered %d deleted collections.' % (
+                all_deleted)])
+        else:
+            yield (key, values)
