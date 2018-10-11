@@ -22,6 +22,7 @@
 #   bash scripts/run_presubmit_checks.sh
 #
 # It runs all the tests, in this order:
+# - Third Party folder size check
 # - Javascript and Python Linting
 # - Frontend Karma unit tests
 # - Backend Python tests
@@ -41,6 +42,12 @@ then
 fi
 
 set -e
+# Run third party folder size check.
+echo 'Running third party size check'
+source $(dirname $0)/run_third_party_size_check.sh || exit 1
+echo 'Third party folder size check passed.'
+echo ''
+
 # Run Javascript and Python linters.
 echo 'Linting files since the last commit'
 python $(dirname $0)/pre_commit_linter.py || exit 1

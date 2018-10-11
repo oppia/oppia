@@ -22,6 +22,7 @@ breaching the 10k file limit on App Engine.
 # pylint: disable=wrong-import-order
 import os
 import os.path
+import sys
 
 # pylint: enable=wrong-import-order
 
@@ -63,10 +64,10 @@ def _check_third_party_size():
         number_of_files_in_third_party)
     print ''
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
-        print '    The size limit of third party has been exceeded.'
+        print '    ERROR: The size limit of third party has been exceeded.'
         print '------------------------------------------------------'
         print ''
-        raise Exception('The size limit of third party has been exceeded.')
+        sys.exit(1)
     else:
         print '    The size of third party is within the limits.'
         print '------------------------------------------------------'
