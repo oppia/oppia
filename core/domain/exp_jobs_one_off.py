@@ -43,6 +43,10 @@ _COMMIT_TYPE_REVERT = 'revert'
 ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
+FILE_FOUND_IN_GCS = 'File found in GCS'
+FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
+FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
+FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
 FILE_DELETED = 'File has been deleted'
 FILE_FOUND_IN_GCS = 'File is there in GCS'
 EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
@@ -54,9 +58,6 @@ ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
-FILE_MODEL_ID_REGEX = re.compile(
-    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
@@ -661,50 +662,6 @@ class ExplorationMigrationValidationJobForCKEditor(
         yield (key, list(set().union(*final_values)))
 
 
-class DeleteImagesFromGAEJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for deleting the images in the exploration
-    from the GAE.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
-
-    @staticmethod
-    def map(file_model):
-        instance_id = file_model.id
-        filetype = instance_id[instance_id.rfind('.') + 1:]
-        # To separate the image entries from the audio entries we get from
-        # the FileSnapshotContentModel.
-        if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            catched_groups = FILE_MODEL_ID_REGEX.match(instance_id)
-            if not catched_groups:
-                yield (WRONG_INSTANCE_ID, instance_id)
-            else:
-                filename = catched_groups.group(2)
-                filepath = 'assets/' + filename
-                exploration_id = catched_groups.group(1)
-                filemetadata_model = (
-                    file_models.FileMetadataModel.get_model(
-                        exploration_id, filepath, False))
-
-                file_model.delete(
-                    'ADMIN',
-                    'Deleting file_model for image from GAE',
-                    force_deletion=True)
-                filemetadata_model.delete(
-                    'ADMIN',
-                    'Deleting filemetamodel for image from GAE',
-                    force_deletion=True)
-                yield (FILE_DELETED, 1)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_DELETED:
-            yield (NUMBER_OF_FILES_DELETED, len(values))
-        else:
-            yield (status, values)
-
-
 class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for copying the image/audio such that the url instead of
     {{exp_id}}/assets/image/image.png is
@@ -718,7 +675,7 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(exp_id))
@@ -744,7 +701,10 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(status, values):
-        yield (status, values)
+        if status == FILE_FOUND_IN_GCS:
+            yield (status, len(values))
+        else:
+            yield (status, values)
 
 
 class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
@@ -760,7 +720,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_model):
-        if not feconf.DEV_MODE:
+        if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(exp_id))
@@ -800,6 +760,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                             image_filename, height, width))
                     exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
                         'ADMIN', filename_with_dimensions, exp_id, raw_image)
+                    yield ('Copied file', 1)
                 except Exception:
                     error = traceback.format_exc()
                     logging.error(
@@ -821,7 +782,10 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(status, values):
-        yield (status, values)
+        if status == 'Copied file':
+            yield (status, len(values))
+        else:
+            yield (status, values)
 
 
 class InteractionCustomizationArgsValidationJob(

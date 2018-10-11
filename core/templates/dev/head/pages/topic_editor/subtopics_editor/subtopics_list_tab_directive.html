@@ -2,19 +2,26 @@
   <md-card class="subtopics">
     <h3> Subtopics </h3>
     <h4 style="color: #6d6d6d">
-      (Drag and drop skills across subtopics or to the uncategorized section or click on a subtopic card to edit its page data)
+      (Drag and drop skills to assign them to subtopics)
     </h4>
     <div class="subtopics-container">
       <md-card class="subtopic"
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
-               ng-click="editSubtopic(subtopic)"
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
-        <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
-        <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
-          <i class="material-icons md-18">&#xE14C;</i>
-        </span>
-        <div style="max-height: 35vh; overflow-y: auto;">
+        <div class="subtopic-header">
+          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
+          <div style="float: right;">
+            <span style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
+              <i class="material-icons md-18">edit</i>
+            </span>
+            <span style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+              <i class="material-icons md-18">&#xE14C;</i>
+            </span>
+          </div>
+        </div>
+        <div style="min-height: 30vh; max-height: 30vh; overflow-y: auto;">
           <md-card class="skill-id"
                    ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
                    dnd-draggable="skillSummary"
@@ -32,7 +39,9 @@
         </div>
       </md-card>
       <md-card class="subtopic new" ng-click="createSubtopic()">
-        <i class="material-icons">add</i>
+        <span>
+          <i class="material-icons">add</i> <span class="add-subtopic-text">Add Subtopic</span>
+        </span>
       </md-card>
     </div>
   </md-card>
@@ -56,6 +65,10 @@
           Skill Deleted
         </span>
       </md-card>
+      <p class="intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0" style="padding-top: 6px;">
+        There are no pending skills in the topic. To add skills to the topic, go to the skills list in the
+        topics and skills dashboard and click 'Assign to Topic' for the required skill.
+      </p>
     </div>
   </md-card>
 </div>
@@ -70,10 +83,22 @@
   subtopics-list-tab .dndDraggingSource {
     display: none;
   }
+  subtopics-list-tab .dndDragover p {
+    display: none;
+  }
+  subtopics-list-tab .dndDragover button {
+    display: none;
+  }
   subtopics-list-tab .dndPlaceholder {
     background-color: #e0e0e0;
     display: block;
     min-height: 42px;
+  }
+  subtopics-list-tab .intro-card-message {
+    color: gray;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 0.8em;
+    text-align: center;
   }
   subtopics-list-tab .subtopics-container {
     display: flex;
@@ -89,17 +114,24 @@
     flex: 0 0 auto;
     position: relative;
   }
+  subtopics-list-tab .subtopic-header {
+    text-align: left;
+  }
   subtopics-list-tab .subtopic:hover {
     background-color: #f6f6f6;
+  }
+  subtopics-list-tab .new {
+    background-color: white;
+    border-width: 3px;
+    border-style: dotted;
+    border-color: #c3c3c3;
   }
   subtopics-list-tab .new:hover {
     background-color: #f1f1f1;
   }
-  subtopics-list-tab .new .material-icons {
-    position: absolute;
-    font-size: 2.5em;
-    bottom: 50%;
-    left: 46%;
+  subtopics-list-tab .new span {
+    position: sticky;
+    top: 40%;
   }
   subtopics-list-tab .subtopics {
     background-color: white;
@@ -122,8 +154,17 @@
 
   subtopics-list-tab .skill-id {
     background-color: #efefef;
+    cursor: move;
+    padding-left: 1vw;
+    text-align: left;
   }
   subtopics-list-tab .skill-id:hover {
     background-color: #e0e0e0;
+  }
+
+  @media (max-width: 830px) {
+    subtopics-list-tab .add-subtopic-text {
+      display: none;
+    }
   }
 </style>

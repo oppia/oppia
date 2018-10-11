@@ -316,9 +316,10 @@ def main():
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
+                total_errors += 1
                 print ''
                 print '------------------------------------------------------'
-                print '    WARNING: FAILED TO RUN TESTS.'
+                print '    WARNING: FAILED TO RUN %s' % spec.test_target
                 print ''
                 print '    This is most likely due to an import error.'
                 print '------------------------------------------------------'

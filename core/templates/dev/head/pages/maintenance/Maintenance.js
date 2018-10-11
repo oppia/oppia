@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Maintenance', [
-  '$scope', '$rootScope', 'UrlInterpolationService',
-  function($scope, $rootScope, UrlInterpolationService) {
+  '$scope', '$rootScope', 'UrlInterpolationService', 'DEV_MODE',
+  function($scope, $rootScope, UrlInterpolationService, DEV_MODE) {
     $scope.currentLang = 'en';
-    $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
+    $rootScope.DEV_MODE = DEV_MODE;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
   }
 ]);
