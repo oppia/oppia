@@ -19,12 +19,13 @@ size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
 
+# Pylint has issues with the import order.
 # pylint: disable=wrong-import-order
 import os
-import os.path
 import sys
 
 # pylint: enable=wrong-import-order
+
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
@@ -72,6 +73,9 @@ def _check_third_party_size():
         print '    The size of third party is within the limits.'
         print '------------------------------------------------------'
         print ''
+        print 'Done!'
+        print ''
+
 
 
 if __name__ == '__main__':

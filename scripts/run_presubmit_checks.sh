@@ -44,7 +44,7 @@ fi
 set -e
 # Run third party folder size check.
 echo 'Running third party size check'
-source $(dirname $0)/run_third_party_size_check.sh || exit 1
+python $(dirname $0)/third_party_size_check.py || exit 1
 echo 'Third party folder size check passed.'
 echo ''
 
