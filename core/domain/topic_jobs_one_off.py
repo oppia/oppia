@@ -16,6 +16,7 @@
 
 """One-off jobs for topics."""
 
+import ast
 import logging
 
 from constants import constants
@@ -83,17 +84,15 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update topic\'s subtopic schema version to %d.' % (
                     feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION))
-            yield (
-                TopicMigrationOneOffJob._MIGRATED_KEY,
-                'Topic successfully migrated.')
+            yield (TopicMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == TopicMigrationOneOffJob._DELETED_KEY:
-            all_deleted = 0
-            for value in values:
-                all_deleted += int(value)
             yield (key, ['Encountered %d deleted topics.' % (
-                all_deleted)])
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == TopicMigrationOneOffJob._MIGRATED_KEY:
+            yield (key, ['%d topics successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

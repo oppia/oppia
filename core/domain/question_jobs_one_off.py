@@ -16,6 +16,7 @@
 
 """One-off jobs for questions."""
 
+import ast
 import logging
 
 from constants import constants
@@ -83,17 +84,15 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update question state schema version to %d.' % (
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
-            yield (
-                QuestionMigrationOneOffJob._MIGRATED_KEY,
-                'Question successfully migrated.')
+            yield (QuestionMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == QuestionMigrationOneOffJob._DELETED_KEY:
-            all_deleted = 0
-            for value in values:
-                all_deleted += int(value)
             yield (key, ['Encountered %d deleted questions.' % (
-                all_deleted)])
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == QuestionMigrationOneOffJob._MIGRATED_KEY:
+            yield (key, ['%d questions successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

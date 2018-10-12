@@ -16,6 +16,7 @@
 
 """One-off jobs for stories."""
 
+import ast
 import logging
 
 from constants import constants
@@ -82,17 +83,15 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update story schema version to %d.' % (
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
-            yield (
-                StoryMigrationOneOffJob._MIGRATED_KEY,
-                'Story successfully migrated.')
+            yield (StoryMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == StoryMigrationOneOffJob._DELETED_KEY:
-            all_deleted = 0
-            for value in values:
-                all_deleted += int(value)
             yield (key, ['Encountered %d deleted stories.' % (
-                all_deleted)])
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == StoryMigrationOneOffJob._MIGRATED_KEY:
+            yield (key, ['%d stories successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

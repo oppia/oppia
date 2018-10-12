@@ -16,6 +16,7 @@
 
 """One-off jobs for skills."""
 
+import ast
 import logging
 
 from constants import constants
@@ -97,17 +98,15 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'skill misconceptions schema version to %d.' % (
                     feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
                     feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION))
-            yield (
-                SkillMigrationOneOffJob._MIGRATED_KEY,
-                'Skill successfully migrated.')
+            yield (SkillMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == SkillMigrationOneOffJob._DELETED_KEY:
-            all_deleted = 0
-            for value in values:
-                all_deleted += int(value)
             yield (key, ['Encountered %d deleted skills.' % (
-                all_deleted)])
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == SkillMigrationOneOffJob._MIGRATED_KEY:
+            yield (key, ['%d skills successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
