@@ -218,13 +218,21 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         can be processed by the MapReduce pipeline.
 
         Args:
-            item: *. The model instance for different statistics models.
+            item: [StateCompleteEventLogEntryModel|
+                AnswerSubmittedEventLogEntryModel|StateHitEventLogEntryModel|
+                SolutionHitEventLogEntryModel|StartExplorationEventLogEntryModel
+                |ExplorationActualStartEventLogEntryModel|
+                CompleteExplorationEventLogEntryModel]. The model instance for
+                different statistics models.
 
         Returns:
             tuple(str, dict(str, str)). The first element of the tuple is the
                 exploration id corresponding to the item. The second element of
                 the tuple is the dict containing information about the event
                 associated with the map.
+
+        Raises:
+            Exception: The item type is wrong.
         """
         # pylint: disable=too-many-return-statements
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
@@ -326,11 +334,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Returns:
             tuple(list(dict), list(ExplorationStats), list(str)). 3-tuple where:
             - The first element is the list of dicts of different version-wise
-                ExplorationStats. Each dict contains the following key-value
-                pairs:
+                ExplorationStats.
             - The second element is the list of ExplorationStats domain class
-                instances of the corrupted statistics models corresponding to
-                the specified version.
+                instances of the corrupted statistics models.
             - The third element is the list of all the errors that occured
                 during the preparation of reduce.
         """
