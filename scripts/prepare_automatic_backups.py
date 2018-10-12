@@ -34,15 +34,15 @@ _OMITTED_MODELS = [
 
 
 def generate_backup_url(cloud_storage_bucket_name, module_class_names):
-    """Generates backup url of new added urls in cron file.
+    """Generates updated backup url.
 
     Args:
         cloud_storage_bucket_name: str. Name of cloud storage bucket.
         module_class_names: list(str). List of newly added module and class
-        names.
+            names.
 
     Returns:
-        str. Returns backup url.
+        str. url of backup.
     """
     return (
         '/_ah/datastore_admin/backup.create?name=%s&kind=%s&queue=%s'
@@ -57,7 +57,11 @@ def update_cron_dict(cron_dict):
     """Adding new urls in dict for backup.
 
     Args:
-        cron_dict: dict(str, str). Content of yaml file in dictionary type.
+        cron_dict: dict(str ,str). Content of yaml file in dictionary type.
+            'description' : 'weekly bakcup'
+            'url' : 'new backup url'.
+            'schedule' : 'sheduled time of cron job'.
+            'target' : 'cloud storage name'
     """
     sys_args = sys.argv
     cloud_storage_bucket_name = sys_args[1]
@@ -95,10 +99,10 @@ def update_cron_dict(cron_dict):
 
 
 def get_cron_dict():
-    """Converting yaml file to dict.
+    """Getting cron file content in dict format.
 
     Returns:
-        dict(str, str). Returns yaml file in dict format.
+        dict(str, str). yaml file in dict format.
     """
     return utils.dict_from_yaml(utils.get_file_contents(_CRON_YAML_FILE_NAME))
 
@@ -107,21 +111,26 @@ def save_cron_dict(cron_dict):
     """Converting dict into yaml and saving into a yaml file.
 
     Args:
-        cron_dict: dict. It is the content of updated yaml file.
+        cron_dict: dict. The content to save as a YAML file.
+            'description' : 'weekly bakcup'
+            'url' : 'current backup url'.
+            'schedule' : 'sheduled time of cron job'.
+            'target' : 'cloud storage name'
     """
     with open(_CRON_YAML_FILE_NAME, 'wt') as cron_yaml_file:
         cron_yaml_file.write(utils.yaml_from_dict(cron_dict))
 
 
 def update_yaml_files():
-    """Adding new urls in cron file for backup."""
+    """Adding new url in cron file for backup."""
     cron_dict = get_cron_dict()
+    print(cron_dict)
     update_cron_dict(cron_dict)
     save_cron_dict(cron_dict)
 
 
 def _prepare_for_prod():
-    """Method for calling function that updates yaml files."""
+    """It calls function that updates cron files."""
     update_yaml_files()
 
 
