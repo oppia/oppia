@@ -115,7 +115,7 @@ def save_cron_dict(cron_dict):
     """Converting dict into yaml and saving into a yaml file.
 
     Args:
-        
+        cron_dict: dict. The content to save as a YAML file.
     """
     with open(_CRON_YAML_FILE_NAME, 'wt') as cron_yaml_file:
         cron_yaml_file.write(utils.yaml_from_dict(cron_dict))
