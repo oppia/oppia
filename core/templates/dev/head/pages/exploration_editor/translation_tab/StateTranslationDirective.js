@@ -33,7 +33,7 @@ oppia.directive('stateTranslation', [
         'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
-        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT', 'ResponsesService',
         function(
             $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
@@ -41,7 +41,7 @@ oppia.directive('stateTranslation', [
             TranslationStatusService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT, ResponsesService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
           $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
@@ -72,6 +72,10 @@ oppia.directive('stateTranslation', [
 
           $scope.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+
+          $scope.getAnswerChoices = function() {
+            return ResponsesService.getAnswerChoices();
           };
 
           $scope.onTabClick = function(tabId) {
