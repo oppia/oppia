@@ -103,6 +103,10 @@ def get_cron_dict():
 
     Returns:
         dict(str, str). yaml file in dict format.
+            'description' : 'weekly bakcup'
+            'url' : 'current backup url'.
+            'schedule' : 'sheduled time of cron job'.
+            'target' : 'cloud storage name'
     """
     return utils.dict_from_yaml(utils.get_file_contents(_CRON_YAML_FILE_NAME))
 
@@ -111,11 +115,7 @@ def save_cron_dict(cron_dict):
     """Converting dict into yaml and saving into a yaml file.
 
     Args:
-        cron_dict: dict. The content to save as a YAML file.
-            'description' : 'weekly bakcup'
-            'url' : 'current backup url'.
-            'schedule' : 'sheduled time of cron job'.
-            'target' : 'cloud storage name'
+        
     """
     with open(_CRON_YAML_FILE_NAME, 'wt') as cron_yaml_file:
         cron_yaml_file.write(utils.yaml_from_dict(cron_dict))
