@@ -196,7 +196,7 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: str. String to collapse.
+            obj: str. String to collapse the spaces.
 
         Returns:
             str. A string that is the same as `obj`, except that each block of
@@ -270,7 +270,7 @@ class _Validators(object):
             min_value: int. Required minimum number of elements.
 
         Returns:
-            bool. True if the number of elements is greater than or equal
+            bool. Whether the number of elements in obj is greater than or equal
                 to min_value.
         """
         return len(obj) >= min_value
@@ -285,7 +285,7 @@ class _Validators(object):
             max_value: int. Required maximum number of elements.
 
         Returns:
-            bool. True if the number of elements is less than or equal
+            bool. Whether the number of elements in obj is less than or equal
                 to max_value.
         """
         return len(obj) <= max_value
@@ -324,7 +324,7 @@ class _Validators(object):
             min_value: int. Value to compare.
 
         Returns:
-            bool. True if the object is greater than or equal to min_value.
+            bool. Whether the object is greater than or equal to min_value.
         """
         return obj >= min_value
 
@@ -338,7 +338,7 @@ class _Validators(object):
             max_value: int. Value to compare.
 
         Returns:
-            bool. True if the object is less than or equal to max_value.
+            bool. Whether the object is less than or equal to max_value.
         """
         return obj <= max_value
 
@@ -350,7 +350,7 @@ class _Validators(object):
             obj: str. String to evaluate and know if it's a regular expression.
 
         Returns:
-            bool. True if the regular expression is valid.
+            bool. Whether the regular expression is valid.
 
         """
         return bool(re.compile(obj))
@@ -365,7 +365,7 @@ class _Validators(object):
             regex: str. The regex to compare the given string against.
 
         Returns:
-            bool. True if the regular expression is valid for the obj.
+            bool. Whether the regular expression is valid for the obj.
 
         """
         return bool(re.compile(obj).match(regex))
@@ -378,6 +378,6 @@ class _Validators(object):
             obj: str. String to evaluate if it is an email.
 
         Returns:
-            bool. True if the email is valid.
+            bool. Whether the email is valid.
         """
         return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
