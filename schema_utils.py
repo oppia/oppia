@@ -380,4 +380,4 @@ class _Validators(object):
         Returns:
             bool. Whether the email is valid.
         """
-        return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj)) 
+        return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
