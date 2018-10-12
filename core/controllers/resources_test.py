@@ -28,10 +28,10 @@ class ImageDevHandlerTest(test_utils.GenericTestBase):
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
 
-    def _get_image_url(self, exp_id, filepath):
+    def _get_image_url(self, exp_id, filename):
         return str(
             '%s/%s/assets/image/%s' %
-            (self.ASSET_HANDLER_URL_PREFIX, exp_id, filepath))
+            (self.ASSET_HANDLER_URL_PREFIX, exp_id, filename))
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
@@ -61,11 +61,11 @@ class ImageDevHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-        filepath = response_dict['filepath']
+        filename = response_dict['filename']
 
         self.logout()
 
-        response = self.testapp.get(self._get_image_url('0', filepath))
+        response = self.testapp.get(self._get_image_url('0', filename))
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 

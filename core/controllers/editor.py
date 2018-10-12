@@ -770,7 +770,7 @@ class ImageUploadHandler(EditorHandler):
         exp_services.save_original_and_compressed_versions_of_image(
             self.user_id, filename, exploration_id, raw)
 
-        self.render_json({'filepath': filename})
+        self.render_json({'filename': filename})
 
 
 class StartedTutorialEventHandler(EditorHandler):

@@ -48,18 +48,18 @@ class ImageDevHandler(base.BaseHandler):
     _IMAGE_PATH_PREFIX = 'image'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, encoded_filepath):
+    def get(self, exploration_id, filename):
         """Returns an image.
 
         Args:
             exploration_id: the id of the exploration.
-            encoded_filepath: a string representing the image filepath. This
+            filename: a string representing the image filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
         try:
-            filepath = urllib.unquote(encoded_filepath)
+            filepath = urllib.unquote(filename)
             file_format = filepath[(filepath.rfind('.') + 1):]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
@@ -87,17 +87,17 @@ class AudioDevHandler(base.BaseHandler):
     _AUDIO_PATH_PREFIX = 'audio'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, encoded_filepath):
+    def get(self, exploration_id, filename):
         """Returns an audio file.
 
         Args:
-            encoded_filepath: a string representing the audio filepath. This
+            filename: a string representing the audio filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
 
-        filepath = urllib.unquote(encoded_filepath)
+        filepath = urllib.unquote(filename)
         file_format = filepath[(filepath.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.
