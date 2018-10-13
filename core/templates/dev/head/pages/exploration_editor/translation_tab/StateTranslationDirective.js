@@ -293,22 +293,25 @@ oppia.directive('stateTranslation', [
             if (interactionId) {
               var interactionPreviewHtml = ExplorationHtmlFormatterService
                 .getInteractionHtml(
-                  interactionId, currentCustomizationArgs, false)
+                  interactionId, currentCustomizationArgs, false);
 
               // Special cases for multiple choice input and image click input.
               if (interactionId === 'MultipleChoiceInput') {
                 $scope.answerChoices =
-                  currentCustomizationArgs.choices.value.map(function(val, ind) {
-                    return {
-                      val: ind,
-                      label: val
-                    };
-                  });
+                  currentCustomizationArgs.choices.value.map(
+                    function(val, ind) {
+                      return {
+                        val: ind,
+                        label: val
+                      };
+                    }
+                  );
               } else if (interactionId === 'ImageClickInput') {
                 var _answerChoices = [];
                 var imageWithRegions =
                   currentCustomizationArgs.imageAndRegions.value;
-                for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
+                for (
+                  var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
                   _answerChoices.push({
                     val: imageWithRegions.labeledRegions[j].label,
                     label: imageWithRegions.labeledRegions[j].label
