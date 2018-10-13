@@ -16,6 +16,7 @@
 
 """One-off jobs for collections."""
 
+import ast
 import logging
 
 from core import jobs
@@ -79,17 +80,15 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update collection schema version to %d.' % (
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
-            yield (
-                CollectionMigrationOneOffJob._MIGRATED_KEY,
-                'Collection successfully migrated.')
+            yield (CollectionMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == CollectionMigrationOneOffJob._DELETED_KEY:
-            all_deleted = 0
-            for value in values:
-                all_deleted += int(value)
             yield (key, ['Encountered %d deleted collections.' % (
-                all_deleted)])
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == CollectionMigrationOneOffJob._MIGRATED_KEY:
+            yield (key, ['%d collections successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
