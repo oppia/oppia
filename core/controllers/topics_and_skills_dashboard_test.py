@@ -169,7 +169,7 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
             csrf_token = self._get_csrf_token_for_put()
 
             json_response = self.post_json(
-                '%s' % self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
+                self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
             topic_id = json_response['topicId']
             self.assertEqual(len(topic_id), 12)
             self.assertIsNotNone(
