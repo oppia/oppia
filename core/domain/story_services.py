@@ -653,10 +653,10 @@ def publish_story(story_id, committer_id):
         Exception. The story is already published.
         Exception. The user does not have enough rights to publish the story.
     """
-    story = get_story_by_id(story_id, strict=False)
-    for node in story.story_contents.nodes:
+    def _is_node_valid_for_publishing(node):
         if not node.exploration_id:
-            raise Exception('Story node does not contain an exploration id.')
+            raise Exception(
+                'Story node does not contain an exploration id.')
         if not exp_services.get_exploration_by_id(
                 node.exploration_id, strict=False):
             raise Exception(
@@ -668,6 +668,14 @@ def publish_story(story_id, committer_id):
             raise Exception(
                 'Story node with exploration id %s isn\'t published.'
                 % node.exploration_id)
+
+    story = get_story_by_id(story_id, strict=False)
+    for node in story.story_contents.nodes:
+        if node.id == story.story_contents.initial_node_id:
+            print '+++++++++++++++++++++++++++++++++++++++++++'
+            print node.id, story.story_contents.initial_node_id
+            print '+++++++++++++++++++++++++++++++++++++++++++'
+            _is_node_valid_for_publishing(node)
 
     story_rights = get_story_rights(story_id, strict=False)
     if story_rights is None:
@@ -776,21 +784,6 @@ def get_story_rights(story_id, strict=True):
         return None
 
     return get_story_rights_from_model(model)
-
-
-def get_all_story_rights():
-    """Returns the rights object of all storys present in the datastore.
-
-    Returns:
-        dict. The dict of rights objects of all storys present in
-            the datastore keyed by story id.
-    """
-    story_rights_models = story_models.StoryRightsModel.get_all()
-    story_rights = {}
-    for model in story_rights_models:
-        rights = get_story_rights_from_model(model)
-        story_rights[rights.id] = rights
-    return story_rights
 
 
 def check_can_edit_story(user, story_rights):
