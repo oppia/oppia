@@ -196,11 +196,7 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-<<<<<<< HEAD
-            obj: str. String to collapse.
-=======
             obj: str. String to collapse the spaces.
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
 
         Returns:
             str. A string that is the same as `obj`, except that each block of
@@ -274,11 +270,7 @@ class _Validators(object):
             min_value: int. Required minimum number of elements.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the number of elements is greater than or equal
-=======
             bool. Whether the number of elements in obj is greater than or equal
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
                 to min_value.
         """
         return len(obj) >= min_value
@@ -293,11 +285,7 @@ class _Validators(object):
             max_value: int. Required maximum number of elements.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the number of elements is less than or equal
-=======
             bool. Whether the number of elements in obj is less than or equal
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
                 to max_value.
         """
         return len(obj) <= max_value
@@ -336,11 +324,7 @@ class _Validators(object):
             min_value: int. Value to compare.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the object is greater than or equal to min_value.
-=======
             bool. Whether the object is greater than or equal to min_value.
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
         """
         return obj >= min_value
 
@@ -354,11 +338,7 @@ class _Validators(object):
             max_value: int. Value to compare.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the object is less than or equal to max_value.
-=======
             bool. Whether the object is less than or equal to max_value.
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
         """
         return obj <= max_value
 
@@ -370,11 +350,7 @@ class _Validators(object):
             obj: str. String to evaluate and know if it's a regular expression.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the regular expression is valid.
-=======
             bool. Whether the regular expression is valid.
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
 
         """
         return bool(re.compile(obj))
@@ -389,11 +365,7 @@ class _Validators(object):
             regex: str. The regex to compare the given string against.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the regular expression is valid for the obj.
-=======
             bool. Whether the regular expression is valid for the obj.
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
 
         """
         return bool(re.compile(obj).match(regex))
@@ -406,13 +378,6 @@ class _Validators(object):
             obj: str. String to evaluate if it is an email.
 
         Returns:
-<<<<<<< HEAD
-            bool. True if the email is valid.
-        """
-        return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
-        
-=======
             bool. Whether the email is valid.
         """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
->>>>>>> a1d86a99222f8e08bf21de14b4cfbb8e2aa9931e
