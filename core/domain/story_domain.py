@@ -19,7 +19,6 @@ import re
 
 from constants import constants
 from core.domain import html_cleaner
-from core.domain import user_services
 import feconf
 import utils
 

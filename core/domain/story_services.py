@@ -672,9 +672,6 @@ def publish_story(story_id, committer_id):
     story = get_story_by_id(story_id, strict=False)
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
-            print '+++++++++++++++++++++++++++++++++++++++++++'
-            print node.id, story.story_contents.initial_node_id
-            print '+++++++++++++++++++++++++++++++++++++++++++'
             _is_node_valid_for_publishing(node)
 
     story_rights = get_story_rights(story_id, strict=False)
