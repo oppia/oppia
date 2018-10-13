@@ -27,11 +27,13 @@ oppia.directive('storySummaryTile', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/story_summary_tile_directive.html'),
-      controller: ['$scope',
-        function($scope) {
+      controller: ['$scope', 'UrlService',
+        function($scope, UrlService) {
+          var topicName = '/' + UrlService.getTopicNameFromLearnerUrl();
+          var storyId = '/' + $scope.getStoryId();
           $scope.getStoryLink = function() {
             return UrlInterpolationService.getStoryUrl(
-              '/story', $scope.getStoryId());
+              storyId, topicName);
           };
 
           $scope.getStaticImageUrl = function(url) {

@@ -32,13 +32,6 @@ oppia.factory('StoryPlaythroughObjectFactory', [function() {
     return this._nextExplorationId;
   };
 
-  //   StoryPlaythrough.prototype.getNextRecommendedStoryNodeCount =
-  //     function() {
-  //       // As the story is linear, only a single node would be available,
-  //       // after any node.
-  //       return 1;
-  //     };
-
   StoryPlaythrough.hasFinishedStory = function() {
     return this._nextExplorationId === null;
   };

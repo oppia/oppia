@@ -22,13 +22,9 @@ oppia.directive('storyViewerNavbarBreadcrumb', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story_viewer/story_viewer_navbar_breadcrumb_directive.html'),
-      controller: ['$scope', 'StoryViewerBackendApiService', 'UrlService',
-        function($scope, StoryViewerBackendApiService, UrlService) {
-          StoryViewerBackendApiService.fetchStoryData(
-            UrlService.getStoryIdFromLearnerUrl()).then(
-            function(storyDataDict) {
-              $scope.storyTitle = storyDataDict.title;
-            });
+      controller: ['$scope', 'UrlService',
+        function($scope, UrlService) {
+          $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
         }
       ]
     };

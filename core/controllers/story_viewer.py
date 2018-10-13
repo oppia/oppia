@@ -18,6 +18,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_services
 import feconf
 
 
@@ -25,10 +26,14 @@ class StoryViewerPage(base.BaseHandler):
     """Renders the story viewer page."""
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id):
+    def get(self, topic_name, story_id):
         """Handles GET requests."""
-
         if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
             raise self.PageNotFoundException
 
         story = story_services.get_story_by_id(story_id, strict=False)
@@ -38,6 +43,7 @@ class StoryViewerPage(base.BaseHandler):
         self.values.update({
             'story_id': story.id,
             'story_title': story.title,
+            'topic_name': topic.name
         })
 
         self.render_template('pages/story_viewer/story_viewer.html')
@@ -49,10 +55,15 @@ class StoryPageDataHandler(base.BaseHandler):
     """
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id):
+    def get(self, topic_name, story_id):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_name(topic_name)
+
+        if topic is None:
             raise self.PageNotFoundException
 
         story = story_services.get_story_by_id(story_id, strict=False)
@@ -62,6 +73,7 @@ class StoryPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
+            'topic_name': topic.name,
             'title': story_dict['title'],
             'id': story_dict['id'],
             'description': story_dict['description'],

@@ -160,9 +160,10 @@ oppia.factory('UrlInterpolationService', [
       /**
        * Given an story id returns the complete url path to that image.
        */
-      getStoryUrl: function(storyId) {
+      getStoryUrl: function(storyId, topicName) {
         validateResourcePath(storyId);
-        return '/story' + storyId;
+        validateResourcePath(topicName);
+        return '/story' + topicName + storyId;
       },
 
       /**

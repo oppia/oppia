@@ -16,15 +16,17 @@
  * @fileoverview Service to get story data.
  */
 oppia.constant(
-  'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
+  'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<topic_name>/<story_id>');
 
 oppia.factory('StoryViewerBackendApiService', [
   '$http', '$q', 'STORY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, STORY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var storyDataDict = null;
-    var _fetchStoryData = function(storyId, successCallback, errorCallback) {
+    var _fetchStoryData = function(
+        storyId, topicName, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         STORY_DATA_URL_TEMPLATE, {
+          topic_name: topicName,
           story_id: storyId
         });
 
@@ -41,9 +43,9 @@ oppia.factory('StoryViewerBackendApiService', [
     };
 
     return {
-      fetchStoryData: function(storyId) {
+      fetchStoryData: function(storyId, topicName) {
         return $q(function(resolve, reject) {
-          _fetchStoryData(storyId, resolve, reject);
+          _fetchStoryData(storyId, topicName, resolve, reject);
         });
       }
     };

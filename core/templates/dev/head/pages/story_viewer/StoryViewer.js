@@ -41,6 +41,7 @@ oppia.controller('StoryViewer', [
     $scope.story = null;
     $scope.storyPlaythrough = null;
     $scope.storyId = UrlService.getStoryIdFromLearnerUrl();
+    $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
     $scope.pathIconParameters = [];
     $scope.explorationCardIsShown = false;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -181,7 +182,7 @@ oppia.controller('StoryViewer', [
 
     // Load the story the learner wants to view.
     StoryViewerBackendApiService.fetchStoryData(
-      $scope.storyId).then(
+      $scope.storyId, $scope.topicName).then(
       function(storyBackendObject) {
         $scope.story = StoryObjectFactory.createFromBackendDict(
           storyBackendObject);

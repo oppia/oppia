@@ -788,7 +788,6 @@ def get_learner_story_dict_by_id(story_id, strict=True):
         'next_exploration_id': next_exploration_id,
         'completed_exploration_ids': completed_nodes
     }
-    # story_is_public = rights_manager.is_story_public(story_id)
 
     for story_node in story_dict['story_contents']['nodes']:
         exploration_id = story_node['exploration_id']

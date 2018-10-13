@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the topic viewer page."""
+"""Tests for the story viewer page."""
 
 from core.domain import rights_manager
 from core.domain import story_domain

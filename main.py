@@ -337,10 +337,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
+        r'%s/<topic_name>/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryViewerPage),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
+        r'%s/<topic_name>/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
