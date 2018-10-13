@@ -33,7 +33,8 @@ oppia.directive('stateTranslation', [
         'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
-        'RULE_SUMMARY_WRAP_CHARACTER_COUNT', 'ResponsesService',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'ExplorationHtmlFormatterService',
         function(
             $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
@@ -41,7 +42,8 @@ oppia.directive('stateTranslation', [
             TranslationStatusService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT, ResponsesService) {
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT,
+            ExplorationHtmlFormatterService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
           $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
@@ -72,10 +74,6 @@ oppia.directive('stateTranslation', [
 
           $scope.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
-          };
-
-          $scope.getAnswerChoices = function() {
-            return ResponsesService.getAnswerChoices();
           };
 
           $scope.onTabClick = function(tabId) {
@@ -289,6 +287,47 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
+            var currentCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento(stateName);
+            var interactionId = $scope.stateInteractionId;
+            if (interactionId) {
+              var interactionPreviewHtml = ExplorationHtmlFormatterService
+                .getInteractionHtml(
+                  interactionId, currentCustomizationArgs, false)
+
+              // Special cases for multiple choice input and image click input.
+              if (interactionId === 'MultipleChoiceInput') {
+                $scope.answerChoices =
+                  currentCustomizationArgs.choices.value.map(function(val, ind) {
+                    return {
+                      val: ind,
+                      label: val
+                    };
+                  });
+              } else if (interactionId === 'ImageClickInput') {
+                var _answerChoices = [];
+                var imageWithRegions =
+                  currentCustomizationArgs.imageAndRegions.value;
+                for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
+                  _answerChoices.push({
+                    val: imageWithRegions.labeledRegions[j].label,
+                    label: imageWithRegions.labeledRegions[j].label
+                  });
+                }
+                $scope.answerChoices = _answerChoices;
+              } else if (interactionId === 'ItemSelectionInput' ||
+                  interactionId === 'DragAndDropSortInput') {
+                $scope.answerChoices =
+                  currentCustomizationArgs.choices.value.map(function(val) {
+                    return {
+                      val: val,
+                      label: val
+                    };
+                  });
+              } else {
+                $scope.answerChoices = null;
+              }
+            }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 
