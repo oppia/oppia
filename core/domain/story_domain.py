@@ -757,7 +757,7 @@ class Story(object):
 
         Raises:
             Exception: The desired_node_id differs from
-                story_contents.next_node_id
+                story_contents.next_node_id.
         """
         if self.story_contents.next_node_id != desired_node_id:
             raise Exception(

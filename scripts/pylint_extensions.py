@@ -697,7 +697,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
 
         Args:
             node. astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST
+                definition in AST.
         """
 
         try:

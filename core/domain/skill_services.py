@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on skills.
-"""
+"""Commands that can be used to operate on skills."""
 
 import copy
 import logging

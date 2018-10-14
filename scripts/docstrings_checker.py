@@ -176,8 +176,8 @@ def docstringify(docstring):
 class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r"""
-        \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
+    re_param_line = re.compile(
+        r"""\s*  \*{{0,2}}(\w+)         # identifier potentially with asterisks
         \s*  ( [:]
             \s*
             ({type}|\S*)
@@ -188,8 +188,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r"""
-        \s* (({type}|\S*).)?              # identifier
+    re_returns_line = re.compile(
+        r"""\s* (({type}|\S*).)?          # identifier
         \s* (.*)                          # beginning of description
     """.format(
         type=re_multiple_type,

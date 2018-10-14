@@ -49,7 +49,6 @@ def _run_cmd(cmd_str):
 
     Returns:
         (str): The output of the command.
-
     """
     return subprocess.check_output(cmd_str.split(' ')).strip()
 
@@ -95,8 +94,7 @@ def _gather_logs(start, stop='HEAD'):
         stop (str):  Tag, Branch or SHA1 of end point, defaults to HEAD
 
     Returns:
-        list[Log]: List of Logs
-
+        list[Log]: List of Logs.
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
@@ -114,8 +112,7 @@ def _extract_issues(logs):
         logs (list[Log]): List of Logs to parse
 
     Returns:
-        set[str]: Set of found issues as links to Github
-
+        set[str]: Set of found issues as links to Github.
     """
     issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
     links = {ISSUE_URL_FORMAT_STRING % issue for issue in issues}
@@ -156,7 +153,6 @@ def _git_diff_names_only(left, right='HEAD'):
 
     Returns:
         (list): List of files that are different between the two points.
-
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
     return _run_cmd(diff_cmd).splitlines()
@@ -195,7 +191,6 @@ def _check_storage_models(current_release):
 
     Returns:
         (list): The changed files (if any)
-
     """
     diff_list = _git_diff_names_only(current_release)
     return [item for item in diff_list if item.startswith('core/storage')]

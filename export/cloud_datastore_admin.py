@@ -17,7 +17,6 @@
 Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
-
 """
 
 import datetime
@@ -44,7 +43,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            AssertionError: Bucket url exists and doesn't start with 'gs://'
+            AssertionError: Bucket url exists and doesn't start with 'gs://'.
         """
         GCS_BUCKET_URL_PREFIX = 'gs://'
 

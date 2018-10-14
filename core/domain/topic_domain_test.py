@@ -46,8 +46,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
 
     def test_create_default_topic(self):
-        """Tests the create_default_topic() function.
-        """
+        """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(self.topic_id, 'Name')
         expected_topic_dict = {
             'id': self.topic_id,

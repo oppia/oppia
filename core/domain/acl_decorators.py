@@ -503,8 +503,7 @@ def can_access_creator_dashboard(handler):
 
 
 def can_create_feedback_thread(handler):
-    """Decorator to check whether the user can create a feedback thread.
-    """
+    """Decorator to check whether the user can create a feedback thread."""
 
     def test_can_access(self, exploration_id, **kwargs):
         """Checks if the user can create a feedback thread.
@@ -579,8 +578,7 @@ def can_view_feedback_thread(handler):
 
 
 def can_comment_on_feedback_thread(handler):
-    """Decorator to check whether the user can comment on feedback thread.
-    """
+    """Decorator to check whether the user can comment on feedback thread."""
 
     def test_can_access(self, thread_id, **kwargs):
         """Checks if the user can comment on the feedback thread.
@@ -1275,7 +1273,8 @@ def can_delete_question(handler):
 
 
 def can_edit_subtopic_page(handler):
-    """Decorator to check whether the user can edit a subtopic page of a topic.
+    """Decorator to check whether the user can edit a subtopic
+    page of a topic.
     """
     def test_can_edit(self, topic_id, **kwargs):
         """Checks whether the user can edit the subtopic page
@@ -1429,8 +1428,7 @@ def can_edit_skill(handler):
 
 
 def can_delete_skill(handler):
-    """Decorator to check whether the user can delete a skill.
-    """
+    """Decorator to check whether the user can delete a skill."""
     def test_can_delete_skill(self, **kwargs):
         """Checks whether the user can delete a skill.
 
@@ -1534,7 +1532,8 @@ def can_publish_skill(handler):
 
 
 def can_delete_story(handler):
-    """Decorator to check whether the user can delete a story in a given topic.
+    """Decorator to check whether the user can delete a story
+    in a given topic.
     """
     def test_can_delete_story(self, topic_id, **kwargs):
         """Checks whether the user can delet a story in
