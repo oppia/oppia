@@ -47,7 +47,7 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/audiohandler/<exploration_id>/audio/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
@@ -74,7 +74,7 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '0',
         filename: 'myfile.png'
       });
@@ -102,7 +102,7 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/audiohandler/<exploration_id>/audio/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -123,7 +123,7 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/imagehandler/<exploration_id>/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
@@ -144,7 +144,7 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/audiohandler/<exploration_id>/audio/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -170,7 +170,7 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        'imagehandler/<exploration_id>/image/<filename>', {
+        'assetsdevhandler/<exploration_id>/assets/image/<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });

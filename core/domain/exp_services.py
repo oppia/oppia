@@ -38,6 +38,7 @@ from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
@@ -284,8 +285,8 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
 
     if error_versions:
         raise Exception(
-            "Exploration %s, versions [%s] could not be converted to latest"
-            "schema version." % (exp_id, ', '.join(map(str, error_versions))))
+            'Exploration %s, versions [%s] could not be converted to latest'
+            'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
     return explorations
 
 
@@ -1597,7 +1598,7 @@ def get_next_page_of_all_non_private_commits(
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
-            "max_age must be a datetime.timedelta instance. or None.")
+            'max_age must be a datetime.timedelta instance. or None.')
 
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
@@ -1652,27 +1653,20 @@ def save_original_and_compressed_versions_of_image(
         original_image_content: str. The content of the original image.
         user_id: str. The id of the user who wants to upload the image.
     """
-    filepath = (
-        filename if constants.DEV_MODE else 'image/%s' % filename)
+    filepath = 'image/%s' % filename
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
 
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
-    compressed_image_filepath = (
-        compressed_image_filename if constants.DEV_MODE
-        else 'image/%s' % compressed_image_filename)
+    compressed_image_filepath = 'image/%s' % compressed_image_filename
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
-    micro_image_filepath = (
-        micro_image_filename if constants.DEV_MODE
-        else 'image/%s' % micro_image_filename)
+    micro_image_filepath = 'image/%s' % micro_image_filename
 
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if constants.DEV_MODE
-        else fs_domain.GcsFileSystem)
+    file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
 

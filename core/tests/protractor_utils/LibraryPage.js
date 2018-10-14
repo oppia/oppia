@@ -46,6 +46,7 @@ var LibraryPage = function(){
   );
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
+  var mainHeader = element(by.css('.protractor-test-library-main-header'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -100,6 +101,10 @@ var LibraryPage = function(){
 
   this.expectCurrentCategorySelectionToBe = function(expectedCategories) {
     categorySelector.expectCurrentSelectionToBe(expectedCategories);
+  };
+
+  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
+    expect(mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = function(name) {

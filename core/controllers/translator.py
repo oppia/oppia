@@ -19,12 +19,12 @@
 import StringIO
 import datetime
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.platform import models
 import feconf
 import utils
@@ -128,9 +128,7 @@ class AudioUploadHandler(base.BaseHandler):
 
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
-        file_system_class = (
-            fs_domain.ExplorationFileSystem if constants.DEV_MODE
-            else fs_domain.GcsFileSystem)
+        file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
         fs.commit(
@@ -179,12 +177,24 @@ class TranslatorAutosaveHandler(base.BaseHandler):
 
 
 class ExplorationTranslationHandler(base.BaseHandler):
+    """Handles updates to exploration translations. It returns json format
+    response when an exception is raised.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_translate_exploration
     def put(self, exploration_id):
-        """Updates properties of the given exploration."""
+        """Updates properties of the given exploration.
+
+        Args:
+            exploration_id: str. Id of exploration to be updated.
+
+        Raises:
+            InvalidInputException: The exploration update operation failed.
+            PageNotFoundException: No exploration data exist for given user id
+                and exploration id.
+        """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)

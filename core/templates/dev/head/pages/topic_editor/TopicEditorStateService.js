@@ -214,11 +214,10 @@ oppia.factory('TopicEditorStateService', [
         return _questionSummaries;
       },
 
-      fetchQuestionSummaries: function(topicId, callback) {
+      fetchQuestionSummaries: function(topicId) {
         EditableTopicBackendApiService.fetchQuestions(topicId).then(
           function(questionSummaries) {
             _setQuestionSummaries(questionSummaries);
-            callback();
           });
       },
 

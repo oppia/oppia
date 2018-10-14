@@ -60,6 +60,8 @@
         <skills-list skill-summaries="untriagedSkillSummaries"
                      ng-if="untriagedSkillSummaries.length > 0"
                      editable-topic-summaries="editableTopicSummaries"
+                     mergeable-skill-summaries="mergeableSkillSummaries"
+                     in-modal="false"
                      user-can-delete-skill="userCanDeleteSkill">
         </skills-list>
         <p class="intro-card-message" ng-if="isSkillsTabHelpTextVisible()" style="padding-top: 6px;">
@@ -70,7 +72,9 @@
       <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
         <skills-list skill-summaries="unpublishedSkillSummaries"
                      editable-topic-summaries="editableTopicSummaries"
-                     user-can-delete-skill="userCanDeleteSkill">
+                     in-modal="false"
+                     user-can-delete-skill="userCanDeleteSkill"
+                     unpublished-skill="true">
         </skills-list>
       </div>
     </div>
@@ -245,4 +249,5 @@
   <script src="/templates/dev/head/domain/topic/EditableTopicBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
 {% endblock footer_js %}

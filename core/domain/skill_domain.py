@@ -202,7 +202,7 @@ class Misconception(object):
         """Creates a Misconception object with default values.
 
         Args:
-            misconception_id: str. ID of the new misconception.
+            misconception_id: int. ID of the new misconception.
 
         Returns:
             Misconception. A misconception object with given id and default
@@ -218,7 +218,7 @@ class Misconception(object):
         """Validates the misconception id for a Misconception object.
 
         Args:
-            misconception_id: str. The misconception id to be validated.
+            misconception_id: int. The misconception id to be validated.
         """
         if not isinstance(misconception_id, int):
             raise utils.ValidationError(
@@ -659,7 +659,7 @@ class Skill(object):
         id, or None if it is not in the misconceptions list.
 
         Args:
-            misconception_id: str. The id of the misconception.
+            misconception_id: int. The id of the misconception.
 
         Returns:
             int or None. The index of the corresponding misconception, or None
@@ -686,13 +686,22 @@ class Skill(object):
             misconception_dict['id'])
 
     def get_incremented_misconception_id(self, misconception_id):
+        """Returns the incremented misconception id.
+
+        Args:
+            misconception_id: int. The id of the misconception to be
+                incremented.
+
+        Returns:
+            int. The incremented misconception id.
+        """
         return misconception_id + 1
 
     def delete_misconception(self, misconception_id):
         """Removes a misconception with the given id.
 
         Args:
-            misconception_id: str. The id of the misconception to be removed.
+            misconception_id: int. The id of the misconception to be removed.
 
         Raises:
             ValueError: There is no misconception with the given id.
@@ -707,7 +716,7 @@ class Skill(object):
         """Updates the name of the misconception with the given id.
 
         Args:
-            misconception_id: str. The id of the misconception to be edited.
+            misconception_id: int. The id of the misconception to be edited.
             name: str. The new name of the misconception.
 
         Raises:
@@ -723,7 +732,7 @@ class Skill(object):
         """Updates the notes of the misconception with the given id.
 
         Args:
-            misconception_id: str. The id of the misconception to be edited.
+            misconception_id: int. The id of the misconception to be edited.
             notes: str. The new notes of the misconception.
 
         Raises:
@@ -739,7 +748,7 @@ class Skill(object):
         """Updates the feedback of the misconception with the given id.
 
         Args:
-            misconception_id: str. The id of the misconception to be edited.
+            misconception_id: int. The id of the misconception to be edited.
             feedback: str. The html string that corresponds to the new feedback
                 of the misconception.
 

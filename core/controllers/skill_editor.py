@@ -14,6 +14,7 @@
 
 """Controllers for the skill editor."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
@@ -55,7 +56,7 @@ class SkillEditorPage(base.BaseHandler):
     def get(self, skill_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -100,10 +101,6 @@ class SkillRightsHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        if skill_rights is None:
-            raise self.InvalidInputException(
-                'Could not find skill rights associated with the provided '
-                'skill id')
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
@@ -124,7 +121,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -142,7 +139,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -177,13 +174,10 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        if not skill_id:
-            raise self.PageNotFoundException
-
         if skill_services.skill_has_associated_questions(skill_id):
             raise Exception(
                 'Please delete all questions associated with this skill '
