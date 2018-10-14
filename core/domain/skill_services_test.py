@@ -270,11 +270,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         except Exception:
             self.fail(msg='Unexpected exception raised.')
 
-        try:
-            skill_services.get_multi_skills(['skill_a', 'skill_c'])
-            self.assertFail()
-        except Exception as e:
-            self.assertEqual(e.message, 'No skill exists for ID skill_c')
+        with self.assertRaisesRegexp(
+            Exception, 'No skill exists for ID skill_c'):
+                skill_services.get_multi_skills(['skill_a', 'skill_c'])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
