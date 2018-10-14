@@ -272,7 +272,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'No skill exists for ID skill_c'):
-                skill_services.get_multi_skills(['skill_a', 'skill_c'])
+            skill_services.get_multi_skills(['skill_a', 'skill_c'])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
