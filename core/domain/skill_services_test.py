@@ -16,6 +16,7 @@
 
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -35,7 +36,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
-            'Explanation', ['Example 1'])
+            state_domain.SubtitledHtml(
+                '1', 'Explanation'), [
+            state_domain.SubtitledHtml('2', 'Example 1')], {})
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
@@ -100,11 +103,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                'Explanation', ['Example 1']))
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                state_domain.SubtitledHtml('2', 'Example 1')], {}))
         self.save_new_skill(
             'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                'Explanation', ['Example 1']))
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                state_domain.SubtitledHtml('2', 'Example 1')], {}))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             skill_descriptions = skill_services.get_skill_descriptions_by_ids(
                 'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
@@ -238,12 +245,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
-            skill_contents=(
-                skill_domain.SkillContents('Explanation', ['Example 1'])))
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                state_domain.SubtitledHtml('2', 'Example 1')], {}))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
-            skill_contents=(
-                skill_domain.SkillContents('Explanation', ['Example 1'])))
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                state_domain.SubtitledHtml('2', 'Example 1')], {}))
 
         skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
             self.user_id_admin)

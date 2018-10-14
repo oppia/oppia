@@ -16,6 +16,7 @@
 
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -34,7 +35,10 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.skill_contents = skill_domain.SkillContents(
-            'Skill Explanation', ['Example 1', 'Example 2'])
+            state_domain.SubtitledHtml(
+                '1', 'Skill Explanation'), [
+            state_domain.SubtitledHtml('2', 'Example 1'),
+            state_domain.SubtitledHtml('3', 'Example 2')], {})
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -48,7 +52,13 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(
                 'Skill Explanation',
-                json_response['concept_card_dict']['explanation'])
+                json_response['concept_card_dict']['explanation']['html'])
             self.assertEqual(
-                ['Example 1', 'Example 2'],
+                [{
+                    'content_id': '2',
+                    'html': 'Example 1'
+                }, {
+                    'content_id': '3',
+                    'html': 'Example 2'
+                }],
                 json_response['concept_card_dict']['worked_examples'])

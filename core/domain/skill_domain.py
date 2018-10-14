@@ -275,12 +275,20 @@ class SkillContents(object):
             ValidationError: One or more attributes of skill contents are
             invalid.
         """
+        if not isinstance(self.explanation, state_domain.SubtitledHtml):
+            raise utils.ValidationError(
+                'Expected skill explanation to be a SubtitledHtml object, '
+                'received %s', self.explanation)
         self.explanation.validate()
         if not isinstance(self.worked_examples, list):
             raise utils.ValidationError(
                 'Expected worked examples to be a list, received %s' %
                 self.worked_examples)
         for example in self.worked_examples:
+            if not isinstance(example, state_domain.SubtitledHtml):
+                raise utils.ValidationError(
+                    'Expected worked example to be a SubtitledHtml object, '
+                    'received %s' % example)
             example.validate()
 
     def to_dict(self):
