@@ -278,7 +278,7 @@ class SkillContents(object):
         if not isinstance(self.explanation, state_domain.SubtitledHtml):
             raise utils.ValidationError(
                 'Expected skill explanation to be a SubtitledHtml object, '
-                'received %s', self.explanation)
+                'received %s' % self.explanation)
         self.explanation.validate()
         if not isinstance(self.worked_examples, list):
             raise utils.ValidationError(

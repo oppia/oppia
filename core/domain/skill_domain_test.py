@@ -33,7 +33,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
-            state_domain.SubtitledHtml('2', 'Example 1')], {})
+                    state_domain.SubtitledHtml('2', 'Example 1')], {})
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
         self.skill = skill_domain.Skill(
@@ -174,7 +174,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
-            state_domain.SubtitledHtml('2', 'Example 1')], {})
+                state_domain.SubtitledHtml('2', 'Example 1')], {})
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
