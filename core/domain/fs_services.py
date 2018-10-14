@@ -21,6 +21,14 @@ from core.domain import fs_domain
 
 
 def get_exploration_file_system_class():
+	""" 
+	Returns:
+		If the development mode of constants is on, the Exploration File System
+		(a datastore-backed read-write file system for a single exploration) is returned.
+
+		Otherwise, it returns Gcs File System (wrapper for a file system based on Google 
+		Cloud Service)
+	"""
     if constants.DEV_MODE:
         return fs_domain.ExplorationFileSystem
     else:

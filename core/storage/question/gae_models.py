@@ -233,6 +233,16 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):
+        """Returns the list of all questions ids of a particular skill id.
+
+        Args:
+            skill_id: str. ID of the skill.
+
+        Returns:
+            list(question_id)|None. The list of question ids
+	    that are linked to a particular skill ID. None if the skill
+            ID doesn't exist.
+        """
         question_skill_link_models = cls.query(cls.skill_id == skill_id)
         question_ids = [
             model.question_id for model in question_skill_link_models
