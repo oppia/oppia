@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
