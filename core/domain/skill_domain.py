@@ -639,7 +639,7 @@ class Skill(object):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: str. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
         self.skill_contents.explanation = (
             state_domain.SubtitledHtml.from_dict(explanation))
