@@ -58,9 +58,6 @@ class SubtopicViewerPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        subtopic = topic.get_subtopic_by_id(int(subtopic_id), strict=False)
-
         topic_rights = topic_services.get_topic_rights(topic_id)
         if not topic_rights.topic_is_published:
             raise self.PageNotFoundException
