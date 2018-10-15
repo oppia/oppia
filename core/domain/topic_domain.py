@@ -19,6 +19,7 @@
 import copy
 
 from constants import constants
+from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -611,6 +612,12 @@ class Topic(object):
             raise Exception(
                 'The skill id %s is already an uncategorized skill.'
                 % new_uncategorized_skill_id)
+
+        skill_ids_for_unpublished_skills = [
+            skill_rights.id for skill_rights in (
+                skill_services.get_all_unpublished_skill_rights())]
+        if new_uncategorized_skill_id in skill_ids_for_unpublished_skills:
+            raise Exception('Cannot assign unpublished skills to a topic')
         self.uncategorized_skill_ids.append(new_uncategorized_skill_id)
 
     def remove_uncategorized_skill_id(self, uncategorized_skill_id):

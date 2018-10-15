@@ -14,6 +14,7 @@
 
 """Tests for the topics and skills dashboard page."""
 
+from constants import constants
 from core.domain import skill_services
 from core.domain import topic_services
 from core.tests import test_utils
@@ -37,9 +38,13 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
+        self.linked_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.linked_skill_id, self.admin_id, 'Description 3')
+        skill_services.publish_skill(self.linked_skill_id, self.admin_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
-            [], 1)
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
+            [self.linked_skill_id], [], 1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTest(
@@ -53,7 +58,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         self.save_new_skill(skill_id, self.admin_id, 'Description')
         skill_services.publish_skill(skill_id, self.admin_id)
         self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -73,6 +78,11 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 json_response['topic_summary_dicts'][0]['id'], self.topic_id)
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
+            self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['mergeable_skill_summary_dicts'][0]['id'],
+                self.linked_skill_id)
             self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
@@ -108,6 +118,11 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.assertEqual(
                 len(json_response['untriaged_skill_summary_dicts']), 1)
             self.assertEqual(
+                len(json_response['mergeable_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['mergeable_skill_summary_dicts'][0]['id'],
+                self.linked_skill_id)
+            self.assertEqual(
                 json_response['untriaged_skill_summary_dicts'][0]['id'],
                 skill_id)
             self.assertEqual(
@@ -127,7 +142,7 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -146,7 +161,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -162,7 +177,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation_in_invalid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -180,7 +195,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -197,5 +212,7 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
             topic = topic_services.get_topic_by_id(self.topic_id)
-            self.assertEqual(topic.uncategorized_skill_ids, [skill_id])
+            self.assertEqual(
+                topic.uncategorized_skill_ids,
+                [self.linked_skill_id, skill_id])
             self.logout()

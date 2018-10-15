@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for defining acctions."""
+"""Base class for defining actions."""
 
 from extensions import domain
 
@@ -32,6 +32,7 @@ class BaseLearnerActionSpec(object):
 
     @property
     def customization_arg_specs(self):
+        """The customization arg specs for the action definition."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]

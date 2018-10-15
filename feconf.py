@@ -366,9 +366,6 @@ ENABLE_PROMO_BAR = True
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = True
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -663,6 +660,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
+MERGE_SKILL_URL = '/merge_skill'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'

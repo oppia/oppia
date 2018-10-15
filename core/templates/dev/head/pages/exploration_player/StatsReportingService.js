@@ -47,12 +47,12 @@ oppia.constant('STATS_REPORTING_URLS', {
 
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
-  'PlaythroughService', 'siteAnalyticsService', 'StopwatchObjectFactory',
+  'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
   'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
-      PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
+      PlaythroughService, SiteAnalyticsService, StopwatchObjectFactory,
       UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
       PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
     var explorationId = null;
@@ -168,7 +168,7 @@ oppia.factory('StatsReportingService', [
 
         statesVisited[stateName] = true;
         numStatesVisited = 1;
-        siteAnalyticsService.registerNewCard(1);
+        SiteAnalyticsService.registerNewCard(1);
 
         stateStopwatch.reset();
         explorationStarted = true;
@@ -243,7 +243,7 @@ oppia.factory('StatsReportingService', [
         if (!statesVisited.hasOwnProperty(newStateName)) {
           statesVisited[newStateName] = true;
           numStatesVisited++;
-          siteAnalyticsService.registerNewCard(numStatesVisited);
+          SiteAnalyticsService.registerNewCard(numStatesVisited);
         }
 
         stateStopwatch.reset();
@@ -277,7 +277,7 @@ oppia.factory('StatsReportingService', [
           paramValues: params
         });
 
-        siteAnalyticsService.registerFinishExploration();
+        SiteAnalyticsService.registerFinishExploration();
 
         postStatsToBackend();
         PlaythroughService.recordExplorationQuitAction(

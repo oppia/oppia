@@ -109,6 +109,15 @@ def _get_skill_memcache_key(skill_id, version=None):
         return 'skill:%s' % skill_id
 
 
+def get_merged_skill_ids():
+    """Returns the skill IDs of skills that have been merged.
+
+    Returns:
+        list(str). List of skill IDs of merged skills.
+    """
+    return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
+
+
 def get_skill_from_model(skill_model, run_conversion=True):
     """Returns a skill domain object given a skill model loaded
     from the datastore.

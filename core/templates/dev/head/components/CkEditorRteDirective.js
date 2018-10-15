@@ -92,10 +92,16 @@ oppia.directive('ckEditorRte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
+        var startupFocusEnabled = true;
+        if (
+          scope.uiConfig() &&
+          scope.uiConfig().startupFocusEnabled !== undefined) {
+          startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
+        }
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
-          startupFocus: true,
+          startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
           title: false,
           floatSpaceDockedOffsetY: 15,

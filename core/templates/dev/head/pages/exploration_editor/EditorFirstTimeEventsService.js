@@ -19,8 +19,8 @@
  */
 
 oppia.factory('EditorFirstTimeEventsService', [
-  'siteAnalyticsService',
-  function(siteAnalyticsService) {
+  'SiteAnalyticsService',
+  function(SiteAnalyticsService) {
     var explorationId = null;
     var shouldRegisterEvents = false;
     var alreadyRegisteredEvents = {};
@@ -32,7 +32,7 @@ oppia.factory('EditorFirstTimeEventsService', [
       registerEditorFirstEntryEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('EditorFirstEntryEvent')) {
-          siteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
+          SiteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
           alreadyRegisteredEvents.EditorFirstEntryEvent = true;
         }
       },
@@ -40,14 +40,14 @@ oppia.factory('EditorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstOpenContentBoxEvent')) {
-          siteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
+          SiteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
           alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
         }
       },
       registerFirstSaveContentEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('FirstSaveContentEvent')) {
-          siteAnalyticsService.registerFirstSaveContentEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveContentEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveContentEvent = true;
         }
       },
@@ -55,7 +55,7 @@ oppia.factory('EditorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstClickAddInteractionEvent')) {
-          siteAnalyticsService.registerFirstClickAddInteractionEvent(
+          SiteAnalyticsService.registerFirstClickAddInteractionEvent(
             explorationId);
           alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
         }
@@ -64,7 +64,7 @@ oppia.factory('EditorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstSelectInteractionTypeEvent')) {
-          siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
+          SiteAnalyticsService.registerFirstSelectInteractionTypeEvent(
             explorationId);
           alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
         }
@@ -73,14 +73,14 @@ oppia.factory('EditorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstSaveInteractionEvent')) {
-          siteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
         }
       },
       registerFirstSaveRuleEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('FirstSaveRuleEvent')) {
-          siteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveRuleEvent = true;
         }
       },
@@ -88,7 +88,7 @@ oppia.factory('EditorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstCreateSecondStateEvent')) {
-          siteAnalyticsService.registerFirstCreateSecondStateEvent(
+          SiteAnalyticsService.registerFirstCreateSecondStateEvent(
             explorationId);
           alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
         }
