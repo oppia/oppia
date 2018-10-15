@@ -1110,15 +1110,19 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(
                 'exploration/%s' % self.EXPLORATION_ID))
-        self.assertEqual(fs.isfile(self.FILENAME), False)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         exp_services.save_original_and_compressed_versions_of_image(
             self.USER, self.FILENAME, self.EXPLORATION_ID,
             original_image_content)
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
 
 
 # pylint: disable=protected-access
@@ -3436,13 +3440,13 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.2 not found"):
+            'Entity for class StateIdMappingModel with id eid.2 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version)
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.1 not found"):
+            'Entity for class StateIdMappingModel with id eid.1 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version - 1)
 
