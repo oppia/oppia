@@ -25,11 +25,11 @@ from constants import constants  # pylint: disable=relative-import
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE is true check that we are running in development enviroment.
-# The SERVER_SOFTWARE enviroment variable does not exist in Travis thus we need
-# to check it.
-if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
-        not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+# When DEV_MODE is true check that we are running in development environment.
+# The SERVER_SOFTWARE environment variable does not exist in Travis thus we
+# need to check whether it even exists.
+if (constants.DEV_MODE and
+        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
     raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')

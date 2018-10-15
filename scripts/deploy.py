@@ -114,6 +114,7 @@ def preprocess_release():
 
     (1) Changes the app name in app.yaml to APP_NAME.
     (2) Substitutes files from the per-app deployment data.
+    (3) Change the DEV_MODE constant in assets/constants.js.
     """
     # Change the app name in app.yaml.
     f = open('app.yaml', 'r')
@@ -156,6 +157,15 @@ def preprocess_release():
             src = os.path.join(src_dir, filename)
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
+
+    # Changes the DEV_MODE constant in assets/constatns.js.
+    f = open(os.path.join('assets', 'constants.js'), 'r')
+    content = f.read()
+    assert '"DEV_MODE": true' in content
+    os.remove(os.path.join('assets', 'constants.js'))
+    content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
+    d = open(os.path.join('assets', 'constants.js'), 'w+')
+    d.write(content)
 
 
 def _get_served_version():
