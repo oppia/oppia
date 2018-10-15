@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to hold info to be displayed on the subtopic page.
+ * @fileoverview Service to hold title info to be displayed on the subtopic
+ * page.
  */
 
-oppia.factory('SubtopicPageInfoService', [
+oppia.factory('SubtopicPageTitleService', [
   function() {
     var _subtopicTitle = null;
     var _topicName = null;

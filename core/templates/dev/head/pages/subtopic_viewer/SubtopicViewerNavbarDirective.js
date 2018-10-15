@@ -17,21 +17,21 @@
  */
 
 oppia.directive('subtopicViewerNavbar', [
-  'SubtopicPageInfoService', 'UrlInterpolationService',
-  function(SubtopicPageInfoService, UrlInterpolationService) {
+  'SubtopicPageTitleService', 'UrlInterpolationService',
+  function(SubtopicPageTitleService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/subtopic_viewer/' +
         'subtopic_viewer_navbar_directive.html'),
-      controller: ['$scope', 'SubtopicPageInfoService', function(
-          $scope, SubtopicPageInfoService) {
+      controller: ['$scope', 'SubtopicPageTitleService', function(
+          $scope, SubtopicPageTitleService) {
         $scope.getTopicName = function() {
-          return SubtopicPageInfoService.getTopicName();
+          return SubtopicPageTitleService.getTopicName();
         };
         $scope.getSubtopicTitle = function() {
-          return SubtopicPageInfoService.getSubtopicTitle();
+          return SubtopicPageTitleService.getSubtopicTitle();
         };
       }]
     };
