@@ -67,7 +67,7 @@ oppia.factory('QuestionUpdateService', [
           });
       },
       setQuestionStateData: function(question, updateFunction) {
-        var oldStateData = question.getStateData();
+        var oldStateData = angular.copy(question.getStateData());
         // We update the question here before making the change,
         // so that we can obtain the new state to save to the backend via
         // the change list.
