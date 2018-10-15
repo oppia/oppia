@@ -117,12 +117,12 @@ def preprocess_release():
     (3) Change the DEV_MODE constant in assets/constants.js.
     """
     # Change the app name in app.yaml.
-    f = open('app.yaml', 'r')
-    content = f.read()
+    with open('app.yaml', 'r') as app_yaml_file:
+        content = app_yaml_file.read()
     os.remove('app.yaml')
     content = content.replace('oppiaserver', APP_NAME)
-    d = open('app.yaml', 'w+')
-    d.write(content)
+    with open('app.yaml', 'w+') as new_app_yaml_file:
+        new_app_yaml_file.write(content)
 
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
@@ -158,14 +158,14 @@ def preprocess_release():
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constatns.js.
-    f = open(os.path.join('assets', 'constants.js'), 'r')
-    content = f.read()
+    # Changes the DEV_MODE constant in assets/constants.js.
+    with open(os.path.join('assets', 'constants.js'), 'r') as assets_file:
+        content = assets_file.read()
     assert '"DEV_MODE": true' in content
     os.remove(os.path.join('assets', 'constants.js'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    d = open(os.path.join('assets', 'constants.js'), 'w+')
-    d.write(content)
+    with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+        new_assets_file.write(content)
 
 
 def _get_served_version():

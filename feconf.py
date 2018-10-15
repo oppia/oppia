@@ -26,8 +26,8 @@ from constants import constants  # pylint: disable=relative-import
 DEBUG = False
 
 # When DEV_MODE is true check that we are running in development environment.
-# The SERVER_SOFTWARE environment variable does not exist in Travis thus we
-# need to check whether it even exists.
+# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
+# need for an explicit default.
 if (constants.DEV_MODE and
         not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
     raise Exception('DEV_MODE can\'t be true on production.')
