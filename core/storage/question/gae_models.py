@@ -256,7 +256,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(QuestionSkillLinkModel)|None. The list of question skill link
-            models that are linked to the question ID. None if there are no
+            models that are linked to the question ID, or None if there are no
             question skill link models associated with the question ID.
         """
         return QuestionSkillLinkModel.query().filter(
