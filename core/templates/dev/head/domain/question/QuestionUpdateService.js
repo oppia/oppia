@@ -66,7 +66,21 @@ oppia.factory('QuestionUpdateService', [
             question.setLanguageCode(oldLanguageCode);
           });
       },
-      setQuestionStateData: function(question, oldStateData, updateFunction) {
+      setQuestionStateData: function(question, updateFunction) {
+        var oldStateData = question.getStateData();
+        // We update the question here before making the change,
+        // so that we can obtain the new state to save to the backend via
+        // the change list.
+        //
+        // We diverge slightly from the other models of update services because
+        // a separate service (StateEditorService) is being used to update
+        // the question, and we can't retrieve the new state data without
+        // simultaneously updating it.
+        //
+        // The updating of the question in the client can't be deferred to
+        // when the change in the change list is applied, because we would
+        // have to defer the extraction of the new state data, which we need
+        // for creating the change to send to the backend.
         updateFunction();
         var newStateData = question.getStateData();
         _applyPropertyChange(
@@ -74,8 +88,7 @@ oppia.factory('QuestionUpdateService', [
           newStateData.toBackendDict(),
           oldStateData.toBackendDict(),
           function(changeDict, question) {
-            updateFunction();
-            question.setStateData(newStateData);
+            // Unused (see comment above).
           }, function(changeDict, question) {
             question.setStateData(oldStateData);
           });

@@ -97,11 +97,8 @@ oppia.directive('questionEditor', [
           };
 
           var _updateQuestion = function(updateFunction) {
-            var oldQuestionStateData =
-              angular.copy($scope.question.getStateData());
             QuestionUpdateService.setQuestionStateData(
               $scope.question,
-              oldQuestionStateData,
               updateFunction);
           };
 
