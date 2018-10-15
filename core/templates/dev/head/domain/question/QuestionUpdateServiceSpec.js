@@ -118,7 +118,7 @@ describe('Question update service', function() {
         'test content', 'content');
     };
     QuestionUpdateService.setQuestionStateData(
-      sampleQuestion, oldStateData, updateFunction);
+      sampleQuestion, updateFunction);
     expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
     QuestionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
