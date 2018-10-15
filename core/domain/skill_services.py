@@ -25,8 +25,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(skill_models, user_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.user])
+(skill_models, user_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -107,6 +107,15 @@ def _get_skill_memcache_key(skill_id, version=None):
         return 'skill-version:%s:%s' % (skill_id, version)
     else:
         return 'skill:%s' % skill_id
+
+
+def get_merged_skill_ids():
+    """Returns the skill IDs of skills that have been merged.
+
+    Returns:
+        list(str). List of skill IDs of merged skills.
+    """
+    return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 
 
 def get_skill_from_model(skill_model, run_conversion=True):
@@ -865,3 +874,18 @@ def get_multi_skill_mastery(user_id, skill_ids):
         degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
 
     return degrees_of_mastery
+
+
+def skill_has_associated_questions(skill_id):
+    """Returns whether or not any question has this skill attached.
+
+    Args:
+        skill_id: str. The skill ID of the user.
+
+    Returns:
+        bool. Whether any question has this skill attached.
+    """
+    question_ids = (
+        question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
+            skill_id))
+    return len(question_ids) > 0

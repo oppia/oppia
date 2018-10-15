@@ -16,6 +16,7 @@
 and are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_domain
@@ -31,7 +32,7 @@ class QuestionCreationHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, skill_id):
         """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -68,7 +69,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, question_id, skill_id):
         """Links a question to a skill."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -84,7 +85,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question_services.delete_question_skill_link(
@@ -99,7 +100,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
     def get(self, question_id):
         """Gets the data for the question overview page."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question = question_services.get_question_by_id(
@@ -126,7 +127,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_question
     def put(self, question_id):
         """Updates properties of the given question."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question = question_services.get_question_by_id(
@@ -167,7 +168,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_question
     def delete(self, question_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question = question_services.get_question_by_id(

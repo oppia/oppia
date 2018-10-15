@@ -211,7 +211,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if feconf.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURES:
             topic_summaries = topic_services.get_all_topic_summaries()
             topic_summary_dicts = [
                 summary.to_dict() for summary in topic_summaries]
@@ -303,14 +303,6 @@ class CreatorDashboardHandler(base.BaseHandler):
             [s['suggestion_id']
              for s in suggestion_dicts_which_can_be_reviewed])
 
-        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            ids_of_suggestions_created_by_user = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_created_by_user])
-            ids_of_suggestions_which_can_be_reviewed = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_which_can_be_reviewed])
-
         threads_linked_to_suggestions_by_user = (
             [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_created_by_user)])
@@ -332,7 +324,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             'created_suggestions_list': suggestion_dicts_created_by_user,
             'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
         })
-        if feconf.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURES:
             self.values.update({
                 'topic_summary_dicts': topic_summary_dicts
             })

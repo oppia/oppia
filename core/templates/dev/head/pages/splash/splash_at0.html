@@ -5,7 +5,7 @@
 {% endblock prerender %}
 
 {% block maintitle %}
-  I18N_SPLASH_PAGE_TITLE
+  Oppia: Teach, Learn, Explore
 {% endblock maintitle %}
 
 {% block header_js %}
@@ -211,4 +211,5 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/pages/splash/Splash.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

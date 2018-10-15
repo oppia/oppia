@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from constants import constants
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
-import feconf
 
 
 class GaeAppIdentityServicesTest(test_utils.GenericTestBase):
@@ -34,7 +34,7 @@ class GaeAppIdentityServicesTest(test_utils.GenericTestBase):
 
     def test_get_gcs_resource_bucket_name_prod(self):
         # Turn off DEV_MODE.
-        with self.swap(feconf, 'DEV_MODE', False):
+        with self.swap(constants, 'DEV_MODE', False):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 self.expected_bucket_name)

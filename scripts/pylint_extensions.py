@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Implements additional custom Pylint checkers to be used as part of
+presubmit checks.
+"""
+
 import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
@@ -216,19 +220,19 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     name = 'parameter_documentation'
     msgs = {
-        'W9005': ('''"%s" has constructor parameters
-                    documented in class and __init__''',
+        'W9005': ('"%s" has constructor parameters '
+                  'documented in class and __init__',
                   'multiple-constructor-doc',
-                  '''Please remove parameter declarations
-                    in the class or constructor.'''),
+                  'Please remove parameter declarations '
+                  'in the class or constructor.'),
         'W9006': ('"%s" not documented as being raised',
                   'missing-raises-doc',
-                  '''Please document exceptions for
-                    all raised exception types.'''),
+                  'Please document exceptions for '
+                  'all raised exception types.'),
         'W9008': ('Redundant returns documentation',
                   'redundant-returns-doc',
-                  '''Please remove the return/rtype
-                    documentation from this method.'''),
+                  'Please remove the return/rtype '
+                  'documentation from this method.'),
         'W9010': ('Redundant yields documentation',
                   'redundant-yields-doc',
                   'Please remove the yields documentation from this method.'),

@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
+"""Continuous computation jobs for feedback system."""
+
 from core import jobs
 from core.domain import feedback_domain
 from core.platform import models
@@ -45,15 +46,32 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_event_types_listened_to(cls):
+        """Get the event types that this class is subscribed to.
+
+        Returns:
+            list(str). List of event types that this class is subscribed to.
+        """
         return [feconf.EVENT_TYPE_NEW_THREAD_CREATED,
                 feconf.EVENT_TYPE_THREAD_STATUS_CHANGED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
+        """Get the realtime datastore class used by the realtime layer.
+
+        Returns:
+            ndb.model.MetaModel. Datastore class used by the
+                realtime layer, which should be a subclass of
+                BaseRealtimeDatastoreClassForContinuousComputations.
+        """
         return FeedbackAnalyticsRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
+        """Get manager class for the continuously-running batch job.
+
+        Returns:
+            type. Manager class for continuous-running batch job.
+        """
         return FeedbackAnalyticsMRJobManager
 
     @classmethod
@@ -201,10 +219,7 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            return [feedback_models.GeneralFeedbackThreadModel]
-        else:
-            return [feedback_models.FeedbackThreadModel]
+        return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
     def map(item):

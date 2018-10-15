@@ -87,6 +87,6 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
         categories = [doc['category'] for doc in indexed_docs]
 
         for index in xrange(5):
-            self.assertIn("%s" % index, ids)
+            self.assertIn('%s' % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)

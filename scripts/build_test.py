@@ -227,7 +227,7 @@ class BuildTests(test_utils.GenericTestBase):
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
-                msg="No white spaces detected in %s unexpectedly"
+                msg='No white spaces detected in %s unexpectedly'
                 % BASE_HTML_SOURCE_PATH)
             # Look for templates/pages/Base.js in source_base_file_content.
             self.assertIn(BASE_JS_RELATIVE_PATH, source_base_file_content)
