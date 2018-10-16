@@ -87,8 +87,8 @@ oppia.directive('skillsList', [
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }
               );
-            }).then(function(){
-              var successToast = ('The skill has been deleted.');
+            }).then(function() {
+              var successToast = 'The skill has been deleted.';
               AlertsService.addSuccessMessage(successToast, 1000);
             });
           };

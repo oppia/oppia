@@ -58,8 +58,8 @@ oppia.directive('topicEditorNavbar', [
               function() {
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
-              }).then(function(){
-              var successToast = ('Topic Published.');
+              }).then(function() {
+              var successToast = 'Topic Published.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
             });
@@ -107,8 +107,8 @@ oppia.directive('topicEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }).then(function(){
-              var successToast = ('Changes Saved.');
+            }).then(function() {
+              var successToast = 'Changes Saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
             });
