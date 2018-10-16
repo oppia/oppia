@@ -61,7 +61,7 @@ oppia.directive('topicEditorNavbar', [
               }).then(function() {
                 var successToast = 'Topic published.';
                 AlertsService.addSuccessMessage(
-                successToast, 1000);
+                  successToast, 1000);
             });
           };
 
