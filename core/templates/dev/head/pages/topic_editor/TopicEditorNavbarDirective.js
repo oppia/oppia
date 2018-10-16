@@ -108,7 +108,7 @@ oppia.directive('topicEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
             }).then(function() {
-              var successToast = 'Changes Saved.';
+              var successToast = 'Changes saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
             });
