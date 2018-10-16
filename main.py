@@ -89,7 +89,6 @@ class HomePageRedirectHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
-
     @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
@@ -118,10 +117,11 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 
 def authorization_wrapper(self, *args, **kwargs):
-    # developers.google.com/appengine/docs/python/taskqueue/overview-push
-    # promises that this header cannot be set by external callers. If this
-    # is present, we can be certain that the request is internal and from
-    # the task queue worker.
+    """This request handler wrapper only admits internal requests from
+    taskqueue workers. If the request is invalid, it leads to a 403 Error page.
+    """
+    # Internal requests should have an "X-AppEngine-TaskName" header
+    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
     if 'X-AppEngine-TaskName' not in self.request.headers:
         self.response.out.write('Forbidden')
         self.response.set_status(403)
@@ -130,6 +130,9 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
+    """This request handler wrapper directly serves UI pages
+    for MapReduce dashboards.
+    """
     self.real_dispatch(*args, **kwargs)
 
 
@@ -272,11 +275,11 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/assets/image/<encoded_filepath>',
-        resources.ImageHandler),
+        r'/assetsdevhandler/<exploration_id>/assets/image/<encoded_filename>',
+        resources.ImageDevHandler),
     get_redirect_route(
-        r'/audiohandler/<exploration_id>/assets/audio/<filename>',
-        resources.AudioHandler),
+        r'/assetsdevhandler/<exploration_id>/assets/audio/<encoded_filename>',
+        resources.AudioDevHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),

@@ -73,6 +73,13 @@ class TopicViewerPage(BaseTopicViewerControllerTest):
 
             self.assertEqual(response.status_int, 404)
 
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+
 
 class TopicPageDataHandler(BaseTopicViewerControllerTest):
 
@@ -90,3 +97,10 @@ class TopicPageDataHandler(BaseTopicViewerControllerTest):
                 'additional_story_dicts': []
             }
             self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 404)
