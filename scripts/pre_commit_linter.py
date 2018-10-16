@@ -1006,8 +1006,8 @@ def _check_docstrings(all_files):
         'If line length exceeds 80 characters, '
         'convert the single line docstring to a multiline docstring.')
     previous_line_message = (
-        'There should not be more than one new line before the end '
-        'of multi-line docstring')
+        'There should not be any empty lines before the end of '
+        'the multi-line docstring.')
     failed = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
