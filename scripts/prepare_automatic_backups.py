@@ -58,10 +58,11 @@ def update_cron_dict(cron_dict):
 
     Args:
         cron_dict: dict(str ,str). Content of yaml file in dictionary type.
-            'description': str. {{ weekly backup.}}
-            'url': str. {{new backup url.}}
-            'schedule': str. {{scheduled time of cron job.}}
-            'target': str. {{cloud storage name.}}
+        The keys and values are as follows:
+            'description': str. weekly backup.
+            'url': str. new backup url.
+            'schedule': str. scheduled time of cron job.
+            'target': str. cloud storage name.
     """
     sys_args = sys.argv
     cloud_storage_bucket_name = sys_args[1]
@@ -103,16 +104,17 @@ def get_cron_dict():
 
     Returns:
         dict(str, str). yaml file in dict format.
-            'description': str. {{ weekly backup.}}
-            'url': str. {{current backup url.}}
-            'schedule': str. {{sheduled time of cron job.}}
-            'target': str. {{cloud storage name.}}
+        The keys and values are as follows:
+            'description': str. weekly backup.
+            'url': str. current backup url.
+            'schedule': str. sheduled time of cron job.
+            'target': str. cloud storage name.
     """
     return utils.dict_from_yaml(utils.get_file_contents(_CRON_YAML_FILE_NAME))
 
 
 def save_cron_dict(cron_dict):
-    """Converting dict into yaml and saving into a yaml file.
+    """Converting dict into yaml format and saving into a cron file.
 
     Args:
         cron_dict: dict. The content to save as a YAML file.
