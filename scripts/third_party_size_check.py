@@ -74,4 +74,7 @@ def _check_third_party_size():
 
 
 if __name__ == '__main__':
+    print 'Running third party size check'
     _check_third_party_size()
+    print 'Third party folder size check passed.'
+    print ''
