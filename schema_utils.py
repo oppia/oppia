@@ -63,7 +63,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
 
 
     Returns:
-        *. Returns the normalized object.
+        *. The normalized object.
 
     Raises:
         AssertionError: if the object fails to validate against the schema.
@@ -176,13 +176,14 @@ class Normalizers(object):
 
     @classmethod
     def get(cls, normalizer_id):
-        """Gets the value of the normalizer_id of the object.
+        """Gets the value of the normalizer_id from the specified object.
 
         Args:
-            normalizer_id: str. String that contains the attribute's name.
+            normalizer_id: str. The name of the normalizer method that
+                should be retrieved.
 
         Returns:
-            *. Returns the value of the name attribute of an object.
+            *. The value of the normalizer_id that was passed by parameter.
 
         Raises:
             Exception: 'normalizer_id' is not valid.
@@ -196,7 +197,7 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: str. String to collapse the spaces.
+            obj: str. String whose spaces should be collapsed.
 
         Returns:
             str. A string that is the same as `obj`, except that each block of
@@ -242,16 +243,14 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
-        """Gets the validation method corresponding to the given validator ID.
+        """Gets the value of the validator_id from the specified object.
 
         Args:
-            validator_id: str. The validator ID.
+            validator_id: str. The name of the validator method that
+                should be retrieved.
 
         Returns:
-            *. Return the value of the named attribute of object.
-                Name must be a string. If the string is the name of
-                one of the object attributes, the result is the
-                value of that attribute.
+            *. The value of the validator_id that was passed by parameter.
 
         Raises:
             Exception: 'validator_id' is not valid.
@@ -266,7 +265,7 @@ class _Validators(object):
         `min_value` elements.
 
         Args:
-            obj: *. Object to compare with min_value.
+            obj: *. Object to compare length with min_value.
             min_value: int. Required minimum number of elements.
 
         Returns:
@@ -281,7 +280,7 @@ class _Validators(object):
         `max_value` elements.
 
         Args:
-            obj: *. Object to compare with max_value.
+            obj: *. Object to compare length with max_value.
             max_value: int. Required maximum number of elements.
 
         Returns:
@@ -295,7 +294,7 @@ class _Validators(object):
         """Returns True iff the given object (a string) is nonempty.
 
         Args:
-            obj: str. String to evaluate if it is not empty.
+            obj: str. The string that is to be evaluated for non-emptiness.
 
         Returns:
             bool. Whether the object is non-empty.
@@ -307,7 +306,7 @@ class _Validators(object):
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
-            obj: list. List to evaluate if you do not have duplicate elements.
+            obj: list. The list whose elements are to be checked for uniqueness.
 
         Returns:
             bool. Whether the object has no duplicates.
