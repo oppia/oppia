@@ -49,9 +49,6 @@ def _check_size_in_dir(dir_path):
 
 def _check_third_party_size():
     """Checks if the third party size limit has been exceeded.
-
-    Raises:
-        Exception: The size limit of third party has been exceeded.
     """
     number_of_files_in_third_party = _check_size_in_dir(THIRD_PARTY_PATH)
     print ''
