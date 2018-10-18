@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Topic-related one-off jobs."""
+import ast
 
 from constants import constants
 from core.domain import topic_domain
@@ -59,10 +60,11 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
         # Start migration job.
-        job_id = (
-            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
@@ -72,6 +74,11 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
         self.assertEqual(topic.subtopics[0].to_dict(),
                          updated_topic.subtopics[0].to_dict())
+
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'topic_migrated',
+                     [u'1 topics successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_topic(self):
         """Tests that the topic migration job skips deleted topic
@@ -90,17 +97,23 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             topic_services.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
-        job_id = (
-            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
 
-        # This running without errors indicates the deleted topic is
-        # being ignored.
-        self.process_and_flush_pending_tasks()
+            # This running without errors indicates the deleted topic is
+            # being ignored.
+            self.process_and_flush_pending_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'topic_deleted',
+                     [u'Encountered 1 deleted topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_converts_old_topic(self):
         """Tests that the schema conversion functions work
@@ -116,10 +129,11 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
-        job_id = (
-            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the topic migrates correctly.
         updated_topic = (
@@ -127,3 +141,8 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'topic_migrated',
+                     [u'1 topics successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

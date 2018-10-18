@@ -38,7 +38,6 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     improving the load time of new questions.
     """
 
-    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'question_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'question_migrated'
@@ -50,9 +49,6 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
-            yield (
-                QuestionMigrationOneOffJob._DISABLED_KEY,
-                'New structures framework is disabled.')
             return
 
         if item.deleted:

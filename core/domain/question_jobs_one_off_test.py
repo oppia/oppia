@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Question-related one-off jobs."""
+import ast
 
 from constants import constants
 from core.domain import question_jobs_one_off
@@ -35,8 +36,6 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(QuestionMigrationOneOffJobTest, self).setUp()
-
-        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
         # Setup user who will own the test questions.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -61,10 +60,11 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Start migration job.
-        job_id = (
-            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the question is exactly the same after migration.
         updated_question = (
@@ -74,6 +74,11 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(question.question_state_data.to_dict(),
                          updated_question.question_state_data.to_dict())
+
+        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'question_migrated',
+                     [u'1 questions successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_question(self):
         """Tests that the question migration job skips deleted question
@@ -88,17 +93,23 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID)
 
         # Start migration job on sample question.
-        job_id = (
-            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
 
-        # This running without errors indicates the deleted question is
-        # being ignored.
-        self.process_and_flush_pending_tasks()
+            # This running without errors indicates the deleted question is
+            # being ignored.
+            self.process_and_flush_pending_tasks()
 
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             question_services.get_question_by_id(self.QUESTION_ID)
+
+        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'question_deleted',
+                     [u'Encountered 1 deleted questions.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_converts_old_question(self):
         """Tests that the schema conversion functions work
@@ -113,10 +124,11 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_schema_version, 25)
 
         # Start migration job.
-        job_id = (
-            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the question migrates correctly.
         updated_question = (
@@ -124,3 +136,8 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_question.question_state_schema_version,
             feconf.CURRENT_STATES_SCHEMA_VERSION)
+
+        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'question_migrated',
+                     [u'1 questions successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

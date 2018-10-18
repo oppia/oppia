@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Story-related one-off jobs."""
+import ast
 
 from constants import constants
 from core.domain import story_domain
@@ -37,8 +38,6 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryMigrationOneOffJobTest, self).setUp()
 
-        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
-
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -58,10 +57,11 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         # Start migration job.
-        job_id = (
-            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the story is exactly the same after migration.
         updated_story = (
@@ -69,6 +69,11 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_story.schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'story_migrated',
+                     [u'1 stories successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_story(self):
         """Tests that the story migration job skips deleted story
@@ -87,17 +92,23 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
             story_services.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
-        job_id = (
-            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
 
-        # This running without errors indicates the deleted story is
-        # being ignored.
-        self.process_and_flush_pending_tasks()
+            # This running without errors indicates the deleted story is
+            # being ignored.
+            self.process_and_flush_pending_tasks()
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             story_services.get_story_by_id(self.STORY_ID)
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'story_deleted',
+                     [u'Encountered 1 deleted stories.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_converts_old_story(self):
         """Tests that the schema conversion functions work
@@ -113,10 +124,11 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(story.schema_version, 1)
 
         # Start migration job.
-        job_id = (
-            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the story migrates correctly.
         updated_story = (
@@ -124,3 +136,8 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_story.schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'story_migrated',
+                     [u'1 stories successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

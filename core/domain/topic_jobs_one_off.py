@@ -38,7 +38,6 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     up-to-date and improving the load time of new topics.
     """
 
-    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'topic_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'topic_migrated'
@@ -50,9 +49,6 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
-            yield (
-                TopicMigrationOneOffJob._DISABLED_KEY,
-                'New structures framework is disabled.')
             return
 
         if item.deleted:

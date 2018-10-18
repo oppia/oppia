@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Skill-related one-off jobs."""
+import ast
 
 from constants import constants
 from core.domain import skill_domain
@@ -36,8 +37,6 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillMigrationOneOffJobTest, self).setUp()
-
-        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 
         # Setup user who will own the test skills.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -61,10 +60,11 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
         # Start migration job.
-        job_id = (
-            skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
-        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
         # Verify the skill is exactly the same after migration.
         updated_skill = (
@@ -75,6 +75,11 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_skill.misconceptions_schema_version,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'skill_migrated',
+                     [u'1 skills successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_skill(self):
         """Tests that the skill migration job skips deleted skill
@@ -93,17 +98,23 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
             skill_services.get_skill_by_id(self.SKILL_ID)
 
         # Start migration job on sample skill.
-        job_id = (
-            skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
-        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
 
-        # This running without errors indicates the deleted skill is
-        # being ignored.
-        self.process_and_flush_pending_tasks()
+            # This running without errors indicates the deleted skill is
+            # being ignored.
+            self.process_and_flush_pending_tasks()
 
         # Ensure the skill is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             skill_services.get_skill_by_id(self.SKILL_ID)
+
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'skill_deleted',
+                     [u'Encountered 1 deleted skills.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_converts_old_skill(self):
         """Tests that the schema conversion functions work
@@ -126,14 +137,15 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 1)
 
         # Start migration job.
-        job_id = (
-            skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
-        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            job_id = (
+                skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
-        # Verify that the skill migrates correctly.
-        updated_skill = (
-            skill_services.get_skill_by_id(self.SKILL_ID))
+            # Verify that the skill migrates correctly.
+            updated_skill = (
+                skill_services.get_skill_by_id(self.SKILL_ID))
 
         self.assertEqual(
             updated_skill.skill_contents_schema_version,
@@ -141,3 +153,8 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_skill.misconceptions_schema_version,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'skill_migrated',
+                     [u'1 skills successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

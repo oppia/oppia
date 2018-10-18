@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Collection-related one-off jobs."""
+import ast
 
 from core.domain import collection_domain
 from core.domain import collection_jobs_one_off
@@ -74,6 +75,11 @@ class CollectionMigrationOneOffJobTest(test_utils.GenericTestBase):
         after_converted_yaml = updated_collection.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
 
+        output = collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'collection_migrated',
+                     [u'1 collections successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
     def test_migration_job_skips_deleted_collection(self):
         """Tests that the collection migration job skips deleted collection
         and does not attempt to migrate.
@@ -108,6 +114,11 @@ class CollectionMigrationOneOffJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id(self.COLLECTION_ID)
+
+        output = collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected = [[u'collection_deleted',
+                     [u'Encountered 1 deleted collections.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migrate_colections_failing_strict_validation(self):
         """Tests that the collection migration job migrates collections which

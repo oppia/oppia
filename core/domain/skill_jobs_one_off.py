@@ -38,7 +38,6 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     improving the load time of new skills.
     """
 
-    _DISABLED_KEY = 'new_structures_disabled'
     _DELETED_KEY = 'skill_deleted'
     _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'skill_migrated'
@@ -50,9 +49,6 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if not constants.ENABLE_NEW_STRUCTURES:
-            yield (
-                SkillMigrationOneOffJob._DISABLED_KEY,
-                'New structures framework is disabled.')
             return
 
         if item.deleted:
