@@ -53,9 +53,10 @@ from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
 import webtest
 
-(exp_models, question_models, skill_models, story_models, topic_models,) = models.Registry.import_models([ # pylint: disable=line-too-long
-    models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.topic])
+(exp_models, question_models, skill_models, story_models, topic_models,) = (
+    models.Registry.import_models([
+        models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
