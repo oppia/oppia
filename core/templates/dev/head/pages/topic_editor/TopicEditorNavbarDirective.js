@@ -60,7 +60,7 @@ oppia.directive('topicEditorNavbar', [
                 TopicEditorStateService.setTopicRights($scope.topicRights);
               }
             ).then(function() {
-                var successToast = 'Topic published.';
+              var successToast = 'Topic published.';
                 AlertsService.addSuccessMessage(
                   successToast, 1000);
             });
