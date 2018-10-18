@@ -34,7 +34,6 @@ oppia.directive('stateTranslation', [
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-        'ExplorationHtmlFormatterService',
         function(
             $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
@@ -42,8 +41,7 @@ oppia.directive('stateTranslation', [
             TranslationStatusService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT,
-            ExplorationHtmlFormatterService) {
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
           $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
@@ -291,10 +289,6 @@ oppia.directive('stateTranslation', [
               .getInteractionCustomizationArgsMemento(stateName);
             var interactionId = $scope.stateInteractionId;
             if (interactionId) {
-              var interactionPreviewHtml = ExplorationHtmlFormatterService
-                .getInteractionHtml(
-                  interactionId, currentCustomizationArgs, false);
-
               // Special cases for multiple choice input and image click input.
               if (interactionId === 'MultipleChoiceInput') {
                 $scope.answerChoices =
