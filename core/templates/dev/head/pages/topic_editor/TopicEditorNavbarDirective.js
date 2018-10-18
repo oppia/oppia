@@ -58,7 +58,8 @@ oppia.directive('topicEditorNavbar', [
               function() {
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
-              }).then(function() {
+              }
+            ).then(function() {
                 var successToast = 'Topic published.';
                 AlertsService.addSuccessMessage(
                   successToast, 1000);
