@@ -882,9 +882,8 @@ def can_resubmit_suggestion(handler):
     def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
         """Checks if the use can edit the given suggestion.
 
-
         Args:
-            suggestion_id: str. The suggestion id.
+            suggestion_id: str. The ID of the suggestion.
             **kwargs: *. keyword arguments.
 
         Returns:

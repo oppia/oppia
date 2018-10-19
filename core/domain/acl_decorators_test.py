@@ -1289,14 +1289,13 @@ class ResubmitSuggestionDecoratorsTest(test_utils.GenericTestBase):
         self.assertEqual(response['suggestion_id'], self.suggestion_id)
         self.logout()
 
-    def test_normal_user_cannot_resubmit_suggestion(self):
+    def test_non_author_cannot_resubmit_suggestion(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.suggestion_id, expect_errors=True,
                 expected_status_int=401)
         self.logout()
-
 
 
 class PublishExplorationTest(test_utils.GenericTestBase):

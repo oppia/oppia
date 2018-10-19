@@ -19,7 +19,6 @@
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import exp_domain
 from core.domain import suggestion_services
 from core.platform import models
 
@@ -90,28 +89,26 @@ class ReSubmitSuggestionHandler(base.BaseHandler):
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
         if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException('Invalid format for suggestion_id.'
-                                             ' It must contain 3 parts'
-                                             ' separated by \'.\'')
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id.It must contain'
+                '3 parts separated by \'.\'')
 
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
-            raise self.InvalidInputException('This handler allows actions only'
-                                             ' on suggestions to explorations.')
+            raise self.InvalidInputException(
+                'This handler allows actions only on'
+                'suggestions to explorations.')
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if not suggestion:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
-        old_change = suggestion.change.__dict__
         new_change = self.payload.get('change')
-        if (
-                new_change['cmd'] != old_change['cmd'] or
-                old_change['property_name'] != new_change['property_name'] or
-                old_change['state_name'] != new_change['state_name']):
-            raise self.InvalidInputException('Invalid change dict.')
-        suggestion.change = exp_domain.ExplorationChange(new_change)
+        change_type = type(suggestion.change)
+        change_object = change_type(new_change)
+        suggestion.pre_update_validate(change_object)
+        suggestion.change = change_object
         summary_message = self.payload.get('summary_message')
         suggestion_services.resubmit_rejected_suggestion(
             suggestion, summary_message, self.user_id)

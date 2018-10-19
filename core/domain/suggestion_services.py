@@ -286,7 +286,6 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
 
-
     Raises:
         Exception: Only rejected suggestions can be resubmitted.
     """
@@ -295,8 +294,9 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     if not suggestion.is_handled:
         raise Exception('The suggestion is not yet handled.')
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
-        raise Exception('The suggestion was accepted.' +
-                        'only rejected suggestions can be resubmitted.')
+        raise Exception(
+            'The suggestion was accepted.'
+            'only rejected suggestions can be resubmitted.')
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
     _update_suggestion(suggestion)
@@ -527,7 +527,16 @@ def update_position_in_rotation(score_category, user_id):
 
 
 def check_can_resubmit_suggestion(suggestion_id, user_id):
-    """Checks whether the given user can resubmit the suggestion."""
+    """Checks whether the given user can resubmit the suggestion.
+
+    Args:
+        suggestion_id: str. The ID of the suggestion.
+        user_id: str. The ID of the user
+
+    Returns:
+        bool: A boolean indication whether
+            the user can resubmit the suggestion or not.
+    """
 
     suggestion = get_suggestion_by_id(suggestion_id)
 
