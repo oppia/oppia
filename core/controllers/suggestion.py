@@ -88,18 +88,6 @@ class ReSubmitSuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
-        if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException(
-                'Invalid format for suggestion_id.It must contain'
-                '3 parts separated by \'.\'')
-
-        if (
-                suggestion_id.split('.')[0] !=
-                suggestion_models.TARGET_TYPE_EXPLORATION):
-            raise self.InvalidInputException(
-                'This handler allows actions only on'
-                'suggestions to explorations.')
-
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if not suggestion:
             raise self.InvalidInputException(
