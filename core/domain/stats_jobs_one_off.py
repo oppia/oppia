@@ -218,11 +218,11 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         can be processed by the MapReduce pipeline.
 
         Args:
-            item: [StateCompleteEventLogEntryModel|
+            item: StateCompleteEventLogEntryModel|
                 AnswerSubmittedEventLogEntryModel|StateHitEventLogEntryModel|
                 SolutionHitEventLogEntryModel|StartExplorationEventLogEntryModel
                 |ExplorationActualStartEventLogEntryModel|
-                CompleteExplorationEventLogEntryModel]. The model instance for
+                CompleteExplorationEventLogEntryModel. The model instance for
                 different statistics models.
 
         Returns:
@@ -334,7 +334,24 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Returns:
             tuple(list(dict), list(ExplorationStats), list(str)). 3-tuple where:
             - The first element is the list of dicts of different version-wise
-                ExplorationStats.
+                ExplorationStats. Each dict contains the following key-value
+                pairs:
+                - num_starts_v1: int. Number of learners who started the
+                    exploration.
+                - num_starts_v2: int. As above, but for events with version 2.
+                - num_actual_starts_v1: int. Number of learners who actually
+                    attempted the exploration. These are the learners who have
+                    completed the initial state of the exploration and traversed
+                    to the next state.
+                - num_actual_starts_v2: int. As above, but for events with
+                    version 2.
+                - num_completions_v1: int. Number of learners who completed the
+                    exploration.
+                - num_completions_v2: int. As above, but for events with
+                    version 2.
+                - state_stats_mapping: dict. A dictionary mapping the state
+                    names of  an exploration to the corresponding StateStats
+                    domain object.
             - The second element is the list of ExplorationStats domain class
                 instances of the corrupted statistics models.
             - The third element is the list of all the errors that occured
