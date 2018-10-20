@@ -89,7 +89,7 @@ oppia.controller('CreatorDashboard', [
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
-      $scope.canCreateCollections = userInfo.can_create_collections;
+      $scope.canCreateCollections = userInfo.canCreateCollections();
     });
 
     var dashboardDataPromise = (

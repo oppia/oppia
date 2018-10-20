@@ -57,7 +57,7 @@ oppia.directive('outcomeDestinationEditor', [
           // development.
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.canEditRefresherExplorationId = (
-              userInfo.is_admin || userInfo.is_moderator);
+              userInfo.isAdmin() || userInfo.isModerator());
           });
 
           $scope.explorationAndSkillIdPattern =

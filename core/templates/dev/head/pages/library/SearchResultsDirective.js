@@ -32,7 +32,7 @@ oppia.directive('searchResults', [
           $rootScope.loadingMessage = 'Loading';
           var userInfoPromise = UserService.getUserInfoAsync();
           userInfoPromise.then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
           // Called when the first batch of search results is retrieved from the

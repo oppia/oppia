@@ -306,7 +306,7 @@ oppia.directive('conversationSkin', [
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.user_is_logged_in;
+            $scope.isLoggedIn = userInfo.isLoggedIn();
           });
 
           var hasInteractedAtLeastOnce = false;

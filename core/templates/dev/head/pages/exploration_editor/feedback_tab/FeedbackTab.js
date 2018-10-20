@@ -40,7 +40,7 @@ oppia.controller('FeedbackTab', [
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
-      $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+      $scope.userIsLoggedIn = userInfo.isLoggedIn();
     });
 
     // Initial load of the thread list on page load.

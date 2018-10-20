@@ -20,7 +20,7 @@ oppia.factory('UserService', [
   '$http', '$q', 'UrlInterpolationService', 'UserInfoObjectFactory',
   'DEFAULT_PROFILE_IMAGE_PATH',
   function($http, $q, UrlInterpolationService, UserInfoObjectFactory,
-           DEFAULT_PROFILE_IMAGE_PATH) {
+      DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;

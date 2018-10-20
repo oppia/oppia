@@ -33,7 +33,7 @@ oppia.controller('LearnerLocalNav', [
     $scope.canEdit = GLOBALS.canEdit;
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.username = userInfo.username;
+      $scope.username = userInfo.getUsername();
       $rootScope.loadingMessage = '';
     });
     $scope.showLearnerSuggestionModal = function() {

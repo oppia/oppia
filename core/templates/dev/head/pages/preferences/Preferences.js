@@ -32,7 +32,7 @@ oppia.controller('Preferences', [
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
-      $scope.username = userInfo.username;
+      $scope.username = userInfo.getUsername();
     });
 
     $scope.hasPageLoaded = false;

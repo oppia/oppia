@@ -34,8 +34,8 @@ oppia.directive('createActivityButton', [
           $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
 
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.canCreateCollections = userInfo.can_create_collections;
-            $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+            $scope.canCreateCollections = userInfo.canCreateCollections();
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
           $scope.showUploadExplorationModal = (
@@ -74,7 +74,7 @@ oppia.directive('createActivityButton', [
                   function($scope, $uibModalInstance) {
                     UserService.getUserInfoAsync().then(function(userInfo) {
                       $scope.canCreateCollections = (
-                        userInfo.can_create_collections);
+                        userInfo.canCreateCollections());
                     });
 
                     $scope.chooseExploration = function() {

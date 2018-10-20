@@ -23,7 +23,7 @@ oppia.controller('Splash', [
       UrlInterpolationService, UserService) {
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.userIsLoggedIn = userInfo.user_is_logged_in;
+      $scope.userIsLoggedIn = userInfo.isLoggedIn();
       $rootScope.loadingMessage = '';
     });
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;

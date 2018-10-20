@@ -47,7 +47,7 @@ oppia.directive('feedbackPopup', [
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.user_is_logged_in;
+            $scope.isLoggedIn = userInfo.isLoggedIn();
           });
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover

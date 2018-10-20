@@ -106,7 +106,7 @@ oppia.controller('LearnerDashboard', [
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
-      $scope.username = userInfo.username;
+      $scope.username = userInfo.getUsername();
     });
 
     var dashboardDataPromise = (

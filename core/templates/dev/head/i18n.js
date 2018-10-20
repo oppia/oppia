@@ -61,7 +61,7 @@ oppia.controller('I18nFooter', [
     $scope.changeLanguage = function() {
       $translate.use($scope.currentLanguageCode);
       UserService.getUserInfoAsync().then(function(userInfo) {
-        if (userInfo.user_is_logged_in) {
+        if (userInfo.isLoggedIn()) {
           $http.put(siteLanguageUrl, {
             site_language_code: $scope.currentLanguageCode
           });
