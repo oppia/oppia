@@ -17,11 +17,13 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', 'UrlInterpolationService', 'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, UrlInterpolationService, DEFAULT_PROFILE_IMAGE_PATH) {
+  '$http', '$q', 'UrlInterpolationService', 'UserInfoFactory',
+  'DEFAULT_PROFILE_IMAGE_PATH',
+  function($http, $q, UrlInterpolationService, UserInfoFactory,
+           DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
-    var userInfo;
+    var userInfo = null;
 
     var getUserInfoAsync = function() {
       if (GLOBALS.userIsLoggedIn) {
@@ -31,8 +33,8 @@ oppia.factory('UserService', [
         return $http.get(
           '/userinfohandler'
         ).then(function(response) {
-          userInfo = response.data;
-          return response.data;
+          userInfo = UserInfoFactory.createFromBackendDict(response.data);
+          return userInfo;
         });
       } else {
         return $q.resolve({});
