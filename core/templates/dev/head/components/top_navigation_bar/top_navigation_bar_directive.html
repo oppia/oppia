@@ -166,7 +166,7 @@
       </ul>
     </li>
 
-    <li uib-dropdown ng-if="!userIsLoggedIn && username != ''" class="oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!userIsLoggedIn && username !== ''" class="oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
         <button class="btn oppia-navbar-button protractor-mobile-test-login"
                 ng-click="onLoginButtonClicked()">
@@ -189,7 +189,7 @@
       </ul>
     </li>
 
-    <li uib-dropdown ng-if="username == ''" class="oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="username === ''" class="oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
       </div>
     </li>
