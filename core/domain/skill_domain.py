@@ -72,7 +72,8 @@ class SkillChange(object):
     )
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'misconception_id'
+        'property_name', 'new_value', 'old_value', 'misconception_id',
+        'from_version', 'to_version'
     ]
 
     def __init__(self, change_dict):
@@ -83,12 +84,19 @@ class SkillChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_skill_misconception' (with new_misconception_dict)
+                - 'delete_skill_misconception' (with id)
+                - 'create_new'
                 - 'update_skill_property' (with property_name, new_value
                 and old_value)
                 - 'update_skill_contents_property' (with property_name,
                 new_value and old_value)
                 - 'update_skill_misconceptions_property' (with property_name,
                 new_value and old_value)
+                - 'migrate_contents_schema_to_latest_version' (with
+                from_version and to_version)
+                - 'migrate_misconceptions_schema_to_latest_version' (with
+                from_version and to_version)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -124,6 +132,12 @@ class SkillChange(object):
             self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             return
+        elif self.cmd == CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 

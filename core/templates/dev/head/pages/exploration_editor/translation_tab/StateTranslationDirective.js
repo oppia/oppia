@@ -285,6 +285,46 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
+            var currentCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento(stateName);
+            var interactionId = $scope.stateInteractionId;
+            if (interactionId) {
+              // Special cases for multiple choice input and image click input.
+              if (interactionId === 'MultipleChoiceInput') {
+                $scope.answerChoices =
+                  currentCustomizationArgs.choices.value.map(
+                    function(val, ind) {
+                      return {
+                        val: ind,
+                        label: val
+                      };
+                    }
+                  );
+              } else if (interactionId === 'ImageClickInput') {
+                var _answerChoices = [];
+                var imageWithRegions =
+                  currentCustomizationArgs.imageAndRegions.value;
+                for (
+                  var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
+                  _answerChoices.push({
+                    val: imageWithRegions.labeledRegions[j].label,
+                    label: imageWithRegions.labeledRegions[j].label
+                  });
+                }
+                $scope.answerChoices = _answerChoices;
+              } else if (interactionId === 'ItemSelectionInput' ||
+                  interactionId === 'DragAndDropSortInput') {
+                $scope.answerChoices =
+                  currentCustomizationArgs.choices.value.map(function(val) {
+                    return {
+                      val: val,
+                      label: val
+                    };
+                  });
+              } else {
+                $scope.answerChoices = null;
+              }
+            }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 
