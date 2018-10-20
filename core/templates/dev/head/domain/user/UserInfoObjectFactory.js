@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-oppia.factory('UserInfoFactory', [function() {
+oppia.factory('UserInfoObjectFactory', function() {
   var UserInfo = function(data) {
     this._userInfo = data;
   };
@@ -55,5 +55,15 @@ oppia.factory('UserInfoFactory', [function() {
     return new UserInfo(data);
   };
 
+  UserInfo.createDefault = function() {
+    return new UserInfo({'is_moderator': false,
+                         'is_admin': false,
+                         'is_super_admin': false,
+                         'can_create_collections': false,
+                         'preferred_site_language_code': undefined,
+                         'username': undefined,
+                         'user_is_logged_in': false});
+  };
+
   return UserInfo;
-}]);
+});

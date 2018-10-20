@@ -17,9 +17,9 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', 'UrlInterpolationService', 'UserInfoFactory',
+  '$http', '$q', 'UrlInterpolationService', 'UserInfoObjectFactory',
   'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, UrlInterpolationService, UserInfoFactory,
+  function($http, $q, UrlInterpolationService, UserInfoObjectFactory,
            DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -33,11 +33,11 @@ oppia.factory('UserService', [
         return $http.get(
           '/userinfohandler'
         ).then(function(response) {
-          userInfo = UserInfoFactory.createFromBackendDict(response.data);
+          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
           return userInfo;
         });
       } else {
-        return $q.resolve({});
+        return $q.resolve(UserInfoObjectFactory.createDefault());
       }
     };
 
