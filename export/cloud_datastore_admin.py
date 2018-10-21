@@ -33,6 +33,7 @@ import webapp2
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 
+
 class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
     """Request handler which supports triggering automatic exports of the
     entities that application stores in Google Cloud Datastore.
@@ -55,9 +56,9 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
 
         if app_id != APP_NAME_OPPIASERVER:
             logging.info('Export service has been pinged. '
-                'Since this is not production, a real export request has '
-                'not been initiated.')
-            return;
+                         'Since this is not production, a real export request '
+                         'has not been initiated.')
+            return
 
         timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
