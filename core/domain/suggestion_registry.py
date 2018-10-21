@@ -365,7 +365,7 @@ class SuggestionEditStateContent(BaseSuggestion):
                 self.change.state_name)
         elif self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
-                'The new html must be not equals to old html')
+                'The new html must not match the old html')
 
 
 class SuggestionAddQuestion(BaseSuggestion):

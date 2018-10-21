@@ -356,7 +356,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(
-            suggestion.change.new_value['html'], self.new_content['html'])
+            suggestion.change.new_value['html'],
+            self.resubmit_change_content['html'])
         self.assertEqual(
             suggestion.change.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
         self.assertEqual(

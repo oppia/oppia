@@ -245,15 +245,19 @@ oppia.controller('CreatorDashboard', [
           },
           stateName: function(){
             return $scope.activeThread.suggestion.stateName;
+          },
+          suggestionType: function(){
+            return $scope.activeThread.suggestion.suggestionType;
           }
         },
         controller: [
           '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionStatus', 'description', 'oldContent',
-          'newContent', 'canReviewActiveThread', 'stateName', function(
+          'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
+          function(
               $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
-              newContent, canReviewActiveThread, stateName) {
+              newContent, canReviewActiveThread, stateName, suggestionType) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -281,6 +285,7 @@ oppia.controller('CreatorDashboard', [
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
             $scope.stateName = stateName;
+            $scope.suggestionType = suggestionType;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
             $scope.summaryMessage = null;
@@ -333,6 +338,7 @@ oppia.controller('CreatorDashboard', [
                 newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
                 summaryMessage: $scope.summaryMessage,
                 stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
                 oldContent: $scope.oldContent
               });
             };
@@ -340,7 +346,8 @@ oppia.controller('CreatorDashboard', [
         ]
       }).result.then(function(result) {
         var url, data;
-        if (result.action === 'resubmit'){
+        if (result.action === 'resubmit' && result.suggestionType ===
+          'edit_exploration_state_content'){
           url = '/suggestionactionhandler/resubmit/' +
             $scope.activeThread.suggestion.suggestionId;
           data = {

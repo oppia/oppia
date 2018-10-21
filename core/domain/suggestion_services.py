@@ -159,7 +159,7 @@ def _update_suggestion(suggestion):
 
     suggestion_model.status = suggestion.status
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change = suggestion.change.to_dict()
+    suggestion_model.change_cmd = suggestion.change.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
