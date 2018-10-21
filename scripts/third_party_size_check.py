@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script that runs a size check in third party folder and crashes if
+"""Script that runs a size check in third party folder and errors if
 size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
@@ -48,21 +48,20 @@ def _check_size_in_dir(dir_path):
 
 
 def _check_third_party_size():
-    """Checks if the third party size limit has been exceeded.
-    """
+    """Checks if the third party size limit has been exceeded."""
     number_of_files_in_third_party = _check_size_in_dir(THIRD_PARTY_PATH)
     print ''
     print '------------------------------------------------------'
-    print '    Number of files in third party: %d' % (
+    print '    Number of files in third party folder: %d' % (
         number_of_files_in_third_party)
     print ''
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
-        print '    ERROR: The size limit of third party has been exceeded.'
+        print'    ERROR: Third party folder size limit has been exceeded.'
         print '------------------------------------------------------'
         print ''
         sys.exit(1)
     else:
-        print '    The size of third party is within the limits.'
+        print '    The size of third party folder is within the limits.'
         print '------------------------------------------------------'
         print ''
         print 'Done!'
