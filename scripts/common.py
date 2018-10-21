@@ -14,9 +14,9 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
+import commands
 import os
 import subprocess
-import commands
 
 
 def ensure_directory_exists(d):
@@ -139,8 +139,8 @@ def require_gcloud_to_be_available():
     if status == 32512:
         # gcloud command does not exist.
         raise Exception('%s.\n Please install gcloud '
-            '(https://cloud.google.com/sdk/docs/downloads-apt-get) before '
-            'running this script.' % msg)
+                        '(https://cloud.google.com/sdk/docs/downloads-apt-get) '
+                        'before running this script.' % msg)
 
 
 class CD(object):

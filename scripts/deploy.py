@@ -252,7 +252,9 @@ def _execute_deployment():
         subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Deploy export service to GAE.
-        subprocess.check_output(['gcloud', 'app', 'deploy', 'export/app.yaml', '--project=%s' % APP_NAME])
+        subprocess.check_output(
+            ['gcloud', 'app', 'deploy', 'export/app.yaml',
+             '--project=%s' % APP_NAME])
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
