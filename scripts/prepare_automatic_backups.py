@@ -54,7 +54,7 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
 
 
 def update_cron_dict(cron_dict):
-    """Adding new url in cron file for backup.
+    """Adds new url in cron file for backup.
 
     Args:
         cron_dict: dict(str ,str). Content of yaml file in dictionary type.
@@ -100,7 +100,7 @@ def update_cron_dict(cron_dict):
 
 
 def get_cron_dict():
-    """Getting cron file content in dict format.
+    """Gets cron file content in dict format.
 
     Returns:
         dict(str, str). yaml file in dict format.
@@ -114,7 +114,7 @@ def get_cron_dict():
 
 
 def save_cron_dict(cron_dict):
-    """Converting dict into yaml format and saving into a cron file.
+    """Converts dict into yaml format and saving into a cron file.
 
     Args:
         cron_dict: dict. The content to save as a YAML file.
