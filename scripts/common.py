@@ -16,6 +16,7 @@
 
 import os
 import subprocess
+import commands
 
 
 def ensure_directory_exists(d):
@@ -130,6 +131,14 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
         subprocess.call(['git', 'pull', remote_alias])
+
+
+def require_gcloud_to_be_available():
+    status, msg = commands.getstatusoutput('gcloud')
+
+    if status == 32512:
+        # gcloud command does not exist.
+        raise Exception('Please install gcloud (https://cloud.google.com/sdk/docs/downloads-apt-get) before running this script.')
 
 
 class CD(object):
