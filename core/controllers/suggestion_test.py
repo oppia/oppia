@@ -83,6 +83,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.new_content = state_domain.SubtitledHtml(
             'content', 'new content html').to_dict()
+        self.resubmit_change_content = state_domain.SubtitledHtml(
+            'content', 'resubmit change content html').to_dict()
 
         self.logout()
 
@@ -344,7 +346,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'State 1',
-                    'new_value': self.new_content,
+                    'new_value': self.resubmit_change_content,
                     'old_value': self.old_content
                 }
             }, csrf_token=csrf_token)
