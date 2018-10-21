@@ -1412,6 +1412,12 @@ def revert_exploration(
         current_exploration, exp_versions_diff=None,
         revert_to_version=revert_to_version)
 
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        revert_to_exploration = get_exploration_by_id(
+            exploration_id, version=revert_to_version)
+        classifier_services.create_classifier_training_job_for_reverted_exploration(
+            current_exploration, revert_to_exploration)
+
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(
         exploration_id, current_version, revert_to_version)

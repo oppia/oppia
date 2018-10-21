@@ -443,3 +443,30 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
         if mapping_model is None:
             classifier_training_jobs.insert(index, None)
     return classifier_training_jobs
+
+def create_classifier_training_job_for_reverted_exploration(
+        exploration, revert_to_exploration):
+    """Create classifier training job model when an exploration is reverted.
+
+    Args:
+        exploration: Exploration. Exploration domain object.
+        revert_to_exploration: Exploration. Exploration to which revert to.
+    """
+    revert_to_classifier_training_jobs = get_classifier_training_jobs(
+        exploration.id, revert_to_exploration.version,
+        revert_to_exploration.states.keys())
+    job_exploration_mappings = []
+    for index, classifier_training_job in enumerate(
+            revert_to_classifier_training_jobs):
+        if classifier_training_job is None:
+            continue
+        new_state_name = revert_to_exploration.states.keys()[index]
+        job_exploration_mapping = (
+            classifier_domain.TrainingJobExplorationMapping(
+                exploration.id, exploration.version + 1, new_state_name,
+                classifier_training_job.job_id))
+        job_exploration_mapping.validate()
+        job_exploration_mappings.append(job_exploration_mapping)
+
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)
