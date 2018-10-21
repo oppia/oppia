@@ -54,7 +54,7 @@ def generate_backup_url(cloud_storage_bucket_name, module_class_names):
 
 
 def update_cron_dict(cron_dict):
-    """Adding new urls in dict for backup.
+    """Adding new url in cron file for backup.
 
     Args:
         cron_dict: dict(str ,str). Content of yaml file in dictionary type.
@@ -131,7 +131,7 @@ def update_yaml_files():
 
 
 def _prepare_for_prod():
-    """It calls function that updates cron files."""
+    """It calls function that updates cron file."""
     update_yaml_files()
 
 
