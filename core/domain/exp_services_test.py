@@ -800,8 +800,7 @@ title: Title
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
         self.assertEqual(
-            fs.get('image/%s' % self.TEST_ASSET_PATH),
-            self.TEST_ASSET_CONTENT)
+            fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
     def test_can_load_yaml_with_audio_translations(self):
         exp_services.save_new_exploration_from_yaml_and_assets(

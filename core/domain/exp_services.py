@@ -1481,7 +1481,7 @@ def save_new_exploration_from_yaml_and_assets(
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
-        fs.commit(committer_id, 'image/%s' % asset_filename, asset_content)
+        fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
