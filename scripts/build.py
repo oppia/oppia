@@ -1030,11 +1030,10 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
             THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename)])
 
 
-def generate_build_directory(minify_only):
+def generate_build_directory():
     """Generates hashes for files. Minifies files and interpolates paths
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
-    If minify_only set to True, return after minify.
     """
     print 'Building Oppia in production mode...'
 
@@ -1046,8 +1045,6 @@ def generate_build_directory(minify_only):
     copy_tasks = collections.deque()
     # Minify third party resources.
     minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-    if minify_only:
-        return
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -1107,13 +1104,18 @@ def build():
         '--prod_env', action='store_true', default=False, dest='prod_mode')
     parser.add_option(
         '--prod_minify_only', action='store_true', default=False,
-        dest='minify_only')
+        dest='minify_third_party_libs_only')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
     if options.prod_mode:
-        generate_build_directory(options.minify_only)
+        # If minify_third_party_libs_only is set to True, skips the rest of the
+        # build process once third party libs are minified.
+        if options.minify_third_party_libs_only:
+            minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        else:
+            generate_build_directory()
 
 
 if __name__ == '__main__':
