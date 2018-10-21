@@ -62,7 +62,7 @@ def update_cron_dict(cron_dict):
             'description': str. weekly backup.
             'url': str. new backup url.
             'schedule': str. scheduled time of cron job.
-            'target': str. cloud storage name.
+            'target': str. backup target.
     """
     sys_args = sys.argv
     cloud_storage_bucket_name = sys_args[1]
@@ -108,7 +108,7 @@ def get_cron_dict():
             'description': str. weekly backup.
             'url': str. current backup url.
             'schedule': str. sheduled time of cron job.
-            'target': str. cloud storage name.
+            'target': str. backup target.
     """
     return utils.dict_from_yaml(utils.get_file_contents(_CRON_YAML_FILE_NAME))
 
