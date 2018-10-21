@@ -56,7 +56,8 @@ def _check_third_party_size():
         number_of_files_in_third_party)
     print ''
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
-        print'    ERROR: Third party folder size limit has been exceeded.'
+        print'    ERROR: The third party folder size exceeded the %d files '\
+                'limit.' % THIRD_PARTY_SIZE_LIMIT
         print '------------------------------------------------------'
         print ''
         sys.exit(1)
