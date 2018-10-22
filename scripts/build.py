@@ -1103,19 +1103,23 @@ def build():
     parser.add_option(
         '--prod_env', action='store_true', default=False, dest='prod_mode')
     parser.add_option(
-        '--prod_minify_only', action='store_true', default=False,
+        '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    # If minify_third_party_libs_only is set to True, skips the rest of the
+    # build process once third party libs are minified.
+    if options.minify_third_party_libs_only:
+        if not options.prod_mode:
+            raise Exception(
+                'minify_third_party_libs_only is set to true in non-prod mode.')
+        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        return
     if options.prod_mode:
-        # If minify_third_party_libs_only is set to True, skips the rest of the
-        # build process once third party libs are minified.
-        if options.minify_third_party_libs_only:
-            minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        else:
-            generate_build_directory()
+        generate_build_directory()
 
 
 if __name__ == '__main__':
