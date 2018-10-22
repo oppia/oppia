@@ -207,6 +207,8 @@ DEFAULT_INIT_STATE_NAME = 'Introduction'
 DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 # Default content id for the interaction's default outcome.
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content id for the explanation in the concept card of a skill.
+DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Default content_ids_to_audio_translations dict for a default state template.
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
