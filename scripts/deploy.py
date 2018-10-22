@@ -248,13 +248,13 @@ def _execute_deployment():
         if build_process.returncode > 0:
             raise Exception('Build failed.')
 
-        # Deploy app to GAE.
-        subprocess.check_output([APPCFG_PATH, 'update', '.'])
-
         # Deploy export service to GAE.
         subprocess.check_output(
             ['gcloud', 'app', 'deploy', 'export/app.yaml',
              '--project=%s' % APP_NAME])
+
+        # Deploy app to GAE.
+        subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))

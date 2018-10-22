@@ -14,7 +14,6 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
-import commands
 import os
 import subprocess
 
@@ -134,9 +133,9 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
 
 
 def require_gcloud_to_be_available():
-    status, msg = commands.getstatusoutput('gcloud')
+    status, msg = subprocess.getstatusoutput('gcloud')
 
-    if status == 32512:
+    if status == 127:
         # gcloud command does not exist.
         raise Exception('%s.\n Please install gcloud '
                         '(https://cloud.google.com/sdk/docs/downloads-apt-get) '
