@@ -126,7 +126,11 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
         # version and old(v1) skill contents schema version.
         skill_contents = {
             'worked_examples': [],
-            'explanation': ''
+            'explanation': {
+                'content_id': 'explanation',
+                'html': feconf.DEFAULT_SKILL_EXPLANATION
+            },
+            'content_ids_to_audio_translations': {}
         }
         self.save_new_skill_with_story_and_skill_contents_schema_version(
             self.SKILL_ID, self.albert_id, 'A description', 0,
