@@ -55,6 +55,8 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
+CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
+
 
 class TopicChange(object):
     """Domain object for changes made to topic object."""
@@ -67,7 +69,8 @@ class TopicChange(object):
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'id', 'title',
-        'old_subtopic_id', 'new_subtopic_id', 'subtopic_id'
+        'old_subtopic_id', 'new_subtopic_id', 'subtopic_id', 'from_version',
+        'to_version'
     ]
 
     def __init__(self, change_dict):
@@ -78,10 +81,23 @@ class TopicChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_subtopic' (with title)
+                - 'delete_subtopic' (with subtopic_id)
+                - 'add_uncategorized_skill_id' (with
+                new_uncategorized_skill_id)
+                - 'remove_uncategorized_skill_id' (with subtopic_id
+                and skill_id)
+                - 'move_skill_id_to_subtopic' (with old_subtopic_id,
+                new_subtopic_id and skill_id)
+                - 'remove_skill_id_from_subtopic' (with subtopic_id and
+                skill_id)
                 - 'update_topic_property' (with property_name, new_value
                 and old_value)
                 - 'update_subtopic_property' (with property_name, new_value
                 and old_value)
+                - 'migrate_subtopic_schema_to_latest_version' (with
+                from_version and to_version)
+                - 'create_new' (with name)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -119,6 +135,9 @@ class TopicChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
+        elif self.cmd == CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         elif self.cmd == CMD_CREATE_NEW:
             self.name = change_dict['name']
         else:

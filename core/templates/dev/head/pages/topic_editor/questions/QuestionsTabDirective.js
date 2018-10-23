@@ -102,6 +102,10 @@ oppia.directive('questionsTab', [
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
+
+                  $scope.ok = function() {
+                    $uibModalInstance.dismiss('ok');
+                  };
                 }
               ]
             });
