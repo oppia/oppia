@@ -1043,8 +1043,6 @@ def generate_build_directory():
     hashes = dict()
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
-    # Minify third party resources.
-    minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -1112,14 +1110,13 @@ def build():
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
-    if options.minify_third_party_libs_only:
-        if not options.prod_mode:
-            raise Exception(
-                'minify_third_party_libs_only is set to true in non-prod mode.')
-        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        return
+    if options.minify_third_party_libs_only and not options.prod_mode:
+        raise Exception(
+            'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
-        generate_build_directory()
+        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        if not options.minify_third_party_libs_only:
+            generate_build_directory()
 
 
 if __name__ == '__main__':
