@@ -1755,7 +1755,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
-
     """Tests for the answer submitted event handler."""
 
     def test_submit_answer_for_exploration(self):
