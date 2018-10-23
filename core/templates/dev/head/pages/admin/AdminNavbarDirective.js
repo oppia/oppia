@@ -44,7 +44,7 @@ oppia.directive('adminNavbar', [
           $scope.profilePictureDataUrl = dataUrl;
         });
         UserService.getUserInfoAsync().then(function(userInfo) {
-          $scope.username = userInfo.getUSername();
+          $scope.username = userInfo.getUsername();
           $scope.isModerator = userInfo.isModerator();
           $scope.isSuperAdmin = userInfo.isSuperAdmin();
 
