@@ -196,7 +196,7 @@ oppia.controller('LearnerDashboard', [
       }
     );
 
-    $q.all(userInfoPromise, dashboardDataPromise).then(function() {
+    $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
       $rootScope.loadingMessage = '';
     });
 

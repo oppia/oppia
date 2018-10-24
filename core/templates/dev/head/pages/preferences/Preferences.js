@@ -56,7 +56,7 @@ oppia.controller('Preferences', [
       _forceSelect2Refresh();
     });
 
-    $q.all(userInfoPromise, preferencesPromise).then(function() {
+    $q.all([userInfoPromise, preferencesPromise]).then(function() {
       $rootScope.loadingMessage = '';
     });
 

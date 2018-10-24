@@ -43,7 +43,7 @@ oppia.directive('searchResults', [
             }
           );
 
-          $q.all(userInfoPromise, searchResultsPromise).then(function() {
+          $q.all([userInfoPromise, searchResultsPromise]).then(function() {
             $rootScope.loadingMessage = '';
           });
 
