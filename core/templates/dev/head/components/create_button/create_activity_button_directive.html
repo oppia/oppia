@@ -1,7 +1,7 @@
 <div class="oppia-navbar-button-container">
   <!-- User must complete the registration process. -->
   <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-          ng-click="onRedirectToLogin('/creator_dashboard?mode=create')" ng-if="!userIsLoggedIn">
+          ng-click="onRedirectToLogin('/creator_dashboard?mode=create')" ng-if="userIsLoggedIn === false">
     <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
   </button>
   <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
