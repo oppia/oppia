@@ -69,7 +69,6 @@ oppia.directive('audioBar', [
 
           $scope.isAudioBarAvailable = function() {
             return (
-              BrowserCheckerService.supportsAudioPlayback() &&
               $scope.languagesInExploration.length > 0);
           };
 
