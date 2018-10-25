@@ -241,6 +241,9 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
+            #
+            # Note: from_version and to_version really should be int, but left
+            # as str to conform with legacy data.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),

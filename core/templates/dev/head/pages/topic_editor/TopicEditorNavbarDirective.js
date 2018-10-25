@@ -58,7 +58,12 @@ oppia.directive('topicEditorNavbar', [
               function() {
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
-              });
+              }
+            ).then(function() {
+              var successToast = 'Topic published.';
+              AlertsService.addSuccessMessage(
+                successToast, 1000);
+            });
           };
 
           $scope.discardChanges = function() {
@@ -103,6 +108,10 @@ oppia.directive('topicEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
+            }).then(function() {
+              var successToast = 'Changes saved.';
+              AlertsService.addSuccessMessage(
+                successToast, 1000);
             });
           };
 

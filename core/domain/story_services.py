@@ -83,17 +83,13 @@ def _get_story_memcache_key(story_id, version=None):
         return 'story:%s' % story_id
 
 
-def get_story_from_model(story_model, run_conversion=True):
+def get_story_from_model(story_model):
     """Returns a story domain object given a story model loaded
     from the datastore.
 
     Args:
         story_model: StoryModel. The story model loaded from the
             datastore.
-        run_conversion: bool. If true, the the story's schema version will
-            be checked against the current schema version. If they do not match,
-            the story will be automatically updated to the latest schema
-            version.
 
     Returns:
         story. A Story domain object corresponding to the given
@@ -108,7 +104,7 @@ def get_story_from_model(story_model, run_conversion=True):
     }
 
     # Migrate the story if it is not using the latest schema version.
-    if (run_conversion and story_model.schema_version !=
+    if (story_model.schema_version !=
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         _migrate_story_contents_to_latest_schema(
             versioned_story_contents)
