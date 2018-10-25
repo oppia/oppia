@@ -24,7 +24,6 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
@@ -865,9 +864,9 @@ class ExplorationContentValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'br', [u'[document]']]",
-            "[u'invalidTags', [u'span']]",
-            "[u'oppia-noninteractive-link', [u'[document]']]",
+            '[u\'br\', [u\'[document]\']]',
+            '[u\'invalidTags\', [u\'span\']]',
+            '[u\'oppia-noninteractive-link\', [u\'[document]\']]',
             (
                 '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
                 'like your <span>program </span>prints output</p>.<blockquote>'
@@ -977,7 +976,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'oppia-noninteractive-image', [u'ol']]",
+            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
@@ -1220,10 +1219,10 @@ class ExplorationContentValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'invalidTags', [u'span', u'code', u'b']]",
-            "[u'ol', [u'ol']]",
-            "[u'oppia-noninteractive-image', [u'p', u'b']]",
-            "[u'p', [u'pre']]",
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
+            '[u\'ol\', [u\'ol\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
+            '[u\'p\', [u\'pre\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1245,47 +1244,6 @@ class ExplorationContentValidationJobForCKEditorTest(
             )
         ]
 
-        self.assertEqual(actual_output, expected_output)
-
-
-class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
-
-    COMMITER_ID = 'ADMIN'
-    COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
-    EXP_ID = 'eid'
-    FILENAME = 'imageFile.png'
-
-    def setUp(self):
-        super(DeleteImagesFromGAEJobTest, self).setUp()
-        self.process_and_flush_pending_tasks()
-
-    def test_for_deletion_job(self):
-        """Checks that images get deleted from the GAE after running the job.
-        """
-        # This job is for deleting the images from the datastore that were
-        # stored in old format --- exp_id/assets/image.png . It should not be
-        # run on the current develop branch because we now store the images
-        # as exploration/exp_id/assets/image.png .
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
-        imageData = ''
-        mimetype = 'image/png'
-        fs.commit(
-            self.COMMITER_ID, self.FILENAME, imageData,
-            mimetype=mimetype)
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-
-        job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
-        exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
-        expected_output = [
-            u"[u'Number of files that got deleted', 1]"
-        ]
-
-        self.assertEqual(fs.isfile(self.FILENAME), False)
         self.assertEqual(actual_output, expected_output)
 
 
@@ -1390,9 +1348,9 @@ class ExplorationMigrationValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'invalidTags', [u'code', u'span']]",
-            "[u'strings', [u'<p>Lorem <span>ipsum </span>"
-            "</p> Hello this is <code>oppia </code>']]"
+            '[u\'invalidTags\', [u\'code\', u\'span\']]',
+            '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
+            '</p> Hello this is <code>oppia </code>\']]'
         ]
 
         self.assertEqual(actual_output, expected_output)

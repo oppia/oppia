@@ -1,10 +1,14 @@
 <md-card layout="row" class="list-view-item">
+  Search By Skill
+  <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText">
+</md-card>
+<md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
-      <col style="width: 40%;">
-      <col style="width: 20%;">
-      <col style="width: 20%;">
-      <col style="width: 10%;">
+      <col style="width: 44%;">
+      <col style="width: 22%;">
+      <col style="width: 22%;">
+      <col style="width: 2%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in SKILL_HEADINGS"
@@ -14,29 +18,42 @@
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
       </th>
     </tr>
-    <tr ng-repeat="skill in getSkillSummaries()"
-        class="list-item">
-      <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+    <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
+        ng-click="isInModal() && selectSkill(skill)"
+        class="list-item"
+        ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.description]> </span>
         </a>
       </td>
-      <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
-      <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
-      <td ng-if="getEditableTopicSummaries().length > 0">
+      <td ng-if="getMergeableSkillSummaries().length > 0">
+        <button class="btn btn-default" ng-click="mergeSkill(skill)">
+          <span> Merge Skill </span>
+        </button>
+      </td>
+      <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
       </td>
-      <td ng-if="canDeleteSkill()">
+      <td ng-if="canDeleteSkill()" class="delete-icon">
         <span ng-click="deleteSkill(skill.id)" class="fa fa-trash list-summary"> </span>
       </td>
     </tr>
@@ -52,7 +69,10 @@
   }
 
   skills-list .dashboard-table {
+    display: block;
     font-size: 15px;
+    max-height: 250px;
+    overflow-y: scroll;
     width: 100%;
   }
 
@@ -74,17 +94,40 @@
     text-decoration: none;
   }
 
+  skills-list .list-item {
+    height: 2.5em;
+  }
+
   skills-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
 
-  skills-list .list-item:hover {
+  skills-list .hoverable-cell {
     background-color: #ededed;
+  }
+
+  skills-list .delete-icon {
+    padding-left: 0.8vw;
+  }
+
+  skills-list tr td:nth-child(4) {
+    border-bottom: 1px solid #fff;
+  }
+
+  skills-list tr td:nth-child(5) {
+    border-bottom: 1px solid #fff;
   }
 
   skills-list .list-summary span {
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
+  }
+
+  @media (max-width: 768px) {
+    skills-list .list-view-item {
+      width: 100%;
+      margin: 0 0 0 0;
+    }
   }
 </style>

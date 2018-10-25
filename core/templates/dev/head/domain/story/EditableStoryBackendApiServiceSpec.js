@@ -57,7 +57,8 @@ describe('Editable story backend API service', function() {
           next_node_id: 'node_3'
         },
         language_code: 'en'
-      }
+      },
+      topic_name: 'Topic Name'
     };
   }));
 
@@ -78,7 +79,10 @@ describe('Editable story backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.story);
+      expect(successHandler).toHaveBeenCalledWith({
+        story: sampleDataResults.story,
+        topicName: sampleDataResults.topic_name
+      });
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -128,7 +132,7 @@ describe('Editable story backend API service', function() {
 
       EditableStoryBackendApiService.fetchStory('topicId', 'storyId').then(
         function(data) {
-          story = data;
+          story = data.story;
         });
       $httpBackend.flush();
 

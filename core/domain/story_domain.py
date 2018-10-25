@@ -85,10 +85,19 @@ class StoryChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_story_node' (with node_id)
+                - 'delete_story_node' (with node_id)
+                - 'update_story_node_outline_status' (with node_id, old_value
+                and new_value)
                 - 'update_story_property' (with property_name, new_value
                 and old_value)
                 - 'update_story_node_property' (with property_name, new_value
                 and old_value)
+                - 'update_story_contents_property' (with property_name,
+                new_value and old_value)
+                - 'migrate_schema_to_latest_version' (with from_version and
+                to_version)
+                - 'create_new' (with title)
 
         Raises:
             Exception: The given change dict is not valid.

@@ -30,7 +30,7 @@ def _js_string_filter(value):
     """Converts a value to a JSON string for use in JavaScript code."""
     string = json.dumps(value)
 
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ('\'', '\\\''),
                     ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
                     ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 

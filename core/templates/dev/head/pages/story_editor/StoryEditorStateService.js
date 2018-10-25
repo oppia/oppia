@@ -33,6 +33,7 @@ oppia.factory('StoryEditorStateService', [
     var _storyIsInitialized = false;
     var _storyIsLoading = false;
     var _storyIsBeingSaved = false;
+    var _topicName = null;
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -42,6 +43,10 @@ oppia.factory('StoryEditorStateService', [
         $rootScope.$broadcast(EVENT_STORY_INITIALIZED);
         _storyIsInitialized = true;
       }
+    };
+
+    var _setTopicName = function(topicName) {
+      _topicName = topicName;
     };
 
     var _updateStory = function(newBackendStoryObject) {
@@ -60,7 +65,8 @@ oppia.factory('StoryEditorStateService', [
         EditableStoryBackendApiService.fetchStory(
           topicId, storyId).then(
           function(newBackendStoryObject) {
-            _updateStory(newBackendStoryObject);
+            _setTopicName(newBackendStoryObject.topicName);
+            _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
           },
           function(error) {
@@ -107,6 +113,10 @@ oppia.factory('StoryEditorStateService', [
        */
       setStory: function(story) {
         _setStory(story);
+      },
+
+      getTopicName: function() {
+        return _topicName;
       },
 
       /**

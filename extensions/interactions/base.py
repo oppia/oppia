@@ -123,20 +123,24 @@ class BaseInteraction(object):
 
     @property
     def id(self):
+        """The name of the class."""
         return self.__class__.__name__
 
     @property
     def customization_arg_specs(self):
+        """The customization arg specs for the interaction."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
     def answer_visualization_specs(self):
+        """The answer visualization specs for the interaction."""
         return self._answer_visualization_specs
 
     @property
     def answer_visualizations(self):
+        """A list of answer visualization specs of the interaction."""
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
@@ -150,12 +154,14 @@ class BaseInteraction(object):
 
     @property
     def answer_calculation_ids(self):
+        """A set of answer calculation ids."""
         visualizations = self.answer_visualizations
         return set(
             [visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self):
+        """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
 
     def normalize_answer(self, answer):

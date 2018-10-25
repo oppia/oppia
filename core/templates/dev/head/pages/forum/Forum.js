@@ -17,7 +17,7 @@
  */
 
 oppia.controller('Forum', [
-  '$scope', function($scope) {
-    $scope.DEV_MODE = GLOBALS.DEV_MODE;
+  '$scope', 'DEV_MODE', function($scope, DEV_MODE) {
+    $scope.DEV_MODE = DEV_MODE;
   }
 ]);
