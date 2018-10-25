@@ -18,8 +18,8 @@
 import io
 
 from PIL import Image
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.api import images
 
@@ -61,7 +61,7 @@ def compress_image(image_content, scaling_factor):
     Returns:
         str. Returns the content of the compressed image.
     """
-    if not feconf.DEV_MODE:
+    if not constants.DEV_MODE:
         height, width = get_image_dimensions(image_content)
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)

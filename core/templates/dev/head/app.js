@@ -46,8 +46,10 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+  'The current solution does not correspond to a correct answer.');
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   'The solution is now valid!');
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -75,6 +77,8 @@ oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+oppia.constant('COMPONENT_NAME_EXPLANATION', 'explanation');
+oppia.constant('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
 
 // Enables recording playthroughs from learner sessions.
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
@@ -339,25 +343,27 @@ oppia.config([
 ]);
 
 oppia.config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', function($delegate) {
-    var _originalError = $delegate.error;
+  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
+    function($delegate, DEV_MODE) {
+      var _originalError = $delegate.error;
 
-    if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
-      $delegate.log = function() {};
-      $delegate.info = function() {};
-      // TODO(sll): Send errors (and maybe warnings) to the backend.
-      $delegate.warn = function() { };
-      $delegate.error = function(message) {
-        if (String(message).indexOf('$digest already in progress') === -1) {
-          _originalError(message);
-        }
-      };
-      // This keeps angular-mocks happy (in tests).
-      $delegate.error.logs = [];
+      if (!DEV_MODE) {
+        $delegate.log = function() {};
+        $delegate.info = function() {};
+        // TODO(sll): Send errors (and maybe warnings) to the backend.
+        $delegate.warn = function() { };
+        $delegate.error = function(message) {
+          if (String(message).indexOf('$digest already in progress') === -1) {
+            _originalError(message);
+          }
+        };
+        // This keeps angular-mocks happy (in tests).
+        $delegate.error.logs = [];
+      }
+
+      return $delegate;
     }
-
-    return $delegate;
-  }]);
+  ]);
 }]);
 
 oppia.config(['toastrConfig', function(toastrConfig) {
@@ -387,6 +393,9 @@ oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
+  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+
   return function(exception, cause) {
     var messageAndSourceAndStackTrace = [
       '',
@@ -396,26 +405,32 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
       '    at URL: ' + window.location.href
     ].join('\n');
 
-    // Catch all errors, to guard against infinite recursive loops.
-    try {
-      // We use jQuery here instead of Angular's $http, since the latter
-      // creates a circular dependency.
-      $.ajax({
-        type: 'POST',
-        url: '/frontend_errors',
-        data: $.param({
-          csrf_token: GLOBALS.csrf_token,
-          payload: JSON.stringify({
-            error: messageAndSourceAndStackTrace
-          }),
-          source: document.URL
-        }, true),
-        contentType: 'application/x-www-form-urlencoded',
-        dataType: 'text',
-        async: true
-      });
-    } catch (loggingError) {
-      $log.warn('Error logging failed.');
+    // To prevent an overdose of errors, throttle to at most 1 error every
+    // MIN_TIME_BETWEEN_ERRORS_MSEC.
+    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+      // Catch all errors, to guard against infinite recursive loops.
+      try {
+        // We use jQuery here instead of Angular's $http, since the latter
+        // creates a circular dependency.
+        $.ajax({
+          type: 'POST',
+          url: '/frontend_errors',
+          data: $.param({
+            csrf_token: GLOBALS.csrf_token,
+            payload: JSON.stringify({
+              error: messageAndSourceAndStackTrace
+            }),
+            source: document.URL
+          }, true),
+          contentType: 'application/x-www-form-urlencoded',
+          dataType: 'text',
+          async: true
+        });
+
+        timeOfLastPostedError = Date.now();
+      } catch (loggingError) {
+        $log.warn('Error logging failed.');
+      }
     }
 
     $log.error.apply($log, arguments);
@@ -423,202 +438,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
 }]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
-// Service for sending events to Google Analytics.
-//
-// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
-// turned on. This flag must be turned on explicitly by the application
-// owner in feconf.py.
-oppia.factory('siteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
-  // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/events
-  var _sendEventToGoogleAnalytics = function(
-      eventCategory, eventAction, eventLabel) {
-    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
-      $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
-    }
-  };
-
-  // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/
-  //   social-interactions
-  var _sendSocialEventToGoogleAnalytics = function(
-      network, action, targetUrl) {
-    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
-      $window.ga('send', 'social', network, action, targetUrl);
-    }
-  };
-
-  return {
-    // The srcElement refers to the element on the page that is clicked.
-    registerStartLoginEvent: function(srcElement) {
-      _sendEventToGoogleAnalytics(
-        'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
-    },
-    registerNewSignupEvent: function() {
-      _sendEventToGoogleAnalytics('SignupButton', 'click', '');
-    },
-    registerClickBrowseLibraryButtonEvent: function() {
-      _sendEventToGoogleAnalytics(
-        'BrowseLibraryButton', 'click', $window.location.pathname);
-    },
-    registerGoToDonationSiteEvent: function(donationSiteName) {
-      _sendEventToGoogleAnalytics(
-        'GoToDonationSite', 'click', donationSiteName);
-    },
-    registerApplyToTeachWithOppiaEvent: function() {
-      _sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
-    },
-    registerClickCreateExplorationButtonEvent: function() {
-      _sendEventToGoogleAnalytics(
-        'CreateExplorationButton', 'click', $window.location.pathname);
-    },
-    registerCreateNewExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
-    },
-    registerCreateNewExplorationInCollectionEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'NewExplorationFromCollection', 'create', explorationId);
-    },
-    registerCreateNewCollectionEvent: function(collectionId) {
-      _sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
-    },
-    registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'CommitToPrivateExploration', 'click', explorationId);
-    },
-    registerShareExplorationEvent: function(network) {
-      _sendSocialEventToGoogleAnalytics(
-        network, 'share', $window.location.pathname);
-    },
-    registerShareCollectionEvent: function(network) {
-      _sendSocialEventToGoogleAnalytics(
-        network, 'share', $window.location.pathname);
-    },
-    registerOpenEmbedInfoEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
-    },
-    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'CommitToPublicExploration', 'click', explorationId);
-    },
-    // Metrics for tutorial on first creating exploration
-    registerTutorialModalOpenEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'TutorialModalOpen', 'open', explorationId);
-    },
-    registerDeclineTutorialModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'DeclineTutorialModal', 'click', explorationId);
-    },
-    registerAcceptTutorialModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'AcceptTutorialModal', 'click', explorationId);
-    },
-    // Metrics for visiting the help center
-    registerClickHelpButtonEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'ClickHelpButton', 'click', explorationId);
-    },
-    registerVisitHelpCenterEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'VisitHelpCenter', 'click', explorationId);
-    },
-    registerOpenTutorialFromHelpCenterEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'OpenTutorialFromHelpCenter', 'click', explorationId);
-    },
-    // Metrics for exiting the tutorial
-    registerSkipTutorialEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'SkipTutorial', 'click', explorationId);
-    },
-    registerFinishTutorialEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FinishTutorial', 'click', explorationId);
-    },
-    // Metrics for first time editor use
-    registerEditorFirstEntryEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstEnterEditor', 'open', explorationId);
-    },
-    registerFirstOpenContentBoxEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstOpenContentBox', 'open', explorationId);
-    },
-    registerFirstSaveContentEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstSaveContent', 'click', explorationId);
-    },
-    registerFirstClickAddInteractionEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstClickAddInteraction', 'click', explorationId);
-    },
-    registerFirstSelectInteractionTypeEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstSelectInteractionType', 'click', explorationId);
-    },
-    registerFirstSaveInteractionEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstSaveInteraction', 'click', explorationId);
-    },
-    registerFirstSaveRuleEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstSaveRule', 'click', explorationId);
-    },
-    registerFirstCreateSecondStateEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'FirstCreateSecondState', 'create', explorationId);
-    },
-    // Metrics for publishing explorations
-    registerSavePlayableExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'SavePlayableExploration', 'save', explorationId);
-    },
-    registerOpenPublishExplorationModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExplorationModal', 'open', explorationId);
-    },
-    registerPublishExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
-    registerVisitOppiaFromIframeEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'VisitOppiaFromIframe', 'click', explorationId);
-    },
-    registerNewCard: function(cardNum) {
-      if (cardNum <= 10 || cardNum % 10 === 0) {
-        _sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
-      }
-    },
-    registerFinishExploration: function() {
-      _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
-    },
-    registerOpenFractionsFromLandingPageEvent: function(viewerType) {
-      _sendEventToGoogleAnalytics(
-        'OpenFractionsFromLandingPage', 'click', viewerType);
-    }
-  };
-}]);
-
-// Service for assembling extension tags (for interactions).
-oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
-    return {
-      formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
-        for (var caSpecName in customizationArgSpecs) {
-          var caSpecValue = customizationArgSpecs[caSpecName].value;
-          element.attr(
-            $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            HtmlEscaperService.objToEscapedJson(caSpecValue));
-        }
-        return element;
-      }
-    };
-  }
-]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

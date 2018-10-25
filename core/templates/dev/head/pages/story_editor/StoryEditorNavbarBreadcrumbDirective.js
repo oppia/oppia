@@ -23,9 +23,45 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story_editor/story_editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'FocusManagerService', 'StoryEditorStateService',
-        function($scope, FocusManagerService, StoryEditorStateService) {
+        '$scope', '$uibModal', '$window', 'UrlService',
+        'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
+        'EVENT_STORY_INITIALIZED',
+        function(
+            $scope, $uibModal, $window, UrlService,
+            UrlInterpolationService, UndoRedoService, StoryEditorStateService,
+            EVENT_STORY_INITIALIZED
+        ) {
           $scope.story = StoryEditorStateService.getStory();
+          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+          var topicId = UrlService.getTopicIdFromUrl();
+          $scope.$on(EVENT_STORY_INITIALIZED, function() {
+            $scope.topicName = StoryEditorStateService.getTopicName();
+          });
+          $scope.returnToTopicEditorPage = function() {
+            if (UndoRedoService.getChangeCount() > 0) {
+              var modalInstance = $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/story_editor/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  TOPIC_EDITOR_URL_TEMPLATE, {
+                    topicId: topicId
+                  }
+                ), '_self');
+            }
+          };
         }
       ]
     };

@@ -22,9 +22,13 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
+from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
+from core.domain import skill_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
+from core.domain import story_jobs_one_off
+from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 
@@ -32,12 +36,8 @@ from core.domain import user_jobs_one_off
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    collection_jobs_one_off.CollectionMigrationJob,
+    collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
-    exp_jobs_one_off.ImageDataMigrationJob,
-    exp_jobs_one_off.ValidationOfImagesOnGCSJob,
-    exp_jobs_one_off.ValidationOfImagesOnGCSJobUsingExps,
-    exp_jobs_one_off.DeleteImagesFromGAEJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
@@ -55,12 +55,11 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.CopyToNewDirectoryJob,
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
-    feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
-    feedback_jobs_one_off.FeedbackSubjectOneOffJob,
-    feedback_jobs_one_off.SuggestionMigrationOneOffJob,
-    feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob,
-    feedback_jobs_one_off.FeedbackThreadIdMigrationOneOffJob,
+    feedback_jobs_one_off.PopulateLastUpdatedFieldOneOffJob,
+    feedback_jobs_one_off.ValidateLastUpdatedFieldOneOffJob,
+    question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -68,6 +67,8 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
+    story_jobs_one_off.StoryMigrationOneOffJob,
+    topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,

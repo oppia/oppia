@@ -317,8 +317,13 @@ class SuggestionEditStateContent(BaseSuggestion):
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
+        if self.change.state_name not in exploration.states:
+            # As the state doesn't exist now, we cannot find the content of the
+            # state to populate the old_value field. So we set it as None.
+            old_content = None
+        else:
+            old_content = (
+                exploration.states[self.change.state_name].content.to_dict())
 
         self.change.old_value = old_content
 

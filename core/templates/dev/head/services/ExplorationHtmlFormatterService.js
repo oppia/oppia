@@ -20,10 +20,10 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('ExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
+  '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
   'INTERACTION_SPECS',
   function(
-      $filter, extensionTagAssemblerService, HtmlEscaperService,
+      $filter, ExtensionTagAssemblerService, HtmlEscaperService,
       INTERACTION_SPECS) {
     return {
       /**
@@ -47,7 +47,7 @@ oppia.factory('ExplorationHtmlFormatterService', [
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
         element = (
-          extensionTagAssemblerService.formatCustomizationArgAttrs(
+          ExtensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('last-answer', parentHasLastAnswerProperty ?
           'lastAnswer' : 'null');

@@ -23,8 +23,8 @@ oppia.directive('searchResults', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/search_results_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
-        function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
+        '$scope', '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+        function($scope, $rootScope, $timeout, $window, SiteAnalyticsService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
@@ -39,7 +39,7 @@ oppia.directive('searchResults', [
           );
 
           $scope.onRedirectToLogin = function(destinationUrl) {
-            siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+            SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
             $timeout(function() {
               $window.location = destinationUrl;
             }, 150);

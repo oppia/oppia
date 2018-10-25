@@ -17,6 +17,7 @@
 import logging
 import urllib
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
@@ -39,21 +40,27 @@ class ValueGeneratorHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ImageHandler(base.BaseHandler):
-    """Handles image retrievals."""
+class ImageDevHandler(base.BaseHandler):
+    """Handles image retrievals (only in dev -- in production, image files are
+    served from GCS).
+    """
+
+    _IMAGE_PATH_PREFIX = 'image'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, encoded_filepath):
+    def get(self, exploration_id, encoded_filename):
         """Returns an image.
 
         Args:
             exploration_id: the id of the exploration.
-            encoded_filepath: a string representing the image filepath. This
+            encoded_filename: a string representing the image filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
         try:
-            filepath = urllib.unquote(encoded_filepath)
-            file_format = filepath[(filepath.rfind('.') + 1):]
+            filename = urllib.unquote(encoded_filename)
+            file_format = filename[(filename.rfind('.') + 1):]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
             self.response.headers['Content-Type'] = str(
@@ -62,7 +69,7 @@ class ImageHandler(base.BaseHandler):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(
                     'exploration/%s' % exploration_id))
-            raw = fs.get(filepath)
+            raw = fs.get('%s/%s' % (self._IMAGE_PATH_PREFIX, filename))
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
@@ -72,7 +79,7 @@ class ImageHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class AudioHandler(base.BaseHandler):
+class AudioDevHandler(base.BaseHandler):
     """Handles audio retrievals (only in dev -- in production, audio files are
     served from GCS).
     """
@@ -80,13 +87,17 @@ class AudioHandler(base.BaseHandler):
     _AUDIO_PATH_PREFIX = 'audio'
 
     @acl_decorators.open_access
-    def get(self, exploration_id, filename):
+    def get(self, exploration_id, encoded_filename):
         """Returns an audio file.
 
         Args:
-            encoded_filepath: a string representing the audio filepath. This
+            encoded_filename: a string representing the audio filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
+
+        filename = urllib.unquote(encoded_filename)
         file_format = filename[(filename.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.

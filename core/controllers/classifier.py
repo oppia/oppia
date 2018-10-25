@@ -18,6 +18,7 @@ import hashlib
 import hmac
 import json
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
@@ -100,7 +101,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         signature = self.payload.get('signature')
         message = self.payload.get('message')
         vm_id = self.payload.get('vm_id')
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
 
         if not validate_job_result_message_dict(message):
@@ -148,7 +149,7 @@ class NextJobHandler(base.BaseHandler):
         vm_id = self.payload.get('vm_id')
         message = self.payload.get('message')
 
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
         if not verify_signature(message, vm_id, signature):
             raise self.UnauthorizedUserException
