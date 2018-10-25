@@ -38,16 +38,41 @@ oppia.directive('storyNodeEditor', [
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             AlertsService) {
+          var _recalculateAvailableNodes = function() {
+            $scope.availableNodes = [{
+              id: undefined,
+              text: ''
+            }];
+            for (i = 0; i < $scope.storyNodeIds.length; i++) {
+              if ($scope.storyNodeIds[i] === $scope.getId()) {
+                continue;
+              }
+              if (
+                $scope.getDestinationNodeIds().indexOf(
+                  $scope.storyNodeIds[i]) !== -1) {
+                continue;
+              }
+              $scope.availableNodes.push({
+                id: $scope.storyNodeIds[i],
+                text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
+              });
+            }
+            $scope.availableNodes.push({
+              id: null,
+              text: 'Add New Chapter'
+            });
+          };
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
+            $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
             $scope.nodeIdToTitleMap =
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
-                $scope.getDestinationNodeIds());
+                $scope.storyNodeIds);
+            _recalculateAvailableNodes();
             $scope.currentTitle =
               $scope.story.getStoryContents().getNodeIdsToTitleMap([
                 $scope.getId()
               ])[$scope.getId()];
-            $scope.titleEditorIsShown = false;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -60,21 +85,13 @@ oppia.directive('storyNodeEditor', [
             };
           };
 
-          $scope.openTitleEditor = function() {
-            $scope.titleEditorIsShown = true;
-            $scope.editableTitle = $scope.currentTitle;
-          };
-
-          $scope.closeTitleEditor = function() {
-            $scope.titleEditorIsShown = false;
-            $scope.editableTitle = $scope.currentTitle;
-          };
-
           $scope.updateTitle = function(newTitle) {
+            if (newTitle === $scope.currentTitle) {
+              return;
+            }
             StoryUpdateService.setStoryNodeTitle(
               $scope.story, $scope.getId(), newTitle);
             $scope.currentTitle = newTitle;
-            $scope.closeTitleEditor();
           };
 
           $scope.viewNodeEditor = function(nodeId) {
@@ -96,81 +113,71 @@ oppia.directive('storyNodeEditor', [
               $scope.story, $scope.getId());
           };
 
-          $scope.addNewDestinationNode = function(title) {
-            var nodeTitles =
-              $scope.story.getStoryContents().getNodes().map(function(node) {
-                return node.getTitle();
-              });
-            var modalInstance = $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/main_editor/' +
-                'new_chapter_title_modal_directive.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.nodeTitle = '';
-                  $scope.nodeTitles = nodeTitles;
-                  $scope.errorMsg = null;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isNodeTitleEmpty = function(nodeTitle) {
-                    return (nodeTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.nodeTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A chapter with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(title) {
-              var nextNodeId = $scope.story.getStoryContents().getNextNodeId();
-              StoryUpdateService.addStoryNode($scope.story, title);
-              StoryUpdateService.addDestinationNodeIdToNode(
-                $scope.story, $scope.getId(), nextNodeId);
-              _init();
-            });
-          };
-
-          $scope.addExistingDestinationNode = function(title) {
-            if (title === $scope.currentTitle) {
-              AlertsService.addInfoMessage(
-                'A chapter cannot lead to itself.', 3000);
-              return;
-            }
-            var nodeId =
-              $scope.story.getStoryContents().getNodeIdCorrespondingToTitle(
-                title);
+          $scope.addDestinationNode = function(nodeId) {
             if (nodeId === null) {
-              AlertsService.addInfoMessage(
-                'The given chapter doesn\'t exist', 3000);
-              return;
+              var nodeTitles =
+                $scope.story.getStoryContents().getNodes().map(function(node) {
+                  return node.getTitle();
+                });
+              var modalInstance = $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/story_editor/main_editor/' +
+                  'new_chapter_title_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.nodeTitle = '';
+                    $scope.nodeTitles = nodeTitles;
+                    $scope.errorMsg = null;
+
+                    $scope.resetErrorMsg = function() {
+                      $scope.errorMsg = null;
+                    };
+                    $scope.isNodeTitleEmpty = function(nodeTitle) {
+                      return (nodeTitle === '');
+                    };
+                    $scope.save = function(title) {
+                      if ($scope.nodeTitles.indexOf(title) !== -1) {
+                        $scope.errorMsg =
+                          'A chapter with this title already exists';
+                        return;
+                      }
+                      $uibModalInstance.close(title);
+                    };
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+
+              modalInstance.result.then(function(title) {
+                var nextNodeId =
+                  $scope.story.getStoryContents().getNextNodeId();
+                StoryUpdateService.addStoryNode($scope.story, title);
+                StoryUpdateService.addDestinationNodeIdToNode(
+                  $scope.story, $scope.getId(), nextNodeId);
+                _init();
+                _recalculateAvailableNodes();
+              });
+            } else {
+              if (nodeId === $scope.getId()) {
+                AlertsService.addInfoMessage(
+                  'A chapter cannot lead to itself.', 3000);
+                return;
+              }
+              try {
+                StoryUpdateService.addDestinationNodeIdToNode(
+                  $scope.story, $scope.getId(), nodeId);
+              } catch (error) {
+                AlertsService.addInfoMessage(
+                  'The given chapter is already a destination for current ' +
+                  'chapter', 3000);
+                return;
+              }
+              _recalculateAvailableNodes();
             }
-            try {
-              StoryUpdateService.addDestinationNodeIdToNode(
-                $scope.story, $scope.getId(), nodeId);
-            } catch (error) {
-              AlertsService.addInfoMessage(
-                'The given chapter is already a destination for current ' +
-                'chapter', 3000);
-              return;
-            }
-            $scope.nodeIdToTitleMap =
-              $scope.story.getStoryContents().getNodeIdsToTitleMap(
-                $scope.getDestinationNodeIds());
-            $scope.newDestinationNodeTitle = '';
-            $scope.closeNodeTitleEditor();
           };
 
           $scope.removeDestinationNodeId = function(nodeId) {

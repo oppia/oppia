@@ -1,24 +1,17 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="story-title">
-      <span ng-if="!storyTitleEditorIsShown" ng-click="openStoryTitleEditor()"
-            class="oppia-editable-section">
-        <strong class="form-heading"><[story.getTitle()]></strong>
-        <i class="material-icons oppia-editor-edit-icon"
-           title="Edit Story Title">&#xE254;
-        </i>
-      </span>
-      <span ng-if="storyTitleEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateStoryTitle(editableTitle)">
-          <input type="text" ng-model="editableTitle">
-          <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeStoryTitleEditor()">Cancel</button>
-        </form>
+      <label for="storyTitle" class="form-heading">Story Title</label>
+      <input id="storyTitle" type="text" class="form-control"
+             ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
+             placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
+        <em>Please use at most 20 characters for the story title.</em>
       </span>
     </div>
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
-      <label for="storyDescription" class="form-heading">Description</label>
+      <label for="storyDescription" class="form-heading">Story Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
