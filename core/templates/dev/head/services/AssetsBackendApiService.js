@@ -67,7 +67,13 @@ oppia.factory('AssetsBackendApiService', [
         timeout: canceler.promise
       }).success(function(data) {
         try {
-          var assetBlob = new Blob([data]);
+          if (assetType === ASSET_TYPE_AUDIO) {
+            // Add type for audio assets. Without this, translations can
+            // not be played on Safari.
+            var assetBlob = new Blob([data], {type: 'audio/mpeg'});
+          } else {
+            var assetBlob = new Blob([data]);
+          }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
                          window.WebKitBlobBuilder ||
