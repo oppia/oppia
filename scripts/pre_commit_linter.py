@@ -520,10 +520,8 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(
-            paths=current_files_to_lint)
-        # This line prints Pycodestyle's output to the console.
-        pycodestyle_report.print_statistics()
+        pycodestyle_report, pycodestyle_results = _check_files(
+            style_guide, paths=current_files_to_lint)
 
         if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
             are_there_errors = True
@@ -531,12 +529,46 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         current_batch_start_index = current_batch_end_index
 
     if are_there_errors:
+        print ''
+        print 'Error Summary:'
+        for pycodestyle_result in pycodestyle_results:
+            print pycodestyle_result
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
     else:
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
+    print ''
     print 'Python linting finished.'
+
+
+def _check_files(style_guide, paths=None):
+    """Run all pycodestyle checks on the paths."""
+    if paths is None:
+        paths = style_guide.paths
+    report = style_guide.options.report
+    runner = style_guide.runner
+    report.start()
+    all_file_results = []
+    try:
+        for filepath in paths:
+            if os.path.isdir(filepath):
+                style_guide.input_dir(filepath)
+            elif not style_guide.excluded(filepath):
+                runner(filepath)
+                deferred_print = report._deferred_print # pylint: disable=protected-access
+                deferred_print.sort()
+                for line_number, offset, code, text, _ in deferred_print:
+                    all_file_results.append(report._fmt % { # pylint: disable=protected-access
+                        'path': report.filename,
+                        'row': report.line_offset + line_number,
+                        'col': offset + 1,
+                        'code': code, 'text': text,
+                    })
+    except KeyboardInterrupt:
+        print '... stopped'
+    report.stop()
+    return (report, all_file_results)
 
 
 def _lint_html_files(all_files):
