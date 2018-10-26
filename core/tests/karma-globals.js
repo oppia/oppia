@@ -78,8 +78,7 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  DEV_MODE: true,
-  GCS_RESOURCE_BUCKET_NAME: null,
+  GCS_RESOURCE_BUCKET_NAME: 'abc',
   userIsLoggedIn: true
 };
 
