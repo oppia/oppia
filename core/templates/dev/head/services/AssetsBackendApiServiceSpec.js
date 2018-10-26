@@ -47,7 +47,7 @@ describe('Assets Backend API Service', function() {
     // can test the production URL, too.
     expect(
       AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
-    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+    ).toEqual('/audiohandler/expid12345/assets/audio/a.mp3');
   });
 
   it('Should successfully fetch and cache audio', function() {
