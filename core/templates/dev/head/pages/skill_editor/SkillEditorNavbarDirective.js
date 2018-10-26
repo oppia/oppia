@@ -50,6 +50,11 @@ oppia.directive('skillEditorNavbar', [
             $scope.validationIssues = $scope.skill.getValidationIssues();
           };
 
+          $scope.discardChanges = function() {
+            UndoRedoService.clearChanges();
+            SkillEditorStateService.loadSkill($scope.skill.getId());
+          };
+
           $scope.getWarningsCount = function() {
             return $scope.validationIssues.length;
           };
@@ -79,6 +84,7 @@ oppia.directive('skillEditorNavbar', [
                 $scope.skillRights.setPublic();
                 SkillEditorStateService.setSkillRights(
                   $scope.skillRights);
+                AlertsService.addSuccessMessage('Skill Published.');
               });
           };
 
@@ -103,6 +109,7 @@ oppia.directive('skillEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
+              AlertsService.addSuccessMessage('Changes Saved.');
             });
           };
 

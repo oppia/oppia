@@ -21,21 +21,58 @@ describe('Concept card object factory', function() {
 
   describe('ConceptCardObjectFactory', function() {
     var ConceptCardObjectFactory;
-    var conceptCardDict = {
-      explanation: 'test explanation',
-      worked_examples: ['worked example 1', 'worked example 2']
-    };
+    var conceptCardDict;
+
     beforeEach(inject(function($injector) {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
+      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+
+      conceptCardDict = {
+        explanation: SubtitledHtmlObjectFactory.createDefault(
+          'test explanation', 'explanation'),
+        worked_examples: [
+          SubtitledHtmlObjectFactory.createDefault(
+            'worked example 1', 'worked_example_1'),
+          SubtitledHtmlObjectFactory.createDefault(
+            'worked example 2', 'worked_example_2')
+        ]
+      };
+
+      conceptCardDict = {
+        explanation: {
+          html: 'test explanation',
+          content_id: 'explanation',
+        },
+        worked_examples: [
+          {
+            html: 'worked example 1',
+            content_id: 'worked_example_1'
+          },
+          {
+            html: 'worked example 2',
+            content_id: 'worked_example_2'
+          }
+        ],
+        content_ids_to_audio_translations: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      };
     }));
 
     it('should create a new concept card from a backend dictionary',
       function() {
         var conceptCard =
           ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
-        expect(conceptCard.getExplanation()).toEqual('test explanation');
+        expect(conceptCard.getExplanation()).toEqual(
+          SubtitledHtmlObjectFactory.createDefault(
+            'test explanation', 'explanation'));
         expect(conceptCard.getWorkedExamples()).toEqual(
-          ['worked example 1', 'worked example 2']);
+          [SubtitledHtmlObjectFactory.createDefault(
+            'worked example 1', 'worked_example_1'),
+          SubtitledHtmlObjectFactory.createDefault(
+            'worked example 2', 'worked_example_2')]);
       });
 
     it('should convert to a backend dictionary', function() {
@@ -48,7 +85,8 @@ describe('Concept card object factory', function() {
       var conceptCard =
         ConceptCardObjectFactory.createInterstitialConceptCard();
       expect(conceptCard.getExplanation()).toEqual(
-        'Loading review material');
+        SubtitledHtmlObjectFactory.createDefault(
+          'Loading review material', 'explanation'));
       expect(conceptCard.getWorkedExamples()).toEqual([]);
     });
   });

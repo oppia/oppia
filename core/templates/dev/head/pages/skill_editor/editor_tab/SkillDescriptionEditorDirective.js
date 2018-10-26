@@ -29,28 +29,24 @@ oppia.directive('skillDescriptionEditor', [
         '/pages/skill_editor/editor_tab/' +
         'skill_description_editor_directive.html'),
       controller: [
-        '$scope',
-        function($scope) {
+        '$scope', 'EVENT_SKILL_REINITIALIZED',
+        function($scope, EVENT_SKILL_REINITIALIZED) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.tmpSkillDescription = $scope.skill.getDescription();
           $scope.skillRights = SkillEditorStateService.getSkillRights();
-          $scope.skillDescriptionEditorIsShown = false;
-
-          $scope.openSkillDescriptionEditor = function() {
-            if ($scope.canEditSkillDescription()) {
-              $scope.skillDescriptionEditorIsShown = true;
-              $scope.tmpSkillDescription = $scope.skill.getDescription();
-            }
-          };
-
-          $scope.closeSkillDescriptionEditor = function() {
-            $scope.skillDescriptionEditorIsShown = false;
-          };
 
           $scope.canEditSkillDescription = function() {
             return $scope.skillRights.canEditSkillDescription();
           };
 
+          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+            $scope.tmpSkillDescription = $scope.skill.getDescription();
+          });
+
           $scope.saveSkillDescription = function(newSkillDescription) {
+            if (newSkillDescription === $scope.skill.getDescription()) {
+              return;
+            }
             if (SkillObjectFactory.hasValidDescription(
               newSkillDescription)) {
               $scope.skillDescriptionEditorIsShown = false;

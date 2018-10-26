@@ -130,15 +130,17 @@ for arg in "$@"; do
 done
 
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  constants_env_variable="\"DEV_MODE\": false"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env
 else
+  constants_env_variable="\"DEV_MODE\": true"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py
 fi
 
-feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
-sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
 # Delete the modified feconf.py file(-i.bak)
-rm feconf.py.bak
+rm assets/constants.js.bak
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.

@@ -18,9 +18,9 @@
 
 oppia.controller('Base', [
   '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'SITE_NAME',
+  'SidebarStatusService', 'SITE_NAME', 'DEV_MODE',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService, SITE_NAME) {
+      SidebarStatusService, SITE_NAME, DEV_MODE) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -29,7 +29,7 @@ oppia.controller('Base', [
     $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
     $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
 
-    $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
+    $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
 

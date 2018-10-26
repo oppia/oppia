@@ -100,9 +100,27 @@ describe('Skill editor state service', function() {
       feedback: 'test feedback'
     };
 
+
     var skillContentsDict = {
-      explanation: 'test explanation',
-      worked_examples: ['test worked_example 1', 'test worked example 2']
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [
+        {
+          html: 'worked example 1',
+          content_id: 'worked_example_1'
+        },
+        {
+          html: 'worked example 2',
+          content_id: 'worked_example_2'
+        }
+      ],
+      content_ids_to_audio_translations: {
+        explanation: {},
+        worked_example_1: {},
+        worked_example_2: {}
+      }
     };
 
     var skillDict = {

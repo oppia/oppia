@@ -26,6 +26,8 @@ NAMES = utils.create_enum(
     'recommendations', 'skill', 'statistics', 'story', 'suggestion', 'topic',
     'user')
 
+GAE_PLATFORM = 'gae'
+
 
 class _Platform(object):
     """A base class for platform-specific imports related to GAE."""
@@ -249,7 +251,7 @@ class Registry(object):
         Returns:
             class: The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get(feconf.PLATFORM)
+        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
 
     @classmethod
     def import_models(cls, model_names):

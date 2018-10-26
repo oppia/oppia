@@ -34,8 +34,12 @@ oppia.factory('EditableStoryBackendApiService', [
 
       $http.get(storyDataUrl).then(function(response) {
         var story = angular.copy(response.data.story);
+        var topicName = angular.copy(response.data.topic_name);
         if (successCallback) {
-          successCallback(story);
+          successCallback({
+            story: story,
+            topicName: topicName
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

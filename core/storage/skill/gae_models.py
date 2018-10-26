@@ -69,6 +69,17 @@ class SkillModel(base_models.VersionedModel):
     # for superseding_skill_id and the merge was completed.
     all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
 
+    @classmethod
+    def get_merged_skills(cls):
+        """Returns the skill models which have been merged.
+
+        Returns: list(SkillModel). List of skill models which have been merged.
+        """
+
+        return [skill for skill in cls.query() if (
+            skill.superseding_skill_id is not None and (
+                len(skill.superseding_skill_id) > 0))]
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -205,7 +216,8 @@ class SkillRightsModel(base_models.VersionedModel):
         """
         return cls.query(
             cls.creator_id == user_id,
-            cls.skill_is_private == True) #pylint: disable=singleton-comparison
+            cls.skill_is_private == True, # pylint: disable=singleton-comparison
+            cls.deleted == False) # pylint: disable=singleton-comparison
 
     @classmethod
     def get_unpublished(cls):
@@ -216,4 +228,4 @@ class SkillRightsModel(base_models.VersionedModel):
             list(SkillRightsModel). A list of skill rights models that are
             private.
         """
-        return cls.query(cls.skill_is_private == True) #pylint: disable=singleton-comparison
+        return cls.query(cls.skill_is_private == True, cls.deleted == False) # pylint: disable=singleton-comparison

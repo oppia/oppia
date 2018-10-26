@@ -32,6 +32,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -760,17 +761,10 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-
-        # Image files are stored to the datastore in the dev env, and to GCS
-        # in production.
-        file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-            else fs_domain.GcsFileSystem)
+        file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
-        filepath = (
-            filename if feconf.DEV_MODE
-            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
@@ -780,7 +774,7 @@ class ImageUploadHandler(EditorHandler):
         exp_services.save_original_and_compressed_versions_of_image(
             self.user_id, filename, exploration_id, raw)
 
-        self.render_json({'filepath': filename})
+        self.render_json({'filename': filename})
 
 
 class AudioUploadHandler(EditorHandler):
@@ -797,7 +791,7 @@ class AudioUploadHandler(EditorHandler):
         """Saves an audio file uploaded by a content creator."""
 
         raw_audio_file = self.request.get('raw_audio_file')
-        audio_url = self.request.get("audio_url")
+        audio_url = self.request.get('audio_url')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
@@ -825,7 +819,7 @@ class AudioUploadHandler(EditorHandler):
                 for chunk in raw_audio:
                     raw_audio_file.extend(chunk)
             except Exception:
-                raise self.InvalidInputException("Audio not recognized")
+                raise self.InvalidInputException('Audio not recognized')
 
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
@@ -874,7 +868,7 @@ class AudioUploadHandler(EditorHandler):
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            fs_domain.ExplorationFileSystem if constants.DEV_MODE
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
