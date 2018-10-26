@@ -68,8 +68,7 @@ oppia.directive('audioBar', [
           });
 
           $scope.isAudioBarAvailable = function() {
-            return (
-              $scope.languagesInExploration.length > 0);
+            return $scope.languagesInExploration.length > 0;
           };
 
           $scope.onNewLanguageSelected = function() {
