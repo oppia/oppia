@@ -249,9 +249,9 @@ def _execute_deployment():
             raise Exception('Build failed.')
 
         # Deploy export service to GAE.
-        subprocess.check_output(
-            ['gcloud', 'app', 'deploy', 'export/app.yaml',
-             '--project=%s' % APP_NAME])
+        subprocess.check_output([
+            common.GCLOUD_PATH, 'app', 'deploy', 'export/app.yaml',
+            '--project=%s' % APP_NAME])
 
         # Deploy app to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.'])

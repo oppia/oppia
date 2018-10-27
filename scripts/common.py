@@ -17,6 +17,10 @@
 import os
 import subprocess
 
+GCLOUD_PATH = os.path.join(
+    '..', 'oppia_tools', 'google-cloud-sdk-222.0.0', 'google-cloud-sdk',
+    'bin', 'gcloud')
+
 
 def ensure_directory_exists(d):
     """Creates the given directory if it does not already exist."""
@@ -133,13 +137,12 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
 
 
 def require_gcloud_to_be_available():
-    status, msg = subprocess.getstatusoutput('gcloud')
-
-    if status == 127:
-        # gcloud command does not exist.
-        raise Exception('%s.\n Please install gcloud '
-                        '(https://cloud.google.com/sdk/docs/downloads-apt-get) '
-                        'before running this script.' % msg)
+    try:
+        subprocess.check_output([GCLOUD_PATH, '--version'])
+    except Exception:
+        raise Exception(
+            'gcloud required, but could not be found. Please run '
+            'scripts/start.sh to install gcloud.')
 
 
 class CD(object):
