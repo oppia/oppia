@@ -519,29 +519,15 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
                 self.change.cmd)
-        if self.change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
-            if self.change.property_name != change.property_name:
-                raise utils.ValidationError(
-                    'The new change property_name must be equal to %s' %
-                    change.property_name)
-            elif self.change.old_value != change.old_value:
-                raise utils.ValidationError(
-                    'The new change old_value must be equal to %s' %
-                    self.change.old_value)
-            elif self.change.new_value == change.new_value:
-                raise utils.ValidationError(
-                    'The updated value must differ from the existing value')
+        if self.change.skill_id != change.skill_id:
+            raise utils.ValidationError(
+                'The new change skill_id must be equal to %s' %
+                self.change.skill_id)
+        if self.change.question_domain == change.question_dict:
+            raise utils.ValidationError(
+                'The new change question_dict must',
+                ' not be equal to old question_dict')
 
-        elif (self.change.cmd ==
-              question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
-            if self.change.skill_id != change.skill_id:
-                raise utils.ValidationError(
-                    'The new change skill_id must be equal to %s' %
-                    self.change.skill_id)
-            if self.change.question_domain != change.question_dict:
-                raise utils.ValidationError(
-                    'The new change question_dict must',
-                    ' not be equal to old question_dict')
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
