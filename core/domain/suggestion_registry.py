@@ -530,7 +530,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                     self.change.old_value)
             elif self.change.new_value == change.new_value:
                 raise utils.ValidationError(
-                    'The new change new_value must not be equal to old value')
+                    'The updated value must differ from the existing value')
 
         elif (self.change.cmd ==
               question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):

@@ -26,14 +26,14 @@
   </section>
   <div style="margin-top: 20px; margin-left: 10px;" ng-show="canReviewActiveThread">
     Review message (required if rejecting):
-    <input type="text" ng-model="reviewMessage" style="width: 100%" >
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
     Brief Description of Changes (required if accepting):
     <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
   </div>
 </div>
 
 <div class="modal-footer">
-  <div ng-show="errorMessage" class="oppia-suggestion-review-error">
+  <div ng-show="errorMessage && !showResubmitButton()" class="oppia-suggestion-review-error">
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
