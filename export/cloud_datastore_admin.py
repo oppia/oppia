@@ -25,7 +25,7 @@ import httplib
 import json
 import logging
 
-from oppia.export import acl_decorators
+import acl_decorators # pylint: disable=relative-import
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
