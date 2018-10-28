@@ -15,6 +15,7 @@
 """Tests for the topics and skills dashboard page."""
 
 from constants import constants
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_services
 from core.tests import test_utils
@@ -46,6 +47,25 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
             [self.linked_skill_id], [], 1)
 
+    def _get_csrf_token_for_put(self):
+        csrf_token = None
+        url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(url_prefix)
+            csrf_token = self.get_csrf_token_from_response(response)
+        return csrf_token
+
+
+class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
+            response = self.testapp.get(url, expect_errors=True)
+            self.assertEqual(response.status_int, 404)
+        self.logout()
+
 
 class TopicsAndSkillsDashboardPageDataHandlerTest(
         BaseTopicsAndSkillsDashboardTest):
@@ -61,15 +81,14 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
-                expect_errors=True)
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access the topics and skills dashboard data.
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
             self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
                 json_response['topic_summary_dicts'][0]['can_edit_topic'],
@@ -106,7 +125,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             # access to any unpublished skills.
             self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
             self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
                 json_response['topic_summary_dicts'][0]['can_edit_topic'],
@@ -140,55 +159,73 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
 
 class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
+    def setUp(self):
+        super(NewTopicHandlerTest, self).setUp()
+        self.url = feconf.NEW_TOPIC_URL
+
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self._get_csrf_token_for_put()
 
             json_response = self.post_json(
-                '%s' % feconf.NEW_TOPIC_URL, {'name': 'Topic name'},
-                csrf_token=csrf_token)
+                self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
             topic_id = json_response['topicId']
             self.assertEqual(len(topic_id), 12)
             self.assertIsNotNone(
                 topic_services.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
+    def test_topic_creation_fails_when_new_structures_not_enabled(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            csrf_token = self._get_csrf_token_for_put()
+
+            self.post_json(
+                self.url, {}, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=404)
+        self.logout()
+
 
 class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
+
+    def setUp(self):
+        super(NewSkillHandlerTest, self).setUp()
+        self.url = feconf.NEW_SKILL_URL
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self._get_csrf_token_for_put()
 
             json_response = self.post_json(
-                '%s' % feconf.NEW_SKILL_URL,
-                {'description': 'Skill Description'}, csrf_token=csrf_token)
+                self.url, {'description': 'Skill Description'},
+                csrf_token=csrf_token)
             skill_id = json_response['skillId']
             self.assertEqual(len(skill_id), 12)
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
             self.logout()
 
+    def test_skill_creation_fails_when_new_structures_not_enabled(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            csrf_token = self._get_csrf_token_for_put()
+            self.post_json(
+                self.url, {}, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=404)
+        self.logout()
+
     def test_skill_creation_in_invalid_topic(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
-
+            csrf_token = self._get_csrf_token_for_put()
+            payload = {
+                'description': 'Skill Description',
+                'linked_topic_ids': ['topic']
+            }
             json_response = self.post_json(
-                '%s' % feconf.NEW_SKILL_URL,
-                {
-                    'description': 'Skill Description',
-                    'linked_topic_ids': ['topic']
-                },
-                csrf_token=csrf_token, expect_errors=True,
+                self.url, payload, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=400)
             self.assertEqual(json_response['status_code'], 400)
             self.logout()
@@ -196,17 +233,13 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
-
+            csrf_token = self._get_csrf_token_for_put()
+            payload = {
+                'description': 'Skill Description',
+                'linked_topic_ids': [self.topic_id]
+            }
             json_response = self.post_json(
-                '%s' % feconf.NEW_SKILL_URL,
-                {
-                    'description': 'Skill Description',
-                    'linked_topic_ids': [self.topic_id]
-                },
-                csrf_token=csrf_token)
+                self.url, payload, csrf_token=csrf_token)
             skill_id = json_response['skillId']
             self.assertEqual(len(skill_id), 12)
             self.assertIsNotNone(
@@ -216,3 +249,61 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
                 topic.uncategorized_skill_ids,
                 [self.linked_skill_id, skill_id])
             self.logout()
+
+
+class MergeSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
+
+    def setUp(self):
+        super(MergeSkillHandlerTest, self).setUp()
+        self.url = feconf.MERGE_SKILL_URL
+
+        self.question_id = question_services.get_new_question_id()
+        self.question = self.save_new_question(
+            self.question_id, self.admin_id,
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            self.question_id, self.linked_skill_id)
+
+    def test_merge_skill(self):
+        self.login(self.ADMIN_EMAIL)
+
+        old_skill_id = self.linked_skill_id
+        new_skill_id = skill_services.get_new_skill_id()
+        old_links = question_services.get_question_skill_links_of_skill(
+            old_skill_id)
+        new_links = question_services.get_question_skill_links_of_skill(
+            new_skill_id)
+
+        self.assertEqual(len(old_links), 1)
+        self.assertEqual(old_links[0].skill_id, old_skill_id)
+        self.assertEqual(len(new_links), 0)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+            csrf_token = self._get_csrf_token_for_put()
+            payload = {
+                'old_skill_id': old_skill_id,
+                'new_skill_id': new_skill_id
+            }
+            json_response = self.post_json(
+                self.url, payload, csrf_token=csrf_token)
+
+            old_links = question_services.get_question_skill_links_of_skill(
+                old_skill_id)
+            new_links = question_services.get_question_skill_links_of_skill(
+                new_skill_id)
+
+            self.assertEqual(json_response['merged_into_skill'], new_skill_id)
+            self.assertEqual(len(old_links), 0)
+            self.assertEqual(len(new_links), 1)
+            self.assertEqual(new_links[0].skill_id, new_skill_id)
+
+        self.logout()
+
+    def test_merge_skill_fails_when_new_structures_not_enabled(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            csrf_token = self._get_csrf_token_for_put()
+            self.post_json(
+                self.url, {}, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=404)
+        self.logout()

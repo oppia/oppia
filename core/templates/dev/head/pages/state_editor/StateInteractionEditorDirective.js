@@ -39,20 +39,18 @@ oppia.directive('stateInteractionEditor', [
         '/pages/state_editor/state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
-        'AlertsService', 'HtmlEscaperService',
+        'AlertsService', 'HtmlEscaperService', 'StateEditorService',
         'INTERACTION_SPECS', 'StateInteractionIdService',
-        'GenerateContentIdService', 'StateCustomizationArgsService',
-        'EditabilityService',
+        'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'StateContentIdsToAudioTranslationsService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
         'StateSolutionService', 'StateHintsService',
         'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
-            AlertsService, HtmlEscaperService,
+            AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
-            GenerateContentIdService, StateCustomizationArgsService,
-            EditabilityService,
+            StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             StateContentIdsToAudioTranslationsService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
@@ -458,6 +456,20 @@ oppia.directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             });
+          };
+
+          var _updateInteractionPreviewAndAnswerChoices = function() {
+            $scope.interactionId = StateInteractionIdService.savedMemento;
+
+            var currentCustomizationArgs =
+              StateCustomizationArgsService.savedMemento;
+            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
+              currentCustomizationArgs);
+
+            $rootScope.$broadcast(
+              'updateAnswerChoices',
+              StateEditorService.getAnswerChoices(
+                $scope.interactionId, currentCustomizationArgs));
           };
         }
       ]

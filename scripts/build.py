@@ -1043,8 +1043,6 @@ def generate_build_directory():
     hashes = dict()
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
-    # Minify third party resources.
-    minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -1102,12 +1100,23 @@ def build():
     parser = optparse.OptionParser()
     parser.add_option(
         '--prod_env', action='store_true', default=False, dest='prod_mode')
+    parser.add_option(
+        '--minify_third_party_libs_only', action='store_true', default=False,
+        dest='minify_third_party_libs_only')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    # If minify_third_party_libs_only is set to True, skips the rest of the
+    # build process once third party libs are minified.
+    if options.minify_third_party_libs_only and not options.prod_mode:
+        raise Exception(
+            'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
-        generate_build_directory()
+        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        if not options.minify_third_party_libs_only:
+            generate_build_directory()
 
 
 if __name__ == '__main__':

@@ -25,11 +25,11 @@ from constants import constants  # pylint: disable=relative-import
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE is true check that we are running in development enviroment.
-# The SERVER_SOFTWARE enviroment variable does not exist in Travis thus we need
-# to check it.
-if (constants.DEV_MODE and os.environ.get('SERVER_SOFTWARE') and
-        not os.environ['SERVER_SOFTWARE'].startswith('Development')):
+# When DEV_MODE is true check that we are running in development environment.
+# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
+# need for an explicit check.
+if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
+        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
     raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
@@ -207,6 +207,8 @@ DEFAULT_INIT_STATE_NAME = 'Introduction'
 DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 # Default content id for the interaction's default outcome.
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content id for the explanation in the concept card of a skill.
+DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Default content_ids_to_audio_translations dict for a default state template.
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
