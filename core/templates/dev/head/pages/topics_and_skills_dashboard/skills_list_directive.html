@@ -1,4 +1,8 @@
 <md-card layout="row" class="list-view-item">
+  Search By Skill
+  <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText">
+</md-card>
+<md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
       <col style="width: 44%;">
@@ -14,28 +18,35 @@
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
       </th>
     </tr>
-    <tr ng-repeat="skill in getSkillSummaries()"
-        class="list-item">
+    <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
+        ng-click="isInModal() && selectSkill(skill)"
+        class="list-item"
+        ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[skillLink]>" class="list-summary">
           <span> <[skill.misconception_count]> </span>
         </a>
+      </td>
+      <td ng-if="getMergeableSkillSummaries().length > 0">
+        <button class="btn btn-default" ng-click="mergeSkill(skill)">
+          <span> Merge Skill </span>
+        </button>
       </td>
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
@@ -58,7 +69,10 @@
   }
 
   skills-list .dashboard-table {
+    display: block;
     font-size: 15px;
+    max-height: 250px;
+    overflow-y: scroll;
     width: 100%;
   }
 

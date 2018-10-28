@@ -28,14 +28,14 @@ oppia.directive('collectionNodeCreator', [
         'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService',
         'ExplorationSummaryBackendApiService',
-        'SearchExplorationsBackendApiService', 'siteAnalyticsService',
+        'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'INVALID_NAME_CHARS',
         function(
             $scope, $http, $filter, AlertsService,
             ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService,
             ExplorationSummaryBackendApiService,
-            SearchExplorationsBackendApiService, siteAnalyticsService,
+            SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
@@ -146,7 +146,7 @@ oppia.directive('collectionNodeCreator', [
               $scope.newExplorationTitle = '';
               var newExplorationId = response.data.explorationId;
 
-              siteAnalyticsService
+              SiteAnalyticsService
                 .registerCreateNewExplorationInCollectionEvent(
                   newExplorationId);
               addExplorationToCollection(newExplorationId);

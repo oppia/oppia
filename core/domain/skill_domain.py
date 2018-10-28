@@ -18,6 +18,7 @@ import copy
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import state_domain
 import feconf
 import utils
 
@@ -72,7 +73,8 @@ class SkillChange(object):
     )
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'misconception_id'
+        'property_name', 'new_value', 'old_value', 'misconception_id',
+        'from_version', 'to_version'
     ]
 
     def __init__(self, change_dict):
@@ -83,12 +85,19 @@ class SkillChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_skill_misconception' (with new_misconception_dict)
+                - 'delete_skill_misconception' (with id)
+                - 'create_new'
                 - 'update_skill_property' (with property_name, new_value
                 and old_value)
                 - 'update_skill_contents_property' (with property_name,
                 new_value and old_value)
                 - 'update_skill_misconceptions_property' (with property_name,
                 new_value and old_value)
+                - 'migrate_contents_schema_to_latest_version' (with
+                from_version and to_version)
+                - 'migrate_misconceptions_schema_to_latest_version' (with
+                from_version and to_version)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -124,6 +133,12 @@ class SkillChange(object):
             self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             return
+        elif self.cmd == CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -249,17 +264,23 @@ class Misconception(object):
 class SkillContents(object):
     """Domain object representing the skill_contents dict."""
 
-    def __init__(self, explanation, worked_examples):
+    def __init__(
+            self, explanation, worked_examples,
+            content_ids_to_audio_translations):
         """Constructs a SkillContents domain object.
 
         Args:
-            explanation: str. An explanation on how to apply the skill.
-            worked_examples: list(str). A list of worked examples for the skill.
-                Each element should be an html string.
+            explanation: SubtitledHtml. An explanation on how to apply the
+                skill.
+            worked_examples: list(SubtitledHtml). A list of worked examples
+                for the skill. Each element should be a SubtitledHtml object.
+            content_ids_to_audio_translations: dict. Dict to contain the ids of
+                the audio translations part of this SkillContents.
         """
         self.explanation = explanation
-        self.worked_examples = [
-            html_cleaner.clean(example) for example in worked_examples]
+        self.worked_examples = worked_examples
+        self.content_ids_to_audio_translations = (
+            content_ids_to_audio_translations)
 
     def validate(self):
         """Validates various properties of the SkillContents object.
@@ -268,19 +289,21 @@ class SkillContents(object):
             ValidationError: One or more attributes of skill contents are
             invalid.
         """
-        if not isinstance(self.explanation, basestring):
+        if not isinstance(self.explanation, state_domain.SubtitledHtml):
             raise utils.ValidationError(
-                'Expected skill explanation to be a string, received %s' %
-                self.explanation)
+                'Expected skill explanation to be a SubtitledHtml object, '
+                'received %s' % self.explanation)
+        self.explanation.validate()
         if not isinstance(self.worked_examples, list):
             raise utils.ValidationError(
                 'Expected worked examples to be a list, received %s' %
                 self.worked_examples)
         for example in self.worked_examples:
-            if not isinstance(example, basestring):
+            if not isinstance(example, state_domain.SubtitledHtml):
                 raise utils.ValidationError(
-                    'Expected each worked example to be a string, received %s' %
-                    example)
+                    'Expected worked example to be a SubtitledHtml object, '
+                    'received %s' % example)
+            example.validate()
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -288,9 +311,22 @@ class SkillContents(object):
         Returns:
             A dict, mapping all fields of SkillContents instance.
         """
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                self.content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    state_domain.AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
+
         return {
-            'explanation': self.explanation,
-            'worked_examples': self.worked_examples
+            'explanation': self.explanation.to_dict(),
+            'worked_examples': [worked_example.to_dict()
+                                for worked_example in self.worked_examples],
+            'content_ids_to_audio_translations': (
+                content_ids_to_audio_translations_dict)
         }
 
     @classmethod
@@ -304,9 +340,26 @@ class SkillContents(object):
         Returns:
             SkillContents. The corresponding SkillContents domain object.
         """
+        content_ids_to_audio_translations = {}
+        for content_id, audio_translations_dict in (
+                skill_contents_dict[
+                    'content_ids_to_audio_translations'].iteritems()):
+            audio_translations = {}
+            for lang_code, audio_translation in (
+                    audio_translations_dict.iteritems()):
+                audio_translations[lang_code] = (
+                    state_domain.AudioTranslation.from_dict(audio_translation))
+            content_ids_to_audio_translations[content_id] = (
+                audio_translations)
         skill_contents = cls(
-            skill_contents_dict['explanation'],
-            skill_contents_dict['worked_examples']
+            state_domain.SubtitledHtml(
+                skill_contents_dict['explanation']['content_id'],
+                skill_contents_dict['explanation']['html']),
+            [state_domain.SubtitledHtml(
+                worked_example['content_id'],
+                worked_example['html'])
+             for worked_example in skill_contents_dict['worked_examples']],
+            content_ids_to_audio_translations
         )
 
         return skill_contents
@@ -502,7 +555,9 @@ class Skill(object):
         Returns:
             Skill. The Skill domain object with the default values.
         """
-        skill_contents = SkillContents(feconf.DEFAULT_SKILL_EXPLANATION, [])
+        skill_contents = SkillContents(
+            state_domain.SubtitledHtml(
+                'explanation', feconf.DEFAULT_SKILL_EXPLANATION), [], {})
         return cls(
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -598,17 +653,20 @@ class Skill(object):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: str. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
-        self.skill_contents.explanation = explanation
+        self.skill_contents.explanation = (
+            state_domain.SubtitledHtml.from_dict(explanation))
 
     def update_worked_examples(self, worked_examples):
         """Updates the worked examples list of the skill.
 
         Args:
-            worked_examples: list(str). The new worked examples of the skill.
+            worked_examples: list(dict). The new worked examples of the skill.
         """
-        self.skill_contents.worked_examples = worked_examples
+        self.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples]
 
     def _find_misconception_index(self, misconception_id):
         """Returns the index of the misconception with the given misconception

@@ -56,6 +56,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
           );
           $scope.untriagedSkillSummaries =
             response.data.untriaged_skill_summary_dicts;
+          $scope.mergeableSkillSummaries =
+            response.data.mergeable_skill_summary_dicts;
           $scope.unpublishedSkillSummaries =
             response.data.unpublished_skill_summary_dicts;
           $scope.activeTab = $scope.TAB_NAME_TOPICS;

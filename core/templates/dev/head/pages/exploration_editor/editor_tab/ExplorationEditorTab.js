@@ -220,6 +220,8 @@ oppia.directive('trainingPanel', [
 
           $scope.beginAddingNewResponse = function() {
             var contentId = GenerateContentIdService.getNextId(
+              StateContentIdsToAudioTranslationsService.displayed
+                .getAllContentId(),
               COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
               StateEditorService.getActiveStateName(), contentId, '', []);

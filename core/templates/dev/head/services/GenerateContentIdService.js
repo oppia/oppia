@@ -18,18 +18,19 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'StateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
-  'COMPONENT_NAME_HINT', function(
-      StateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
-      COMPONENT_NAME_HINT) {
-    var generateIdForHintOrFeedback = function(componentName) {
-      var contentIdList = StateContentIdsToAudioTranslationsService
-        .displayed.getAllContentId();
+  'COMPONENT_NAME_FEEDBACK',
+  'COMPONENT_NAME_HINT', 'COMPONENT_NAME_WORKED_EXAMPLE', function(
+      COMPONENT_NAME_FEEDBACK,
+      COMPONENT_NAME_HINT, COMPONENT_NAME_WORKED_EXAMPLE) {
+    var generateIdForComponent = function(existingComponentIds, componentName) {
+      var contentIdList = angular.copy(existingComponentIds);
       var searchKey = componentName + '_';
       var count = 0;
       for (contentId in contentIdList) {
         if (contentIdList[contentId].indexOf(searchKey) === 0) {
-          var tempCount = parseInt(contentIdList[contentId].split('_')[1]);
+          var splitContentId = contentIdList[contentId].split('_');
+          var tempCount =
+            parseInt(splitContentId[splitContentId.length - 1]);
           if (tempCount > count) {
             count = tempCount;
           }
@@ -38,17 +39,18 @@ oppia.factory('GenerateContentIdService', [
       return (searchKey + String(count + 1));
     };
 
-    var _getNextId = function(componentName) {
+    var _getNextId = function(existingComponentIds, componentName) {
       if (componentName === COMPONENT_NAME_FEEDBACK ||
-          componentName === COMPONENT_NAME_HINT) {
-        return generateIdForHintOrFeedback(componentName);
+          componentName === COMPONENT_NAME_HINT ||
+          componentName === COMPONENT_NAME_WORKED_EXAMPLE) {
+        return generateIdForComponent(existingComponentIds, componentName);
       } else {
         throw Error('Unknown component name provided.');
       }
     };
     return {
-      getNextId: function(componentName) {
-        return _getNextId(componentName);
+      getNextId: function(existingComponentIds, componentName) {
+        return _getNextId(existingComponentIds, componentName);
       }
     };
   }]);

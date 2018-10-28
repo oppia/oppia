@@ -36,12 +36,12 @@ oppia.factory('AssetsBackendApiService', [
     var ASSET_TYPE_IMAGE = 'image';
 
     var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration/');
+      GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration');
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/audiohandler' : GCS_PREFIX) +
+      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<exploration_id>/assets/audio/<filename>');
     var IMAGE_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/imagehandler' : GCS_PREFIX) +
+      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<exploration_id>/assets/image/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
@@ -67,7 +67,13 @@ oppia.factory('AssetsBackendApiService', [
         timeout: canceler.promise
       }).success(function(data) {
         try {
-          var assetBlob = new Blob([data]);
+          if (assetType === ASSET_TYPE_AUDIO) {
+            // Add type for audio assets. Without this, translations can
+            // not be played on Safari.
+            var assetBlob = new Blob([data], {type: 'audio/mpeg'});
+          } else {
+            var assetBlob = new Blob([data]);
+          }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
                          window.WebKitBlobBuilder ||

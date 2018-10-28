@@ -18,9 +18,9 @@
 
 oppia.controller('Fractions', [
   '$scope', '$timeout', '$window',
-  'siteAnalyticsService', 'UrlInterpolationService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function($scope, $timeout, $window,
-      siteAnalyticsService, UrlInterpolationService) {
+      SiteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.getStaticVideoUrl = UrlInterpolationService.getStaticVideoUrl;
@@ -31,7 +31,7 @@ oppia.controller('Fractions', [
     };
 
     $scope.onClickGetStartedButton = function(viewerType) {
-      siteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
+      SiteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
         viewerType);
       $timeout(function() {
         $window.location = '/collection/4UgTQUc1tala';
