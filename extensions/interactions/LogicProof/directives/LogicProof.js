@@ -203,8 +203,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
             for (var i = 0; i < proofLines.length; i++) {
               numberedLines.push((i + 1) + '  ' + proofLines[i]);
             }
-            // We split incorrect proofs into three parts so that response.html
-            // can make the invalid line bold.
+
+            // We split incorrect proofs into three parts so that
+            // response.html can make the invalid line bold.
             return (errorLineNum === undefined) ?
               [numberedLines.join('\n')] :
               [
