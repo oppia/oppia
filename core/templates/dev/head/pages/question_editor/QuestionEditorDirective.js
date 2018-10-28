@@ -22,9 +22,11 @@ oppia.directive('questionEditor', [
     return {
       restrict: 'E',
       scope: {
+        getQuestionId: '&questionId',
         getMisconceptions: '&misconceptions',
         canEditQuestion: '&',
-        question: '='
+        question: '=',
+        questionStateData: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
@@ -82,7 +84,7 @@ oppia.directive('questionEditor', [
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            var stateData = $scope.question.getStateData();
+            var stateData = $scope.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
               $rootScope.$broadcast('stateEditorInitialized', stateData);

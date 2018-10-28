@@ -60,7 +60,7 @@ oppia.directive('questionsTab', [
             return QuestionUndoRedoService.hasChanges();
           };
 
-          $scope.saveQuestion = function() {
+          $scope.saveAndPublishQuestion = function() {
             var validationErrors = $scope.question.validate(
               $scope.misconceptions);
             if (validationErrors) {
@@ -85,7 +85,7 @@ oppia.directive('questionsTab', [
                 $scope.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
-                  $scope.questionId, $scope.question.getVersion(), 'blank',
+                  $scope.questionId, $scope.question.getVersion(), '',
                   QuestionUndoRedoService.getCommittableChangeList()).then(
                   function() {
                     QuestionUndoRedoService.clearChanges();
@@ -117,8 +117,9 @@ oppia.directive('questionsTab', [
                   response.question_dict);
               $scope.questionId = $scope.question.getId();
               $scope.questionStateData = $scope.question.getStateData();
-              $scope.questionEditorIsShown = true;
               $scope.questionIsBeingUpdated = true;
+
+              $scope.openQuestionEditor();
             }, function(errorResponse) {
               AlertsService.addWarning(
                 errorResponse.error || 'Failed to fetch question.');
@@ -182,6 +183,7 @@ oppia.directive('questionsTab', [
                     QuestionObjectFactory.createDefaultQuestion();
                   $scope.questionId = $scope.question.getId();
                   $scope.questionStateData = $scope.question.getStateData();
+                  $scope.questionIsBeingUpdated = false;
                   $scope.openQuestionEditor();
                 }, function(error) {
                   AlertsService.addWarning();
