@@ -291,12 +291,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_multi_skills(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
-            skill_contents=(
-                skill_domain.SkillContents('Explanation', ['Example 1'])))
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
-            skill_contents=(
-                skill_domain.SkillContents('Explanation', ['Example 1'])))
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
         try:
             skill_services.get_multi_skills(['skill_a', 'skill_b'])
         except Exception:
