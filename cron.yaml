@@ -21,6 +21,6 @@ cron:
   url: /cron/suggestions/notify_reviewers
   schedule: every day 9:00
 - description: "Weekly Cloud Datastore Export"
-  url: /cloud_datastore_export?namespace_id=&output_url_prefix=gs://oppia-test-export
+  url: /cloud_datastore_export?namespace_id=&output_url_prefix=gs://oppia-export-backups
   target: cloud-datastore-admin
   schedule: every thursday 9:00

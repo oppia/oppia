@@ -38,5 +38,73 @@ describe('Editor state service', function() {
       ecs.setActiveStateName(null);
       expect(ecs.getActiveStateName()).toBeNull();
     });
+
+    it('should correctly return answer choices for interaction', function() {
+      var customizationArgs = {
+        choices: {
+          value: [
+            'Choice 1',
+            'Choice 2'
+          ]
+        }
+      };
+      expect(
+        ecs.getAnswerChoices('MultipleChoiceInput', customizationArgs)
+      ).toEqual([{
+        val: 0,
+        label: 'Choice 1',
+      }, {
+        val: 1,
+        label: 'Choice 2',
+      }]);
+
+      customizationArgs = {
+        imageAndRegions: {
+          value: {
+            labeledRegions: [{
+              label: 'Label 1'
+            }, {
+              label: 'Label 2'
+            }]
+          }
+        }
+      };
+      expect(
+        ecs.getAnswerChoices('ImageClickInput', customizationArgs)
+      ).toEqual([{
+        val: 'Label 1',
+        label: 'Label 1',
+      }, {
+        val: 'Label 2',
+        label: 'Label 2',
+      }]);
+
+      customizationArgs = {
+        choices: {
+          value: [
+            'Choice 1',
+            'Choice 2'
+          ]
+        }
+      };
+      expect(
+        ecs.getAnswerChoices('ItemSelectionInput', customizationArgs)
+      ).toEqual([{
+        val: 'Choice 1',
+        label: 'Choice 1',
+      }, {
+        val: 'Choice 2',
+        label: 'Choice 2',
+      }]);
+      expect(
+        ecs.getAnswerChoices('DragAndDropSortInput', customizationArgs)
+      ).toEqual([{
+        val: 'Choice 1',
+        label: 'Choice 1',
+      }, {
+        val: 'Choice 2',
+        label: 'Choice 2',
+      }]);
+    });
   });
 });

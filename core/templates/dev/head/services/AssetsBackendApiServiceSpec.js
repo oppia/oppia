@@ -42,6 +42,14 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
+  it('Should correctly formulate the download URL', function() {
+    // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
+    // can test the production URL, too.
+    expect(
+      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
+    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+  });
+
   it('Should successfully fetch and cache audio', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');

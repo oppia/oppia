@@ -73,6 +73,44 @@ oppia.factory('StateEditorService', [
       getInteraction: function() {
         return interaction;
       },
+      getAnswerChoices: function(interactionId, customizationArgs) {
+        if (!interactionId) {
+          return null;
+        }
+        // Special cases for multiple choice input and image click input.
+        if (interactionId === 'MultipleChoiceInput') {
+          return customizationArgs.choices.value.map(
+            function(val, ind) {
+              return {
+                val: ind,
+                label: val
+              };
+            }
+          );
+        } else if (interactionId === 'ImageClickInput') {
+          var _answerChoices = [];
+          var imageWithRegions =
+            customizationArgs.imageAndRegions.value;
+          for (
+            var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
+            _answerChoices.push({
+              val: imageWithRegions.labeledRegions[j].label,
+              label: imageWithRegions.labeledRegions[j].label
+            });
+          }
+          return _answerChoices;
+        } else if (interactionId === 'ItemSelectionInput' ||
+            interactionId === 'DragAndDropSortInput') {
+          return customizationArgs.choices.value.map(function(val) {
+            return {
+              val: val,
+              label: val
+            };
+          });
+        } else {
+          return null;
+        }
+      },
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
       },

@@ -28,7 +28,8 @@ import feconf
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
-    TOPIC_NAME = 'topic_name'
+    TOPIC_NAME = 'tOpic_NaMe'
+    TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
@@ -38,6 +39,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_models.TopicModel(
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
+            canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             next_subtopic_id=1,
             language_code='en'

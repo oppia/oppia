@@ -337,6 +337,7 @@ class Topic(object):
         """
         self.id = topic_id
         self.name = name
+        self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_ids = canonical_story_ids
         self.additional_story_ids = additional_story_ids
@@ -809,7 +810,7 @@ class TopicSummary(object):
     """Domain object for Topic Summary."""
 
     def __init__(
-            self, topic_id, name, language_code, version,
+            self, topic_id, name, canonical_name, language_code, version,
             canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated):
@@ -818,6 +819,7 @@ class TopicSummary(object):
         Args:
             topic_id: str. The unique id of the topic.
             name: str. The name of the topic.
+            canonical_name: str. The canonical name (lowercase) of the topic.
             language_code: str. The language code of the topic.
             version: int. The version of the topic.
             canonical_story_count: int. The number of canonical stories present
@@ -836,6 +838,7 @@ class TopicSummary(object):
         """
         self.id = topic_id
         self.name = name
+        self.canonical_name = canonical_name
         self.language_code = language_code
         self.version = version
         self.canonical_story_count = canonical_story_count
