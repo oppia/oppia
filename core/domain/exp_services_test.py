@@ -799,7 +799,8 @@ title: Title
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
-        self.assertEqual(fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
+        self.assertEqual(
+            fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
     def test_can_load_yaml_with_audio_translations(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -1110,15 +1111,19 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(
                 'exploration/%s' % self.EXPLORATION_ID))
-        self.assertEqual(fs.isfile(self.FILENAME), False)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         exp_services.save_original_and_compressed_versions_of_image(
             self.USER, self.FILENAME, self.EXPLORATION_ID,
             original_image_content)
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
 
 
 # pylint: disable=protected-access

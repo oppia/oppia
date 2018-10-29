@@ -94,13 +94,16 @@ oppia.directive('skillMisconceptionsEditor', [
                   $scope.skill = SkillEditorStateService.getSkill();
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
-                    ui_config: {}
+                    ui_config: {
+                      startupFocusEnabled: false
+                    }
                   };
 
                   $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {
-                      hide_complex_extensions: true
+                      hide_complex_extensions: true,
+                      startupFocusEnabled: false
                     }
                   };
 
