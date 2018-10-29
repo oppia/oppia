@@ -420,6 +420,7 @@ def _lint_css_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            stdout_list.append(linter_stdout)
             print linter_stdout
             stdout.put(linter_stdout)
 
@@ -524,7 +525,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         pylinter = lint.Run(
             current_files_to_lint + [config_pylint],
             exit=False).linter
-
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
         pycodestyle_report = style_guide.check_files(
