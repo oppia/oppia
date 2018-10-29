@@ -184,7 +184,8 @@ oppia.directive('subtopicsListTab', [
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
-            TopicUpdateService.removeUncategorizedSkill($scope.topic, skillSummary);
+            TopicUpdateService.removeUncategorizedSkill(
+              $scope.topic, skillSummary);
             _initEditor();
           };
 
