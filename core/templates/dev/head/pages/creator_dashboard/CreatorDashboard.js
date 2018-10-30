@@ -253,37 +253,59 @@ oppia.controller('CreatorDashboard', [
           },
           canReviewActiveThread: function() {
             return $scope.canReviewActiveThread;
+          },
+          stateName: function(){
+            return $scope.activeThread.suggestion.stateName;
+          },
+          suggestionType: function(){
+            return $scope.activeThread.suggestion.suggestionType;
           }
         },
         controller: [
           '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionStatus', 'description', 'oldContent',
-          'newContent', 'canReviewActiveThread', function(
+          'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
+          function(
               $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
-              newContent, canReviewActiveThread) {
+              newContent, canReviewActiveThread, stateName, suggestionType) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
               'rejected.';
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
+            var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
+            var SUGGESTION_ACCEPTED = 'accepted';
+            var SUGGESTION_REJECTED = 'rejected';
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canReject = $scope.isNotHandled;
             $scope.canAccept = $scope.isNotHandled;
-
             if (!$scope.isNotHandled) {
-              $scope.errorMessage = (suggestionStatus === 'accepted') ?
-                SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
+              if (suggestionStatus === SUGGESTION_ACCEPTED){
+                $scope.errorMessage = SUGGESTION_ACCEPTED_MSG;
+                $scope.isSuggestionRejected = false;
+              } else {
+                $scope.errorMessage = SUGGESTION_REJECTED_MSG;
+                $scope.isSuggestionRejected = true;
+              }
             } else {
               $scope.errorMessage = '';
             }
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
+            $scope.stateName = stateName;
+            $scope.suggestionType = suggestionType;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
+            $scope.summaryMessage = null;
             $scope.canReviewActiveThread = canReviewActiveThread;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {newSuggestionHtml: newContent.html};
+            $scope.showSuggestionEditor = false;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -299,23 +321,71 @@ oppia.controller('CreatorDashboard', [
                 reviewMessage: $scope.reviewMessage
               });
             };
-
+            $scope.editSuggestion = function(){
+              $scope.showSuggestionEditor = true;
+            };
             $scope.cancelReview = function() {
               $uibModalInstance.dismiss();
+            };
+            $scope.showEditButton = function(){
+              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
+                !$scope.showSuggestionEditor);
+            };
+            $scope.showResubmitButton = function(){
+              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
+                $scope.showSuggestionEditor);
+            };
+            $scope.disableResubmitButton = function(){
+              return !($scope.summaryMessage &&
+                ($scope.suggestionData.newSuggestionHtml.trim() !==
+                  newContent.html.trim()));
+            };
+            $scope.cancelEditMode = function(){
+              $scope.showSuggestionEditor = false;
+            };
+            $scope.resubmitChanges = function(){
+              $uibModalInstance.close({
+                action: ACTION_RESUBMIT_SUGGESTION,
+                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
+                oldContent: $scope.oldContent
+              });
             };
           }
         ]
       }).result.then(function(result) {
-        $http.put(
-          '/suggestionactionhandler/' +
-          $scope.activeThread.suggestion.targetType + '/' +
-          $scope.activeThread.suggestion.targetId + '/' +
-          $scope.activeThread.suggestion.suggestionId, {
+        var url, data;
+        if (result.action === 'resubmit' && result.suggestionType ===
+          'edit_exploration_state_content'){
+          url = '/suggestionactionhandler/resubmit/' +
+            $scope.activeThread.suggestion.suggestionId;
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            change: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: result.stateName,
+              old_value: result.oldContent,
+              new_value: {
+                html: result.newSuggestionHtml
+              }
+            }
+          };
+        } else {
+          url = '/suggestionactionhandler/' +
+            $scope.activeThread.suggestion.targetType + '/' +
+            $scope.activeThread.suggestion.targetId + '/' +
+            $scope.activeThread.suggestion.suggestionId;
+          data = {
             action: result.action,
             commit_message: result.commitMessage,
             review_message: result.reviewMessage
-          }
-        ).then(function() {
+          };
+        }
+        $http.put(url, data).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
               $scope.suggestionsToReviewList.splice(i, 1);

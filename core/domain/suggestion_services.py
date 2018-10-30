@@ -159,7 +159,7 @@ def _update_suggestion(suggestion):
 
     suggestion_model.status = suggestion.status
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change = suggestion.change.to_dict()
+    suggestion_model.change_cmd = suggestion.change.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
@@ -275,6 +275,36 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)
+
+
+def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
+    """Resubmit a rejected suggestion.
+
+     Args:
+        suggestion: Suggestion. The rejected suggestion.
+        summary_message: str. The message provided by the author to
+            summarize new suggestion.
+        author_id: str. The ID of the author creating the suggestion.
+
+    Raises:
+        Exception: Only rejected suggestions can be resubmitted.
+    """
+    if not summary_message:
+        raise Exception('Summary message cannot be empty.')
+    if not suggestion.is_handled:
+        raise Exception('The suggestion is not yet handled.')
+    if suggestion.status == suggestion_models.STATUS_ACCEPTED:
+        raise Exception(
+            'The suggestion was accepted.'
+            'only rejected suggestions can be resubmitted.')
+
+    suggestion.status = suggestion_models.STATUS_IN_REVIEW
+    _update_suggestion(suggestion)
+
+    thread_id = suggestion.suggestion_id
+    feedback_services.create_message(
+        thread_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
+        None, summary_message)
 
 
 def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
@@ -494,3 +524,20 @@ def update_position_in_rotation(score_category, user_id):
     """
     suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
         score_category, user_id)
+
+
+def check_can_resubmit_suggestion(suggestion_id, user_id):
+    """Checks whether the given user can resubmit the suggestion.
+
+    Args:
+        suggestion_id: str. The ID of the suggestion.
+        user_id: str. The ID of the user
+
+    Returns:
+        bool: A boolean indication whether
+            the user can resubmit the suggestion or not.
+    """
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    return suggestion.author_id == user_id
