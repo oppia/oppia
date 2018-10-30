@@ -21,13 +21,13 @@ oppia.controller('FeedbackTab', [
   'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION', '$log',
   function(
       $scope, $log, $uibModal, $timeout, $rootScope, AlertsService,
       DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, $log) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;

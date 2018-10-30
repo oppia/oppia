@@ -83,6 +83,26 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ReSubmitSuggestionHandler(base.BaseHandler):
+    """Handler to Reopen a rejected suggestion."""
+
+    @acl_decorators.can_resubmit_suggestion
+    def put(self, suggestion_id):
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if not suggestion:
+            raise self.InvalidInputException(
+                'No suggestion found with given suggestion id')
+        new_change = self.payload.get('change')
+        change_type = type(suggestion.change)
+        change_object = change_type(new_change)
+        suggestion.pre_update_validate(change_object)
+        suggestion.change = change_object
+        summary_message = self.payload.get('summary_message')
+        suggestion_services.resubmit_rejected_suggestion(
+            suggestion, summary_message, self.user_id)
+        self.render_json(self.values)
+
+
 class SuggestionToTopicActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to topics."""
 
