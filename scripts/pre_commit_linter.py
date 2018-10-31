@@ -1009,6 +1009,7 @@ def _check_docstrings(all_files):
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
     failed = False
+    is_docstring = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -1020,14 +1021,21 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
+                if (prev_line.startswith('class ') or
+                        prev_line.startswith('def ')) and (
+                            line.startswith('"""')):
+                    is_docstring = True
+
                 # Check if single line docstring span two lines.
-                if line == '"""' and prev_line.startswith('"""'):
+                if line == '"""' and prev_line.startswith('"""') and (
+                        is_docstring):
                     failed = True
                     print '%s --> Line %s: %s' % (
                         filename, line_num, single_line_docstring_message)
+                    is_docstring = False
 
                 # Check for single line docstring.
-                elif re.match(r'^""".+"""$', line):
+                elif re.match(r'^""".+"""$', line) and is_docstring:
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
                     if (len(line) > 6) and (
@@ -1035,9 +1043,10 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
+                    is_docstring = False
 
                 # Check for multiline docstring.
-                elif line.endswith('"""'):
+                elif line.endswith('"""') and is_docstring:
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
@@ -1064,6 +1073,8 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
+
+                    is_docstring = False
 
     print ''
     print '----------------------------------------'
