@@ -214,7 +214,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def prepare_map(cls, item):
-        """Returns a dict that represents the given model instance, so that it
+        """Returns a tuple that represents the given model instance, so that it
         can be processed by the MapReduce pipeline.
 
         Args:
@@ -328,7 +328,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             exp_id: str. The exploration id.
-            values: list(str). List of events for preparing the reduce.
+            values: list(str). List of string-encoded version of an event dict.
 
         Returns:
             tuple(list(dict), list(ExplorationStats), list(str)). 3-tuple where:
