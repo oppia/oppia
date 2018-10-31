@@ -83,6 +83,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_revert_configuration_property(self):
+        """Test that a configuration property can be reverted."""
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': '',
+        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                base.BEFORE_END_HEAD_TAG_HOOK.name: (
+                    self.UNICODE_TEST_STRING),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': self.UNICODE_TEST_STRING,
+        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
+
+        payload = {
+            'action': 'revert_config_property',
+            'config_property_id': base.BEFORE_END_HEAD_TAG_HOOK.name
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': '',
+        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
+
+        self.logout()
+
     def test_change_about_page_config_property(self):
         """Test that config property values are changed correctly."""
         new_config_value = 'new_config_value'
