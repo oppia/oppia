@@ -420,7 +420,7 @@ def _lint_css_files(
 
         if linter_stdout:
             num_files_with_errors += 1
-            stdout_list.append(linter_stdout)
+            result_list.append(linter_stdout)
             print linter_stdout
             stdout.put(linter_stdout)
 
@@ -473,7 +473,7 @@ def _lint_js_files(
 
         if linter_stdout:
             num_files_with_errors += 1
-            stdout_list.append(linter_stdout)
+            result_list.append(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
