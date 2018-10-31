@@ -405,7 +405,7 @@ def _lint_css_files(
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
-    stdout_list = []
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -425,8 +425,8 @@ def _lint_css_files(
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        for error in stdout_list:
-            stdout.put(error)
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -458,7 +458,7 @@ def _lint_js_files(
 
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
-    stdout_list = []
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
@@ -477,8 +477,8 @@ def _lint_js_files(
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        for error in stdout_list:
-            stdout.put(error)
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
