@@ -737,6 +737,7 @@ def _pre_commit_linter(all_files):
 
     print ''
     print '\n'.join(js_messages)
+    print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
     summary_messages.append(css_in_html_result.get())
