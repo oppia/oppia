@@ -328,8 +328,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             exp_id: str. The exploration id.
-            values: list(dict(str, str)). List of dicts of events for preparing
-                the reduce.
+            values: list(str). List of events for preparing the reduce.
 
         Returns:
             tuple(list(dict), list(ExplorationStats), list(str)). 3-tuple where:
