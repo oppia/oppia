@@ -262,11 +262,11 @@ oppia.controller('CreatorDashboard', [
           }
         },
         controller: [
-          '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
+          '$scope', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionStatus', 'description', 'oldContent',
           'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
           function(
-              $scope, $log, $uibModalInstance, suggestionIsHandled,
+              $scope, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
               newContent, canReviewActiveThread, stateName, suggestionType) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
