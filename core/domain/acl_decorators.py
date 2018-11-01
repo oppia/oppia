@@ -16,6 +16,8 @@
 
 """Decorators to provide authorization across the site."""
 
+import urllib
+
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -2305,6 +2307,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
+        topic_name = urllib.unquote_plus(topic_name)
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:
