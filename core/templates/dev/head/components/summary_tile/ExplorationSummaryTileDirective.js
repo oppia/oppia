@@ -88,6 +88,7 @@ oppia.directive('explorationSummaryTile', [
             $scope, $http, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService) {
+          $scope.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });

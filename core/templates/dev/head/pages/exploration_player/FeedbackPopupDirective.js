@@ -46,6 +46,7 @@ oppia.directive('feedbackPopup', [
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
+          $scope.isLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });

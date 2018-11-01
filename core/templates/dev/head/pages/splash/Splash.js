@@ -21,6 +21,7 @@ oppia.controller('Splash', [
   'UrlInterpolationService', 'UserService',
   function($scope, $rootScope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService, UserService) {
+    $scope.userIsLoggedIn = null;
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.userIsLoggedIn = userInfo.isLoggedIn();

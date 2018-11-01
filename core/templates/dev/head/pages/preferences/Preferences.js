@@ -29,6 +29,7 @@ oppia.controller('Preferences', [
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
     $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
+    $scope.username = '';
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {

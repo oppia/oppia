@@ -31,6 +31,7 @@ oppia.controller('LearnerLocalNav', [
       FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
+    $scope.username = '';
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.username = userInfo.getUsername();

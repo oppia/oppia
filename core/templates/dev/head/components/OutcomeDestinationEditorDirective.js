@@ -52,10 +52,11 @@ oppia.directive('outcomeDestinationEditor', [
             }
           });
 
-          // We restrict editing of refresher exploration IDs to
-          // admins/moderators for now, since the feature is still in
-          // development.
+          $scope.canEditRefresherExplorationId = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
+            // We restrict editing of refresher exploration IDs to
+            // admins/moderators for now, since the feature is still in
+            // development.
             $scope.canEditRefresherExplorationId = (
               userInfo.isAdmin() || userInfo.isModerator());
           });

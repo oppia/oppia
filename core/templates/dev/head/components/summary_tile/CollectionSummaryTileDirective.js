@@ -49,6 +49,7 @@ oppia.directive('collectionSummaryTile', [
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
             $scope, DateTimeFormatService, UserService,
             COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
+          $scope.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });

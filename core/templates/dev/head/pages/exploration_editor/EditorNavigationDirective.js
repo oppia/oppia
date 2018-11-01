@@ -53,6 +53,7 @@ oppia.directive('editorNavigation', [
             }
           });
 
+          $scope.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });

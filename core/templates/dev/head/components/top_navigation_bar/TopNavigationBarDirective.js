@@ -36,6 +36,10 @@ oppia.directive('topNavigationBar', [
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
+          $scope.isModerator = null;
+          $scope.isAdmin = null;
+          $scope.isSuperAdmin = null;
+          $scope.userIsLoggedIn = null;
           $scope.username = '';
           UserService.getUserInfoAsync().then(function(userInfo) {
             if (userInfo.getPreferredSiteLanguageCode()) {

@@ -29,6 +29,7 @@ oppia.directive('searchResults', [
             SiteAnalyticsService, UserService) {
           $scope.someResultsExist = true;
 
+          $scope.userIsLoggedIn = null;
           $rootScope.loadingMessage = 'Loading';
           var userInfoPromise = UserService.getUserInfoAsync();
           userInfoPromise.then(function(userInfo) {

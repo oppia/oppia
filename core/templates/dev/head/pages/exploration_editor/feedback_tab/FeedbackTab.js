@@ -37,6 +37,7 @@ oppia.controller('FeedbackTab', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = null;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {

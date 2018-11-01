@@ -86,6 +86,7 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
+    $scope.canCreateCollections = null;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
