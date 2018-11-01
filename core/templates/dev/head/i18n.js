@@ -41,7 +41,8 @@ oppia.controller('I18nFooter', [
   '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
   'UserService',
   function(
-      $http, $rootScope, $scope, $translate, $timeout, $cookies, UserService) {
+      $http, $rootScope, $scope, $translate, $timeout, $cookies,
+      UserService) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
