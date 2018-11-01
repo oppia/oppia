@@ -373,7 +373,9 @@ class SiteLanguageHandler(base.BaseHandler):
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user."""
 
-    @acl_decorators.require_user_id_else_redirect_to_homepage
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.require_user_id
     def get(self):
         """Handles GET requests."""
 
