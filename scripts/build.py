@@ -1098,7 +1098,7 @@ def generate_build_directory():
 
 def build():
     """Creates a third party directory where all the dependencies of JS and
-    CSS files minifies and stored.
+    CSS files minified and stored.
     """
     parser = optparse.OptionParser()
     parser.add_option(
