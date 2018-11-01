@@ -707,4 +707,4 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
         self.get_json('/userinfohandler', expect_errors=True,
-                     expected_status_int=401)
+                      expected_status_int=401)
