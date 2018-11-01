@@ -686,3 +686,25 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.assertIn('User bio exceeds maximum character limit: 2000',
                       user_bio_response['error'])
         self.logout()
+
+
+class UserInfoHandlerTests(test_utils.GenericTestBase):
+
+    def test_user_info_handler(self):
+        """Test the language is saved in the preferences when handler is
+        called.
+        """
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        json_response = self.get_json('/userinfohandler')
+        self.assertDictContainsSubset({
+            'is_moderator': False,
+            'is_admin': False,
+            'is_super_admin': False,
+            'can_create_collections': False,
+            'username': self.EDITOR_USERNAME,
+            'user_is_logged_in': True}, json_response)
+        self.logout()
+
+        self.get_json('/userinfohandler', expect_errors=True,
+                     expected_status_int=401)
