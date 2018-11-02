@@ -1,5 +1,104 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.6.9 (30 Oct 2018)
+--------------------
+Bug fixes:
+* Fixes prod bug by preventing populating old_content value of suggestion when state doesn't exist (#5772)
+* Fix #5691: Fix bug in translation tab resulting from answer choices not being calculated for the short answer summaries (#5756)
+* Fix #5748: Incorrect get-involved link (#5750)
+* Fix #5688: Added users to user condition if only 1 user has reviewed an exploration (#5708)
+
+New structures:
+* Filter skills (#5635)
+* UI and controller to add functionality to merge untriaged skills (#5632)
+
+Infrastructure:
+* Add deployment of export service to deploy.py (#5773)
+* Fix Karma test to use older version of URL.
+* Fix erroneous image path in production. (#5788)
+* Fix broken image region #5765 (#5768)
+* Throttle error reporting to at most once every 5 seconds. (#5767)
+* Fix deployment script to update DEV_MODE value which is now read from constants.js instead of feconf.py. (#5763)
+
+Developer workflow and code clean-up:
+* (Dead code) Remove check 'topic is None', which is already covered by core.domain.acl_decorators.can_access_topic_viewer_page (#5737)
+* Fix part of #4374: Added docstrings to scripts.cut_release_branch and scripts.pylint_extensions (#5728)
+* Fix part of #4374: Update docstrings in the python backend code (#5680)
+* Fix part of #5134: Add tests to core_storage_story (#5644)
+* Add CSS lint rules: Space before curly braces for HTML files (#5732)
+* Added test to core.storage.topic.gae_models (#5727)
+* Extract extensionTagAssemblerService and siteAnalyticsService from app.js - Issue 3826 (#5711)
+* Space before and after CSS classes's curly braces (#5725)
+* Add additional instructions for prefixing PR title for partial fixes (#5718)
+
+
+v2.6.8 (2 Oct 2018)
+-------------------
+Bug fixes:
+* Fix persistent answer even after submit bug (#5696)
+* Add sitemap and remove i18n from title. (#5647)
+* Added one off job and validation job to populate last_updated field. (#5681)
+* Cleanup for the feedback framework (#5631)
+* Fix #5600: correctly align the translation progress label in Firefox (#5622)
+* Update Teach with Oppia form link. (#5619)
+* Only Force Answer Resolution for Whitelisted Interaction IDs (#5626)
+* Remove unnecessary interpolation in logic proof answer display. (#5604)
+* URL fix for topic viewer page (#5602)
+* Fix #4893 The navigation bar in portfolio page is now clearly visible in 612 to 1050px screens. (#5588)
+* Fix unicode errors in VerifyAllUrlsMatchGcsIdRegexJob which make it (#5598)
+* Fix #4978 : change JSON response on user not logged in (#5589)
+* Fix demo exploration--- Modelling_graphs, Solar System, Test_interactions, All_interactions, Three balls, binary_Search (#5543)
+* Added the exceptions in the copytodirectoryJob (#5560)
+* Fix #5535:  Share buttons on info card (#5540)
+
+Development workflow and build process improvements
+* Start selenium server using a specific chromedriver (#5648)
+* Run travis builds on release branches (#5645)
+* Fix #5620: Add check for git conflict markers (#5624)
+* Build process refactorization + increasing coverage for build.py (#5580)
+* Fix creator dashboard tests. (#5579)
+* Moved git related files in .github directory (#5519)
+
+Testing and documentation:
+* Remaining backend tests for jinja_utils (#5582)
+* Fix part of #4374 : Update docstrings in the python backend code (#5593)
+* Fix #5134: Write backend tests for core.storage.skill.gae_models (#5599)
+* Backend tests for core.platform.users.gae_current_user_services (#5563)
+* Fix part of #5134: Add test for core.storage.config.gae_models (#5565)
+* Fix #5134: Write backend tests for core.storage.exploration.gae_models (#5552)
+* Fix #4830: Create and use delete_json in tests (#5568)
+* Add test class for gae_app_identity_services (#5439)
+* Fix part of #5134 Backend test for audit models (#5512)
+* Fix #5134: Write backend tests for core.storage.controllers.recent_commits_test (#5551)
+* Forbidding browser.sleep by adding lint rule and fixing an e2e flake in editorFeatures (#5536)
+
+Infrastructure improvements
+* Removed unwanted file and added css in state translation (#5658)
+* Introduce IssuesService (#5630)
+* Add some additional headers to all pages for privacy/security. (#5596)
+* Deduplicate skill migrate questions (#5376)
+* Fix #4386: Implement a CurrentInteractionService (#5440)
+* Add skill deletion. (#5375)
+* Added StoryProgressModel (#5396)
+* Fully remove state-id-mapping flag. (#5562)
+* Refactor exploration player: Cleaned up the engine services (#5533)
+* Create Topic Viewer Page. (#5323)
+* Fix #5256: Separate validation and parsing from directive scope check function (#5541)
+* Fixes #5402: State domain refactor (#5505)
+* Removed the ValidationOfImagesOnGCSJob (#5538)
+* Fix dependency ordering, and prevent questions from showing up on the common suggestions view (#5531)
+* Question suggestions UI (#5486)
+* Remove Dead Changes (#5528)
+* Generalised Review System: Common suggestion view (#5419)
+* Add functionality for pretests to explorations in a story. (#5479)
+* Fixed #5425: Redesign fractions landing page (#5527)
+
+Miscellaneous
+* "Update version number to 2.6.8"
+* Routine update to translations. (#5608)
+* Add apb7 and seanlip as codeowners for core/tests and scripts directory (#5578)
+
+
 v2.6.7 (3 Sep 2018)
 -------------------
 Rich-text editor

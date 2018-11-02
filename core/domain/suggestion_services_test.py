@@ -48,6 +48,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@example.com'
+    NORMAL_USER_EMAIL = 'normal@example.com'
 
     THREAD_ID = 'exploration.exp1.thread_1'
 
@@ -63,6 +64,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.signup(self.NORMAL_USER_EMAIL, 'normaluser')
+        self.normal_user_id = self.get_user_id_from_email(
+            self.NORMAL_USER_EMAIL)
 
     def generate_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
@@ -86,6 +90,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         return None
 
     def null_function(self):
+        pass
+
+    def null_function2(self, arg1):
         pass
 
     def test_create_new_suggestion_successfully(self):
@@ -339,6 +346,108 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
+
+    def test_resubmit_rejected_suggestion_success(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        suggestion_services.reject_suggestion(
+            suggestion, self.reviewer_id, 'reject review message')
+        suggestion_services.resubmit_rejected_suggestion(
+            suggestion, 'resubmit summary message', self.author_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+
+    def test_resubmit_rejected_suggestion_failure(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        with self.assertRaisesRegexp(
+            Exception, 'Summary message cannot be empty.'):
+            suggestion_services.resubmit_rejected_suggestion(
+                suggestion, '', self.author_id)
+        with self.assertRaisesRegexp(
+            Exception, 'The suggestion is not yet handled.'):
+            suggestion_services.resubmit_rejected_suggestion(
+                suggestion, 'resubmit summary message', self.author_id)
+
+
+    def test_resubmit_accepted_suggestion_failure(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+                suggestion = suggestion_services.get_suggestion_by_id(
+                    self.suggestion_id)
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'accept', self.null_function2):
+                    suggestion_services.accept_suggestion(
+                        suggestion, self.reviewer_id,
+                        self.COMMIT_MESSAGE, 'review message')
+                suggestion = suggestion_services.get_suggestion_by_id(
+                    self.suggestion_id)
+                with self.assertRaisesRegexp(
+                    Exception,
+                    'The suggestion was accepted.only rejected suggestions '
+                    'can be resubmitted.'):
+                    suggestion_services.resubmit_rejected_suggestion(
+                        suggestion, 'resubmit summary message', self.author_id)
+
+
+
+    def test_check_can_resubmit_suggestion(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.author_id)
+        self.assertEqual(can_resubmit, True)
+        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.normal_user_id)
+        self.assertEqual(can_resubmit, False)
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):

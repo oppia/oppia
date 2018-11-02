@@ -16,6 +16,7 @@
 
 """Tests for suggestion controllers."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -82,6 +83,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.new_content = state_domain.SubtitledHtml(
             'content', 'new content html').to_dict()
+        self.resubmit_change_content = state_domain.SubtitledHtml(
+            'content', 'resubmit change content html').to_dict()
 
         self.logout()
 
@@ -319,6 +322,50 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             )['suggestions']
         self.assertEqual(len(suggestions), 2)
 
+    def test_resubmit_rejected_suggestion(self):
+
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
+        suggestion_services.reject_suggestion(
+            suggestion, self.reviewer_id, 'reject message')
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.put_json('%s/resubmit/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
+                'summary_message': 'summary message',
+                'action': u'resubmit',
+                'change': {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 1',
+                    'new_value': self.resubmit_change_content,
+                    'old_value': self.old_content
+                }
+            }, csrf_token=csrf_token)
+
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(
+            suggestion.change.new_value['html'],
+            self.resubmit_change_content['html'])
+        self.assertEqual(
+            suggestion.change.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
+        self.assertEqual(
+            suggestion.change.property_name, exp_domain.STATE_PROPERTY_CONTENT)
+        self.assertEqual(
+            suggestion.change.state_name, 'State 1')
+        self.logout()
+
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
@@ -397,7 +444,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
