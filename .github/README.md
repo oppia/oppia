@@ -24,14 +24,19 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for fu
 
 1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://github.com/oppia/oppia/wiki/Fork-and-Clone-Oppia) the Oppia repo. This will create a new folder named `opensource/oppia`.
 
-2. Navigate to `opensource/oppia/` and run:
+2. Navigate to 'opensource' and run:
+  ```
+    sudo chmod -R 777 oppia oppia_tools node_modules
+  ```
+  
+3. Navigate to `opensource/oppia/` and run:
 
   ```
     git checkout develop
     bash scripts/start.sh
   ```
 
-3. To run tests:
+4. To run tests:
 
   ```
     bash scripts/run_tests.sh
