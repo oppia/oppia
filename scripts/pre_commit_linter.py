@@ -1049,86 +1049,6 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _check_controller_class_names(all_files):
-    """This function checks that all controller class names end with
-    either 'Handler' or 'Page'.
-    """
-    print 'Starting controller class names check...'
-    print '----------------------------------------'
-    summary_messages = []
-    controllers_path = 'core/controllers*'
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py') and not filename.endswith('_test.py')
-        and fnmatch.fnmatch(filename, controllers_path)]
-    failed = False
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            class_name = None
-            previous_class_name = None
-            super_class_name = None
-            previous_super_class_name = None
-            line_num_of_class = None
-            class_name_passed = True
-            function_name = None
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                if line.startswith('def '):
-                    function_name = line.split(' ')[1].split('(')[0]
-                # Check that the name of the class ends with 'Page' if
-                # it has a get function that renders a HTML page.
-                if (line.startswith('self.render_template(') and
-                        super_class_name.endswith('Handler')
-                        and not class_name.endswith('Page')
-                        and function_name == 'get'):
-                    message = (
-                        'Please ensure that the name of this class '
-                        'ends with \'Page\'')
-                    failed = True
-                    class_name_passed = False
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num_of_class + 1, message)
-                if line.startswith('class '):
-                    previous_class_name = class_name
-                    previous_super_class_name = super_class_name
-                    class_name = line.split(' ')[1].split('(')[0]
-                    super_class_name = line.split('(')[1][:-2]
-                    if (previous_super_class_name and previous_class_name
-                            and class_name_passed):
-                        # Check that the name of the class ends with 'Handler'
-                        # if not ending with 'Page'.
-                        if (previous_super_class_name.endswith('Handler') and
-                                not previous_class_name.endswith('Handler') and
-                                not previous_class_name.endswith('Page')):
-                            message = (
-                                'Please ensure that the name of this class '
-                                'ends with \'Handler\'')
-                            failed = True
-                            print '%s --> Line %s: %s' % (
-                                filename, line_num_of_class + 1, message)
-                    class_name_passed = True
-                    line_num_of_class = line_num
-
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Controller class names check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Controller class names check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-
-    return summary_messages
-
-
 def _check_html_directive_name(all_files):
     """This function checks that all HTML directives end
     with _directive.html.
@@ -1632,7 +1552,6 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    controller_class_name_messages = _check_controller_class_names(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
@@ -1644,8 +1563,8 @@ def main():
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
-        controller_class_name_messages + html_tag_and_attribute_messages +
-        html_linter_messages + linter_messages + pattern_messages +
+        html_tag_and_attribute_messages + html_linter_messages +
+        linter_messages + pattern_messages +
         copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):

@@ -86,6 +86,8 @@ def _require_valid_version(version_from_payload, exploration_version):
 class EditorLogoutHandler(base.BaseHandler):
     """Handles logout from editor page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.open_access
     def get(self):
         """Checks if exploration is published and redirects accordingly."""
@@ -629,6 +631,7 @@ class FetchIssuesHandler(EditorHandler):
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id):
@@ -649,6 +652,8 @@ class FetchIssuesHandler(EditorHandler):
 
 class FetchPlaythroughHandler(EditorHandler):
     """Handler used for retrieving a playthrough."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id, playthrough_id):
@@ -828,6 +833,8 @@ class EditorAutosaveHandler(ExplorationHandler):
 class StateAnswerStatisticsHandler(EditorHandler):
     """Returns basic learner answer statistics for a state."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -845,6 +852,8 @@ class StateAnswerStatisticsHandler(EditorHandler):
 
 class TopUnresolvedAnswersHandler(EditorHandler):
     """Returns a list of top N unresolved answers."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):

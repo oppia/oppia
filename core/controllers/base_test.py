@@ -17,6 +17,8 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import importlib
+import inspect
 import json
 import os
 import re
@@ -593,3 +595,64 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
                 'param2=value%20with%20%26%20%2B%20-%20/&'
                 'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
             self.assertDictContainsSubset(params, result)
+
+
+class ControllerClassNameTest(test_utils.GenericTestBase):
+
+    def test_controller_class_names(self):
+        """This function checks that all controller class names end with
+        either 'Handler' or 'Page'.
+        """
+        for url in main.URLS:
+            if not isinstance(url, tuple):
+                handler = str(url.handler)[8:-2].rsplit('.', 1)[1]
+                class_path = str(url.handler)[8:-2].rsplit('.', 1)[0]
+                file_name = class_path.replace('.', '/') + ".py"
+                module = importlib.import_module(class_path)
+                clazz = getattr(module, handler)
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                if 'BaseHandler' in all_base_classes:
+                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                    # Check that the name of the class ends with 'Handler'
+                    # if it renders JSON.
+                    if class_return_type == 'json' or (
+                            not 'get' in clazz.__dict__.keys()):
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'Handler\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, inspect.getsourcelines(clazz)[-1],
+                               message))
+                        self.assertTrue(handler.endswith('Handler'),
+                                        msg=error_message)
+
+                    # Check that the name of the class ends with 'Page' if
+                    # it has a get function that renders a HTML page.
+                    elif class_return_type == 'html' and (
+                            'get' in clazz.__dict__.keys()):
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'Page\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, inspect.getsourcelines(clazz)[-1],
+                               message))
+                        self.assertTrue(handler.endswith('Page'),
+                                        msg=error_message)
+
+                    # Check that the name of the class ends with
+                    # 'FileDownloader' if it has a get function
+                    # that prepares downloadable content.
+                    elif class_return_type == 'downloadable' and (
+                            'get' in clazz.__dict__.keys()):
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'FileDownloader\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, inspect.getsourcelines(clazz)[-1],
+                               message))
+                        self.assertTrue(handler.endswith('FileDownloader'),
+                                        msg=error_message)

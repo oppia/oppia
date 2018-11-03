@@ -76,7 +76,7 @@ class FrontendErrorHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class WarmupHandler(base.BaseHandler):
+class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
     @acl_decorators.open_access
@@ -85,7 +85,7 @@ class WarmupHandler(base.BaseHandler):
         pass
 
 
-class HomePageRedirectHandler(base.BaseHandler):
+class HomePageRedirectPage(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
@@ -167,8 +167,8 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
-    get_redirect_route(r'/_ah/warmup', WarmupHandler),
-    get_redirect_route(r'/', HomePageRedirectHandler),
+    get_redirect_route(r'/_ah/warmup', WarmupPage),
+    get_redirect_route(r'/', HomePageRedirectPage),
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
@@ -193,7 +193,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
-        admin.AdminTopicsCsvDownloadHandler),
+        admin.AdminTopicsCsvDownloadFileDownloader),
 
     get_redirect_route(
         r'/notifications_dashboard',
@@ -653,7 +653,7 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
             r'/adminjoboutput', admin.AdminJobOutputHandler),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvDownloadHandler),
+            admin.AdminTopicsCsvDownloadFileDownloader),
         get_redirect_route(
             r'/<:.*>', pages.MaintenancePage)]
 else:

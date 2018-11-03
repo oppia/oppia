@@ -280,6 +280,13 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
+    def render_downloadable_file(self, values):
+        """Prepares downloadable content to be sent to the client."""
+        self.response.headers['Content-Type'] = 'text/csv'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=topic_similarities.csv')
+        self.response.write(values)
+
     def _get_logout_url(self, redirect_url_on_logout):
         """Prepares and returns logout url which will be handled
         by LogoutPage handler.
