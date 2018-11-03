@@ -19,44 +19,44 @@
 
 oppia.factory('UserInfoObjectFactory', [function() {
   var UserInfo = function(
-      isModerator, isAdmin, isSuperisAdmin, canCreateCollections,
+      isModerator, isAdmin, isSuperAdmin, canCreateCollections,
       preferredSiteLanguageCode, username, isLoggedIn) {
-    this.isModerator = isModerator;
-    this.isAdmin = isAdmin;
-    this.isSuperAdmin = isSuperAdmin;
-    this.canCreateCollections = canCreateCollections;
-    this.preferredSiteLanguageCode = preferredSiteLanguageCode;
-    this.username = username;
-    this.isLoggedIn = isLoggedIn;
+    this._isModerator = isModerator;
+    this._isAdmin = isAdmin;
+    this._isSuperAdmin = isSuperAdmin;
+    this._canCreateCollections = canCreateCollections;
+    this._preferredSiteLanguageCode = preferredSiteLanguageCode;
+    this._username = username;
+    this._isLoggedIn = isLoggedIn;
   };
 
   // Instance methods
   UserInfo.prototype.isModerator = function() {
-    return this.isModerator;
+    return this._isModerator;
   };
 
   UserInfo.prototype.isAdmin = function() {
-    return this.isAdmin;
+    return this._isAdmin;
   };
 
   UserInfo.prototype.isSuperAdmin = function() {
-    return this.isSuperAdmin;
+    return this._isSuperAdmin;
   };
 
   UserInfo.prototype.canCreateCollections = function() {
-    return this.canCreateCollections;
+    return this._canCreateCollections;
   };
 
   UserInfo.prototype.getPreferredSiteLanguageCode = function() {
-    return this.preferredSiteLanguageCode;
+    return this._preferredSiteLanguageCode;
   };
 
   UserInfo.prototype.getUsername = function() {
-    return this.username;
+    return this._username;
   };
 
   UserInfo.prototype.isLoggedIn = function() {
-    return this.isLoggedIn;
+    return this._isLoggedIn;
   };
 
   UserInfo.createFromBackendDict = function(data) {
