@@ -104,22 +104,13 @@ def _get_collection_memcache_key(collection_id, version=None):
         return 'collection:%s' % collection_id
 
 
-def get_collection_from_model(collection_model, run_conversion=True):
+def get_collection_from_model(collection_model):
     """Returns a Collection domain object given a collection model loaded
     from the datastore.
 
     Args:
         collection_model: CollectionModel. The collection model loaded from the
             datastore.
-        run_conversion: bool. If true, the the collection's schema version will
-            be checked against the current schema version. If they do not match,
-            the collection will be automatically updated to the latest schema
-            version.
-
-            IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should
-            never be False. This option is only used for testing that the
-            schema version migration works correctly, and it should never be
-            changed otherwise.
 
     Returns:
         Collection. A Collection domain object corresponding to the given
@@ -140,7 +131,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
         }
 
     # Migrate the collection if it is not using the latest schema version.
-    if (run_conversion and collection_model.schema_version !=
+    if (collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         _migrate_collection_contents_to_latest_schema(
             versioned_collection_contents)

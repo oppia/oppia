@@ -14,7 +14,7 @@
           <div class="oppia-state-content-display oppia-transition-200"
                ng-class="oppia-prevent-selection"
                title="Concept Card Explanation">
-            <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation() === ''">
+            <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation().getHtml() === ''">
                 Give a review or explanation of the skill.
             </span>
             <angular-html-bind html-data="bindableFieldsDict.displayedConceptCardExplanation">
@@ -71,8 +71,8 @@
                ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
               <summary-list-header index="$index"
                                    disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                   summary="getWorkedExampleSummary(workedExample)"
-                                   short-summary="getWorkedExampleSummary(workedExample)"
+                                   summary="getWorkedExampleSummary(workedExample.getHtml())"
+                                   short-summary="getWorkedExampleSummary(workedExample.getHtml())"
                                    is-active="$index === activeWorkedExampleIndex"
                                    is-delete-available="isEditable"
                                    on-delete-fn="deleteWorkedExample">

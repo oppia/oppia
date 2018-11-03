@@ -47,6 +47,8 @@ class TopicModel(base_models.VersionedModel):
 
     # The name of the topic.
     name = ndb.StringProperty(required=True, indexed=True)
+    # The canonical name of the topic, created by making `name` lowercase.
+    canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # This consists of the list of canonical story ids that are part of
@@ -115,7 +117,7 @@ class TopicModel(base_models.VersionedModel):
             found.
         """
         return TopicModel.query().filter(
-            cls.name == topic_name).filter(
+            cls.canonical_name == topic_name.lower()).filter(
                 cls.deleted == False).get() #pylint: disable=singleton-comparison
 
 
@@ -161,6 +163,8 @@ class TopicSummaryModel(base_models.BaseModel):
 
     # The name of the topic.
     name = ndb.StringProperty(required=True, indexed=True)
+    # The canonical name of the topic, created by making `name` lowercase.
+    canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 

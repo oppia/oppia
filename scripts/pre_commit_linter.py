@@ -405,6 +405,7 @@ def _lint_css_files(
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -419,10 +420,13 @@ def _lint_css_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             print linter_stdout
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -454,6 +458,7 @@ def _lint_js_files(
 
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
@@ -468,9 +473,12 @@ def _lint_js_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -517,7 +525,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         pylinter = lint.Run(
             current_files_to_lint + [config_pylint],
             exit=False).linter
-
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
         pycodestyle_report = style_guide.check_files(
@@ -730,6 +737,7 @@ def _pre_commit_linter(all_files):
 
     print ''
     print '\n'.join(js_messages)
+    print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
     summary_messages.append(css_in_html_result.get())
@@ -1572,6 +1580,9 @@ def _check_for_copyright_notice(all_files):
 
 
 def main():
+    """Main method for pre commit linter script that lints Python and JavaScript
+    files.
+    """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (

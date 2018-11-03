@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Implements additional custom Pylint checkers to be used as part of
+presubmit checks.
+"""
+
 import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
