@@ -18,53 +18,55 @@
  */
 
 oppia.factory('UserInfoObjectFactory', [function() {
-  var UserInfo = function(data) {
-    this._userInfo = data;
+  var UserInfo = function(
+      isModerator, isAdmin, isSuperisAdmin, canCreateCollections,
+      preferredSiteLanguageCode, username, isLoggedIn) {
+    this.isModerator = isModerator;
+    this.isAdmin = isAdmin;
+    this.isSuperAdmin = isSuperAdmin;
+    this.canCreateCollections = canCreateCollections;
+    this.preferredSiteLanguageCode = preferredSiteLanguageCode;
+    this.username = username;
+    this.isLoggedIn = isLoggedIn;
   };
 
   // Instance methods
   UserInfo.prototype.isModerator = function() {
-    return this._userInfo.is_moderator;
+    return this.isModerator;
   };
 
   UserInfo.prototype.isAdmin = function() {
-    return this._userInfo.is_admin;
+    return this.isAdmin;
   };
 
   UserInfo.prototype.isSuperAdmin = function() {
-    return this._userInfo.is_super_admin;
+    return this.isSuperAdmin;
   };
 
   UserInfo.prototype.canCreateCollections = function() {
-    return this._userInfo.can_create_collections;
+    return this.canCreateCollections;
   };
 
   UserInfo.prototype.getPreferredSiteLanguageCode = function() {
-    return this._userInfo.preferred_site_language_code;
+    return this.preferredSiteLanguageCode;
   };
 
   UserInfo.prototype.getUsername = function() {
-    return this._userInfo.username;
+    return this.username;
   };
 
   UserInfo.prototype.isLoggedIn = function() {
-    return this._userInfo.user_is_logged_in;
+    return this.isLoggedIn;
   };
 
   UserInfo.createFromBackendDict = function(data) {
-    return new UserInfo(data);
+    return new UserInfo(data.is_moderator, data.is_admin, data.is_super_admin,
+      data.can_create_collections, data.preferred_site_language_code,
+      data.username, data.user_is_logged_in);
   };
 
   UserInfo.createDefault = function() {
-    return new UserInfo({
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      can_create_collections: false,
-      preferred_site_language_code: undefined,
-      username: undefined,
-      user_is_logged_in: false
-    });
+    return new UserInfo(false, false, false, false, null, null, false);
   };
 
   return UserInfo;
