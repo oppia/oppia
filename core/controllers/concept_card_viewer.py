@@ -23,6 +23,8 @@ from core.domain import skill_services
 class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.can_view_skill
     def get(self, skill_id):
         """Handles GET requests."""

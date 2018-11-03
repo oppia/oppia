@@ -322,15 +322,14 @@ class AdminJobOutput(base.BaseHandler):
         })
 
 
-class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+class AdminTopicsCsvDownloadFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'downloadable'
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=topic_similarities.csv')
-        self.response.write(
+        self.render_downloadable_file(
             recommendations_services.get_topic_similarities_as_csv())
 
 

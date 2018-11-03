@@ -96,6 +96,8 @@ class QuestionSkillLinkHandler(base.BaseHandler):
 class EditableQuestionDataHandler(base.BaseHandler):
     """A data handler for questions which supports writing."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.can_view_question_editor
     def get(self, question_id):
         """Gets the data for the question overview page."""

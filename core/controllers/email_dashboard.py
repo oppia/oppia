@@ -40,6 +40,8 @@ class EmailDashboardPage(base.BaseHandler):
 class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         cursor = self.request.get('cursor')
@@ -125,6 +127,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
 class QueryStatusCheck(base.BaseHandler):
     """Handler for checking status of individual queries."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):

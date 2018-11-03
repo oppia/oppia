@@ -27,6 +27,8 @@ from core.domain import value_generators_domain
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.open_access
     def get(self, generator_id):
         """Handles GET requests."""
@@ -46,6 +48,8 @@ class ImageDevHandler(base.BaseHandler):
     """
 
     _IMAGE_PATH_PREFIX = 'image'
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.open_access
     def get(self, exploration_id, encoded_filename):
@@ -85,6 +89,7 @@ class AudioDevHandler(base.BaseHandler):
     """
 
     _AUDIO_PATH_PREFIX = 'audio'
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.open_access
     def get(self, exploration_id, encoded_filename):

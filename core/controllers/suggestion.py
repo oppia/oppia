@@ -152,6 +152,8 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     @acl_decorators.open_access
     def get(self):
         # The query_fields_and_values variable is a list of tuples. The first

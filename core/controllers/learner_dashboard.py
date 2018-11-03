@@ -128,6 +128,7 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
     the activities currently being pursued, and the activities present in
     the playlist.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
@@ -145,6 +146,8 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
 
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_access_learner_dashboard
     def get(self, thread_id):

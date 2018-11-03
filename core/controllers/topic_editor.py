@@ -42,6 +42,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
     display in topic editor page.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
@@ -97,6 +98,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     """Manages the creation of a question and receiving of all question
     summaries for display in topic editor page.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
@@ -177,6 +179,8 @@ class TopicEditorPage(base.BaseHandler):
 class EditableSubtopicPageDataHandler(base.BaseHandler):
     """The data handler for subtopic pages."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
     def _require_valid_version(
             self, version_from_payload, subtopic_page_version):
         """Check that the payload version matches the given subtopic page
@@ -217,6 +221,8 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 
 class EditableTopicDataHandler(base.BaseHandler):
     """A data handler for topics which supports writing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     def _require_valid_version(self, version_from_payload, topic_version):
         """Check that the payload version matches the given topic
@@ -328,6 +334,8 @@ class EditableTopicDataHandler(base.BaseHandler):
 
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
