@@ -29,8 +29,6 @@ oppia.controller('Admin', [
   function($scope, $location, AdminRouterService, DEV_MODE) {
     $scope.username = GLOBALS.USERNAME;
     $scope.userEmail = GLOBALS.USER_EMAIL;
-    $scope.isModerator = GLOBALS.IS_MODERATOR;
-    $scope.isSuperAdmin = GLOBALS.IS_SUPER_ADMIN;
     $scope.logoutUrl = GLOBALS.LOGOUT_URL;
     $scope.inDevMode = DEV_MODE;
 

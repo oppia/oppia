@@ -325,6 +325,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
+    get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
 
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(

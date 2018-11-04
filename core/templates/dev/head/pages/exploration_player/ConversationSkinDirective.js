@@ -270,7 +270,7 @@ oppia.directive('conversationSkin', [
         'ImagePreloaderService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         'ExplorationPlayerStateService',
-        'CurrentInteractionService',
+        'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             $location, MessengerService, AlertsService,
@@ -295,13 +295,18 @@ oppia.directive('conversationSkin', [
             ImagePreloaderService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
             ExplorationPlayerStateService,
-            CurrentInteractionService) {
+            CurrentInteractionService, UserService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
+
+          $scope.isLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.isLoggedIn = userInfo.isLoggedIn();
+          });
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -561,7 +566,6 @@ oppia.directive('conversationSkin', [
 
           var _initializeDirectiveComponents = function(
               initialCard, focusLabel) {
-            $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
             _addNewCard(initialCard);
             $scope.nextCard = initialCard;
             $rootScope.$broadcast(

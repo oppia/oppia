@@ -16,6 +16,8 @@
 
 """Decorators to provide authorization across the site."""
 
+import urllib
+
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -1417,6 +1419,32 @@ def can_manage_question_skill_status(handler):
     return test_can_manage_question_skill_status
 
 
+def require_user_id(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, NotLoggedInException is raised.
+    """
+
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+        If not, raises NotLoggedInException.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        return handler(self, **kwargs)
+    test_login.__wrapped__ = True
+
+    return test_login
+
+
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
@@ -2305,6 +2333,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
+        topic_name = urllib.unquote_plus(topic_name)
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:

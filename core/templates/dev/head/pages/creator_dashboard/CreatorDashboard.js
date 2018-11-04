@@ -47,25 +47,25 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window',
-  'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
-  'RatingComputationService', 'ExplorationCreationService',
-  'QuestionObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory',
-  'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
-  'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', '$log',
+  '$scope', '$q', '$rootScope', '$http', '$log', '$uibModal', '$window',
+  'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
+  'ExplorationCreationService', 'QuestionObjectFactory',
+  'RatingComputationService', 'SuggestionObjectFactory',
+  'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
+  'UrlInterpolationService',
+  'UserService', 'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
+  'FATAL_ERROR_CODES', 'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window,
-      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
-      RatingComputationService, ExplorationCreationService,
-      QuestionObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory,
-      ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
-      EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
-      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, $log) {
+      $scope, $q, $rootScope, $http, $log, $uibModal, $window,
+      AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
+      ExplorationCreationService, QuestionObjectFactory,
+      RatingComputationService, SuggestionObjectFactory,
+      SuggestionThreadObjectFactory, ThreadStatusDisplayService,
+      UrlInterpolationService,
+      UserService, EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
+      FATAL_ERROR_CODES, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -86,7 +86,102 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
-    $scope.canCreateCollections = GLOBALS.can_create_collections;
+    $scope.canCreateCollections = null;
+    $rootScope.loadingMessage = 'Loading';
+    var userInfoPromise = UserService.getUserInfoAsync();
+    userInfoPromise.then(function(userInfo) {
+      $scope.canCreateCollections = userInfo.canCreateCollections();
+    });
+
+    var dashboardDataPromise = (
+      CreatorDashboardBackendApiService.fetchDashboardData());
+    dashboardDataPromise.then(
+      function(response) {
+        var responseData = response.data;
+        $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+        $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+        $scope.isCurrentSortDescending = true;
+        $scope.isCurrentSubscriptionSortDescending = true;
+        $scope.explorationsList = responseData.explorations_list;
+        $scope.collectionsList = responseData.collections_list;
+        $scope.subscribersList = responseData.subscribers_list;
+        $scope.dashboardStats = responseData.dashboard_stats;
+        $scope.lastWeekStats = responseData.last_week_stats;
+        $scope.myExplorationsView = responseData.display_preference;
+        $scope.topicSummaries = responseData.topic_summary_dicts;
+        var numberOfCreatedSuggestions = (
+          responseData.threads_for_created_suggestions_list.length);
+        var numberOfSuggestionsToReview = (
+          responseData.threads_for_suggestions_to_review_list.length);
+        $scope.mySuggestionsList = [];
+        for (var i = 0; i < numberOfCreatedSuggestions; i++) {
+          if (responseData.created_suggestions_list.length !==
+              numberOfCreatedSuggestions) {
+            $log.error('Number of suggestions does not match number of ' +
+                       'suggestion threads');
+          }
+          for (var j = 0; j < numberOfCreatedSuggestions; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              responseData.created_suggestions_list[j]);
+            var threadDict = (
+              responseData.threads_for_created_suggestions_list[i]);
+            if (threadDict.thread_id === suggestion.getThreadId()) {
+              var suggestionThread = (
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  threadDict, responseData.created_suggestions_list[j]));
+              $scope.mySuggestionsList.push(suggestionThread);
+            }
+          }
+        }
+        $scope.suggestionsToReviewList = [];
+        for (var i = 0; i < numberOfSuggestionsToReview; i++) {
+          if (responseData.suggestions_to_review_list.length !==
+              numberOfSuggestionsToReview) {
+            $log.error('Number of suggestions does not match number of ' +
+                       'suggestion threads');
+          }
+          for (var j = 0; j < numberOfSuggestionsToReview; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              responseData.suggestions_to_review_list[j]);
+            var threadDict = (
+              responseData.threads_for_suggestions_to_review_list[i]);
+            if (threadDict.thread_id === suggestion.getThreadId()) {
+              var suggestionThread = (
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  threadDict, responseData.suggestions_to_review_list[j]));
+              $scope.suggestionsToReviewList.push(suggestionThread);
+            }
+          }
+        }
+
+        if ($scope.dashboardStats && $scope.lastWeekStats) {
+          $scope.relativeChangeInTotalPlays = (
+            $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
+          );
+        }
+
+        if ($scope.explorationsList.length === 0 &&
+          $scope.collectionsList.length > 0) {
+          $scope.activeTab = 'myCollections';
+        } else if ($scope.explorationsList.length === 0 && (
+          $scope.mySuggestionsList.length > 0 ||
+          $scope.suggestionsToReviewList.length > 0)) {
+          $scope.activeTab = 'suggestions';
+        } else {
+          $scope.activeTab = 'myExplorations';
+        }
+      },
+      function(errorResponse) {
+        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+          AlertsService.addWarning('Failed to get dashboard data');
+        }
+      }
+    );
+
+    $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
+      $rootScope.loadingMessage = '';
+    });
+
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -501,90 +596,5 @@ oppia.controller('CreatorDashboard', [
         $log.error('Error while submitting question');
       });
     };
-
-    $rootScope.loadingMessage = 'Loading';
-    CreatorDashboardBackendApiService.fetchDashboardData().then(
-      function(response) {
-        var responseData = response.data;
-        $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
-        $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
-        $scope.isCurrentSortDescending = true;
-        $scope.isCurrentSubscriptionSortDescending = true;
-        $scope.explorationsList = responseData.explorations_list;
-        $scope.collectionsList = responseData.collections_list;
-        $scope.subscribersList = responseData.subscribers_list;
-        $scope.dashboardStats = responseData.dashboard_stats;
-        $scope.lastWeekStats = responseData.last_week_stats;
-        $scope.myExplorationsView = responseData.display_preference;
-        $scope.topicSummaries = responseData.topic_summary_dicts;
-        var numberOfCreatedSuggestions = (
-          responseData.threads_for_created_suggestions_list.length);
-        var numberOfSuggestionsToReview = (
-          responseData.threads_for_suggestions_to_review_list.length);
-        $scope.mySuggestionsList = [];
-        for (var i = 0; i < numberOfCreatedSuggestions; i++) {
-          if (responseData.created_suggestions_list.length !==
-              numberOfCreatedSuggestions) {
-            $log.error('Number of suggestions does not match number of ' +
-              'suggestion threads');
-          }
-          for (var j = 0; j < numberOfCreatedSuggestions; j++) {
-            var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              responseData.created_suggestions_list[j]);
-            var threadDict = (
-              responseData.threads_for_created_suggestions_list[i]);
-            if (threadDict.thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  threadDict, responseData.created_suggestions_list[j]));
-              $scope.mySuggestionsList.push(suggestionThread);
-            }
-          }
-        }
-        $scope.suggestionsToReviewList = [];
-        for (var i = 0; i < numberOfSuggestionsToReview; i++) {
-          if (responseData.suggestions_to_review_list.length !==
-              numberOfSuggestionsToReview) {
-            $log.error('Number of suggestions does not match number of ' +
-              'suggestion threads');
-          }
-          for (var j = 0; j < numberOfSuggestionsToReview; j++) {
-            var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              responseData.suggestions_to_review_list[j]);
-            var threadDict = (
-              responseData.threads_for_suggestions_to_review_list[i]);
-            if (threadDict.thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  threadDict, responseData.suggestions_to_review_list[j]));
-              $scope.suggestionsToReviewList.push(suggestionThread);
-            }
-          }
-        }
-
-        if ($scope.dashboardStats && $scope.lastWeekStats) {
-          $scope.relativeChangeInTotalPlays = (
-            $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
-          );
-        }
-
-        if ($scope.explorationsList.length === 0 &&
-          $scope.collectionsList.length > 0) {
-          $scope.activeTab = 'myCollections';
-        } else if ($scope.explorationsList.length === 0 && (
-          $scope.mySuggestionsList.length > 0 ||
-            $scope.suggestionsToReviewList.length > 0)) {
-          $scope.activeTab = 'suggestions';
-        } else {
-          $scope.activeTab = 'myExplorations';
-        }
-        $rootScope.loadingMessage = '';
-      },
-      function(errorResponse) {
-        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          AlertsService.addWarning('Failed to get dashboard data');
-        }
-      }
-    );
   }
 ]);

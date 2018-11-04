@@ -39,7 +39,10 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 
 oppia.controller('I18nFooter', [
   '$http', '$scope', '$translate', '$timeout',
-  function($http, $scope, $translate, $timeout) {
+  'UserService',
+  function(
+      $http, $scope, $translate, $timeout,
+      UserService) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
@@ -58,11 +61,13 @@ oppia.controller('I18nFooter', [
 
     $scope.changeLanguage = function() {
       $translate.use($scope.currentLanguageCode);
-      if (GLOBALS.userIsLoggedIn) {
-        $http.put(siteLanguageUrl, {
-          site_language_code: $scope.currentLanguageCode
-        });
-      }
+      UserService.getUserInfoAsync().then(function(userInfo) {
+        if (userInfo.isLoggedIn()) {
+          $http.put(siteLanguageUrl, {
+            site_language_code: $scope.currentLanguageCode
+          });
+        }
+      });
     };
   }
 ]);
