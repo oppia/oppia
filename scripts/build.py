@@ -1098,6 +1098,7 @@ def generate_build_directory():
 
 def build():
     """The main method of this script.
+
     Creates a third-party directory where all the JS and CSS dependencies are
     built and stored. Depending on the options passed to the script, might also
     minify third-party libraries and/or generate a build directory.
