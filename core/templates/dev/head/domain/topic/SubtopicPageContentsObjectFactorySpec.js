@@ -31,15 +31,15 @@ describe('Subtopic page contents object factory', function() {
 
   var backendDict = {
     subtitled_html: {
-      'html': 'test content',
-      'content_id': 'content'
+      html: 'test content',
+      content_id: 'content'
     },
     content_ids_to_audio_translations: {
-      'content': {
-        'en': {
-          'filename': 'test.mp3',
-          'file_size_bytes': 100,
-          'needs_update': false
+      content: {
+        en: {
+          filename: 'test.mp3',
+          file_size_bytes: 100,
+          needs_update: false
         }
       }
     }

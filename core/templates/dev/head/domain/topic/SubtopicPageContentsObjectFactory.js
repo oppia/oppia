@@ -57,7 +57,7 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       return {
         'subtitled_html': this._subtitledHtml.toBackendDict(),
         'content_ids_to_audio_translations':
-          this._contentIdsToAudioTranslations.toBackendDict()
+          this._contentIdsToAudioTranslations.toBackendDict();
       };
     };
 
