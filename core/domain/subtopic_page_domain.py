@@ -25,7 +25,7 @@ import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
-SUBTOPIC_PAGE_PROPERTY_HTML_DATA = 'html_data'
+SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS = 'page_contents'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_CREATE_NEW = 'create_new'
@@ -38,7 +38,7 @@ CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 class SubtopicPageChange(object):
     """Domain object for changes made to subtopic_page object."""
 
-    SUBTOPIC_PAGE_PROPERTIES = (SUBTOPIC_PAGE_PROPERTY_HTML_DATA,)
+    SUBTOPIC_PAGE_PROPERTIES = (SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS,)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'subtopic_id',
@@ -233,8 +233,8 @@ class SubtopicPage(object):
                 with.
 
         Returns:
-            SubtopicPage. A subtopic object with given id, topic_id and empty
-                html_data field.
+            SubtopicPage. A subtopic object with given id, topic_id and default
+                page contents field.
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(

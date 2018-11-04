@@ -248,7 +248,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [subtopic_page_domain.SubtopicPageChange({
             'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
             'property_name': (
-                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
             'old_value': '',
             'subtopic_id': 1,
             'new_value': {
@@ -284,7 +284,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
+                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
                 'old_value': {
                     'subtitled_html': {
                         'html': '',
@@ -354,7 +354,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
+                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
                 'old_value': '',
                 'subtopic_id': 2,
                 'new_value': {

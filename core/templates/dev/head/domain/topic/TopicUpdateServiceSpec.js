@@ -729,7 +729,7 @@ describe('Topic update service', function() {
         _sampleSubtopicPage, 1, newSamplePageContents);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_subtopic_page_property',
-        property_name: 'html_data',
+        property_name: 'page_contents',
         subtopic_id: 1,
         new_value: newSamplePageContents.toBackendDict(),
         old_value: {

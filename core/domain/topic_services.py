@@ -414,7 +414,8 @@ def apply_change_list(topic_id, change_list):
                         'The subtopic with id %s doesn\'t exist' % change.id)
 
                 if (change.property_name ==
-                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
+                        subtopic_page_domain.
+                        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS):
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents(change.new_value)
                 else:
