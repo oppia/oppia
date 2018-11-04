@@ -349,8 +349,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 - num_completions_v2: int. As above, but for events with
                     version 2.
                 - state_stats_mapping: dict. A dictionary mapping the state
-                    names of an exploration to the corresponding StateStats
-                    domain object.
+                    names of an exploration to the corresponding statistics
+                    dicts of the states.
             - The second element is the list of ExplorationStats domain class
                 instances of the corrupted statistics models.
             - The third element is the list of all the errors that occured
