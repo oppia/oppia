@@ -85,7 +85,7 @@ oppia.directive('questionsTab', [
                 $scope.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
-                  $scope.questionId, $scope.question.getVersion(), '',
+                  $scope.questionId, $scope.question.getVersion(), 'blank',
                   QuestionUndoRedoService.getCommittableChangeList()).then(
                   function() {
                     QuestionUndoRedoService.clearChanges();
