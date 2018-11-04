@@ -35,8 +35,11 @@ def get_subtopic_page_from_model(subtopic_page_model):
         SubtopicPage.
     """
     return subtopic_page_domain.SubtopicPage(
-        subtopic_page_model.id, subtopic_page_model.topic_id,
-        subtopic_page_model.html_data, subtopic_page_model.language_code,
+        subtopic_page_model.id,
+        subtopic_page_model.topic_id,
+        subtopic_page_domain.SubtopicPageContents.from_dict(
+            subtopic_page_model.page_contents),
+        subtopic_page_model.language_code,
         subtopic_page_model.version
     )
 
@@ -134,7 +137,7 @@ def save_subtopic_page(
                 % (subtopic_page_model.version, subtopic_page.version))
 
     subtopic_page_model.topic_id = subtopic_page.topic_id
-    subtopic_page_model.html_data = subtopic_page.html_data
+    subtopic_page_model.page_contents = subtopic_page.page_contents.to_dict()
     subtopic_page_model.language_code = subtopic_page.language_code
     change_dicts = [change.to_dict() for change in change_list]
     subtopic_page_model.commit(committer_id, commit_message, change_dicts)

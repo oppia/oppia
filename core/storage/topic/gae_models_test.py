@@ -111,7 +111,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         subtopic_page = topic_models.SubtopicPageModel(
             id=self.SUBTOPIC_PAGE_ID,
             topic_id='topic_id',
-            html_data='',
+            page_contents={},
             language_code='en'
         )
         # We check that subtopic page has not been saved before calling

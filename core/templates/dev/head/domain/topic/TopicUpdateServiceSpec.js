@@ -22,6 +22,7 @@ describe('Topic update service', function() {
   var SubtopicObjectFactory = null;
   var SkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+  var SubtopicPageContentsObjectFactory = null;
   var UndoRedoService = null;
   var _sampleTopic = null;
 
@@ -32,6 +33,8 @@ describe('Topic update service', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
+    SubtopicPageContentsObjectFactory =
+      $injector.get('SubtopicPageContentsObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
@@ -60,7 +63,21 @@ describe('Topic update service', function() {
     var sampleSubtopicPageObject = {
       id: 'topic_id-1',
       topic_id: 'topic_id',
-      html_data: '<p>Data</p>',
+      page_contents: {
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
+          }
+        }
+      },
       language_code: 'en'
     };
     _firstSkillSummary = SkillSummaryObjectFactory.create(
@@ -631,26 +648,105 @@ describe('Topic update service', function() {
     }
   );
 
-  it('should set/unset changes to a subtopic page\'s html data', function() {
-    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
-    TopicUpdateService.setSubtopicPageHtmlData(
-      _sampleSubtopicPage, 1, '<p>New Data</p>');
-    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>New Data</p>');
+  it('should set/unset changes to a subtopic page\'s page content', function() {
+    var newSamplePageContentsDict = {
+      subtitled_html: {
+        html: 'new content',
+        content_id: 'content'
+      },
+      content_ids_to_audio_translations: {
+        content: {
+          en: {
+            filename: 'new_test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
+        }
+      }
+    };
+    var newSamplePageContents =
+      SubtopicPageContentsObjectFactory.createFromBackendDict(
+        newSamplePageContentsDict);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      content_ids_to_audio_translations: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
+        }
+      }
+    });
+    TopicUpdateService.setSubtopicPageContents(
+      _sampleSubtopicPage, 1, newSamplePageContents);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual(
+      newSamplePageContentsDict);
 
     UndoRedoService.undoChange(_sampleSubtopicPage);
-    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      content_ids_to_audio_translations: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
+        }
+      }
+    });
   });
 
   it('should create a proper backend change dict for changing html data',
     function() {
-      TopicUpdateService.setSubtopicPageHtmlData(
-        _sampleSubtopicPage, 1, '<p>New Data</p>');
+      var newSamplePageContentsDict = {
+        subtitled_html: {
+          html: 'new content',
+          content_id: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {
+            en: {
+              filename: 'new_test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
+          }
+        }
+      };
+      var newSamplePageContents =
+        SubtopicPageContentsObjectFactory.createFromBackendDict(
+          newSamplePageContentsDict);
+      TopicUpdateService.setSubtopicPageContents(
+        _sampleSubtopicPage, 1, newSamplePageContents);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_subtopic_page_property',
         property_name: 'html_data',
         subtopic_id: 1,
-        new_value: '<p>New Data</p>',
-        old_value: '<p>Data</p>',
+        new_value: newSamplePageContents.toBackendDict(),
+        old_value: {
+          subtitled_html: {
+            html: 'test content',
+            content_id: 'content'
+          },
+          content_ids_to_audio_translations: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        },
         change_affects_subtopic_page: true
       }]);
     }

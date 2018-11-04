@@ -251,14 +251,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
             'old_value': '',
             'subtopic_id': 1,
-            'new_value': '<p>New Value</p>'
+            'new_value': {
+                'subtitled_html': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated html data')
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1)
-        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>New Value</p>')
 
         # Test a sequence of changes with both topic and subtopic page changes.
         changelist = [
@@ -275,9 +285,25 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
                     subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
-                'old_value': '',
+                'old_value': {
+                    'subtitled_html': {
+                        'html': '',
+                        'content_id': 'content'
+                    },
+                    'content_ids_to_audio_translations': {
+                        'content': {}
+                    },
+                },
                 'subtopic_id': 2,
-                'new_value': '<p>New Value</p>'
+                'new_value': {
+                    'subtitled_html': {
+                        'html': '<p>New Value</p>',
+                        'content_id': 'content'
+                    },
+                    'content_ids_to_audio_translations': {
+                        'content': {}
+                    },
+                }
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -303,7 +329,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Validate the newly created subtopic page.
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
-        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>New Value</p>')
 
         # Making sure everything resets when an error is encountered anywhere.
         changelist = [
@@ -329,7 +357,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
                 'old_value': '',
                 'subtopic_id': 2,
-                'new_value': '<p>New Value</p>'
+                'new_value': {
+                    'subtitled_html': {
+                        'html': '<p>New Value</p>',
+                        'content_id': 'content'
+                    },
+                    'content_ids_to_audio_translations': {
+                        'content': {}
+                    },
+                }
             }),
         ]
         with self.assertRaisesRegexp(

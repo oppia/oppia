@@ -19,7 +19,7 @@
 import copy
 
 from constants import constants
-from core.domain import html_cleaner
+from core.domain import state_domain
 from core.platform import models
 import utils
 
@@ -92,25 +92,107 @@ class SubtopicPageChange(object):
         return subtopic_page_change_dict
 
 
+class SubtopicPageContents(object):
+    """Domain object for the contents on a subtopic page."""
+
+    def __init__(
+            self, subtitled_html, content_ids_to_audio_translations):
+        """Constructs a SubtopicPageContents domain object.
+
+        Args:
+            subtitled_html: SubtitledHtml. The html data being displayed on
+                the page.
+            content_ids_to_audio_translations: dict. The audio translations
+                that are a part of the subtopic page, organized by language
+                code.
+        """
+        self.subtitled_html = subtitled_html
+        self.content_ids_to_audio_translations = (
+            content_ids_to_audio_translations)
+
+    def validate(self):
+        self.subtitled_html.validate()
+
+        # TODO(tjiang11): Extract content ids to audio translations out into
+        # its own object to reuse throughout audio-capable structures.
+        if not isinstance(self.content_ids_to_audio_translations, dict):
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to be a dict,'
+                'received %s' % self.content_ids_to_audio_translations)
+        for (content_id, audio_translations) in (
+                self.content_ids_to_audio_translations.iteritems()):
+
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received: %s' %
+                    content_id)
+            if not isinstance(audio_translations, dict):
+                raise utils.ValidationError(
+                    'Expected audio_translations to be a dict, received %s'
+                    % audio_translations)
+
+            allowed_audio_language_codes = [
+                language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+            for language_code, translation in audio_translations.iteritems():
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language code to be a string, received: %s' %
+                        language_code)
+
+                if language_code not in allowed_audio_language_codes:
+                    raise utils.ValidationError(
+                        'Unrecognized language code: %s' % language_code)
+
+                translation.validate()
+
+    @classmethod
+    def create_default_subtopic_page_contents(cls):
+        return cls(
+            state_domain.SubtitledHtml.create_default_subtitled_html(
+                'content'),
+            {'content': {}})
+
+    def to_dict(self):
+        """Returns a dict representing this SubtopicPageContents domain object.
+
+        Returns:
+            A dict, mapping all fields of SubtopicPageContents instance.
+        """
+        return {
+            'subtitled_html': self.subtitled_html.to_dict(),
+            'content_ids_to_audio_translations': (
+                self.content_ids_to_audio_translations),
+        }
+
+    @classmethod
+    def from_dict(cls, page_contents_dict):
+        return cls(
+            state_domain.SubtitledHtml.from_dict(
+                page_contents_dict['subtitled_html']),
+            page_contents_dict['content_ids_to_audio_translations'])
+
+
 class SubtopicPage(object):
     """Domain object for a Subtopic page."""
 
     def __init__(
-            self, subtopic_page_id, topic_id, html_data, language_code,
-            version):
+            self, subtopic_page_id, topic_id, page_contents,
+            language_code, version):
         """Constructs a SubtopicPage domain object.
 
         Args:
             subtopic_page_id: str. The unique ID of the subtopic page.
             topic_id: str. The ID of the topic that this subtopic is a part of.
-            html_data: str. The HTML content of the subtopic page.
+            page_contents: SubtopicPageContents. The html and audio translations
+                to be surfaced to the learner.
             language_code: str. The ISO 639-1 code for the language this
                 subtopic page is written in.
             version: int. The current version of the subtopic.
         """
         self.id = subtopic_page_id
         self.topic_id = topic_id
-        self.html_data = html_cleaner.clean(html_data)
+        self.page_contents = page_contents
         self.language_code = language_code
         self.version = version
 
@@ -123,7 +205,7 @@ class SubtopicPage(object):
         return {
             'id': self.id,
             'topic_id': self.topic_id,
-            'html_data': self.html_data,
+            'page_contents': self.page_contents.to_dict(),
             'language_code': self.language_code,
             'version': self.version
         }
@@ -156,7 +238,9 @@ class SubtopicPage(object):
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
-            subtopic_page_id, topic_id, '', constants.DEFAULT_LANGUAGE_CODE, 0)
+            subtopic_page_id, topic_id,
+            SubtopicPageContents.create_default_subtopic_page_contents(),
+            constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the subtopic id from the subtopic page id of the object.
@@ -166,13 +250,14 @@ class SubtopicPage(object):
         """
         return int(self.id[len(self.topic_id) + 1:])
 
-    def update_html_data(self, new_html_data):
+    def update_page_contents(self, new_page_contents):
         """The new value for the html data field.
 
         Args:
-            new_html_data: str. The new html data for the subtopic page.
+            new_page_contents: dict. The new page contents for the subtopic
+            page.
         """
-        self.html_data = html_cleaner.clean(new_html_data)
+        self.page_contents = SubtopicPageContents.from_dict(new_page_contents)
 
     def validate(self):
         """Validates various properties of the SubtopicPage object.
@@ -189,10 +274,7 @@ class SubtopicPage(object):
             raise utils.ValidationError(
                 'Expected version number to be an int, received %s' %
                 self.version)
-        if not isinstance(self.html_data, basestring):
-            raise utils.ValidationError(
-                'Expected html data to be a string, received %s' %
-                self.html_data)
+        self.page_contents.validate()
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(

@@ -415,8 +415,8 @@ def apply_change_list(topic_id, change_list):
 
                 if (change.property_name ==
                         subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    modified_subtopic_pages[subtopic_page_id].update_html_data(
-                        change.new_value)
+                    modified_subtopic_pages[
+                        subtopic_page_id].update_page_contents(change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:

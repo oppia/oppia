@@ -405,19 +405,21 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Changes the html data of a subtopic page and records the change in
+       * Changes the contents of a subtopic page and records the change in
        * the undo/redo service.
        */
-      setSubtopicPageHtmlData: function(subtopicPage, subtopicId, htmlData) {
-        var oldHtmlData = angular.copy(subtopicPage.getHtmlData());
+      setSubtopicPageContents: function(subtopicPage, subtopicId,
+          newPageContents) {
+        var oldPageContents = angular.copy(subtopicPage.getPageContents());
         _applySubtopicPagePropertyChange(
-          subtopicPage, SUBTOPIC_PAGE_PROPERTY_HTML_DATA, subtopicId, htmlData,
-          oldHtmlData, function(changeDict, subtopicPage) {
+          subtopicPage, SUBTOPIC_PAGE_PROPERTY_HTML_DATA, subtopicId,
+          newPageContents.toBackendDict(), oldPageContents.toBackendDict(),
+          function(changeDict, subtopicPage) {
             // Apply.
-            subtopicPage.setHtmlData(htmlData);
+            subtopicPage.setPageContents(newPageContents);
           }, function(changeDict, subtopicPage) {
             // Undo.
-            subtopicPage.setHtmlData(oldHtmlData);
+            subtopicPage.setPageContents(oldPageContents);
           });
       },
 

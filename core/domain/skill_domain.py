@@ -305,6 +305,39 @@ class SkillContents(object):
                     'received %s' % example)
             example.validate()
 
+        # TODO(tjiang11): Extract content ids to audio translations out into
+        # its own object to reuse throughout audio-capable structures.
+        if not isinstance(self.content_ids_to_audio_translations, dict):
+            raise utils.ValidationError(
+                'Expected state content_ids_to_audio_translations to be a dict,'
+                'received %s' % self.param_changes)
+        for (content_id, audio_translations) in (
+                self.content_ids_to_audio_translations.iteritems()):
+
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received: %s' %
+                    content_id)
+            if not isinstance(audio_translations, dict):
+                raise utils.ValidationError(
+                    'Expected audio_translations to be a dict, received %s'
+                    % audio_translations)
+
+            allowed_audio_language_codes = [
+                language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+            for language_code, translation in audio_translations.iteritems():
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language code to be a string, received: %s' %
+                        language_code)
+
+                if language_code not in allowed_audio_language_codes:
+                    raise utils.ValidationError(
+                        'Unrecognized language code: %s' % language_code)
+
+                translation.validate()
+
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
 
