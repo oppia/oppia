@@ -21,11 +21,11 @@ describe('Subtopic page contents object factory', function() {
 
   var expectedDefaultObject = {
     subtitled_html: {
-      'html': '',
-      'content_id': 'content'
+      html: '',
+      content_id: 'content'
     },
     content_ids_to_audio_translations: {
-      'content': {}
+      content: {}
     }
   };
 
@@ -67,9 +67,9 @@ describe('Subtopic page contents object factory', function() {
     expect(sampleSubtopicPageContents.getContentIdsToAudioTranslations()
       .getAudioTranslation('content', 'en').toBackendDict())
       .toEqual({
-        'filename': 'test.mp3',
-        'file_size_bytes': 100,
-        'needs_update': false
+        filename: 'test.mp3',
+        file_size_bytes: 100,
+        needs_update: false
       });
   });
 

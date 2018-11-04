@@ -20,7 +20,7 @@
 oppia.factory('SubtopicPageContentsObjectFactory', [
   'SubtitledHtmlObjectFactory', 'ContentIdsToAudioTranslationsObjectFactory',
   function(
-    SubtitledHtmlObjectFactory, ContentIdsToAudioTranslationsObjectFactory) {
+      SubtitledHtmlObjectFactory, ContentIdsToAudioTranslationsObjectFactory) {
     var SubtopicPageContents = function(
         subtitledHtml, contentIdsToAudioTranslations) {
       this._subtitledHtml = subtitledHtml;
@@ -40,7 +40,8 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       this._subtitledHtml.setHtml(html);
     };
 
-    SubtopicPageContents.prototype.getContentIdsToAudioTranslations = function() {
+    SubtopicPageContents.prototype.getContentIdsToAudioTranslations =
+    function() {
       return this._contentIdsToAudioTranslations;
     };
 
@@ -55,8 +56,8 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
 
     SubtopicPageContents.prototype.toBackendDict = function() {
       return {
-        'subtitled_html': this._subtitledHtml.toBackendDict(),
-        'content_ids_to_audio_translations':
+        subtitled_html: this._subtitledHtml.toBackendDict(),
+        content_ids_to_audio_translations:
           this._contentIdsToAudioTranslations.toBackendDict()
       };
     };
