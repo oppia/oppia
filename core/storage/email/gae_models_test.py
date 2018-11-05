@@ -24,7 +24,9 @@ import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
+
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
+
     """Test the SentEmailModel class."""
 
 
@@ -156,7 +158,7 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_bulk_emails_send_to_multiple_receivers(self):
         email_models.BulkEmailModel.create("instance_id",
-            ['recipient_id1', 'recipient_id2','recipient_id3'], 'sender_id',
+            ['recipient_id1', 'recipient_id2', 'recipient_id3'], 'sender_id',
              'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
              'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
@@ -164,7 +166,9 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
 
         #self.assertEqual(len(results), 3) #Not equals to 3 RN
 
+
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
+
 
     """Test the GeneralFeedbackEmailReplyToIdModel class"""
 
@@ -231,12 +235,12 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(result), 1)
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                "bad_user_id","bad_thread_id", strict=False) #Should not throw
+                "bad_user_id", "bad_thread_id", strict=False) #Should not throw
         self.assertEqual(result, None)
 
         with self.assertRaises(Exception):
             result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                "bad_user_id","bad_thread_id") #Should throw
+                "bad_user_id", "bad_thread_id") #Should throw
 
     def test_get_multi_by_user_ids_works_correctly(self):
         email_models.GeneralFeedbackEmailReplyToIdModel.create(
@@ -275,7 +279,9 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result.thread_id, "entity_type.entity_id.thread_id")
 
+
 class GenerateHashTests(test_utils.GenericTestBase):
+
     """Test that generating hash functionality works as expected."""
 
 
