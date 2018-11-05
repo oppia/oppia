@@ -525,6 +525,8 @@
 	"I18N_TOPNAV_SIGN_IN": "Kirjaudu sisään",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Kirjaudu sisään Googlella",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
+	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Aiheet ja taidot -kojelauta",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Sinulla on yhteensä <[totalSubscribers]> tilaajaa.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Peruuta tilaus"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Peruuta tilaus",
+	"I18N_WORKED_EXAMPLE": "Työstetty esimerkki"
 }
