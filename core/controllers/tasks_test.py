@@ -70,5 +70,4 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #Using UnsentFeedbackEmailHandler
 
 
-            feedback_services.enqueue_feedback_message_batch_email_task(
-                'A') 
+            feedback_services.enqueue_feedback_message_batch_email_task('A')
