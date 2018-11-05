@@ -19,6 +19,7 @@
 import os
 import re
 import sys
+import ast
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
@@ -196,3 +197,106 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     ), flags=re.X | re.S | re.M)
 
     re_yields_line = re_returns_line
+
+
+class ASTDocStringChecker(object):
+    """Checks that docstrings meet the code style."""
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def get_args_list_from_function_definition(cls, function_node):
+        """Extracts the arguments from a function definition.
+        Ignores class specific arguments (self and cls).
+
+        Args:
+            function_node: ast node object. Represents a function.
+
+        Returns:
+            list(str) of the args for a function as listed in the function
+            definition.
+        """
+        # Ignore self and cls args.
+        args_to_ignore = ['self', 'cls']
+        return [a.id for a in function_node.args.args if a.id not in
+                args_to_ignore]
+
+    @classmethod
+    def parse_arg_list_from_docstring(cls, docstring):
+        """Extracts the arguments from a function definition.
+        NOTE this will fail if the arg does not have a colon after it.
+
+        Args:
+            docstring: str. The contents of a docstring.
+
+        Returns:
+            list(str) of the args for a function as listed in the docstring.
+        """
+        if docstring is not None and 'Args:' in docstring:
+            # only keep the docstring contents after 'Args' and before
+            # 'Returns' or 'Raises'.
+            docstring = docstring.split('Args:')[1]
+            docstring = docstring.split('Returns:')[0]
+            docstring = docstring.split('Raises:')[0]
+            ds_arg_lines = docstring.split('\n')
+            # Extract just the arg name from the line describing the arg.
+            # This only finds lines that contain a colon, which should be
+            # between the arg name and its description.
+            ds_arg_lines = [line.split(':')[0].strip() for line in ds_arg_lines
+                            if ':' in line]
+            return ds_arg_lines
+        else:
+            return []
+
+    @classmethod
+    def compare_arg_order(cls, func_def_args, docstring_args):
+        """Compares the arguments listed in the function definition and
+        docstring, and raises errors if there are missing or mis-ordered
+        arguments in the docstring.
+
+        Args:
+            func_def_args: list(str). The args as listed in the function
+            definition.
+
+            docstring_args: list(str). The args as listed in the docstring.
+
+        Returns:
+            bool, representing whether the function passed linting or failed.
+        """
+        results = []
+
+        # If there are no args listed in the docstring, exit without errors.
+        if len(docstring_args) == 0:
+            return results
+
+        for i, arg_name in enumerate(func_def_args):
+            if func_def_args[i] not in docstring_args:
+                results.append('Arg missing from docstring: {}'.format(
+                    arg_name))
+            elif i < len(docstring_args):
+                if func_def_args[i] != docstring_args[i]:
+                    results.append('Arg ordering error in docstring: '
+                                   '{}'.format(arg_name))
+            else:
+                results.append('Arg ordering error in docstring: '
+                               '{}'.format(arg_name))
+        return results
+
+    @classmethod
+    def check_docstrings_arg_order(cls, function_node):
+        """Extracts the arguments from a function definition.
+
+        Args:
+            function_node: ast node object. Represents a function.
+
+        Returns:
+            func_result: list(str). List of docstring errors associated with
+            the function. If the function has no errors, the list is empty.
+        """
+        func_def_args = cls.get_args_list_from_function_definition(
+            function_node)
+        docstring = ast.get_docstring(function_node)
+        docstring_args = cls.parse_arg_list_from_docstring(docstring)
+        func_result = cls.compare_arg_order(func_def_args, docstring_args)
+        return func_result

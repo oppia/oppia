@@ -305,6 +305,7 @@ import isort  # isort:skip
 import pycodestyle  # isort:skip
 import pyjsparser  # isort:skip
 from pylint import lint  # isort:skip
+import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -1073,57 +1074,17 @@ def _check_docstrings(all_files):
 
     # Check that the args in the docstring are listed in the same
     # order as they appear in the function definition.
-    def _check_docstrings_arg_order(filename):
-        file_result = True
+    docstring_checker = docstrings_checker.ASTDocStringChecker()
+    for filename in files_to_check:
         with open(filename, 'r') as f:
             ast_file = ast.walk(ast.parse(f.read()))
             func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
             for func in func_defs:
-
-                def get_args_list_from_function_definition(function_node):
-                    return [a.id for a in function_node.args.args]
-
-                def parse_arg_list_from_docstring(docstring):
-                    # Note: this function returns everything after the 'Args:'
-                    # title within the docstring, including 'Returns:' etc if
-                    # they exist.
-                    if docstring is not None and 'Args:' in docstring:
-                        docstring_post_args_title = docstring.split('Args:')[1]
-                        ds_arg_lines = docstring_post_args_title.split('\n')
-                        return [line for line in ds_arg_lines if line != '']
-                    else:
-                        return []
-
-                func_def_args = get_args_list_from_function_definition(func)
-                docstring = ast.get_docstring(func)
-                docstring_args = parse_arg_list_from_docstring(docstring)
-
-                def check_arg_order(func_name, func_def_args, docstring_args):
-                    num_args_in_docstring = len(docstring_args)
-                    if num_args_in_docstring > 0:
-                        for i, arg_name in enumerate(func_def_args):
-                            if i < len(docstring_args):
-                                if func_def_args[i] not in docstring_args[i]:
-                                    print 'Arg ordering error in docstring'
-                                    print '%s --> Function %s: Arg: %s' % (
-                                        filename, func_name, arg_name)
-                                    return False
-                            else:
-                                print 'Missing arg in docstring'
-                                print '%s --> Function %s: Arg: %s' % (
-                                    filename, func_name, arg_name)
-                                return False
-                    return True
-
-                func_result = check_arg_order(
-                    func.name, func_def_args, docstring_args)
-                if not func_result:
-                    file_result = False
-
-        return file_result
-
-    if any([not _check_docstrings_arg_order(filename) for filename in files_to_check]):
-        failed = False
+                func_result = docstring_checker.check_docstrings_arg_order(func)
+                for error_line in func_result:
+                    print '%s --> Func %s: %s' % (
+                        filename, func.name, error_line)
+                    failed = True
 
     print ''
     print '----------------------------------------'
