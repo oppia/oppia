@@ -48,7 +48,7 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_UnsentFeedbackEmailHandler(self):
-        #create feedback thread
+        #create feedback thread.
 
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
 
