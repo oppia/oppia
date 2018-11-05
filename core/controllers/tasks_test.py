@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """Tests for Tasks Email Handler"""
-import json
 
 from core.domain import feedback_services
 from core.platform import models
@@ -58,11 +57,9 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
-
             #create another message.
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
-
              #check that there are two messages in thread
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
@@ -72,5 +69,4 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #telling tasks.py to send email to User 'A'
             #Using UnsentFeedbackEmailHandler
             feedback_services.enqueue_feedback_message_batch_email_task(
-                'A')
-            
+                'A')            
