@@ -30,7 +30,7 @@ import feconf
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, email_models) = models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.email])
+    [models.NAMES.feedback, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -40,7 +40,7 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
     USER_B_EMAIL = 'b@example.com'
 
     def setUp(self):
-        super(UnsentFeedbackEmailHandlerTests,self).setUp()
+        super(UnsentFeedbackEmailHandlerTests, self).setUp()
         self.signup(self.USER_A_EMAIL, 'A')
         self.user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, 'B')
@@ -52,9 +52,8 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
 
 
 
-    def test_test(self):
+    def test_UnsentFeedbackEmailHandler(self):
         #create feedback thread
-    
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -63,19 +62,18 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
 
             feedback_services.create_thread(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
-                    self.user_id_a,'a subject', 'some text')
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
+                self.user_id_a, 'a subject', 'some text')
             threadlist = feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
 
-                     
             #create another message.
             feedback_services.create_message(
-                    thread_id, self.user_id_b, None, None, 'user b message')
+                thread_id, self.user_id_b, None, None, 'user b message')
 
              #check that there are two messages in thread
-            messages= feedback_services.get_messages(thread_id)
+            messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages),2)
             
             #create feedback message 
@@ -85,5 +83,5 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #telling tasks.py to send email to User 'A'
             #Using UnsentFeedbackEmailHandler
             feedback_services.enqueue_feedback_message_batch_email_task(
-                    'A')
+                'A')
             
