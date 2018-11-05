@@ -15,13 +15,6 @@
 """Tests for Tasks Email Handler"""
 import json
 
-from core.controllers import base
-from core.domain import email_manager
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import rights_manager
-from core.platform import models
-from core.tests import test_utils
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
@@ -49,15 +42,13 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-
-
-
-    def test_UnsentFeedbackEmailHandler(self):
-        #create feedback thread
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_UnsentFeedbackEmailHandler(self):
+        #create feedback thread
 
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
 
@@ -74,12 +65,10 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
 
              #check that there are two messages in thread
             messages = feedback_services.get_messages(thread_id)
-            self.assertEqual(len(messages),2)
-            
+            self.assertEqual(len(messages), 2)
             #create feedback message 
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'testing feedback')
-
             #telling tasks.py to send email to User 'A'
             #Using UnsentFeedbackEmailHandler
             feedback_services.enqueue_feedback_message_batch_email_task(
