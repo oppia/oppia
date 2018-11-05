@@ -15,12 +15,12 @@
 # limitations under the License.
 
 import unittest
-import docstrings_checker
+import docstrings_checker # pylint: disable=relative-import
 
 
 class ASTDocStringCheckerTest(unittest.TestCase):
 
-    def test_parse_arg_list_from_docstring_empty_docstring_returns_empty_list(self):
+    def test_parse_arg_list_from_docstring_empty_string_yield_empty_list(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         docstring = ''
         expected_result = []
@@ -38,7 +38,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.parse_arg_list_from_docstring(docstring)
         self.assertEqual(result, expected_result)
 
-    def test_parse_arg_list_from_docstring_returns_title_does_not_affect_result(self):
+    def test_parse_arg_list_from_docstring_returns_title_has_no_effect(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         docstring = """This is what the function does.
 
@@ -52,7 +52,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.parse_arg_list_from_docstring(docstring)
         self.assertEqual(result, expected_result)
 
-    def test_parse_arg_list_from_docstring_raises_title_does_not_affect_result(self):
+    def test_parse_arg_list_from_docstring_raises_title_has_no_effect(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         docstring = """This is what the function does.
 
@@ -66,7 +66,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.parse_arg_list_from_docstring(docstring)
         self.assertEqual(result, expected_result)
 
-    def test_parse_arg_list_from_docstring_no_colon_after_arg_returns_empty_list(self):
+    def test_parse_arg_list_from_docstring_no_colon_returns_empty_list(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         docstring = """Args:
                     arg_name and then no colon.
@@ -75,7 +75,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.parse_arg_list_from_docstring(docstring)
         self.assertEqual(result, expected_result)
 
-    def test_parse_arg_list_from_docstring_no_arg_title_returns_empty_list(self):
+    def test_parse_arg_list_from_docstring_no_heder_returns_empty_list(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         docstring = """arg_name: type. But there is no Arg title first.
                 """
@@ -92,7 +92,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.compare_arg_order(func_args, docstring_args)
         self.assertEqual(result, expected_result)
 
-    def test_compare_arg_order_one_two_matching_ordered_args_returns_empty_list(self):
+    def test_compare_arg_order_two_matching_ordered_args_success(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         func_args = ['arg_name1', 'arg_name2']
         docstring_args = ['arg_name1', 'arg_name2']
@@ -116,7 +116,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.compare_arg_order(func_args, docstring_args)
         self.assertEqual(result, expected_result)
 
-    def test_compare_arg_order_missing_first_arg_returns_missing_error_and_order_error(self):
+    def test_compare_arg_order_missing_first_arg_returns_two_errors(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         func_args = ['arg_name1', 'arg_name2']
         docstring_args = ['arg_name2']
