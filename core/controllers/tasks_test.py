@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Tasks Email Handler"""
+"""Tests for Tasks Email Handler."""
 
 from core.domain import feedback_services
 from core.platform import models
@@ -61,14 +61,14 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #create another message.
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
-            #check that there are two messages in thread
+            #check that there are two messages in thread.
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
-            #create feedback message
+            #create feedback message.
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'testing feedback')
-            #telling tasks.py to send email to User 'A'
-            #Using UnsentFeedbackEmailHandler
+            #telling tasks.py to send email to User 'A'.
+            #Using UnsentFeedbackEmailHandler.
 
 
             feedback_services.enqueue_feedback_message_batch_email_task('A')
