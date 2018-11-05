@@ -69,5 +69,6 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #telling tasks.py to send email to User 'A'
             #Using UnsentFeedbackEmailHandler
 
+
             feedback_services.enqueue_feedback_message_batch_email_task(
                 'A')            
