@@ -58,9 +58,9 @@
               ng-show="profileDropdownIsActive">
             <li>
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
-                 ng-href="<[getProfileUrl()]>"
+                 ng-href="<[profileUrl]>"
                  style="color: #00376d">
-                <strong><[getUsername()]></strong>
+                <strong><[username]></strong>
               </a>
             </li>
             <hr class="oppia-top-right-menu-item-separator">
@@ -86,7 +86,7 @@
               </a>
             </li>
 
-            <li ng-if="isModerator()">
+            <li ng-if="isModerator">
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
                  href="/moderator"
                  target="_blank"
@@ -94,7 +94,7 @@
                 Moderator Page
               </a>
             </li>
-            <li ng-if="isSuperAdmin()">
+            <li ng-if="isSuperAdmin">
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
                  href="/admin"
                  target="_blank"

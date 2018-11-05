@@ -18,6 +18,7 @@
 
 import copy
 import logging
+import urllib
 
 from core.domain import role_services
 from core.domain import subtopic_page_domain
@@ -154,6 +155,7 @@ def get_topic_summary_from_model(topic_summary_model):
     """
     return topic_domain.TopicSummary(
         topic_summary_model.id, topic_summary_model.name,
+        topic_summary_model.canonical_name,
         topic_summary_model.language_code,
         topic_summary_model.version,
         topic_summary_model.canonical_story_count,
@@ -214,16 +216,20 @@ def get_topics_by_ids(topic_ids):
     return topics
 
 
-def get_topic_by_name(topic_name):
+def get_topic_by_name(topic_name, quoted=False):
     """Returns a domain object representing a topic.
 
     Args:
         topic_name: str. The name of the topic.
+        quoted: boolean. True if the topic_name is url-encoded. False otherwise.
 
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
+    if quoted:
+        topic_name = urllib.unquote_plus(topic_name)
+
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
     if topic_model is None:
         return None
@@ -278,6 +284,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     model = topic_models.TopicModel(
         id=topic.id,
         name=topic.name,
+        canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
         canonical_story_ids=topic.canonical_story_ids,
@@ -705,7 +712,7 @@ def compute_summary_of_topic(topic):
         total_skill_count = total_skill_count + len(subtopic.skill_ids)
 
     topic_summary = topic_domain.TopicSummary(
-        topic.id, topic.name, topic.language_code,
+        topic.id, topic.name, topic.canonical_name, topic.language_code,
         topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
@@ -726,6 +733,7 @@ def save_topic_summary(topic_summary):
     topic_summary_model = topic_models.TopicSummaryModel(
         id=topic_summary.id,
         name=topic_summary.name,
+        canonical_name=topic_summary.canonical_name,
         language_code=topic_summary.language_code,
         version=topic_summary.version,
         additional_story_count=topic_summary.additional_story_count,

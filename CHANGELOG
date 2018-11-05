@@ -1,5 +1,37 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.6.9 (30 Oct 2018)
+--------------------
+Bug fixes:
+* Fixes prod bug by preventing populating old_content value of suggestion when state doesn't exist (#5772)
+* Fix #5691: Fix bug in translation tab resulting from answer choices not being calculated for the short answer summaries (#5756)
+* Fix #5748: Incorrect get-involved link (#5750)
+* Fix #5688: Added users to user condition if only 1 user has reviewed an exploration (#5708)
+
+New structures:
+* Filter skills (#5635)
+* UI and controller to add functionality to merge untriaged skills (#5632)
+
+Infrastructure:
+* Add deployment of export service to deploy.py (#5773)
+* Fix Karma test to use older version of URL.
+* Fix erroneous image path in production. (#5788)
+* Fix broken image region #5765 (#5768)
+* Throttle error reporting to at most once every 5 seconds. (#5767)
+* Fix deployment script to update DEV_MODE value which is now read from constants.js instead of feconf.py. (#5763)
+
+Developer workflow and code clean-up:
+* (Dead code) Remove check 'topic is None', which is already covered by core.domain.acl_decorators.can_access_topic_viewer_page (#5737)
+* Fix part of #4374: Added docstrings to scripts.cut_release_branch and scripts.pylint_extensions (#5728)
+* Fix part of #4374: Update docstrings in the python backend code (#5680)
+* Fix part of #5134: Add tests to core_storage_story (#5644)
+* Add CSS lint rules: Space before curly braces for HTML files (#5732)
+* Added test to core.storage.topic.gae_models (#5727)
+* Extract extensionTagAssemblerService and siteAnalyticsService from app.js - Issue 3826 (#5711)
+* Space before and after CSS classes's curly braces (#5725)
+* Add additional instructions for prefixing PR title for partial fixes (#5718)
+
+
 v2.6.8 (2 Oct 2018)
 -------------------
 Bug fixes:

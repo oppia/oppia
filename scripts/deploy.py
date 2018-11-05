@@ -201,6 +201,7 @@ def _execute_deployment():
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
+    common.require_gcloud_to_be_available()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
@@ -247,7 +248,12 @@ def _execute_deployment():
         if build_process.returncode > 0:
             raise Exception('Build failed.')
 
-        # Deploy to GAE.
+        # Deploy export service to GAE.
+        subprocess.check_output([
+            common.GCLOUD_PATH, 'app', 'deploy', 'export/app.yaml',
+            '--project=%s' % APP_NAME])
+
+        # Deploy app to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Writing log entry.
