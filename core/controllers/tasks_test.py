@@ -26,6 +26,7 @@ import feconf
 transaction_services = models.Registry.import_transaction_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+
 class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
 
     USER_A_EMAIL = 'a@example.com'
