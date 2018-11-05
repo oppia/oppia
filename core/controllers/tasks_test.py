@@ -63,7 +63,7 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #check that there are two messages in thread
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
-            #create feedback message 
+            #create feedback message
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'testing feedback')
             #telling tasks.py to send email to User 'A'
@@ -71,4 +71,4 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
 
 
             feedback_services.enqueue_feedback_message_batch_email_task(
-                'A')            
+                'A') 
