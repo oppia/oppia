@@ -267,26 +267,24 @@ oppia.directive('stateTranslation', [
               StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.displayed);
             }
-
-            var stateName = StateEditorService.getActiveStateName();
-
+            $scope.stateName = StateEditorService.getActiveStateName();
             $scope.stateContent = ExplorationStatesService
-              .getStateContentMemento(stateName);
+              .getStateContentMemento($scope.stateName);
             $scope.stateSolution = ExplorationStatesService
-              .getSolutionMemento(stateName);
+              .getSolutionMemento($scope.stateName);
             $scope.stateHints = ExplorationStatesService
-              .getHintsMemento(stateName);
+              .getHintsMemento($scope.stateName);
             $scope.stateAnswerGroups = ExplorationStatesService
-              .getInteractionAnswerGroupsMemento(stateName);
+              .getInteractionAnswerGroupsMemento($scope.stateName);
             $scope.stateDefaultOutcome = ExplorationStatesService
-              .getInteractionDefaultOutcomeMemento(stateName);
+              .getInteractionDefaultOutcomeMemento($scope.stateName);
             $scope.stateInteractionId = ExplorationStatesService
-              .getInteractionIdMemento(stateName);
+              .getInteractionIdMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
             var currentCustomizationArgs = ExplorationStatesService
-              .getInteractionCustomizationArgsMemento(stateName);
+              .getInteractionCustomizationArgsMemento($scope.stateName);
             var interactionId = $scope.stateInteractionId;
             if (interactionId) {
               // Special cases for multiple choice input and image click input.
