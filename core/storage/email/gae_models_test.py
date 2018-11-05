@@ -27,6 +27,7 @@ import feconf
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
+
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
@@ -150,7 +151,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object')
 
+
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
+
     def test_bulk_emails_send_to_multiple_receivers(self):
         email_models.BulkEmailModel.create("instance_id",
             ['recipient_id1', 'recipient_id2','recipient_id3'], 'sender_id',
@@ -162,7 +165,10 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
         #self.assertEqual(len(results), 3) #Not equals to 3 RN
 
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
+
     """Test the GeneralFeedbackEmailReplyToIdModel class"""
+
+
     def setUp(self):
         super(ReplyToIdModelUnitTests, self).setUp()
 
@@ -171,7 +177,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             return 'Non_unique_id'
 
         self.generate_constant_id_ctx = self.swap(
-            email_models.GeneralFeedbackEmailReplyToIdModel, 
+            email_models.GeneralFeedbackEmailReplyToIdModel,
             '_generate_unique_reply_to_id',
             types.MethodType(
                 _generate_unique_id_for_tests,
@@ -186,7 +192,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             "other_user_id", "other_thread_id")
 
         self.assertNotEqual(id_generated, "user_id.thread_id")
-        
+
     def test_unique_reply_id_is_unique(self):
         all_ids = [email_models.GeneralFeedbackEmailReplyToIdModel._generate_unique_reply_to_id() for i in range(100)]
         for current_id in all_ids:
@@ -218,7 +224,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
     def test_get_works_correctly(self):
         email_models.GeneralFeedbackEmailReplyToIdModel.create(
             "user_id", "thread_id")
-        
+
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             "user_id", "thread_id", strict=False)
 
@@ -240,7 +246,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
             ["user_id_1", "user_id_2"], "thread_id")
-        
+
         self.assertEqual(len(result), 2)
         assert("user_id_1" in result.keys())
         assert("user_id_2" in result.keys())
@@ -271,6 +277,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
+
 
     def test_same_inputs_always_gives_same_hashes(self):
         # pylint: disable=protected-access
