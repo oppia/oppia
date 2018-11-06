@@ -78,9 +78,9 @@ oppia.factory('AssetsBackendApiService', [
           }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
-            window.WebKitBlobBuilder ||
-            window.MozBlobBuilder ||
-            window.MSBlobBuilder;
+                          window.WebKitBlobBuilder ||
+                          window.MozBlobBuilder ||
+                          window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(data);
@@ -122,7 +122,7 @@ oppia.factory('AssetsBackendApiService', [
         assetType) {
       if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
         for (var index = 0; index <
-          _audioFilesCurrentlyBeingRequested.length; index++) {
+            _audioFilesCurrentlyBeingRequested.length; index++) {
           if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
             _audioFilesCurrentlyBeingRequested.splice(index, 1);
             break;
@@ -130,7 +130,7 @@ oppia.factory('AssetsBackendApiService', [
         }
       } else if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_IMAGE)) {
         for (var index = 0; index <
-          _imageFilesCurrentlyBeingRequested.length; index++) {
+            _imageFilesCurrentlyBeingRequested.length; index++) {
           if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
             _imageFilesCurrentlyBeingRequested.splice(index, 1);
             break;
@@ -220,7 +220,7 @@ oppia.factory('AssetsBackendApiService', [
     var _getDownloadUrl = function(explorationId, filename, assetType) {
       return UrlInterpolationService.interpolateUrl(
         (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
-          IMAGE_DOWNLOAD_URL_TEMPLATE), {
+        IMAGE_DOWNLOAD_URL_TEMPLATE), {
           exploration_id: explorationId,
           filename: filename
         });

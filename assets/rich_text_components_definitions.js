@@ -55,6 +55,26 @@ var richTextComponents = {
         "obj_type": "Filepath"
       },
       "default_value": ""
+    }, {
+      "name": "caption",
+      "description": "Caption for image (optional)",
+      "schema": {
+        "type": "unicode"
+      },
+      "default_value": ""
+    }, {
+      "name": "alt",
+      "description": "Briefly explain this image to a visually impaired learner",
+      "schema": {
+        "type": "unicode",
+        "validators": [{
+          "id": "is_nonempty"
+        }],
+        "ui_config": {
+          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)"
+        }
+      },
+      "default_value": ""
     }]
   },
   "Link": {
@@ -163,10 +183,10 @@ var richTextComponents = {
       "description": "Video end time in seconds: (leave at 0 to play until the end.)",
       "schema": {
         "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
+          "validators": [{
+            "id": "is_at_least",
+            "min_value": 0
+          }]
       },
       "default_value": 0
     }, {
