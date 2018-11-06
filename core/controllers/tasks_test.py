@@ -72,17 +72,17 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
                 thread_id, self.user_id_a, None, None, 'testing feedback')
 
             #telling tasks.py to send email to User 'A'.
-            #Using UnsentFeedbackEmailHandler.
-            #35-66, 75-84, 93-107, 119-133, 144-151
-            payload={
+            #Using UnsentFeedbackEmailHandler using two methods.
+            payload = {
                 'user_id':self.user_id_a}
-                    
-            #taskqueue_services.enqueue_email_task(
-                #feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
-            #feedback_services.enqueue_feedback_message_batch_email_task(self.user_id_a)
-            payload={
-                'exploration_id': 'A',
+            taskqueue_services.enqueue_email_task(
+                feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
+            feedback_services.enqueue_feedback_message_batch_email_task(
+                self.user_id_a)
+            #try invoke exploration email handler.
+            payload = {
+                'exploration_id' : 'A',
                 'report_text': 'test report',
                 'reporter_id': 'test reporter id'}
             taskqueue_services.enqueue_email_task(
-                feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,payload,0)
+                feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)
