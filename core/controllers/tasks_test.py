@@ -45,44 +45,52 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+                feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
 
     def test_UnsentFeedbackEmailHandler(self):
+         
         #create feedback thread.
-
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
-
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
-            threadlist = feedback_services.get_all_threads(
+            self.threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
-            thread_id = threadlist[0].id
+            self.thread_id = self.threadlist[0].id
+
 
             #create another message.
             feedback_services.create_message(
-                thread_id, self.user_id_b, None, None, 'user b message')
+                self.thread_id, self.user_id_b, None, None, 'user b message')
 
             #check that there are two messages in thread.
-            messages = feedback_services.get_messages(thread_id)
+            messages = feedback_services.get_messages(self.thread_id)
             self.assertEqual(len(messages), 2)
 
             #create feedback message.
-            feedback_services.create_message(
-                thread_id, self.user_id_a, None, None, 'testing feedback')
+            #feedback_services.create_message(
+                #self.thread_id, self.user_id_a, None, None, 'testing feedback')
 
             #telling tasks.py to send email to User 'A'.
-            #Using UnsentFeedbackEmailHandler using two methods.
             payload = {
                 'user_id': self.user_id_a}
             taskqueue_services.enqueue_email_task(
                 feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
-            feedback_services.enqueue_feedback_message_batch_email_task(
-                self.user_id_a)
-            #try invoke exploration email handler.
-            payload = {
-                'exploration_id': 'A',
-                'report_text': 'test report',
-                'reporter_id': 'test reporter id'}
-            taskqueue_services.enqueue_email_task(
-                feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)
+
+            #check that there are no feedback emails sent to User 'A'.
+            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            self.assertEqual(len(messages),0)
+
+            #send task and subsequent email to User 'A'.
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            expected_message = ('Hi userA,\n\nNew update to thread "a subject"'+
+            ' on Title:\n- userB: user b message\n(You received this message'+
+            ' because you are a participant in this thread.)\n\nBest wishes,\nThe'+
+            ' Oppia team\n\nYou can change your email preferences via the Preferences'+
+            ' page.')
+
+            #assert that the message is correct.
+            self.assertEqual(len(messages),1)
+            self.assertEqual(messages[0].body.decode(),expected_message)
