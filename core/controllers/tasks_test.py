@@ -34,9 +34,9 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UnsentFeedbackEmailHandlerTests, self).setUp()
-        self.signup(self.USER_A_EMAIL, 'A')
+        self.signup(self.USER_A_EMAIL, 'userA')
         self.user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
-        self.signup(self.USER_B_EMAIL, 'B')
+        self.signup(self.USER_B_EMAIL, 'userB')
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -58,17 +58,31 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
+
             #create another message.
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
+
             #check that there are two messages in thread.
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
+
             #create feedback message.
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'testing feedback')
+
             #telling tasks.py to send email to User 'A'.
             #Using UnsentFeedbackEmailHandler.
-
-
-            feedback_services.enqueue_feedback_message_batch_email_task('A')
+            #35-66, 75-84, 93-107, 119-133, 144-151
+            payload={
+                'user_id':self.user_id_a}
+                    
+            #taskqueue_services.enqueue_email_task(
+                #feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
+            #feedback_services.enqueue_feedback_message_batch_email_task(self.user_id_a)
+            payload={
+                'exploration_id': 'A',
+                'report_text': 'test report',
+                'reporter_id': 'test reporter id'}
+            taskqueue_services.enqueue_email_task(
+                feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,payload,0)
