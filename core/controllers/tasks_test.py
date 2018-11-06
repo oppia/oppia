@@ -84,11 +84,12 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
             #send task and subsequent email to User 'A'.
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
-            expected_message = ('Hi userA,\n\nNew update to thread "a subject"'
-            ' on Title:\n- userB: user b message\n(You received this message'
-            ' because you are a participant in this thread.)\n\nBest'
-            ' wishes,\nThe Oppia team\n\nYou can change your email preferences via'
-            ' the Preferences page.')
+            expected_message = (
+                'Hi userA,\n\nNew update to thread "a subject"'
+                ' on Title:\n- userB: user b message\n(You received this message'
+                ' because you are a participant in this thread.)\n\nBest'
+                ' wishes,\nThe Oppia team\n\nYou can change your email' 
+                ' preferences via the Preferences page.')
 
             #assert that the message is correct.
             self.assertEqual(len(messages), 1)
