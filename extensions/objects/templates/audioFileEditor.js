@@ -16,7 +16,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('audioUrlEditor', [
+oppia.directive('audioFileEditor', [
   'UrlInterpolationService', 'AssetsBackendApiService', 'AlertsService',
   'ContextService', '$timeout',
   function(UrlInterpolationService, AssetsBackendApiService, AlertsService,

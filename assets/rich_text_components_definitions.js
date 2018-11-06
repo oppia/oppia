@@ -213,7 +213,7 @@ var richTextComponents = {
       "description": "Upload audio",
       "schema": {
         "type": "custom",
-        "obj_type": "audioUrl"
+        "obj_type": "audioFile"
       },
       "default_value": ""
     }]
