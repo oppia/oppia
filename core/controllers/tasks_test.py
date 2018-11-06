@@ -84,7 +84,7 @@ class UnsentFeedbackEmailHandlerTests(test_utils.GenericTestBase):
                 'Hi userA,\n\nNew update to thread "a subject"'
                 ' on Title:\n- userB: user b message\n(You received'
                 'this message because you are a participant in this thread.)'
-                '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email' 
+                '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
                 ' preferences via the Preferences page.')
 
             #assert that the message is correct.
