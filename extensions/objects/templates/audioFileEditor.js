@@ -52,15 +52,7 @@ oppia.directive('audioUrlEditor', [
         var validateData = function() {
           audioFile = fileElement.files[0];
           audioUrl = urlElement.value;
-          if (audioFile && audioUrl) {
-            return true;
-          } else if (audioFile) {
-            return true;
-          } else if (audioUrl) {
-            return true;
-          } else {
-            return false;
-          }
+          return (audioFile || audioUrl);
         };
 
         var downloadAndSaveAudio = function() {

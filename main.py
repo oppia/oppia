@@ -325,6 +325,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
+    get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
 
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
@@ -486,6 +487,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
+    get_redirect_route(
+        r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.ReSubmitSuggestionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,

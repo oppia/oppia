@@ -25,10 +25,7 @@ oppia.directive('adminNavbar', [
     return {
       restrict: 'E',
       scope: {
-        getUsername: '&username',
         getUserEmail: '&userEmail',
-        isModerator: '&isModerator',
-        isSuperAdmin: '&isSuperAdmin',
         getLogoutUrl: '&logoutUrl'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -47,6 +44,22 @@ oppia.directive('adminNavbar', [
           $scope.profilePictureDataUrl = dataUrl;
         });
 
+        $scope.username = '';
+        $scope.isModerator = null;
+        $scope.isSuperAdmin = null;
+        $scope.profileUrl = '';
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          $scope.username = userInfo.getUsername();
+          $scope.isModerator = userInfo.isModerator();
+          $scope.isSuperAdmin = userInfo.isSuperAdmin();
+
+          $scope.profileUrl = (
+            UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
+              username: $scope.username
+            })
+          );
+        });
+
         $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');
 
@@ -59,12 +72,6 @@ oppia.directive('adminNavbar', [
         $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
           angular.element(evt.currentTarget).parent().removeClass('open');
           $scope.profileDropdownIsActive = false;
-        };
-
-        $scope.getProfileUrl = function() {
-          return UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-            username: $scope.getUsername()
-          });
         };
       }]
     };
