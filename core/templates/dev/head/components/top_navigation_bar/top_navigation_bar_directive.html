@@ -61,7 +61,7 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
+    <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="userIsLoggedIn" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
          ng-mouseover="openSubmenu($event, 'profileMenu')"
          ng-mouseleave="closeSubmenuIfNotMobile($event)"
@@ -166,7 +166,7 @@
       </ul>
     </li>
 
-    <li uib-dropdown ng-if="!username" class="oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!userIsLoggedIn && username !== ''" class="oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
         <button class="btn oppia-navbar-button protractor-mobile-test-login"
                 ng-click="onLoginButtonClicked()">
@@ -187,6 +187,11 @@
           </a>
         </li>
       </ul>
+    </li>
+
+    <li uib-dropdown ng-if="username === ''" class="oppia-navbar-clickable-dropdown">
+      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+      </div>
     </li>
   </ul>
 </div>
