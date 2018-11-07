@@ -93,13 +93,13 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(messages[0].body.decode(), expected_message)
 
     def test_SuggestionEmailHandler(self):
-        """Tests SuggestionEmailHandler functionality"""
+        """Tests SuggestionEmailHandler functionality."""
         class FakeActivityRights:
             def __init__(
-            self, exploration_id, owner_ids, editor_ids, translator_ids,
-            viewer_ids, community_owned=False, cloned_from=None,
-            status=True, viewable_if_private=False,
-            first_published_msec=None):
+                self, exploration_id, owner_ids, editor_ids, translator_ids,
+                viewer_ids, community_owned=False, cloned_from=None,
+                status=True, viewable_if_private=False,
+                first_published_msec=None):
                 #user B ID hardcoded into owner_ids to get email_manager.
                 #to send email to user B to test functionality.
                 self.id = exploration_id
@@ -152,7 +152,7 @@ class TasksTests(test_utils.GenericTestBase):
                 self.assertEqual(len(messages), 1)
 
     def test_InstantFeedbackMessageEmailHandler(self):
-        """Tests Instant feedback message handler"""
+        """Tests Instant feedback message handler."""
         #WORK IN PROGRESS.
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
