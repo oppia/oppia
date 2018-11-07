@@ -112,14 +112,23 @@ oppia.factory('ExplorationStatesService', [
       if (propertyRef === undefined) {
         throw Error('Undefined states error debug logs:' +
           '\nRequested state name: ' + stateName +
-          '\nRequested info type: ' + backendName +
           '\nExploration ID: ' + ContextService.getExplorationId() +
           '\nChange list: ' + ChangeListService.getChangeList() +
           '\nAll states names: ' + _states.getStateNames());
       }
-      accessorList.forEach(function(key) {
-        propertyRef = propertyRef[key];
-      });
+      try {
+        accessorList.forEach(function(key) {
+          propertyRef = propertyRef[key];
+        });
+      } catch (e) {
+        var additionalInfo = ('Undefined states error debug logs:' +
+          '\nRequested state name: ' + stateName +
+          '\nExploration ID: ' + ContextService.getExplorationId() +
+          '\nChange list: ' + ChangeListService.getChangeList() +
+          '\nAll states names: ' + _states.getStateNames());
+        e.message += additionalInfo;
+        throw e;
+      }
 
       return angular.copy(propertyRef);
     };
