@@ -49,6 +49,7 @@ class TasksTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
+
     def test_UnsentFeedbackEmailHandler(self):
         #create feedback thread.
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
@@ -94,12 +95,12 @@ class TasksTests(test_utils.GenericTestBase):
 
     def test_SuggestionEmailHandler(self):
         """Tests SuggestionEmailHandler functionality."""
-        class FakeActivityRights:
+        class FakeActivityRights(object):
             def __init__(
-                self, exploration_id, owner_ids, editor_ids, translator_ids,
-                viewer_ids, community_owned=False, cloned_from=None,
-                status=True, viewable_if_private=False,
-                first_published_msec=None):
+                    self, exploration_id, owner_ids, editor_ids, translator_ids,
+                    viewer_ids, community_owned=False, cloned_from=None,
+                    status=True, viewable_if_private=False,
+                    first_published_msec=None):
                 #user B ID hardcoded into owner_ids to get email_manager.
                 #to send email to user B to test functionality.
                 self.id = exploration_id
@@ -114,8 +115,8 @@ class TasksTests(test_utils.GenericTestBase):
                 self.owner_ids = ['121121523518511814218']
 
         email_user_b = self.swap(
-                rights_manager, 'ActivityRights',
-                FakeActivityRights)
+            rights_manager, 'ActivityRights',
+            FakeActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx: 
             with self.can_send_emails_ctx:
                 change = {
@@ -132,7 +133,7 @@ class TasksTests(test_utils.GenericTestBase):
                     self.user_id_a, change, 'test description',
                     None)
                 threadlist = feedback_services.get_all_threads(
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
                         self.exploration.id, True)
                 thread_id = threadlist[0].id
 
