@@ -1294,7 +1294,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
 
     # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
     pattern_to_match = (
-        r'controller: \[(?P<stringfied_dependencies>[\S\s]*?)' +
+        r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
         r'function\((?P<function_parameters>[\S\s]*?)\)')
     for filename in files_to_check:
         with open(filename) as f:
