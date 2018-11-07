@@ -21,8 +21,8 @@ from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.platform import models
 from core.domain import suggestion_services
+from core.platform import models
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
