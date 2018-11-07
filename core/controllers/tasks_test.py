@@ -113,7 +113,8 @@ class TasksTests(test_utils.GenericTestBase):
                 self.first_published_msec = first_published_msec
                 self.owner_ids = ['121121523518511814218']
 
-        email_user_b = self.swap(rights_manager, 'ActivityRights', 
+        email_user_b = self.swap(
+                rights_manager, 'ActivityRights',
                 FakeActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx: 
             with self.can_send_emails_ctx:
@@ -131,7 +132,8 @@ class TasksTests(test_utils.GenericTestBase):
                     self.user_id_a, change, 'test description',
                     None)
                 threadlist = feedback_services.get_all_threads(
-                        suggestion_models.TARGET_TYPE_EXPLORATION, self.exploration.id, True)
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.exploration.id, True)
                 thread_id = threadlist[0].id
 
                 #enqueue and send suggestion email task.
@@ -145,7 +147,8 @@ class TasksTests(test_utils.GenericTestBase):
                 self.process_and_flush_pending_tasks()
 
                 #check that user B recieved message.
-                messages = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+                messages = self.mail_stub.get_sent_messages(
+                    to=self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
     def test_InstantFeedbackMessageEmailHandler(self):
