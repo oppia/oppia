@@ -16,10 +16,11 @@
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
+from core.domain import suggestion_services
 import feconf
+
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
