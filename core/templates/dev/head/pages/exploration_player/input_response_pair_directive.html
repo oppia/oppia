@@ -2,8 +2,8 @@
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
-         popover-placement="bottom"
-         popover-trigger="none" style="cursor: pointer;">
+         popover-placement="bottom" uib-popover-template="'popover/answer'"
+         popover-trigger="click" style="cursor: pointer;">
       <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
       </angular-html-bind>
     </div>
@@ -42,11 +42,9 @@
     position: relative;
     padding: 0 20px;
   }
-
   .conversation-skin-learner-answer-container {
     text-align: right;
   }
-
   .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
     border: 2px solid #094142;
     height: 100px;
@@ -54,7 +52,6 @@
     top: -33px;
     width: 100px;
   }
-
   .conversation-skin-learner-answer-container:after {
     border: 7px solid;
     border-color: rgb(236, 239, 241) transparent transparent rgb(236, 239, 241);
@@ -64,7 +61,6 @@
     top: 11%;
     width: 0;
   }
-
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-container:after {
     border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
   }
@@ -72,7 +68,7 @@
 
 <script type="text/ng-template" id="popover/answer">
   <div>
-    <angular-html-bind html-data="answer()">
+    <angular-html-bind html-data="getAnswerHtml()">
     </angular-html-bind>
   </div>
 </script>
