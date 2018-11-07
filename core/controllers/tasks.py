@@ -22,6 +22,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
+from core.domain import suggestion_services
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -79,7 +80,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        suggestion = feedback_services.get_suggestion(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
 
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
