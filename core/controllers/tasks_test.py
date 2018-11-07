@@ -16,7 +16,6 @@
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import suggestion_services
-from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 from core.domain import rights_manager
@@ -50,6 +49,8 @@ class TasksTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
+        self.email_user_b = self.swap(rights_manager, 'ActivityRights', 
+                FakeActivityRights)
 
     def test_UnsentFeedbackEmailHandler(self):
         #create feedback thread.
@@ -93,24 +94,37 @@ class TasksTests(test_utils.GenericTestBase):
             #assert that the message is correct.
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].body.decode(), expected_message)
+
     def test_SuggestionEmailHandler(self):
         """Tests SuggestionEmailHandler functionality"""
         class FakeActivityRights:
             def __init__(
-                self, exploration_id, owner_ids, editor_ids, translator_ids,
-                viewer_ids, community_owned=False, cloned_from=None,
-                status=True, viewable_if_private=False,
-                first_published_msec=None):
+            self, exploration_id, owner_ids, editor_ids, translator_ids,
+            viewer_ids, community_owned=False, cloned_from=None,
+            status=True, viewable_if_private=False,
+            first_published_msec=None):
                 #user B ID hardcoded into owner_ids to get email_manager.
                 #to send email to user B to test functionality.
+                self.id = exploration_id
+                self.editor_ids = editor_ids
+                self.translator_ids = translator_ids
+                self.viewer_ids = viewer_ids
+                self.community_owned = community_owned
+                self.cloned_from = cloned_from
+                self.status = status
+                self.viewable_if_private = viewable_if_private
+                self.first_published_msec = first_published_msec
                 self.owner_ids = ['121121523518511814218']
-        self.email_user_b=self.swap(rights_manager, 'ActivityRights', FakeActivityRights)
-        with self.email_user_b, self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+
+
+        with self.email_user_b, self.can_send_feedback_email_ctx, 
+        self.can_send_emails_ctx:
             change = {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
                 'new_value': 'new suggestion content'}
+
             #create suggestion from user A to user B.
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -121,6 +135,7 @@ class TasksTests(test_utils.GenericTestBase):
             threadlist = feedback_services.get_all_threads(
                     suggestion_models.TARGET_TYPE_EXPLORATION, self.exploration.id, True)
             thread_id = threadlist[0].id
+
             #enqueue and send suggestion email task.
             payload = {
                 'exploration_id': self.exploration.id,
@@ -130,6 +145,7 @@ class TasksTests(test_utils.GenericTestBase):
             taskqueue_services.enqueue_email_task(
                 feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
             self.process_and_flush_pending_tasks()
+
             #check that user B recieved message.
             messages = self.mail_stub.get_sent_messages(to= self.USER_B_EMAIL)
             self.assertEqual(len(messages), 1)
