@@ -104,7 +104,7 @@ class TasksTests(test_utils.GenericTestBase):
                 #user B ID hardcoded into owner_ids to get email_manager.
                 #to send email to user B to test functionality.
                 self.id = exploration_id
-                self.getLintToShutUp=owner_ids
+                self.getLintToShutUp = owner_ids
                 self.editor_ids = editor_ids
                 self.translator_ids = translator_ids
                 self.viewer_ids = viewer_ids
