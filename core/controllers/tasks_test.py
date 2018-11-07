@@ -149,6 +149,7 @@ class TasksTests(test_utils.GenericTestBase):
             #check that user B recieved message.
             messages = self.mail_stub.get_sent_messages(to= self.USER_B_EMAIL)
             self.assertEqual(len(messages), 1)
+
     def test_InstantFeedbackMessageEmailHandler(self):
         """Tests Instant feedback message handler"""
         #WORK IN PROGRESS.
@@ -166,9 +167,3 @@ class TasksTests(test_utils.GenericTestBase):
             reference_dict= {
                 'entity_id': self.exploration.id,
                 'thread_id': thread_id}
-
-
-
-
-
-
