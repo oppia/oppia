@@ -147,7 +147,7 @@ class TasksTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             #check that user B recieved message.
-            messages = self.mail_stub.get_sent_messages(to= self.USER_B_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
             self.assertEqual(len(messages), 1)
 
     def test_InstantFeedbackMessageEmailHandler(self):
@@ -164,6 +164,6 @@ class TasksTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
             #send instant feedback message email.
-            reference_dict= {
+            reference_dict = {
                 'entity_id': self.exploration.id,
                 'thread_id': thread_id}
