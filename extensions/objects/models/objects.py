@@ -424,6 +424,14 @@ class Filepath(BaseObject):
     SCHEMA = UnicodeString.SCHEMA
 
 
+class AudioFile(BaseObject):
+    """class for audio file."""
+
+    description = 'A string that represents a filepath'
+
+    SCHEMA = UnicodeString.SCHEMA
+
+
 class CheckedProof(BaseObject):
     """A proof attempt and any errors it makes."""
 
