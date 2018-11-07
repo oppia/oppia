@@ -104,6 +104,7 @@ class TasksTests(test_utils.GenericTestBase):
                 #user B ID hardcoded into owner_ids to get email_manager.
                 #to send email to user B to test functionality.
                 self.id = exploration_id
+                self.getLintToShutUp=owner_ids
                 self.editor_ids = editor_ids
                 self.translator_ids = translator_ids
                 self.viewer_ids = viewer_ids
@@ -117,7 +118,7 @@ class TasksTests(test_utils.GenericTestBase):
         email_user_b = self.swap(
             rights_manager, 'ActivityRights',
             FakeActivityRights)
-        with email_user_b, self.can_send_feedback_email_ctx: 
+        with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -134,7 +135,7 @@ class TasksTests(test_utils.GenericTestBase):
                     None)
                 threadlist = feedback_services.get_all_threads(
                     suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.exploration.id, True)
+                    self.exploration.id, True)
                 thread_id = threadlist[0].id
 
                 #enqueue and send suggestion email task.
@@ -166,6 +167,3 @@ class TasksTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
             #send instant feedback message email.
-            reference_dict = {
-                'entity_id': self.exploration.id,
-                'thread_id': thread_id}
