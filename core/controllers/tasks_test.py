@@ -49,9 +49,6 @@ class TasksTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
-        self.email_user_b = self.swap(rights_manager, 'ActivityRights', 
-                FakeActivityRights)
-
     def test_UnsentFeedbackEmailHandler(self):
         #create feedback thread.
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
@@ -116,39 +113,40 @@ class TasksTests(test_utils.GenericTestBase):
                 self.first_published_msec = first_published_msec
                 self.owner_ids = ['121121523518511814218']
 
+        email_user_b = self.swap(rights_manager, 'ActivityRights', 
+                FakeActivityRights)
+        with email_user_b, self.can_send_feedback_email_ctx: 
+            with self.can_send_emails_ctx:
+                change = {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'state_1',
+                    'new_value': 'new suggestion content'}
 
-        with self.email_user_b, self.can_send_feedback_email_ctx, 
-        self.can_send_emails_ctx:
-            change = {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'state_1',
-                'new_value': 'new suggestion content'}
+                #create suggestion from user A to user B.
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.exploration.id, 1,
+                    self.user_id_a, change, 'test description',
+                    None)
+                threadlist = feedback_services.get_all_threads(
+                        suggestion_models.TARGET_TYPE_EXPLORATION, self.exploration.id, True)
+                thread_id = threadlist[0].id
 
-            #create suggestion from user A to user B.
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.exploration.id, 1,
-                self.user_id_a, change, 'test description',
-                None)
-            threadlist = feedback_services.get_all_threads(
-                    suggestion_models.TARGET_TYPE_EXPLORATION, self.exploration.id, True)
-            thread_id = threadlist[0].id
+                #enqueue and send suggestion email task.
+                payload = {
+                    'exploration_id': self.exploration.id,
+                    'thread_id': thread_id}
+                messages = self.mail_stub.get_sent_messages()
+                self.assertEqual(len(messages), 0)
+                taskqueue_services.enqueue_email_task(
+                    feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
+                self.process_and_flush_pending_tasks()
 
-            #enqueue and send suggestion email task.
-            payload = {
-                'exploration_id': self.exploration.id,
-                'thread_id': thread_id}
-            messages = self.mail_stub.get_sent_messages()
-            self.assertEqual(len(messages), 0)
-            taskqueue_services.enqueue_email_task(
-                feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
-            self.process_and_flush_pending_tasks()
-
-            #check that user B recieved message.
-            messages = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
-            self.assertEqual(len(messages), 1)
+                #check that user B recieved message.
+                messages = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+                self.assertEqual(len(messages), 1)
 
     def test_InstantFeedbackMessageEmailHandler(self):
         """Tests Instant feedback message handler"""
