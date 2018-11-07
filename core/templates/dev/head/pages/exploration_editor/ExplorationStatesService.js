@@ -109,9 +109,20 @@ oppia.factory('ExplorationStatesService', [
     var getStatePropertyMemento = function(stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
       var propertyRef = _states.getState(stateName);
-      accessorList.forEach(function(key) {
-        propertyRef = propertyRef[key];
-      });
+      try {
+        accessorList.forEach(function(key) {
+          propertyRef = propertyRef[key];
+        });
+      } catch (e) {
+        var additionalInfo = ('\nUndefined states error debug logs:' +
+          '\nRequested state name: ' + stateName +
+          '\nExploration ID: ' + ContextService.getExplorationId() +
+          '\nChange list: ' + JSON.stringify(
+          ChangeListService.getChangeList()) +
+          '\nAll states names: ' + _states.getStateNames());
+        e.message += additionalInfo;
+        throw e;
+      }
 
       return angular.copy(propertyRef);
     };
