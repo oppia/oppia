@@ -60,6 +60,8 @@ import subprocess
 import sys
 import time
 
+import docstrings_checker  # pylint: disable=relative-import
+
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -301,7 +303,6 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
-import docstrings_checker  # pylint: disable=relative-import
 import isort  # isort:skip
 import pycodestyle  # isort:skip
 import pyjsparser  # isort:skip
