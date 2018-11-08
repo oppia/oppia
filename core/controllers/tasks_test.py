@@ -14,7 +14,6 @@
 
 """Tests for Tasks Email Handler."""
 from core.domain import exp_domain
-from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
@@ -200,12 +199,12 @@ class TasksTests(test_utils.GenericTestBase):
 
                 #check that user B recieved correct message.
                 expected_message = (
-                        'Hi userB,\nuserA has submitted a new suggestion' 
-                        ' for your Oppia exploration, "Title".\nYou can'
-                        ' accept or reject this suggestion by visiting'
-                        ' the feedback page for your exploration.\n\nTha'
-                        'nks!\n- The Oppia Team\n\nYou can change your'
-                        ' email preferences via the Preferences page.')
+                    'Hi userB,\nuserA has submitted a new suggestion'
+                    ' for your Oppia exploration, "Title".\nYou can'
+                    ' accept or reject this suggestion by visiting'
+                    ' the feedback page for your exploration.\n\nTha'
+                    'nks!\n- The Oppia Team\n\nYou can change your'
+                    ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body.decode(), expected_message)
 
     def test_InstantFeedbackMessageEmailHandler(self):
@@ -224,7 +223,6 @@ class TasksTests(test_utils.GenericTestBase):
             messages = feedback_services.get_messages(thread_id)
             #make sure there are only 2 messages in thread.
             self.assertEqual(len(messages), 2)
-            user_b_message_id = messages[1].message_id
 
             #ensure that user A has no emails sent yet.
             messages = self.mail_stub.get_sent_messages(
@@ -243,14 +241,14 @@ class TasksTests(test_utils.GenericTestBase):
             #ensure that user A has right email sent to them.
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject" on'
-                ' Title:\n- userB: user b message\n(You received' 
+                ' Title:\n- userB: user b message\n(You received'
                 ' this message because you are a participant in'
                 ' this thread.)\n\nBest wishes,\nThe Oppia'
                 ' team\n\nYou can change your email preferences'
-                    ' via the Preferences page.')
+                ' via the Preferences page.')
             self.assertEqual(messages[0].body.decode(), expected_message)
     def test_FeedbackThreadStatusChangeEmailHandler(self):
-        """Tests Feedback Thread Status Change Email Handler"""
+        """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             
             #create thread.
@@ -292,11 +290,13 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(status_change_email.body.decode(), expected_message)
 
     def test_FlagExplorationEmailHandler(self):
-        """Tests Flagged Exploration Email Handler"""
+        """Tests Flagged Exploration Email Handler."""
         def fake_get_user_ids_by_role(some_string):
-            """Replaces get_user_ids_by_role for testing purposes"""
+            some_string
+            """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
-        get_moderator_id_as_list = self.swap(user_services, 'get_user_ids_by_role',
+        get_moderator_id_as_list = self.swap(
+            user_services, 'get_user_ids_by_role',
             fake_get_user_ids_by_role)
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             with get_moderator_id_as_list:
@@ -307,7 +307,6 @@ class TasksTests(test_utils.GenericTestBase):
                     self.user_id_a, 'bad subject', 'bad text')
                 threadlist = feedback_services.get_all_threads(
                     feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
-                thread_id = threadlist[0].id
 
                 #user B reports thread, sends email.
                 payload = {
@@ -338,8 +337,3 @@ class TasksTests(test_utils.GenericTestBase):
                     '.\n\nThanks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body.decode(), expected_message)
-
-
-
-
-
