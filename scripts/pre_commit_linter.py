@@ -1010,6 +1010,7 @@ def _check_docstrings(all_files):
         'the multi-line docstring.')
     failed = False
     is_docstring = False
+    start_of_docstring = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -1021,10 +1022,15 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
+                # Check if it is a docstring and not some multi-line string.
                 if (prev_line.startswith('class ') or
-                        prev_line.startswith('def ')) and (
+                        prev_line.startswith('def ')) or (
+                            start_of_docstring):
+                    start_of_docstring = True
+                    if prev_line.endswith('):') and (
                             line.startswith('"""')):
-                    is_docstring = True
+                        is_docstring = True
+                        start_of_docstring = False
 
                 # Check if single line docstring span two lines.
                 if line == '"""' and prev_line.startswith('"""') and (

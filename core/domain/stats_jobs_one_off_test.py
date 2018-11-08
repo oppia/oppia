@@ -156,8 +156,8 @@ class RegenerateMissingStatsModelsOneOffJobTest(test_utils.GenericTestBase):
         self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
 
     def test_stats_models_regeneration_works(self):
-        """Test that stats models are regenerated with correct v1
-        stats values.
+        """Test that stats models are regenerated with correct v1 stats
+        values.
         """
         job_id = (
             stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob.create_new()) # pylint: disable=line-too-long

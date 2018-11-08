@@ -186,8 +186,8 @@ class BaseSuggestion(object):
                 ' choices, received %s' % self.get_score_type())
 
     def accept(self):
-        """Accepts the suggestion. Each subclass must implement
-        this function.
+        """Accepts the suggestion. Each subclass must implement this
+        function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
