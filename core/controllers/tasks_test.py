@@ -228,7 +228,7 @@ class TasksTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
- 
+
             #invoke InstantFeedbackMessageEmail which sends.
             #InstantFeedbackMessage.
             self.process_and_flush_pending_tasks()
@@ -250,7 +250,7 @@ class TasksTests(test_utils.GenericTestBase):
     def test_FeedbackThreadStatusChangeEmailHandler(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
-            
+
             #create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -291,8 +291,9 @@ class TasksTests(test_utils.GenericTestBase):
 
     def test_FlagExplorationEmailHandler(self):
         """Tests Flagged Exploration Email Handler."""
+
         def fake_get_user_ids_by_role(some_string):
-            some_string
+            somestring = some_string
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
         get_moderator_id_as_list = self.swap(
@@ -305,8 +306,6 @@ class TasksTests(test_utils.GenericTestBase):
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                     self.user_id_a, 'bad subject', 'bad text')
-                threadlist = feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
 
                 #user B reports thread, sends email.
                 payload = {
