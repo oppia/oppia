@@ -16,10 +16,10 @@
 
 """Utility methods for docstring checking."""
 
+import ast
 import os
 import re
 import sys
-import ast
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
@@ -223,64 +223,64 @@ class ASTDocStringChecker(object):
                 args_to_ignore]
 
     @classmethod
-    def parse_arg_list_from_docstring(cls, docstring):
-        """Extracts the arguments from a function definition.
-        NOTE this will fail if the arg does not have a colon after it.
+    def build_regex_from_args(cls, function_args):
+        """Builds a regex string from a function's arguments to match against
+        the docstring. Ensures the docstring contains an 'Args' header, and
+        each of the arguments are listed, followed by a colon, separated by new
+        lines, and are listed in the correct order.
 
         Args:
-            docstring: str. The contents of a docstring.
+            function_args: list(str). The arguments for a function.
 
         Returns:
-            list(str) of the args for a function as listed in the docstring.
+            str. a regex that looks like this: (the backslashes are escaped)
+                (Args:)[\\S\\s]*(arg_name0:)[\\S\\s]*(arg_name1:)
+            If passed an empty list, returns None.
         """
-        if docstring is not None and 'Args:' in docstring:
-            # only keep the docstring contents after 'Args' and before
-            # 'Returns' or 'Raises'.
-            docstring = docstring.split('Args:')[1]
-            docstring = docstring.split('Returns:')[0]
-            docstring = docstring.split('Raises:')[0]
-            ds_arg_lines = docstring.split('\n')
-            # Extract just the arg name from the line describing the arg.
-            # This only finds lines that contain a colon, which should be
-            # between the arg name and its description.
-            ds_arg_lines = [line.split(':')[0].strip() for line in ds_arg_lines
-                            if ':' in line]
-            return ds_arg_lines
-        else:
-            return []
+        if len(function_args) > 0:
+            formatted_args = ['({}:)'.format(arg) for arg in function_args]
+            return r'(Args:)[\S\s]*' + r'[\S\s]*'.join(formatted_args)
 
     @classmethod
-    def compare_arg_order(cls, func_def_args, docstring_args):
+    def compare_arg_order(cls, func_def_args, docstring):
         """Compares the arguments listed in the function definition and
         docstring, and raises errors if there are missing or mis-ordered
         arguments in the docstring.
 
         Args:
             func_def_args: list(str). The args as listed in the function
-            definition.
-
-            docstring_args: list(str). The args as listed in the docstring.
+                definition.
+            docstring: str. The contents of the docstring under the Args
+                header.
 
         Returns:
-            bool, representing whether the function passed linting or failed.
+            list(str. Each str contains an error message. If no linting
+                errors were found, the list will be empty.
         """
         results = []
 
-        # If there are no args listed in the docstring, exit without errors.
-        if len(docstring_args) == 0:
+        # If there is no docstring or it doesn't have an Args section, exit
+        # without errors.
+        if docstring is None or 'Args' not in docstring:
             return results
 
-        for i, arg_name in enumerate(func_def_args):
-            if func_def_args[i] not in docstring_args:
-                results.append('Arg missing from docstring: {}'.format(
-                    arg_name))
-            elif i < len(docstring_args):
-                if func_def_args[i] != docstring_args[i]:
-                    results.append('Arg ordering error in docstring: '
-                                   '{}'.format(arg_name))
-            else:
-                results.append('Arg ordering error in docstring: '
-                               '{}'.format(arg_name))
+        # First check that each arg is in the docstring.
+        for arg_name in func_def_args:
+            arg_name_colon = arg_name + ':'
+            if arg_name_colon not in docstring:
+                if arg_name not in docstring:
+                    results.append('Arg missing from docstring: {}'.format(
+                        arg_name))
+                else:
+                    results.append('Arg not followed by colon: {}'.format(
+                        arg_name))
+        # Only check ordering if there's more than one argument in the
+        # function definition, and no other errors have been found.
+        if len(func_def_args) > 0 and len(results) == 0:
+            regex_pattern = cls.build_regex_from_args(func_def_args)
+            regex_result = re.search(regex_pattern, docstring)
+            if regex_result is None:
+                results.append('Arg ordering error in docstring.')
         return results
 
     @classmethod
@@ -297,6 +297,5 @@ class ASTDocStringChecker(object):
         func_def_args = cls.get_args_list_from_function_definition(
             function_node)
         docstring = ast.get_docstring(function_node)
-        docstring_args = cls.parse_arg_list_from_docstring(docstring)
-        func_result = cls.compare_arg_order(func_def_args, docstring_args)
+        func_result = cls.compare_arg_order(func_def_args, docstring)
         return func_result

@@ -652,7 +652,7 @@ def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
-        html_string. str: HTML string in which the caption attribute is to be
+        html_string: str. HTML string in which the caption attribute is to be
             added.
 
     Returns:
@@ -781,8 +781,8 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        html_string: str. HTML string to modify.
         exp_id: str. Exploration id.
+        html_string: str. HTML string to modify.
 
     Returns:
         str. Updated HTML string with the dimensions for all
