@@ -123,7 +123,7 @@ class TasksTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject"'
-                ' on Title:\n- userB:'+'B'*200 + '...' + ' e\n(You received'
+                ' on Title:\n- userB:' + 'B'*200 + '...' + ' e\n(You received'
                 ' this message because you are a participant in this thread.)'
                 '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
                 ' preferences via the Preferences page.')
@@ -247,6 +247,7 @@ class TasksTests(test_utils.GenericTestBase):
                 ' team\n\nYou can change your email preferences'
                 ' via the Preferences page.')
             self.assertEqual(messages[0].body.decode(), expected_message)
+
     def test_FeedbackThreadStatusChangeEmailHandler(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
