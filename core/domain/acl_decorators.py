@@ -1589,7 +1589,7 @@ def can_delete_question(handler):
     """Decorator to check whether the user can delete a question.
 
     Args:
-        handler. The function to be decorated.
+        handler: The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks
@@ -1721,7 +1721,7 @@ def can_edit_story(handler):
     topic.
 
     Args:
-        handler. The function to be decorated.
+        handler: The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if
@@ -2028,7 +2028,7 @@ def can_delete_topic(handler):
     """Decorator to check whether the user can delete a topic.
 
     Args:
-        handler. The function to be decorated.
+        handler: The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also
@@ -2112,7 +2112,7 @@ def can_access_topics_and_skills_dashboard(handler):
     dashboard.
 
     Args:
-        handler. The function to be decorated.
+        handler: The function to be decorated.
 
     Returns:
         function. The newly decorated function that also checks if
