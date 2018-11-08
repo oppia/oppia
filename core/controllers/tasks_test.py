@@ -287,7 +287,8 @@ class TasksTests(test_utils.GenericTestBase):
                 '.)\n\nBest wishes,\nThe Oppia team\n\nYou can change your'
                 ' email preferences via the Preferences page.')
             status_change_email = messages[0]
-            self.assertEqual(status_change_email.body.decode(), expected_message)
+            self.assertEqual(
+                status_change_email.body.decode(), expected_message)
 
     def test_FlagExplorationEmailHandler(self):
         """Tests Flagged Exploration Email Handler."""
