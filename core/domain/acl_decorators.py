@@ -1419,6 +1419,32 @@ def can_manage_question_skill_status(handler):
     return test_can_manage_question_skill_status
 
 
+def require_user_id(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, NotLoggedInException is raised.
+    """
+
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+        If not, raises NotLoggedInException.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        return handler(self, **kwargs)
+    test_login.__wrapped__ = True
+
+    return test_login
+
+
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
