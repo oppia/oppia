@@ -39,11 +39,11 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     """Tests for dependency loading on user-facing pages."""
 
     def test_no_dependencies_in_non_exploration_pages(self):
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 
-        response = self.testapp.get('/about')
+        response = self.get_html('/about')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 
@@ -65,7 +65,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # However, Skulpt is loaded in the exploration editor anyway, since
         # all dependencies are loaded in the exploration editor.
-        response = self.testapp.get('/create/0')
+        response = self.get_html('/create/0')
         self.assertEqual(response.status_int, 200)
         response.mustcontain('skulpt')
 
@@ -85,7 +85,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.assertNotIn('skulpt', all_dependency_ids)
 
         # Thus, Skulpt is not loaded in the exploration reader.
-        response = self.testapp.get('/explore/%s' % exp_id)
+        response = self.get_html('/explore/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 
@@ -103,6 +103,6 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.assertIn('skulpt', all_dependency_ids)
 
         # Thus, Skulpt is loaded in the exploration reader.
-        response = self.testapp.get('/explore/%s' % exp_id)
+        response = self.get_html('/explore/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         response.mustcontain('skulpt')

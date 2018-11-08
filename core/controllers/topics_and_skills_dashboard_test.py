@@ -51,7 +51,7 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         csrf_token = None
         url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(url_prefix)
+            response = self.get_html(url_prefix)
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
@@ -62,7 +62,8 @@ class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
-            response = self.testapp.get(url, expect_errors=True)
+            response = self.get_html(url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         self.logout()
 
@@ -80,9 +81,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
-                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+            response = self.get_json(
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, expect_errors=True,
+                expected_status_int=401)
+            self.assertEqual(response['status_code'], 401)
             self.logout()
 
             # Check that admins can access the topics and skills dashboard data.

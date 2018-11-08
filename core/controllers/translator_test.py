@@ -67,7 +67,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
 
         self.login(self.TRANSLATOR_EMAIL)
         # Generate CSRF token.
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.get_html('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_transator_can_save_valid_change_list(self):
@@ -160,7 +160,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
             draft_change_list_id=1).put()
 
         # Generate CSRF token.
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.get_html('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_draft_updated_version_valid(self):

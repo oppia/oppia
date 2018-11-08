@@ -53,7 +53,7 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
         csrf_token = None
         url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get('%s/%s' % (url_prefix, self.skill_id))
+            response = self.get_html('%s/%s' % (url_prefix, self.skill_id))
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
@@ -89,14 +89,14 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
-                self.url, expect_errors=True)
+            response = self.get_html(
+                self.url, expect_errors=True, expected_status_int=401)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access and edit in the editor page.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(self.url)
+            response = self.get_html(self.url)
             self.assertEqual(response.status_int, 200)
             self.logout()
 
@@ -104,13 +104,15 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when new strutures' pages are not enabled.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.testapp.get(self.url, expect_errors=True)
+            response = self.get_html(self.url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
 
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(self.url, expect_errors=True)
+            response = self.get_html(self.url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         self.logout()
 
@@ -143,7 +145,8 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
         skill_services_swap = self.swap(
             skill_services, 'get_skill_rights', self._mock_get_skill_rights)
         with skill_services_swap:
-            response = self.testapp.get(self.url, expect_errors=True)
+            response = self.get_html(self.url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         self.logout()
 
@@ -178,12 +181,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when new strutures' pages are not enabled.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.testapp.get(self.url, expect_errors=True)
+            response = self.get_html(self.url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(self.url, expect_errors=True)
+            response = self.get_html(self.url, expect_errors=True,
+                                     expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         self.logout()
 

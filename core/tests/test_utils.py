@@ -482,6 +482,28 @@ tags: []
         """Returns the expected logout URL."""
         return current_user_services.create_logout_url(slug)
 
+    def get_html(self, url, params=None, expect_errors=False,
+                 expected_status_int=200):
+        """Get a HTML response, transformed to a Python object."""
+        html_response = self.testapp.get(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(html_response.status_int, expected_status_int)
+        if not expect_errors:
+            self.assertEqual(html_response.status_int, 200)
+        self.assertEqual(
+            html_response.content_type, 'text/html')
+
+        return html_response
+
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
@@ -635,7 +657,7 @@ tags: []
         # external  calls being made to Gravatar when running the backend
         # tests.
         with self.urlfetch_mock():
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
             response = self.testapp.post(
@@ -656,7 +678,7 @@ tags: []
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminhandler', {
@@ -679,7 +701,7 @@ tags: []
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminrolehandler', {

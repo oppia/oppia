@@ -119,7 +119,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
-            response = self.testapp.get('%s/%s' % (
+            response = self.get_html('%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, self.exploration.id))
             csrf_token = self.get_csrf_token_from_response(response)
             self.put_json('%s/%s' % (
@@ -472,7 +472,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -502,7 +502,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -549,7 +549,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -594,7 +594,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -626,7 +626,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -659,7 +659,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -693,7 +693,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -737,7 +737,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(

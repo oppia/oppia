@@ -78,7 +78,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
             question_dict['id'] = None
@@ -96,7 +96,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
             question_dict['id'] = None
@@ -131,7 +131,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
     def test_post(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             response = self.testapp.post(
                 '%s/%s/%s' % (
@@ -142,7 +142,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             self.post_json(
                 '%s/%s/%s' % (
@@ -158,7 +158,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             self.post_json(
                 '%s/%s/%s' % (
@@ -225,10 +225,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             # Check that non-admin and topic_manager cannot access the editor
             # data.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            response = self.get_html(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                expect_errors=True)
+                expect_errors=True, expected_status_int=401)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
@@ -292,7 +292,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             payload['commit_message'] = 'update question data'
 
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             response_json = self.put_json(
                 '%s/%s' % (
@@ -333,7 +333,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             payload = {}
             new_question_data = self._create_valid_question_data('GHI')
@@ -363,7 +363,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
 
             # Check that the question creator can edit the question.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             payload = {}
             new_question_data = self._create_valid_question_data('GHI')
