@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -56,7 +55,7 @@ class TasksTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
-    def test_UnsentFeedbackEmailHandler(self):
+    def test_email_sent_when_feedback_in_thread(self):
         #create feedback thread.
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
@@ -65,7 +64,6 @@ class TasksTests(test_utils.GenericTestBase):
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
-
 
             #create another message.
             feedback_services.create_message(
@@ -132,12 +130,7 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 2)
             #self.assertEqual(messages[1].body.decode(), expected_message)
 
-
-
-
-
-
-    def test_SuggestionEmailHandler(self):
+    def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
         class FakeActivityRights(object):
             def __init__(
@@ -207,7 +200,7 @@ class TasksTests(test_utils.GenericTestBase):
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body.decode(), expected_message)
 
-    def test_InstantFeedbackMessageEmailHandler(self):
+    def test_instant_feedback_reply_email(self):
         """Tests Instant feedback message handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
@@ -248,7 +241,7 @@ class TasksTests(test_utils.GenericTestBase):
                 ' via the Preferences page.')
             self.assertEqual(messages[0].body.decode(), expected_message)
 
-    def test_FeedbackThreadStatusChangeEmailHandler(self):
+    def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
 
@@ -291,7 +284,7 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status_change_email.body.decode(), expected_message)
 
-    def test_FlagExplorationEmailHandler(self):
+    def test_email_sent_to_moderator_after_flag(self):
         """Tests Flagged Exploration Email Handler."""
 
         def fake_get_user_ids_by_role(_):
