@@ -165,9 +165,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             exploration = exp_services.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
-                    suggestion.state_name].content.html)
+                    suggestion.change.state_name].content.html)
             suggestion_summary = {
-                'suggestion_html': suggestion.suggestion_html,
+                'suggestion_html': suggestion.change.new_value['html'],
                 'current_content_html': current_content_html,
                 'description': suggestion.description,
                 'author_username': authors_settings[0].username,
