@@ -123,7 +123,7 @@ class TasksTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject"'
-                ' on Title:\n- userB:'+'B'*200+'...'+' e\n(You received'
+                ' on Title:\n- userB:'+'B'*200 + '...' + ' e\n(You received'
                 ' this message because you are a participant in this thread.)'
                 '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
                 ' preferences via the Preferences page.')
@@ -262,7 +262,7 @@ class TasksTests(test_utils.GenericTestBase):
             #user B creates message with status change.
             feedback_services.create_message(
                 thread_id, self.user_id_b,
-                feedback_models.STATUS_CHOICES_FIXED, 
+                feedback_models.STATUS_CHOICES_FIXED,
                 None, 'user b message')
 
             #ensure user A has no messages sent to him yet.
@@ -282,8 +282,8 @@ class TasksTests(test_utils.GenericTestBase):
             #check that user A has right email sent to him.
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject" on Title:\n-'
-                ' userB: changed status from open to fixed\n(You received this'
-                ' message because you are a participant in this thread'
+                ' userB: changed status from open to fixed\n(You received'
+                ' this message because you are a participant in this thread'
                 '.)\n\nBest wishes,\nThe Oppia team\n\nYou can change your'
                 ' email preferences via the Preferences page.')
             status_change_email = messages[0]
@@ -292,13 +292,13 @@ class TasksTests(test_utils.GenericTestBase):
     def test_FlagExplorationEmailHandler(self):
         """Tests Flagged Exploration Email Handler."""
 
-        def fake_get_user_ids_by_role(some_string):
-            somestring = some_string
+        def fake_get_user_ids_by_role(_):
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
         get_moderator_id_as_list = self.swap(
             user_services, 'get_user_ids_by_role',
             fake_get_user_ids_by_role)
+
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             with get_moderator_id_as_list:
 
