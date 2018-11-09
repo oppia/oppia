@@ -2333,11 +2333,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-<<<<<<< HEAD
-        topic_name = urllib.unquote(urllib.unquote(topic_name))
-=======
         topic_name = urllib.unquote_plus(topic_name)
->>>>>>> upstream/develop
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:
