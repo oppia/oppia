@@ -45,11 +45,14 @@ oppia.directive('collectionSummaryTile', [
         '/components/summary_tile/' +
         'collection_summary_tile_directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService',
+        '$scope', 'DateTimeFormatService', 'UserService',
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
-            $scope, DateTimeFormatService,
+            $scope, DateTimeFormatService, UserService,
             COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 

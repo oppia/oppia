@@ -36,9 +36,46 @@ oppia.directive('topNavigationBar', [
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
-          if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-            $translate.use(GLOBALS.preferredSiteLanguageCode);
-          }
+          $scope.isModerator = null;
+          $scope.isAdmin = null;
+          $scope.isSuperAdmin = null;
+          $scope.userIsLoggedIn = null;
+          $scope.username = '';
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            if (userInfo.getPreferredSiteLanguageCode()) {
+              $translate.use(userInfo.getPreferredSiteLanguageCode());
+            }
+            $scope.isModerator = userInfo.isModerator();
+            $scope.isAdmin = userInfo.isAdmin();
+            $scope.isSuperAdmin = userInfo.isSuperAdmin();
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            $scope.username = userInfo.getUsername();
+            if ($scope.username) {
+              $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
+                '/profile/<username>', {
+                  username: $scope.username
+                });
+            }
+
+            if ($scope.userIsLoggedIn) {
+              // Show the number of unseen notifications in the navbar and page
+              // title, unless the user is already on the dashboard page.
+              $http.get('/notificationshandler').then(function(response) {
+                var data = response.data;
+                if ($window.location.pathname !== '/') {
+                  $scope.numUnseenNotifications = data.num_unseen_notifications;
+                  if ($scope.numUnseenNotifications > 0) {
+                    $window.document.title = (
+                      '(' + $scope.numUnseenNotifications + ') ' +
+                      $window.document.title);
+                  }
+                }
+              });
+            }
+          });
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            $scope.profilePictureDataUrl = dataUrl;
+          });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
@@ -48,14 +85,6 @@ oppia.directive('topNavigationBar', [
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
-          $scope.username = GLOBALS.username;
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            $scope.profilePictureDataUrl = dataUrl;
-          });
-          $scope.isAdmin = GLOBALS.isAdmin;
-          $scope.isTopicManager = GLOBALS.isTopicManager;
-          $scope.isModerator = GLOBALS.isModerator;
-          $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.ACTION_OPEN = 'open';
           $scope.ACTION_CLOSE = 'close';
@@ -73,12 +102,6 @@ oppia.directive('topNavigationBar', [
               keyCode: 9
             }
           };
-          if ($scope.username) {
-            $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
-              '/profile/<username>', {
-                username: $scope.username
-              });
-          }
           $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
@@ -163,22 +186,6 @@ oppia.directive('topNavigationBar', [
               $scope.$apply();
             }
           });
-
-          if (GLOBALS.userIsLoggedIn) {
-            // Show the number of unseen notifications in the navbar and page
-            // title, unless the user is already on the dashboard page.
-            $http.get('/notificationshandler').then(function(response) {
-              var data = response.data;
-              if ($window.location.pathname !== '/') {
-                $scope.numUnseenNotifications = data.num_unseen_notifications;
-                if ($scope.numUnseenNotifications > 0) {
-                  $window.document.title = (
-                    '(' + $scope.numUnseenNotifications + ') ' +
-                    $window.document.title);
-                }
-              }
-            });
-          }
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
