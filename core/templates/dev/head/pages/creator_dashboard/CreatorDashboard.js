@@ -349,10 +349,10 @@ oppia.controller('CreatorDashboard', [
           canReviewActiveThread: function() {
             return $scope.canReviewActiveThread;
           },
-          stateName: function(){
+          stateName: function() {
             return $scope.activeThread.suggestion.stateName;
           },
-          suggestionType: function(){
+          suggestionType: function() {
             return $scope.activeThread.suggestion.suggestionType;
           }
         },
@@ -364,10 +364,10 @@ oppia.controller('CreatorDashboard', [
               $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
               newContent, canReviewActiveThread, stateName, suggestionType) {
-            var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
-              'accepted.';
-            var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
-              'rejected.';
+            var SUGGESTION_ACCEPTED_MSG = (
+              'This suggestion has already been accepted.');
+            var SUGGESTION_REJECTED_MSG = (
+              'This suggestion has already been rejected.');
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
             var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
@@ -377,7 +377,7 @@ oppia.controller('CreatorDashboard', [
             $scope.canReject = $scope.isNotHandled;
             $scope.canAccept = $scope.isNotHandled;
             if (!$scope.isNotHandled) {
-              if (suggestionStatus === SUGGESTION_ACCEPTED){
+              if (suggestionStatus === SUGGESTION_ACCEPTED) {
                 $scope.errorMessage = SUGGESTION_ACCEPTED_MSG;
                 $scope.isSuggestionRejected = false;
               } else {
@@ -400,7 +400,7 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $scope.showSuggestionEditor = false;
+            $scope.suggestionEditorIsShown = false;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -416,29 +416,32 @@ oppia.controller('CreatorDashboard', [
                 reviewMessage: $scope.reviewMessage
               });
             };
-            $scope.editSuggestion = function(){
-              $scope.showSuggestionEditor = true;
+            $scope.editSuggestion = function() {
+              $scope.suggestionEditorIsShown = true;
             };
             $scope.cancelReview = function() {
               $uibModalInstance.dismiss();
             };
-            $scope.showEditButton = function(){
-              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                !$scope.showSuggestionEditor);
+            $scope.isEditButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                !$scope.suggestionEditorIsShown);
             };
-            $scope.showResubmitButton = function(){
-              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                $scope.showSuggestionEditor);
+            $scope.isResubmitButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                $scope.suggestionEditorIsShown);
             };
-            $scope.disableResubmitButton = function(){
-              return !($scope.summaryMessage &&
+            $scope.isResubmitButtonDisabled = function() {
+              return !(
+                $scope.summaryMessage &&
                 ($scope.suggestionData.newSuggestionHtml.trim() !==
                   newContent.html.trim()));
             };
-            $scope.cancelEditMode = function(){
-              $scope.showSuggestionEditor = false;
+            $scope.cancelEditMode = function() {
+              $scope.suggestionEditorIsShown = false;
             };
-            $scope.resubmitChanges = function(){
+            $scope.resubmitChanges = function() {
               $uibModalInstance.close({
                 action: ACTION_RESUBMIT_SUGGESTION,
                 newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
@@ -451,11 +454,20 @@ oppia.controller('CreatorDashboard', [
           }
         ]
       }).result.then(function(result) {
-        var url, data;
-        if (result.action === 'resubmit' && result.suggestionType ===
-          'edit_exploration_state_content'){
-          url = '/suggestionactionhandler/resubmit/' +
-            $scope.activeThread.suggestion.suggestionId;
+        var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/resubmit/<suggestion_id>');
+        var HANDLE_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
+
+        var url = null;
+        var data = null;
+        if (result.action === 'resubmit' &&
+            result.suggestionType === 'edit_exploration_state_content') {
+          url = UrlInterpolationService.interpolateUrl(
+            RESUBMIT_SUGGESTION_URL_TEMPLATE, {
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
+            }
+          );
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
@@ -470,16 +482,20 @@ oppia.controller('CreatorDashboard', [
             }
           };
         } else {
-          url = '/suggestionactionhandler/' +
-            $scope.activeThread.suggestion.targetType + '/' +
-            $scope.activeThread.suggestion.targetId + '/' +
-            $scope.activeThread.suggestion.suggestionId;
+          url = UrlInterpolationService.interpolateUrl(
+            HANDLE_SUGGESTION_URL_TEMPLATE, {
+              target_type: $scope.activeThread.suggestion.targetType,
+              target_id: $scope.activeThread.suggestion.targetId,
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
+            }
+          );
           data = {
             action: result.action,
             commit_message: result.commitMessage,
             review_message: result.reviewMessage
           };
         }
+
         $http.put(url, data).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {

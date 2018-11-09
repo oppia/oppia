@@ -287,7 +287,9 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
         author_id: str. The ID of the author creating the suggestion.
 
     Raises:
-        Exception: Only rejected suggestions can be resubmitted.
+        Exception: The summary message is empty.
+        Exception: The suggestion has not been handled yet.
+        Exception: The suggestion has already been accepted.
     """
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
@@ -295,8 +297,8 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
         raise Exception('The suggestion is not yet handled.')
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
-            'The suggestion was accepted.'
-            'only rejected suggestions can be resubmitted.')
+            'The suggestion was accepted. '
+            'Only rejected suggestions can be resubmitted.')
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
     _update_suggestion(suggestion)
@@ -531,11 +533,10 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
 
     Args:
         suggestion_id: str. The ID of the suggestion.
-        user_id: str. The ID of the user
+        user_id: str. The ID of the user.
 
     Returns:
-        bool: A boolean indication whether
-            the user can resubmit the suggestion or not.
+        bool: Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
