@@ -193,7 +193,7 @@ class TasksTests(test_utils.GenericTestBase):
                     to=self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
-                # Check that user B recieved correct message.
+                # Check that user B received correct message.
                 expected_message = (
                     'Hi userB,\nuserA has submitted a new suggestion'
                     ' for your Oppia exploration, "Title".\nYou can'
@@ -225,7 +225,7 @@ class TasksTests(test_utils.GenericTestBase):
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            # Invoke InstantFeedbackMessageEmail which sends.
+            # Invoke InstantFeedbackMessageEmail which sends
             # instantFeedbackMessage.
             self.process_and_flush_pending_tasks()
 
