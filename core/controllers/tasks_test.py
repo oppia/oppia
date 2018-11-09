@@ -56,7 +56,7 @@ class TasksTests(test_utils.GenericTestBase):
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
     def test_email_sent_when_feedback_in_thread(self):
-        #create feedback thread.
+        # Create feedback thread.
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -65,25 +65,25 @@ class TasksTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
 
-            #create another message.
+            # Create another message.
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
 
-            #check that there are two messages in thread.
+            # Check that there are two messages in thread.
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
 
-            #telling tasks.py to send email to User 'A'.
+            # Telling tasks.py to send email to User 'A'.
             payload = {
                 'user_id': self.user_id_a}
             taskqueue_services.enqueue_email_task(
                 feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
 
-            #check that there are no feedback emails sent to User 'A'.
+            # Check that there are no feedback emails sent to User 'A'.
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            #send task and subsequent email to User 'A'.
+            # Send task and subsequent email to User 'A'.
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
             expected_message = (
@@ -93,32 +93,34 @@ class TasksTests(test_utils.GenericTestBase):
                 '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
                 ' preferences via the Preferences page.')
 
-            #assert that the message is correct.
+            # Assert that the message is correct.
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].body.decode(), expected_message)
 
-            #create another message that is len = 201.
+            # Create another message that is len = 201.
             user_b_message = 'B' * 201
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, user_b_message)
 
-            #check that there are three messages in thread.
+            # Check that there are three messages in thread.
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 3)
 
-            #telling tasks.py to send email to User 'A'.
+            # Telling tasks.py to send email to User 'A'.
             payload = {
                 'user_id': self.user_id_a}
             taskqueue_services.enqueue_email_task(
                 feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
 
-            #check that there is one feedback email sent to User 'A'.
+            # Check that there is one feedback email sent to User 'A'.
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            #send task and subsequent email to User 'A'.
+            # Send task and subsequent email to User 'A'.
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+
+            # What is expected in the email body.
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject"'
                 ' on Title:\n- userB:' + 'B' * 200 + '...' + ' e\n(You received'
@@ -126,20 +128,20 @@ class TasksTests(test_utils.GenericTestBase):
                 '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
                 ' preferences via the Preferences page.')
 
-            #check that greater than 200 word message is correct.
+            # Check that greater than 200 word message is sent.
             self.assertEqual(len(messages), 2)
-            #self.assertEqual(messages[1].body.decode(), expected_message)
 
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
         class FakeActivityRights(object):
+
             def __init__(
                     self, exploration_id, owner_ids, editor_ids, translator_ids,
                     viewer_ids, community_owned=False, cloned_from=None,
                     status=True, viewable_if_private=False,
                     first_published_msec=None):
-                #user B ID hardcoded into owner_ids to get email_manager.
-                #to send email to user B to test functionality.
+                # User B ID hardcoded into owner_ids to get email_manager
+                # to send email to user B to test functionality.
                 self.id = exploration_id
                 self.getLintToShutUp = owner_ids
                 self.editor_ids = editor_ids
@@ -163,7 +165,7 @@ class TasksTests(test_utils.GenericTestBase):
                     'state_name': 'state_1',
                     'new_value': 'new suggestion content'}
 
-                #create suggestion from user A to user B.
+                # Create suggestion from user A to user B.
                 suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -175,7 +177,7 @@ class TasksTests(test_utils.GenericTestBase):
                     self.exploration.id, True)
                 thread_id = threadlist[0].id
 
-                #enqueue and send suggestion email task.
+                # Enqueue and send suggestion email task.
                 payload = {
                     'exploration_id': self.exploration.id,
                     'thread_id': thread_id}
@@ -185,12 +187,12 @@ class TasksTests(test_utils.GenericTestBase):
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
-                #check that user B recieved message.
+                # Check that user B recieved message.
                 messages = self.mail_stub.get_sent_messages(
                     to=self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
-                #check that user B recieved correct message.
+                # Check that user B recieved correct message.
                 expected_message = (
                     'Hi userB,\nuserA has submitted a new suggestion'
                     ' for your Oppia exploration, "Title".\nYou can'
@@ -209,29 +211,29 @@ class TasksTests(test_utils.GenericTestBase):
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
-            #create reply message.
+            # Create reply message.
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
-            #get all messages in the thread.
+            # Get all messages in the thread.
             messages = feedback_services.get_messages(thread_id)
-            #make sure there are only 2 messages in thread.
+            # Make sure there are only 2 messages in thread.
             self.assertEqual(len(messages), 2)
 
-            #ensure that user A has no emails sent yet.
+            # Ensure that user A has no emails sent yet.
             messages = self.mail_stub.get_sent_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            #invoke InstantFeedbackMessageEmail which sends.
-            #InstantFeedbackMessage.
+            # Invoke InstantFeedbackMessageEmail which sends.
+            # instantFeedbackMessage.
             self.process_and_flush_pending_tasks()
 
-            #ensure that user A has an email sent now.
+            # Ensure that user A has an email sent now.
             messages = self.mail_stub.get_sent_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            #ensure that user A has right email sent to them.
+            # Ensure that user A has right email sent to them.
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject" on'
                 ' Title:\n- userB: user b message\n(You received'
@@ -245,7 +247,7 @@ class TasksTests(test_utils.GenericTestBase):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
 
-            #create thread.
+            # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -253,27 +255,27 @@ class TasksTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
 
-            #user B creates message with status change.
+            # User B creates message with status change.
             feedback_services.create_message(
                 thread_id, self.user_id_b,
                 feedback_models.STATUS_CHOICES_FIXED,
                 None, 'user b message')
 
-            #ensure user A has no messages sent to him yet.
+            # Ensure user A has no messages sent to him yet.
             messages = self.mail_stub.get_sent_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            #invoke feedback status change email handler.
+            # Invoke feedback status change email handler.
             self.process_and_flush_pending_tasks()
 
-            #check that user A has 2 emails sent to him.
-            #1 instant feedback message email and 1 status change.
+            # Check that user A has 2 emails sent to him.
+            # 1 instant feedback message email and 1 status change.
             messages = self.mail_stub.get_sent_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 2)
 
-            #check that user A has right email sent to him.
+            # Check that user A has right email sent to him.
             expected_message = (
                 'Hi userA,\n\nNew update to thread "a subject" on Title:\n-'
                 ' userB: changed status from open to fixed\n(You received'
@@ -297,12 +299,12 @@ class TasksTests(test_utils.GenericTestBase):
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             with get_moderator_id_as_list:
 
-                #create thread.
+                # Create thread.
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                     self.user_id_a, 'bad subject', 'bad text')
 
-                #user B reports thread, sends email.
+                # User B reports thread, sends email.
                 payload = {
                     'exploration_id': self.exploration.id,
                     'report_text': 'He said a bad word :-( ',
@@ -310,20 +312,20 @@ class TasksTests(test_utils.GenericTestBase):
                 taskqueue_services.enqueue_email_task(
                     feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
                     payload, 0)
-                #ensure moderator has no messages sent to him yet.
+                # Ensure moderator has no messages sent to him yet.
                 messages = self.mail_stub.get_sent_messages(
                     to=self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 0)
 
-                #Invoke Flag Exploration Email Handler.
+                # Invoke Flag Exploration Email Handler.
                 self.process_and_flush_pending_tasks()
 
-                #ensure moderator has 1 email now.
+                # Ensure moderator has 1 email now.
                 messages = self.mail_stub.get_sent_messages(
                     to=self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 1)
 
-                #ensure moderator has recieved correct email.
+                # Ensure moderator has recieved correct email.
                 expected_message = (
                     'Hello Moderator,\nuserB has flagged exploration "Title"'
                     ' on the following grounds: \nHe said a bad word :-( '
