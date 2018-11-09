@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Tasks Email Handler."""
+
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
@@ -26,9 +27,8 @@ import feconf
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
-transaction_services = models.Registry.import_transaction_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-
+transaction_services = models.Registry.import_transaction_services()
 
 class TasksTests(test_utils.GenericTestBase):
 
@@ -187,7 +187,7 @@ class TasksTests(test_utils.GenericTestBase):
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
-                # Check that user B recieved message.
+                # Check that user B received message.
                 messages = self.mail_stub.get_sent_messages(
                     to=self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
