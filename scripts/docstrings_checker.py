@@ -174,7 +174,8 @@ def docstringify(docstring):
 
 
 class GoogleDocstring(_check_docs_utils.GoogleDocstring):
-
+    """Class that checks whether docstrings follows Google Python Style Guide
+    or not."""
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
     re_param_line = re.compile(r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
