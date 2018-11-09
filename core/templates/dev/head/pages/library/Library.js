@@ -31,14 +31,14 @@ oppia.controller('Library', [
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
-  'LearnerDashboardIdsBackendApiService',
+  'LearnerDashboardIdsBackendApiService', 'UserService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
       $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
-      LearnerDashboardIdsBackendApiService,
+      LearnerDashboardIdsBackendApiService, UserService,
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
@@ -80,54 +80,57 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
-        $scope.activitiesOwned = {explorations: {}, collections: {}};
-        if ($scope.userIsLoggedIn) {
-          $http.get('/creatordashboardhandler/data')
-            .then(function(response) {
-              $scope.libraryGroups.forEach(function(libraryGroup) {
-                var activitySummaryDicts = libraryGroup.activity_summary_dicts;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          $scope.activitiesOwned = {explorations: {}, collections: {}};
+          if (userInfo.isLoggedIn()) {
+            $http.get('/creatordashboardhandler/data')
+              .then(function(response) {
+                $scope.libraryGroups.forEach(function(libraryGroup) {
+                  var activitySummaryDicts = (
+                    libraryGroup.activity_summary_dicts);
 
-                var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                var ACTIVITY_TYPE_COLLECTION = 'collection';
-                activitySummaryDicts.forEach(function(activitySummaryDict) {
-                  if (activitySummaryDict.activity_type === (
-                    ACTIVITY_TYPE_EXPLORATION)) {
-                    $scope.activitiesOwned.explorations[
-                      activitySummaryDict.id] = false;
-                  } else if (activitySummaryDict.activity_type === (
-                    ACTIVITY_TYPE_COLLECTION)) {
-                    $scope.activitiesOwned.collections[
-                      activitySummaryDict.id] = false;
-                  } else {
-                    $log.error('INVALID ACTIVITY TYPE: Activity' +
-                    '(id: ' + activitySummaryDict.id +
-                    ', name: ' + activitySummaryDict.title +
-                    ', type: ' + activitySummaryDict.activity_type +
-                    ') has an invalid activity type, which could ' +
-                    'not be recorded as an exploration or a collection.');
-                  }
+                  var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                  var ACTIVITY_TYPE_COLLECTION = 'collection';
+                  activitySummaryDicts.forEach(function(activitySummaryDict) {
+                    if (activitySummaryDict.activity_type === (
+                      ACTIVITY_TYPE_EXPLORATION)) {
+                      $scope.activitiesOwned.explorations[
+                        activitySummaryDict.id] = false;
+                    } else if (activitySummaryDict.activity_type === (
+                      ACTIVITY_TYPE_COLLECTION)) {
+                      $scope.activitiesOwned.collections[
+                        activitySummaryDict.id] = false;
+                    } else {
+                      $log.error('INVALID ACTIVITY TYPE: Activity' +
+                      '(id: ' + activitySummaryDict.id +
+                      ', name: ' + activitySummaryDict.title +
+                      ', type: ' + activitySummaryDict.activity_type +
+                      ') has an invalid activity type, which could ' +
+                      'not be recorded as an exploration or a collection.');
+                    }
+                  });
+
+                  response.data.explorations_list
+                    .forEach(function(ownedExplorations) {
+                      $scope.activitiesOwned.explorations[
+                        ownedExplorations.id] = true;
+                    });
+
+                  response.data.collections_list
+                    .forEach(function(ownedCollections) {
+                      $scope.activitiesOwned.collections[
+                        ownedCollections.id] = true;
+                    });
                 });
-
-                response.data.explorations_list
-                  .forEach(function(ownedExplorations) {
-                    $scope.activitiesOwned.explorations[
-                      ownedExplorations.id] = true;
-                  });
-
-                response.data.collections_list
-                  .forEach(function(ownedCollections) {
-                    $scope.activitiesOwned.collections[
-                      ownedCollections.id] = true;
-                  });
+                $rootScope.loadingMessage = '';
               });
-            });
-        }
+          } else {
+            $rootScope.loadingMessage = '';
+          }
+        });
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-        $rootScope.loadingMessage = '';
 
         // Initialize the carousel(s) on the library index page.
         // Pause is necessary to ensure all elements have loaded.
