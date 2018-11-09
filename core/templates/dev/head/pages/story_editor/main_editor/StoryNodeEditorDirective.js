@@ -73,6 +73,7 @@ oppia.directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap([
                 $scope.getId()
               ])[$scope.getId()];
+            $scope.editableTitle = $scope.currentTitle;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -203,6 +204,7 @@ oppia.directive('storyNodeEditor', [
             }
             StoryUpdateService.setStoryNodeOutline(
               $scope.story, $scope.getId(), newOutline);
+            $scope.oldOutline = newOutline;
           };
 
           $scope.$on(EVENT_STORY_INITIALIZED, _init);

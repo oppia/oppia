@@ -31,7 +31,7 @@
         </schema-based-editor>
         <button type="button"
                 class="btn btn-success save-button"
-                ng-disabled="!editableNotes"
+                ng-disabled="!editableNotes || (editableNotes === story.getNotes())"
                 ng-click="updateNotes(editableNotes)">
           Save
         </button>

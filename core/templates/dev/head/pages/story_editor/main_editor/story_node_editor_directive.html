@@ -31,9 +31,14 @@
   </form>
   <div class="node-field">
     <label class="form-heading"> Next Chapters </label>
-    <div ng-repeat="nodeId in getDestinationNodeIds()">
+    <md-card class="destination-node-id"
+             ng-repeat="nodeId in getDestinationNodeIds()"
+             ng-click="viewNodeEditor(nodeId)">
       <[nodeIdToTitleMap[nodeId]]>
-    </div>
+      <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+      </span>
+    </md-card>
     <div style="margin-top: 1em;">
       <label> Add a destination chapter </label>
     </div>
@@ -58,6 +63,7 @@
   }
   story-editor .destination-node-id {
     background-color: #efefef;
+    margin-left: 0;
   }
   story-editor .destination-node-id:hover {
     background-color: #e0e0e0;
