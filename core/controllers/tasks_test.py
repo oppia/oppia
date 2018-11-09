@@ -326,7 +326,7 @@ class TasksTests(test_utils.GenericTestBase):
                     to=self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 1)
 
-                # Ensure moderator has recieved correct email.
+                # Ensure moderator has received correct email.
                 expected_message = (
                     'Hello Moderator,\nuserB has flagged exploration "Title"'
                     ' on the following grounds: \nHe said a bad word :-( '
