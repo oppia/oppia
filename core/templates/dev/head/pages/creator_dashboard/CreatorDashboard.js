@@ -419,7 +419,7 @@ oppia.controller('CreatorDashboard', [
             $scope.editSuggestion = function() {
               $scope.suggestionEditorIsShown = true;
             };
-            $scope.cancelReview = function() {
+            $scope.cancel = function() {
               $uibModalInstance.dismiss();
             };
             $scope.isEditButtonShown = function() {

@@ -36,9 +36,9 @@
   <div ng-show="errorMessage && !isResubmitButtonShown()" class="oppia-suggestion-review-error">
     <[ errorMessage ]>
   </div>
-  <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-info" ng-if="isEditButtonShown()" ng-click="editSuggestion()">Edit</button>
-  <button class="btn btn-primary" ng-disabled="isResubmitButtonDisabled()" ng-if="isResubmitButtonShown()" ng-click="resubmitChanges()">Submit Changes</button>
+  <button class="btn btn-primary" ng-if="isResubmitButtonShown()" ng-disabled="isResubmitButtonDisabled()" ng-click="resubmitChanges()">Submit Changes</button>
   <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
 </div>
