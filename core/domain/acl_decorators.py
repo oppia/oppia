@@ -1859,7 +1859,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 def can_access_story_viewer_page(handler):
     """Decorator to check whether user can access story viewer page."""
 
-    def test_can_access(self, story_id, **kwargs):
+    def test_can_access(self, topic_name, story_id, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
@@ -1873,8 +1873,10 @@ def can_access_story_viewer_page(handler):
 
         if story is None:
             raise self.PageNotFoundException
+        
+        
 
-        return handler(self, story_id, **kwargs)
+        return handler(self, topic_name, story_id, **kwargs)
 
     test_can_access.__wrapped__ = True
 

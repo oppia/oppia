@@ -18,6 +18,8 @@ from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -36,6 +38,8 @@ class BaseStoryViewerControllerTest(test_utils.GenericTestBase):
 
         self.story_id = 'story'
         self.unsaved_story_id = 'story1'
+        self.topic_id = 'topic'
+        self.topic_name = 'topic_name'
 
         self.story = story_domain.Story.create_default_story(
             self.story_id, 'story_title')
@@ -98,21 +102,30 @@ class BaseStoryViewerControllerTest(test_utils.GenericTestBase):
         story_domain.Story.create_default_story(
             self.unsaved_story_id, 'story_title')
 
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, self.topic_name)
+        topic.canonical_story_ids.append(self.story_id)
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+
 
 class StoryViewerPage(BaseStoryViewerControllerTest):
 
     def test_any_user_can_access_story_viewer_page(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.story_id))
+                '%s/%s/%s' % (
+                    feconf.STORY_VIEWER_URL_PREFIX,
+                    self.topic_name, self.story_id))
 
             self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unsaved_story_viewer_page(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s' % (
-                    feconf.STORY_VIEWER_URL_PREFIX, self.unsaved_story_id),
+                '%s/%s/%s' % (
+                    feconf.STORY_VIEWER_URL_PREFIX,
+                    self.topic_name, self.unsaved_story_id),
                 expect_errors=True)
 
             self.assertEqual(response.status_int, 404)
@@ -123,7 +136,8 @@ class StoryPageDataHandler(BaseStoryViewerControllerTest):
     def test_get(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.STORY_DATA_HANDLER, self.story_id))
+                '%s/%s/%s' % (
+                    feconf.STORY_DATA_HANDLER, 'topic_name', self.story_id))
             expected_dict = (
                 summary_services.get_learner_story_dict_by_id(self.story_id))
 
