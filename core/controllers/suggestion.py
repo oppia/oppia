@@ -152,7 +152,7 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):

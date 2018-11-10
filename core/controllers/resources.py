@@ -14,6 +14,7 @@
 
 """Controllers for Oppia resources (templates, images)."""
 
+import feconf
 import logging
 import urllib
 
@@ -27,7 +28,7 @@ from core.domain import value_generators_domain
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, generator_id):
@@ -49,7 +50,7 @@ class ImageDevHandler(base.BaseHandler):
 
     _IMAGE_PATH_PREFIX = 'image'
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, exploration_id, encoded_filename):
@@ -89,7 +90,7 @@ class AudioDevHandler(base.BaseHandler):
     """
 
     _AUDIO_PATH_PREFIX = 'audio'
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, exploration_id, encoded_filename):

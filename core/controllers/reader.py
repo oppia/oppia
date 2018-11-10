@@ -313,7 +313,7 @@ class ExplorationHandler(base.BaseHandler):
 class PretestHandler(base.BaseHandler):
     """Provides subsequent pretest questions after initial batch."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):

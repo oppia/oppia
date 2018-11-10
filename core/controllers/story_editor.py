@@ -59,7 +59,7 @@ class StoryEditorPage(base.BaseHandler):
 class EditableStoryDataHandler(base.BaseHandler):
     """A data handler for stories which support writing."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _require_valid_version(self, version_from_payload, story_version):
         """Check that the payload version matches the given story
