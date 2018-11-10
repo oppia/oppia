@@ -991,11 +991,11 @@ def _check_comments(all_files):
                     print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
                 if not line.startswith('# coding:') and not (
-                    line.startswith('# pylint:')):
+                        line.startswith('# pylint:')):
                     # Check that comment starts with a capital letter.
                     if line.startswith('#') and len(line) > 2 and not (
-                        previous_line.startswith('#')) and (
-                        line[2] != line[2].upper()):
+                            previous_line.startswith('#')) and (
+                            line[2] != line[2].upper()):
                         message = (
                             'There should be a capital letter'
                             ' to begin the content of the comment.')
