@@ -947,7 +947,7 @@ def _check_import_order(all_files):
 
 
 def _check_comments(all_files):
-    """This function ensures that comments end in a period."""
+    """This function ensures that comments follow correct style."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -964,8 +964,11 @@ def _check_comments(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 next_line = ''
+                previous_line = ''
                 if line_num + 1 < file_length:
                     next_line = file_content[line_num + 1].lstrip().rstrip()
+                if -1 < line_num - 1 < file_length:
+                    previous_line = file_content[line_num - 1].lstrip().rstrip()
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
@@ -979,6 +982,26 @@ def _check_comments(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
 
+                # Check that comment starts with a space.
+                if line.startswith('#') and len(line) > 1 and line[1] != ' ':
+                    message = (
+                        'There should be a space at the beginning '
+                        'of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
+                if not line.startswith('# coding:') and not (
+                        line.startswith('# pylint:')):
+                    # Check that comment starts with a capital letter.
+                    if line.startswith('#') and len(line) > 2 and not (
+                            previous_line.startswith('#')) and (
+                                line[2] != line[2].upper()):
+                        message = (
+                            'There should be a capital letter'
+                            ' to begin the content of the comment.')
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
