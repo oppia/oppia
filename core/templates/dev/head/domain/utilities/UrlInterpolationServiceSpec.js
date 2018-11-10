@@ -279,9 +279,12 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should interpolate URLs not requiring parameters', function() {
-    expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
-    expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
-    expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
+    expect(uis.getStoryUrl('/storyId', '/topicName', {}))
+      .toBe('/story/topicName/storyId');
+    expect(uis.getStoryUrl('/storyId123', '/topicName123', {}))
+      .toBe('/story/topicName123/storyId123');
+    expect(uis.getStoryUrl('/story&Id', '/topicName&123', {}))
+      .toBe('/story/topicName&123/story&Id');
     expect(function(){
       uis.getStoryUrl('', {});
     }).toThrowError('Empty path passed in method.');
