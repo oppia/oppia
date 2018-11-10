@@ -55,11 +55,18 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
 
+    Args:
+        obj: *. The object to validate and normalize.
+        schema: dict(str, *). The schema to validate and normalize the value
+            against.
+        apply_custom_validators: bool. Whether to validate the normalized
+             object using the validators defined in the schema.
+
     Returns:
-        the normalized object.
+        *. The normalized object.
 
     Raises:
-        AssertionError: if the object fails to validate against the schema.
+        AssertionError: The object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -169,6 +176,20 @@ class Normalizers(object):
 
     @classmethod
     def get(cls, normalizer_id):
+        """Returns the normalizer method corresponding to the specified
+        normalizer_id.
+
+        Args:
+            normalizer_id: str. The name of the normalizer method that should be
+                retrieved.
+
+        Returns:
+            function. The normalizer method corresponding to the given
+                normalizer_id.
+
+        Raises:
+            Exception: The normalizer_id is not valid.
+        """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
@@ -221,6 +242,17 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
+        """Returns the validator method corresponding to the specified
+        validator_id.
+
+        Args:
+            validator_id: str. The name of the validator method that should be
+                retrieved.
+
+        Returns:
+            function. The validator method corresponding to the specified
+                validator_id.
+        """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
