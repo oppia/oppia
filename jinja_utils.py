@@ -53,6 +53,14 @@ JINJA_FILTERS = {
 
 
 def get_jinja_env(dir_path):
+    """Creates a template environment with the default settings and a loader.
+
+    Args:
+        dir_path: str. path of folder where loader looks up the templates.
+
+    Returns:
+        obj. template environment.
+    """
     loader = jinja2.FileSystemLoader(os.path.join(
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
