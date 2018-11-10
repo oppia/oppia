@@ -14,7 +14,6 @@
 
 """Controllers for Oppia resources (templates, images)."""
 
-import feconf
 import logging
 import urllib
 
@@ -22,6 +21,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+import feconf
 
 
 class ValueGeneratorHandler(base.BaseHandler):
