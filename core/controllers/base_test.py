@@ -17,7 +17,6 @@
 """Tests for generic controller behavior."""
 
 import datetime
-import importlib
 import inspect
 import json
 import os
@@ -302,6 +301,33 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
         self.assertNotIn('<script>', response.body)
         self.assertNotIn('马', response.body)
+
+
+class RenderDownloadableTest(test_utils.GenericTestBase):
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler that subclasses BaseHandler and serves a response
+        that is of a 'downloadable' type.
+        """
+        def get(self):
+            """Handles GET requests."""
+            text = 'example'
+            self.render_downloadable_file(text, 'example.pdf', 'text/plain')
+
+    def setUp(self):
+        super(RenderDownloadableTest, self).setUp()
+
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_downloadable(self):
+        response = self.testapp.get('/mock')
+        self.assertEqual(response.status_int, 200)
+        self.assertTrue(response.content_disposition.startswith('attachment'))
+        self.assertEqual(response.body, 'example')
 
 
 class LogoutPageTest(test_utils.GenericTestBase):
@@ -601,58 +627,62 @@ class ControllerClassNameTest(test_utils.GenericTestBase):
 
     def test_controller_class_names(self):
         """This function checks that all controller class names end with
-        either 'Handler' or 'Page'.
+        either 'Handler', 'Page' or 'FileDownloader'.
         """
+        allowed_handler_error_return_type = [feconf.HANDLER_TYPE_JSON,
+                                             feconf.HANDLER_TYPE_HTML,
+                                             feconf.HANDLER_TYPE_DOWNLOADABLE]
+        # A mapping of returned handler types to expected name endings.
+        handler_type_to_name_endings_dict = {
+            feconf.HANDLER_TYPE_HTML: 'Page',
+            feconf.HANDLER_TYPE_JSON: 'Handler',
+            feconf.HANDLER_TYPE_DOWNLOADABLE: 'FileDownloader',
+        }
         for url in main.URLS:
-            if not isinstance(url, tuple):
-                handler = str(url.handler)[8:-2].rsplit('.', 1)[1]
-                class_path = str(url.handler)[8:-2].rsplit('.', 1)[0]
-                file_name = class_path.replace('.', '/') + ".py"
-                module = importlib.import_module(class_path)
-                clazz = getattr(module, handler)
-                all_base_classes = [base_class.__name__ for base_class in
-                                    (inspect.getmro(clazz))]
-                if 'BaseHandler' in all_base_classes:
-                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
-                    # Check that the name of the class ends with 'Handler'
-                    # if it renders JSON.
-                    if class_return_type == 'json' or (
-                            not 'get' in clazz.__dict__.keys()):
-                        message = (
-                            'Please ensure that the name of this class '
-                            'ends with \'Handler\'')
-                        error_message = (
-                            '%s --> Line %s: %s'
-                            % (file_name, inspect.getsourcelines(clazz)[-1],
-                               message))
-                        self.assertTrue(handler.endswith('Handler'),
-                                        msg=error_message)
+            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(url, tuple):
+                continue
+            else:
+                clazz = url.handler
+            all_base_classes = [base_class.__name__ for base_class in
+                                (inspect.getmro(clazz))]
+            # Check that it is a subclass of 'BaseHandler'.
+            if 'BaseHandler' in all_base_classes:
+                class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                # Check that any class with a get handler has a
+                # GET_HANDLER_ERROR_RETURN_TYPE that's one of
+                # the allowed values.
+                if 'get' in clazz.__dict__.keys():
+                    self.assertIn(
+                        class_return_type,
+                        allowed_handler_error_return_type)
+                class_name = clazz.__name__
+                file_name = inspect.getfile(clazz)
+                line_num = inspect.getsourcelines(clazz)[1]
+                allowed_class_ending = handler_type_to_name_endings_dict[
+                    class_return_type]
+                # Check that the name of the class ends with
+                # the proper word if it has a get function.
+                if 'get' in clazz.__dict__.keys():
+                    message = (
+                        'Please ensure that the name of this class '
+                        'ends with \'%s\'' % allowed_class_ending)
+                    error_message = (
+                        '%s --> Line %s: %s'
+                        % (file_name, line_num, message))
+                    self.assertTrue(
+                        class_name.endswith(allowed_class_ending),
+                        msg=error_message)
 
-                    # Check that the name of the class ends with 'Page' if
-                    # it has a get function that renders a HTML page.
-                    elif class_return_type == 'html' and (
-                            'get' in clazz.__dict__.keys()):
-                        message = (
-                            'Please ensure that the name of this class '
-                            'ends with \'Page\'')
-                        error_message = (
-                            '%s --> Line %s: %s'
-                            % (file_name, inspect.getsourcelines(clazz)[-1],
-                               message))
-                        self.assertTrue(handler.endswith('Page'),
-                                        msg=error_message)
-
-                    # Check that the name of the class ends with
-                    # 'FileDownloader' if it has a get function
-                    # that prepares downloadable content.
-                    elif class_return_type == 'downloadable' and (
-                            'get' in clazz.__dict__.keys()):
-                        message = (
-                            'Please ensure that the name of this class '
-                            'ends with \'FileDownloader\'')
-                        error_message = (
-                            '%s --> Line %s: %s'
-                            % (file_name, inspect.getsourcelines(clazz)[-1],
-                               message))
-                        self.assertTrue(handler.endswith('FileDownloader'),
-                                        msg=error_message)
+                # Check that the name of the class ends with 'Handler'
+                # if it does not has a get function.
+                else:
+                    message = (
+                        'Please ensure that the name of this class '
+                        'ends with \'Handler\'')
+                    error_message = (
+                        '%s --> Line %s: %s'
+                        % (file_name, line_num, message))
+                    self.assertTrue(class_name.endswith('Handler'),
+                                    msg=error_message)

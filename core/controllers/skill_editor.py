@@ -94,7 +94,7 @@ def check_can_edit_skill_description(user):
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
@@ -123,7 +123,7 @@ class SkillRightsHandler(base.BaseHandler):
 class EditableSkillDataHandler(base.BaseHandler):
     """A data handler for skills which supports writing."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):

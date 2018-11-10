@@ -46,7 +46,7 @@ class TopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
     """
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):

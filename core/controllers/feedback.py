@@ -64,7 +64,7 @@ class ThreadListHandler(base.BaseHandler):
 class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):

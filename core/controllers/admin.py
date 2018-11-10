@@ -321,21 +321,22 @@ class AdminJobOutputHandler(base.BaseHandler):
         })
 
 
-class AdminTopicsCsvDownloadFileDownloader(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'downloadable'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
 
     @acl_decorators.can_access_admin_page
     def get(self):
         self.render_downloadable_file(
-            recommendations_services.get_topic_similarities_as_csv())
+            recommendations_services.get_topic_similarities_as_csv(),
+            'topic_similarities.csv', 'text/csv')
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
     """Handler for data extraction query."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):

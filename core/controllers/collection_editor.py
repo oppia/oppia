@@ -75,7 +75,7 @@ class CollectionEditorPage(CollectionEditorHandler):
 class EditableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _require_valid_version(self, version_from_payload, collection_version):
         """Check that the payload version matches the given collection
@@ -143,7 +143,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
@@ -238,7 +238,7 @@ class CollectionUnpublishHandler(base.BaseHandler):
 class ExplorationMetadataSearchHandler(base.BaseHandler):
     """Provides data for exploration search."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):

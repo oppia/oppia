@@ -193,7 +193,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
-        admin.AdminTopicsCsvDownloadFileDownloader),
+        admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
         r'/notifications_dashboard',
@@ -300,14 +300,10 @@ URLS = MAPREDUCE_HANDLERS + [
         library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
-    get_redirect_route(
-        r'/gallery', library.LibraryRedirectPage),
-    get_redirect_route(
-        r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(
-        r'/learn', library.LibraryRedirectPage),
-    get_redirect_route(
-        r'/playtest', library.LibraryRedirectPage),
+    get_redirect_route(r'/gallery', library.LibraryRedirectPage),
+    get_redirect_route(r'/contribute', library.LibraryRedirectPage),
+    get_redirect_route(r'/learn', library.LibraryRedirectPage),
+    get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
@@ -315,12 +311,10 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    get_redirect_route(
-        r'/profile/<username>', profile.ProfilePage),
+    get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(
-        r'/preferences', profile.PreferencesPage),
+    get_redirect_route(r'/preferences', profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -328,17 +322,14 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/preferenceshandler/profile_picture_by_username/<username>',
         profile.ProfilePictureHandlerByUsernameHandler),
-    get_redirect_route(
-        r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
-    get_redirect_route(
-        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
+    get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
+    get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
 
-    get_redirect_route(
-        r'/moderator', moderator.ModeratorPage),
+    get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -413,7 +404,7 @@ URLS = MAPREDUCE_HANDLERS + [
         translator.ExplorationTranslationHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
-        editor.ExplorationDownloadHandler),
+        editor.ExplorationFileDownloader),
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
@@ -643,17 +634,13 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
         not current_user_services.is_current_user_super_admin()):
     # Show only the maintenance mode page.
     URLS_TO_SERVE = [
-        get_redirect_route(
-            r'%s' % feconf.ADMIN_URL, admin.AdminPage),
-        get_redirect_route(
-            r'/adminhandler', admin.AdminHandler),
-        get_redirect_route(
-            r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(
-            r'/adminjoboutput', admin.AdminJobOutputHandler),
+        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+        get_redirect_route(r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvDownloadFileDownloader),
+            admin.AdminTopicsCsvFileDownloader),
         get_redirect_route(
             r'/<:.*>', pages.MaintenancePage)]
 else:
