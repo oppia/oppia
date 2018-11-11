@@ -238,7 +238,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(story_rights.story_is_published)
         with self.assertRaisesRegexp(
             Exception,
-            'Story node with exploration id exp_id isn\'t published.'):
+            'Exploration id exp_id isn\'t published.'):
             story_services.publish_story('private_story', self.user_id_admin)
 
     def test_publish_and_unpublish_story(self):

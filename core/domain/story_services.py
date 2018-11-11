@@ -661,7 +661,8 @@ def publish_story(story_id, committer_id):
             node.exploration_id, strict=False)
         if exploration_rights.is_private():
             raise Exception(
-                'Exploration with id %s isn\'t published.' % node.exploration_id)
+                'Exploration with id %s isn\'t published.'
+                % node.exploration_id)
 
     story = get_story_by_id(story_id, strict=False)
     for node in story.story_contents.nodes:
