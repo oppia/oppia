@@ -18,10 +18,12 @@
 
 oppia.controller('Fractions', [
   '$scope', '$timeout', '$window',
-  'siteAnalyticsService', 'UrlInterpolationService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function($scope, $timeout, $window,
-      siteAnalyticsService, UrlInterpolationService) {
+      SiteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+    $scope.getStaticVideoUrl = UrlInterpolationService.getStaticVideoUrl;
 
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
@@ -29,7 +31,7 @@ oppia.controller('Fractions', [
     };
 
     $scope.onClickGetStartedButton = function(viewerType) {
-      siteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
+      SiteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
         viewerType);
       $timeout(function() {
         $window.location = '/collection/4UgTQUc1tala';
@@ -39,6 +41,12 @@ oppia.controller('Fractions', [
     $scope.onClickLearnMoreButton = function() {
       $timeout(function() {
         $window.location = '/splash';
+      }, 150);
+    };
+
+    $scope.onClickExploreLessonsButton = function() {
+      $timeout(function() {
+        $window.location = '/library';
       }, 150);
     };
   }

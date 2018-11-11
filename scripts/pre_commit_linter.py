@@ -92,6 +92,14 @@ BAD_PATTERNS = {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': (),
         'excluded_dirs': ()},
+    '<<<<<<<': {
+        'message': 'Please fully resolve existing merge conflicts.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    '>>>>>>>': {
+        'message': 'Please fully resolve existing merge conflicts.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
@@ -102,44 +110,44 @@ BAD_PATTERNS = {
 BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
-        'message': "In tests, please do not use browser.explore().",
+        'message': 'In tests, please do not use browser.explore().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.pause)\(',
-        'message': "In tests, please do not use browser.pause().",
+        'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.sleep)\(',
-        'message': "In tests, please do not use browser.sleep().",
+        'message': 'In tests, please do not use browser.sleep().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.waitForAngular)\(',
-        'message': "In tests, please do not use browser.waitForAngular().",
+        'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(ddescribe|fdescribe)\(',
-        'message': "In tests, please use 'describe' instead of 'ddescribe'"
-                   "or 'fdescribe'",
+        'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
+                   'or \'fdescribe\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(iit|fit)\(',
-        'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
+        'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'templateUrl: \'',
-        'message': "The directives must be directly referenced.",
+        'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
             'FeedbackPopupDirective.js'
@@ -153,9 +161,9 @@ BAD_PATTERNS_JS_REGEXP = [
     },
     {
         'regexp': r'\$parent',
-        'message': "Please do not access parent properties " +
-                   "using $parent. Use the scope object" +
-                   "for this purpose.",
+        'message': 'Please do not access parent properties ' +
+                   'using $parent. Use the scope object' +
+                   'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -164,7 +172,7 @@ BAD_PATTERNS_JS_REGEXP = [
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
-        'message': "The directives must be directly referenced.",
+        'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
             'feedback_popup_container_directive.html',
@@ -179,7 +187,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     },
     {
         'regexp': r'[ \t]+$',
-        'message': "There should not be any trailing whitespaces.",
+        'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -188,26 +196,35 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': r'print ',
-        'message': "Please do not use print statement.",
+        'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
             'core/tests/performance_framework/perf_domain.py'),
         'excluded_dirs': ('scripts/',)
     },
     {
+        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'message': 'Please remove pylint exculsion if it is unnecessary or '
+                   'make it human readable with a sentence instead of an id. '
+                   'The id to message list can be seen '
+                   'here->http://pylint-messages.wikidot.com/all-codes',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'self.assertEquals\(',
-        'message': "Please do not use self.assertEquals method. " +
-                   "This method has been deprecated. Instead use " +
-                   "self.assertEqual method.",
+        'message': 'Please do not use self.assertEquals method. ' +
+                   'This method has been deprecated. Instead use ' +
+                   'self.assertEqual method.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
 
-REQUIRED_STRINGS_FECONF = {
-    'FORCE_PROD_MODE = False': {
-        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
-                   'to False before committing.',
+REQUIRED_STRINGS_CONSTANTS = {
+    'DEV_MODE: true': {
+        'message': 'Please set the DEV_MODE variable in constants.js'
+                   'to true before committing.',
         'excluded_files': ()
     }
 }
@@ -221,7 +238,7 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+    'assets/scripts/*', 'core/tests/data/*', '*.mp3', '*.mp4')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -267,6 +284,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
@@ -387,6 +405,7 @@ def _lint_css_files(
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -401,10 +420,13 @@ def _lint_css_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             print linter_stdout
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -436,6 +458,7 @@ def _lint_js_files(
 
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
@@ -450,9 +473,12 @@ def _lint_js_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -499,7 +525,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         pylinter = lint.Run(
             current_files_to_lint + [config_pylint],
             exit=False).linter
-
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
         pycodestyle_report = style_guide.check_files(
@@ -712,6 +737,7 @@ def _pre_commit_linter(all_files):
 
     print ''
     print '\n'.join(js_messages)
+    print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
     summary_messages.append(css_in_html_result.get())
@@ -857,13 +883,13 @@ def _check_bad_patterns(all_files):
                         failed = True
                         total_error_count += 1
 
-            if filename == 'feconf.py':
-                for pattern in REQUIRED_STRINGS_FECONF:
+            if filename == 'constants.js':
+                for pattern in REQUIRED_STRINGS_CONSTANTS:
                     if pattern not in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            REQUIRED_STRINGS_FECONF[pattern]['message'])
+                            REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
@@ -876,7 +902,7 @@ def _check_bad_patterns(all_files):
     print '----------------------------------------'
     print ''
     if total_files_checked == 0:
-        print "There are no files to be checked."
+        print 'There are no files to be checked.'
     else:
         print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
@@ -1018,6 +1044,9 @@ def _check_docstrings(all_files):
 
                 # Check for multiline docstring.
                 elif line.endswith('"""'):
+                    # Ignore regular expression, i.e. lines end with r""".
+                    if line.endswith('r"""'):
+                        continue
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
@@ -1275,7 +1304,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
             stringfied_dependencies, function_parameters = matched_pattern
             stringfied_dependencies = (
                 stringfied_dependencies.strip().replace(
-                    "'", '').replace(' ', ''))[:-1]
+                    '\'', '').replace(' ', ''))[:-1]
             function_parameters = function_parameters.strip().replace(' ', '')
             if stringfied_dependencies != function_parameters:
                 failed = True
@@ -1551,6 +1580,9 @@ def _check_for_copyright_notice(all_files):
 
 
 def main():
+    """Main method for pre commit linter script that lints Python and JavaScript
+    files.
+    """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (
@@ -1572,8 +1604,7 @@ def main():
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        linter_messages + pattern_messages +
-        copyright_notice_messages)
+        linter_messages + pattern_messages + copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

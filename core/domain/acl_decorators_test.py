@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -450,52 +450,47 @@ class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id,
-                    expect_errors=True, expected_status_int=401)
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id,
-                    expect_errors=True, expected_status_int=401)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id,
+                expect_errors=True, expected_status_int=401)
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id,
+                expect_errors=True, expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(
-                self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
-                feconf.HANDLER_TYPE_HTML):
-                response = self.mock_testapp.get(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id,
-                    expect_errors=True)
-                self.assertEqual(response.status_int, 302)
-                response = self.mock_testapp.get(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id,
-                    expect_errors=True)
-                self.assertEqual(response.status_int, 302)
+        with self.swap(
+            self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
+            feconf.HANDLER_TYPE_HTML):
+            response = self.mock_testapp.get(
+                '/mock/exploration.%s.thread1' % self.private_exp_id,
+                expect_errors=True)
+            self.assertEqual(response.status_int, 302)
+            response = self.mock_testapp.get(
+                '/mock/exploration.%s.thread1' % self.published_exp_id,
+                expect_errors=True)
+            self.assertEqual(response.status_int, 302)
 
     def test_owner_can_comment_on_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id)
+        self.logout()
 
     def test_moderator_can_comment_on_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
+        self.logout()
 
     def test_admin_can_comment_on_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
-            self.logout()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.private_exp_id)
+        self.logout()
 
 
 class CreateFeedbackThreadTest(test_utils.GenericTestBase):
@@ -588,33 +583,27 @@ class ViewFeedbackThreadTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
 
     def test_owner_cannot_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/exploration.%s.thread1' % self.private_exp_id)
         self.logout()
 
     def test_moderator_can_view_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.published_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1' % self.published_exp_id)
         self.logout()
 
     def test_admin_can_view_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
-                self.get_json(
-                    '/mock/exploration.%s.thread1' % self.private_exp_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/exploration.%s.thread1' % self.private_exp_id)
         self.logout()
 
 
@@ -1238,6 +1227,74 @@ class SuggestChangesDecoratorsTest(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock', expected_status_int=200)
+        self.logout()
+
+
+class ResubmitSuggestionDecoratorsTest(test_utils.GenericTestBase):
+    """Tests for can_resubmit_suggestion decorator."""
+    owner_username = 'owner'
+    owner_email = 'owner@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+    TARGET_TYPE = 'exploration'
+    SUGGESTION_TYPE = 'edit_exploration_state_content'
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
+        'cmd': 'edit_state_property',
+        'property_name': 'content',
+        'state_name': 'Introduction',
+        'new_value': ''
+    }
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_resubmit_suggestion
+        def get(self, suggestion_id):
+            self.render_json({'suggestion_id': suggestion_id})
+
+    def setUp(self):
+        super(ResubmitSuggestionDecoratorsTest, self).setUp()
+        self.signup(self.author_email, self.author_username)
+        self.signup(self.user_email, self.username)
+        self.signup(self.owner_email, self.owner_username)
+        self.author_id = self.get_user_id_from_email(self.author_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_default_exploration(self.exploration_id, self.owner_id)
+        suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.change_dict, '', None)
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[0]
+        self.suggestion_id = suggestion.suggestion_id
+
+
+    def test_author_can_resubmit_suggestion(self):
+        self.login(self.author_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.suggestion_id, expect_errors=False,
+                expected_status_int=200)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_non_author_cannot_resubmit_suggestion(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.suggestion_id, expect_errors=True,
+                expected_status_int=401)
         self.logout()
 
 

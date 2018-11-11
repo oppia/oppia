@@ -27,13 +27,14 @@ oppia.directive('editorNavigation', [
         '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationRightsService', 'ExplorationWarningsService',
         'RouterService', 'StateEditorTutorialFirstTimeService',
-        'siteAnalyticsService', 'ThreadDataService', 'WindowDimensionsService',
-
+        'SiteAnalyticsService', 'ThreadDataService', 'UserService',
+        'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
             ExplorationRightsService, ExplorationWarningsService,
             RouterService, StateEditorTutorialFirstTimeService,
-            siteAnalyticsService, ThreadDataService, WindowDimensionsService) {
+            SiteAnalyticsService, ThreadDataService, UserService,
+            WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -52,11 +53,14 @@ oppia.directive('editorNavigation', [
             }
           });
 
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
-            siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+            SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -64,22 +68,22 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
-                'siteAnalyticsService', 'ContextService',
+                'SiteAnalyticsService', 'ContextService',
                 function(
                     $scope, $uibModalInstance,
-                    siteAnalyticsService, ContextService) {
+                    SiteAnalyticsService, ContextService) {
                   var explorationId = (
                     ContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
-                    siteAnalyticsService
+                    SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
                     $uibModalInstance.close();
                   };
 
                   $scope.goToHelpCenter = function() {
-                    siteAnalyticsService.registerVisitHelpCenterEvent(
+                    SiteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
                     $uibModalInstance.dismiss('cancel');
                   };

@@ -285,6 +285,10 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
+            var currentCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento(stateName);
+            $scope.answerChoices = StateEditorService.getAnswerChoices(
+              $scope.stateInteractionId, currentCustomizationArgs);
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 

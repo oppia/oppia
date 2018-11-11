@@ -14,6 +14,7 @@
 
 """Services for questions data model."""
 
+import copy
 import logging
 
 from core.domain import question_domain
@@ -23,6 +24,41 @@ import feconf
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
+
+
+def _migrate_state_schema(versioned_question_state):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the state structure based on the schema version of the input
+    state dictionary. If the current State schema changes, a new
+    conversion function must be added and some code appended to this function
+    to account for that new version.
+
+    Args:
+        versioned_question_state: dict. A dict with two keys:
+            state_schema_version: int. the state schema version for the
+                question.
+            state: The State domain object representing the question
+                state data.
+
+    Raises:
+        Exception: The given state_schema_version is invalid.
+    """
+    state_schema_version = versioned_question_state[
+        'state_schema_version']
+    if state_schema_version is None or state_schema_version < 1:
+        state_schema_version = 0
+
+    if not (25 <= state_schema_version
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v25-v%d state schemas at present.' %
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    while (state_schema_version <
+           feconf.CURRENT_STATE_SCHEMA_VERSION):
+        question_domain.Question.update_state_from_model(
+            versioned_question_state, state_schema_version)
+        state_schema_version += 1
 
 
 def _create_new_question(committer_id, question, commit_message):
@@ -138,7 +174,7 @@ def delete_question(
 
 
 def get_question_from_model(question_model):
-    """Returns domain object repersenting the given question model.
+    """Returns domain object representing the given question model.
 
     Args:
         question_model: QuestionModel. The question model loaded from the
@@ -147,10 +183,23 @@ def get_question_from_model(question_model):
     Returns:
         Question. The domain object representing the question model.
     """
+
+    # Ensure the original question model does not get altered.
+    versioned_question_state = {
+        'state_schema_version': question_model.question_state_schema_version,
+        'state': copy.deepcopy(
+            question_model.question_state_data)
+    }
+
+    # Migrate the question if it is not using the latest schema version.
+    if (question_model.question_state_schema_version !=
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
+        _migrate_state_schema(versioned_question_state)
+
     return question_domain.Question(
         question_model.id,
-        state_domain.State.from_dict(question_model.question_state_data),
-        question_model.question_state_schema_version,
+        state_domain.State.from_dict(versioned_question_state['state']),
+        versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.created_on, question_model.last_updated)
 

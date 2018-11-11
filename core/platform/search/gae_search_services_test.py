@@ -696,8 +696,8 @@ class SearchQueryTests(test_utils.GenericTestBase):
 
 class SearchGetFromIndexTests(test_utils.GenericTestBase):
     def test_get_document_from_index(self):
-        document = search.Document(doc_id="my_doc", fields=[
-            search.TextField(name="my_field", value="value")
+        document = search.Document(doc_id='my_doc', fields=[
+            search.TextField(name='my_field', value='value')
         ])
         search.Index('my_index').put(document)
         result = gae_search_services.get_document_from_index(

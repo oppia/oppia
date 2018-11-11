@@ -16,7 +16,7 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
-oppia.factory('IssuesService', [
+oppia.factory('PlaythroughIssuesService', [
   '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',

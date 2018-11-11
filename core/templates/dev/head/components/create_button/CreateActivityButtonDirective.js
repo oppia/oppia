@@ -25,21 +25,26 @@ oppia.directive('createActivityButton', [
       controller: [
         '$scope', '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
-        'siteAnalyticsService', 'UrlService',
+        'SiteAnalyticsService', 'UrlService', 'UserService',
         function(
             $scope, $timeout, $window, $uibModal,
             ExplorationCreationService, CollectionCreationService,
-            siteAnalyticsService, UrlService) {
+            SiteAnalyticsService, UrlService, UserService) {
           $scope.creationInProgress = false;
-
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
+
+          $scope.canCreateCollections = null;
+          $scope.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.canCreateCollections = userInfo.canCreateCollections();
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 
           $scope.onRedirectToLogin = function(destinationUrl) {
-            siteAnalyticsService.registerStartLoginEvent(
+            SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
             $timeout(function() {
               $window.location = destinationUrl;
@@ -56,7 +61,7 @@ oppia.directive('createActivityButton', [
 
             $scope.creationInProgress = true;
 
-            if (!GLOBALS.can_create_collections) {
+            if (!$scope.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
@@ -69,6 +74,11 @@ oppia.directive('createActivityButton', [
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
+                    UserService.getUserInfoAsync().then(function(userInfo) {
+                      $scope.canCreateCollections = (
+                        userInfo.canCreateCollections());
+                    });
+
                     $scope.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
                       $uibModalInstance.close();
@@ -78,10 +88,6 @@ oppia.directive('createActivityButton', [
                       CollectionCreationService.createNewCollection();
                       $uibModalInstance.close();
                     };
-
-                    $scope.canCreateCollections = (
-                      GLOBALS.can_create_collections
-                    );
 
                     $scope.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
@@ -106,7 +112,7 @@ oppia.directive('createActivityButton', [
           // open the create modal immediately (or redirect to the exploration
           // editor if the create modal does not need to be shown).
           if (UrlService.getUrlParams().mode === 'create') {
-            if (!GLOBALS.can_create_collections) {
+            if (!$scope.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else {
               $scope.initCreationProcess();

@@ -301,22 +301,22 @@ describe('Image preloader service', function() {
     };
 
     requestUrl1 = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '1',
         filename: 'sIMChoice1_height_32_width_42.png'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '1',
         filename: 'sIMChoice2_height_30_width_40.png'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '1',
         filename: 'sIOFeedback_height_50_width_50.png'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '1',
         filename: 's6Hint1_height_60_width_60.png'
       });

@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}
-  I18N_SIGNUP_PAGE_TITLE
+  Join the community - Oppia
 {% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
@@ -114,4 +114,5 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/pages/signup/Signup.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Utility methods for docstring checking."""
+
 import os
 import re
 import sys
@@ -51,12 +53,12 @@ def get_setters_property_name(node):
         str|None. The name of the property that the node is a setter for,
             or None if one could not be found.
     """
-    decorators = node.decorators.nodes if node.decorators else []
-    for decorator in decorators:
-        if (isinstance(decorator, astroid.Attribute) and
-                decorator.attrname == "setter" and
-                isinstance(decorator.expr, astroid.Name)):
-            return decorator.expr.name
+    decorator_nodes = node.decorators.nodes if node.decorators else []
+    for decorator_node in decorator_nodes:
+        if (isinstance(decorator_node, astroid.Attribute) and
+                decorator_node.attrname == 'setter' and
+                isinstance(decorator_node.expr, astroid.Name)):
+            return decorator_node.expr.name
     return None
 
 
@@ -153,6 +155,16 @@ def possible_exc_types(node):
 
 
 def docstringify(docstring):
+    """Converts a docstring in its str form to its Docstring object
+    as defined in the pylint library.
+
+    Args:
+        docstring: str. Docstring for a particular class or function.
+
+    Returns:
+        Docstring. Pylint Docstring class instance representing
+            a node's docstring.
+    """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
         if instance.is_valid():
@@ -164,7 +176,7 @@ def docstringify(docstring):
 class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r'''
+    re_param_line = re.compile(r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
         \s*  ( [:]
             \s*
@@ -172,14 +184,14 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
             (?:,\s+optional)?
             [.] )? \s*                  # optional type declaration
         \s*  (.*)                       # beginning of optional description
-    '''.format(
+    """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r'''
+    re_returns_line = re.compile(r"""
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
-    '''.format(
+    """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
