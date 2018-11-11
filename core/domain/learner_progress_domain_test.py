@@ -16,6 +16,7 @@
 
 """Tests for learner progress domain objects."""
 
+
 from core.domain import learner_progress_domain
 from core.tests import test_utils
 
