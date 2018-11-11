@@ -656,14 +656,12 @@ def publish_story(story_id, committer_id):
         if not exp_services.get_exploration_by_id(
                 node.exploration_id, strict=False):
             raise Exception(
-                'Story node with exploration id %s doesn\'t exist.'
-                % node.exploration_id)
+                'Exploration id %s doesn\'t exist.' % node.exploration_id)
         exploration_rights = rights_manager.get_exploration_rights(
             node.exploration_id, strict=False)
         if exploration_rights.is_private():
             raise Exception(
-                'Story node with exploration id %s isn\'t published.'
-                % node.exploration_id)
+                'Exploration with id %s isn\'t published.' % node.exploration_id)
 
     story = get_story_by_id(story_id, strict=False)
     for node in story.story_contents.nodes:
