@@ -25,7 +25,7 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LearnerProgressUnitTests, self).setUp()
-
+    
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
@@ -35,20 +35,21 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         super(ActivityIdsInLearnerDashboardUnitTests, self).setUp()
 
     def test_to_dict(self):
-        expected_activity_ids_in_learner_dashboard_dict = {
-            'completed_exploration_ids': ["0"],
-            'completed_collection_ids': ["0"],
-            'incomplete_exploration_ids': ["0"],
-            'incomplete_collection_ids': ["0"],
-            'exploration_playlist_ids': ["0"],
-            'collection_playlist_ids': ["0"]
+        expected_activity_ids_dict = {
+            'completed_exploration_ids': ['0'],
+            'completed_collection_ids': ['0'],
+            'incomplete_exploration_ids': ['0'],
+            'incomplete_collection_ids': ['0'],
+            'exploration_playlist_ids': ['0'],
+            'collection_playlist_ids': ['0']
         }
-        observed_activity_ids_in_learner_dashboard = learner_progress_domain.ActivityIdsInLearnerDashboard(
-            expected_activity_ids_in_learner_dashboard_dict['completed_exploration_ids'],
-            expected_activity_ids_in_learner_dashboard_dict['completed_collection_ids'],
-            expected_activity_ids_in_learner_dashboard_dict['incomplete_exploration_ids'],
-            expected_activity_ids_in_learner_dashboard_dict['incomplete_collection_ids'],
-            expected_activity_ids_in_learner_dashboard_dict['exploration_playlist_ids'],
-            expected_activity_ids_in_learner_dashboard_dict['collection_playlist_ids'])
+        observed_activity_ids_in_learner_dashboard = \
+            learner_progress_domain.ActivityIdsInLearnerDashboard(
+                expected_activity_ids_dict['completed_exploration_ids'],
+                expected_activity_ids_dict['completed_collection_ids'],
+                expected_activity_ids_dict['incomplete_exploration_ids'],
+                expected_activity_ids_dict['incomplete_collection_ids'],
+                expected_activity_ids_dict['exploration_playlist_ids'],
+                expected_activity_ids_dict['collection_playlist_ids'])
         self.assertDictEqual(
-            expected_activity_ids_in_learner_dashboard_dict, observed_activity_ids_in_learner_dashboard.to_dict())
+            expected_activity_ids_dict, observed_activity_ids_in_learner_dashboard.to_dict())
