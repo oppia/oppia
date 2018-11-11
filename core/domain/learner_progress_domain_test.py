@@ -18,21 +18,25 @@
 
 from core.domain import learner_progress_domain
 from core.tests import test_utils
-import feconf
 
 class LearnerProgressUnitTests(test_utils.GenericTestBase):
     """Tests the learner progress domain object."""
 
-    def setUp(self):
-        super(LearnerProgressUnitTests, self).setUp()
-    
+    def test_initialization(self):
+        """Tests init method."""
+        user_learner_progress = (learner_progress_domain.LearnerProgress(
+            [], [], [], [], [], []))
+
+        self.assertEqual(user_learner_progress.incomplete_exp_summaries, [])
+        self.assertEqual(user_learner_progress.incomplete_collection_summaries, [])
+        self.assertEqual(user_learner_progress.completed_exp_summaries, [])
+        self.assertEqual(user_learner_progress.completed_collection_summaries, [])
+        self.assertEqual(user_learner_progress.exploration_playlist_summaries, [])
+        self.assertEqual(user_learner_progress.collection_playlist_summaries, [])
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
     """Tests the activity ids in learner dashboard domain object."""
-
-    def setUp(self):
-        super(ActivityIdsInLearnerDashboardUnitTests, self).setUp()
 
     def test_to_dict(self):
         expected_activity_ids_dict = {
@@ -52,4 +56,5 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
                 expected_activity_ids_dict['exploration_playlist_ids'],
                 expected_activity_ids_dict['collection_playlist_ids'])
         self.assertDictEqual(
-            expected_activity_ids_dict, observed_activity_ids_in_learner_dashboard.to_dict())
+            expected_activity_ids_dict,
+            observed_activity_ids_in_learner_dashboard.to_dict())
