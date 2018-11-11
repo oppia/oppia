@@ -17,11 +17,15 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import email_manager
+from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+current_user_services = models.Registry.import_current_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -364,3 +368,30 @@ class SiteLanguageHandler(base.BaseHandler):
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
+
+
+class UserInfoHandler(base.BaseHandler):
+    """Provides info about user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.require_user_id
+    def get(self):
+        """Handles GET requests."""
+
+        user_actions = user_services.UserActionsInfo(self.user_id).actions
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False)
+        self.render_json({
+            'is_moderator': (
+                user_services.is_at_least_moderator(self.user_id)),
+            'is_admin': user_services.is_admin(self.user_id),
+            'is_super_admin': (
+                current_user_services.is_current_user_super_admin()),
+            'can_create_collections': bool(
+                role_services.ACTION_CREATE_COLLECTION in user_actions),
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'username': user_settings.username,
+            'user_is_logged_in': True
+        })

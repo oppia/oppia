@@ -647,10 +647,10 @@ oppia.directive('filepathEditor', [
             // Pre-load image before marking the image as saved.
             var img = new Image();
             img.onload = function() {
-              $scope.setSavedImageFilename(data.filepath, true);
+              $scope.setSavedImageFilename(data.filename, true);
               $scope.$apply();
             };
-            img.src = getTrustedResourceUrlForImageFileName(data.filepath);
+            img.src = getTrustedResourceUrlForImageFileName(data.filename);
           }).fail(function(data) {
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);

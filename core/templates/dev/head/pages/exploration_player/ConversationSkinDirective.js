@@ -254,7 +254,7 @@ oppia.directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'LearnerParamsService', 'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
-        'StatsReportingService', 'siteAnalyticsService',
+        'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
@@ -271,7 +271,7 @@ oppia.directive('conversationSkin', [
         'PlaythroughService', 'PretestEngineService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
-        'CurrentInteractionService',
+        'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             $location, $q, MessengerService, AlertsService,
@@ -280,7 +280,7 @@ oppia.directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             LearnerParamsService, ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
-            StatsReportingService, siteAnalyticsService,
+            StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
@@ -297,13 +297,18 @@ oppia.directive('conversationSkin', [
             PlaythroughService, PretestEngineService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
             ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
-            CurrentInteractionService) {
+            CurrentInteractionService, UserService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
+
+          $scope.isLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.isLoggedIn = userInfo.isLoggedIn();
+          });
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -563,7 +568,6 @@ oppia.directive('conversationSkin', [
 
           var _initializeDirectiveComponents = function(
               initialCard, focusLabel) {
-            $scope.isLoggedIn = GLOBALS.userIsLoggedIn;
             _addNewCard(initialCard);
             $scope.nextCard = initialCard;
             $rootScope.$broadcast(
@@ -1032,7 +1036,7 @@ oppia.directive('conversationSkin', [
           }
 
           $scope.onNavigateFromIframe = function() {
-            siteAnalyticsService.registerVisitOppiaFromIframeEvent(
+            SiteAnalyticsService.registerVisitOppiaFromIframeEvent(
               $scope.explorationId);
           };
 

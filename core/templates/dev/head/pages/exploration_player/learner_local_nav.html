@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right"
+<ul class="nav ng-cloak navbar-nav oppia-navbar-nav navbar-right"
     ng-controller="LearnerLocalNav" style="margin-right: 0px;">
   <li popover-placement="bottom" uib-popover-template="'popover/feedback'" popover-trigger="click">
     <a href="" class="protractor-test-exploration-feedback-popup-link" uib-tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
@@ -11,6 +11,8 @@
       <i class="material-icons">&#xE254;</i>
       <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_EDIT_TOOLTIP' | translate]></span>
     </a>
+  </li>
+  <li>
     <a ng-if="!canEdit && username" class="protractor-test-exploration-suggestion-popup-link" ng-click="showLearnerSuggestionModal()" uib-tooltip="Suggest Changes" tooltip-placement="bottom" target="_blank">
       <i class="material-icons">&#xE254;</i>
       <span class="oppia-icon-accessibility-label">Suggest Changes</span>

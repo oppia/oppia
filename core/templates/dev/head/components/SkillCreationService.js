@@ -27,7 +27,7 @@ oppia.factory('SkillCreationService', [
     var skillCreationInProgress = false;
 
     return {
-      createNewSkill: function(description) {
+      createNewSkill: function(description, linkedTopicIds) {
         if (skillCreationInProgress) {
           return;
         }
@@ -35,7 +35,8 @@ oppia.factory('SkillCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
         $http.post('/skill_editor_handler/create_new', {
-          description: description
+          description: description,
+          linked_topic_ids: linkedTopicIds
         }).then(function(response) {
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(

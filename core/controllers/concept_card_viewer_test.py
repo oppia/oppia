@@ -14,8 +14,10 @@
 
 """Tests for the handler that returns concept card for a skill."""
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -34,7 +36,10 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.skill_contents = skill_domain.SkillContents(
-            'Skill Explanation', ['Example 1', 'Example 2'])
+            state_domain.SubtitledHtml(
+                '1', 'Skill Explanation'), [
+                    state_domain.SubtitledHtml('2', 'Example 1'),
+                    state_domain.SubtitledHtml('3', 'Example 2')], {})
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -42,13 +47,25 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             skill_contents=self.skill_contents)
 
     def test_get_concept_card(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
+                '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(
                 'Skill Explanation',
-                json_response['concept_card_dict']['explanation'])
+                json_response['concept_card_dict']['explanation']['html'])
             self.assertEqual(
-                ['Example 1', 'Example 2'],
+                [{
+                    'content_id': '2',
+                    'html': 'Example 1'
+                }, {
+                    'content_id': '3',
+                    'html': 'Example 2'
+                }],
                 json_response['concept_card_dict']['worked_examples'])
+
+    def test_get_concept_card_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 404)
