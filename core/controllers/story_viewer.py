@@ -14,12 +14,12 @@
 
 """Controllers for the story viewer page."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_services
-import feconf
 
 
 class StoryViewerPage(base.BaseHandler):
@@ -28,7 +28,7 @@ class StoryViewerPage(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, topic_name, story_id):
         """Handles GET requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
@@ -58,7 +58,7 @@ class StoryPageDataHandler(base.BaseHandler):
     def get(self, topic_name, story_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)

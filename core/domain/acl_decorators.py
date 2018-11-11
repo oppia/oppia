@@ -2415,6 +2415,7 @@ def can_access_story_viewer_page(handler):
         """Checks if the user can access story viewer page.
 
         Args:
+            topic_name: str. The name of the topic.
             story_id: str. The id of the story.
             **kwargs: *. Keyword arguments.
 
@@ -2425,8 +2426,6 @@ def can_access_story_viewer_page(handler):
 
         if story is None:
             raise self.PageNotFoundException
-        
-        
 
         return handler(self, topic_name, story_id, **kwargs)
 

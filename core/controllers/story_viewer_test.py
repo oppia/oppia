@@ -14,6 +14,7 @@
 
 """Tests for the story viewer page."""
 
+from constants import constants
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
@@ -112,7 +113,7 @@ class BaseStoryViewerControllerTest(test_utils.GenericTestBase):
 class StoryViewerPage(BaseStoryViewerControllerTest):
 
     def test_any_user_can_access_story_viewer_page(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_VIEWER_URL_PREFIX,
@@ -121,7 +122,7 @@ class StoryViewerPage(BaseStoryViewerControllerTest):
             self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unsaved_story_viewer_page(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_VIEWER_URL_PREFIX,
@@ -134,7 +135,7 @@ class StoryViewerPage(BaseStoryViewerControllerTest):
 class StoryPageDataHandler(BaseStoryViewerControllerTest):
 
     def test_get(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             json_response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.STORY_DATA_HANDLER, 'topic_name', self.story_id))
