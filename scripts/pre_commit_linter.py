@@ -957,6 +957,7 @@ def _check_comments(all_files):
         and filename.endswith('.py')]
     message = 'There should be a period at the end of the comment.'
     failed = False
+    space_regex = re.compile('# .*')
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -967,7 +968,7 @@ def _check_comments(all_files):
                 previous_line = ''
                 if line_num + 1 < file_length:
                     next_line = file_content[line_num + 1].lstrip().rstrip()
-                if -1 < line_num - 1 < file_length:
+                if line_num > 0:
                     previous_line = file_content[line_num - 1].lstrip().rstrip()
 
                 if line.startswith('#') and not next_line.startswith('#'):
@@ -983,13 +984,15 @@ def _check_comments(all_files):
                             filename, line_num + 1, message)
 
                 # Check that comment starts with a space.
-                if line.startswith('#') and len(line) > 1 and line[1] != ' ':
+                if line.startswith('#') and len(line) > 1 and not (
+                        space_regex.match(line)):
                     message = (
                         'There should be a space at the beginning '
                         'of the comment.')
                     failed = True
                     print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
+
                 if not line.startswith('# coding:') and not (
                         line.startswith('# pylint:')):
                     # Check that comment starts with a capital letter.
