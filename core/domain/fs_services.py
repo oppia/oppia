@@ -21,12 +21,11 @@ from core.domain import fs_domain
 
 
 def get_exploration_file_system_class():
-    """Returns ExplorationFileSystem class to the client if the development mode
-    of constants is on. Otherwise, returns GcsFileSystem.
+    """Returns ExplorationFileSystem class to the client if DEV_MODE is True.
+    Otherwise, returns GcsFileSystem.
 
     Returns:
-        ExplorationFileSystem|GcsFileSystem. Returns the correct file system
-            class to the client.
+        ExplorationFileSystem|GcsFileSystem. The correct file system class.
     """
     if constants.DEV_MODE:
         return fs_domain.ExplorationFileSystem
