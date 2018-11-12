@@ -137,6 +137,9 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
 
 
 def require_gcloud_to_be_available():
+    """Check whether gcloud is installed while undergoing deployment process.
+    If not installed, can be installed by running scripts/start.sh.
+    """
     try:
         subprocess.check_output([GCLOUD_PATH, '--version'])
     except Exception:
