@@ -4,5 +4,5 @@
 </span>
 <span ng-if="!answer.correct">
   <span translate="I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS"></span>:
-  <pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre>
+  <pre><[answer.displayed_proof.join('\n') | truncateAtFirstLine]></pre>
 </span>
