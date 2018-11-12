@@ -45,18 +45,22 @@ class AssetDevHandler(base.BaseHandler):
     image and audio files are served from GCS).
     """
 
+    _SUPPORTED_TYPES = ['image', 'audio']
+
     @acl_decorators.open_access
     def get(self, exploration_id, asset_type, encoded_filename):
         """Returns an asset file.
 
         Args:
-            exploration_id: the id of the exploration.
-            asset_type: type of the asset, either image or audio
-            encoded_filename: a string representing the asset filename. This
+            exploration_id: str. The id of the exploration.
+            asset_type: str. Type of the asset, either image or audio.
+            encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
+        if asset_type not in self._SUPPORTED_TYPES:
+            raise Exception('%s is not a supported asset type.' % asset_type)
         try:
             filename = urllib.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
