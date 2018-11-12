@@ -25,7 +25,8 @@ def get_exploration_file_system_class():
     Otherwise, returns GcsFileSystem.
 
     Returns:
-        ExplorationFileSystem|GcsFileSystem. The correct file system class.
+        class. The correct file system class (either ExplorationFileSystem or
+            GcsFileSystem).
     """
     if constants.DEV_MODE:
         return fs_domain.ExplorationFileSystem

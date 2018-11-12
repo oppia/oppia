@@ -263,11 +263,12 @@ class _Validators(object):
         `min_value` elements.
 
         Args:
-            obj: list(str). An object.
-            min_value: int. The minimum value to check the length of object.
+            obj: list(*). A list of strings.
+            min_value: int. The minimum number of elements that `obj` should
+                contain.
 
         Returns:
-            bool. The given object has at least `min_value` elements.
+            bool. Whether the given object has at least `min_value` elements.
         """
         return len(obj) >= min_value
 
@@ -277,11 +278,12 @@ class _Validators(object):
         `max_value` elements.
 
         Args:
-            obj: list(str). An object.
-            max_value: int. The maximum value to check the length of object.
+            obj: list(*). A list of strings.
+            max_value: int. The maximum number of elements that `obj` should
+                contain.
 
         Returns:
-            bool. The given object has at most `max_value` elements.
+            bool. Whether the given object has at most `max_value` elements.
         """
         return len(obj) <= max_value
 
@@ -290,10 +292,10 @@ class _Validators(object):
         """Returns True iff the given object (a string) is nonempty.
 
         Args:
-            obj: str. An object.
+            obj: str. A string.
 
         Returns:
-            bool. The given object is nonempty.
+            bool. Whether the given object is nonempty.
         """
         return bool(obj)
 
@@ -302,10 +304,10 @@ class _Validators(object):
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
-            obj: list(str). An object.
+            obj: list(*). A list of strings.
 
         Returns:
-            bool. The given object has no duplicates.
+            bool. Whether the given object has no duplicates.
         """
         return sorted(list(set(obj))) == sorted(obj)
 
@@ -318,7 +320,7 @@ class _Validators(object):
             min_value: int. The minimum value of an object.
 
         Returns:
-            bool. The given object is at least `min_value`.
+            bool. Whether the given object is at least `min_value`.
         """
         return obj >= min_value
 
@@ -331,7 +333,7 @@ class _Validators(object):
             max_value: int. The maximum value of an object.
 
         Returns:
-            bool. The given object is at most `max_value`.
+            bool. Whether the given object is at most `max_value`.
         """
         return obj <= max_value
 
@@ -340,10 +342,10 @@ class _Validators(object):
         """Ensures that `obj` (a string) defines a valid regex.
 
         Args:
-            obj: str. An object.
+            obj: str. A string.
 
         Raises:
-            NotImplementedError: The method is not implemented in the sub class.
+            NotImplementedError: The method is not implemented.
         """
         raise NotImplementedError
 
@@ -352,11 +354,11 @@ class _Validators(object):
         """Ensures that `obj` (a string) matches the given regex.
 
         Args:
-            obj: str. An object.
+            obj: str. A string.
             regex: str. A regular expression to match the given object with.
 
         Raises:
-            NotImplementedError: The method is not implemented in the sub class.
+            NotImplementedError: The method is not implemented.
         """
         raise NotImplementedError
 
@@ -365,9 +367,9 @@ class _Validators(object):
         """Ensures that `obj` (a string) is a valid email.
 
         Args:
-            obj: str. An object.
+            obj: str. A string.
 
         Returns:
-            bool. The given object is a valid email.
+            bool. Whether the given object is a valid email.
         """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
