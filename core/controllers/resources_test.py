@@ -223,6 +223,16 @@ class AssetDevHandlerImageTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_request_invalid_asset_type(self):
+        """Test that requests for invalid asset type is rejected with a 404."""
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get(
+            '/assetsdevhandler/0/assets/unknown/myfile',
+            expect_errors=True)
+        self.logout()
+        self.assertEqual(response.status_int, 404)
+
 
 class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
