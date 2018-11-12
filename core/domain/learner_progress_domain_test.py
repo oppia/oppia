@@ -45,22 +45,16 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
     """Tests the activity ids in learner dashboard domain object."""
 
     def test_to_dict(self):
-        expected_activity_ids_dict = {
-            'completed_exploration_ids': ['0'],
-            'completed_collection_ids': ['0'],
-            'incomplete_exploration_ids': ['0'],
-            'incomplete_collection_ids': ['0'],
-            'exploration_playlist_ids': ['0'],
-            'collection_playlist_ids': ['0']
-        }
-        observed_activity_ids_in_learner_dashboard = \
+        exp_id = '0'
+        observed_activity_ids_in_learner_dashboard = (
             learner_progress_domain.ActivityIdsInLearnerDashboard(
-                expected_activity_ids_dict['completed_exploration_ids'],
-                expected_activity_ids_dict['completed_collection_ids'],
-                expected_activity_ids_dict['incomplete_exploration_ids'],
-                expected_activity_ids_dict['incomplete_collection_ids'],
-                expected_activity_ids_dict['exploration_playlist_ids'],
-                expected_activity_ids_dict['collection_playlist_ids'])
-        self.assertDictEqual(
-            expected_activity_ids_dict,
-            observed_activity_ids_in_learner_dashboard.to_dict())
+                exp_id,
+                exp_id,
+                exp_id,
+                exp_id,
+                exp_id,
+                exp_id))
+        to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()
+
+        for key in to_dict_result:
+            self.assertEqual(to_dict_result[key], exp_id)
