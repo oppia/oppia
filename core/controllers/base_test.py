@@ -638,51 +638,54 @@ class ControllerClassNameTest(test_utils.GenericTestBase):
             feconf.HANDLER_TYPE_JSON: 'Handler',
             feconf.HANDLER_TYPE_DOWNLOADABLE: 'FileDownloader',
         }
+        handlers_checked = 0
         for url in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
-            # are tuples. So, below check is to handle them.
-            if isinstance(url, tuple):
-                continue
-            else:
+            # are tuples. So, below check is to pick only those which have
+            # a RedirectRoute associated with it.
+            if isinstance(url, main.routes.RedirectRoute):
                 clazz = url.handler
-            all_base_classes = [base_class.__name__ for base_class in
-                                (inspect.getmro(clazz))]
-            # Check that it is a subclass of 'BaseHandler'.
-            if 'BaseHandler' in all_base_classes:
-                class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
-                # Check that any class with a get handler has a
-                # GET_HANDLER_ERROR_RETURN_TYPE that's one of
-                # the allowed values.
-                if 'get' in clazz.__dict__.keys():
-                    self.assertIn(
-                        class_return_type,
-                        allowed_handler_error_return_type)
-                class_name = clazz.__name__
-                file_name = inspect.getfile(clazz)
-                line_num = inspect.getsourcelines(clazz)[1]
-                allowed_class_ending = handler_type_to_name_endings_dict[
-                    class_return_type]
-                # Check that the name of the class ends with
-                # the proper word if it has a get function.
-                if 'get' in clazz.__dict__.keys():
-                    message = (
-                        'Please ensure that the name of this class '
-                        'ends with \'%s\'' % allowed_class_ending)
-                    error_message = (
-                        '%s --> Line %s: %s'
-                        % (file_name, line_num, message))
-                    self.assertTrue(
-                        class_name.endswith(allowed_class_ending),
-                        msg=error_message)
+                handlers_checked += 1
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it is a subclass of 'BaseHandler'.
+                if 'BaseHandler' in all_base_classes:
+                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                    # Check that any class with a get handler has a
+                    # GET_HANDLER_ERROR_RETURN_TYPE that's one of
+                    # the allowed values.
+                    if 'get' in clazz.__dict__.keys():
+                        self.assertIn(
+                            class_return_type,
+                            allowed_handler_error_return_type)
+                    class_name = clazz.__name__
+                    file_name = inspect.getfile(clazz)
+                    line_num = inspect.getsourcelines(clazz)[1]
+                    allowed_class_ending = handler_type_to_name_endings_dict[
+                        class_return_type]
+                    # Check that the name of the class ends with
+                    # the proper word if it has a get function.
+                    if 'get' in clazz.__dict__.keys():
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'%s\'' % allowed_class_ending)
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(
+                            class_name.endswith(allowed_class_ending),
+                            msg=error_message)
 
-                # Check that the name of the class ends with 'Handler'
-                # if it does not has a get function.
-                else:
-                    message = (
-                        'Please ensure that the name of this class '
-                        'ends with \'Handler\'')
-                    error_message = (
-                        '%s --> Line %s: %s'
-                        % (file_name, line_num, message))
-                    self.assertTrue(class_name.endswith('Handler'),
-                                    msg=error_message)
+                    # Check that the name of the class ends with 'Handler'
+                    # if it does not has a get function.
+                    else:
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'Handler\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(class_name.endswith('Handler'),
+                                        msg=error_message)
+
+        self.assertGreater(handlers_checked, 150)
