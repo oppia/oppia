@@ -317,7 +317,7 @@ class _Validators(object):
 
         Args:
             obj: int|float. An object.
-            min_value: int. The minimum value of an object.
+            min_value: int. The minimum allowed value for `obj`.
 
         Returns:
             bool. Whether the given object is at least `min_value`.
@@ -330,7 +330,7 @@ class _Validators(object):
 
         Args:
             obj: int|float. An object.
-            max_value: int. The maximum value of an object.
+            max_value: int. The maximum allowed value for `obj`.
 
         Returns:
             bool. Whether the given object is at most `max_value`.
