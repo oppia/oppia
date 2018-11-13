@@ -34,7 +34,7 @@
   </button>
 </div>
 
-<div class="oppia-audio-recording-bar" ng-show="selectedRecording">
+<div class="oppia-audio-recording-bar" ng-show="selectedRecording && !checkSavingProcess">
   <ng-audio-recorder id="<[RECORDER_ID]>"
                      on-record-start="onRecordStart()"
                      on-conversion-complete="onConversionComplete()"
@@ -59,7 +59,6 @@
         <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel && !checkSavingProcess " >
           <ng-audio-recorder-wave-view wave-color="#009688" progress-color="#ccc" height="50"></ng-audio-recorder-wave-view>
         </div>
-        <div class="savingProcess" ng-show="checkSavingProcess">saving .. <loading-dots></loading-dots></div>
       </canvas-sizer>
     </div>
 
@@ -76,24 +75,31 @@
   </ng-audio-recorder>
   <button class="btn oppia-audio-button"
           uib-tooltip="Re-take" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob && !checkSavingProcess"
+          ng-if="!recorder.status.isRecording && audioBlob"
           ng-click="reRecord()">
     <i class="material-icons">&#xE028;</i>
   </button>
   <button class="btn oppia-audio-button"
           uib-tooltip="Save" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob && !checkSavingProcess"
+          ng-if="!recorder.status.isRecording && audioBlob"
           ng-click="saveRecordedAudio()">
     <i class="material-icons">&#xE161;</i>
   </button>
   <button class="btn oppia-audio-button"
           uib-tooltip="Cancel" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob && !checkSavingProcess"
+          ng-if="!recorder.status.isRecording && audioBlob"
           ng-click="cancelRecording()">
     <i class="material-icons">&#xE5C9;</i>
   </button>
 </div>
-
+<div class="oppia-audio-recording-bar" ng-if="checkSavingProcess">
+  <button class="btn oppia-audio-button" disabled>
+    <i class="material-icons">&#xE039;</i>
+  </button>
+  <div class="oppia-audio-bar-info">
+    <div>Saving<loading-dots></loading-dots></div>
+  </div>
+</div>
 <div ng-if="isAudioAvailable && !audioIsUpdating">
   <button class="btn oppia-audio-button"
           ng-click="playPauseUploadedAudioTranslation()">
