@@ -322,8 +322,11 @@ class RenderDownloadableTest(test_utils.GenericTestBase):
     def test_downloadable(self):
         response = self.testapp.get('/mock')
         self.assertEqual(response.status_int, 200)
-        self.assertTrue(response.content_disposition.startswith('attachment'))
+        self.assertEqual(
+            response.content_disposition,
+            'attachment; filename=example.pdf')
         self.assertEqual(response.body, 'example')
+        self.assertEqual(response.content_type, 'text/plain')
 
 
 class LogoutPageTest(test_utils.GenericTestBase):
@@ -541,7 +544,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
         handlers_checked = []
 
         for route in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
@@ -625,23 +628,20 @@ class ControllerClassNameTest(test_utils.GenericTestBase):
         """This function checks that all controller class names end with
         either 'Handler', 'Page' or 'FileDownloader'.
         """
-        allowed_handler_error_return_type = [feconf.HANDLER_TYPE_JSON,
-                                             feconf.HANDLER_TYPE_HTML,
-                                             feconf.HANDLER_TYPE_DOWNLOADABLE]
         # A mapping of returned handler types to expected name endings.
         handler_type_to_name_endings_dict = {
             feconf.HANDLER_TYPE_HTML: 'Page',
             feconf.HANDLER_TYPE_JSON: 'Handler',
             feconf.HANDLER_TYPE_DOWNLOADABLE: 'FileDownloader',
         }
-        handlers_checked = 0
+        num_handlers_checked = 0
         for url in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to pick only those which have
             # a RedirectRoute associated with it.
             if isinstance(url, main.routes.RedirectRoute):
                 clazz = url.handler
-                handlers_checked += 1
+                num_handlers_checked += 1
                 all_base_classes = [base_class.__name__ for base_class in
                                     (inspect.getmro(clazz))]
                 # Check that it is a subclass of 'BaseHandler'.
@@ -653,7 +653,7 @@ class ControllerClassNameTest(test_utils.GenericTestBase):
                     if 'get' in clazz.__dict__.keys():
                         self.assertIn(
                             class_return_type,
-                            allowed_handler_error_return_type)
+                            handler_type_to_name_endings_dict)
                     class_name = clazz.__name__
                     file_name = inspect.getfile(clazz)
                     line_num = inspect.getsourcelines(clazz)[1]
@@ -684,4 +684,4 @@ class ControllerClassNameTest(test_utils.GenericTestBase):
                         self.assertTrue(class_name.endswith('Handler'),
                                         msg=error_message)
 
-        self.assertGreater(handlers_checked, 150)
+        self.assertGreater(num_handlers_checked, 150)
