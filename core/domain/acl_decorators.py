@@ -2386,6 +2386,17 @@ def get_decorator_for_accepting_suggestion(decorator):
         """
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
+            """Returns a decorator handler with common checks and permissions.
+
+            Args:
+                target_id: str. The target id.
+                suggestion_id: str. The suggestion id.
+                **kwargs: *. Keyword arguments.
+
+            Returns:
+                function. The newly decorated handler that has common checks and
+                    permissions.
+            """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
             user_actions_info = user_services.UserActionsInfo(self.user_id)

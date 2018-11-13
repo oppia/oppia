@@ -27,7 +27,14 @@ from jinja2 import meta
 
 
 def _js_string_filter(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
+    """Converts a value to a JSON string for use in JavaScript code.
+
+    Args:
+        value: *. The specified value to be coverted to JSON string.
+
+    Returns:
+        str. The JSON string.
+    """
     string = json.dumps(value)
 
     replacements = [('\\', '\\\\'), ('"', '\\"'), ('\'', '\\\''),
@@ -40,7 +47,14 @@ def _js_string_filter(value):
 
 
 def _log2_floor_filter(value):
-    """Returns the logarithm base 2 of the given value, rounded down."""
+    """Returns the logarithm base 2 of the given value, rounded down.
+
+    Args:
+        value: int|float. The specified value.
+
+    Returns:
+        int. The rounded off value of logarithm base 2 of the given value.
+    """
     return int(math.log(value, 2))
 
 
@@ -53,6 +67,15 @@ JINJA_FILTERS = {
 
 
 def get_jinja_env(dir_path):
+    """Creates the template environment with a loader.
+
+    Args:
+        dir_path: str. The directory path where the loader looks up the
+            templates.
+
+    Returns:
+        Environment. The template environment.
+    """
     loader = jinja2.FileSystemLoader(os.path.join(
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
@@ -61,6 +84,13 @@ def get_jinja_env(dir_path):
         """Returns the relative path for the resource, appending it to the
         corresponding cache slug. resource_suffix should have a leading
         slash.
+
+        Args:
+            domain_url: str. The url of the domain.
+            resource_suffix: str. The resource suffix.
+
+        Returns:
+            str. The relative path for the resource.
         """
         return '%s%s%s' % (
             domain_url, utils.get_asset_dir_prefix(), resource_suffix)
@@ -75,12 +105,12 @@ def parse_string(string, params, autoescape=True):
     """Parses a string using Jinja templating.
 
     Args:
-      string: the string to be parsed.
-      params: the parameters to parse the string with.
-      autoescape: whether to enable autoescaping when parsing.
+        string: str. The string to be parsed.
+        params: list(*). The parameters to parse the string with.
+        autoescape: bool. Whether to enable autoescaping when parsing.
 
     Returns:
-      the parsed string, or None if the string could not be parsed.
+        str|None. The parsed string, or None if the string could not be parsed.
     """
     env = jinja2.Environment(autoescape=autoescape)
 
@@ -104,7 +134,15 @@ def parse_string(string, params, autoescape=True):
 
 
 def evaluate_object(obj, params):
-    """Returns a copy of `obj` after parsing strings in it using `params`."""
+    """Returns a copy of `obj` after parsing strings in it using `params`.
+
+    Args:
+        obj: *. An object to parse strings in it.
+        params: list(*). The parameters to parse the string with.
+
+    Returns:
+        *. The copy of `obj` after parsing strings in it.
+    """
 
     if isinstance(obj, basestring):
         return parse_string(obj, params)
