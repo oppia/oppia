@@ -211,10 +211,10 @@ class ASTDocStringChecker(object):
         Ignores class specific arguments (self and cls).
 
         Args:
-            function_node: ast node object. Represents a function.
+            function_node: ast.FunctionDef. Represents a function.
 
         Returns:
-            list(str) of the args for a function as listed in the function
+            list(str). The args for a function as listed in the function
             definition.
         """
         # Ignore self and cls args.
@@ -233,7 +233,9 @@ class ASTDocStringChecker(object):
             function_args: list(str). The arguments for a function.
 
         Returns:
-            str. a regex that looks like this: (the backslashes are escaped)
+            str. A regex that checks for an "Arg" header and then each arg term
+            with a colon in order with any characters in between.
+            The resulting regex looks like this (the backslashes are escaped):
                 (Args:)[\\S\\s]*(arg_name0:)[\\S\\s]*(arg_name1:)
             If passed an empty list, returns None.
         """
@@ -254,7 +256,7 @@ class ASTDocStringChecker(object):
                 header.
 
         Returns:
-            list(str. Each str contains an error message. If no linting
+            list(str). Each str contains an error message. If no linting
                 errors were found, the list will be empty.
         """
         results = []
