@@ -49,7 +49,7 @@
     </button>
     <div class="oppia-audio-visulaizer">
       <div class="oppia-mp3-converting" ng-if="recorder.status.isConverting">
-        Converting to mp3 <loading-dots></loading-dots>
+        Converting to mp3<loading-dots></loading-dots>
       </div>
       <canvas-sizer id="analyser" >
         <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording && !checkSavingProcess ">
@@ -205,10 +205,6 @@
     border-right: 1px solid #ccc;
   }
   .oppia-mp3-converting {
-    text-align: center;
-    padding: 13px 0px 13px 0px;
-  }
-  .savingProcess {
     text-align: center;
     padding: 13px 0px 13px 0px;
   }
