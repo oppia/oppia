@@ -958,7 +958,7 @@ def _check_comments(all_files):
     message = 'There should be a period at the end of the comment.'
     failed = False
     space_regex = re.compile(r'^#[^\s].*$')
-    capital_regex = re.compile('^# [a-z].*$')
+    capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -993,17 +993,15 @@ def _check_comments(all_files):
                     print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
 
-                if not line.startswith('# coding:') and not (
-                        line.startswith('# pylint:')):
-                    # Check that comment starts with a capital letter.
-                    if not previous_line.startswith('#') and (
-                            capital_regex.match(line)):
-                        message = (
-                            'There should be a capital letter'
-                            ' to begin the content of the comment.')
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
+                # Check that comment starts with a capital letter.
+                if not previous_line.startswith('#') and (
+                        capital_regex.match(line)):
+                    message = (
+                        'There should be a capital letter'
+                        ' to begin the content of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
