@@ -985,7 +985,7 @@ def _check_comments(all_files):
                             filename, line_num + 1, message)
 
                 # Check that comment starts with a space.
-                if space_regex.match(line):
+                if space_regex.match(line) and not line.startswith('#!'):
                     message = (
                         'There should be a space at the beginning '
                         'of the comment.')
