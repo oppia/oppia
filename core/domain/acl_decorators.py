@@ -2386,7 +2386,8 @@ def get_decorator_for_accepting_suggestion(decorator):
         """
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
-            """Returns a decorator handler with common checks and permissions.
+            """Returns a decorator handler to test whether a suggestion can be
+            accepted based on the user actions and roles.
 
             Args:
                 target_id: str. The target id.
@@ -2394,8 +2395,8 @@ def get_decorator_for_accepting_suggestion(decorator):
                 **kwargs: *. Keyword arguments.
 
             Returns:
-                function. The newly decorated handler that has common checks and
-                    permissions.
+                function. The newly decorated handler to test the acceptance of
+                    a suggestion.
             """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException

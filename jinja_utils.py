@@ -33,7 +33,7 @@ def _js_string_filter(value):
         value: *. The specified value to be coverted to JSON string.
 
     Returns:
-        str. The JSON string.
+        str. The resulting JSON string.
     """
     string = json.dumps(value)
 
@@ -67,7 +67,7 @@ JINJA_FILTERS = {
 
 
 def get_jinja_env(dir_path):
-    """Creates the template environment with a loader.
+    """Loads the correct jinja2 template environment.
 
     Args:
         dir_path: str. The directory path where the loader looks up the
@@ -87,7 +87,8 @@ def get_jinja_env(dir_path):
 
         Args:
             domain_url: str. The url of the domain.
-            resource_suffix: str. The resource suffix.
+            resource_suffix: str. The resource suffix to get the relative path
+                for the resource. It should have a leading slash.
 
         Returns:
             str. The relative path for the resource.
@@ -137,7 +138,7 @@ def evaluate_object(obj, params):
     """Returns a copy of `obj` after parsing strings in it using `params`.
 
     Args:
-        obj: *. An object to parse strings in it.
+        obj: *. An object containing strings that need to be parsed.
         params: list(*). The parameters to parse the string with.
 
     Returns:
