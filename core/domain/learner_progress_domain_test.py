@@ -71,6 +71,7 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             to_dict_result['incomplete_collection_ids'], incomplete_coll_ids)
         self.assertEqual(
-            to_dict_result['exploration_playlist_ids'], exploration_playlist_ids)
+            to_dict_result['exploration_playlist_ids'],
+            exploration_playlist_ids)
         self.assertEqual(
             to_dict_result['collection_playlist_ids'], collection_playlist_ids)
