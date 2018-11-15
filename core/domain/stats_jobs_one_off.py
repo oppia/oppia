@@ -161,7 +161,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             old_state_name = (
                                 exp_versions_diff.new_to_old_state_names[
                                     state_name])
-                        # 'pssm' mean previous state stats mapping.
+                        # 'pssm' mean 'previous state stats mapping'.
                         pssm = prev_exp_stats.state_stats_mapping[
                             old_state_name]
                         exp_stats_default.state_stats_mapping[
