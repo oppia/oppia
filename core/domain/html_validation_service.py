@@ -238,8 +238,8 @@ def convert_to_textangular(html_data):
         elif tag.name == 'td' and tag.next_sibling:
             tag.insert_after(' ')
             tag.unwrap()
-        # Divs and table rows both are replaced with p tag
-        # to maintain almost same apperance.
+        # Divs and table rows are both replaced with p tag
+        # to maintain almost same appearance.
         elif tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
         # All other invalid tags are simply removed.
