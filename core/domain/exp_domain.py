@@ -1308,7 +1308,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        # ensure widgets are renamed to be interactions.
+        # Ensure widgets are renamed to be interactions.
         for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue

@@ -236,7 +236,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         default user having the username - 'tmpsuperadm1n'.
         """
         output = self._run_one_off_job()
-        # number of users = 1.
+        # Number of users = 1.
         # length of usernames = 13 (tmpsuperadm1n).
         self.assertEqual(output['13'], 1)
 
@@ -246,7 +246,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         """
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 2.
+        # Number of users = 2.
         # length of usernames = 13 (tmpsuperadm1n), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['1'], 1)
@@ -258,7 +258,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 3
+        # Number of users = 3
         # length of usernames = 13 (tmpsuperadm1n), 2 (ab), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['2'], 1)
@@ -267,7 +267,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 5
+        # Number of users = 5
         # length of usernames = 13 (tmpsuperadm1n), 3 (bcd), 2 (ab, bc), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['3'], 1)

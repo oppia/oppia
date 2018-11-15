@@ -78,7 +78,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             email_subscription_services.inform_subscribers(
                 self.editor_id, 'A', 'Title')
 
-            # make sure correct number of emails is sent and no email is sent
+            # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
