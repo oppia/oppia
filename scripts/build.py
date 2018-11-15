@@ -1110,6 +1110,8 @@ def build():
         '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
     options = parser.parse_args()[0]
+    # Create empty hashes file to prevent 404 error in dev mode
+    open(HASHES_JS_FILEPATH, 'w+')
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
