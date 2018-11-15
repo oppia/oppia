@@ -238,7 +238,7 @@ def convert_to_textangular(html_data):
         elif tag.name == 'td' and tag.next_sibling:
             tag.insert_after(' ')
             tag.unwrap()
-        # Rows div and table both are replaced with p tag
+        # Divs and table rows both are replaced with p tag
         # to maintain almost same apperance.
         elif tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
