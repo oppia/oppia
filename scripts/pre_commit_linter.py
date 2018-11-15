@@ -984,8 +984,9 @@ def _check_comments(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
 
-                # Check that comment starts with a space
-                # and is not a shebang, which doesn't work with a space.
+                # Check that comment starts with a space and is not a shebang
+                # expression at the start of a bash script which loses function
+                # when a space is added.
                 if space_regex.match(line) and not line.startswith('#!'):
                     message = (
                         'There should be a space at the beginning '
