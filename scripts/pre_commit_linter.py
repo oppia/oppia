@@ -947,7 +947,7 @@ def _check_import_order(all_files):
 
 
 def _check_comments(all_files):
-    """This function ensures that comments end in a period."""
+    """This function ensures that comments follow correct style."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -957,6 +957,8 @@ def _check_comments(all_files):
         and filename.endswith('.py')]
     message = 'There should be a period at the end of the comment.'
     failed = False
+    space_regex = re.compile(r'^#[^\s].*$')
+    capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -964,8 +966,11 @@ def _check_comments(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 next_line = ''
+                previous_line = ''
                 if line_num + 1 < file_length:
                     next_line = file_content[line_num + 1].lstrip().rstrip()
+                if line_num > 0:
+                    previous_line = file_content[line_num - 1].lstrip().rstrip()
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
@@ -979,6 +984,26 @@ def _check_comments(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
 
+                # Check that comment starts with a space and is not a shebang
+                # expression at the start of a bash script which loses function
+                # when a space is added.
+                if space_regex.match(line) and not line.startswith('#!'):
+                    message = (
+                        'There should be a space at the beginning '
+                        'of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
+
+                # Check that comment starts with a capital letter.
+                if not previous_line.startswith('#') and (
+                        capital_regex.match(line)):
+                    message = (
+                        'There should be a capital letter'
+                        ' to begin the content of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
