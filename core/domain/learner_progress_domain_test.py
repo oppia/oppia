@@ -45,32 +45,32 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
     """Tests the activity ids in learner dashboard domain object."""
 
     def test_to_dict(self):
-        incomplete_exp_id = ['0']
-        incomplete_coll_id = ['1']
-        completed_exp_id = ['2']
-        completed_coll_id = ['3']
-        exploration_playlist_id = ['4']
-        collection_playlist_id = ['5']
+        incomplete_exp_ids = ['0']
+        incomplete_coll_ids = ['1']
+        completed_exp_ids = ['2']
+        completed_coll_ids = ['3']
+        exploration_playlist_ids = ['4']
+        collection_playlist_ids = ['5']
 
         observed_activity_ids_in_learner_dashboard = (
             learner_progress_domain.ActivityIdsInLearnerDashboard(
-                completed_exp_id,
-                completed_coll_id,
-                incomplete_exp_id,
-                incomplete_coll_id,
-                exploration_playlist_id,
-                collection_playlist_id))
+                completed_exp_ids,
+                completed_coll_ids,
+                incomplete_exp_ids,
+                incomplete_coll_ids,
+                exploration_playlist_ids,
+                collection_playlist_ids))
         to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()
 
         self.assertEqual(
-            to_dict_result['completed_exploration_ids'], completed_exp_id)
+            to_dict_result['completed_exploration_ids'], completed_exp_ids)
         self.assertEqual(
-            to_dict_result['completed_collection_ids'], completed_coll_id)
+            to_dict_result['completed_collection_ids'], completed_coll_ids)
         self.assertEqual(
-            to_dict_result['incomplete_exploration_ids'], incomplete_exp_id)
+            to_dict_result['incomplete_exploration_ids'], incomplete_exp_ids)
         self.assertEqual(
-            to_dict_result['incomplete_collection_ids'], incomplete_coll_id)
+            to_dict_result['incomplete_collection_ids'], incomplete_coll_ids)
         self.assertEqual(
-            to_dict_result['exploration_playlist_ids'], exploration_playlist_id)
+            to_dict_result['exploration_playlist_ids'], exploration_playlist_ids)
         self.assertEqual(
-            to_dict_result['collection_playlist_ids'], collection_playlist_id)
+            to_dict_result['collection_playlist_ids'], collection_playlist_ids)
