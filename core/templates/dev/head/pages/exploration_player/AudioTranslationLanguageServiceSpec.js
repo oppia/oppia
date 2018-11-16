@@ -72,13 +72,20 @@ describe('Audio translation language service', function() {
     expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
   });
 
-  it('should not have any audio language options when no preferred language ' +
-      'is set, no audio is available and automatic Text-to-speech is ' +
-      'disabled  in an exploration ', function() {
+  it('should not have any audio language option when no audio is available ' +
+     'and automatic Text-to-speech is disabled in an exploration', function() {
     var allAudioLanguageCodesInExploration = [];
-    var preferredLanguageCode = null;
     var explorationLanguageCode = 'en';
     var automaticTextToSpeechEnabled = false;
+
+    // When preferredLanguageCode is set.
+    var preferredLanguageCode = 'hi';
+    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+      explorationLanguageCode, automaticTextToSpeechEnabled);
+    expect(atls.getLanguageOptionsForDropdown()).toEqual([]);
+
+    // When preferredLanguageCode is not set.
+    var preferredLanguageCode = null;
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
     expect(atls.getLanguageOptionsForDropdown()).toEqual([]);
