@@ -107,7 +107,7 @@ def parse_string(string, params, autoescape=True):
 
     Args:
         string: str. The string to be parsed.
-        params: list(*). The parameters to parse the string with.
+        params: dict(str, *). The parameters to parse the string with.
         autoescape: bool. Whether to enable autoescaping when parsing.
 
     Returns:
@@ -139,7 +139,7 @@ def evaluate_object(obj, params):
 
     Args:
         obj: *. An object containing strings that need to be parsed.
-        params: list(*). The parameters to parse the string with.
+        params: dict(str, *). The parameters to parse the string with.
 
     Returns:
         *. The copy of `obj` after parsing strings in it.
