@@ -95,7 +95,7 @@ def _gather_logs(start, stop='HEAD'):
         stop: str.  Tag, Branch or SHA1 of end point, defaults to HEAD
 
     Returns:
-        list[Log]: List of Logs
+        list(Log): List of Logs
 
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
@@ -114,7 +114,7 @@ def _extract_issues(logs):
         logs: list(Log). List of Logs to parse
 
     Returns:
-        set[str]: Set of found issues as links to Github
+        set(str): Set of found issues as links to Github
 
     """
     issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
@@ -151,8 +151,8 @@ def _git_diff_names_only(left, right='HEAD'):
     """ Get names of changed files from git.
 
     Args:
-        left: str. Lefthand timepoint
-        right: str. rightand timepoint
+        left: str. Lefthand timepoint.
+        right: str. rightand timepoint.
 
     Returns:
         (list): List of files that are different between the two points.

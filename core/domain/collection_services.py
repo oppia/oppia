@@ -489,12 +489,12 @@ def _get_collection_summary_dicts_from_models(collection_summary_models):
     containing corresponding collection summary domain objects, keyed by id.
 
     Args:
-        collection_summary_models: An iterable of CollectionSummaryModel
-            instances.
+        collection_summary_models: iterable(CollectionSummaryModel). An
+            iterable of CollectionSummaryModel instances.
 
     Returns:
-        A dict containing corresponding collection summary domain objects, keyed
-        by id.
+        A dict containing corresponding collection summary domain objects,
+        keyed by id.
     """
     collection_summaries = [
         get_collection_summary_from_model(collection_summary_model)
