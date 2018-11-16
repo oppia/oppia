@@ -512,14 +512,14 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     """Updates a skill. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - skill_id: str. The skill id.
-    - change_list: list(SkillChange). These changes are applied in sequence to
-        produce the resulting skill.
-    - commit_message: str or None. A description of changes made to the
-        skill. For published skills, this must be present; for
-        unpublished skills, it may be equal to None.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        skill_id: str. The skill id.
+        change_list: list(SkillChange). These changes are applied in sequence to
+            produce the resulting skill.
+        commit_message: str or None. A description of changes made to the
+            skill. For published skills, this must be present; for
+            unpublished skills, it may be equal to None.
 
     Raises:
         ValueError: No commit message was provided.

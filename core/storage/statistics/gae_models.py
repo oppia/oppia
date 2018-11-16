@@ -421,11 +421,11 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             exp_version: int. Version of exploration.
             state_name: str. Name of current state.
             session_id: str. ID of current student's session.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
-            client_time_spent_in_secs: float. Time since start of this
-                state before this event occurred.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -526,11 +526,11 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             exp_version: int. Version of exploration.
             state_name: str. Name of current state.
             session_id: str. ID of current student's session.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
-            client_time_spent_in_secs: float. Time since start of this
-                state before this event occurred.
 
         Returns:
             str. The ID of the entity.
