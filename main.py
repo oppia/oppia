@@ -193,7 +193,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
@@ -241,7 +241,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        creator_dashboard.UploadExploration),
+        creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
@@ -285,25 +285,25 @@ URLS = MAPREDUCE_HANDLERS + [
         resources.ValueGeneratorHandler),
     get_redirect_route(
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-        custom_landing_pages.FractionLandingPageHandler),
+        custom_landing_pages.FractionLandingPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_URL,
-        library.LibraryPageHandler),
+        library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
         library.LibraryIndexHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-        library.LibraryGroupPageHandler),
+        library.LibraryGroupPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-        library.LibraryGroupPageHandler),
+        library.LibraryGroupPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
         library.LibraryGroupIndexHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_URL,
-        library.LibraryPageHandler),
+        library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
@@ -347,7 +347,7 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.ExplorationPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
-        reader.ExplorationPageEmbed),
+        reader.ExplorationEmbedPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -479,7 +479,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.ThreadListHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-        feedback.ThreadListHandlerForTopics),
+        feedback.ThreadListHandlerForTopicsHandler),
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
@@ -586,7 +586,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
     get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheck),
+        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler),
     get_redirect_route(
         r'/emaildashboardresult/<query_id>',
         email_dashboard.EmailDashboardResultPage),
@@ -638,8 +638,7 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
             admin.AdminTopicsCsvFileDownloader),
-        get_redirect_route(
-            r'/<:.*>', pages.MaintenancePage)]
+        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
 else:
     URLS_TO_SERVE = URLS
 

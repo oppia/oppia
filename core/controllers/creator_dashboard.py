@@ -396,7 +396,7 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class UploadExploration(base.BaseHandler):
+class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
     @acl_decorators.can_upload_exploration

@@ -308,7 +308,7 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminJobOutput(base.BaseHandler):
+class AdminJobOutputHandler(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -60,7 +60,7 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadListHandlerForTopics(base.BaseHandler):
+class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

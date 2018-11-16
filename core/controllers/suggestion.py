@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
+import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
