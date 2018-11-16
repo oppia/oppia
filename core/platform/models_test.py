@@ -20,6 +20,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+
 class RegistryUnitTest(test_utils.GenericTestBase):
     """Tests the Registry class interface."""
 
