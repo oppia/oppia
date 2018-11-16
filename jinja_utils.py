@@ -82,8 +82,7 @@ def get_jinja_env(dir_path):
 
     def get_complete_static_resource_url(domain_url, resource_suffix):
         """Returns the relative path for the resource, appending it to the
-        corresponding cache slug. resource_suffix should have a leading
-        slash.
+        corresponding cache slug.
 
         Args:
             domain_url: str. The url of the domain.
@@ -111,7 +110,10 @@ def parse_string(string, params, autoescape=True):
         autoescape: bool. Whether to enable autoescaping when parsing.
 
     Returns:
-        str|None. The parsed string, or None if the string could not be parsed.
+        str. The parsed string.
+
+    Raises:
+        Exception: Unable to parse string with Jinja.
     """
     env = jinja2.Environment(autoescape=autoescape)
 
