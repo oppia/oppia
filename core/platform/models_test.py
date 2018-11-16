@@ -27,10 +27,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         super(RegistryUnitTest, self).setUp()
         self.registry_instance = models.Registry()
 
-    def test_get_method(self):
-        """Tests get method."""
-        self.assertEqual(models._Gae, self.registry_instance._get())
-
     def test_import_models_activity(self):
         """Tests import_models function with activity option."""
         from core.storage.activity import gae_models as activity_models
@@ -144,7 +140,8 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         expected_recommendations_models.append(recommendations_models)
         self.assertEqual(
             tuple(expected_recommendations_models),
-            self.registry_instance.import_models([models.NAMES.recommendations]))
+            self.registry_instance.import_models(
+                [models.NAMES.recommendations]))
 
     def test_import_models_skill(self):
         """Tests import_models function with skill option."""
@@ -259,7 +256,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Invalid email service provider: invalid service provider'):
-                self.registry_instance.import_email_services()
+            self.registry_instance.import_email_services()
 
     def test_import_memcache_services(self):
         """Tests import memcache services function."""
