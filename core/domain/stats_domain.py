@@ -888,16 +888,16 @@ class StateAnswers(object):
         """Constructs a StateAnswers domain object.
 
         Args:
-            exploration_id. The ID of the exploration corresponding to submitted
+            exploration_id: The ID of the exploration corresponding to submitted
                 answers.
-            exploration_version. The version of the exploration corresponding to
+            exploration_version: The version of the exploration corresponding to
                 submitted answers.
-            state_name. The state to which the answers were submitted.
-            interaction_id. The ID of the interaction which created the answers.
-            submitted_answer_list. The list of SubmittedAnswer domain objects
+            state_name: The state to which the answers were submitted.
+            interaction_id: The ID of the interaction which created the answers.
+            submitted_answer_list: The list of SubmittedAnswer domain objects
                 that were submitted to the exploration and version specified in
                 this object.
-            schema_version. The schema version of this answers object.
+            schema_version: The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version

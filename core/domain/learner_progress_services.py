@@ -547,8 +547,8 @@ def _remove_activity_ids_from_incomplete_list(user_id, exploration_ids=None,
 
     Args:
         user_id: str. The id of the user.
-        collection_ids: list(str). The ids of the collections to be removed.
         exploration_ids: list(str). The ids of the explorations to be removed.
+        collection_ids: list(str). The ids of the collections to be removed.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(

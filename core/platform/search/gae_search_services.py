@@ -203,7 +203,7 @@ def clear_index(index_name):
     there are too many entries in the index.
 
     Args:
-      - index: the name of the index to delete the document from, a string.
+      - index_name: the name of the index to delete the document from, a string.
     """
     index = gae_search.Index(index_name)
 
@@ -229,12 +229,12 @@ def search(query_string, index, cursor=None,
       - cursor: a cursor string, as returned by this function. Pass this in to
           get the next 'page' of results. Leave as None to start at the
           beginning.
+      - limit: the maximum number of documents to return.
       - sort: a string indicating how to sort results. This should be a string
           of space separated values. Each value should start with a '+' or a
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on.
-      - limit: the maximum number of documents to return.
       - ids_only: whether to only return document ids.
       - retries: the number of times to retry searching the index.
 

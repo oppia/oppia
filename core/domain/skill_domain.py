@@ -948,7 +948,7 @@ class UserSkillMastery(object):
         """Returns a UserSkillMastery domain object from the given dict.
 
         Args:
-            skill_mastery_dict. dict. A dict mapping all the fields of
+            skill_mastery_dict: dict. A dict mapping all the fields of
                 UserSkillMastery object.
 
         Returns:

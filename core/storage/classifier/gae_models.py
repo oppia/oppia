@@ -111,10 +111,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 this training job was created.
             next_scheduled_check_time: datetime.datetime. The next scheduled
                 time to check the job.
+            training_data: dict. The data used in training phase.
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
-            training_data: dict. The data used in training phase.
             classifier_data: dict|None. The data stored as result of training.
             data_schema_version: int. The schema version for the data.
 

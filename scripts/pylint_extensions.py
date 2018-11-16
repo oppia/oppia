@@ -47,7 +47,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         """Visits each function call in a lint check.
 
         Args:
-            node. Call. The current function call node.
+            node: Call. The current function call node.
         """
         called = checker_utils.safe_infer(node.func)
 
@@ -696,8 +696,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node. astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST
+            node: astroid.scoped_nodes.Function. Node for a function or method
+                definition in AST.
         """
 
         try:

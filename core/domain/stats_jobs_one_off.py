@@ -654,7 +654,7 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item. ExplorationStatsModel.
+            item: ExplorationStatsModel.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -865,7 +865,7 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item. ExplorationStatsModel.
+            item: ExplorationStatsModel.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form

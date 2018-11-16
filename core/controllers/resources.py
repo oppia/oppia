@@ -91,7 +91,8 @@ class AudioDevHandler(base.BaseHandler):
         """Returns an audio file.
 
         Args:
-            encoded_filename: a string representing the audio filename. This
+            exploration_id: str. The id of the exploration.
+            encoded_filename: str. Represents the audio filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
