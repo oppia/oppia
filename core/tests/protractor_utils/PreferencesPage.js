@@ -58,7 +58,6 @@ var PreferencesPage = function() {
 
   this.selectPreferredAudioLanguage = function(language) {
     preferredAudioLanguageSelector.click();
-    browser.enterRepl();
     var options = element.all(by.css('.select2-dropdown li')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
