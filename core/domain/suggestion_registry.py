@@ -214,7 +214,7 @@ class BaseSuggestion(object):
             'populate_old_value_of_change.')
 
     def pre_update_validate(self, change):
-        """Performs the pre update validation. This functions need to be called
+        """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
         """
         raise NotImplementedError(
@@ -347,7 +347,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             commit_message, is_suggestion=True)
 
     def pre_update_validate(self, change):
-        """Performs the pre update validation. This functions need to be called
+        """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
         Args:
@@ -530,8 +530,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.skill_id)
         if self.change.question_domain == change.question_dict:
             raise utils.ValidationError(
-                'The new change question_dict must',
-                ' not be equal to old question_dict')
+                'The new change question_dict must not be equal to the old '
+                'question_dict')
 
 
 

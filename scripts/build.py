@@ -339,9 +339,10 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -357,9 +358,10 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -375,9 +377,10 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -888,9 +891,9 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
             - 'staging_dir': the directory that contains minified files waiting
-            for final copy process.
+                for final copy process.
             - 'out_dir': the final directory that contains built files with hash
-            inserted into filenames.
+                inserted into filenames.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
 

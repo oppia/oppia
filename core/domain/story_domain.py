@@ -541,14 +541,14 @@ class Story(object):
             story_contents: StoryContents. The StoryContents instance
                 representing the contents (like nodes) that are part of the
                 story.
-            created_on: datetime.datetime. Date and time when the story is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                story was last updated.
             schema_version: int. The schema version for the story nodes object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             version: int. The version of the story.
+            created_on: datetime.datetime. Date and time when the story is
+                created.
+            last_updated: datetime.datetime. Date and time when the
+                story was last updated.
         """
         self.id = story_id
         self.title = title
