@@ -199,27 +199,27 @@ describe('Assets Backend API Service', function() {
     });
 
   it('should use the correct blob type for audio assets', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
-          exploration_id: '0',
-          filename: 'myfile.mp3'
-        });
+    var requestUrl = UrlInterpolationService.interpolateUrl(
+      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        exploration_id: '0',
+        filename: 'myfile.mp3'
+      });
 
-      $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(1);
-      $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(0);
+    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      successHandler, failHandler);
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(1);
+    $httpBackend.flush();
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(0);
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-      expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg')
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg')
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
 });
