@@ -59,6 +59,7 @@ describe('Preferences Controller', function() {
        'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
     function() {
       var numberOfAudioLanguageChoices = scope.AUDIO_LANGUAGE_CHOICES.length;
+      expect(numberOfAudioLanguageChoices > 0).toBe(true);
       for (var index = 0; index < numberOfAudioLanguageChoices; index++) {
         expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
           ['id', 'text']);

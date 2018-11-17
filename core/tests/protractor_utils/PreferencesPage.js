@@ -29,8 +29,6 @@ var PreferencesPage = function() {
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
-  var preferredAudioLanguageSelector = element(
-    by.css('.protractor-test-preferred-audio-language-selector'));
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -47,17 +45,6 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = function(language) {
     systemLanguageSelector.click();
-    var options = element.all(by.css('.select2-dropdown li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === language;
-        });
-      });
-    options.first().click();
-  };
-
-  this.selectPreferredAudioLanguage = function(language) {
-    preferredAudioLanguageSelector.click();
     var options = element.all(by.css('.select2-dropdown li')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
@@ -96,12 +83,6 @@ var PreferencesPage = function() {
 
   this.expectPreferredSiteLanguageToBe = function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
-      by.css('.select2-selection__rendered'));
-    expect(selectedLanguageElement.getText()).toEqual(language);
-  };
-
-  this.expectPreferredAudioLanguageToBe = function(language) {
-    var selectedLanguageElement = preferredAudioLanguageSelector.element(
       by.css('.select2-selection__rendered'));
     expect(selectedLanguageElement.getText()).toEqual(language);
   };
