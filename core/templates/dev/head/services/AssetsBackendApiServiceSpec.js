@@ -198,8 +198,7 @@ describe('Assets Backend API Service', function() {
       expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
     });
 
-  it('should use the correct blob type for audio assets',
-    function() {
+  it('should use the correct blob type for audio assets', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
