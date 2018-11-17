@@ -228,7 +228,7 @@ class AssetDevHandlerImageTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(
-            '/assetsdevhandler/0/assets/unknown/myfile',
+            '/assetsdevhandler/0/assets/unknowntype/myfile',
             expect_errors=True)
         self.logout()
         self.assertEqual(response.status_int, 404)
