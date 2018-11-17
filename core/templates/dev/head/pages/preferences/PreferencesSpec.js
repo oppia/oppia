@@ -14,7 +14,7 @@
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, ctrl, $httpBackend, mockAlertsService;
+    var scope, ctrl, $httpBackend, mockAlertsService, SUPPORTED_AUDIO_LANGUAGES;
 
     beforeEach(function() {
       module('oppia');
@@ -22,7 +22,8 @@ describe('Preferences Controller', function() {
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($controller, $http, _$httpBackend_, $rootScope) {
+    beforeEach(inject(function(
+        $controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
         can_receive_email_updates: false,
@@ -38,7 +39,7 @@ describe('Preferences Controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: $rootScope,
-        AlertsService: mockAlertsService
+        AlertsService: mockAlertsService,
       });
     }));
 
@@ -53,6 +54,15 @@ describe('Preferences Controller', function() {
     function() {
       $httpBackend.flush();
       expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
+    });
+
+    it('should map SUPPORTED_AUDIO_LANGUAGES correctly to ' +
+       'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
+    function() {
+      for (var i = 0; i < scope.AUDIO_LANGUAGE_CHOICES.length; i++) {
+        expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[i])).toEqual(
+          ['id', 'text']);
+      }
     });
   });
 });
