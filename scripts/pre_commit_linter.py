@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import HTMLParser
 import argparse
+import ast
 import fnmatch
 import multiprocessing
 import os
@@ -58,6 +59,8 @@ import re
 import subprocess
 import sys
 import time
+
+import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
 
@@ -405,6 +408,7 @@ def _lint_css_files(
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -419,10 +423,13 @@ def _lint_css_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             print linter_stdout
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -454,6 +461,7 @@ def _lint_js_files(
 
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
+    result_list = []
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
@@ -468,9 +476,12 @@ def _lint_js_files(
 
         if linter_stdout:
             num_files_with_errors += 1
+            result_list.append(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
+        for error in result_list:
+            result.put(error)
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
@@ -517,7 +528,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         pylinter = lint.Run(
             current_files_to_lint + [config_pylint],
             exit=False).linter
-
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
         pycodestyle_report = style_guide.check_files(
@@ -730,6 +740,7 @@ def _pre_commit_linter(all_files):
 
     print ''
     print '\n'.join(js_messages)
+    print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
     summary_messages.append(css_in_html_result.get())
@@ -938,7 +949,7 @@ def _check_import_order(all_files):
 
 
 def _check_comments(all_files):
-    """This function ensures that comments end in a period."""
+    """This function ensures that comments follow correct style."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -948,6 +959,8 @@ def _check_comments(all_files):
         and filename.endswith('.py')]
     message = 'There should be a period at the end of the comment.'
     failed = False
+    space_regex = re.compile(r'^#[^\s].*$')
+    capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -955,8 +968,11 @@ def _check_comments(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 next_line = ''
+                previous_line = ''
                 if line_num + 1 < file_length:
                     next_line = file_content[line_num + 1].lstrip().rstrip()
+                if line_num > 0:
+                    previous_line = file_content[line_num - 1].lstrip().rstrip()
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
@@ -970,6 +986,26 @@ def _check_comments(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
 
+                # Check that comment starts with a space and is not a shebang
+                # expression at the start of a bash script which loses function
+                # when a space is added.
+                if space_regex.match(line) and not line.startswith('#!'):
+                    message = (
+                        'There should be a space at the beginning '
+                        'of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
+
+                # Check that comment starts with a capital letter.
+                if not previous_line.startswith('#') and (
+                        capital_regex.match(line)):
+                    message = (
+                        'There should be a capital letter'
+                        ' to begin the content of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
@@ -989,7 +1025,16 @@ def _check_comments(all_files):
 
 
 def _check_docstrings(all_files):
-    """This function ensures that docstrings end in a period."""
+    """This function ensures that docstrings end in a period and the arg
+    order in the function definition matches the order in the doc string.
+
+    Args:
+        all_files: list(str). Names of files to consider during docstring check.
+
+    Returns:
+        summary_messages: list(str). Summary of messages generated by the check.
+    """
+
     print 'Starting docstring checks'
     print '----------------------------------------'
     summary_messages = []
@@ -1081,6 +1126,20 @@ def _check_docstrings(all_files):
                             filename, line_num + 1, multiline_docstring_message)
 
                     is_docstring = False
+
+    # Check that the args in the docstring are listed in the same
+    # order as they appear in the function definition.
+    docstring_checker = docstrings_checker.ASTDocStringChecker()
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            ast_file = ast.walk(ast.parse(f.read()))
+            func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+            for func in func_defs:
+                func_result = docstring_checker.check_docstrings_arg_order(func)
+                for error_line in func_result:
+                    print '%s --> Func %s: %s' % (
+                        filename, func.name, error_line)
+                    failed = True
 
     print ''
     print '----------------------------------------'
@@ -1307,7 +1366,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
 
     # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
     pattern_to_match = (
-        r'controller: \[(?P<stringfied_dependencies>[\S\s]*?)' +
+        r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
         r'function\((?P<function_parameters>[\S\s]*?)\)')
     for filename in files_to_check:
         with open(filename) as f:
@@ -1593,6 +1652,9 @@ def _check_for_copyright_notice(all_files):
 
 
 def main():
+    """Main method for pre commit linter script that lints Python and JavaScript
+    files.
+    """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (

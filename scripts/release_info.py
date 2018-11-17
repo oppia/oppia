@@ -45,10 +45,10 @@ def _run_cmd(cmd_str):
     Raises subprocess.CalledProcessError upon failure.
 
     Args:
-        cmd_str (str): The command string to execute
+        cmd_str: str. The command string to execute
 
     Returns:
-        (str): The output of the command.
+        str. The output of the command.
     """
     return subprocess.check_output(cmd_str.split(' ')).strip()
 
@@ -78,7 +78,7 @@ def _get_base_commit_with_develop(reference):
     specified reference commit.
 
     Args:
-        reference (str): Tag, Branch, or commit hash of reference commit.
+        reference: str. Tag, Branch, or commit hash of reference commit.
 
     Returns:
         (str): The common commit hash.
@@ -90,11 +90,11 @@ def _gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
-        start (str): Tag, Branch or SHA1 of start point
-        stop (str):  Tag, Branch or SHA1 of end point, defaults to HEAD
+        start: str. Tag, Branch or SHA1 of start point
+        stop: str.  Tag, Branch or SHA1 of end point, defaults to HEAD
 
     Returns:
-        list[Log]: List of Logs.
+        list(Log): List of Logs
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
@@ -109,10 +109,10 @@ def _extract_issues(logs):
     """Extract references to issues out of a list of Logs
 
     Args:
-        logs (list[Log]): List of Logs to parse
+        logs: list(Log). List of Logs to parse
 
     Returns:
-        set[str]: Set of found issues as links to Github.
+        set(str): Set of found issues as links to Github
     """
     issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
     links = {ISSUE_URL_FORMAT_STRING % issue for issue in issues}
@@ -124,7 +124,7 @@ def _check_versions(current_release):
     changed.
 
     Args:
-        current_release (str): The current release tag to diff against.
+        current_release: str. The current release tag to diff against.
 
     Returns:
         List of variable names that changed.
@@ -148,8 +148,8 @@ def _git_diff_names_only(left, right='HEAD'):
     """ Get names of changed files from git.
 
     Args:
-        left (str): Lefthand timepoint
-        right (str): rightand timepoint
+        left: str. Lefthand timepoint.
+        right: str. rightand timepoint.
 
     Returns:
         list (str): List of files that are different between the two points.
@@ -162,8 +162,8 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
     """Check if setup scripts have changed.
 
     Args:
-        base_release_tag (str): The current release tag to diff against.
-        changed_only (bool): If set to False will return all tested files
+        base_release_tag: str. The current release tag to diff against.
+        changed_only: bool. If set to False will return all tested files
             instead of just the changed ones.
 
     Returns:

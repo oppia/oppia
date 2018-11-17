@@ -214,6 +214,14 @@ class BaseSuggestion(object):
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'pre_update_validate.')
+
     @property
     def is_handled(self):
         """Returns if the suggestion has either been accepted or rejected.
@@ -318,8 +326,13 @@ class SuggestionEditStateContent(BaseSuggestion):
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
+        if self.change.state_name not in exploration.states:
+            # As the state doesn't exist now, we cannot find the content of the
+            # state to populate the old_value field. So we set it as None.
+            old_content = None
+        else:
+            old_content = (
+                exploration.states[self.change.state_name].content.to_dict())
 
         self.change.old_value = old_content
 
@@ -333,6 +346,32 @@ class SuggestionEditStateContent(BaseSuggestion):
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError: Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.property_name != change.property_name:
+            raise utils.ValidationError(
+                'The new change property_name must be equal to %s' %
+                self.change.property_name)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.new_value['html'] == change.new_value['html']:
+            raise utils.ValidationError(
+                'The new html must not match the old html')
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -470,6 +509,31 @@ class SuggestionAddQuestion(BaseSuggestion):
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         pass
+
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This functions need to be called
+        before updating the suggestion.
+
+        Args:
+            change: QuestionChange. The new change.
+
+        Raises:
+            ValidationError: Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        if self.change.skill_id != change.skill_id:
+            raise utils.ValidationError(
+                'The new change skill_id must be equal to %s' %
+                self.change.skill_id)
+        if self.change.question_domain == change.question_dict:
+            raise utils.ValidationError(
+                'The new change question_dict must not be equal to the old '
+                'question_dict')
+
 
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {

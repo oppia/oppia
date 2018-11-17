@@ -1011,7 +1011,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'eid', exp_version, state_name)
             self.assertEqual(state_answers, None)
 
-        # answer is a string.
+        # Answer is a string.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 0, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
@@ -1020,32 +1020,32 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'eid', exp_version, first_state_name, 'TextInput', 0, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
             self.PARAMS, 'answer1')
-        # answer is a dict.
+        # Answer is a dict.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 1, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, {'x': 1.0, 'y': 5.0})
-        # answer is a number.
+        # Answer is a number.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, 10)
-        # answer is a list of dicts.
+        # Answer is a list of dicts.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 3, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}])
-        # answer is a list.
+        # Answer is a list.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
             self.PARAMS, [2, 4, 8])
-        # answer is a unicode string.
+        # Answer is a unicode string.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
             self.PARAMS, self.UNICODE_TEST_STRING)
-        # answer is None (such as for Continue).
+        # Answer is None (such as for Continue).
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, third_state_name, 'Continue', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid5', self.TIME_SPENT,

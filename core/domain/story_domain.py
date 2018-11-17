@@ -85,10 +85,19 @@ class StoryChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'add_story_node' (with node_id)
+                - 'delete_story_node' (with node_id)
+                - 'update_story_node_outline_status' (with node_id, old_value
+                and new_value)
                 - 'update_story_property' (with property_name, new_value
                 and old_value)
                 - 'update_story_node_property' (with property_name, new_value
                 and old_value)
+                - 'update_story_contents_property' (with property_name,
+                new_value and old_value)
+                - 'migrate_schema_to_latest_version' (with from_version and
+                to_version)
+                - 'create_new' (with title)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -532,14 +541,14 @@ class Story(object):
             story_contents: StoryContents. The StoryContents instance
                 representing the contents (like nodes) that are part of the
                 story.
-            created_on: datetime.datetime. Date and time when the story is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                story was last updated.
             schema_version: int. The schema version for the story nodes object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             version: int. The version of the story.
+            created_on: datetime.datetime. Date and time when the story is
+                created.
+            last_updated: datetime.datetime. Date and time when the
+                story was last updated.
         """
         self.id = story_id
         self.title = title

@@ -3951,3 +3951,9 @@ span.oppia-issues-learner-action {
   width: 100%;
   border: 1px solid black;
 }
+
+/* To fix the shifting of tooltip when text is too long. */
+.nav .tooltip-inner {
+  max-width: none;
+  white-space: nowrap;
+}

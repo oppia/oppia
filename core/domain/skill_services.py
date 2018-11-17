@@ -117,17 +117,13 @@ def get_merged_skill_ids():
     return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 
 
-def get_skill_from_model(skill_model, run_conversion=True):
+def get_skill_from_model(skill_model):
     """Returns a skill domain object given a skill model loaded
     from the datastore.
 
     Args:
         skill_model: SkillModel. The skill model loaded from the
             datastore.
-        run_conversion: bool. If true, the the skill's schema version will
-            be checked against the current schema version. If they do not match,
-            the skill will be automatically updated to the latest schema
-            version.
 
     Returns:
         skill. A Skill domain object corresponding to the given
@@ -146,11 +142,11 @@ def get_skill_from_model(skill_model, run_conversion=True):
     }
 
     # Migrate the skill if it is not using the latest schema version.
-    if (run_conversion and skill_model.skill_contents_schema_version !=
+    if (skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
 
-    if (run_conversion and skill_model.misconceptions_schema_version !=
+    if (skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
@@ -515,14 +511,14 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     """Updates a skill. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - skill_id: str. The skill id.
-    - change_list: list(SkillChange). These changes are applied in sequence to
-        produce the resulting skill.
-    - commit_message: str or None. A description of changes made to the
-        skill. For published skills, this must be present; for
-        unpublished skills, it may be equal to None.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        skill_id: str. The skill id.
+        change_list: list(SkillChange). These changes are applied in sequence to
+            produce the resulting skill.
+        commit_message: str or None. A description of changes made to the
+            skill. For published skills, this must be present; for
+            unpublished skills, it may be equal to None.
 
     Raises:
         ValueError: No commit message was provided.

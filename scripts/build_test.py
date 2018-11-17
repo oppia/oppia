@@ -61,7 +61,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Tests _minify with an invalid filepath."""
         with self.assertRaises(subprocess.CalledProcessError) as called_process:
             build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # returncode is the exit status of the child process.
+        # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_minify_and_create_sourcemap(self):
@@ -69,7 +69,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaises(subprocess.CalledProcessError) as called_process:
             build._minify_and_create_sourcemap(
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # returncode is the exit status of the child process.
+        # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_ensure_files_exist(self):
@@ -420,7 +420,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test get_hashes_json_file_contents parses provided hash dict
         correctly to JSON format.
         """
-        # set constant to provide everything to frontend.
+        # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/file.js': '123456'}
             self.assertEqual(

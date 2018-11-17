@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -189,8 +190,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_fail_to_add_unpublished_skill_id(self):
         self.save_new_skill(
             'skill_a', self.user_id_a, 'Description A', misconceptions=[],
-            skill_contents=(
-                skill_domain.SkillContents('Explanation', ['Example 1'])))
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
         with self.assertRaisesRegexp(
             Exception,
             'Cannot assign unpublished skills to a topic'):

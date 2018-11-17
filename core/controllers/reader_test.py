@@ -1752,3 +1752,45 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
+
+
+class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
+    """Tests for the answer submitted event handler."""
+
+    def test_submit_answer_for_exploration(self):
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 'This is an answer.',
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+            }
+        )
+        submitted_answer = stats_services.get_state_answers(
+            exp_id, version, state_name_1)
+        self.assertEqual(
+            len(submitted_answer.get_submitted_answer_dict_list()), 1)
+        self.assertEqual(
+            submitted_answer.get_submitted_answer_dict_list()[0]['answer'],
+            'This is an answer.'
+        )
+        self.logout()
