@@ -152,7 +152,7 @@ def _git_diff_names_only(left, right='HEAD'):
         right (str): rightand timepoint
 
     Returns:
-        (list): List of files that are different between the two points.
+        list (str): List of files that are different between the two points.
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
     return _run_cmd(diff_cmd).splitlines()
@@ -190,7 +190,7 @@ def _check_storage_models(current_release):
         current_release: The current release version
 
     Returns:
-        (list): The changed files (if any)
+        list (str): The changed files (if any)
     """
     diff_list = _git_diff_names_only(current_release)
     return [item for item in diff_list if item.startswith('core/storage')]
