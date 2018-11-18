@@ -94,7 +94,7 @@ def _gather_logs(start, stop='HEAD'):
         stop: str.  Tag, Branch or SHA1 of end point, defaults to HEAD
 
     Returns:
-        list(Log): List of Logs
+        list(Log): List of Logs.
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
@@ -112,7 +112,7 @@ def _extract_issues(logs):
         logs: list(Log). List of Logs to parse
 
     Returns:
-        set(str): Set of found issues as links to Github
+        set(str): Set of found issues as links to Github.
     """
     issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
     links = {ISSUE_URL_FORMAT_STRING % issue for issue in issues}
