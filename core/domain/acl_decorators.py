@@ -2386,6 +2386,21 @@ def get_decorator_for_accepting_suggestion(decorator):
         """
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
+            """Returns a (possibly-decorated) handler to test whether a
+            suggestion can be accepted based on the user actions and roles.
+
+            Args:
+                target_id: str. The target id.
+                suggestion_id: str. The suggestion id.
+                **kwargs: *. Keyword arguments.
+
+            Returns:
+                function. The (possibly-decorated) handler for accepting a
+                    suggestion.
+
+            Raises:
+                NotLoggedInException: The user is not logged in.
+            """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
             user_actions_info = user_services.UserActionsInfo(self.user_id)
