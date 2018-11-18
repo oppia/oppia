@@ -268,63 +268,27 @@ oppia.directive('stateTranslation', [
                 ExplorationInitStateNameService.displayed);
             }
 
-            var stateName = StateEditorService.getActiveStateName();
+            $scope.stateName = StateEditorService.getActiveStateName();
 
             $scope.stateContent = ExplorationStatesService
-              .getStateContentMemento(stateName);
+              .getStateContentMemento($scope.stateName);
             $scope.stateSolution = ExplorationStatesService
-              .getSolutionMemento(stateName);
+              .getSolutionMemento($scope.stateName);
             $scope.stateHints = ExplorationStatesService
-              .getHintsMemento(stateName);
+              .getHintsMemento($scope.stateName);
             $scope.stateAnswerGroups = ExplorationStatesService
-              .getInteractionAnswerGroupsMemento(stateName);
+              .getInteractionAnswerGroupsMemento($scope.stateName);
             $scope.stateDefaultOutcome = ExplorationStatesService
-              .getInteractionDefaultOutcomeMemento(stateName);
+              .getInteractionDefaultOutcomeMemento($scope.stateName);
             $scope.stateInteractionId = ExplorationStatesService
-              .getInteractionIdMemento(stateName);
+              .getInteractionIdMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
             var currentCustomizationArgs = ExplorationStatesService
-              .getInteractionCustomizationArgsMemento(stateName);
-            var interactionId = $scope.stateInteractionId;
-            if (interactionId) {
-              // Special cases for multiple choice input and image click input.
-              if (interactionId === 'MultipleChoiceInput') {
-                $scope.answerChoices =
-                  currentCustomizationArgs.choices.value.map(
-                    function(val, ind) {
-                      return {
-                        val: ind,
-                        label: val
-                      };
-                    }
-                  );
-              } else if (interactionId === 'ImageClickInput') {
-                var _answerChoices = [];
-                var imageWithRegions =
-                  currentCustomizationArgs.imageAndRegions.value;
-                for (
-                  var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
-                  _answerChoices.push({
-                    val: imageWithRegions.labeledRegions[j].label,
-                    label: imageWithRegions.labeledRegions[j].label
-                  });
-                }
-                $scope.answerChoices = _answerChoices;
-              } else if (interactionId === 'ItemSelectionInput' ||
-                  interactionId === 'DragAndDropSortInput') {
-                $scope.answerChoices =
-                  currentCustomizationArgs.choices.value.map(function(val) {
-                    return {
-                      val: val,
-                      label: val
-                    };
-                  });
-              } else {
-                $scope.answerChoices = null;
-              }
-            }
+              .getInteractionCustomizationArgsMemento($scope.stateName);
+            $scope.answerChoices = StateEditorService.getAnswerChoices(
+              $scope.stateInteractionId, currentCustomizationArgs);
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 

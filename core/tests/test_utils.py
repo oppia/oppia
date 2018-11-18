@@ -931,8 +931,8 @@ tags: []
         """Publish the exploration with the given exploration_id.
 
         Args:
-            exploration_id: str. The ID of the new exploration.
             owner_id: str. The user_id of the owner of the exploration.
+            exploration_id: str. The ID of the new exploration.
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
@@ -1121,7 +1121,7 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, description,
+            self, topic_id, owner_id, name, canonical_name, description,
             canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
             next_subtopic_id, language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new topic with a default version 1 subtopic
@@ -1140,6 +1140,7 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1155,6 +1156,7 @@ tags: []
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
+            canonical_name=canonical_name,
             description=description,
             language_code=language_code,
             canonical_story_ids=canonical_story_ids,
@@ -1236,10 +1238,10 @@ tags: []
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            skill_contents: SkillContents. A SkillContents object containing the
-                explanation and examples of the skill.
             misconceptions: list(Misconception). A list of Misconception objects
                 that contains the various misconceptions of the skill.
+            skill_contents: SkillContents. A SkillContents object containing the
+                explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
 

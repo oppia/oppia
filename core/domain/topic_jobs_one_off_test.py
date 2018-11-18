@@ -122,7 +122,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         """
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', '',
+            self.TOPIC_ID, self.albert_id, 'A name', 'a name', '',
             [], [], [], 2)
         topic = (
             topic_services.get_topic_by_id(self.TOPIC_ID))

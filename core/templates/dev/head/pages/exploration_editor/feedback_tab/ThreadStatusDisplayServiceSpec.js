@@ -60,6 +60,6 @@ describe('Thread Status Display Service', function() {
 
     mockStatusID = 'compliment';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'label label-success');
   });
 });

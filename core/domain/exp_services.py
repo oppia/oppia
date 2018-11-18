@@ -77,9 +77,9 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
 
     Args:
         versioned_exploration_states: dict. A dict with two keys:
-            states_schema_version: int. the states schema version for the
+            - states_schema_version: int. the states schema version for the
                 exploration.
-            states: the dict of states comprising the exploration. The keys in
+            - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
         exploration_id: str. ID of the exploration.
 
@@ -1654,10 +1654,10 @@ def save_original_and_compressed_versions_of_image(
     """Saves the three versions of the image file.
 
     Args:
-        exp_id: str. The id of the exploration.
-        filename: str. The name of the image file.
-        original_image_content: str. The content of the original image.
         user_id: str. The id of the user who wants to upload the image.
+        filename: str. The name of the image file.
+        exp_id: str. The id of the exploration.
+        original_image_content: str. The content of the original image.
     """
     filepath = 'image/%s' % filename
 

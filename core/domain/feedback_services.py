@@ -201,7 +201,7 @@ def create_message(
     if (user_services.is_user_registered(author_id) and
             feconf.CAN_SEND_EMAILS and
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
-            # send feedback message email if user is registered.
+            # Send feedback message email if user is registered.
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text),
             old_status, new_status)
@@ -216,8 +216,8 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     function.
 
     Args:
-        thread_id: str. The id of the thread.
         user_id: str. The id of the user reading the messages,
+        thread_id: str. The id of the thread.
         message_ids: list(int). The ids of the messages in the thread read by
             the user.
     """

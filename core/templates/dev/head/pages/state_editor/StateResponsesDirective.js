@@ -286,11 +286,13 @@ oppia.directive('stateResponses', [
                 'EditorFirstTimeEventsService', 'StateEditorService',
                 'RuleObjectFactory', 'OutcomeObjectFactory',
                 'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
+                'StateContentIdsToAudioTranslationsService',
                 function(
                     $scope, $uibModalInstance, ResponsesService,
                     EditorFirstTimeEventsService, StateEditorService,
                     RuleObjectFactory, OutcomeObjectFactory,
-                    COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
+                    COMPONENT_NAME_FEEDBACK, GenerateContentIdService,
+                    StateContentIdsToAudioTranslationsService) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
                   $scope.questionModeEnabled =
@@ -300,6 +302,8 @@ oppia.directive('stateResponses', [
                   };
                   $scope.tmpRule = RuleObjectFactory.createNew(null, {});
                   var feedbackContentId = GenerateContentIdService.getNextId(
+                    StateContentIdsToAudioTranslationsService
+                      .displayed.getAllContentId(),
                     COMPONENT_NAME_FEEDBACK);
 
                   $scope.tmpOutcome = OutcomeObjectFactory.createNew(

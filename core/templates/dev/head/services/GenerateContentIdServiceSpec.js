@@ -20,6 +20,7 @@ describe('GenerateContentIdService', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
     $provide.value('COMPONENT_NAME_HINT', 'hint');
+    $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
   }));
   var gcis = null;
   var citatDict = {
@@ -30,6 +31,11 @@ describe('GenerateContentIdService', function() {
     solution: {}
   };
 
+  var citatDictConceptCard = {
+    explanation: {},
+    worked_example_1: {}
+  };
+
   beforeEach(inject(function($injector) {
     gcis = $injector.get('GenerateContentIdService');
     scitat = $injector.get('StateContentIdsToAudioTranslationsService');
@@ -37,12 +43,23 @@ describe('GenerateContentIdService', function() {
     scitat.displayed = citatof.createFromBackendDict(citatDict);
   }));
 
-  it('should generate content id for new feedbacks', function(){
-    expect(gcis.getNextId('feedback')).toEqual('feedback_2');
+  it('should generate content id for new feedbacks', function() {
+    expect(
+      gcis.getNextId(scitat.displayed.getAllContentId(), 'feedback'))
+      .toEqual('feedback_2');
   });
 
-  it('should generate content id for new hint', function(){
-    expect(gcis.getNextId('hint')).toEqual('hint_2');
+  it('should generate content id for new hint', function() {
+    expect(
+      gcis.getNextId(scitat.displayed.getAllContentId(), 'hint'))
+      .toEqual('hint_2');
+  });
+
+  it('should generate content id for new worked example', function() {
+    scitat.displayed = citatof.createFromBackendDict(citatDictConceptCard);
+    expect(
+      gcis.getNextId(scitat.displayed.getAllContentId(), 'worked_example'))
+      .toEqual('worked_example_2');
   });
 
   it('should throw error for unknown content id', function(){

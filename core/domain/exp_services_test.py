@@ -799,7 +799,8 @@ title: Title
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
-        self.assertEqual(fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
+        self.assertEqual(
+            fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
     def test_can_load_yaml_with_audio_translations(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -2499,7 +2500,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        #TODO(frederikcreemers@gmail.com) test max_age here.
+        # TODO(frederikcreemers@gmail.com) test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
@@ -2828,7 +2829,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2872,7 +2873,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             )
         }
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',

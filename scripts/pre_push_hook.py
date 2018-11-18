@@ -44,7 +44,7 @@ GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
-# git hash of /dev/null, refers to an 'empty' commit.
+# Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*.
@@ -59,6 +59,10 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
 class ChangedBranch(object):
+    """Context manager class that changes branch when there are modified files
+    that need to be linted. It does not change branch when modified files are
+    not committed.
+    """
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()
@@ -164,18 +168,18 @@ def _collect_files_being_pushed(ref_list, remote):
     """
     if not ref_list:
         return {}
-    # avoid testing of non branch pushes (tags for instance) or deletions.
+    # Avoid testing of non branch pushes (tags for instance) or deletions.
     ref_heads_only = [ref for ref in ref_list
                       if ref.local_ref.startswith('refs/heads/')]
-    # get branch name from e.g. local_ref='refs/heads/lint_hook'.
+    # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     collected_files = {}
-    # git allows that multiple branches get pushed simultaneously with the "all"
+    # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
-        # git reports the following for an empty / non existing branch
+        # Git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'.
         if set(remote_sha1) != {'0'}:
             try:
@@ -189,7 +193,7 @@ def _collect_files_being_pushed(ref_list, remote):
                 modified_files = _compare_to_remote(
                     remote, branch, remote_branch='develop')
             except ValueError:
-                # give up, return all files in repo.
+                # Give up, return all files in repo.
                 try:
                     modified_files = _git_diff_name_status(
                         GIT_NULL_COMMIT, sha1)
@@ -241,7 +245,7 @@ def _has_uncommitted_files():
 
 
 def _install_hook():
-    # install script ensures that oppia is root.
+    # Install script ensures that oppia is root.
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
@@ -251,13 +255,16 @@ def _install_hook():
     try:
         os.symlink(os.path.abspath(__file__), pre_push_file)
         print 'Created symlink in .git/hooks directory'
-    # raises AttributeError on windows, OSError added as failsafe.
+    # Raises AttributeError on windows, OSError added as failsafe.
     except (OSError, AttributeError):
         shutil.copy(__file__, pre_push_file)
         print 'Copied file to .git/hooks directory'
 
 
 def main():
+    """Main method for pre-push hook that executes the Python/JS linters on all
+    files that deviate from develop.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
@@ -270,7 +277,7 @@ def main():
         sys.exit(0)
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
-    # only interfere if we actually have something to lint (prevent annoyances).
+    # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
         print ('Your repo is in a dirty state which prevents the linting from'
                ' working.\nStash your changes or commit them.\n')

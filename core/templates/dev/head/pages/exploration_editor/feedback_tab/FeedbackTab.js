@@ -17,17 +17,17 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
-  'DateTimeFormatService', 'ThreadStatusDisplayService',
+  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
+  'AlertsService', 'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
-      DateTimeFormatService, ThreadStatusDisplayService,
+      $scope, $http, $q, $uibModal, $timeout, $rootScope,
+      AlertsService, DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -37,8 +37,14 @@ oppia.controller('FeedbackTab', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
-    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+    $scope.userIsLoggedIn = null;
     $rootScope.loadingMessage = 'Loading';
+    var userInfoPromise = UserService.getUserInfoAsync();
+    userInfoPromise.then(function(userInfo) {
+      $scope.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+
+    // Initial load of the thread list on page load.
     $scope.tmpMessage = {
       status: null,
       text: ''
@@ -48,11 +54,16 @@ oppia.controller('FeedbackTab', [
         $scope.activeThread.status : null;
       $scope.tmpMessage.text = '';
     };
-
     $scope.clearActiveThread = function() {
       $scope.activeThread = null;
       _resetTmpMessageFields();
     };
+    $scope.clearActiveThread();
+    ThreadDataService.fetchFeedbackStats();
+    var threadPromise = ThreadDataService.fetchThreads();
+    $q.all([userInfoPromise, threadPromise]).then(function() {
+      $rootScope.loadingMessage = '';
+    });
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({
@@ -281,14 +292,5 @@ oppia.controller('FeedbackTab', [
       }
       $scope.tmpMessage.status = $scope.activeThread.status;
     };
-
-    // Initial load of the thread list on page load.
-    $scope.clearActiveThread();
-    ThreadDataService.fetchFeedbackStats();
-    ThreadDataService.fetchThreads(function() {
-      $timeout(function() {
-        $rootScope.loadingMessage = '';
-      }, 500);
-    });
   }
 ]);

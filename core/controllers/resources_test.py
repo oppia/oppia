@@ -23,7 +23,7 @@ from core.tests import test_utils
 import feconf
 
 
-class ImageDevHandlerTest(test_utils.GenericTestBase):
+class AssetDevHandlerImageTest(test_utils.GenericTestBase):
 
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
@@ -35,7 +35,7 @@ class ImageDevHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
-        super(ImageDevHandlerTest, self).setUp()
+        super(AssetDevHandlerImageTest, self).setUp()
 
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
@@ -223,8 +223,18 @@ class ImageDevHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_request_invalid_asset_type(self):
+        """Test that requests for invalid asset type is rejected with a 404."""
+        self.login(self.EDITOR_EMAIL)
 
-class AudioDevHandlerTest(test_utils.GenericTestBase):
+        response = self.testapp.get(
+            '/assetsdevhandler/0/assets/unknowntype/myfile',
+            expect_errors=True)
+        self.logout()
+        self.assertEqual(response.status_int, 404)
+
+
+class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
@@ -234,7 +244,7 @@ class AudioDevHandlerTest(test_utils.GenericTestBase):
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
     def setUp(self):
-        super(AudioDevHandlerTest, self).setUp()
+        super(AssetDevHandlerAudioTest, self).setUp()
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
         exp_services.load_demo('0')
