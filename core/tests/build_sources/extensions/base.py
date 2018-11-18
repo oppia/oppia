@@ -121,20 +121,43 @@ class BaseInteraction(object):
 
     @property
     def id(self):
+        """Returns the name of the class.
+
+        Returns:
+            str. The class name.
+        """
         return self.__class__.__name__
 
     @property
     def customization_arg_specs(self):
+        """Returns the customization args of the interaction.
+
+        Returns:
+            list(CustomizationArgSpec). The list of customization arg spec
+                objects.
+        """
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
     def answer_visualization_specs(self):
+        """Returns the answer visualization specs of the interaction.
+
+        Returns:
+            list(dict(str, *)). The specs for desired visualizations of the
+                recorded state answers.
+        """
         return self._answer_visualization_specs
 
     @property
     def answer_visualizations(self):
+        """Returns a list of objects of visualization classes using the unique
+        visualization id of the class.
+
+        Returns:
+            list(*). The list of objects of visualization classes.
+        """
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
@@ -148,16 +171,35 @@ class BaseInteraction(object):
 
     @property
     def answer_calculation_ids(self):
+        """Returns the set of all the objects of visualization classes.
+
+        Returns:
+            set(*). The set of objects of visualization classes.
+        """
         visualizations = self.answer_visualizations
         return set(
             [visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self):
+        """Returns a copy of dependency ids of the interaction.
+
+        Returns:
+            list(str). The copy of list of all the dependency ids.
+        """
         return copy.deepcopy(self._dependency_ids)
 
     def normalize_answer(self, answer):
-        """Normalizes a learner's input to this interaction."""
+        """Normalizes a learner's input to this interaction.
+
+        Args:
+            answer: dict(str, *). The learner's input.
+
+        Returns:
+            dict(str, *)|None. The normalized learner's answer in dict format.
+                Otherwise, returns None if answer type is None.
+
+        """
         if self.answer_type is None:
             return None
         else:
@@ -166,7 +208,12 @@ class BaseInteraction(object):
 
     @property
     def rules_dict(self):
-        """A dict of rule names to rule properties."""
+        """A dict of rule names to rule properties.
+
+        Returns:
+            dict(str, *). A dict containing rule names as keys mapped to rule
+                properties as values.
+        """
         if self._cached_rules_dict is not None:
             return self._cached_rules_dict
 
@@ -178,6 +225,12 @@ class BaseInteraction(object):
 
     @property
     def _rule_description_strings(self):
+        """Returns a dict of rule names to rule description strings.
+
+        Returns:
+            dict(str, str). A dict containing rule names as keys mapped to rule
+                description strings as values.
+        """
         return {
             rule_name: self.rules_dict[rule_name]['description']
             for rule_name in self.rules_dict
@@ -201,6 +254,10 @@ class BaseInteraction(object):
     def validator_html(self):
         """The HTML code containing validators for the interaction's
         customization_args and submission handler.
+
+        Returns:
+            str. The HTML code containing validators for the interaction's
+                customization_args and submission handler.
         """
         return (
             '<script>%s</script>\n' %
@@ -212,6 +269,9 @@ class BaseInteraction(object):
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
         provided.
+
+        Returns:
+            dict(str, *). A dict representing this interaction.
         """
         return {
             'id': self.id,
@@ -238,14 +298,32 @@ class BaseInteraction(object):
         }
 
     def get_rule_description(self, rule_name):
-        """Gets a rule description, given its name."""
+        """Gets a rule description, given its name.
+
+        Args:
+            str. The rule name.
+
+        Returns:
+            str. The rule description given its name.
+
+        Raises:
+            Exception: The rule could not be found.
+        """
         if rule_name not in self.rules_dict:
             raise Exception('Could not find rule with name %s' % rule_name)
         else:
             return self.rules_dict[rule_name]['description']
 
     def get_rule_param_list(self, rule_name):
-        """Gets the parameter list for a given rule."""
+        """Gets the parameter list for a given rule.
+
+        Args:
+            rule_name: str. The rule name.
+
+        Returns:
+            list(tuple(*)). The list of tuples containing parameter for a given
+                rule.
+        """
         description = self.get_rule_description(rule_name)
 
         param_list = []
@@ -268,7 +346,18 @@ class BaseInteraction(object):
         return param_list
 
     def get_rule_param_type(self, rule_name, rule_param_name):
-        """Gets the parameter type for a given rule parameter name."""
+        """Gets the parameter type for a given rule parameter name.
+
+        Args:
+            rule_name: str. The rule name.
+            rule_param_name: str. The name of the parameter of rule.
+
+        Returns:
+            str. The parameter type for a given rule parameter name.
+
+        Raises:
+            Exception: The given rule has no parameter of the given name.
+        """
         rule_param_list = self.get_rule_param_list(rule_name)
 
         for param_name, param_type in rule_param_list:
