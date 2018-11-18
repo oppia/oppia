@@ -1151,7 +1151,6 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
-
         """
         topic_model = topic_models.TopicModel(
             id=topic_id,
