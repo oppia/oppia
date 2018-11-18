@@ -110,7 +110,8 @@ def parse_string(string, params, autoescape=True):
         autoescape: bool. Whether to enable autoescaping when parsing.
 
     Returns:
-        str. The parsed string.
+        str. The string parsed using Jinja templating. Returns an error string
+            in case of error in parsing.
 
     Raises:
         Exception: Unable to parse string with Jinja.

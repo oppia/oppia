@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Python configuration for recording the action corresponding to a learner
-submitting an answer.
+starting an exploration.
 """
 
 from extensions.actions import base
