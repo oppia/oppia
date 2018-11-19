@@ -765,7 +765,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     This model stores the degree of mastery of each skill for a given user.
 
-    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'
+    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'.
     """
 
     # The user id of the user.

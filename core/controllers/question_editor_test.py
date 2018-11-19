@@ -59,8 +59,7 @@ class BaseQuestionEditorControllerTest(test_utils.GenericTestBase):
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests returning of new question ids and creating questions.
-    """
+    """Tests returning of new question ids and creating questions."""
 
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
@@ -115,8 +114,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
 
 
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests link and unlink question from skills.
-    """
+    """Tests link and unlink question from skills."""
 
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
@@ -217,8 +215,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
 
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests get, put and delete methods of editable questions data handler.
-    """
+    """Tests get, put and delete methods of editable questions data handler."""
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):

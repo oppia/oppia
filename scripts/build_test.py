@@ -121,8 +121,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
-        """Test _insert_hash returns correct filenames with provided hashes.
-        """
+        """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')
         self.assertEqual(

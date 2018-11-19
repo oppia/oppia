@@ -1617,8 +1617,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 
 class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while onboarding reviewers.
-    """
+    """Test that correct email is sent while onboarding reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1684,8 +1683,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
 
 
 class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while notifying reviewers.
-    """
+    """Test that correct email is sent while notifying reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 

@@ -232,7 +232,8 @@ class BaseModel(ndb.Model):
 
 
 class BaseCommitLogEntryModel(BaseModel):
-    """Base Model for the models that store the log of commits to a construct.
+    """Base Model for the models that store the log of commits to a
+    construct.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)

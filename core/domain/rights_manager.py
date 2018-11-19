@@ -1298,7 +1298,6 @@ def unpublish_collection(committer, collection_id):
     Raises:
         Exception. This could potentially throw an exception from
             _unpublish_activity.
-
     """
     _unpublish_activity(
         committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)

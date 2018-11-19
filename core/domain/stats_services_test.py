@@ -152,7 +152,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
 
     def test_exploration_changes_effect_on_exp_issues_model(self):
-        """Test the effect of exploration changes on exploration issues model.
+        """Test the effect of exploration changes on exploration issues
+        model.
         """
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(

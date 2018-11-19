@@ -840,8 +840,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
 
 
 def _check_bad_patterns(all_files):
-    """This function is used for detecting bad patterns.
-    """
+    """This function is used for detecting bad patterns."""
     print 'Starting Pattern Checks'
     print '----------------------------------------'
     total_files_checked = 0
@@ -1051,7 +1050,12 @@ def _check_docstrings(all_files):
         'Single line docstring should not span two lines. '
         'If line length exceeds 80 characters, '
         'convert the single line docstring to a multiline docstring.')
+    previous_line_message = (
+        'There should not be any empty lines before the end of '
+        'the multi-line docstring.')
     failed = False
+    is_docstring = False
+    is_class_or_function = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -1063,8 +1067,26 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
+                # Check if it is a docstring and not some multi-line string.
+                if (prev_line.startswith('class ') or
+                        prev_line.startswith('def ')) or (
+                            is_class_or_function):
+                    is_class_or_function = True
+                    if prev_line.endswith('):') and (
+                            line.startswith('"""')):
+                        is_docstring = True
+                        is_class_or_function = False
+
+                # Check if single line docstring span two lines.
+                if line == '"""' and prev_line.startswith('"""') and (
+                        is_docstring):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num, single_line_docstring_message)
+                    is_docstring = False
+
                 # Check for single line docstring.
-                if line.startswith('"""') and line.endswith('"""'):
+                elif re.match(r'^""".+"""$', line) and is_docstring:
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
                     if (len(line) > 6) and (
@@ -1072,32 +1094,29 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
-
-                # Check if single line docstring span two lines.
-                elif line == '"""' and prev_line.startswith('"""'):
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num, single_line_docstring_message)
+                    is_docstring = False
 
                 # Check for multiline docstring.
-                elif line.endswith('"""'):
-                    # Ignore regular expression, i.e. lines end with r""".
-                    if line.endswith('r"""'):
-                        continue
+                elif line.endswith('"""') and is_docstring:
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
-                        line = file_content[line_num - 1].lstrip().rstrip()
-                        # Check for punctuation at end of docstring.
-                        last_char_is_invalid = line[-1] not in (
-                            ALLOWED_TERMINATING_PUNCTUATIONS)
-                        no_word_is_present_in_excluded_phrases = not any(
-                            word in line for word in EXCLUDED_PHRASES)
-                        if last_char_is_invalid and (
-                                no_word_is_present_in_excluded_phrases):
+                        # Check for empty line before the end of docstring.
+                        if prev_line == '':
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num, missing_period_message)
+                                filename, line_num, previous_line_message)
+                        # Check for punctuation at end of docstring.
+                        else:
+                            last_char_is_invalid = prev_line[-1] not in (
+                                ALLOWED_TERMINATING_PUNCTUATIONS)
+                            no_word_is_present_in_excluded_phrases = not any(
+                                word in prev_line for word in EXCLUDED_PHRASES)
+                            if last_char_is_invalid and (
+                                    no_word_is_present_in_excluded_phrases):
+                                failed = True
+                                print '%s --> Line %s: %s' % (
+                                    filename, line_num, missing_period_message)
 
                     # Case 2: line contains some words before """. """ should
                     # shift to next line.
@@ -1105,6 +1124,8 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
+
+                    is_docstring = False
 
     # Check that the args in the docstring are listed in the same
     # order as they appear in the function definition.

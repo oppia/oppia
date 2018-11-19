@@ -493,8 +493,7 @@ class ExplorationIssues(object):
 
 
 class Playthrough(object):
-    """Domain object representing a learner playthrough.
-    """
+    """Domain object representing a learner playthrough."""
 
     def __init__(
             self, exp_id, exp_version, issue_type, issue_customization_args,

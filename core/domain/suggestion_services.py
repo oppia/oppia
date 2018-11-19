@@ -382,7 +382,7 @@ def check_user_can_review_in_category(user_id, score_category):
 
     Returns:
         bool. Whether the user can review suggestions under category
-            score_category
+            score_category.
     """
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
