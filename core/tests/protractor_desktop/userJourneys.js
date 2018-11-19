@@ -299,6 +299,7 @@ describe('Site language', function() {
       users.createUser('varda@example.com', 'Varda');
       users.login('varda@example.com');
       preferencesPage.get();
+      preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
       preferencesPage.selectPreferredAudioLanguage('Chinese');
       // TODO(DubeySandeep): Add the test to check preferred audio language
       // choice gets reflected to the exploration player. This can be done once

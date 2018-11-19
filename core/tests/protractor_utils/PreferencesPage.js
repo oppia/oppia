@@ -107,6 +107,12 @@ var PreferencesPage = function() {
     expect(selectedLanguageElement.getText()).toEqual(language);
   };
 
+  this.expectPreferredAudioLanguageNotToBe = function(language) {
+    var selectedLanguageElement = preferredAudioLanguageSelector.element(
+      by.css('.select2-selection__rendered'));
+    expect(selectedLanguageElement.getText()).not.toEqual(language);
+  };
+
   this.expectSubscriptionCountToEqual = function(value) {
     expect(subscriptions.count()).toEqual(value);
   };
