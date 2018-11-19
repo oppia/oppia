@@ -453,3 +453,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(story_rights.is_manager(self.USER_ID))
         self.assertTrue(story_rights.is_manager(self.USER_ID_1))
         self.assertFalse(story_rights.is_manager('fakeuser'))
+
+    def test_story_rights_change_defaults(self):
+        change_dict = story_domain.StoryRightsChange({
+            'cmd': story_domain.CMD_CREATE_NEW
+        }).to_dict()
+        story_rights = story_domain.StoryRightsChange(change_dict)
+        expected_dict = {
+            'cmd': story_domain.CMD_CREATE_NEW,
+        }
+        self.assertEqual(expected_dict, story_rights.to_dict())

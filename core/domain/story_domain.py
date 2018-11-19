@@ -1063,7 +1063,7 @@ class StoryRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is a story manager of this story.
+            bool. Whether user is a manager of this story.
         """
         return bool(user_id in self.manager_ids)
 

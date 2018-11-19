@@ -664,11 +664,6 @@ def publish_story(story_id, committer_id):
                 'Exploration with id %s isn\'t published.'
                 % node.exploration_id)
 
-    story = get_story_by_id(story_id, strict=False)
-    for node in story.story_contents.nodes:
-        if node.id == story.story_contents.initial_node_id:
-            _is_node_valid_for_publishing(node)
-
     story_rights = get_story_rights(story_id, strict=False)
     if story_rights is None:
         raise Exception('The given story does not exist')
@@ -679,6 +674,12 @@ def publish_story(story_id, committer_id):
 
     if story_rights.story_is_published:
         raise Exception('The story is already published.')
+
+    story = get_story_by_id(story_id, strict=False)
+    for node in story.story_contents.nodes:
+        if node.id == story.story_contents.initial_node_id:
+            _is_node_valid_for_publishing(node)
+
     story_rights.story_is_published = True
     commit_cmds = [story_domain.StoryRightsChange({
         'cmd': story_domain.CMD_PUBLISH_STORY
