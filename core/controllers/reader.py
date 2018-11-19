@@ -46,7 +46,7 @@ import utils
 
 import jinja2
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
