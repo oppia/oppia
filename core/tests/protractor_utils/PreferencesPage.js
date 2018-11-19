@@ -29,6 +29,8 @@ var PreferencesPage = function() {
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
+  var preferredAudioLanguageSelector = element(
+    by.css('.protractor-test-preferred-audio-language-selector'));
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -52,6 +54,18 @@ var PreferencesPage = function() {
         });
       });
     options.first().click();
+  };
+
+  this.selectPreferredAudioLanguage = function(language) {
+    preferredAudioLanguageSelector.click();
+    var optionsList = element.all(by.css('.select2-results'));
+    var correctOptions = optionsList.all(by.tagName('li')).filter(
+      function(elem) {
+        return elem.getText().then(function(text) {
+          return text === language;
+        });
+      });
+    correctOptions.first().click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
@@ -83,6 +97,12 @@ var PreferencesPage = function() {
 
   this.expectPreferredSiteLanguageToBe = function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
+      by.css('.select2-selection__rendered'));
+    expect(selectedLanguageElement.getText()).toEqual(language);
+  };
+
+  this.expectPreferredAudioLanguageToBe = function(language) {
+    var selectedLanguageElement = preferredAudioLanguageSelector.element(
       by.css('.select2-selection__rendered'));
     expect(selectedLanguageElement.getText()).toEqual(language);
   };
