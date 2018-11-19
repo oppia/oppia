@@ -847,8 +847,6 @@ def assign_role(committer, assignee, new_role, story_id):
     elif new_role == story_domain.ROLE_NONE:
         if story_rights.is_manager(assignee.user_id):
             story_rights.manager_ids.remove(assignee.user_id)
-        else:
-            old_role = story_domain.ROLE_NONE
     else:
         raise Exception('Invalid role: %s' % new_role)
 
