@@ -439,7 +439,8 @@ def get_dependencies_filepaths():
 
 
 def minify_third_party_libs(third_party_directory_path):
-    """Minify third_party.js and third_party.css and remove un-minified files.
+    """Minify third_party.js and third_party.css and remove un-minified
+    files.
     """
     THIRD_PARTY_JS_FILEPATH = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
