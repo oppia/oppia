@@ -276,22 +276,24 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         """Test to verify to_dict method of the Question Summary
         object.
         """
+        fake_date_created = datetime.datetime(2018, 11, 17, 20, 2, 45, 0)
+        fake_date_updated = datetime.datetime(2018, 11, 17, 20, 3, 14, 0)
         expected_object_dict = {
             'id': 'question_1',
             'creator_id': 'user_1',
-            'question_content': 'question content',
-            'last_updated_msec': 1542481394768.944,
-            'created_on_msec': 1542481365004.327,
+            'question_content': u'question content',
+            'last_updated_msec': utils.get_time_in_millisecs(fake_date_updated),
+            'created_on_msec': utils.get_time_in_millisecs(fake_date_created),
         }
+
         observed_object = question_domain.QuestionSummary(
             creator_id='user_1',
             question_id='question_1',
             question_content='question content',
-            question_model_created_on=datetime.datetime(
-                2018, 11, 17, 20, 2, 45, 4327),
-            question_model_last_updated=datetime.datetime(
-                2018, 11, 17, 20, 3, 14, 768944),
+            question_model_created_on=fake_date_created,
+            question_model_last_updated=fake_date_updated,
         )
+
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
