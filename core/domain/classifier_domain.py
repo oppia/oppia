@@ -69,7 +69,6 @@ class ClassifierTrainingJob(object):
             classification purpose.
         data_schema_version: int. Schema version of the data used by the
             classifier. This depends on the algorithm ID.
-
     """
 
     def __init__(

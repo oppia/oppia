@@ -430,13 +430,13 @@ def update_story(
     """Updates a story. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - story_id: str. The story id.
-    - change_list: list(StoryChange).These changes are applied in sequence to
-        produce the resulting story.
-    - commit_message: str or None. A description of changes made to the
-        story.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        story_id: str. The story id.
+        change_list: list(StoryChange).These changes are applied in sequence to
+            produce the resulting story.
+        commit_message: str or None. A description of changes made to the
+            story.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

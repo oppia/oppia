@@ -1213,7 +1213,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
-            # check that email body is correct.
+            # Check that email body is correct.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1223,7 +1223,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-            # check that email model is correct.
+            # Check that email model is correct.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
@@ -1299,7 +1299,7 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1382,7 +1382,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1617,8 +1617,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 
 class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while onboarding reviewers.
-    """
+    """Test that correct email is sent while onboarding reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1684,8 +1683,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
 
 
 class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while notifying reviewers.
-    """
+    """Test that correct email is sent while notifying reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 

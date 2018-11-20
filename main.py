@@ -275,11 +275,9 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/assets/image/<encoded_filename>',
-        resources.ImageDevHandler),
-    get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/assets/audio/<encoded_filename>',
-        resources.AudioDevHandler),
+        r'/assetsdevhandler/<exploration_id>/'
+        'assets/<asset_type:(image|audio)>/<encoded_filename>',
+        resources.AssetDevHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
@@ -486,7 +484,7 @@ URLS = MAPREDUCE_HANDLERS + [
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
-        suggestion.ReSubmitSuggestionHandler),
+        suggestion.ResubmitSuggestionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,

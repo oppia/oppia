@@ -40,6 +40,8 @@ oppia.factory('ThreadStatusDisplayService', [function() {
     getLabelClass: function(status) {
       if (status === 'open') {
         return 'label label-info';
+      } else if (status === 'compliment') {
+        return 'label label-success';
       } else {
         return 'label label-default';
       }
