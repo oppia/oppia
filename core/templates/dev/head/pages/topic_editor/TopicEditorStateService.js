@@ -56,6 +56,7 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _questionSummaries = [];
+    var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -113,6 +114,9 @@ oppia.factory('TopicEditorStateService', [
       _questionSummaries = angular.copy(questionSummaries);
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
+    var _setNextQuestionsCursor = function(nextCursor) {
+      _nextCursorForQuestions = nextCursor;
+    };
 
     return {
       /**
@@ -133,10 +137,13 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            EditableTopicBackendApiService.fetchQuestions(topicId).then(
-              function(questionSummaries) {
-                _setQuestionSummaries(questionSummaries);
-              });
+            EditableTopicBackendApiService.fetchQuestions(
+              topicId, _nextCursorForQuestions).then(
+                function(returnObject) {
+                  _setQuestionSummaries(returnObject.questionSummaries);
+                  _setNextQuestionsCursor(returnObject.nextCursor);
+                }
+              );
           },
           function(error) {
             AlertsService.addWarning(
@@ -215,10 +222,13 @@ oppia.factory('TopicEditorStateService', [
       },
 
       fetchQuestionSummaries: function(topicId) {
-        EditableTopicBackendApiService.fetchQuestions(topicId).then(
-          function(questionSummaries) {
-            _setQuestionSummaries(questionSummaries);
-          });
+        EditableTopicBackendApiService.fetchQuestions(
+          topicId, _nextCursorForQuestions).then(
+            function(returnObject) {
+              _setQuestionSummaries(returnObject.questionSummaries);
+              _setNextQuestionsCursor(returnObject.nextCursor);
+            }
+          );
       },
 
       /**
