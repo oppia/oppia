@@ -50,6 +50,9 @@
             <div class="story-editor-node-title">
               <[node.getTitle()]>
             </div>
+            <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
+              <i>This chapter is not reachable from any other chapter</i>
+            </span>
             <span class="story-editor-initial-node">
               <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
                 <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
@@ -114,6 +117,7 @@
     position: relative;
     text-align: center;
     width: 15vw;
+    white-space: normal;
   }
 
   story-editor .selected-node {

@@ -20,6 +20,8 @@
 oppia.factory('StoryContentsObjectFactory', [
   'StoryNodeObjectFactory', 'NODE_ID_PREFIX',
   function(StoryNodeObjectFactory, NODE_ID_PREFIX) {
+    var _disconnectedNodeIds = [];
+
     var StoryContents = function(initialNodeId, nodes, nextNodeId) {
       this._initialNodeId = initialNodeId;
       this._nodes = nodes;
@@ -36,6 +38,10 @@ oppia.factory('StoryContentsObjectFactory', [
 
     StoryContents.prototype.getInitialNodeId = function() {
       return this._initialNodeId;
+    };
+
+    StoryContents.prototype.getDisconnectedNodeIds = function() {
+      return _disconnectedNodeIds;
     };
 
     StoryContents.prototype.getNextNodeId = function() {
@@ -74,6 +80,7 @@ oppia.factory('StoryContentsObjectFactory', [
     };
 
     StoryContents.prototype.validate = function() {
+      _disconnectedNodeIds = [];
       var issues = [];
       var nodes = this._nodes;
       for (var i = 0; i < nodes.length; i++) {
@@ -89,6 +96,9 @@ oppia.factory('StoryContentsObjectFactory', [
       // valid.
       var nodeIds = nodes.map(function(node) {
         return node.getId();
+      });
+      var nodeTitles = nodes.map(function(node) {
+        return node.getTitle();
       });
       for (var i = 0; i < nodeIds.length; i++) {
         var nodeId = nodeIds[i];
@@ -182,9 +192,10 @@ oppia.factory('StoryContentsObjectFactory', [
         }
         for (var i = 0; i < nodeIsVisited.length; i++){
           if (!nodeIsVisited[i]) {
+            _disconnectedNodeIds.push(nodeIds[i]);
             issues.push(
-              'The node with id ' + nodeIds[i] +
-              ' is disconnected from the graph');
+              'There is no way to get to the chapter with title ' +
+              nodeTitles[i] + ' from any other chapter');
           }
         }
       }

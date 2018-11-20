@@ -39,9 +39,10 @@ oppia.directive('storyNodeEditor', [
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             AlertsService) {
           var _recalculateAvailableNodes = function() {
+            $scope.newNodeId = undefined;
             $scope.availableNodes = [{
               id: undefined,
-              text: ''
+              text: 'Pick (or add) next chapter'
             }];
             for (i = 0; i < $scope.storyNodeIds.length; i++) {
               if ($scope.storyNodeIds[i] === $scope.getId()) {
@@ -168,6 +169,11 @@ oppia.directive('storyNodeEditor', [
                   'A chapter cannot lead to itself.', 3000);
                 return;
               }
+              if (nodeId === undefined) {
+                // This happens when the default option is clicked, in which
+                // case don't do anything.
+                return;
+              }
               try {
                 StoryUpdateService.addDestinationNodeIdToNode(
                   $scope.story, $scope.getId(), nodeId);
@@ -177,6 +183,8 @@ oppia.directive('storyNodeEditor', [
                   'chapter', 3000);
                 return;
               }
+              $rootScope.$broadcast(
+                'storyGraphUpdated', $scope.story.getStoryContents());
               _recalculateAvailableNodes();
             }
           };
@@ -184,6 +192,9 @@ oppia.directive('storyNodeEditor', [
           $scope.removeDestinationNodeId = function(nodeId) {
             StoryUpdateService.removeDestinationNodeIdFromNode(
               $scope.story, $scope.getId(), nodeId);
+            $rootScope.$broadcast(
+              'storyGraphUpdated', $scope.story.getStoryContents());
+            _recalculateAvailableNodes();
           };
 
           $scope.openNodeTitleEditor = function() {

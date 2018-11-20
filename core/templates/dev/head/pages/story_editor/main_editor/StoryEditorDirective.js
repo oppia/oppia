@@ -27,11 +27,11 @@ oppia.directive('storyEditor', [
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService) {
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -44,8 +44,11 @@ oppia.directive('storyEditor', [
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
+            $scope.disconnectedNodeIds = [];
             if ($scope.storyContents) {
               $scope.nodes = $scope.storyContents.getNodes();
+              $scope.disconnectedNodeIds =
+                $scope.storyContents.getDisconnectedNodeIds();
             }
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableNotes = $scope.story.getNotes();
@@ -69,10 +72,36 @@ oppia.directive('storyEditor', [
               return;
             }
             StoryUpdateService.setInitialNodeId($scope.story, nodeId);
+            _initEditor();
           };
 
           $scope.deleteNode = function(nodeId) {
-            StoryUpdateService.deleteStoryNode($scope.story, nodeId);
+            if ($scope.isInitialNode(nodeId)) {
+              AlertsService.addInfoMessage(
+                'Cannot delete the first chapter of a story.', 3000);
+              return;
+            }
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story_editor/main_editor/' +
+                'delete_chapter_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.confirmDeletion = function() {
+                    $uibModalInstance.close();
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(title) {
+              StoryUpdateService.deleteStoryNode($scope.story, nodeId);
+            });
           };
 
           $scope.createNode = function() {
@@ -115,6 +144,11 @@ oppia.directive('storyEditor', [
             modalInstance.result.then(function(title) {
               StoryUpdateService.addStoryNode($scope.story, title);
               _initEditor();
+              // If the first node is added, open it just after creation.
+              if ($scope.story.getStoryContents().getNodes().length === 1) {
+                $scope.setNodeToEdit(
+                  $scope.story.getStoryContents().getInitialNodeId());
+              }
             });
           };
 
@@ -153,6 +187,10 @@ oppia.directive('storyEditor', [
 
           $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
             $scope.setNodeToEdit(nodeId);
+          });
+
+          $scope.$on('storyGraphUpdated', function(evt, storyContents) {
+            _initEditor();
           });
 
           $scope.$on(EVENT_STORY_INITIALIZED, _init);
