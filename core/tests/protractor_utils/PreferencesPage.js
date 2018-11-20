@@ -25,12 +25,15 @@ var PreferencesPage = function() {
     by.css('.protractor-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
+  var languageOptionsList = element.all(by.css('.select2-results'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
+  var preferredAudioLanguageSelector = element(
+    by.css('.protractor-test-preferred-audio-language-selector'));
+  var selectedAudioLanguageElement = preferredAudioLanguageSelector.element(
+    by.css('.select2-selection__rendered'));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
-  var preferredAudioLanguageSelector = element(
-    by.css('.protractor-test-preferred-audio-language-selector'));
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -58,8 +61,7 @@ var PreferencesPage = function() {
 
   this.selectPreferredAudioLanguage = function(language) {
     preferredAudioLanguageSelector.click();
-    var optionsList = element.all(by.css('.select2-results'));
-    var correctOptions = optionsList.all(by.tagName('li')).filter(
+    var correctOptions = languageOptionsList.all(by.tagName('li')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
           return text === language;
@@ -91,8 +93,7 @@ var PreferencesPage = function() {
   };
 
   this.expectPageHeaderToBe = function(text) {
-    expect(pageHeader
-      .getText()).toEqual(text);
+    expect(pageHeader.getText()).toEqual(text);
   };
 
   this.expectPreferredSiteLanguageToBe = function(language) {
@@ -102,15 +103,11 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredAudioLanguageToBe = function(language) {
-    var selectedLanguageElement = preferredAudioLanguageSelector.element(
-      by.css('.select2-selection__rendered'));
-    expect(selectedLanguageElement.getText()).toEqual(language);
+    expect(selectedAudioLanguageElement.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = function(language) {
-    var selectedLanguageElement = preferredAudioLanguageSelector.element(
-      by.css('.select2-selection__rendered'));
-    expect(selectedLanguageElement.getText()).not.toEqual(language);
+    expect(selectedAudioLanguageElement.getText()).not.toEqual(language);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {

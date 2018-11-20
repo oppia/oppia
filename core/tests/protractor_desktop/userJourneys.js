@@ -296,8 +296,8 @@ describe('Site language', function() {
 
   it('should set preferred audio language selected in the Preferences page.',
     function() {
-      users.createUser('varda@example.com', 'Varda');
-      users.login('varda@example.com');
+      users.createUser('audioPlayer@example.com', 'audioPlayer');
+      users.login('audioPlayer@example.com');
       preferencesPage.get();
       preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
       preferencesPage.selectPreferredAudioLanguage('Chinese');
