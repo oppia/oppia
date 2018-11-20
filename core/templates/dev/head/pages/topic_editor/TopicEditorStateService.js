@@ -111,7 +111,7 @@ oppia.factory('TopicEditorStateService', [
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
     var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries = angular.copy(questionSummaries);
+      _questionSummaries.push(angular.copy(questionSummaries));
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
     var _setNextQuestionsCursor = function(nextCursor) {
@@ -193,6 +193,10 @@ oppia.factory('TopicEditorStateService', [
         return _topicIsLoading;
       },
 
+      isLastQuestionBatch: function(index) {
+        return (_nextCursorForQuestions === null && index === _questionSummaries.length - 1);
+      },
+
       /**
        * Returns whether a topic has yet been loaded using either
        * loadTopic() or setTopic().
@@ -217,11 +221,11 @@ oppia.factory('TopicEditorStateService', [
         return _canonicalStorySummaries;
       },
 
-      getQuestionSummaries: function() {
-        return _questionSummaries;
-      },
-
-      fetchQuestionSummaries: function(topicId) {
+      fetchQuestionSummaries: function(topicId, resetHistory = false) {
+        if (resetHistory) {
+          _questionSummaries = [];
+          _nextCursorForQuestions = '';
+        }
         EditableTopicBackendApiService.fetchQuestions(
           topicId, _nextCursorForQuestions).then(
             function(returnObject) {
@@ -229,6 +233,13 @@ oppia.factory('TopicEditorStateService', [
               _setNextQuestionsCursor(returnObject.nextCursor);
             }
           );
+      },
+
+      getQuestionSummaries: function(index) {
+        if (index >= _questionSummaries.length) {
+          return null;
+        }
+        return _questionSummaries[index];
       },
 
       /**
