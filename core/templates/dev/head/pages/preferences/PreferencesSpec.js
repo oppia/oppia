@@ -14,7 +14,7 @@
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, ctrl, $httpBackend, mockAlertsService;
+    var scope, ctrl, $httpBackend, mockAlertsService, SUPPORTED_AUDIO_LANGUAGES;
 
     beforeEach(function() {
       module('oppia');
@@ -53,6 +53,17 @@ describe('Preferences Controller', function() {
     function() {
       $httpBackend.flush();
       expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
+    });
+
+    it('should map SUPPORTED_AUDIO_LANGUAGES correctly to ' +
+       'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
+    function() {
+      var numberOfAudioLanguageChoices = scope.AUDIO_LANGUAGE_CHOICES.length;
+      expect(numberOfAudioLanguageChoices > 0).toBe(true);
+      for (var index = 0; index < numberOfAudioLanguageChoices; index++) {
+        expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
+          ['id', 'text']);
+      }
     });
   });
 });

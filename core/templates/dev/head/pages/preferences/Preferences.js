@@ -20,10 +20,12 @@ oppia.controller('Preferences', [
   '$scope', '$http', '$q', '$rootScope', '$uibModal', '$timeout', '$translate',
   'AlertsService', 'UrlInterpolationService', 'UserService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+  'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
   function(
       $scope, $http, $q, $rootScope, $uibModal, $timeout, $translate,
       AlertsService, UrlInterpolationService, UserService, UtilsService,
-      DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
+      DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+      SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $scope.profilePictureDataUrl = '';
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
@@ -237,7 +239,14 @@ oppia.controller('Preferences', [
       }
     );
 
-    $scope.SITE_LANGUAGE_CHOICES = constants.SUPPORTED_SITE_LANGUAGES;
-    $scope.AUDIO_LANGUAGE_CHOICES = constants.SUPPORTED_AUDIO_LANGUAGES;
+    $scope.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
+    $scope.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
+      function(languageItem) {
+        return {
+          id: languageItem.id,
+          text: languageItem.description
+        };
+      }
+    );
   }
 ]);
