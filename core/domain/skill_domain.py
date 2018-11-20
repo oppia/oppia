@@ -159,8 +159,7 @@ class SkillChange(object):
 
 
 class Misconception(object):
-    """Domain object describing a skill misconception.
-    """
+    """Domain object describing a skill misconception."""
 
     def __init__(
             self, misconception_id, name, notes, feedback):
@@ -948,7 +947,7 @@ class UserSkillMastery(object):
         """Returns a UserSkillMastery domain object from the given dict.
 
         Args:
-            skill_mastery_dict. dict. A dict mapping all the fields of
+            skill_mastery_dict: dict. A dict mapping all the fields of
                 UserSkillMastery object.
 
         Returns:

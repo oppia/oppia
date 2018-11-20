@@ -76,7 +76,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         def check_cycle(source, roles):
             """Checks that source is not reachable from any of the given roles.
 
-            Args :
+            Args:
                 source: str. Role that should not be reachable via any path
                     from roles.
                 roles: list(str). List of roles that should not be able to

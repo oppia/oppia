@@ -34,8 +34,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 self.subtopic_id, self.topic_id))
 
     def test_create_default_subtopic_page(self):
-        """Tests the create_default_topic() function.
-        """
+        """Tests the create_default_topic() function."""
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
