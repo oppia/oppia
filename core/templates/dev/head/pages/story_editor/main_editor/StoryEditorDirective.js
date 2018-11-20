@@ -47,6 +47,7 @@ oppia.directive('storyEditor', [
             if ($scope.storyContents) {
               $scope.nodes = $scope.storyContents.getNodes();
             }
+            $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableNotes = $scope.story.getNotes();
@@ -58,6 +59,14 @@ oppia.directive('storyEditor', [
 
           $scope.setNodeToEdit = function(nodeId) {
             $scope.idOfNodeToEdit = nodeId;
+          };
+
+          $scope.openNotesEditor = function() {
+            $scope.notesEditorIsShown = true;
+          };
+
+          $scope.closeNotesEditor = function() {
+            $scope.notesEditorIsShown = false;
           };
 
           $scope.isInitialNode = function(nodeId) {
@@ -77,8 +86,7 @@ oppia.directive('storyEditor', [
           };
 
           $scope.NOTES_SCHEMA = {
-            type: 'html',
-            ui_config: {}
+            type: 'html'
           };
 
           $scope.updateNotes = function(newNotes) {
@@ -86,6 +94,7 @@ oppia.directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryNotes($scope.story, newNotes);
+            _initEditor();
           };
 
           $scope.updateStoryDescriptionStatus = function(description) {
