@@ -60,7 +60,7 @@ oppia.directive('questionsTab', [
               TopicEditorStateService.getQuestionSummaries($scope.currentPage);
             if (questionSummaries === null) {
               TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId()
+                $scope.topic.getId(), false
               );
             } else {
               $scope.questionSummaries = questionSummaries;

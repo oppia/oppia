@@ -139,11 +139,11 @@ oppia.factory('TopicEditorStateService', [
               });
             EditableTopicBackendApiService.fetchQuestions(
               topicId, _nextCursorForQuestions).then(
-                function(returnObject) {
-                  _setQuestionSummaries(returnObject.questionSummaries);
-                  _setNextQuestionsCursor(returnObject.nextCursor);
-                }
-              );
+              function(returnObject) {
+                _setQuestionSummaries(returnObject.questionSummaries);
+                _setNextQuestionsCursor(returnObject.nextCursor);
+              }
+            );
           },
           function(error) {
             AlertsService.addWarning(
@@ -194,7 +194,9 @@ oppia.factory('TopicEditorStateService', [
       },
 
       isLastQuestionBatch: function(index) {
-        return (_nextCursorForQuestions === null && index === _questionSummaries.length - 1);
+        return (
+          _nextCursorForQuestions === null &&
+          index === _questionSummaries.length - 1);
       },
 
       /**
@@ -221,18 +223,18 @@ oppia.factory('TopicEditorStateService', [
         return _canonicalStorySummaries;
       },
 
-      fetchQuestionSummaries: function(topicId, resetHistory = false) {
+      fetchQuestionSummaries: function(topicId, resetHistory) {
         if (resetHistory) {
           _questionSummaries = [];
           _nextCursorForQuestions = '';
         }
         EditableTopicBackendApiService.fetchQuestions(
           topicId, _nextCursorForQuestions).then(
-            function(returnObject) {
-              _setQuestionSummaries(returnObject.questionSummaries);
-              _setNextQuestionsCursor(returnObject.nextCursor);
-            }
-          );
+          function(returnObject) {
+            _setQuestionSummaries(returnObject.questionSummaries);
+            _setNextQuestionsCursor(returnObject.nextCursor);
+          }
+        );
       },
 
       getQuestionSummaries: function(index) {

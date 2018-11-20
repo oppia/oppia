@@ -81,7 +81,7 @@ oppia.factory('EditableTopicBackendApiService', [
       var questionsDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_EDITOR_QUESTION_URL_TEMPLATE, {
           topic_id: topicId,
-          cursor: cursor ? cursor: ''
+          cursor: cursor ? cursor : ''
         });
 
       $http.get(questionsDataUrl).then(function(response) {
