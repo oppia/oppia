@@ -110,9 +110,10 @@ describe('Story contents object factory', function() {
 
   it('should correctly correctly validate the case where the story graph is' +
     ' disconnected.', function() {
-    _sampleStoryContents.addNode('Title 2');
+    _sampleStoryContents.addNode('Title 3');
     expect(_sampleStoryContents.validate()).toEqual([
-      'The node with id node_3 is disconnected from the graph'
+      'There is no way to get to the chapter with title Title 3 from any ' +
+      'other chapter'
     ]);
   });
 
