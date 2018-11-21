@@ -30,6 +30,7 @@ oppia.controller('Admin', [
     $scope.userEmail = GLOBALS.USER_EMAIL;
     $scope.logoutUrl = GLOBALS.LOGOUT_URL;
     $scope.inDevMode = DEV_MODE;
+    $scope.DEV_MODE = DEV_MODE;
 
     $scope.statusMessage = '';
     $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
