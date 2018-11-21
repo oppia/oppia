@@ -86,13 +86,13 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         change_dict = {
             'cmd': 'create_new_fully_specified_question',
             'question_dict': {},
-            'skill_id': 10,
+            'skill_id': '10',
         }
         observed_object = question_domain.QuestionChange(
             change_dict=change_dict,
         )
 
-        self.assertEqual(10, observed_object.skill_id)
+        self.assertEqual('10', observed_object.skill_id)
         self.assertEqual({}, observed_object.question_dict)
 
     def test_migrate_state_schema_to_latest_version(self):
@@ -199,9 +199,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected all answer groups to have destination as None.')
 
     def test_strict_validation_passes(self):
-        """Test to verify validate method of Question domain object with
-       strict as True with correct input.
-       """
+        """Test to verify validate method of a finalized Question domain object
+        with correct input.
+        """
         try:
             self.question.validate()
         except utils.ValidationError:
