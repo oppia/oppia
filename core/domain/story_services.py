@@ -659,7 +659,7 @@ def publish_story(story_id, committer_id):
             exploration_id_list.append(node.exploration_id)
         for exploration in exp_services.get_multiple_explorations_by_id(
                 exploration_id_list):
-            if not exploration:
+            if exploration is None:
                 raise Exception(
                     'Exploration id %s doesn\'t exist.' % exploration.id)
         multiple_exploration_rights = (

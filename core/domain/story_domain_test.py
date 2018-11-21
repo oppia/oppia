@@ -481,6 +481,38 @@ class StoryRightsChangeTests(test_utils.GenericTestBase):
             'old_role': 'old_role'
         })
 
+        self.assertEqual(change_role_object.cmd, story_domain.CMD_CHANGE_ROLE)
+        self.assertEqual(change_role_object.assignee_id, 'assignee_id')
+        self.assertEqual(change_role_object.new_role, 'new_role')
+        self.assertEqual(change_role_object.old_role, 'old_role')
+
+        cmd_list = [
+            story_domain.CMD_CREATE_NEW,
+            story_domain.CMD_PUBLISH_STORY,
+            story_domain.CMD_UNPUBLISH_STORY
+        ]
+
+        for cmd in cmd_list:
+            cmd_object = story_domain.StoryRightsChange({
+                'cmd': cmd
+            })
+            self.assertDictEqual(cmd_object.cmd, cmd)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change_dict: '
+            '{\'cmd\': \'invalid_command\'}'):
+            story_domain.StoryRightsChange({
+                'cmd': 'invalid_command'
+            })
+
+    def test_to_dict(self):
+        change_role_object = story_domain.StoryRightsChange({
+            'cmd': story_domain.CMD_CHANGE_ROLE,
+            'assignee_id': 'assignee_id',
+            'new_role': 'new_role',
+            'old_role': 'old_role'
+        })
+
         expected_dict = {
             'cmd': story_domain.CMD_CHANGE_ROLE,
             'assignee_id': 'assignee_id',
@@ -504,10 +536,3 @@ class StoryRightsChangeTests(test_utils.GenericTestBase):
                 'cmd': cmd
             }
             self.assertDictEqual(expected_dict, cmd_object.to_dict())
-
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid change_dict: '
-            '{\'cmd\': \'invalid_command\'}'):
-            story_domain.StoryRightsChange({
-                'cmd': 'invalid_command'
-            })
