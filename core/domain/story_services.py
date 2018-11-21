@@ -649,20 +649,27 @@ def publish_story(story_id, committer_id):
         Exception. The story is already published.
         Exception. The user does not have enough rights to publish the story.
     """
-    def _is_node_valid_for_publishing(node):
-        if not node.exploration_id:
-            raise Exception(
-                'Story node does not contain an exploration id.')
-        if not exp_services.get_exploration_by_id(
-                node.exploration_id, strict=False):
-            raise Exception(
-                'Exploration id %s doesn\'t exist.' % node.exploration_id)
-        exploration_rights = rights_manager.get_exploration_rights(
-            node.exploration_id, strict=False)
-        if exploration_rights.is_private():
-            raise Exception(
-                'Exploration with id %s isn\'t published.'
-                % node.exploration_id)
+    def _are_nodes_valid_for_publishing(story_nodes):
+        exploration_id_list = []
+        for node in story_nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+            exploration_id_list.append(node.exploration_id)
+        for exploration in exp_services.get_multiple_explorations_by_id(
+                exploration_id_list):
+            if not exploration:
+                raise Exception(
+                    'Exploration id %s doesn\'t exist.' % exploration.id)
+        multiple_exploration_rights = (
+            rights_manager.get_multiple_exploration_rights_by_ids(
+                exploration_id_list))
+        for exploration_rights in multiple_exploration_rights:
+            if exploration_rights.is_private():
+                raise Exception(
+                    'Exploration with id %s isn\'t published.'
+                    % exploration_rights.id)
 
     story_rights = get_story_rights(story_id, strict=False)
     if story_rights is None:
@@ -678,7 +685,7 @@ def publish_story(story_id, committer_id):
     story = get_story_by_id(story_id, strict=False)
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
-            _is_node_valid_for_publishing(node)
+            _are_nodes_valid_for_publishing([node])
 
     story_rights.story_is_published = True
     commit_cmds = [story_domain.StoryRightsChange({
