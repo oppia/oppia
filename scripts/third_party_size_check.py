@@ -31,7 +31,7 @@ def _check_size_in_dir(dir_path):
     directory.
 
     Args:
-         dir_path. str. The directory which files will be counted.
+         dir_path: str. The directory which files will be counted.
 
     Returns:
         The number of files inside the given directory.

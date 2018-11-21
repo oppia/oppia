@@ -216,8 +216,8 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     function.
 
     Args:
-        thread_id: str. The id of the thread.
         user_id: str. The id of the user reading the messages,
+        thread_id: str. The id of the thread.
         message_ids: list(int). The ids of the messages in the thread read by
             the user.
     """
