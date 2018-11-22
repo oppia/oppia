@@ -428,10 +428,10 @@ def _lint_css_files(
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        for error in result_list:
-            result.put(error)
         result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
+        for error in result_list:
+            result.put(error)
     else:
         result.put('%s   %s CSS file linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
@@ -480,10 +480,10 @@ def _lint_js_files(
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        for error in result_list:
-            result.put(error)
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
+        for error in result_list:
+            result.put(error)
     else:
         result.put('%s   %s JavaScript files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
