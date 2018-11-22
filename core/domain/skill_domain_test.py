@@ -138,8 +138,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'all_questions_merged is True.')
 
     def test_create_default_skill(self):
-        """Test the create_default_skill function.
-        """
+        """Test the create_default_skill function."""
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description')
         expected_skill_dict = {

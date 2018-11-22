@@ -1279,7 +1279,6 @@ class ResubmitSuggestionDecoratorsTest(test_utils.GenericTestBase):
              ('target_id', self.exploration_id)])[0]
         self.suggestion_id = suggestion.suggestion_id
 
-
     def test_author_can_resubmit_suggestion(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
