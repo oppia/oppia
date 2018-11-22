@@ -356,25 +356,19 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(story_services.check_can_edit_story(
             self.user_b, story_rights))
 
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_NONE, self.STORY_ID)
-
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_invalid_dict_and_no_changes(self):
+    def test_invalid_dict(self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid role: invalid_role'):
             story_services.assign_role(
                 self.user_admin, self.user_a,
                 'invalid_role', self.STORY_ID)
 
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_NONE, self.STORY_ID)
+    def reassigning_none_role_to_same_user(self):
+        with self.assertRaisesRegexp(
+            Exception, 'This user already has no role for this story'):
+            story_services.assign_role(
+                self.user_admin, self.user_a, 
+                story_domain.ROLE_NONE, self.STORY_ID)
         story_rights = story_services.get_story_rights(self.STORY_ID)
         self.assertFalse(story_services.check_can_edit_story(
             self.user_a, story_rights))

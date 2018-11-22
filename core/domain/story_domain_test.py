@@ -496,7 +496,7 @@ class StoryRightsChangeTests(test_utils.GenericTestBase):
             cmd_object = story_domain.StoryRightsChange({
                 'cmd': cmd
             })
-            self.assertDictEqual(cmd_object.cmd, cmd)
+            self.assertEqual(cmd, cmd_object.cmd)
 
         with self.assertRaisesRegexp(
             Exception, 'Invalid change_dict: '
