@@ -219,7 +219,7 @@ describe('Assets Backend API Service', function() {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-    expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg')
+    expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg');
     $httpBackend.verifyNoOutstandingExpectation();
   });
 });
