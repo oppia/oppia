@@ -726,7 +726,7 @@ def _pre_commit_linter(all_files):
     print '----------------------------------------'
 
     for process in linting_processes:
-        process.daemon = True
+        process.daemon = False
         process.start()
 
     for process in linting_processes:
