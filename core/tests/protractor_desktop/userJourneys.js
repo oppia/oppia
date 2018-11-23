@@ -294,6 +294,21 @@ describe('Site language', function() {
     users.logout();
   });
 
+  it('should set preferred audio language selected in the Preferences page.',
+    function() {
+      users.createUser('audioPlayer@example.com', 'audioPlayer');
+      users.login('audioPlayer@example.com');
+      preferencesPage.get();
+      preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
+      preferencesPage.selectPreferredAudioLanguage('Chinese');
+      // TODO(DubeySandeep): Add the test to check preferred audio language
+      // choice gets reflected to the exploration player. This can be done once
+      // we will finalize a way to upload an audio file in e2e test.
+      preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      general.ensurePageHasNoTranslationIds();
+      users.logout();
+    });
+
   it('should save the language selected in the footer into the preferences.',
     function() {
       users.createUser('feanor@example.com', 'Feanor');
