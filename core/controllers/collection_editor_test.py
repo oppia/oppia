@@ -82,8 +82,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response = self.get_html(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID), expect_errors=True,
-            expected_status_int=302)
+                self.COLLECTION_ID), expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Check that whitelisted users can access and edit in the editor page.
@@ -108,8 +107,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response = self.get_html(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID), expect_errors=True,
-            expected_status_int=302)
+                self.COLLECTION_ID), expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Check that whitelisted users can access the data

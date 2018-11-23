@@ -38,24 +38,23 @@ class HomePageTest(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
 
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
-        response = self.get_html('/notifications_dashboard', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(
+            '/notifications_dashboard', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
         self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.get_html('/notifications_dashboard', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(
+            '/notifications_dashboard', expected_status_int=302)
         # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
         self.logout()

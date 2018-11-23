@@ -24,8 +24,7 @@ class ModeratorTest(test_utils.GenericTestBase):
     def test_moderator_page(self):
         """Tests access to the Moderator page."""
         # Try accessing the moderator page without logging in.
-        response = self.get_html('/moderator', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/moderator', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Try accessing the moderator page without being a moderator or admin.

@@ -264,8 +264,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(invalid_logout_url, expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -289,8 +288,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(invalid_logout_url, expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -314,8 +312,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(invalid_logout_url, expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -329,8 +326,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         empty_redirect_logout_url = '/exploration_editor_logout?return_url='
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(empty_redirect_logout_url, expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(
+            empty_redirect_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         response.follow()
@@ -349,8 +346,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             '/exploration_editor_logout?return_url=%s' % invalid_current_page)
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(invalid_logout_url, expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html(invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -370,12 +366,12 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         current_page_url = '%s/%s' % (
             feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(current_page_url, expect_errors=False)
+        response = self.get_html(current_page_url)
         self.assertEqual(response.status_int, 200)
 
         response = self.get_html(
             '/exploration_editor_logout?return_url=%s' % current_page_url,
-            expect_errors=True, expected_status_int=302)
+            expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response = response.follow()
         self.assertEqual(response.status_int, 302)
@@ -395,14 +391,14 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         current_page_url = '%s/%s' % (
             feconf.EDITOR_URL_PREFIX, published_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.get_html(current_page_url, expect_errors=False)
+        response = self.get_html(current_page_url)
         self.assertEqual(response.status_int, 200)
 
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         response = self.get_html(
             '/exploration_editor_logout?return_url=%s' % current_page_url,
-            expect_errors=True, expected_status_int=302)
+            expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response = response.follow()
         self.assertEqual(response.status_int, 302)
@@ -777,7 +773,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
             self.login(self.OWNER_EMAIL)
             self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+                '/createhandler/data/%s' % exp_id)
 
             # Observed_log_messages[1] is 'Attempting to delete documents
             # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
@@ -803,8 +799,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.admin_id, exploration)
 
             self.login(self.ADMIN_EMAIL)
-            self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
                 observed_log_messages[0],
@@ -824,8 +819,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.moderator_id, exploration)
 
             self.login(self.MODERATOR_EMAIL)
-            self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
                 observed_log_messages[0],
@@ -990,10 +984,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.set_banned_users(['joe'])
 
         # Test that Joe is banned (He can still access the library page).
-        response = self.get_html(
-            feconf.LIBRARY_INDEX_URL, expect_errors=True)
+        response = self.get_html(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
-        response = self.get_html('/create/%s' % exp_id, expect_errors=True)
+        response = self.get_html('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
 
@@ -1078,7 +1071,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Check that viewer can access editor page but cannot edit.
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html('/create/%s' % exp_id, expect_errors=True)
+        response = self.get_html('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
         self.assert_cannot_translate(response.body)

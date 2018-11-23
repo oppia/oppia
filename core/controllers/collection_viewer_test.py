@@ -86,8 +86,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         response = self.get_html(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
 
     def test_published_collections_are_visible_to_logged_in_users(self):
@@ -95,8 +94,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         response = self.get_html(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
 
 

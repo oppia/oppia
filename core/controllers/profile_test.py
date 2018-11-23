@@ -41,8 +41,7 @@ class SignupTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
-        response = self.get_html('/create/0', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/create/0', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('Logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])

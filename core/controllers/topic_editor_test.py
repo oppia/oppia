@@ -425,8 +425,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s/%s' % (
                     feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.topic_manager_id),
-                {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=200)
+                {}, csrf_token=csrf_token)
             self.logout()
 
             # Test for when committer doesn't have sufficient rights to assign

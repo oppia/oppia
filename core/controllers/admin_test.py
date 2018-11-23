@@ -38,8 +38,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
 
-        response = self.get_html('/admin', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/admin', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Login as a non-admin.

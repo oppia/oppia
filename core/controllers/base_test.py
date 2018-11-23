@@ -125,8 +125,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
 
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
@@ -136,8 +135,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
@@ -155,8 +153,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
@@ -170,8 +167,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
         self.assertIn('creator_dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
@@ -201,8 +197,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.
-        response = self.get_html('/', expect_errors=True,
-                                 expected_status_int=302)
+        response = self.get_html('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
@@ -316,7 +311,7 @@ class LogoutPageTest(test_utils.GenericTestBase):
         response = self.get_html(current_page)
         self.assertEqual(response.status_int, 200)
         response = self.get_html(current_user_services.create_logout_url(
-            current_page), expect_errors=True, expected_status_int=302)
+            current_page), expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(

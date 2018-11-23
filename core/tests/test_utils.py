@@ -498,7 +498,11 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(html_response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertEqual(html_response.status_int, 200)
+            self.assertTrue(html_response.status_int >= 200 and
+                            html_response.status_int < 400)
+        else:
+            self.assertTrue(html_response.status_int >= 400 and
+                            html_response.status_int < 600)
         self.assertEqual(
             html_response.content_type, 'text/html')
 
@@ -507,7 +511,11 @@ tags: []
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
-            self.assertEqual(json_response.status_int, 200)
+            self.assertTrue(json_response.status_int >= 200 and
+                            json_response.status_int < 400)
+        else:
+            self.assertTrue(json_response.status_int >= 400 and
+                            json_response.status_int < 600)
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))

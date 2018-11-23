@@ -108,8 +108,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         response = self.get_html(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
 
     def test_published_explorations_are_visible_to_logged_in_users(self):
@@ -118,8 +117,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         response = self.get_html(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
 
 
