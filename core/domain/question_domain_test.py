@@ -124,7 +124,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             feconf.CURRENT_STATES_SCHEMA_VERSION, 'en', 1)
 
     def test_to_and_from_dict(self):
-        """Test to verify verify to_dict and from_dict methods
+        """Test to verify to_dict and from_dict methods
         of Question domain object.
         """
         default_question_state_data = (
