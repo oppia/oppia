@@ -132,13 +132,42 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '/ml/trainedclassifierhandler', self.payload,
             expect_errors=True, expected_status_int=401)
 
-    def test_error_on_invalid_message(self):
+    def test_error_on_invalid_job_id(self):
         # Altering message dict to result in invalid dict.
         self.payload['message']['job_id'] = 1
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
             expect_errors=True, expected_status_int=400)
 
+    def test_error_on_invalid_classifier_data_with_floats_stringified(self):
+        # Altering message dict to result in invalid dict.
+        self.payload['message']['classifier_data_with_floats_stringified'] = 1
+        self.post_json(
+            '/ml/trainedclassifierhandler', self.payload,
+            expect_errors=True, expected_status_int=400)
+
+    def test_error_on_failed_training_job_status(self):
+        classifier_training_job_model = (
+            classifier_models.ClassifierTrainingJobModel.get(
+                self.job_id, strict=False))
+        classifier_training_job_model.status = (
+            feconf.TRAINING_JOB_STATUS_FAILED)
+        classifier_training_job_model.put()
+
+        self.post_json(
+            '/ml/trainedclassifierhandler', self.payload,
+            expect_errors=True, expected_status_int=500)
+
+    def test_error_on_exception_in_store_classifier_data(self):
+        classifier_training_job_model = (
+            classifier_models.ClassifierTrainingJobModel.get(
+                self.job_id, strict=False))
+        classifier_training_job_model.state_name = 'invalid_state'
+        classifier_training_job_model.put()
+
+        self.post_json(
+            '/ml/trainedclassifierhandler', self.payload,
+            expect_errors=True, expected_status_int=500)
 
 class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
@@ -214,3 +243,4 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/ml/nextjobhandler', self.payload,
             expect_errors=True, expected_status_int=401)
+
