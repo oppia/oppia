@@ -3,7 +3,7 @@
 </div>
 
 <div class="modal-body">
-  <section ng-class="['oppia-suggestion-review-container',{'oppia-edit-mode':showSuggestionEditor}]">
+  <section ng-class="['oppia-suggestion-review-container', {'oppia-edit-mode': suggestionEditorIsShown}]">
     <div class="oppia-suggestion-review-panel-container" style="float: left;">
       <strong>Current:</strong>
       <div class="oppia-suggestion-review-panel">
@@ -14,11 +14,11 @@
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel" ng-show="!showSuggestionEditor">
+      <div class="oppia-suggestion-review-panel" ng-show="!suggestionEditorIsShown">
         <angular-html-bind html-data="newContent.html">
         </angular-html-bind>
       </div>
-      <div ng-show="showSuggestionEditor">
+      <div ng-show="suggestionEditorIsShown">
         <ck-editor-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-rte>
         <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
@@ -33,12 +33,12 @@
 </div>
 
 <div class="modal-footer">
-  <div ng-show="errorMessage && !showResubmitButton()" class="oppia-suggestion-review-error">
+  <div ng-show="errorMessage && !isResubmitButtonShown()" class="oppia-suggestion-review-error">
     <[ errorMessage ]>
   </div>
-  <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-info" ng-if="showEditButton()" ng-click="editSuggestion()">Edit</button>
-  <button class="btn btn-primary" ng-disabled="disableResubmitButton()" ng-if="showResubmitButton()" ng-click="resubmitChanges()">Submit Changes</button>
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-info" ng-if="isEditButtonShown()" ng-click="editSuggestion()">Edit</button>
+  <button class="btn btn-primary" ng-if="isResubmitButtonShown()" ng-disabled="isResubmitButtonDisabled()" ng-click="resubmitChanges()">Submit Changes</button>
   <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
 </div>

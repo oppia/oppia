@@ -422,7 +422,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.suggestion_id)
                 with self.assertRaisesRegexp(
                     Exception,
-                    'The suggestion was accepted.only rejected suggestions '
+                    'The suggestion was accepted. Only rejected suggestions '
                     'can be resubmitted.'):
                     suggestion_services.resubmit_rejected_suggestion(
                         suggestion, 'resubmit summary message', self.author_id)

@@ -55,11 +55,18 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
 
+    Args:
+        obj: *. The object to validate and normalize.
+        schema: dict(str, *). The schema to validate and normalize the value
+            against.
+        apply_custom_validators: bool. Whether to validate the normalized
+             object using the validators defined in the schema.
+
     Returns:
-        the normalized object.
+        *. The normalized object.
 
     Raises:
-        AssertionError: if the object fails to validate against the schema.
+        AssertionError: The object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -169,6 +176,20 @@ class Normalizers(object):
 
     @classmethod
     def get(cls, normalizer_id):
+        """Returns the normalizer method corresponding to the specified
+        normalizer_id.
+
+        Args:
+            normalizer_id: str. The name of the normalizer method that should be
+                retrieved.
+
+        Returns:
+            function. The normalizer method corresponding to the given
+                normalizer_id.
+
+        Raises:
+            Exception: The normalizer_id is not valid.
+        """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
@@ -221,6 +242,17 @@ class _Validators(object):
     """
     @classmethod
     def get(cls, validator_id):
+        """Returns the validator method corresponding to the specified
+        validator_id.
+
+        Args:
+            validator_id: str. The name of the validator method that should be
+                retrieved.
+
+        Returns:
+            function. The validator method corresponding to the specified
+                validator_id.
+        """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
@@ -229,6 +261,14 @@ class _Validators(object):
     def has_length_at_least(obj, min_value):
         """Returns True iff the given object (a list) has at least
         `min_value` elements.
+
+        Args:
+            obj: list(*). A list of strings.
+            min_value: int. The minimum number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has at least `min_value` elements.
         """
         return len(obj) >= min_value
 
@@ -236,40 +276,100 @@ class _Validators(object):
     def has_length_at_most(obj, max_value):
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
+
+        Args:
+            obj: list(*). A list of strings.
+            max_value: int. The maximum number of elements that `obj` should
+                contain.
+
+        Returns:
+            bool. Whether the given object has at most `max_value` elements.
         """
         return len(obj) <= max_value
 
     @staticmethod
     def is_nonempty(obj):
-        """Returns True iff the given object (a string) is nonempty."""
+        """Returns True iff the given object (a string) is nonempty.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is nonempty.
+        """
         return bool(obj)
 
     @staticmethod
     def is_uniquified(obj):
-        """Returns True iff the given object (a list) has no duplicates."""
+        """Returns True iff the given object (a list) has no duplicates.
+
+        Args:
+            obj: list(*). A list of strings.
+
+        Returns:
+            bool. Whether the given object has no duplicates.
+        """
         return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
     def is_at_least(obj, min_value):
-        """Ensures that `obj` (an int/float) is at least `min_value`."""
+        """Ensures that `obj` (an int/float) is at least `min_value`.
+
+        Args:
+            obj: int|float. An object.
+            min_value: int. The minimum allowed value for `obj`.
+
+        Returns:
+            bool. Whether the given object is at least `min_value`.
+        """
         return obj >= min_value
 
     @staticmethod
     def is_at_most(obj, max_value):
-        """Ensures that `obj` (an int/float) is at most `max_value`."""
+        """Ensures that `obj` (an int/float) is at most `max_value`.
+
+        Args:
+            obj: int|float. An object.
+            max_value: int. The maximum allowed value for `obj`.
+
+        Returns:
+            bool. Whether the given object is at most `max_value`.
+        """
         return obj <= max_value
 
     @staticmethod
     def is_regex(obj):
-        """Ensures that `obj` (a string) defines a valid regex."""
+        """Ensures that `obj` (a string) defines a valid regex.
+
+        Args:
+            obj: str. A string.
+
+        Raises:
+            NotImplementedError: The method is not implemented.
+        """
         raise NotImplementedError
 
     @staticmethod
     def matches_regex(obj, regex):
-        """Ensures that `obj` (a string) matches the given regex."""
+        """Ensures that `obj` (a string) matches the given regex.
+
+        Args:
+            obj: str. A string.
+            regex: str. A regular expression to match the given object with.
+
+        Raises:
+            NotImplementedError: The method is not implemented.
+        """
         raise NotImplementedError
 
     @staticmethod
     def is_valid_email(obj):
-        """Ensures that `obj` (a string) is a valid email."""
+        """Ensures that `obj` (a string) is a valid email.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid email.
+        """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
