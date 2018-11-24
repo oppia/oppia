@@ -46,7 +46,6 @@ describe('Text Input Prediction Service', function() {
           //  trainingData[i].answer_group_index);
           }
         }
-      }
     });
 
     it('should not have accuracy less than 85', function() {
