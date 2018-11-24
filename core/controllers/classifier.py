@@ -23,6 +23,8 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import email_manager
+from core.platform.email import gae_email_services as email_services
 import feconf
 
 
@@ -123,6 +125,24 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
+            # Send email to admin and admin specified email recipients.
+            # Other email recipients are specified on admin config page.
+            mail_subject = 'Failed ML Job %s' % job_id
+            admin_mail_body = ((
+                'ML job %s has failed. For more information,'
+                'please visit the admin page.') % job_id)
+            email_manager.send_mail_to_admin(mail_subject, admin_mail_body)
+            other_recipients = (
+                email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
+            if other_recipients:
+                other_mail_body = ((
+                    'ML job %s has failed. For more information,'
+                    'please contact the admin who put you'
+                    'on the list.') % job_id)
+                email_services.send_bulk_mail(
+                    feconf.SYSTEM_EMAIL_ADDRESS, other_recipients,
+                    mail_subject, other_mail_body,
+                    other_mail_body.replace('\n', '<br/>'))
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:
