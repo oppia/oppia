@@ -367,7 +367,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'This user already has no role for this story'):
             story_services.assign_role(
-                self.user_admin, self.user_a, 
+                self.user_admin, self.user_a,
                 story_domain.ROLE_NONE, self.STORY_ID)
         story_rights = story_services.get_story_rights(self.STORY_ID)
         self.assertFalse(story_services.check_can_edit_story(
