@@ -130,19 +130,16 @@ class TrainedClassifierHandler(base.BaseHandler):
             mail_subject = 'Failed ML Job %s' % job_id
             admin_mail_body = ((
                 'ML job %s has failed. For more information,'
-                'please visit the admin page.') % job_id)
+                'please visit the admin page at:\n'
+                'www.oppia.org/admin#/jobs') % job_id)
             email_manager.send_mail_to_admin(mail_subject, admin_mail_body)
             other_recipients = (
                 email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
             if other_recipients:
-                other_mail_body = ((
-                    'ML job %s has failed. For more information,'
-                    'please contact the admin who put you'
-                    'on the list.') % job_id)
                 email_services.send_bulk_mail(
                     feconf.SYSTEM_EMAIL_ADDRESS, other_recipients,
-                    mail_subject, other_mail_body,
-                    other_mail_body.replace('\n', '<br/>'))
+                    mail_subject, admin_mail_body,
+                    admin_mail_body.replace('\n', '<br/>'))
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:
