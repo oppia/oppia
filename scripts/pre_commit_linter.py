@@ -241,7 +241,8 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', '*.mp3', '*.mp4')
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
