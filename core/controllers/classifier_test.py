@@ -243,4 +243,3 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/ml/nextjobhandler', self.payload,
             expect_errors=True, expected_status_int=401)
-
