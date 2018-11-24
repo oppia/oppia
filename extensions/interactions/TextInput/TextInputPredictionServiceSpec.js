@@ -30,7 +30,6 @@ describe('Text Input Prediction Service', function() {
       $scope = $rootScope.$new();
     }));
     it('should predict the same as oppia-ml', function() {
-
       jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
       var classifierData = getJSONFixture('text_input_classifier_data.json');
       var trainingData = getJSONFixture('text_classifier_results.json');
@@ -39,14 +38,16 @@ describe('Text Input Prediction Service', function() {
       for (var i = 0; i < trainingData.length; i++) {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
-            classifierData, trainingData[i].answers[j]);
+            classifierData, trainingData[i].answers[j].answer);
           if (predictedAnswerGroup === -1) {
             predictedAnswerGroup = 3;
           }
-          //expect(predictedAnswerGroup).toEqual(trainingData[i].answer_group_index);      
+          // expect(predictedAnswerGroup).toEqual(
+          //  trainingData[i].answer_group_index);
           }
         }
-      })
+      }
+    });
 
     it('should not have accuracy less than 85', function() {
       // These answers are taken from the text_input_training_data.json
