@@ -192,6 +192,10 @@ oppia.factory('SiteAnalyticsService', ['$window', function($window) {
     registerOpenFractionsFromLandingPageEvent: function(viewerType) {
       _sendEventToGoogleAnalytics(
         'OpenFractionsFromLandingPage', 'click', viewerType);
+    },
+    registerStewardsLandingPageEvent: function(viewerType, buttonText) {
+      _sendEventToGoogleAnalytics(
+        'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
     }
   };
 }]);

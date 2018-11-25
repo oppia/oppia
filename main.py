@@ -281,17 +281,38 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       custom_landing_pages.FractionLandingPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
-                       library.LibraryIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
-                       library.LibraryGroupIndexHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+        library.LibraryGroupPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_TOP_RATED_URL, library.LibraryGroupPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+        library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
