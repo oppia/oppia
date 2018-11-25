@@ -67,6 +67,10 @@ describe('Story contents object factory', function() {
       node_1: 'Title 1',
       node_2: 'Title 2'
     });
+
+    expect(function() {
+      _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2', 'node_3']);
+    }).toThrow();
   });
 
   it('should correctly correctly validate valid story contents', function() {

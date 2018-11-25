@@ -31,6 +31,9 @@
   </form>
   <div class="node-field">
     <label class="form-heading"> Next Chapters </label>
+    <div ng-if="getDestinationNodeIds().length === 0">
+      This chapter doesn't lead to any other chapters yet.
+    </div>
     <md-card class="destination-node-id"
              ng-repeat="nodeId in getDestinationNodeIds()"
              ng-click="viewNodeEditor(nodeId)">
@@ -43,8 +46,14 @@
       <label> Add a destination chapter </label>
     </div>
     <span>
-      <select class="form-control" ng-model="newNodeId" ng-options="node.id as node.text for node in availableNodes" style="width: 300px;" ng-click="addDestinationNode(newNodeId)">
+      <select class="form-control"
+              ng-model="newNodeId"
+              ng-options="node.id as node.text for node in availableNodes"
+              style="width: 300px; margin-bottom: 10px;"
+              ng-click="addDestinationNode(newNodeId)">
+        <option value="">Pick an already existing chapter</option>
       </select>
+      <button class="btn btn-success" ng-click="addNewDestinationNode()"> Add a new Destination Chapter </button>
     </span>
   </div>
 </div>
