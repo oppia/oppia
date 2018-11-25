@@ -39,7 +39,6 @@ oppia.directive('questionsTab', [
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.currentPage = 0;
-          $scope.NUM_QUESTIONS_PER_PAGE = NUM_QUESTIONS_PER_PAGE;
 
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
@@ -55,6 +54,10 @@ oppia.directive('questionsTab', [
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
+          };
+
+          $scope.getQuestionIndex = function(index) {
+            return $scope.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
           };
 
           $scope.goToNextPage = function() {

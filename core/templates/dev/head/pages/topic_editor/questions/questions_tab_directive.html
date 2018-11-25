@@ -21,7 +21,7 @@
       </tr>
       <tr ng-repeat="question in questionSummaries"
           class="list-item">
-        <td> <[currentPage * NUM_QUESTIONS_PER_PAGE + $index + 1]> </td>
+        <td> <[getQuestionIndex($index)]> </td>
         <td>
           <a class="list-summary">
             <angular-html-bind html-data="question.question_content"></angular-html-bind>
