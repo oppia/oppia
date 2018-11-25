@@ -169,6 +169,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '/ml/trainedclassifierhandler', self.payload,
             expect_errors=True, expected_status_int=500)
 
+
 class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
 
@@ -243,3 +244,4 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/ml/nextjobhandler', self.payload,
             expect_errors=True, expected_status_int=401)
+
