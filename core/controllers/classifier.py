@@ -127,7 +127,7 @@ class TrainedClassifierHandler(base.BaseHandler):
                 feconf.TRAINING_JOB_STATUS_FAILED):
             # Send email to admin and admin specified email recipients.
             # Other email recipients are specified on admin config page.
-            mail_subject = 'Failed ML Job %s' % job_id
+            mail_subject = 'Failed ML Job'
             admin_mail_body = ((
                 'ML job %s has failed. For more information,'
                 'please visit the admin page at:\n'

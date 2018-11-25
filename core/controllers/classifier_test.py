@@ -23,6 +23,8 @@ import os
 from constants import constants
 from core.controllers import classifier
 from core.domain import classifier_services
+from core.domain import config_domain
+from core.domain import email_manager
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -44,6 +46,8 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with open(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup('moderator@example.com', 'mod')
 
         assets_list = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -117,6 +121,57 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             classifier_training_jobs[0].status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
+
+    def test_email_sent_on_failed_job(self):
+
+        class Fake_Training_Job(object):
+            """ Fake training class
+                to invoke failed job functions.
+            """
+            def __init__(self):
+                self.status = feconf.TRAINING_JOB_STATUS_FAILED
+
+        def return_fake_training_job(_):
+            return Fake_Training_Job()
+
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        fail_training_job = self.swap(
+            classifier_services,
+            'get_classifier_training_job_by_id',
+            return_fake_training_job)
+        with can_send_emails_ctx, can_send_feedback_email_ctx:
+            with fail_training_job:
+                # Adding moderator email to admin config page
+                # for sending emails for failed training jobs.
+                self.login(self.ADMIN_EMAIL, is_super_admin=True)
+                name = 'notification_emails_for_failed_tasks'
+                config_property = config_domain.Registry.get_config_property(
+                    name)
+                config_property.set_value(
+                    'commiter_id', ['moderator@example.com'])
+                response_dict = self.get_json('/adminhandler')
+                response_config_properties = response_dict['config_properties']
+                expected_email_list = {
+                    'value': ['moderator@example.com']}
+                sys_config_list = (
+                    response_config_properties[email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name]) # pylint: disable=line-too-long
+                self.assertDictContainsSubset(
+                    expected_email_list, sys_config_list)
+                self.post_json(
+                    '/ml/trainedclassifierhandler', self.payload,
+                    expect_errors=True, expected_status_int=500)
+                messages = self.mail_stub.get_sent_messages(
+                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                expected_subject = 'Failed ML Job'
+                self.assertEqual(len(messages), 1)
+                self.assertEqual(messages[0].subject.decode(), expected_subject)
+                messages = self.mail_stub.get_sent_messages(
+                    to='moderator@example.com')
+                self.assertEqual(len(messages), 1)
+                self.assertEqual(messages[0].subject.decode(), expected_subject)
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
