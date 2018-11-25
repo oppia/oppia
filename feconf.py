@@ -393,9 +393,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
 
-# No. of questions to be displayed on a page in the topic editor.
-NUM_QUESTIONS_PER_PAGE = 10
-
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
 

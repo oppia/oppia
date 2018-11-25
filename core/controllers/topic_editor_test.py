@@ -95,7 +95,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(feconf, 'NUM_QUESTIONS_PER_PAGE', 1):
+            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
                 json_response = self.get_json(
                     '%s/%s?cursor=' % (
                         feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
