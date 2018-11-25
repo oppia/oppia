@@ -61,9 +61,11 @@ oppia.directive('translatorOverview', [
               .getExplorationAudioRequiredCount();
             var notAvailable = TranslationStatusService
               .getExplorationAudioNotAvailableCount();
-            var progressPercent = (
+            $scope.progressPercent = (
               100 - (notAvailable / numberRequiredAudio) * 100);
-            return {width: progressPercent + '%'};
+            $scope.progressPercent = 
+              $scope.progressPercent.toFixed(2);
+            return {width: $scope.progressPercent + '%'};
           };
 
           $scope.changeTranslationLanguage = function() {
