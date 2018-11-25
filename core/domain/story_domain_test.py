@@ -32,6 +32,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     SKILL_ID_2 = 'skill_id_2'
     EXP_ID = 'exp_id'
     USER_ID = 'user'
+    USER_ID_1 = 'user1'
 
     def setUp(self):
         super(StoryDomainUnitTests, self).setUp()
@@ -39,6 +40,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story = self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
+        self.signup('user@example.com', 'user')
+        self.signup('user1@example.com', 'user1')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the story passes validation."""
@@ -432,3 +435,104 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
+
+    def test_to_dict(self):
+        user_ids = [self.USER_ID, self.USER_ID_1]
+        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
+        expected_dict = {
+            'story_id': self.STORY_ID,
+            'manager_names': ['user', 'user1'],
+            'story_is_published': False
+        }
+
+        self.assertEqual(expected_dict, story_rights.to_dict())
+
+    def test_is_manager(self):
+        user_ids = [self.USER_ID, self.USER_ID_1]
+        story_rights = story_domain.StoryRights(self.STORY_ID, user_ids, False)
+        self.assertTrue(story_rights.is_manager(self.USER_ID))
+        self.assertTrue(story_rights.is_manager(self.USER_ID_1))
+        self.assertFalse(story_rights.is_manager('fakeuser'))
+
+
+class StoryRightsChangeTests(test_utils.GenericTestBase):
+    """Test the story rights change domain object."""
+
+    def setUp(self):
+        super(StoryRightsChangeTests, self).setUp()
+        self.STORY_ID = story_services.get_new_story_id()
+        self.story = self.save_new_story(
+            self.STORY_ID, 'user_id', 'Title', 'Description', 'Notes'
+        )
+        self.signup('user@example.com', 'user')
+
+    def test_initializations(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change_dict: '
+            '{\'invalid_key\': \'invalid_value\'}'):
+            story_domain.StoryRightsChange({
+                'invalid_key': 'invalid_value'
+            })
+
+        change_role_object = story_domain.StoryRightsChange({
+            'cmd': story_domain.CMD_CHANGE_ROLE,
+            'assignee_id': 'assignee_id',
+            'new_role': 'new_role',
+            'old_role': 'old_role'
+        })
+
+        self.assertEqual(change_role_object.cmd, story_domain.CMD_CHANGE_ROLE)
+        self.assertEqual(change_role_object.assignee_id, 'assignee_id')
+        self.assertEqual(change_role_object.new_role, 'new_role')
+        self.assertEqual(change_role_object.old_role, 'old_role')
+
+        cmd_list = [
+            story_domain.CMD_CREATE_NEW,
+            story_domain.CMD_PUBLISH_STORY,
+            story_domain.CMD_UNPUBLISH_STORY
+        ]
+
+        for cmd in cmd_list:
+            cmd_object = story_domain.StoryRightsChange({
+                'cmd': cmd
+            })
+            self.assertEqual(cmd, cmd_object.cmd)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change_dict: '
+            '{\'cmd\': \'invalid_command\'}'):
+            story_domain.StoryRightsChange({
+                'cmd': 'invalid_command'
+            })
+
+    def test_to_dict(self):
+        change_role_object = story_domain.StoryRightsChange({
+            'cmd': story_domain.CMD_CHANGE_ROLE,
+            'assignee_id': 'assignee_id',
+            'new_role': 'new_role',
+            'old_role': 'old_role'
+        })
+
+        expected_dict = {
+            'cmd': story_domain.CMD_CHANGE_ROLE,
+            'assignee_id': 'assignee_id',
+            'new_role': 'new_role',
+            'old_role': 'old_role'
+        }
+
+        self.assertDictEqual(expected_dict, change_role_object.to_dict())
+
+        cmd_list = [
+            story_domain.CMD_CREATE_NEW,
+            story_domain.CMD_PUBLISH_STORY,
+            story_domain.CMD_UNPUBLISH_STORY
+        ]
+
+        for cmd in cmd_list:
+            cmd_object = story_domain.StoryRightsChange({
+                'cmd': cmd
+            })
+            expected_dict = {
+                'cmd': cmd
+            }
+            self.assertDictEqual(expected_dict, cmd_object.to_dict())
