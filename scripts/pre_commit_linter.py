@@ -1172,7 +1172,6 @@ def _check_arg_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
     failed = False
-    print files_to_check
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -1182,9 +1181,9 @@ def _check_arg_order(all_files):
                 if line[0:3] == 'def':
                     START = '('
                     END = ')'
-                    # Find index of '('
+                    # Find index of '('.
                     start_index = line.index(START)
-                    # Find index of ')'
+                    # Find index of ')'.
                     while 1:
                         try:
                             end_index = line.index(END)
@@ -1193,7 +1192,7 @@ def _check_arg_order(all_files):
                             line_num = line_num + 1
                             line = file_content[line_num].lstrip().rstrip()
                     if start_index + 1 != end_index:
-                        # Getting the list of all the arguments
+                        # Getting the list of all the arguments.
                         args_list = line[start_index + 1:end_index].split(',')
                         if 'self' in args_list:
                             if args_list[0] != 'self':
