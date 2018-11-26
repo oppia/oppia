@@ -417,9 +417,10 @@ class BaseHandler(webapp2.RequestHandler):
             values: dict. The key-value pairs to include in the response.
         """
 
-        if return_type == feconf.HANDLER_TYPE_JSON:
-            self.render_json(values)
-        elif return_type == feconf.HANDLER_TYPE_HTML:
+        method = self.request.environ['REQUEST_METHOD']
+
+        if(return_type == feconf.HANDLER_TYPE_HTML and
+           method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
@@ -427,8 +428,9 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.render_template('pages/error/error.html')
         else:
-            logging.warning('Not a recognized return type: '
-                            'defaulting to render JSON.')
+            if return_type != feconf.HANDLER_TYPE_JSON:
+                logging.warning('Not a recognized return type: '
+                                'defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):

@@ -307,8 +307,10 @@ class RenderDownloadableTest(test_utils.GenericTestBase):
         """
         def get(self):
             """Handles GET requests."""
-            text = 'example'
-            self.render_downloadable_file(text, 'example.pdf', 'text/plain')
+            file_contents = 'example'
+            self.render_downloadable_file(
+                file_contents, 'example.pdf',
+                'text/plain')
 
     def setUp(self):
         super(RenderDownloadableTest, self).setUp()
