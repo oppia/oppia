@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3>
+    Enter Chapter Title
+  </h3>
+</div>
+<form ng-submit="save(nodeTitle)">
+  <div class="modal-body new-chapter-title-editor">
+    <p>
+      Enter the title for the chapter
+    </p>
+    <input class="form-control" style="font-size: 12px;"
+           placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
+           ng-model="nodeTitle" ng-change="resetErrorMsg()" autofocus>
+    <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+      <em><[errorMsg]></em>
+    </span>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-success" type="submit" ng-disabled="isNodeTitleEmpty(nodeTitle)">
+      <span>Create Chapter</span>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</form>

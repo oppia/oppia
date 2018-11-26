@@ -35,6 +35,7 @@ describe('Story object factory', function() {
         initial_node_id: 'node_1',
         nodes: [{
           id: 'node_1',
+          title: 'Title 1',
           prerequisite_skill_ids: [],
           acquired_skill_ids: [],
           destination_node_ids: [],
@@ -82,6 +83,7 @@ describe('Story object factory', function() {
         initial_node_id: 'node_2',
         nodes: [{
           id: 'node_2',
+          title: 'Title 2',
           prerequisite_skill_ids: [],
           acquired_skill_ids: [],
           destination_node_ids: [],

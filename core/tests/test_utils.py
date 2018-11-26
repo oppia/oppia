@@ -233,6 +233,7 @@ class TestBase(unittest.TestCase):
             'outline_is_finalized': False,
             'acquired_skill_ids': [],
             'id': 'node_1',
+            'title': 'Chapter 1',
             'prerequisite_skill_ids': []}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'

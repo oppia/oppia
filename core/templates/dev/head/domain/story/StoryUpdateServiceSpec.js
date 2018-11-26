@@ -40,6 +40,7 @@ describe('Story update service', function() {
         nodes: [
           {
             id: 'node_1',
+            title: 'Title 1',
             prerequisite_skill_ids: ['skill_1'],
             acquired_skill_ids: ['skill_2'],
             destination_node_ids: [],
@@ -48,6 +49,7 @@ describe('Story update service', function() {
             outline_is_finalized: false
           }, {
             id: 'node_2',
+            title: 'Title 2',
             prerequisite_skill_ids: ['skill_3'],
             acquired_skill_ids: ['skill_4'],
             destination_node_ids: ['node_1'],
@@ -265,11 +267,14 @@ describe('Story update service', function() {
 
   it('should add/remove a story node', function() {
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
-    StoryUpdateService.addStoryNode(_sampleStory);
+    StoryUpdateService.addStoryNode(_sampleStory, 'Title 2');
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(3);
     expect(_sampleStory.getStoryContents().getNextNodeId()).toEqual('node_4');
     expect(
       _sampleStory.getStoryContents().getNodes()[2].getId()).toEqual('node_3');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[2].getTitle()).toEqual(
+      'Title 2');
 
     UndoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
@@ -277,30 +282,28 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for adding a story node',
     function() {
-      StoryUpdateService.addStoryNode(_sampleStory);
+      StoryUpdateService.addStoryNode(_sampleStory, 'Title 2');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_story_node',
-        node_id: 'node_3'
+        node_id: 'node_3',
+        title: 'Title 2'
       }]);
     }
   );
 
   it('should remove/add a story node', function() {
+    expect(function() {
+      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    }).toThrow();
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
     StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
-    expect(function() {
-      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
-    }).toThrow();
-    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(1);
-    expect(
-      _sampleStory.getStoryContents().getNodes()[0].getId()).toEqual('node_2');
-    expect(
-      _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
-    ).toEqual([]);
+    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(function() {
       UndoRedoService.undoChange(_sampleStory);
@@ -395,6 +398,36 @@ describe('Story update service', function() {
         property_name: 'outline',
         new_value: 'new outline',
         old_value: 'Outline',
+        node_id: 'node_1'
+      }]);
+    }
+  );
+
+  it('should set a story node title', function() {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe('Title 1');
+    StoryUpdateService.setStoryNodeTitle(
+      _sampleStory, 'node_1', 'new title');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe('new title');
+
+    UndoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe('Title 1');
+  });
+
+  it('should create a proper backend change dict for setting a node title',
+    function() {
+      StoryUpdateService.setStoryNodeTitle(
+        _sampleStory, 'node_1', 'new title');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_story_node_property',
+        property_name: 'title',
+        new_value: 'new title',
+        old_value: 'Title 1',
         node_id: 'node_1'
       }]);
     }

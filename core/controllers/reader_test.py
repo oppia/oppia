@@ -214,6 +214,14 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         self.save_new_story(
             STORY_ID, 'user', 'Title', 'Description', 'Notes'
         )
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story('user', STORY_ID, changelist, 'Added node.')
         SKILL_ID = skill_services.get_new_skill_id()
         self.save_new_skill(
             SKILL_ID, 'user', 'Description')
