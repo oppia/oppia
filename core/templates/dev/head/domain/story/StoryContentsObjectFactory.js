@@ -72,7 +72,7 @@ oppia.factory('StoryContentsObjectFactory', [
       }
       if (Object.keys(nodeTitles).length !== nodeIds.length) {
         for (var i = 0; i < nodeIds.length; i++) {
-          if (!nodeTitles[nodeIds[i]]) {
+          if (!nodeTitles.hasOwnProperty(nodeIds[i])) {
             throw Error('The node with id ' + nodesIds[i] + ' is invalid');
           }
         }
