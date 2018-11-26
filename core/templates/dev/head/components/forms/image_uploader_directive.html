@@ -10,6 +10,7 @@
     Please do not upload watermarked images.
   </span>
   <label for="image-file-input" translate="I18N_DIRECTIVES_UPLOAD_A_FILE" class="image-uploader-upload-label-button"></label>
+  <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
   <input type="file" id="image-file-input" onclick="this.value = null" class="image-uploader-file-input" ng-class="fileInputClassName">
 </div>
 
