@@ -213,14 +213,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated).fetch_page(
+            ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated).fetch_page(
+            ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
         question_ids = [
