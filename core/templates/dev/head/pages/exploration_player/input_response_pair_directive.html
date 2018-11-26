@@ -71,8 +71,8 @@
 </style>
 
 <script type="text/ng-template" id="popover/answer">
-  <div>
-    <angular-html-bind html-data="answer()">
+  <div style="max-height: 300px; overflow-y: scroll;">
+    <angular-html-bind html-data="getAnswerHtml()">
     </angular-html-bind>
   </div>
 </script>
