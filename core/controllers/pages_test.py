@@ -27,3 +27,78 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         response.mustcontain(
             'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
             'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')
+
+
+class GetStartedPageTest(test_utils.GenericTestBase):
+
+    def test_get_started_page(self):
+        """Test for the get started page."""
+        response = self.testapp.get('/get_started')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain(
+            'I18N_GET_STARTED_PAGE_HEADING', 'I18N_GET_STARTED_PAGE_HEADING')
+
+
+class TeachPageTest(test_utils.GenericTestBase):
+
+    def test_teach_page(self):
+        """Test for the teach page."""
+        response = self.testapp.get('/teach')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
+class ContactPageTest(test_utils.GenericTestBase):
+
+    def test_contact_page(self):
+        """Test for the contact page."""
+        response = self.testapp.get('/contact')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain('I18N_CONTACT_PAGE_HEADING')
+
+
+class DonatePageTest(test_utils.GenericTestBase):
+
+    def test_donate_page(self):
+        """Test for donate page."""
+        response = self.testapp.get('/donate')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
+class ThanksPageTest(test_utils.GenericTestBase):
+
+    def test_thanks_page(self):
+        """Test for thanks page."""
+        response = self.testapp.get('/thanks')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
+class TermsPageTest(test_utils.GenericTestBase):
+
+    def test_terms_page(self):
+        """Test for terms page."""
+        response = self.testapp.get('/terms')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
+class PrivacyPageTest(test_utils.GenericTestBase):
+
+    def test_privacy_page(self):
+        """Test for privacy page."""
+        response = self.testapp.get('/privacy')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
+class AboutRedirectPageTest(test_utils.GenericTestBase):
+
+    def test_about_redirect_page(self):
+        """Test for about redirect page."""
+        about_page_url = '/about'
+        response = self.testapp.get(about_page_url, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
