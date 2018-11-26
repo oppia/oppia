@@ -124,15 +124,13 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
     def test_email_sent_on_failed_job(self):
 
-        class Fake_Training_Job(object):
-            """ Fake training class
-                to invoke failed job functions.
-            """
+        class FakeTrainingJob(object):
+            """Fake training class to invoke failed job functions."""
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 
         def return_fake_training_job(_):
-            return Fake_Training_Job()
+            return FakeTrainingJob()
 
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -147,22 +145,34 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
                 # Adding moderator email to admin config page
                 # for sending emails for failed training jobs.
                 self.login(self.ADMIN_EMAIL, is_super_admin=True)
-                name = 'notification_emails_for_failed_tasks'
                 config_property = config_domain.Registry.get_config_property(
-                    name)
+                    'notification_emails_for_failed_tasks')
                 config_property.set_value(
-                    'commiter_id', ['moderator@example.com'])
+                    'committer_id', ['moderator@example.com'])
                 response_dict = self.get_json('/adminhandler')
                 response_config_properties = response_dict['config_properties']
                 expected_email_list = {
                     'value': ['moderator@example.com']}
-                sys_config_list = (
-                    response_config_properties[email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name]) # pylint: disable=line-too-long
+                sys_config_list = response_config_properties[
+                    email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name]
                 self.assertDictContainsSubset(
                     expected_email_list, sys_config_list)
+
+                # Check that there are no sent emails to either
+                # email address before posting json.
+                messages = self.mail_stub.get_sent_messages(
+                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                self.assertEqual(len(messages), 0)
+                messages = self.mail_stub.get_sent_messages(
+                    to='moderator@example.com')
+                self.assertEqual(len(messages), 0)
+
+                # Post ML Job.
                 self.post_json(
                     '/ml/trainedclassifierhandler', self.payload,
                     expect_errors=True, expected_status_int=500)
+
+                # Check that there are now emails sent.
                 messages = self.mail_stub.get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'

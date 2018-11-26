@@ -24,8 +24,10 @@ from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
-from core.platform.email import gae_email_services as email_services
+from core.platform import models
 import feconf
+
+email_services = models.Registry.import_email_services()
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -125,7 +127,7 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
-            # Send email to admin and admin specified email recipients.
+            # Send email to admin and admin-specified email recipients.
             # Other email recipients are specified on admin config page.
             mail_subject = 'Failed ML Job'
             admin_mail_body = ((
