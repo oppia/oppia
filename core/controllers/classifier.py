@@ -24,10 +24,7 @@ from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
-from core.platform import models
 import feconf
-
-email_services = models.Registry.import_email_services()
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -129,19 +126,7 @@ class TrainedClassifierHandler(base.BaseHandler):
                 feconf.TRAINING_JOB_STATUS_FAILED):
             # Send email to admin and admin-specified email recipients.
             # Other email recipients are specified on admin config page.
-            mail_subject = 'Failed ML Job'
-            admin_mail_body = ((
-                'ML job %s has failed. For more information,'
-                'please visit the admin page at:\n'
-                'www.oppia.org/admin#/jobs') % job_id)
-            email_manager.send_mail_to_admin(mail_subject, admin_mail_body)
-            other_recipients = (
-                email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
-            if other_recipients:
-                email_services.send_bulk_mail(
-                    feconf.SYSTEM_EMAIL_ADDRESS, other_recipients,
-                    mail_subject, admin_mail_body,
-                    admin_mail_body.replace('\n', '<br/>'))
+            email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:
