@@ -1,24 +1,17 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="story-title">
-      <span ng-if="!storyTitleEditorIsShown" ng-click="openStoryTitleEditor()"
-            class="oppia-editable-section">
-        <strong class="form-heading"><[story.getTitle()]></strong>
-        <i class="material-icons oppia-editor-edit-icon"
-           title="Edit Story Title">&#xE254;
-        </i>
-      </span>
-      <span ng-if="storyTitleEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateStoryTitle(editableTitle)">
-          <input type="text" ng-model="editableTitle">
-          <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeStoryTitleEditor()">Cancel</button>
-        </form>
+      <label for="storyTitle" class="form-heading">Story Title</label>
+      <input id="storyTitle" type="text" class="form-control"
+             ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
+             placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
+        <em>Please use at most 20 characters for the story title.</em>
       </span>
     </div>
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
-      <label for="storyDescription" class="form-heading">Description</label>
+      <label for="storyDescription" class="form-heading">Story Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
@@ -38,27 +31,28 @@
         </schema-based-editor>
         <button type="button"
                 class="btn btn-success save-button"
-                ng-disabled="!editableNotes"
+                ng-disabled="!editableNotes || (editableNotes === story.getNotes())"
                 ng-click="updateNotes(editableNotes)">
           Save
         </button>
       </div>
     </div>
     <div class="story-nodes-title">
-      <label for="storyNodes" class="form-heading">Story Nodes</label>
-      <br>
-      Click on the check box to mark it as initial node
+      <label for="storyNodes" class="form-heading">Chapters</label>
+      <span ng-if="nodes.length > 0"> <i> (Click on check box to mark it as the first chapter.)</i> </span>
     </div>
-    <div class="story-node-editor">
-      <br>
+    <div class="story-node-editor" ng-if="nodes.length > 0">
       <div class="story-nodes-container">
         <div ng-repeat="node in nodes">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <[node.getId()]>
+              <[node.getTitle()]>
             </div>
+            <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
+              <i>This chapter is not reachable from any other chapter</i>
+            </span>
             <span class="story-editor-initial-node">
               <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
                 <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
@@ -85,6 +79,16 @@
         </div>
       </div>
     </div>
+    <div ng-if="nodes.length === 0" style="text-align: center;">
+      <p class="no-chapters-message" style="padding-top: 6px;">
+        This story has no chapters.
+      </p>
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+              style="color: white; text-decoration: none;"
+              ng-click="createNode()">
+        Create Chapter
+      </button>
+    </div>
   </md-card>
 </div>
 
@@ -93,6 +97,12 @@
     margin-left: 10%;
     margin-top: -1%;
     width: 80%;
+  }
+
+  story-editor .no-chapters-message {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
   }
 
   story-editor .story-editor-node {
@@ -107,6 +117,7 @@
     position: relative;
     text-align: center;
     width: 15vw;
+    white-space: normal;
   }
 
   story-editor .selected-node {

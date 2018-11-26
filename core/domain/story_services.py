@@ -285,7 +285,7 @@ def apply_change_list(story_id, change_list):
     try:
         for change in change_list:
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
-                story.add_node(change.node_id)
+                story.add_node(change.node_id, change.title)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 story.delete_node(change.node_id)
             elif (change.cmd ==
@@ -298,6 +298,9 @@ def apply_change_list(story_id, change_list):
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
                     story.update_node_outline(change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_TITLE):
+                    story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(
