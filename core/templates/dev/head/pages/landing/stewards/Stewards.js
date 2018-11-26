@@ -63,7 +63,7 @@ oppia.controller('Stewards', [
           tabName === $scope.TAB_NAME_TEACHERS) {
         // TODO(sll): Add newsletter form here.
         return [{
-          text: 'Browse our lessons',
+          text: 'Browse Lessons',
           href: '/library'
         }];
       } else if (tabName === $scope.TAB_NAME_NONPROFITS) {
@@ -72,6 +72,7 @@ oppia.controller('Stewards', [
           href: 'https://www.oppiafoundation.org/partnerships#get-in-touch'
         }];
       } else if (tabName === $scope.TAB_NAME_VOLUNTEERS) {
+        // TODO(sll): Add "Get in Touch" link that points to contact form.
         return [{
           text: 'Browse Volunteer Opportunities',
           href: 'https://www.oppiafoundation.org/volunteer'
