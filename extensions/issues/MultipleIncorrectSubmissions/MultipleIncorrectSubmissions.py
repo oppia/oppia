@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for recording multiple incorrect submissions issue."""
+
 from extensions.issues import base
 
 

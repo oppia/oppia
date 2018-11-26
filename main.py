@@ -275,25 +275,44 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/assets/image/<encoded_filename>',
-        resources.ImageDevHandler),
-    get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/assets/audio/<encoded_filename>',
-        resources.AudioDevHandler),
+        r'/assetsdevhandler/<exploration_id>/'
+        'assets/<asset_type:(image|audio)>/<encoded_filename>',
+        resources.AssetDevHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       custom_landing_pages.FractionLandingPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
-                       library.LibraryIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
-                       library.LibraryGroupPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
-                       library.LibraryGroupIndexHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+    get_redirect_route(
+        r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
+        custom_landing_pages.StewardsLandingPage),
+
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+        library.LibraryGroupPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_TOP_RATED_URL, library.LibraryGroupPage),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+        library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
@@ -486,7 +505,7 @@ URLS = MAPREDUCE_HANDLERS + [
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
-        suggestion.ReSubmitSuggestionHandler),
+        suggestion.ResubmitSuggestionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
