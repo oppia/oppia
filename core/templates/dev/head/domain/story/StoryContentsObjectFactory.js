@@ -71,7 +71,11 @@ oppia.factory('StoryContentsObjectFactory', [
         }
       }
       if (Object.keys(nodeTitles).length !== nodeIds.length) {
-        throw Error('The node with id ' + nodes[i].getId() + ' is invalid');
+        for (var i = 0; i < nodeIds.length; i++) {
+          if (!nodeTitles[nodeIds[i]]) {
+            throw Error('The node with id ' + nodesIds[i] + ' is invalid');
+          }
+        }
       }
       return nodeTitles;
     };
