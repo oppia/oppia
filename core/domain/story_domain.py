@@ -55,6 +55,12 @@ CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
 
+CMD_CHANGE_ROLE = 'change_role'
+CMD_PUBLISH_STORY = 'publish_story'
+CMD_UNPUBLISH_STORY = 'unpublish_story'
+
+ROLE_MANAGER = 'manager'
+ROLE_NONE = 'none'
 # The prefix for all node ids of a story.
 NODE_ID_PREFIX = 'node_'
 
@@ -1055,3 +1061,101 @@ class StorySummary(object):
             'title': self.title,
             'description': self.description
         }
+
+
+class StoryRights(object):
+    """Domain object for story rights."""
+
+    def __init__(self, story_id, manager_ids, story_is_published):
+        """Constructs a StoryRights domain object.
+
+        Args:
+            story_id: str. The id of the story.
+            manager_ids: list(str). The id of the users who have been assigned
+                as managers for the story.
+            story_is_published: bool. Whether the story is viewable by a
+                learner.
+        """
+        self.id = story_id
+        self.manager_ids = manager_ids
+        self.story_is_published = story_is_published
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend.
+
+        Returns:
+            dict. A dict version of StoryRights suitable for use by the
+                frontend.
+        """
+        return {
+            'story_id': self.id,
+            'manager_names': self.manager_ids,
+            'story_is_published': self.story_is_published
+        }
+
+    def is_manager(self, user_id):
+        """Checks whether given user is a manager of the story.
+
+        Args:
+            user_id: str or None. Id of the user.
+
+        Returns:
+            bool. Whether user is a manager of this story.
+        """
+        return bool(user_id in self.manager_ids)
+
+
+class StoryRightsChange(object):
+    """Domain object for changes made to a story rights object."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'assignee_id', 'new_role', 'old_role'
+    ]
+
+    def __init__(self, change_dict):
+        """Initialize a StoryRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'change_role' (with assignee_id, new_role and old_role)
+                - 'create_new'
+                - 'publish_story'
+                - 'unpublish_story'
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CHANGE_ROLE:
+            self.assignee_id = change_dict['assignee_id']
+            self.new_role = change_dict['new_role']
+            self.old_role = change_dict['old_role']
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        elif self.cmd == CMD_PUBLISH_STORY:
+            pass
+        elif self.cmd == CMD_UNPUBLISH_STORY:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the StoryRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of StoryRightsChange instance.
+        """
+        story_rights_change_dict = {}
+        story_rights_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                story_rights_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return story_rights_change_dict
