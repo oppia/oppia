@@ -328,6 +328,28 @@ def _send_bulk_mail(
         _send_bulk_mail_in_transaction, instance_id)
 
 
+def send_job_failure_email(job_id):
+    """Sends an email to admin email as well as any email addresses
+    specificed on the admin config page.
+
+    Args:
+        job_id: str. The Job ID of the failing job.
+    """
+    mail_subject = 'Failed ML Job'
+    mail_body = ((
+        'ML job %s has failed. For more information,'
+        'please visit the admin page at:\n'
+        'https://www.oppia.org/admin#/jobs') % job_id)
+    send_mail_to_admin(mail_subject, mail_body)
+    other_recipients = (
+        NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
+    if other_recipients:
+        email_services.send_bulk_mail(
+            feconf.SYSTEM_EMAIL_ADDRESS, other_recipients,
+            mail_subject, mail_body,
+            mail_body.replace('\n', '<br/>'))
+
+
 def send_mail_to_admin(email_subject, email_body):
     """Send an email to the admin email address.
 
