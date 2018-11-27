@@ -140,15 +140,16 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             classifier_services,
             'get_classifier_training_job_by_id',
             return_fake_training_job)
+        config_property = config_domain.Registry.get_config_property(
+            'notification_emails_for_failed_tasks')
+        config_property.set_value(
+            'committer_id', ['moderator@example.com'])
+
         with can_send_emails_ctx, can_send_feedback_email_ctx:
             with fail_training_job:
                 # Adding moderator email to admin config page
                 # for sending emails for failed training jobs.
                 self.login(self.ADMIN_EMAIL, is_super_admin=True)
-                config_property = config_domain.Registry.get_config_property(
-                    'notification_emails_for_failed_tasks')
-                config_property.set_value(
-                    'committer_id', ['moderator@example.com'])
                 response_dict = self.get_json('/adminhandler')
                 response_config_properties = response_dict['config_properties']
                 expected_email_list = {

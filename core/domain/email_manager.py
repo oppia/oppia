@@ -339,7 +339,7 @@ def send_job_failure_email(job_id):
     mail_body = ((
         'ML job %s has failed. For more information,'
         'please visit the admin page at:\n'
-        'www.oppia.org/admin#/jobs') % job_id)
+        'https://www.oppia.org/admin#/jobs') % job_id)
     send_mail_to_admin(mail_subject, mail_body)
     other_recipients = (
         NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
