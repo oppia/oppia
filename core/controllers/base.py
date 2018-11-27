@@ -419,8 +419,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         method = self.request.environ['REQUEST_METHOD']
 
-        if(return_type == feconf.HANDLER_TYPE_HTML and
-           method == 'GET'):
+        if return_type == feconf.HANDLER_TYPE_HTML and (
+                method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
@@ -428,7 +428,8 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.render_template('pages/error/error.html')
         else:
-            if return_type != feconf.HANDLER_TYPE_JSON:
+            if return_type != feconf.HANDLER_TYPE_JSON and (
+                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
                 logging.warning('Not a recognized return type: '
                                 'defaulting to render JSON.')
             self.render_json(values)
