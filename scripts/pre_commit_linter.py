@@ -1183,12 +1183,12 @@ def _check_args_order(all_files):
                     END = ')'
                     # Find index of '('.
                     while 1:
-                       try:
-                           start_index = line.index(START)
-                           break
-                       except ValueError:
-                           line_num = line_num + 1
-                           line = file_content[line_num].lstrip().rstrip()
+                        try:
+                            start_index = line.index(START)
+                            break
+                        except ValueError:
+                            line_num = line_num + 1
+                            line = file_content[line_num].lstrip().rstrip()
                     # Find index of ')'.
                     while 1:
                         try:
