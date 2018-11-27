@@ -1178,11 +1178,17 @@ def _check_args_order(all_files):
             file_length = len(file_content)
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
-                if line[0:3] == 'def':
+                if line[0:3] == 'def ':
                     START = '('
                     END = ')'
                     # Find index of '('.
-                    start_index = line.index(START)
+                    while 1:
+                       try:
+                           start_index = line.index(START)
+                           break
+                       except ValueError:
+                           line_num = line_num + 1
+                           line = file_content[line_num].lstrip().rstrip()
                     # Find index of ')'.
                     while 1:
                         try:
