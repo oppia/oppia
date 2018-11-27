@@ -36,3 +36,15 @@ class FractionLandingPage(base.BaseHandler):
 
         self.render_template(
             'pages/landing/fractions/landing_page_%s.html' % viewer_type)
+
+
+class StewardsLandingPage(base.BaseHandler):
+    """Page showing the landing page for stewards (parents, teachers,
+    volunteers, or NGOs).
+    """
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_template(
+            'pages/landing/stewards/landing_page_stewards.html')

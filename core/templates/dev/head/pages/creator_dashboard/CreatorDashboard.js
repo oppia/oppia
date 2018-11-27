@@ -323,7 +323,8 @@ oppia.controller('CreatorDashboard', [
           'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/' +
-          'view_suggestion_edit_exploration_state_content_modal_directive.html');
+          'view_suggestion_edit_exploration_state_content_modal_directive.html'
+        );
       }
 
       $uibModal.open({
