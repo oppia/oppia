@@ -1158,7 +1158,7 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _check_arg_order(all_files):
+def _check_args_order(all_files):
     """If class args like self and cls are there
     in function then it come first.
     """
@@ -1727,7 +1727,7 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _check_arg_order(all_files)
+    args_order_messages = _check_args_order(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
