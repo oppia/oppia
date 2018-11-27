@@ -17,8 +17,10 @@
               <div class="oppia-stewards-landing-top-section">
                 <h1 class="oppia-stewards-landing-h1">Help your kids and students succeed.</h1>
                 <h2 class="oppia-stewards-landing-h2" style="padding-right: 15px;">Oppia's FREE, effective online lessons can help your students learn important life skills.</h2>
-                <div ng-repeat="buttonDefinition in buttonDefinitions track by $index">
-                  <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+                <div>
+                  <span ng-repeat="buttonDefinition in buttonDefinitions track by $index">
+                    <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+                  </span>
                 </div>
               </div>
             </div>
@@ -188,58 +190,87 @@
 
             <div ng-if="activeTabName === TAB_NAME_TEACHERS">
               <h2>
-                Free, personalized lessons that your students can use to learn
+                Oppia's free, personalized lessons are a great way to support student learning
               </h2>
 
               <p>
-                With Oppia, you can get access to additional free online
-                lessons to supplement your classroom teaching. Help your
-                students by introducing them to Oppia’s free, effective online
-                lessons that they can use at home to supplement their learning
-                at school.
+                Every student learns in a unique way at their own pace. As a
+                teacher, even in the best circumstances, it can be difficult to
+                cater to every student's unique needs. Oppia's engaging,
+                story-driven lessons are a great tool to support student
+                learning.
               </p>
 
               <p>
-                The lessons keep students engaged and excited, and have resulted
-                in significant learning gains in controlled trials with
-                low-income students in India. Oppia can respond intelligently
-                to the student, providing personalised feedback even when
-                you're not available.
+                Oppia's personalized feedback and engaging storytelling can
+                assist students who require additional help outside of the
+                classroom. Or, Oppia can be used inside your classroom,
+                allowing every student can work at their own pace and giving
+                you the opportunity to provide additional support to those that
+                need a helping hand.
               </p>
 
               <p>
-                Oppia was created by a global community of volunteers who aim
-                to provide every student with access to effective and
-                affordable education. Join our community to support the
-                project, request lessons needed by your students, and help
-                create lessons for others. All of Oppia's lessons are
-                <strong>free</strong> to use.
+                Our approach to creating lessons has been tested in controlled
+                trials and shown to result in significant learning gains. We
+                have designed our content to be relatable, interesting, and
+                scaffolded in a way that builds on earlier conceptual
+                understanding.
+              </p>
+
+              <p>
+                And, best of all, as a volunteer-led non-profit, our lessons
+                are <strong>100% free to use</strong> and contain no
+                advertising or monetization strategies.
+              </p>
+
+              <p>
+                We welcome you to join our community, support the project by
+                spreading the message to other educators, request lessons
+                needed by your students, or create new lessons for others.
               </p>
             </div>
 
             <div ng-if="activeTabName === TAB_NAME_NONPROFITS">
               <h2>
-                Let's work together on improving education for underserved
-                students
+                Let's work together to make compelling, effective educational
+                content for students all over the world
               </h2>
               <p>
-                If you are working to help improve education for underserved
-                students, we'd love to work with you!
+                Oppia is a rapidly-growing, all volunteer non-profit dedicated
+                to making engaging educational lessons available to students
+                from every walk of life.
               </p>
 
               <p>
-                Oppia provides free, effective online lessons that you can use
-                to scale your capacity while working together with an recognized
-                international nonprofit. Since Oppia can provide students with
-                intelligent feedback, it can help take some of the teaching
-                load off the volunteer, allowing them to use their time with
-                the students most effectively. Students can also do additional
-                learning at home to complement the time spent with the
-                volunteer.
+                Our free, effective digital library of lessons is being built
+                with an emphasis on scalability and accessibility. Our lesson
+                builder allows content creators to provide intelligent,
+                personalized feedback to students based on their responses.
+                Lessons are continuously translated into new languages and
+                available on low-bandwidth mobile devices to reach students in
+                underserved communities around the world.
               </p>
 
               <p>
-                Contact us to arrange a pilot with your students.
+                In controlled trials, Oppia has been shown to result in
+                significant learning gains in communities that lack access to
+                effective learning environments.
+              </p>
+
+              <p>
+                At Oppia, we believe that quality education is a fundamental
+                right. Our mission is to provide every student the tools they
+                need to achieve basic literacy and numeracy while developing a
+                lifelong love for learning. It’s no small task, but with the
+                help of partners who share our vision, it’s one we are
+                confident can be achieved.
+              </p>
+
+              <p>
+                We invite you to contact us to learn more about our
+                organization, inquire about partnerships, or arrange a pilot
+                study.
               </p>
             </div>
 
@@ -273,8 +304,10 @@
               </p>
             </div>
 
-            <div ng-repeat="buttonDefinition in buttonDefinitions track by $index">
-              <button class="btn oppia-stewards-button oppia-stewards-main-content-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+            <div class="oppia-stewards-main-content-buttons">
+              <span ng-repeat="buttonDefinition in buttonDefinitions track by $index">
+                <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+              </span>
             </div>
           </div>
         </main>
@@ -411,6 +444,7 @@
       font-family: "Capriola", "Roboto", Arial, sans-serif;
       font-size: 20px;
       height: 56px;
+      margin-bottom: 20px;
       position: relative;
       text-align: center;
       text-transform: uppercase;
@@ -447,9 +481,9 @@
       margin-left: 20px;
       width: 60%;
     }
-    .oppia-stewards-main-content-button {
-      margin: 0 auto;
+    .oppia-stewards-main-content-buttons {
       display: block;
+      margin: 40px auto 0;
     }
     .oppia-stewards-landing-top-section {
       margin-left: 60px;
