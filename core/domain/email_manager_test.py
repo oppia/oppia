@@ -17,6 +17,7 @@
 import datetime
 import types
 
+from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import rights_manager
@@ -27,6 +28,48 @@ from core.tests import test_utils
 import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+
+
+class FailedMLTest(test_utils.GenericTestBase):
+    """Test that email functionality for sending failed ML Job emails
+    works.
+    """
+
+    def setUp(self):
+        super(FailedMLTest, self).setUp()
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_property = config_domain.Registry.get_config_property(
+            'notification_emails_for_failed_tasks')
+        config_property.set_value(
+            'committer_id', ['moderator@example.com'])
+
+    def test_send_failed_ml_email(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            messages = self.mail_stub.get_sent_messages(
+                to='moderator@example.com')
+            self.assertEqual(len(messages), 0)
+
+            # Send job failure email with mock Job ID.
+            email_manager.send_job_failure_email('123ABC')
+
+            # Make sure emails are sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_subject = 'Failed ML Job'
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject.decode(), expected_subject)
+            messages = self.mail_stub.get_sent_messages(
+                to='moderator@example.com')
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject.decode(), expected_subject)
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
