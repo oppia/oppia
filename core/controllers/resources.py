@@ -22,10 +22,13 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+import feconf
 
 
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, generator_id):
@@ -46,6 +49,8 @@ class AssetDevHandler(base.BaseHandler):
     """
 
     _SUPPORTED_TYPES = ['image', 'audio']
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, exploration_id, asset_type, encoded_filename):

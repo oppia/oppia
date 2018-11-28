@@ -281,6 +281,13 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
+    def render_downloadable_file(self, values, filename, content_type):
+        """Prepares downloadable content to be sent to the client."""
+        self.response.headers['Content-Type'] = content_type
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s' % (filename))
+        self.response.write(values)
+
     def _get_logout_url(self, redirect_url_on_logout):
         """Prepares and returns logout url which will be handled
         by LogoutPage handler.
@@ -410,9 +417,10 @@ class BaseHandler(webapp2.RequestHandler):
             values: dict. The key-value pairs to include in the response.
         """
 
-        if return_type == feconf.HANDLER_TYPE_JSON:
-            self.render_json(values)
-        elif return_type == feconf.HANDLER_TYPE_HTML:
+        method = self.request.environ['REQUEST_METHOD']
+
+        if return_type == feconf.HANDLER_TYPE_HTML and (
+                method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
@@ -420,8 +428,10 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.render_template('pages/error/error.html')
         else:
-            logging.warning('Not a recognized return type: '
-                            'defaulting to render JSON.')
+            if return_type != feconf.HANDLER_TYPE_JSON and (
+                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+                logging.warning('Not a recognized return type: '
+                                'defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):

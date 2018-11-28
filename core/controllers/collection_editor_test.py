@@ -107,8 +107,8 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response = self.testapp.get(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 302)
+                self.COLLECTION_ID), expect_errors=True)
+        self.assertEqual(response.status_int, 401)
 
         # Check that whitelisted users can access the data
         # from the editable_collection_data_handler.
