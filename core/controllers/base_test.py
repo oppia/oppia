@@ -17,6 +17,7 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import inspect
 import json
 import os
 import re
@@ -298,6 +299,37 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertNotIn('马', response.body)
 
 
+class RenderDownloadableTest(test_utils.GenericTestBase):
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler that subclasses BaseHandler and serves a response
+        that is of a 'downloadable' type.
+        """
+        def get(self):
+            """Handles GET requests."""
+            file_contents = 'example'
+            self.render_downloadable_file(
+                file_contents, 'example.pdf', 'text/plain')
+
+    def setUp(self):
+        super(RenderDownloadableTest, self).setUp()
+
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_downloadable(self):
+        response = self.testapp.get('/mock')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(
+            response.content_disposition,
+            'attachment; filename=example.pdf')
+        self.assertEqual(response.body, 'example')
+        self.assertEqual(response.content_type, 'text/plain')
+
+
 class LogoutPageTest(test_utils.GenericTestBase):
 
     def test_logout_page(self):
@@ -513,7 +545,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
         handlers_checked = []
 
         for route in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
@@ -589,3 +621,68 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
                 'param2=value%20with%20%26%20%2B%20-%20/&'
                 'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
             self.assertDictContainsSubset(params, result)
+
+
+class ControllerClassNameTest(test_utils.GenericTestBase):
+
+    def test_controller_class_names(self):
+        """This function checks that all controller class names end with
+        either 'Handler', 'Page' or 'FileDownloader'.
+        """
+        # A mapping of returned handler types to expected name endings.
+        handler_type_to_name_endings_dict = {
+            feconf.HANDLER_TYPE_HTML: 'Page',
+            feconf.HANDLER_TYPE_JSON: 'Handler',
+            feconf.HANDLER_TYPE_DOWNLOADABLE: 'FileDownloader',
+        }
+        num_handlers_checked = 0
+        for url in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to pick only those which have
+            # a RedirectRoute associated with it.
+            if isinstance(url, main.routes.RedirectRoute):
+                clazz = url.handler
+                num_handlers_checked += 1
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it is a subclass of 'BaseHandler'.
+                if 'BaseHandler' in all_base_classes:
+                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                    # Check that any class with a get handler has a
+                    # GET_HANDLER_ERROR_RETURN_TYPE that's one of
+                    # the allowed values.
+                    if 'get' in clazz.__dict__.keys():
+                        self.assertIn(
+                            class_return_type,
+                            handler_type_to_name_endings_dict)
+                    class_name = clazz.__name__
+                    file_name = inspect.getfile(clazz)
+                    line_num = inspect.getsourcelines(clazz)[1]
+                    allowed_class_ending = handler_type_to_name_endings_dict[
+                        class_return_type]
+                    # Check that the name of the class ends with
+                    # the proper word if it has a get function.
+                    if 'get' in clazz.__dict__.keys():
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'%s\'' % allowed_class_ending)
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(
+                            class_name.endswith(allowed_class_ending),
+                            msg=error_message)
+
+                    # Check that the name of the class ends with 'Handler'
+                    # if it does not has a get function.
+                    else:
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'Handler\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(class_name.endswith('Handler'),
+                                        msg=error_message)
+
+        self.assertGreater(num_handlers_checked, 150)

@@ -918,6 +918,7 @@ THANKS_PAGE_DESCRIPTION = (
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
