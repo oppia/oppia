@@ -111,7 +111,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
 
         question_summaries, next_start_cursor = (
             question_services.get_question_summaries_linked_to_skills(
-                feconf.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
         )
         question_summary_dicts = [
             summary.to_dict() for summary in question_summaries]
