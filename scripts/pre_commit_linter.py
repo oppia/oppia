@@ -1200,14 +1200,14 @@ def _check_args_order(all_files):
                     if start_index + 1 != end_index:
                         # Getting the list of all the arguments.
                         args_list = line[start_index + 1:end_index].split(', ')
-                        # Checking if 'self' exists in args and doesn't comes first
-                        if 'self' in args_list and arg_list[0] != 'self':
+                        # Check if 'self' exists in args and doesn't comes first
+                        if 'self' in args_list and args_list[0] != 'self':
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num + 1,
                                 wrong_ordself_message)
-                        # Checking if 'cls' exists in args and doesn't comes first
-                        elif 'cls' in args_list and arg_list[0] != 'cls':
+                        # Check if 'cls' exists in args and doesn't comes first
+                        elif 'cls' in args_list and args_list[0] != 'cls':
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num + 1,
