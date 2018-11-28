@@ -86,7 +86,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.questionData.language.operators);
           $scope.questionString = (
             $scope.assumptionsString === '' ?
-            'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
+            'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION':
             'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
           $scope.questionStringData = {
             target: $scope.targetString,
