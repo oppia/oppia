@@ -1159,8 +1159,8 @@ def _check_docstrings(all_files):
 
 
 def _check_args_order(all_files):
-    """If class args like self and cls are there
-    in function then it come first.
+    """This function ensures that class args(self or cls)
+    comes first in the function definition.
     """
     print 'Starting arguments order check'
     print '----------------------------------------'
@@ -1179,39 +1179,39 @@ def _check_args_order(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 if line[0:3] == 'def ':
-                    START = '('
-                    END = ')'
-                    # Find index of '('.
+                    start = '('
+                    end = ')'
+                    # Finding the index of '('.
                     while 1:
                         try:
-                            start_index = line.index(START)
+                            start_index = line.index(start)
                             break
                         except ValueError:
                             line_num = line_num + 1
                             line = file_content[line_num].lstrip().rstrip()
-                    # Find index of ')'.
+                    # Finding the index of ')'.
                     while 1:
                         try:
-                            end_index = line.index(END)
+                            end_index = line.index(end)
                             break
                         except ValueError:
                             line_num = line_num + 1
                             line = file_content[line_num].lstrip().rstrip()
                     if start_index + 1 != end_index:
                         # Getting the list of all the arguments.
-                        args_list = line[start_index + 1:end_index].split(',')
-                        if 'self' in args_list:
-                            if args_list[0] != 'self':
-                                failed = True
-                                print '%s --> Line %s: %s' % (
-                                    filename, line_num + 1,
-                                    wrong_ordself_message)
-                            elif 'cls' in args_list:
-                                if args_list[0] != 'cls':
-                                    failed = True
-                                    print '%s --> Line %s: %s' % (
-                                        filename, line_num + 1,
-                                        wrong_ordcls_message)
+                        args_list = line[start_index + 1:end_index].split(', ')
+                        # Checking if 'self' exists in args and doesn't comes first
+                        if 'self' in args_list and arg_list[0] != 'self':
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num + 1,
+                                wrong_ordself_message)
+                        # Checking if 'cls' exists in args and doesn't comes first
+                        elif 'cls' in args_list and arg_list[0] != 'cls':
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num + 1,
+                                wrong_ordcls_message)
     print ''
     print '----------------------------------------'
     print ''
