@@ -233,6 +233,7 @@ class TestBase(unittest.TestCase):
             'outline_is_finalized': False,
             'acquired_skill_ids': [],
             'id': 'node_1',
+            'title': 'Chapter 1',
             'prerequisite_skill_ids': []}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
@@ -485,7 +486,9 @@ tags: []
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
-            self.assertEqual(json_response.status_int, 200)
+            self.assertTrue(
+                json_response.status_int < 400 and
+                json_response.status_int >= 200)
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
