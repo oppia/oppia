@@ -61,17 +61,21 @@ oppia.controller('Stewards', [
     var getButtonDefinitions = function(tabName) {
       if (tabName === $scope.TAB_NAME_PARENTS ||
           tabName === $scope.TAB_NAME_TEACHERS) {
-        // TODO(sll): Add newsletter form here.
+        // TODO(sll): Add additional "Subscribe to our Newsletter" link.
         return [{
-          text: 'Browse our lessons',
+          text: 'Browse Lessons',
           href: '/library'
         }];
       } else if (tabName === $scope.TAB_NAME_NONPROFITS) {
         return [{
           text: 'Contact us',
           href: 'https://www.oppiafoundation.org/partnerships#get-in-touch'
+        }, {
+          text: 'Browse Lessons',
+          href: '/library'
         }];
       } else if (tabName === $scope.TAB_NAME_VOLUNTEERS) {
+        // TODO(sll): Add "Get in Touch" link that points to contact form.
         return [{
           text: 'Browse Volunteer Opportunities',
           href: 'https://www.oppiafoundation.org/volunteer'
