@@ -205,7 +205,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '/ml/trainedclassifierhandler', self.payload,
             expect_errors=True, expected_status_int=400)
 
-    def test_error_on_invalid_classifier_data_with_floats_stringified_in_message(self):
+    def test_error_on_invalid_classifier_data_in_message(self):
         # Altering message dict to result in invalid dict.
         self.payload['message']['classifier_data_with_floats_stringified'] = 1
         self.post_json(
