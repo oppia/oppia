@@ -94,6 +94,9 @@ fi
 # Delete the modified feconf.py file(-i.bak)
 rm assets/constants.js.bak
 
+# Set the configuration for CKEDITOR which prevents addition of new line everytime save button is pressed.
+cp -rf export/config.js third_party/static/ckeditor-4.9.2
+
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
 echo Starting GAE development server
