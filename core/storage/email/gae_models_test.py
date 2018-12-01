@@ -189,7 +189,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         all_ids = [
-            model.create('user_id', 'thread_id').reply_to_id 
+            model.create('user_id', 'thread_id').reply_to_id
             for _ in xrange(100)]
         for current_id in all_ids:
             other_ids = copy.copy(all_ids)
