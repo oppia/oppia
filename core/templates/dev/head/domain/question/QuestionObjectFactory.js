@@ -37,6 +37,10 @@ oppia.factory('QuestionObjectFactory', [
       return this._stateData;
     };
 
+    Question.prototype.setStateData = function(newStateData) {
+      this._stateData = angular.copy(newStateData);
+    };
+
     Question.prototype.getLanguageCode = function() {
       return this._languageCode;
     };
