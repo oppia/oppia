@@ -164,6 +164,36 @@ describe('Oppia static pages tour', function() {
     waitFor.pageToFullyLoad();
   });
 
+  it('visits the Fractions landing page', function() {
+    browser.get('/fractions');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Partners landing page', function() {
+    browser.get('/partners');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Nonprofits landing page', function() {
+    browser.get('/nonprofits');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Parents landing page', function() {
+    browser.get('/parents');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Teachers landing page', function() {
+    browser.get('/teachers');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Volunteers landing page', function() {
+    browser.get('/volunteers');
+    waitFor.pageToFullyLoad();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
@@ -293,6 +323,21 @@ describe('Site language', function() {
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
+
+  it('should set preferred audio language selected in the Preferences page.',
+    function() {
+      users.createUser('audioPlayer@example.com', 'audioPlayer');
+      users.login('audioPlayer@example.com');
+      preferencesPage.get();
+      preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
+      preferencesPage.selectPreferredAudioLanguage('Chinese');
+      // TODO(DubeySandeep): Add the test to check preferred audio language
+      // choice gets reflected to the exploration player. This can be done once
+      // we will finalize a way to upload an audio file in e2e test.
+      preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      general.ensurePageHasNoTranslationIds();
+      users.logout();
+    });
 
   it('should save the language selected in the footer into the preferences.',
     function() {

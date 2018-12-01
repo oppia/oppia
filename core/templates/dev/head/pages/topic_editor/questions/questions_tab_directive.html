@@ -22,7 +22,7 @@
       <tr ng-repeat="question in questionSummaries"
           class="list-item"
           ng-click="editQuestion(question)">
-        <td> <[$index + 1]> </td>
+        <td><[getQuestionIndex($index)]></td>
         <td>
           <a class="list-summary">
             <angular-html-bind html-data="question.question_content"></angular-html-bind>
@@ -64,6 +64,13 @@
         </td>
       </tr>
     </table>
+    <div class="page-navigation-arrows" ng-if="questionSummaries.length > 0">
+      <i class="material-icons md-18"
+         ng-if="currentPage !== 0"
+         ng-click="goToPreviousPage()">&#xE5C4;
+      </i> Page <[currentPage + 1]>
+      <i class="material-icons md-18" ng-if="!isLastPage(currentPage)" ng-click="goToNextPage()">&#xE5C8;</i>
+    </div>
   </div>
 </md-card>
 
@@ -109,6 +116,10 @@
     width: 80%;
   }
 
+  questions-tab .questions {
+    padding-bottom: 10px;
+  }
+
   questions-tab .oppia-editor-publish-button {
     margin-top: 2%;
   }
@@ -117,6 +128,10 @@
     font-size: 15px;
     text-align: center;
     width: 100%;
+  }
+
+  questions-tab .page-navigation-arrows {
+    float: right;
   }
 
   questions-tab .list-summary,

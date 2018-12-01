@@ -29,15 +29,18 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        'QuestionUndoRedoService', 'UndoRedoService', function(
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
+        'QuestionUndoRedoService', 'UndoRedoService',
+        'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            QuestionUndoRedoService, UndoRedoService) {
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
+            QuestionUndoRedoService, UndoRedoService,
+            NUM_QUESTIONS_PER_PAGE) {
+          $scope.currentPage = 0;
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -46,7 +49,8 @@ oppia.directive('questionsTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
-              TopicEditorStateService.getQuestionSummaries();
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            $scope.isLastPage = TopicEditorStateService.isLastQuestionBatch;
             $scope.misconceptions = [];
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
@@ -60,6 +64,29 @@ oppia.directive('questionsTab', [
             return QuestionUndoRedoService.hasChanges();
           };
 
+          $scope.getQuestionIndex = function(index) {
+            return $scope.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
+          };
+
+          $scope.goToNextPage = function() {
+            $scope.currentPage++;
+            var questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            if (questionSummaries === null) {
+              TopicEditorStateService.fetchQuestionSummaries(
+                $scope.topic.getId(), false
+              );
+            } else {
+              $scope.questionSummaries = questionSummaries;
+            }
+          };
+
+          $scope.goToPreviousPage = function() {
+            $scope.currentPage--;
+            $scope.questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+          };
+
           $scope.saveAndPublishQuestion = function() {
             var validationErrors = $scope.question.validate(
               $scope.misconceptions);
@@ -67,6 +94,7 @@ oppia.directive('questionsTab', [
               AlertsService.addWarning(validationErrors);
               return;
             }
+
             if (!$scope.questionIsBeingUpdated) {
               $scope.questionIsBeingSaved = true;
               EditableQuestionBackendApiService.createQuestion(
@@ -74,11 +102,10 @@ oppia.directive('questionsTab', [
                 $scope.question.toBackendDict(true)
               ).then(function() {
                 TopicEditorStateService.fetchQuestionSummaries(
-                  $scope.topic.getId(), function() {
-                    _initTab();
-                  }
+                  $scope.topic.getId(), true
                 );
                 $scope.questionIsBeingSaved = false;
+                $scope.currentPage = 0;
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {

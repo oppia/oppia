@@ -17,26 +17,36 @@
  */
 
 oppia.directive('searchResults', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', '$q', function(UrlInterpolationService, $q) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/search_results_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
-        function($scope, $rootScope, $timeout, $window, SiteAnalyticsService) {
-          $rootScope.loadingMessage = 'Loading';
+        '$scope', '$rootScope', '$q', '$timeout', '$window',
+        'SiteAnalyticsService', 'UserService',
+        function($scope, $rootScope, $q, $timeout, $window,
+            SiteAnalyticsService, UserService) {
           $scope.someResultsExist = true;
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+
+          $scope.userIsLoggedIn = null;
+          $rootScope.loadingMessage = 'Loading';
+          var userInfoPromise = UserService.getUserInfoAsync();
+          userInfoPromise.then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           // Called when the first batch of search results is retrieved from the
           // server.
-          $scope.$on(
+          var searchResultsPromise = $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
               $scope.someResultsExist = activityList.length > 0;
-              $rootScope.loadingMessage = '';
             }
           );
+
+          $q.all([userInfoPromise, searchResultsPromise]).then(function() {
+            $rootScope.loadingMessage = '';
+          });
 
           $scope.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent('noSearchResults');

@@ -1,5 +1,87 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.0 (29 November 2018)
+-------------------------
+Bug fixes:
+* Fix video on fractions landing (#5906)
+* Fix profile picture modal not showing picture when we add it again after discard it (#5891)
+* Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
+* Added atts check for audio bar. (#5880)
+* Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
+* Fix #5814: Double edit button in exploration player navbar (#5815)
+* Remove code duplication for calculating answer choices (#5779)
+
+New structures:
+* Remove skills from a topic (#5804)
+* URL decode topic name using urllib.unquote_plus (#5810)
+* Add field canonical_name for Topic and TopicSummary (#5775)
+* Add audio translation schema for concept card (#5677)
+* Fix #5052: Create one-off schema migration jobs for topics, skills, questions and stories (#5660)
+* Fix #5671: Create success message toasts for topics and skills (#5705)
+* Fix #5712: Display an appropriate message when creating questions in topic editor with no skills (#5736)
+
+Infrastructure:
+* Fix #5310: Added a size check to third party folder to prevent breaching the 10k files limit on AppEngine (#5743)
+* Fix #4973: Add minify_only option to build.py (#5758)
+* Fix #5713: Change asset handler url to make it clearer that it's used in dev mode (#5721)
+
+Developer workflow and code health:
+* Fix part of #4374: Add docstrings to the Python files. (#5734)
+* Fix part of #5002: Move user related variables form GLOBALS (#5659)
+* Fix part of #5529: print CSS and JS lint check error messages at the end of the check (#5748)
+* Fix part of #4374: Add acl decorator docstrings (#5803)
+* Fix #5243: Set ignore_whitespace to true in .isort.cfg (#5789)
+* Fix part of #4057: Remove TriggerObjectFactory code (#5770)
+* Fix part of #5134: Added AnswerSubmittedEventHandlerTest (#5778)
+* Fix part of #4374: Added missing docstrings to scripts (#5723)
+* Fix part of #5134: Improve test coverage of core.controllers.topics_and_skills_dashboard (#5741)
+* Fix part of #5134: Improve test coverage of core.controllers.concept_card_viewer (#5762)
+* Fix part of #5134: Improve test coverage of core.controllers.topic_viewer (#5742)
+* Fix typo in constants.py (#5754)
+* Fix part of #4374: Add docstrings for docstring_checker (#5744)
+* Fix part of #4374: Add docstrings for main.py (#5704)
+
+Investigation work:
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+Miscellaneous:
+* Fixes #5687: Allow resubmission of rejected suggestions. (#5730)
+* Fix #5553: Enable audio translations for Safari (#5780)
+* Fix broken SkillMigrationOneOffJobTest (#5781)
+
+
+v2.6.9 (30 Oct 2018)
+--------------------
+Bug fixes:
+* Fixes prod bug by preventing populating old_content value of suggestion when state doesn't exist (#5772)
+* Fix #5691: Fix bug in translation tab resulting from answer choices not being calculated for the short answer summaries (#5756)
+* Fix #5749: Incorrect get-involved link (#5750)
+* Fix #5688: Added users to user condition if only 1 user has reviewed an exploration (#5708)
+
+New structures:
+* Filter skills (#5635)
+* UI and controller to add functionality to merge untriaged skills (#5632)
+
+Infrastructure:
+* Add deployment of export service to deploy.py (#5773)
+* Fix Karma test to use older version of URL.
+* Fix erroneous image path in production. (#5788)
+* Fix broken image region #5765 (#5768)
+* Throttle error reporting to at most once every 5 seconds. (#5767)
+* Fix deployment script to update DEV_MODE value which is now read from constants.js instead of feconf.py. (#5763)
+
+Developer workflow and code clean-up:
+* (Dead code) Remove check 'topic is None', which is already covered by core.domain.acl_decorators.can_access_topic_viewer_page (#5737)
+* Fix part of #4374: Added docstrings to scripts.cut_release_branch and scripts.pylint_extensions (#5728)
+* Fix part of #4374: Update docstrings in the python backend code (#5680)
+* Fix part of #5134: Add tests to core_storage_story (#5644)
+* Add CSS lint rules: Space before curly braces for HTML files (#5732)
+* Added test to core.storage.topic.gae_models (#5727)
+* Extract extensionTagAssemblerService and siteAnalyticsService from app.js - Issue 3826 (#5711)
+* Space before and after CSS classes's curly braces (#5725)
+* Add additional instructions for prefixing PR title for partial fixes (#5718)
+
+
 v2.6.8 (2 Oct 2018)
 -------------------
 Bug fixes:

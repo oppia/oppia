@@ -194,10 +194,10 @@ class AnswerGroup(object):
         only has one classifier rule.
 
         Args:
+            interaction: InteractionInstance. The interaction object.
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -1030,10 +1030,10 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            classifier_model_id: str or None. The classifier model ID
-                associated with this state, if applicable.
             content_ids_to_audio_translations: dict. A dict representing audio
                 translations for corresponding content_id.
+            classifier_model_id: str or None. The classifier model ID
+                associated with this state, if applicable.
         """
         # The content displayed to the reader in this state.
         self.content = content
