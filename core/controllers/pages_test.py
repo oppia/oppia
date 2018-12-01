@@ -14,6 +14,7 @@
 
 """Tests for various static pages (like the About page)."""
 
+from core.controllers import pages
 from core.tests import test_utils
 
 
@@ -27,6 +28,15 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         response.mustcontain(
             'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
             'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')
+
+
+class SplashPageTest(test_utils.GenericTestBase, pages.SplashPage):
+
+    def test_splash_page(self):
+        """Test for splash page."""
+        response = self.testapp.get('/splash')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
 
 
 class GetStartedPageTest(test_utils.GenericTestBase):
@@ -77,6 +87,15 @@ class ThanksPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/html')
 
 
+class ForumPageTest(test_utils.GenericTestBase):
+
+    def test_forum_page(self):
+        """Test for forum page."""
+        response = self.testapp.get('/forum')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+
+
 class TermsPageTest(test_utils.GenericTestBase):
 
     def test_terms_page(self):
@@ -99,6 +118,29 @@ class AboutRedirectPageTest(test_utils.GenericTestBase):
 
     def test_about_redirect_page(self):
         """Test for about redirect page."""
-        about_page_url = '/about'
-        response = self.testapp.get(about_page_url, expect_errors=False)
+        response = self.testapp.get('/credits')
+        self.assertEqual(response.status_int, 302)
+
+
+class FoundationRedirectPageTest(test_utils.GenericTestBase):
+
+    def test_foundation_redirect_page(self):
+        """Test for foundation redirect page."""
+        response = self.testapp.get('/foundation')
+        self.assertEqual(response.status_int, 302)
+
+
+class TeachRedirectPageTest(test_utils.GenericTestBase):
+
+    def test_teach_redirect_page(self):
+        """Test for teach redirect page."""
+        response = self.testapp.get('/participate')
+        self.assertEqual(response.status_int, 302)
+
+
+class ConsoleErrorPageTest(test_utils.GenericTestBase):
+
+    def test_console_error_page(self):
+        """Test for console error page."""
+        response = self.testapp.get('/console_errors')
         self.assertEqual(response.status_int, 200)
