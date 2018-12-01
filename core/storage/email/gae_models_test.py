@@ -2,14 +2,14 @@
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -154,18 +154,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     sent_datetime_lower_bound='Not a datetime object')
 
 
-class BulkEmailModelUnitTests(test_utils.GenericTestBase):
-
-    def test_bulk_emails_send_to_multiple_receivers(self):
-        email_models.BulkEmailModel.create("instance_id",
-            ['recipient_id1', 'recipient_id2', 'recipient_id3'], 'sender_id',
-             'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
-             'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-        results = email_models.SentEmailModel.get_by_hash('Email Hash')
-
-        #self.assertEqual(len(results), 3) #Not equals to 3 RN
-
 
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
@@ -189,13 +177,13 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
     def test_id_generation_works_correctly(self):
         id_generated = email_models.GeneralFeedbackEmailReplyToIdModel._generate_id(
-            "user_id", "thread_id")
-        self.assertEqual(id_generated, "user_id.thread_id")
+            'user_id', 'thread_id')
+        self.assertEqual(id_generated, 'user_id.thread_id')
 
         id_generated = email_models.GeneralFeedbackEmailReplyToIdModel._generate_id(
-            "other_user_id", "other_thread_id")
+            'other_user_id', 'other_thread_id')
 
-        self.assertNotEqual(id_generated, "user_id.thread_id")
+        self.assertNotEqual(id_generated, 'user_id.thread_id')
 
     def test_unique_reply_id_is_unique(self):
         all_ids = [email_models.GeneralFeedbackEmailReplyToIdModel._generate_unique_reply_to_id() for i in range(100)]
@@ -206,78 +194,83 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_raises_when_duplicate_ids(self):
         with self.generate_constant_id_ctx, self.assertRaises(Exception):
-            created_id = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "thread_id")
-            created_id = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "thread_id") #This should throw
+            created1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+            created1.put()
+            created2 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+            created2.put()
 
     def test_get_by_reply_to_id_works_correctly(self):
-        created_id = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "thread_id")
+        created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+        created.put()
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
-            created_id.reply_to_id)
+            created.reply_to_id)
 
-        self.assertEqual(len(result), 1)
+        self.assertNotEqual(result, None) #There should be a result
+        self.assertEqual(result.reply_to_id, created.reply_to_id)
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
-            "non_existent_reply_to_id")
+            'non_existent_reply_to_id')
 
         self.assertEqual(result, None)
 
     def test_get_works_correctly(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "thread_id")
+        created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+        created.put()
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            "user_id", "thread_id", strict=False)
+            'user_id', 'thread_id', strict=False)
 
-        self.assertEqual(len(result), 1)
+        self.assertNotEqual(result, 1)
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                "bad_user_id", "bad_thread_id", strict=False) #Should not throw
+                'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
         self.assertEqual(result, None)
 
         with self.assertRaises(Exception):
             result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                "bad_user_id", "bad_thread_id") #Should throw
+                'bad_user_id', 'bad_thread_id') #Should throw
 
     def test_get_multi_by_user_ids_works_correctly(self):
         email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id_1", "thread_id")
+            'user_id_1', 'thread_id')
         email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id_2", "thread_id")
+            'user_id_2', 'thread_id')
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
-            ["user_id_1", "user_id_2"], "thread_id")
+            ['user_id_1', 'user_id_2'], 'thread_id')
 
         self.assertEqual(len(result), 2)
-        assert("user_id_1" in result.keys())
-        assert("user_id_2" in result.keys())
+        assert('user_id_1' in result.keys())
+        assert('user_id_2' in result.keys())
 
     def test_user_id(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "entity_type.entity_id.thread_id")
+            'user_id', 'entity_type.entity_id.thread_id')
 
-        self.assertEqual(result.user_id, "user_id")
+        self.assertEqual(result.user_id, 'user_id')
 
     def test_entity_type(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "entity_type.entity_id.thread_id")
+            'user_id', 'entity_type.entity_id.thread_id')
 
-        self.assertEqual(result.entity_type, "entity_type")
+        self.assertEqual(result.entity_type, 'entity_type')
 
     def test_entity_id(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "entity_type.entity_id.thread_id")
+            'user_id', 'entity_type.entity_id.thread_id')
 
-        self.assertEqual(result.entity_id, "entity_id")
+        self.assertEqual(result.entity_id, 'entity_id')
 
     def test_thread_id(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            "user_id", "entity_type.entity_id.thread_id")
+            'user_id', 'entity_type.entity_id.thread_id')
 
-        self.assertEqual(result.thread_id, "entity_type.entity_id.thread_id")
+        self.assertEqual(result.thread_id, 'entity_type.entity_id.thread_id')
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
