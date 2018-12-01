@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import datetime
 import types
-import copy
 
 from core.platform import models
 from core.tests import test_utils
@@ -158,7 +158,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
 
-    """Test the GeneralFeedbackEmailReplyToIdModel class"""
+    """Test the GeneralFeedbackEmailReplyToIdModel class."""
 
     def setUp(self):
         super(ReplyToIdModelUnitTests, self).setUp()
