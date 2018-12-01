@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.user_services."""
+
 import datetime
 import logging
 import os
@@ -187,14 +189,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
+
         error_messages = []
-        def log_mock(message):
+        def mock_log_function(message):
             error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(log_mock)
+        logging_error_mock = test_utils.CallCounter(mock_log_function)
         urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
         urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
         log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
@@ -209,14 +212,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
+
         error_messages = []
-        def log_mock(message):
+        def mock_log_function(message):
             error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             'Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(log_mock)
+        logging_error_mock = test_utils.CallCounter(mock_log_function)
         urlfetch_fail_mock = test_utils.FailingFunction(
             urlfetch.fetch, urlfetch.InvalidURLError,
             test_utils.FailingFunction.INFINITY)
@@ -742,7 +746,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def _mock_get_current_date_as_string(self):
+    def mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
     def test_get_user_dashboard_stats(self):
@@ -792,9 +796,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
-            user_services,
-            'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
@@ -836,9 +839,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(
-            user_services,
-            'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
@@ -902,11 +904,11 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
             self.user_id, ['singleword', 'has spaces'])
 
 
-class LastLoginIntegrationTest(test_utils.GenericTestBase):
+class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create exploration with two versions."""
-        super(LastLoginIntegrationTest, self).setUp()
+        super(LastLoginIntegrationTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -945,21 +947,21 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
             def __instancecheck__(cls, other):
                 return isinstance(other, original_datetime_type)
 
-        class PatchedDatetime11Hours(datetime.datetime):
+        class MockDatetime11Hours(datetime.datetime):
             __metaclass__ = PatchedDatetimeType
 
             @classmethod
             def utcnow(cls):
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class PatchedDatetime13Hours(datetime.datetime):
+        class MockDatetime13Hours(datetime.datetime):
             __metaclass__ = PatchedDatetimeType
 
             @classmethod
             def utcnow(cls):
                 return current_datetime + datetime.timedelta(hours=13)
 
-        with self.swap(datetime, 'datetime', PatchedDatetime11Hours):
+        with self.swap(datetime, 'datetime', MockDatetime11Hours):
             self.login(self.VIEWER_EMAIL)
             self.testapp.get(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -967,7 +969,7 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
                 previous_last_logged_in_datetime)
             self.logout()
 
-        with self.swap(datetime, 'datetime', PatchedDatetime13Hours):
+        with self.swap(datetime, 'datetime', MockDatetime13Hours):
             self.login(self.VIEWER_EMAIL)
             self.testapp.get(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(

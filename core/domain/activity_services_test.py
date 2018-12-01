@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.activity_services."""
+
 from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services

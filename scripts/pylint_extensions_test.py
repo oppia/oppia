@@ -17,13 +17,15 @@
 # For details on how to write such tests, please refer to
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
+"""Unit tests for scripts/pylint_extensions."""
+
 import os
 import sys
 import tempfile
 import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 sys.path.insert(0, _PYLINT_PATH)
 
 # Since these module needs to be imported after adding Pylint path,
@@ -38,7 +40,7 @@ from pylint import testutils  # isort:skip
 # pylint: enable=relative-import
 
 
-class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
+class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
     def test_finds_non_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -88,7 +90,7 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
                 func_call_node_three)
 
 
-class HangingIndentCheckerTest(unittest.TestCase):
+class HangingIndentCheckerTests(unittest.TestCase):
 
     def test_finds_hanging_indent(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -135,7 +137,7 @@ class HangingIndentCheckerTest(unittest.TestCase):
             temp_file.close()
 
 
-class DocstringParameterCheckerTest(unittest.TestCase):
+class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_finds_docstring_parameter(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -160,7 +162,7 @@ class DocstringParameterCheckerTest(unittest.TestCase):
             checker_test_object.checker.visit_functiondef(func_node)
 
 
-class ImportOnlyModulesCheckerTest(unittest.TestCase):
+class ImportOnlyModulesCheckerTests(unittest.TestCase):
 
     def test_finds_import_from(self):
         checker_test_object = testutils.CheckerTestCase()

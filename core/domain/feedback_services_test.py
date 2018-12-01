@@ -250,7 +250,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 [self.EXP_ID_1, self.EXP_ID_2])), 1)
 
     def test_get_thread_summaries(self):
-
         feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')

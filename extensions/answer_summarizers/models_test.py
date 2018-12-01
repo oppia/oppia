@@ -288,7 +288,7 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
-class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
+class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
     CALCULATION_ID = 'TopAnswersByCategorization'
 
     def test_empty_state_answers_dict(self):
@@ -381,8 +381,8 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
-class TopNUnresolvedAnswersByFrequency(CalculationUnitTestBase):
-    CALCULATION_ID = 'TopNUnresolvedAnswersByFrequency'
+class TopNUnresolvedAnswersByFrequencyUnitTests(CalculationUnitTestBase):
+    CALCULATION_ID = 'TopNUnresolvedAnswersByFrequencyUnitTests'
 
     def test_empty_state_answers_dict(self):
         state_answers_dict = self._create_state_answers_dict([])

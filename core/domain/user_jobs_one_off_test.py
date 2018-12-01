@@ -733,7 +733,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def _mock_get_current_date_as_string(self):
+    def mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
     def _rate_exploration(self, user_id, exp_id, rating):
@@ -760,12 +760,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         expected_results_list = [{
-            self._mock_get_current_date_as_string(): {
+            self.mock_get_current_date_as_string(): {
                 'num_ratings': 0,
                 'average_ratings': None,
                 'total_plays': 0
@@ -785,13 +785,13 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 0,
                     'average_ratings': None,
                     'total_plays': 0
@@ -821,13 +821,13 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 5.0,
                     'total_plays': 1
@@ -861,13 +861,13 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 2,
                     'average_ratings': 4.5,
                     'total_plays': 1
@@ -898,13 +898,13 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
@@ -935,7 +935,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_results_list = [
             {
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
@@ -1055,10 +1055,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -1079,10 +1079,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.

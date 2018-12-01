@@ -37,7 +37,7 @@ import feconf
     [models.NAMES.user, models.NAMES.statistics])
 
 
-class BaseEditorControllerTest(test_utils.GenericTestBase):
+class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
@@ -46,7 +46,7 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseEditorControllerTest, self).setUp()
+        super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -97,14 +97,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
 
 
-class EditorTest(BaseEditorControllerTest):
+class EditorTests(BaseEditorControllerTests):
 
     ALL_CC_MANAGERS_FOR_TESTS = [
         stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
     ]
 
     def setUp(self):
-        super(EditorTest, self).setUp()
+        super(EditorTests, self).setUp()
         exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
@@ -245,7 +245,7 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ExplorationEditorLogoutTest(BaseEditorControllerTest):
+class ExplorationEditorLogoutTest(BaseEditorControllerTests):
     """Test handler for logout from exploration editor page."""
 
     def test_logout_from_invalid_url(self):
@@ -403,7 +403,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         self.logout()
 
 
-class DownloadIntegrationTest(BaseEditorControllerTest):
+class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
@@ -661,7 +661,7 @@ param_changes: []
         self.logout()
 
 
-class ExplorationDeletionRightsTest(BaseEditorControllerTest):
+class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -751,7 +751,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test correctness of logged statements while deleting exploration."""
         observed_log_messages = []
 
-        def add_logging_info(msg, *_):
+        def mock_logging_function(msg, *_):
             # Message logged by function clear_all_pending() in
             # oppia_tools/google_appengine_1.9.67/google_appengine/google/
             # appengine/ext/ndb/tasklets.py, not to be checked here.
@@ -760,8 +760,8 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', add_logging_info), self.swap(
-            logging, 'debug', add_logging_info):
+        with self.swap(logging, 'info', mock_logging_function), self.swap(
+            logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
@@ -831,7 +831,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.logout()
 
 
-class VersioningIntegrationTest(BaseEditorControllerTest):
+class VersioningIntegrationTest(BaseEditorControllerTests):
     """Test retrieval of and reverting to old exploration versions."""
 
     EXP_ID = '0'
@@ -955,7 +955,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         self.assertEqual(response.status_int, 404)
 
 
-class ExplorationEditRightsTest(BaseEditorControllerTest):
+class ExplorationEditRightsTest(BaseEditorControllerTests):
     """Test the handling of edit rights for explorations."""
 
     def test_user_banning(self):
@@ -1001,7 +1001,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
+class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for managing exploration editing rights."""
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
@@ -1229,7 +1229,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.logout()
 
 
-class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
+class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
 
     def test_user_exploration_emails_handler(self):
@@ -1291,13 +1291,13 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ModeratorEmailsTest(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.GenericTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
 
     def setUp(self):
-        super(ModeratorEmailsTest, self).setUp()
+        super(ModeratorEmailsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1466,13 +1466,13 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.logout()
 
 
-class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
+class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     """Test the handling of request to fetch issues and playthroughs."""
 
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(FetchIssuesPlaythroughHandlerTest, self).setUp()
+        super(FetchIssuesPlaythroughHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1607,13 +1607,13 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
             }])
 
 
-class ResolveIssueHandlerTest(test_utils.GenericTestBase):
+class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     """Test the handler for resolving issues."""
 
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(ResolveIssueHandlerTest, self).setUp()
+        super(ResolveIssueHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1748,7 +1748,7 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
             expect_errors=True, expected_status_int=404)
 
 
-class EditorAutosaveTest(BaseEditorControllerTest):
+class EditorAutosaveTest(BaseEditorControllerTests):
     """Test the handling of editor autosave actions."""
 
     EXP_ID1 = '1'
