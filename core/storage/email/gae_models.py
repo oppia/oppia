@@ -342,7 +342,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             FeedbackEmailReplyToIdModel. The created instance
-            with the unique_reply_id generated.
+            with the unique reply_to_id generated.
 
         Raises:
             Exception: Model instance for given user_id and
@@ -367,8 +367,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             FeedbackEmailReplyToIdModel or None. The instance corresponding to
-            the given 'reply-to' id if it is present in the datastore.
-            Otherwise, None.
+            the given 'reply_to_id' if it is present in the datastore, else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
         return model
