@@ -191,35 +191,34 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         #Name is too long for linter
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
-        all_ids = [model._generate_unique_reply_to_id() 
-            for i in range(100)]
+        all_ids = [model._generate_unique_reply_to_id() for i in range(100)]
         for current_id in all_ids:
             other_ids = copy.copy(all_ids)
             other_ids.remove(current_id)
-            assert(current_id not in other_ids)
+            assert current_id not in other_ids
 
     def test_create_raises_when_duplicate_ids(self):
         with self.generate_constant_id_ctx, self.assertRaises(Exception):
             created1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'thread_id')
+                'user_id', 'thread_id')
             created1.put()
             created2 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'thread_id')
+                'user_id', 'thread_id')
             created2.put()
 
     def test_get_by_reply_to_id_works_correctly(self):
-        created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'thread_id')
+        #Name is too long for linter
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created = model.create('user_id', 'thread_id')
         created.put()
 
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
-            created.reply_to_id)
+        result = model.get_by_reply_to_id(created.reply_to_id)
 
         self.assertNotEqual(result, None) #There should be a result
         self.assertEqual(result.reply_to_id, created.reply_to_id)
 
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
-            'non_existent_reply_to_id')
+        result = model.get_by_reply_to_id('non_existent_reply_to_id')
 
         self.assertEqual(result, None)
 
@@ -234,7 +233,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(result, 1)
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
+            'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
         self.assertEqual(result, None)
 
         with self.assertRaises(Exception):
@@ -242,17 +241,18 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 'bad_user_id', 'bad_thread_id') #Should throw
 
     def test_get_multi_by_user_ids_works_correctly(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id_1', 'thread_id')
-        email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id_2', 'thread_id')
+        #Name is too long for linter
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
 
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
+        model.create('user_id_1', 'thread_id')
+        model.create('user_id_2', 'thread_id')
+
+        result = model.get_multi_by_user_ids(
             ['user_id_1', 'user_id_2'], 'thread_id')
 
         self.assertEqual(len(result), 2)
-        assert('user_id_1' in result.keys())
-        assert('user_id_2' in result.keys())
+        assert 'user_id_1' in result.keys()
+        assert 'user_id_2' in result.keys()
 
     def test_user_id(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
