@@ -159,9 +159,6 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
 
     """Test the GeneralFeedbackEmailReplyToIdModel class"""
-    #Name is too long for linter
-    model = email_models.GeneralFeedbackEmailReplyToIdModel 
-
 
     def setUp(self):
         super(ReplyToIdModelUnitTests, self).setUp()
@@ -182,11 +179,11 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         id_generated = model._generate_id(
-                'user_id', 'thread_id')
+            'user_id', 'thread_id')
         self.assertEqual(id_generated, 'user_id.thread_id')
 
         id_generated = model._generate_id(
-                'other_user_id', 'other_thread_id')
+            'other_user_id', 'other_thread_id')
 
         self.assertNotEqual(id_generated, 'user_id.thread_id')
 
