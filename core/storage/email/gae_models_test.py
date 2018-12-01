@@ -46,22 +46,22 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_duplicate_mails_detected(self):
         email_models.SentEmailModel.create(
-                'recipient_id', 'recipient@email.com', 'sender_id',
-                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
         email_models.SentEmailModel.create(
-                'recipient_id', 'recipient@email.com', 'sender_id',
-                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
-        duplicated = email_models.SentEmailModel.check_duplicate_message('recipient_id',
-                'Email Subject', 'Email Body')
+        duplicated = email_models.SentEmailModel.check_duplicate_message(
+            'recipient_id', 'Email Subject', 'Email Body')
 
         self.assertEqual(duplicated, True)
 
-        not_duplicated = email_models.SentEmailModel.check_duplicate_message('recipient_id',
-                'Other Email Subject', 'Other Email Body')
+        not_duplicated = email_models.SentEmailModel.check_duplicate_message(
+            'recipient_id', 'Other Email Subject', 'Other Email Body')
 
         self.assertEqual(not_duplicated, False)
 
@@ -159,6 +159,8 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
 
     """Test the GeneralFeedbackEmailReplyToIdModel class"""
+    #Name is too long for linter
+    model = email_models.GeneralFeedbackEmailReplyToIdModel 
 
 
     def setUp(self):
@@ -176,17 +178,24 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 email_models.GeneralFeedbackEmailReplyToIdModel))
 
     def test_id_generation_works_correctly(self):
-        id_generated = email_models.GeneralFeedbackEmailReplyToIdModel._generate_id(
-            'user_id', 'thread_id')
+        #Name is too long for linter
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        id_generated = model._generate_id(
+                'user_id', 'thread_id')
         self.assertEqual(id_generated, 'user_id.thread_id')
 
-        id_generated = email_models.GeneralFeedbackEmailReplyToIdModel._generate_id(
-            'other_user_id', 'other_thread_id')
+        id_generated = model._generate_id(
+                'other_user_id', 'other_thread_id')
 
         self.assertNotEqual(id_generated, 'user_id.thread_id')
 
     def test_unique_reply_id_is_unique(self):
-        all_ids = [email_models.GeneralFeedbackEmailReplyToIdModel._generate_unique_reply_to_id() for i in range(100)]
+        #Name is too long for linter
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        all_ids = [model._generate_unique_reply_to_id() 
+            for i in range(100)]
         for current_id in all_ids:
             other_ids = copy.copy(all_ids)
             other_ids.remove(current_id)
