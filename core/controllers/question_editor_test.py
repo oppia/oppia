@@ -215,8 +215,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
 
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests get, put and delete methods of editable questions data handler.
-    """
+    """Tests get, put and delete methods of editable questions data handler."""
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
         super(EditableQuestionDataHandlerTest, self).setUp()
