@@ -341,7 +341,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. ID of the corresponding thread.
 
         Returns:
-            the created FeedbackEmailReplyToIdModel instance.
+            FeedbackEmailReplyToIdModel. The created instance
+            with the unique_reply_id generated.
 
         Raises:
             Exception: Model instance for given user_id and
