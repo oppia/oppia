@@ -106,43 +106,10 @@ oppia.directive('stateInteractionEditor', [
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
 
-            // Special cases for multiple choice input and image click input.
-            if ($scope.interactionId === 'MultipleChoiceInput') {
-              $rootScope.$broadcast(
-                'updateAnswerChoices',
-                currentCustomizationArgs.choices.value.map(function(val, ind) {
-                  return {
-                    val: ind,
-                    label: val
-                  };
-                })
-              );
-            } else if ($scope.interactionId === 'ImageClickInput') {
-              var _answerChoices = [];
-              var imageWithRegions =
-                currentCustomizationArgs.imageAndRegions.value;
-              for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
-                _answerChoices.push({
-                  val: imageWithRegions.labeledRegions[j].label,
-                  label: imageWithRegions.labeledRegions[j].label
-                });
-              }
-
-              $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
-            } else if ($scope.interactionId === 'ItemSelectionInput' ||
-                $scope.interactionId === 'DragAndDropSortInput') {
-              $rootScope.$broadcast(
-                'updateAnswerChoices',
-                currentCustomizationArgs.choices.value.map(function(val) {
-                  return {
-                    val: val,
-                    label: val
-                  };
-                })
-              );
-            } else {
-              $rootScope.$broadcast('updateAnswerChoices', null);
-            }
+            $rootScope.$broadcast(
+              'updateAnswerChoices',
+              StateEditorService.getAnswerChoices(
+                $scope.interactionId, currentCustomizationArgs));
           };
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -456,20 +423,6 @@ oppia.directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             });
-          };
-
-          var _updateInteractionPreviewAndAnswerChoices = function() {
-            $scope.interactionId = StateInteractionIdService.savedMemento;
-
-            var currentCustomizationArgs =
-              StateCustomizationArgsService.savedMemento;
-            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
-              currentCustomizationArgs);
-
-            $rootScope.$broadcast(
-              'updateAnswerChoices',
-              StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
           };
         }
       ]

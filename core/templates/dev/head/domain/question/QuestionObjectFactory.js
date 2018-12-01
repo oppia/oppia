@@ -37,10 +37,6 @@ oppia.factory('QuestionObjectFactory', [
       return this._stateData;
     };
 
-    Question.prototype.setStateData = function(stateData) {
-      this._stateData.copy(stateData);
-    };
-
     Question.prototype.getLanguageCode = function() {
       return this._languageCode;
     };
@@ -61,6 +57,9 @@ oppia.factory('QuestionObjectFactory', [
 
     Question.prototype.validate = function(misconceptions) {
       var interaction = this._stateData.interaction;
+      if (interaction.id === null) {
+        return 'An interaction must be specified';
+      }
       if (interaction.hints.length === 0) {
         return 'At least 1 hint should be specfied';
       }

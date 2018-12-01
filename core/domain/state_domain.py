@@ -402,7 +402,8 @@ class InteractionInstance(object):
         solution_dict = (
             Solution.from_dict(
                 interaction_dict['id'], interaction_dict['solution'])
-            if interaction_dict['solution'] else None)
+            if (interaction_dict['solution'] and interaction_dict['id'])
+            else None)
 
         return cls(
             interaction_dict['id'],
