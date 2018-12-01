@@ -104,6 +104,7 @@ oppia.directive('ckEditorRte', [
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
           title: false,
+          autoParagraph: false,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
