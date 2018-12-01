@@ -367,7 +367,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             FeedbackEmailReplyToIdModel or None. The instance corresponding to
-            the given 'reply_to_id' if it is present in the datastore, 
+            the given 'reply_to_id' if it is present in the datastore,
             else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
