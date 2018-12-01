@@ -365,8 +365,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             reply_to_id: str. The unique 'reply-to' id.
 
         Returns:
-            The FeedbackEmailReplyToIdModel instance corresponding to 
-            the given 'reply-to' id it is present in the datastore. 
+            The FeedbackEmailReplyToIdModel instance corresponding to
+            the given 'reply-to' id it is present in the datastore.
             Otherwise, None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
