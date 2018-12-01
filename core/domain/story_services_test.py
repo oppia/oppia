@@ -406,7 +406,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.user_admin, self.user_a,
                 'invalid_role', self.STORY_ID)
 
-    def reassigning_none_role_to_same_user(self):
+    def test_reassigning_none_role_to_same_user(self):
         with self.assertRaisesRegexp(
             Exception, 'This user already has no role for this story'):
             story_services.assign_role(
