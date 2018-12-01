@@ -178,20 +178,19 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         #Name is too long for linter
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
-        id_generated = model._generate_id(
-            'user_id', 'thread_id')
-        self.assertEqual(id_generated, 'user_id.thread_id')
+        created = model.create('user_id', 'thread_id')
+        self.assertEqual(created.id, 'user_id.thread_id')
 
-        id_generated = model._generate_id(
-            'other_user_id', 'other_thread_id')
-
-        self.assertNotEqual(id_generated, 'user_id.thread_id')
+        created = model.create('other_user_id', 'other_thread_id')
+        self.assertNotEqual(created.id, 'user_id.thread_id')
 
     def test_unique_reply_id_is_unique(self):
         #Name is too long for linter
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
-        all_ids = [model._generate_unique_reply_to_id() for i in range(100)]
+        all_ids = [
+            model.create('user_id', 'thread_id').reply_to_id 
+            for _ in xrange(100)]
         for current_id in all_ids:
             other_ids = copy.copy(all_ids)
             other_ids.remove(current_id)
