@@ -47,11 +47,38 @@ python $(dirname $0)/pre_commit_linter.py || exit 1
 echo 'Linting passed.'
 echo ''
 
-# Run frontend unit tests.
-echo 'Running frontend unit tests'
-source $(dirname $0)/run_frontend_tests.sh --run-minified-tests=true || exit 1
-echo 'Frontend tests passed.'
-echo ''
+for i in "$@"
+do
+case $i in
+    -b=*|--branch=*)
+    ORIGIN_BRANCH=${i#*=}
+    shift
+    ;;
+esac
+done
+
+# default origin branch set to origin/develop
+if [ -z $ORIGIN_BRANCH ];
+then
+  BRANCH=origin/develop
+else
+  BRANCH=origin/$ORIGIN_BRANCH
+fi
+FRONT_END_DIR='core/templates/dev/head'
+
+if git diff --cached --name-only --diff-filter=ACM ${BRANCH} | grep ${FRONT_END_DIR} --quiet
+then 
+  # Run frontend unit tests.
+  echo 'Running frontend unit tests'
+  source $(dirname $0)/run_frontend_tests.sh --run-minified-tests=true || exit 1
+  echo 'Frontend tests passed.'
+  echo ''
+else 
+  # If files in FRONT_END_DIR not changed, skip the tests
+  echo 'Front end files not changed'
+  echo 'Skip front end tests'
+fi
+
 
 # Run backend tests.
 echo 'Running backend tests'
