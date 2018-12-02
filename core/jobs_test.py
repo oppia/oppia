@@ -72,7 +72,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_create_new(self):
         """Test the creation of a new job."""
         job_id = MockJobManagerOne.create_new()
-        self.assertTrue(job_id.startswith('DummyJob'))
+        self.assertTrue(job_id.startswith('MockJobManagerOne'))
         self.assertEqual(
             MockJobManagerOne.get_status_code(job_id), jobs.STATUS_CODE_NEW)
         self.assertIsNone(MockJobManagerOne.get_time_queued_msec(job_id))

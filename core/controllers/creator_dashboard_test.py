@@ -23,7 +23,6 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
-from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -32,6 +31,28 @@ import feconf
 (user_models, stats_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
+
+
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
 
 
 class HomePageTests(test_utils.GenericTestBase):
@@ -122,8 +143,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
-        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
-         start_computation())
+        MockUserStatsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)

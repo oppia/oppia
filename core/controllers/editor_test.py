@@ -26,7 +26,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous_test
+from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -97,11 +97,31 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
 
 
+class MockInteractionAnswerSummariesAggregator(
+        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
+    """A modified InteractionAnswerSummariesAggregator that does not start
+    a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockInteractionAnswerSummariesMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockInteractionAnswerSummariesMRJobManager(
+        stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockInteractionAnswerSummariesAggregator
+
+
 class EditorTests(BaseEditorControllerTests):
 
-    ALL_CC_MANAGERS_FOR_TESTS = [
-        stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
-    ]
+    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
 
     def setUp(self):
         super(EditorTests, self).setUp()

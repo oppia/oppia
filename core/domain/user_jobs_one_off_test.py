@@ -30,7 +30,7 @@ from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_jobs_continuous_test
+from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
@@ -704,6 +704,28 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
 
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
+
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard stats job."""
 
@@ -777,9 +799,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             expected_results_list[0])
 
     def test_weekly_stats_if_no_explorations(self):
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
@@ -813,9 +833,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
@@ -853,9 +871,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
@@ -890,9 +906,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
@@ -911,16 +925,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 }
             }])
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            stop_computation(self.owner_id))
+        MockUserStatsAggregator.stop_computation(self.owner_id)
         self.process_and_flush_pending_tasks()
 
         self._rate_exploration('user2', exp_id, 2)
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         def _mock_get_date_after_one_week():

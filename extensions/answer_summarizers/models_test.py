@@ -382,7 +382,7 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
 
 
 class TopNUnresolvedAnswersByFrequencyUnitTests(CalculationUnitTestBase):
-    CALCULATION_ID = 'TopNUnresolvedAnswersByFrequencyUnitTests'
+    CALCULATION_ID = 'TopNUnresolvedAnswersByFrequency'
 
     def test_empty_state_answers_dict(self):
         state_answers_dict = self._create_state_answers_dict([])

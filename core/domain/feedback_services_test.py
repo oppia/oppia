@@ -17,7 +17,7 @@ import json
 
 from core.domain import event_services
 from core.domain import feedback_domain
-from core.domain import feedback_jobs_continuous_test
+from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import user_services
@@ -87,6 +87,28 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
 
 
+class MockFeedbackAnalyticsAggregator(
+        feedback_jobs_continuous.FeedbackAnalyticsAggregator):
+    """A modified FeedbackAnalyticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockFeedbackAnalyticsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockFeedbackAnalyticsMRJobManager(
+        feedback_jobs_continuous.FeedbackAnalyticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockFeedbackAnalyticsAggregator
+
+
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'eid1'
@@ -140,8 +162,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_thread_user_model else [])
 
     def _run_computation(self):
-        (feedback_jobs_continuous_test.ModifiedFeedbackAnalyticsAggregator.
-         start_computation())
+        MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
