@@ -1,6 +1,2 @@
-<div ng-if="!DEV_MODE">
-  <script src="/third_party/generated/js/third_party.min.js"></script>
-</div>
-<div ng-if="DEV_MODE">
-  <script src="/third_party/generated/js/third_party.js"></script>
-</div>
+<script src="/third_party/generated/js/third_party.min.js" ng-if="!inDevMode"></script>
+<script src="/third_party/generated/js/third_party.js" ng-if="inDevMode"></script>
