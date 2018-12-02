@@ -18,28 +18,39 @@
 
 oppia.directive('translationTab', [
   'UrlInterpolationService', '$timeout',
-  function(UrlInterpolationService, $timeout) {
+  'ContextService', 'ExplorationDataService',
+  'StateTranslationTutorialFirstTimeService',
+  function(UrlInterpolationService, $timeout,
+    ContextService, ExplorationDataService,
+    StateTranslationTutorialFirstTimeService) {
     return {
       restrict: 'E',
       scope: {},
       link: function(scope) {
         scope.$broadcast('refreshTranslationTab');
-        $timeout( function(){
-          scope.$broadcast('openTranslationTutorial');
-        }, 5000);
+        ExplorationDataService.getData().then(function(data){
+          
+            StateTranslationTutorialFirstTimeService.init(
+              data.show_state_translation_tutorial_on_load,
+              ContextService.getExplorationId()
+        )});
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', '$templateCache',
-        function($scope, $rootScope, $templateCache) {
-          var _ID_TUTORIAL_TRANSLATE_LANGUAGE = '#tutorialTranslateLanguage';
-          var _ID_TUTORIAL_TRANSLATE_STATE = '#tutorialTranslateState';
-          var _ID_TUTORIAL_TRANSLATE_GRAPH = '#tutorialTranslateStateGraph';
-          var _ID_TUTORIAL_TRANSLATE_AUDIOBAR = '#tutorialTranslateAudioBar';
-          $scope.TRANSLATE_TUTORIAL_OPTIONS = [{
+      '$uibModal', 'EditabilityService',
+      'StateTranslationTutorialFirstTimeService', 'UrlInterpolationService',
+        function($scope, $rootScope, $templateCache,
+          $uibModal, EditabilityService,
+          StateTranslationTutorialFirstTimeService ,UrlInterpolationService) {
+          console.log($rootScope);
+          var _ID_TUTORIAL_TRANSLATION_LANGUAGE = '#tutorialTranslationLanguage';
+          var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
+          var _ID_TUTORIAL_TRANSLATION_AUDIOBAR = '#tutorialTranslationAudioBar';
+          $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
             type: 'title',
-            heading: 'Translations in Oppia',
+            heading: 'Translations In Oppia',
             text: (
               'Hello, welcome to translation tab ' +
               'this tour will walk you through the translation page. ' +
@@ -53,7 +64,7 @@ oppia.directive('translationTab', [
             }
           }, {
             type: 'element',
-            selector: _ID_TUTORIAL_TRANSLATE_LANGUAGE,
+            selector: _ID_TUTORIAL_TRANSLATION_LANGUAGE,
             heading: 'Choose Language',
             text: ('Start your translation by choosing the language that ' +
               'you desire to translate to.'),
@@ -62,20 +73,21 @@ oppia.directive('translationTab', [
             type: 'function',
             fn: function(isGoingForward) {
               var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_TRANSLATE_AUDIOBAR :
-                _ID_TUTORIAL_TRANSLATE_LANGUAGE);
+                isGoingForward ? _ID_TUTORIAL_TRANSLATION_STATE:
+                _ID_TUTORIAL_TRANSLATION_LANGUAGE);
               $('html, body').animate({
                 scrollTop: angular.element(idToScrollTo).offset().top - 200
               }, 1000);
             }
           }, {
             type: 'element',
-            selector: _ID_TUTORIAL_TRANSLATE_AUDIOBAR,
-            heading: 'Audio Recording Bar',
+            selector: _ID_TUTORIAL_TRANSLATION_STATE,
+            heading: 'Choose State You Want to Translate',
             text: (
-              '<p>This audio translation bar is where the translation magic' +
-              ' happens. Upload, Create or Play your translations here.</p>'),
-            placement: 'top',
+              '<p>Next choose one of the tabs in the menu here. This is where ' +
+              'each tab can have different audio translations. ' +
+              '</p>'),
+            placement: 'bottom'
           }, {
             type: 'function',
             fn: function(isGoingForward) {
@@ -85,7 +97,20 @@ oppia.directive('translationTab', [
             }
           }, {
             type: 'title',
-            heading: 'Uploading Audio Translations',
+            heading: 'Choose Section You Want to Translate',
+            text: ('<p>Within the tab, multiple sections maybe available for ' +
+              'translating so choose the section that you want to translate ' +
+              '</p>')
+          }, {
+            type: 'function',
+            fn: function(isGoingForward) {
+              $('html, body').animate({
+                scrollTop: (isGoingForward ? 0 : 20)
+              }, 1000);
+            }
+          }, {
+            type: 'title',
+            heading: 'Uploading Audio',
             text: ('<p>You can upload your own translations with the ' +
               '<i class="material-icons" style="color:#009688" >&#xE2C6;</i> ' +
               'or <b>"reupload files"</b> button, a window ' +
@@ -100,7 +125,7 @@ oppia.directive('translationTab', [
             }
           }, {
             type: 'title',
-            heading: 'Recording Audio Translations',
+            heading: 'Recording Audio',
             text: ('<p>To create audio translations in Oppia ' +
               'simply follow these 3 steps.</p>' +
               '<ol>' +
@@ -130,7 +155,7 @@ oppia.directive('translationTab', [
             }
           }, {
             type: 'title',
-            heading: 'Recording Audio Translation - Continued',
+            heading: 'Re-record/Re-upload audio',
             text: ('<p>The audio recording also has options related ' +
               'to updating and deleting translations.</p>' +
               '<ul>' +
@@ -152,7 +177,7 @@ oppia.directive('translationTab', [
               '  <li>' +
               '    Play the audio with the ' +
               '    <i class="material-icons" style="color:#009688" >' +
-              '    &#xE161;</i> and ' +
+              '    &#xE039;</i> and ' +
               '    pause with the <i class="material-icons" ' +
               '    style="color:#009688" >&#xE035;</i>.' +
               '  </li>' +
@@ -160,78 +185,6 @@ oppia.directive('translationTab', [
               '    Mark the interaction needing updates or changes ' +
               '    with the <b>"mark need updates"</b> button' +
               '  </li>' +
-              '</ul>')
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              $('html, body').animate({
-                scrollTop: (isGoingForward ? 0 : 20)
-              }, 1000);
-            }
-          }, {
-            type: 'element',
-            selector: _ID_TUTORIAL_TRANSLATE_STATE,
-            heading: 'Translation State',
-            text: (
-              '<p>The translation state menu, shows the state of translation ' +
-              '<b>for each and every component</b> of the interaction. ' +
-              'Each tab can have different and varying audio translations. ' +
-              '</p>'),
-            placement: 'bottom'
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_TRANSLATE_GRAPH :
-              _ID_TUTORIAL_TRANSLATE_STATE);
-              $('html, body').animate({
-                scrollTop: 0
-              }, 1000);
-            }
-          }, {
-            type: 'element',
-            selector: _ID_TUTORIAL_TRANSLATE_GRAPH,
-            heading: 'Exploration Overview Graph',
-            text: (
-              '<p>This shows the different interactions available ' +
-              'for translation.' +
-              'A bold border marks that its the current interaction ' +
-              'selected. You will be able to switch between quickly between ' +
-              'clicking diffrent interaction here.' +
-              '</p>'),
-            placement: 'left'
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              $('html, body').animate({
-                scrollTop: (isGoingForward ? 0 : 20)
-              }, 1000);
-            }
-          }, {
-            type: 'title',
-            heading: 'Color and Warning States',
-            text: (
-              '<p>In both the Translation State tabs and Exploration Overview' +
-              ' components, you will notice there are colors and ' +
-              'symbols indicating the translation state.</p> ' +
-              '<ul>' +
-              ' <li>' +
-              '   <span style="color:green;">Green:</span> If <b>all</b> the ' +
-              '   interaction components have audio. ' +
-              ' </li>' +
-              ' <li>' +
-              '   <span style="color:yellow;">Yellow:</span> If <b>any</b> ' +
-              '   of the interaction components have audio. ' +
-              ' </li>' +
-              ' <li>' +
-              '   <span style="color:red;">Red:</span> If <b>none</b> of ' +
-              '   the interaction components have audio. ' +
-              ' </li>' +
-              ' <li>' +
-              '  The Warning sign <i class="material-icons">⚠</i> is used to ' +
-              '  show if any part of the interaction ' +
-              '  component require a change. ' +
-              ' </li>' +
               '</ul>')
           }, {
             type: 'function',
@@ -261,12 +214,19 @@ oppia.directive('translationTab', [
           $templateCache.put('ng-joyride-title-tplv1.html',
             ngJoyrideTemplate);
 
-          $scope.onFinishTutorial = function(){
+          $scope.leaveTutorial = function(){
+            EditabilityService.onEndTutorial();
+            $scope.$apply();
+            StateTranslationTutorialFirstTimeService.markTutorialFinished();
             $scope.translationTutorial = false;
           };
 
+          $scope.onFinishTutorial = function(){
+            $scope.leaveTutorial();
+          };
+
           $scope.onSkipTutorial = function(){
-            $scope.translationTutorial = false;
+            $scope.leaveTutorial();
           };
 
           $scope.translationTutorial = false;
@@ -276,11 +236,55 @@ oppia.directive('translationTab', [
             }
           };
 
+          $scope.showWelcomeTranslationModal = function() {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/translation_tab/' +
+                'welcome_translation_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+                'ContextService',
+                function($scope, $uibModalInstance, SiteAnalyticsService,
+                    ContextService) {
+                  var explorationId = ContextService.getExplorationId();
+      
+                  SiteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
+      
+                  $scope.beginTutorial = function() {
+                    SiteAnalyticsService.registerAcceptTutorialModalEvent(
+                      explorationId);
+                    $uibModalInstance.close();
+                  };
+      
+                  $scope.cancel = function() {
+                    SiteAnalyticsService.registerDeclineTutorialModalEvent(
+                      explorationId);
+                    $uibModalInstance.dismiss('cancel');
+                  };
+      
+                  $scope.editorWelcomeImgUrl = (
+                    UrlInterpolationService.getStaticImageUrl(
+                      '/general/editor_welcome.svg'));
+                }
+              ],
+              windowClass: 'oppia-welcome-modal'
+            });
+      
+            modalInstance.result.then(function() {
+              $scope.onStartTutorial();
+            }, function() {
+               StateTranslationTutorialFirstTimeService.markTutorialFinished();
+            });
+          };
+
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.$on('refreshTranslationTab', function() {
             $scope.$broadcast('refreshStateTranslation');
           });
+          $scope.$on(
+            'enterTranslationForTheFirstTime', $scope.showWelcomeTranslationModal);
           $scope.$on('openTranslationTutorial', $scope.onStartTutorial);
         }]
     };
