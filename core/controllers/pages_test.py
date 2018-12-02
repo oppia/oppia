@@ -17,7 +17,7 @@
 from core.tests import test_utils
 
 
-class NoninteractivePagesTest(test_utils.GenericTestBase):
+class NoninteractivePagesTests(test_utils.GenericTestBase):
 
     def test_about_page(self):
         """Test the About page."""

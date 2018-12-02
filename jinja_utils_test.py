@@ -14,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=relative-import
+"""Unit tests for jinja_utils.py."""
 
+# pylint: disable=relative-import
 from core.tests import test_utils
 import jinja_utils
+# pylint: enable=relative-import
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):

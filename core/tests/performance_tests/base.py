@@ -25,6 +25,7 @@ from core.tests.performance_tests import test_config
 
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
+
     # The default number of page load sessions used to collect timing metrics.
     DEFAULT_SESSION_SAMPLE_COUNT = 3
 

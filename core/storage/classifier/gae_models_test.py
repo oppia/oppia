@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.classifier.gae_models."""
+
 import datetime
 
 from core.domain import classifier_domain

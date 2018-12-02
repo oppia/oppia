@@ -28,7 +28,7 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
+class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,7 +36,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(TopicMigrationOneOffJobTest, self).setUp()
+        super(TopicMigrationOneOffJobTests, self).setUp()
 
         self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
 

@@ -296,9 +296,25 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
 
         def _get_username(index):
+            """Returns a dummy username, parameterized by the given index.
+
+            Args:
+                index: int. The index to append to the username.
+
+            Returns:
+                str. A dummy username corresponding to the given index.
+            """
             return 'editor%s' % index
 
         def _get_email(index):
+            """Returns a dummy email, parameterized by the given index.
+
+            Args:
+                index: int. The index to use in the email.
+
+            Returns:
+                str. A dummy email corresponding to the given index.
+            """
             return '%s@example.com' % index
 
         # Generate 10 users.

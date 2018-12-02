@@ -19,7 +19,7 @@ from core.domain import user_services
 from core.tests import test_utils
 
 
-class ModeratorTest(test_utils.GenericTestBase):
+class ModeratorPageTests(test_utils.GenericTestBase):
 
     def test_moderator_page(self):
         """Tests access to the Moderator page."""
@@ -51,7 +51,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
+class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
@@ -59,7 +59,7 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
     user_email = 'albert@example.com'
 
     def setUp(self):
-        super(FeaturedActivitiesHandlerTest, self).setUp()
+        super(FeaturedActivitiesHandlerTests, self).setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])

@@ -21,7 +21,7 @@ from core.tests import test_utils
 import feconf
 
 
-class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
+class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
     """Test permissions for learners to view collections."""
 
     COLLECTION_ID = 'cid'
@@ -29,7 +29,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy collection."""
-        super(CollectionViewerPermissionsTest, self).setUp()
+        super(CollectionViewerPermissionsTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

@@ -25,11 +25,11 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class BaseTranslatorControllerTest(test_utils.GenericTestBase):
+class BaseTranslatorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.TRANSLATOR_EMAIL."""
-        super(BaseTranslatorControllerTest, self).setUp()
+        super(BaseTranslatorControllerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
 
@@ -39,7 +39,7 @@ class BaseTranslatorControllerTest(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
 
-class TranslatorTest(BaseTranslatorControllerTest):
+class TranslatorTest(BaseTranslatorControllerTests):
     """Test the handling of saving translation work."""
 
     EXP_ID = 'exp1'
@@ -110,7 +110,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
                       })
 
 
-class TranslatorAutosaveTest(BaseTranslatorControllerTest):
+class TranslatorAutosaveTest(BaseTranslatorControllerTests):
     """Test the handling of translator autosave actions."""
 
     EXP_ID = 'expId'

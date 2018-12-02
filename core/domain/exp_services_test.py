@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.exp_services."""
+
 import StringIO
 import copy
 import datetime
@@ -602,7 +604,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 })], 'Did migration.')
 
 
-class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
+class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
@@ -3353,7 +3355,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
 
-class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
+class GetExplorationAndExplorationRightsTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_and_exploration_rights_object(self):
         exploration_id = self.EXP_ID

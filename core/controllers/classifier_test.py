@@ -33,11 +33,11 @@ import feconf
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
+class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
-        super(TrainedClassifierHandlerTest, self).setUp()
+        super(TrainedClassifierHandlerTests, self).setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
@@ -129,7 +129,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 
-        def return_fake_training_job(_):
+        def mock_get_classifier_training_job_by_id(_):
             return FakeTrainingJob()
 
         can_send_emails_ctx = self.swap(
@@ -139,7 +139,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         fail_training_job = self.swap(
             classifier_services,
             'get_classifier_training_job_by_id',
-            return_fake_training_job)
+            mock_get_classifier_training_job_by_id)
         config_property = config_domain.Registry.get_config_property(
             'notification_emails_for_failed_tasks')
         config_property.set_value(

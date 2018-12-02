@@ -28,7 +28,7 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
+class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,7 +36,7 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
     STORY_ID = 'story_id'
 
     def setUp(self):
-        super(StoryMigrationOneOffJobTest, self).setUp()
+        super(StoryMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

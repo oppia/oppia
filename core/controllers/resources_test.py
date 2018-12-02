@@ -23,7 +23,7 @@ from core.tests import test_utils
 import feconf
 
 
-class AssetDevHandlerImageTest(test_utils.GenericTestBase):
+class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
@@ -35,7 +35,7 @@ class AssetDevHandlerImageTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
-        super(AssetDevHandlerImageTest, self).setUp()
+        super(AssetDevHandlerImageTests, self).setUp()
 
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()

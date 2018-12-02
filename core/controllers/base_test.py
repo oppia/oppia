@@ -45,7 +45,7 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
-class BaseHandlerTest(test_utils.GenericTestBase):
+class BaseHandlerTests(test_utils.GenericTestBase):
 
     TEST_LEARNER_EMAIL = 'test.learner@example.com'
     TEST_LEARNER_USERNAME = 'testlearneruser'
@@ -55,7 +55,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     TEST_EDITOR_USERNAME = 'testeditoruser'
 
     def setUp(self):
-        super(BaseHandlerTest, self).setUp()
+        super(BaseHandlerTests, self).setUp()
         self.signup('user@example.com', 'user')
 
         # Create a user to test redirect behavior for the learner.
@@ -202,7 +202,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CsrfTokenManagerTest(test_utils.GenericTestBase):
+class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
     def test_create_and_validate_token(self):
         uid = 'user_id'
@@ -227,12 +227,12 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         orig_time = 100.0
         current_time = orig_time
 
-        def _get_current_time(unused_cls):
+        def mock_get_current_time(unused_cls):
             return current_time
 
         with self.swap(
             base.CsrfTokenManager, '_get_current_time',
-            types.MethodType(_get_current_time, base.CsrfTokenManager)):
+            types.MethodType(mock_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
             token = base.CsrfTokenManager().create_csrf_token('uid')
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
@@ -251,7 +251,7 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
                 'uid', token))
 
 
-class EscapingTest(test_utils.GenericTestBase):
+class EscapingTests(test_utils.GenericTestBase):
 
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
@@ -265,7 +265,7 @@ class EscapingTest(test_utils.GenericTestBase):
             self.render_json({'big_value': u'\n<script>马={{'})
 
     def setUp(self):
-        super(EscapingTest, self).setUp()
+        super(EscapingTests, self).setUp()
 
         # Update a config property that shows in all pages.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -299,7 +299,7 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertNotIn('马', response.body)
 
 
-class RenderDownloadableTest(test_utils.GenericTestBase):
+class RenderDownloadableTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         """Mock handler that subclasses BaseHandler and serves a response
@@ -312,7 +312,7 @@ class RenderDownloadableTest(test_utils.GenericTestBase):
                 file_contents, 'example.pdf', 'text/plain')
 
     def setUp(self):
-        super(RenderDownloadableTest, self).setUp()
+        super(RenderDownloadableTests, self).setUp()
 
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -330,7 +330,7 @@ class RenderDownloadableTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/plain')
 
 
-class LogoutPageTest(test_utils.GenericTestBase):
+class LogoutPageTests(test_utils.GenericTestBase):
 
     def test_logout_page(self):
         """Tests for logout handler."""
@@ -349,7 +349,7 @@ class LogoutPageTest(test_utils.GenericTestBase):
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
 
 
-class I18nDictsTest(test_utils.GenericTestBase):
+class I18nDictsTests(test_utils.GenericTestBase):
 
     def _extract_keys_from_json_file(self, filename):
         return sorted(json.loads(utils.get_file_contents(
@@ -368,6 +368,17 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def _get_tags(self, input_string, key, filename):
         """Returns the parts in the input string that lie within <...>
         characters.
+
+        Args:
+            input_string: str. The string to extract tags from.
+            key: str. The key for the key-value pair in the dict where the
+                string comes from (the string is typically the value in this
+                key-value pair). This is used only for logging errors.
+            filename: str. The filename which the string comes from. This is
+                used only for logging errors.
+
+        Returns:
+            list(str). A list of all tags contained in the input string.
         """
         result = []
         bracket_level = 0
@@ -513,7 +524,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
         self.assertEqual(sorted(mismatches), [])
 
 
-class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
+class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -536,7 +547,7 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
             self.assertTrue(isinstance(response, dict))
 
 
-class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
+class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     """Tests that all methods in handlers have authentication decorators
     applied on them.
     """
@@ -591,7 +602,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
             self.assertTrue(handler_is_decorated)
 
 
-class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
+class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
     class MockHandler(base.BaseHandler):
 
@@ -623,7 +634,7 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
             self.assertDictContainsSubset(params, result)
 
 
-class ControllerClassNameTest(test_utils.GenericTestBase):
+class ControllerClassNameTests(test_utils.GenericTestBase):
 
     def test_controller_class_names(self):
         """This function checks that all controller class names end with

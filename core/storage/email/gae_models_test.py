@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.email.gae_models."""
+
 import datetime
 import types
 
@@ -30,16 +32,14 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
 
-        # pylint: disable=unused-argument
-        def _generate_hash_for_tests(
-                cls, recipient_id, email_subject, email_body):
+        def mock_generate_hash(
+                unused_cls, unused_recipient_id, unused_email_subject,
+                unused_email_body):
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(
-                _generate_hash_for_tests,
-                email_models.SentEmailModel))
+            types.MethodType(mock_generate_hash, email_models.SentEmailModel))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:

@@ -25,7 +25,7 @@ from core.tests import test_utils
 import feconf
 
 
-class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
+class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'eid1'
 
@@ -40,7 +40,7 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(FeedbackThreadSummariesLoadTest, self).setUp()
+        super(FeedbackThreadSummariesLoadTests, self).setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

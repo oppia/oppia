@@ -28,7 +28,7 @@ import feconf
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
+class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,7 +36,7 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id'
 
     def setUp(self):
-        super(SkillMigrationOneOffJobTest, self).setUp()
+        super(SkillMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test skills.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

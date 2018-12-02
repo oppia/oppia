@@ -23,7 +23,6 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
-from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -34,7 +33,29 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class HomePageTest(test_utils.GenericTestBase):
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
+
+class HomePageTests(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
@@ -67,7 +88,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
+class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
     OWNER_EMAIL_1 = 'owner1@example.com'
     OWNER_USERNAME_1 = 'owner1'
     OWNER_EMAIL_2 = 'owner2@example.com'
@@ -84,7 +105,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
     USER_IMPACT_SCORE_DEFAULT = 0.0
 
     def setUp(self):
-        super(CreatorDashboardStatisticsTest, self).setUp()
+        super(CreatorDashboardStatisticsTests, self).setUp()
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
 
@@ -122,8 +143,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
-        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
-         start_computation())
+        MockUserStatsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -416,7 +436,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
+class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
@@ -436,7 +456,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
     EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
-        super(CreatorDashboardHandlerTest, self).setUp()
+        super(CreatorDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -626,12 +646,12 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscribers_list']), 0)
 
 
-class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
+class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
 
     DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
 
     def setUp(self):
-        super(NotificationsDashboardHandlerTest, self).setUp()
+        super(NotificationsDashboardHandlerTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -689,10 +709,10 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-class CreationButtonsTest(test_utils.GenericTestBase):
+class CreationButtonsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CreationButtonsTest, self).setUp()
+        super(CreationButtonsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
     def test_new_exploration_ids(self):

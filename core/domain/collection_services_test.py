@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.collection_services."""
+
 import datetime
 
 from core.domain import collection_domain
@@ -661,7 +663,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.version, 2)
 
 
-class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
+class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_collections(self):
         """Test loading, validation and deletion of the demo collections."""
@@ -1552,7 +1554,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         #                                 {albert_id: 1, bob_id: 2})
 
 
-class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):
+class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
 
     def test_get_collection_and_collection_rights_object(self):
         collection_id = self.COLLECTION_ID
