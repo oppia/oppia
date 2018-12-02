@@ -229,6 +229,8 @@ class ExplorationHandler(EditorHandler):
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -257,6 +259,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id, exploration_id)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
@@ -781,6 +785,13 @@ class StartedTutorialEventHandler(EditorHandler):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
 
+class StartedTranslationTutorialEventHandler(EditorHandler):
+    """Records that this user has started the state translation tutorial."""
+
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
+        """Handles GET requests."""
+        user_services.record_user_started_state_translation_tutorial(self.user_id)
 
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""

@@ -155,6 +155,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
+        self.has_seen_translation_tutorial = False
         self.partially_logged_in = False
         self.preferred_site_language_code = None
 
@@ -179,6 +180,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
+                if user_settings.last_started_state_translation_tutorial:
+                    self.has_seen_translation_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.

@@ -1879,6 +1879,7 @@ def get_user_exploration_data(
         'rights': rights_manager.get_exploration_rights(
             exploration_id).to_dict(),
         'show_state_editor_tutorial_on_load': None,
+        'show_state_translation_tutorial_on_load': None,
         'states': states,
         'tags': exploration.tags,
         'title': exploration.title,
