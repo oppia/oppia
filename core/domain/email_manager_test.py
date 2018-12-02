@@ -842,9 +842,9 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
         }
 
-        # pylint: disable=unused-argument
         def _generate_hash_for_tests(
-                cls, recipient_id, email_subject, email_body):
+                unused_cls, unused_recipient_id, unused_email_subject,
+                unused_email_body):
             return 'Email Hash'
 
         self.generate_hash_ctx = self.swap(
@@ -1287,9 +1287,9 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 sent_email_model.subject, self.expected_email_subject)
 
 
-class SuggestionEmailTest(test_utils.GenericTestBase):
+class SuggestionEmailTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(SuggestionEmailTest, self).setUp()
+        super(SuggestionEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1371,9 +1371,9 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
 
-class SubscriptionEmailTest(test_utils.GenericTestBase):
+class SubscriptionEmailTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(SubscriptionEmailTest, self).setUp()
+        super(SubscriptionEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

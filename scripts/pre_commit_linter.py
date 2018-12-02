@@ -207,9 +207,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
-        'message': 'Please remove pylint exculsion if it is unnecessary or '
+        'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
-                   'The id to message list can be seen '
+                   'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -261,7 +261,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
