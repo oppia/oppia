@@ -21,33 +21,35 @@ oppia.directive('translationTab', [
   'ContextService', 'ExplorationDataService',
   'StateTranslationTutorialFirstTimeService',
   function(UrlInterpolationService, $timeout,
-    ContextService, ExplorationDataService,
-    StateTranslationTutorialFirstTimeService) {
+      ContextService, ExplorationDataService,
+      StateTranslationTutorialFirstTimeService) {
     return {
       restrict: 'E',
       scope: {},
       link: function(scope) {
         scope.$broadcast('refreshTranslationTab');
         ExplorationDataService.getData().then(function(data){
-          
-            StateTranslationTutorialFirstTimeService.init(
-              data.show_state_translation_tutorial_on_load,
-              ContextService.getExplorationId()
-        )});
+          StateTranslationTutorialFirstTimeService.init(
+            data.show_state_translation_tutorial_on_load,
+            ContextService.getExplorationId()
+          );
+        });
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', '$templateCache',
-      '$uibModal', 'EditabilityService',
-      'StateTranslationTutorialFirstTimeService', 'UrlInterpolationService',
+        '$uibModal', 'EditabilityService',
+        'StateTranslationTutorialFirstTimeService', 'UrlInterpolationService',
         function($scope, $rootScope, $templateCache,
-          $uibModal, EditabilityService,
-          StateTranslationTutorialFirstTimeService ,UrlInterpolationService) {
-          console.log($rootScope);
-          var _ID_TUTORIAL_TRANSLATION_LANGUAGE = '#tutorialTranslationLanguage';
-          var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
-          var _ID_TUTORIAL_TRANSLATION_AUDIOBAR = '#tutorialTranslationAudioBar';
+            $uibModal, EditabilityService,
+            StateTranslationTutorialFirstTimeService, UrlInterpolationService) {
+          var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
+            '#tutorialTranslationLanguage';
+          var _ID_TUTORIAL_TRANSLATION_STATE =
+            '#tutorialTranslationState';
+          var _ID_TUTORIAL_TRANSLATION_AUDIOBAR =
+            '#tutorialTranslationAudioBar';
           $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
             type: 'title',
             heading: 'Translations In Oppia',
@@ -73,7 +75,7 @@ oppia.directive('translationTab', [
             type: 'function',
             fn: function(isGoingForward) {
               var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_TRANSLATION_STATE:
+                isGoingForward ? _ID_TUTORIAL_TRANSLATION_STATE :
                 _ID_TUTORIAL_TRANSLATION_LANGUAGE);
               $('html, body').animate({
                 scrollTop: angular.element(idToScrollTo).offset().top - 200
@@ -84,8 +86,8 @@ oppia.directive('translationTab', [
             selector: _ID_TUTORIAL_TRANSLATION_STATE,
             heading: 'Choose State You Want to Translate',
             text: (
-              '<p>Next choose one of the tabs in the menu here. This is where ' +
-              'each tab can have different audio translations. ' +
+              '<p>Next choose one of the tabs in the menu here. This is ' +
+              'where each tab can have different audio translations. ' +
               '</p>'),
             placement: 'bottom'
           }, {
@@ -248,21 +250,22 @@ oppia.directive('translationTab', [
                 function($scope, $uibModalInstance, SiteAnalyticsService,
                     ContextService) {
                   var explorationId = ContextService.getExplorationId();
-      
-                  SiteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
-      
+
+                  SiteAnalyticsService.registerTutorialModalOpenEvent(
+                    explorationId);
+
                   $scope.beginTutorial = function() {
                     SiteAnalyticsService.registerAcceptTutorialModalEvent(
                       explorationId);
                     $uibModalInstance.close();
                   };
-      
+
                   $scope.cancel = function() {
                     SiteAnalyticsService.registerDeclineTutorialModalEvent(
                       explorationId);
                     $uibModalInstance.dismiss('cancel');
                   };
-      
+
                   $scope.editorWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
                       '/general/editor_welcome.svg'));
@@ -270,11 +273,11 @@ oppia.directive('translationTab', [
               ],
               windowClass: 'oppia-welcome-modal'
             });
-      
+
             modalInstance.result.then(function() {
               $scope.onStartTutorial();
             }, function() {
-               StateTranslationTutorialFirstTimeService.markTutorialFinished();
+              StateTranslationTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
@@ -284,7 +287,9 @@ oppia.directive('translationTab', [
             $scope.$broadcast('refreshStateTranslation');
           });
           $scope.$on(
-            'enterTranslationForTheFirstTime', $scope.showWelcomeTranslationModal);
+            'enterTranslationForTheFirstTime',
+            $scope.showWelcomeTranslationModal
+          );
           $scope.$on('openTranslationTutorial', $scope.onStartTutorial);
         }]
     };

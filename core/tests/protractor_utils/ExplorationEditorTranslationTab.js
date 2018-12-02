@@ -21,7 +21,8 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-dismiss-welcome-modal'));
-  var translationWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
+  var translationWelcomeModal = element(
+    by.css('.protractor-test-welcome-modal'));
 
   /*
    Actions
@@ -41,7 +42,8 @@ var ExplorationEditorTranslationTab = function() {
     });
 
     waitFor.invisibilityOf(
-      translationWelcomeModal, 'Translate Welcome modal takes too long to disappear');
+      translationWelcomeModal,
+      'Translate Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
     element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -102,7 +104,8 @@ var ExplorationEditorTranslationTab = function() {
 
   this.startTutorial = function() {
     waitFor.visibilityOf(
-      translationWelcomeModal, 'Translate Welcome modal takes too long to appear');
+      translationWelcomeModal,
+      'Translate Welcome modal takes too long to appear');
     element(by.css('.protractor-test-start-tutorial')).click();
     waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),

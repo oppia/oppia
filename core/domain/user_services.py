@@ -106,8 +106,8 @@ class UserSettings(object):
                 last agreed to the terms of the site.
             last_started_state_editor_tutorial: datetime.datetime or None. When
                 the user last started the state editor tutorial.
-            last_started_state_translation_tutorial: datetime.datetime or None. When
-                the user last started the state translation tutorial.
+            last_started_state_translation_tutorial: datetime.datetime or None.
+                When the user last started the state translation tutorial.
             last_logged_in: datetime.datetime or None. When the user last
                 logged in.
             last_created_an_exploration: datetime.datetime or None. When the
@@ -1027,6 +1027,7 @@ def record_user_started_state_editor_tutorial(user_id):
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
     _save_user_settings(user_settings)
+
 
 def record_user_started_state_translation_tutorial(user_id):
     """Updates last_started_state_translation_tutorial to the current datetime

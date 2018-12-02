@@ -98,10 +98,9 @@ oppia.directive('editorNavigation', [
             });
 
             modalInstance.result.then(function(mode) {
-              if(mode == 'editor') {
+              if (mode === 'editor') {
                 $rootScope.$broadcast('openEditorTutorial');
-              }
-              else if(mode == 'translation') {
+              } else if (mode === 'translation') {
                 $rootScope.$broadcast('openTranslationTutorial');
               }
             }, function() {
