@@ -27,13 +27,15 @@ oppia.directive('editorNavigation', [
         '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationRightsService', 'ExplorationWarningsService',
         'RouterService', 'StateEditorTutorialFirstTimeService',
-        'SiteAnalyticsService', 'ThreadDataService', 'WindowDimensionsService',
+        'SiteAnalyticsService', 'ThreadDataService',
+        'WindowDimensionsService', 'StateTranslationTutorialFirstTimeService',
 
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
             ExplorationRightsService, ExplorationWarningsService,
             RouterService, StateEditorTutorialFirstTimeService,
-            SiteAnalyticsService, ThreadDataService, WindowDimensionsService) {
+            SiteAnalyticsService, ThreadDataService,
+            WindowDimensionsService, StateTranslationTutorialFirstTimeService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -75,7 +77,14 @@ oppia.directive('editorNavigation', [
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close();
+                    $uibModalInstance.close('editor');
+                  };
+
+                  $scope.beginTranslateTutorial = function() {
+                    SiteAnalyticsService
+                      .registerOpenTutorialFromHelpCenterEvent(
+                        explorationId);
+                    $uibModalInstance.close('translation');
                   };
 
                   $scope.goToHelpCenter = function() {
@@ -88,10 +97,16 @@ oppia.directive('editorNavigation', [
               windowClass: 'oppia-help-modal'
             });
 
-            modalInstance.result.then(function() {
-              $rootScope.$broadcast('openEditorTutorial');
+            modalInstance.result.then(function(mode) {
+              if(mode == 'editor') {
+                $rootScope.$broadcast('openEditorTutorial');
+              }
+              else if(mode == 'translation') {
+                $rootScope.$broadcast('openTranslationTutorial');
+              }
             }, function() {
               StateEditorTutorialFirstTimeService.markTutorialFinished();
+              StateTranslationTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
