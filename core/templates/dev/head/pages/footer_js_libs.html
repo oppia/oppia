@@ -1,5 +1,6 @@
-{% if not DEV_MODE %}
+<div ng-if="!DEV_MODE">
   <script src="/third_party/generated/js/third_party.min.js"></script>
-{% else %}
+</div>
+<div ng-if="DEV_MODE">
   <script src="/third_party/generated/js/third_party.js"></script>
-{% endif %}
+</div>
