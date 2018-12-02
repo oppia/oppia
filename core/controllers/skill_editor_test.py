@@ -28,11 +28,11 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 
 
-class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
+class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseSkillEditorControllerTest, self).setUp()
+        super(BaseSkillEditorControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -76,7 +76,7 @@ class BaseSkillEditorControllerTest(test_utils.GenericTestBase):
         raise Exception()
 
 
-class SkillEditorTest(BaseSkillEditorControllerTest):
+class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""
 
     def setUp(self):
@@ -115,7 +115,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         self.logout()
 
 
-class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
+class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillRightsHandler."""
 
     def setUp(self):
@@ -128,11 +128,11 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
         self.get_json(self.url)
         # Check GET returns JSON object with can_edit_skill_description set
         # to False if the user is not allowed to edit the skill description.
-        def _mock_get_all_actions(*_args):
+        def mock_get_all_actions(*_args):
             actions = list(self.admin.actions)
             actions.remove(role_services.ACTION_EDIT_SKILL_DESCRIPTION)
             return actions
-        with self.swap(role_services, 'get_all_actions', _mock_get_all_actions):
+        with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
             json_response = self.get_json(self.url)
             self.assertEqual(json_response['can_edit_skill_description'], False)
         self.logout()
@@ -148,7 +148,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTest):
         self.logout()
 
 
-class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
+class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for EditableSkillDataHandler."""
 
     def setUp(self):
@@ -247,7 +247,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTest):
         self.logout()
 
 
-class SkillPublishHandlerTest(BaseSkillEditorControllerTest):
+class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillPublishHandler."""
 
     def setUp(self):

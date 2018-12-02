@@ -29,7 +29,7 @@ import feconf
     models.NAMES.job, models.NAMES.collection])
 
 
-class CollectionMigrationOneOffJobTest(test_utils.GenericTestBase):
+class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -38,7 +38,7 @@ class CollectionMigrationOneOffJobTest(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(CollectionMigrationOneOffJobTest, self).setUp()
+        super(CollectionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test collections.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

@@ -20,7 +20,7 @@ oppia.constant(
 
 oppia.constant(
   'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
-  '/topic_editor_question_handler/<topic_id>');
+  '/topic_editor_question_handler/<topic_id>?cursor=<cursor>');
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
@@ -77,17 +77,22 @@ oppia.factory('EditableTopicBackendApiService', [
     };
 
     var _fetchQuestions = function(
-        topicId, successCallback, errorCallback) {
+        topicId, cursor, successCallback, errorCallback) {
       var questionsDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_EDITOR_QUESTION_URL_TEMPLATE, {
-          topic_id: topicId
+          topic_id: topicId,
+          cursor: cursor ? cursor : ''
         });
 
       $http.get(questionsDataUrl).then(function(response) {
         var questionSummaries = angular.copy(
           response.data.question_summary_dicts);
+        var nextCursor = response.data.next_start_cursor;
         if (successCallback) {
-          successCallback(questionSummaries);
+          successCallback({
+            questionSummaries: questionSummaries,
+            nextCursor: nextCursor
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -176,9 +181,9 @@ oppia.factory('EditableTopicBackendApiService', [
         });
       },
 
-      fetchQuestions: function(topicId) {
+      fetchQuestions: function(topicId, cursor) {
         return $q(function(resolve, reject) {
-          _fetchQuestions(topicId, resolve, reject);
+          _fetchQuestions(topicId, cursor, resolve, reject);
         });
       },
 

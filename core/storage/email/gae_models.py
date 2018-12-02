@@ -341,7 +341,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. ID of the corresponding thread.
 
         Returns:
-            str. A unique ID that can be used in 'reply-to' email address.
+            FeedbackEmailReplyToIdModel. The created instance
+            with the unique reply_to_id generated.
 
         Raises:
             Exception: Model instance for given user_id and
@@ -365,8 +366,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             reply_to_id: str. The unique 'reply-to' id.
 
         Returns:
-            str or None. The FeedbackEmailReplyToIdModel instance corresponding
-                to the given 'reply-to' id if it is fetched else None.
+            FeedbackEmailReplyToIdModel or None. The instance corresponding to
+            the given 'reply_to_id' if it is present in the datastore,
+            else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
         return model

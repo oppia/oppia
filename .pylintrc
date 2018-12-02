@@ -34,6 +34,10 @@ dummy-variables-rgx=_|unused_*
 # Regular expression which should match good variable names
 variable-rgx=[a-z_]+
 
+# Regular expression which should only match function or class names that do
+# not require a docstring.
+no-docstring-rgx=test_[a-z_]*|[A-Za-z]*Tests|Mock[A-Za-z]*|mock_[a-z_]*|setUp|tearDown|__.*__
+
 [DESIGN]
 
 # Minimum number of public methods for a class (see R0903).
