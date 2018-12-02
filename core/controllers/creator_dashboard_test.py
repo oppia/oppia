@@ -38,14 +38,14 @@ class HomePageTest(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
 
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
-        response = self.get_html(
+        response = self.get_response(
             '/notifications_dashboard', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
@@ -53,7 +53,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.get_html(
+        response = self.get_response(
             '/notifications_dashboard', expected_status_int=302)
         # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
@@ -64,7 +64,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/notifications_dashboard')
+        response = self.get_response('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -701,7 +701,7 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         """Test generation of exploration ids."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_response(feconf.CREATOR_DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_a_id = self.post_json(

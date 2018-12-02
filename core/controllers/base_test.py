@@ -72,12 +72,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         """Test dev indicator appears in dev and not in production."""
 
         with self.swap(constants, 'DEV_MODE', True):
-            response = self.get_html(feconf.LIBRARY_INDEX_URL)
+            response = self.get_response(feconf.LIBRARY_INDEX_URL)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
         with self.swap(constants, 'DEV_MODE', False):
-            response = self.get_html(feconf.LIBRARY_INDEX_URL)
+            response = self.get_response(feconf.LIBRARY_INDEX_URL)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
@@ -94,7 +94,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             url = re.sub('<([^/^:]+)>', 'abc123', url)
 
             # Some of these will 404 or 302. This is expected.
-            response = self.testapp.get(url, expect_errors=True)
+            response = self.get_response(url, expect_errors=True,
+                                         can_have_multiple_responses=True)
             self.assertIn(
                 response.status_int, [200, 302, 400, 401, 404], msg=url)
 
@@ -106,12 +107,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
 
-        response = self.get_html('/library/extra', expect_errors=True,
-                                 expected_status_int=404)
+        response = self.get_response('/library/extra', expect_errors=True,
+                                     expected_status_int=404)
         self.assertEqual(response.status_int, 404)
 
-        response = self.get_html('/library/data/extra', expect_errors=True,
-                                 expected_status_int=404)
+        response = self.get_response('/library/data/extra', expect_errors=True,
+                                     expected_status_int=404)
         self.assertEqual(response.status_int, 404)
 
         response = self.testapp.post(
@@ -125,7 +126,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
 
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
@@ -135,7 +136,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
@@ -153,7 +154,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
@@ -167,7 +168,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
         self.assertIn('creator_dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
@@ -197,7 +198,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.
-        response = self.get_html('/', expected_status_int=302)
+        response = self.get_response('/', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
@@ -281,7 +282,7 @@ class EscapingTest(test_utils.GenericTestBase):
     def test_jinja_autoescaping(self):
         form_url = '<[angular_tag]> x{{51 * 3}}y'
         with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
-            response = self.get_html('/fake')
+            response = self.get_response('/fake')
             self.assertEqual(response.status_int, 200)
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
@@ -308,9 +309,9 @@ class LogoutPageTest(test_utils.GenericTestBase):
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
-        response = self.get_html(current_page)
+        response = self.get_response(current_page)
         self.assertEqual(response.status_int, 200)
-        response = self.get_html(current_user_services.create_logout_url(
+        response = self.get_response(current_user_services.create_logout_url(
             current_page), expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 

@@ -51,7 +51,7 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         csrf_token = None
         url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.get_html(url_prefix)
+            response = self.get_response(url_prefix)
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
@@ -62,8 +62,8 @@ class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
-            response = self.get_html(url, expect_errors=True,
-                                     expected_status_int=404)
+            response = self.get_response(url, expect_errors=True,
+                                         expected_status_int=404)
             self.assertEqual(response.status_int, 404)
         self.logout()
 

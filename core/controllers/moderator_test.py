@@ -24,14 +24,14 @@ class ModeratorTest(test_utils.GenericTestBase):
     def test_moderator_page(self):
         """Tests access to the Moderator page."""
         # Try accessing the moderator page without logging in.
-        response = self.get_html('/moderator', expected_status_int=302)
+        response = self.get_response('/moderator', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Try accessing the moderator page without being a moderator or admin.
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html('/moderator', expect_errors=True,
-                                 expected_status_int=401)
+        response = self.get_response('/moderator', expect_errors=True,
+                                     expected_status_int=401)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
@@ -39,7 +39,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
-        response = self.get_html('/moderator')
+        response = self.get_response('/moderator')
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -47,7 +47,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html('/moderator')
+        response = self.get_response('/moderator')
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -73,7 +73,7 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_unpublished_activities_cannot_be_added_to_featured_list(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.get_html('/moderator')
+        response = self.get_response('/moderator')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
 

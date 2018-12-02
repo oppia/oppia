@@ -71,15 +71,14 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that it is possible to access a page with specific version
         # number.
-        response = self.testapp.get(
+        response = self.get_json(
             '%s/%s?v=1' % (
                 feconf.COLLECTION_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
-        self.assertEqual(response.status_code, 200)
 
         # Check that non-editors cannot access the editor page. This is due
         # to them not being whitelisted.
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_URL_PREFIX,
                 self.COLLECTION_ID), expected_status_int=302)
@@ -87,7 +86,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that whitelisted users can access and edit in the editor page.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_URL_PREFIX,
                 self.COLLECTION_ID))
@@ -104,7 +103,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that non-editors cannot access the editor data handler.
         # This is due to them not being whitelisted.
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID), expected_status_int=302)
@@ -137,7 +136,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.login(self.VIEWER_EMAIL)
 
         # Call get handler to return the csrf token.
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_URL_PREFIX,
                 self.COLLECTION_ID))
@@ -169,7 +168,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.login(self.EDITOR_EMAIL)
 
         # Call get handler to return the csrf token.
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_URL_PREFIX,
                 self.COLLECTION_ID))
@@ -251,7 +250,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         collection = collection_services.get_collection_by_id(collection_id)
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (
                 feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
@@ -264,7 +263,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Login as admin and unpublish the collection.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html(
+        response = self.get_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.put_json(

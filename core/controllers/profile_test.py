@@ -29,7 +29,7 @@ class SignupTest(test_utils.GenericTestBase):
 
     def test_signup_page_does_not_have_top_right_menu(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
         # Sign in can't be inside an html tag, but can appear inside js code.
         response.mustcontain(no=['Logout'])
@@ -39,9 +39,9 @@ class SignupTest(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
-        response = self.get_html('/create/0', expected_status_int=302)
+        response = self.get_response('/create/0', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertIn('Logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])
@@ -50,7 +50,7 @@ class SignupTest(test_utils.GenericTestBase):
 
     def test_accepting_terms_is_handled_correctly(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
@@ -76,7 +76,7 @@ class SignupTest(test_utils.GenericTestBase):
     def test_username_is_handled_correctly(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
@@ -117,7 +117,7 @@ class SignupTest(test_utils.GenericTestBase):
 
     def test_default_dashboard_for_new_users(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # This user should have the creator dashboard as default.
@@ -136,7 +136,7 @@ class SignupTest(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # This user should have the learner dashboard as default.
@@ -161,7 +161,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         self.signup('abc@example.com', username='abc')
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
@@ -202,7 +202,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_not_setting_email_prefs_on_signup(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -239,7 +239,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_allowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -276,7 +276,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_disallowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html(feconf.SIGNUP_URL)
+        response = self.get_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -320,7 +320,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
@@ -427,7 +427,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
     def test_preference_page_updates(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         original_preferences = self.get_json('/preferenceshandler/data')
         self.assertEqual(
@@ -455,7 +455,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(
             '/preferenceshandler/data',
@@ -469,7 +469,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
         self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(
             '/preferenceshandler/data',
@@ -629,7 +629,7 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         language_code = 'es'
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(
@@ -655,7 +655,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
     def test_userbio_within_limit(self):
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.login(self.EMAIL_A)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(
@@ -672,7 +672,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
     def test_user_bio_exceeds_limit(self):
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.login(self.EMAIL_B)
-        response = self.get_html('/preferences')
+        response = self.get_response('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         user_bio_response = self.put_json(

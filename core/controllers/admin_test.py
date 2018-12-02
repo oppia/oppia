@@ -38,19 +38,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
 
-        response = self.get_html('/admin', expected_status_int=302)
+        response = self.get_response('/admin', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         # Login as a non-admin.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html('/admin', expect_errors=True,
-                                 expected_status_int=401)
+        response = self.get_response('/admin', expect_errors=True,
+                                     expected_status_int=401)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         # Login as an admin.
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -58,7 +58,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that configuration properties can be changed."""
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.get_json('/adminhandler')
@@ -88,11 +88,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that config property values are changed correctly."""
         new_config_value = 'new_config_value'
 
-        response = self.get_html('/about')
+        response = self.get_response('/about')
         self.assertNotIn(new_config_value, response.body)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminhandler', {
@@ -102,7 +102,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }
             }, csrf_token=csrf_token)
 
-        response = self.get_html('/about')
+        response = self.get_response('/about')
         self.assertIn(new_config_value, response.body)
 
 
@@ -112,7 +112,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_greater_than_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminhandler', {
@@ -128,7 +128,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_equal_to_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminhandler', {
@@ -144,7 +144,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_less_than_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html('/admin')
+        response = self.get_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -186,7 +186,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
 
         # Check role correctly gets updated.
-        response = self.get_html(feconf.ADMIN_URL)
+        response = self.get_response(feconf.ADMIN_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -214,7 +214,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400, expect_errors=True)
 
         # Trying to update role of non-existent user.
-        response = self.get_html(feconf.ADMIN_URL)
+        response = self.get_response(feconf.ADMIN_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         response = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
