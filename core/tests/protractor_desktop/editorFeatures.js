@@ -950,6 +950,7 @@ describe('Exploration translation', function() {
     explorationEditorPage.saveChanges();
 
     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectContentTabContentToMatch(
       'This is first card.');
     explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
