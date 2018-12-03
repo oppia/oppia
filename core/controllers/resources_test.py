@@ -100,16 +100,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.logout()
 
         # Test that neither form of the image is stored.
-        response = self.get_response(
+        self.get_json(
             self._get_image_url('0', supplied_filename),
-            expect_errors=True, expected_status_int=404,
-            expected_content_type='image/jpg')
-        self.assertEqual(response.status_int, 404)
-        response = self.get_response(
+            expect_errors=True, expected_status_int=404)
+        self.get_json(
             self._get_image_url('0', filename_with_correct_extension),
-            expect_errors=True, expected_status_int=404,
-            expected_content_type='image/png')
-        self.assertEqual(response.status_int, 404)
+            expect_errors=True, expected_status_int=404)
 
     def test_upload_empty_image(self):
         """Test upload of an empty image."""
@@ -156,11 +152,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
 
-        response = self.get_response(
+        self.get_json(
             self._get_image_url('0', 'bad_image'),
-            expect_errors=True, expected_status_int=404,
-            expected_content_type='image/bad_image')
-        self.assertEqual(response.status_int, 404)
+            expect_errors=True, expected_status_int=404)
 
     def test_bad_filenames_are_detected(self):
         # TODO(sll): Add more tests here.

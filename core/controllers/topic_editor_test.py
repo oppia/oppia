@@ -136,11 +136,10 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             self.logout()
 
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_response(
+            self.get_json(
                 '%s/%s?cursor=' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
                 ), expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
 
@@ -151,12 +150,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         # editable subtopic data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_response(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1),
                 expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that topic managers not assigned to this topic can
@@ -227,11 +225,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         # Check that non-admins cannot access the editable topic data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_response(
+            self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
                 expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access the editable topic data.
@@ -454,11 +451,10 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
             self.login(self.NEW_USER_EMAIL)
             # Test that other users cannot access topic rights.
-            response = self.get_response(
+            self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
                 expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
 

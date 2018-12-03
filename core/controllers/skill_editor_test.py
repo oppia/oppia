@@ -145,9 +145,8 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
         skill_services_swap = self.swap(
             skill_services, 'get_skill_rights', self._mock_get_skill_rights)
         with skill_services_swap:
-            response = self.get_response(self.url, expect_errors=True,
+            self.get_json(self.url, expect_errors=True,
                                          expected_status_int=404)
-            self.assertEqual(response.status_int, 404)
         self.logout()
 
 
@@ -181,15 +180,13 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when new strutures' pages are not enabled.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.get_response(self.url, expect_errors=True,
+            self.get_json(self.url, expect_errors=True,
                                          expected_status_int=404)
-            self.assertEqual(response.status_int, 404)
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.get_response(self.url, expect_errors=True,
+            self.get_json(self.url, expect_errors=True,
                                          expected_status_int=404)
-            self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_editable_skill_handler_put_succeeds(self):

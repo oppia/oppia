@@ -74,11 +74,10 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Check that non-admins cannot access the editable story data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_response(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
                     self.story_id), expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
             # Check that admins can access the editable story data.

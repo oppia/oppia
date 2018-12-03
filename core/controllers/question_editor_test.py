@@ -222,11 +222,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             # Check that non-admin and topic_manager cannot access the editor
             # data.
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_response(
+            self.get_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
                 expect_errors=True, expected_status_int=401)
-            self.assertEqual(response.status_int, 401)
             self.logout()
 
             self.login(self.ADMIN_EMAIL)

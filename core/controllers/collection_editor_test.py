@@ -103,11 +103,11 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Check that non-editors cannot access the editor data handler.
         # This is due to them not being whitelisted.
-        response = self.get_response(
+        self.get_json(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID), expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+                self.COLLECTION_ID), expect_errors=True,
+            expected_status_int=401)
 
         # Check that whitelisted users can access the data
         # from the editable_collection_data_handler.

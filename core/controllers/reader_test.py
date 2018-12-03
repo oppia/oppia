@@ -276,17 +276,15 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 json_response_1['pretest_question_dicts'][0]['id'],
                 json_response_2['pretest_question_dicts'][0]['id'])
 
-        response = self.get_response(
+        self.get_json(
             '%s/%s?story_id=%s' % (
                 feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, STORY_ID),
             expect_errors=True, expected_status_int=400)
-        self.assertEqual(response.status_int, 400)
 
-        response = self.get_response(
+        self.get_json(
             '%s/%s?story_id=%s' % (
                 feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
             expect_errors=True, expected_status_int=400)
-        self.assertEqual(response.status_int, 400)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
