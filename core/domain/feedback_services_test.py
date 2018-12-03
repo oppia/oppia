@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 import json
 
+from core.domain import email_services
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
@@ -772,22 +773,20 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             # Check that reply_to id is created for user A.
             model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
                 self.user_id_a, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_a)
+            cross_object = email_services.get_general_feedback_reply_to_id(
+                model.reply_to_id)
+            self.assertEqual(model.id, cross_object.id)
+            self.assertEqual(cross_object.user_id, self.user_id_a)
 
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'user a message')
             # Check that reply_to id is created for user B.
             model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
                 self.user_id_b, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_b)
+            cross_object = email_services.get_general_feedback_reply_to_id(
+                model.reply_to_id)
+            self.assertEqual(model.id, cross_object.id)
+            self.assertEqual(cross_object.user_id, self.user_id_b)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
