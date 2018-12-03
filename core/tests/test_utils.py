@@ -483,8 +483,8 @@ tags: []
         return current_user_services.create_logout_url(slug)
 
     def get_response(self, url, params=None, expect_errors=False,
-                     expected_status_int=200, expected_content_type='text/html',
-                     can_have_multiple_responses=False):
+                     expected_status_int=200,
+                     expected_content_type='text/html'):
         """Get a response, transformed to a Python object."""
         response = self.testapp.get(
             url, params, expect_errors=expect_errors,
@@ -497,16 +497,26 @@ tags: []
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-        if not can_have_multiple_responses:
-            self.assertEqual(response.status_int, expected_status_int)
-            if not expect_errors:
-                self.assertTrue(response.status_int >= 200 and
-                                response.status_int < 400)
-            else:
-                self.assertTrue(response.status_int >= 400 and
-                                response.status_int < 600)
-            self.assertEqual(
-                response.content_type, expected_content_type)
+        self.assertEqual(response.status_int, expected_status_int)
+        if not expect_errors:
+            self.assertTrue(response.status_int >= 200 and
+                            response.status_int < 400)
+        else:
+            self.assertTrue(response.status_int >= 400 and
+                            response.status_int < 600)
+        self.assertEqual(
+            response.content_type, expected_content_type)
+
+        return response
+
+    def get_response_without_checking_for_errors(
+            self, url, expected_status_int_list, params=None):
+        """Get a response, transformed to a Python object and
+        checks for a list of status codes.
+        """
+        response = self.testapp.get(url, params, expect_errors=True)
+
+        self.assertIn(response.status_int, expected_status_int_list)
 
         return response
 

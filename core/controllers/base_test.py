@@ -94,10 +94,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             url = re.sub('<([^/^:]+)>', 'abc123', url)
 
             # Some of these will 404 or 302. This is expected.
-            response = self.get_response(url, expect_errors=True,
-                                         can_have_multiple_responses=True)
-            self.assertIn(
-                response.status_int, [200, 302, 400, 401, 404], msg=url)
+            self.get_response_without_checking_for_errors(
+                url, [200, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
