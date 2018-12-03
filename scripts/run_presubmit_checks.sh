@@ -21,15 +21,27 @@
 # Run this script from the oppia root folder prior to opening a PR:
 #   bash scripts/run_presubmit_checks.sh
 #
-# It runs all the tests, in this order:
+# It runs the following tests in all cases.
 # - Javascript and Python Linting
-# - Frontend Karma unit tests
 # - Backend Python tests
+# 
+# Only when frontend files are changed will it run Frontend Karma unit tests.
 #
 # If any of these tests result in errors, this script will terminate.
 #
 # Note: The test scripts are arranged in increasing order of time taken. This
 # enables a broken build to be detected as quickly as possible.
+# 
+# =====================
+# CUSTOMIZATION OPTIONS
+# =====================
+#
+# Set the origin branch to compare against by adding
+#
+#   --branch=your_branch or -b=your_branch
+#
+# By default the origin branch is set to origin/develop.
+
 if [ -z "$BASH_VERSION" ]
 then
   echo ""
@@ -47,6 +59,7 @@ python $(dirname $0)/pre_commit_linter.py || exit 1
 echo 'Linting passed.'
 echo ''
 
+# Read arguments from the command line.
 for i in "$@"
 do
 case $i in
@@ -57,7 +70,7 @@ case $i in
 esac
 done
 
-# default origin branch set to origin/develop
+# Set the origin branch to origin/develop if it's not specified.
 if [ -z $ORIGIN_BRANCH ];
 then
   BRANCH=origin/develop
@@ -74,9 +87,9 @@ then
   echo 'Frontend tests passed.'
   echo ''
 else 
-  # If files in FRONT_END_DIR not changed, skip the tests
-  echo 'Front end files not changed'
-  echo 'Skip front end tests'
+  # If files in FRONT_END_DIR were not changed, skip the tests.
+  echo 'No frontend files were changed.'
+  echo 'Skipped frontend tests'
 fi
 
 
