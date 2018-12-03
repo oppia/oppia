@@ -19,7 +19,7 @@ from core.tests import test_utils
 
 
 class EmailDomainTest(test_utils.GenericTestBase):
-    """Tests for email_domain classes"""
+    """Tests for email_domain classes."""
     def test_that_general_feedback_reply_to_id_objects_are_created(self):
         obj = email_domain.GeneralFeedbackEmailReplyToId(
             'user1.exploration.exp1.1', 'reply_to_id1')

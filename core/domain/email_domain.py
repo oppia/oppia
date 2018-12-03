@@ -14,6 +14,7 @@
 
 """Domain objects for models relating to emails."""
 
+
 class GeneralFeedbackEmailReplyToId(object):
     """Domain object for email reply-to-id objects.
 

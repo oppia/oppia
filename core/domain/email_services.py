@@ -40,7 +40,7 @@ def get_general_feedback_reply_to_id(reply_to_id):
     Args:
         reply_to_id: str. The reply_to_id to search for.
 
-    Returns
+    Returns:
         FeedbackEmailReplyToId or None. The corresponding domain object.
     """
     model = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
