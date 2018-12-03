@@ -40,7 +40,7 @@
 #
 #   --branch=your_branch or -b=your_branch
 #
-# By default the origin branch is set to origin/develop.
+# By default the origin branch is set to develop.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -70,12 +70,12 @@ case $i in
 esac
 done
 
-# Set the origin branch to origin/develop if it's not specified.
+# Set the origin branch to develop if it's not specified.
 if [ -z $ORIGIN_BRANCH ];
 then
-  BRANCH=origin/develop
+  BRANCH=develop
 else
-  BRANCH=origin/$ORIGIN_BRANCH
+  BRANCH=$ORIGIN_BRANCH
 fi
 FRONT_END_DIR='core/templates/dev/head'
 
