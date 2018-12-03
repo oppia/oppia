@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import HTMLParser
 import argparse
+import ast
 import fnmatch
 import multiprocessing
 import os
@@ -58,6 +59,8 @@ import re
 import subprocess
 import sys
 import time
+
+import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
 
@@ -204,9 +207,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
-        'message': 'Please remove pylint exculsion if it is unnecessary or '
+        'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
-                   'The id to message list can be seen '
+                   'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -258,7 +261,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -723,7 +726,7 @@ def _pre_commit_linter(all_files):
     print '----------------------------------------'
 
     for process in linting_processes:
-        process.daemon = True
+        process.daemon = False
         process.start()
 
     for process in linting_processes:
@@ -837,8 +840,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
 
 
 def _check_bad_patterns(all_files):
-    """This function is used for detecting bad patterns.
-    """
+    """This function is used for detecting bad patterns."""
     print 'Starting Pattern Checks'
     print '----------------------------------------'
     total_files_checked = 0
@@ -947,7 +949,7 @@ def _check_import_order(all_files):
 
 
 def _check_comments(all_files):
-    """This function ensures that comments end in a period."""
+    """This function ensures that comments follow correct style."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -957,6 +959,8 @@ def _check_comments(all_files):
         and filename.endswith('.py')]
     message = 'There should be a period at the end of the comment.'
     failed = False
+    space_regex = re.compile(r'^#[^\s].*$')
+    capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -964,8 +968,11 @@ def _check_comments(all_files):
             for line_num in range(file_length):
                 line = file_content[line_num].lstrip().rstrip()
                 next_line = ''
+                previous_line = ''
                 if line_num + 1 < file_length:
                     next_line = file_content[line_num + 1].lstrip().rstrip()
+                if line_num > 0:
+                    previous_line = file_content[line_num - 1].lstrip().rstrip()
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
@@ -979,6 +986,26 @@ def _check_comments(all_files):
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
 
+                # Check that comment starts with a space and is not a shebang
+                # expression at the start of a bash script which loses function
+                # when a space is added.
+                if space_regex.match(line) and not line.startswith('#!'):
+                    message = (
+                        'There should be a space at the beginning '
+                        'of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
+
+                # Check that comment starts with a capital letter.
+                if not previous_line.startswith('#') and (
+                        capital_regex.match(line)):
+                    message = (
+                        'There should be a capital letter'
+                        ' to begin the content of the comment.')
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
@@ -998,7 +1025,16 @@ def _check_comments(all_files):
 
 
 def _check_docstrings(all_files):
-    """This function ensures that docstrings end in a period."""
+    """This function ensures that docstrings end in a period and the arg
+    order in the function definition matches the order in the doc string.
+
+    Args:
+        all_files: list(str). Names of files to consider during docstring check.
+
+    Returns:
+        summary_messages: list(str). Summary of messages generated by the check.
+    """
+
     print 'Starting docstring checks'
     print '----------------------------------------'
     summary_messages = []
@@ -1014,7 +1050,12 @@ def _check_docstrings(all_files):
         'Single line docstring should not span two lines. '
         'If line length exceeds 80 characters, '
         'convert the single line docstring to a multiline docstring.')
+    previous_line_message = (
+        'There should not be any empty lines before the end of '
+        'the multi-line docstring.')
     failed = False
+    is_docstring = False
+    is_class_or_function = False
     for filename in files_to_check:
         with open(filename, 'r') as f:
             file_content = f.readlines()
@@ -1026,8 +1067,26 @@ def _check_docstrings(all_files):
                 if line_num > 0:
                     prev_line = file_content[line_num - 1].lstrip().rstrip()
 
+                # Check if it is a docstring and not some multi-line string.
+                if (prev_line.startswith('class ') or
+                        prev_line.startswith('def ')) or (
+                            is_class_or_function):
+                    is_class_or_function = True
+                    if prev_line.endswith('):') and (
+                            line.startswith('"""')):
+                        is_docstring = True
+                        is_class_or_function = False
+
+                # Check if single line docstring span two lines.
+                if line == '"""' and prev_line.startswith('"""') and (
+                        is_docstring):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num, single_line_docstring_message)
+                    is_docstring = False
+
                 # Check for single line docstring.
-                if line.startswith('"""') and line.endswith('"""'):
+                elif re.match(r'^""".+"""$', line) and is_docstring:
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
                     if (len(line) > 6) and (
@@ -1035,32 +1094,29 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
-
-                # Check if single line docstring span two lines.
-                elif line == '"""' and prev_line.startswith('"""'):
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num, single_line_docstring_message)
+                    is_docstring = False
 
                 # Check for multiline docstring.
-                elif line.endswith('"""'):
-                    # Ignore regular expression, i.e. lines end with r""".
-                    if line.endswith('r"""'):
-                        continue
+                elif line.endswith('"""') and is_docstring:
                     # Case 1: line is """. This is correct for multiline
                     # docstring.
                     if line == '"""':
-                        line = file_content[line_num - 1].lstrip().rstrip()
-                        # Check for punctuation at end of docstring.
-                        last_char_is_invalid = line[-1] not in (
-                            ALLOWED_TERMINATING_PUNCTUATIONS)
-                        no_word_is_present_in_excluded_phrases = not any(
-                            word in line for word in EXCLUDED_PHRASES)
-                        if last_char_is_invalid and (
-                                no_word_is_present_in_excluded_phrases):
+                        # Check for empty line before the end of docstring.
+                        if prev_line == '':
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num, missing_period_message)
+                                filename, line_num, previous_line_message)
+                        # Check for punctuation at end of docstring.
+                        else:
+                            last_char_is_invalid = prev_line[-1] not in (
+                                ALLOWED_TERMINATING_PUNCTUATIONS)
+                            no_word_is_present_in_excluded_phrases = not any(
+                                word in prev_line for word in EXCLUDED_PHRASES)
+                            if last_char_is_invalid and (
+                                    no_word_is_present_in_excluded_phrases):
+                                failed = True
+                                print '%s --> Line %s: %s' % (
+                                    filename, line_num, missing_period_message)
 
                     # Case 2: line contains some words before """. """ should
                     # shift to next line.
@@ -1068,6 +1124,22 @@ def _check_docstrings(all_files):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
+
+                    is_docstring = False
+
+    # Check that the args in the docstring are listed in the same
+    # order as they appear in the function definition.
+    docstring_checker = docstrings_checker.ASTDocStringChecker()
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            ast_file = ast.walk(ast.parse(f.read()))
+            func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+            for func in func_defs:
+                func_result = docstring_checker.check_docstrings_arg_order(func)
+                for error_line in func_result:
+                    print '%s --> Func %s: %s' % (
+                        filename, func.name, error_line)
+                    failed = True
 
     print ''
     print '----------------------------------------'
@@ -1294,7 +1366,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
 
     # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
     pattern_to_match = (
-        r'controller: \[(?P<stringfied_dependencies>[\S\s]*?)' +
+        r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
         r'function\((?P<function_parameters>[\S\s]*?)\)')
     for filename in files_to_check:
         with open(filename) as f:

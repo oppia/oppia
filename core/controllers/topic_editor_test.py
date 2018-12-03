@@ -25,11 +25,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
+class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicEditorControllerTest, self).setUp()
+        super(BaseTopicEditorControllerTests, self).setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -62,7 +62,7 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
 
-class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
+class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
@@ -81,7 +81,7 @@ class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
         self.logout()
 
 
-class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
+class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get(self):
         # Create 5 questions linked to the same skill.
@@ -95,7 +95,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(feconf, 'NUM_QUESTIONS_PER_PAGE', 1):
+            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
                 json_response = self.get_json(
                     '%s/%s?cursor=' % (
                         feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
@@ -144,7 +144,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
             self.logout()
 
 
-class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
+class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
@@ -192,7 +192,7 @@ class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
             self.logout()
 
 
-class TopicEditorTest(BaseTopicEditorControllerTest):
+class TopicEditorTests(BaseTopicEditorControllerTests):
 
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
@@ -399,7 +399,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.logout()
 
 
-class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
+class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
 
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality."""
@@ -438,7 +438,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
             self.assertEqual(json_response['status_code'], 401)
 
 
-class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
+class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get_topic_rights(self):
         """Test the get topic rights functionality."""
@@ -462,7 +462,7 @@ class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
             self.logout()
 
 
-class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
+class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""

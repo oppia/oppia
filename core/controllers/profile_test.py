@@ -25,7 +25,7 @@ import feconf
 import utils
 
 
-class SignupTest(test_utils.GenericTestBase):
+class SignupTests(test_utils.GenericTestBase):
 
     def test_signup_page_does_not_have_top_right_menu(self):
         self.login(self.EDITOR_EMAIL)

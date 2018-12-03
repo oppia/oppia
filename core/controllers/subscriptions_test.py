@@ -22,7 +22,7 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class SubscriptionTest(test_utils.GenericTestBase):
+class SubscriptionTests(test_utils.GenericTestBase):
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
@@ -30,7 +30,7 @@ class SubscriptionTest(test_utils.GenericTestBase):
     USER2_USERNAME = 'user2'
 
     def setUp(self):
-        super(SubscriptionTest, self).setUp()
+        super(SubscriptionTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

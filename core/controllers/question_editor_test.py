@@ -25,11 +25,11 @@ import feconf
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
-class BaseQuestionEditorControllerTest(test_utils.GenericTestBase):
+class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseQuestionEditorControllerTest, self).setUp()
+        super(BaseQuestionEditorControllerTests, self).setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -58,9 +58,8 @@ class BaseQuestionEditorControllerTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
 
 
-class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests returning of new question ids and creating questions.
-    """
+class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
+    """Tests returning of new question ids and creating questions."""
 
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
@@ -114,9 +113,8 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
 
-class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests link and unlink question from skills.
-    """
+class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
+    """Tests link and unlink question from skills."""
 
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
@@ -216,9 +214,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
             self.logout()
 
 
-class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
-    """Tests get, put and delete methods of editable questions data handler.
-    """
+class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
+    """Tests get, put and delete methods of editable questions data handler."""
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):

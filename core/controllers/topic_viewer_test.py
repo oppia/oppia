@@ -24,11 +24,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
+class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicViewerControllerTest, self).setUp()
+        super(BaseTopicViewerControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
@@ -55,7 +55,7 @@ class BaseTopicViewerControllerTest(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
 
-class TopicViewerPage(BaseTopicViewerControllerTest):
+class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
@@ -81,7 +81,7 @@ class TopicViewerPage(BaseTopicViewerControllerTest):
             self.assertEqual(response.status_int, 404)
 
 
-class TopicPageDataHandler(BaseTopicViewerControllerTest):
+class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):

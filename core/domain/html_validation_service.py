@@ -161,7 +161,7 @@ def convert_to_textangular(html_data):
         feconf.RTE_CONTENT_SPEC[
             'RTE_TYPE_TEXTANGULAR']['ALLOWED_PARENT_LIST'])
 
-    # td tag will be unwrapped and tr tag will be replaced with p tag.
+    # The td tag will be unwrapped and tr tag will be replaced with p tag.
     # So if td is parent of blockquote after migration blockquote should
     # be parent of the p tag to get the alomst same appearance. p cannot
     # remain parent of blockquote since that is not allowed in TextAngular.
@@ -194,7 +194,7 @@ def convert_to_textangular(html_data):
         # the same appearance.
         elif tag.name == 'hr':
             tag.name = 'br'
-        # a tag is to be replaced with oppia-noninteractive-link.
+        # 'a' tag is to be replaced with oppia-noninteractive-link.
         # For this the attributes and text within a tag is used to
         # create new link tag which is wrapped as parent of a and then
         # a tag is removed.
@@ -238,8 +238,8 @@ def convert_to_textangular(html_data):
         elif tag.name == 'td' and tag.next_sibling:
             tag.insert_after(' ')
             tag.unwrap()
-        # div and table rows both are replaced with p tag
-        # to maintain almost same apperance.
+        # Divs and table rows are both replaced with p tag
+        # to maintain almost same appearance.
         elif tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
         # All other invalid tags are simply removed.
@@ -652,7 +652,7 @@ def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
-        html_string. str: HTML string in which the caption attribute is to be
+        html_string: str. HTML string in which the caption attribute is to be
             added.
 
     Returns:
@@ -781,8 +781,8 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        html_string: str. HTML string to modify.
         exp_id: str. Exploration id.
+        html_string: str. HTML string to modify.
 
     Returns:
         str. Updated HTML string with the dimensions for all

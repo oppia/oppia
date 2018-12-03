@@ -22,11 +22,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
+class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicsAndSkillsDashboardTest, self).setUp()
+        super(BaseTopicsAndSkillsDashboardTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -56,7 +56,7 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         return csrf_token
 
 
-class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
+class TopicsAndSkillsDashboardPageTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
@@ -68,8 +68,8 @@ class TopicsAndSkillsDashboardPageTest(BaseTopicsAndSkillsDashboardTest):
         self.logout()
 
 
-class TopicsAndSkillsDashboardPageDataHandlerTest(
-        BaseTopicsAndSkillsDashboardTest):
+class TopicsAndSkillsDashboardPageDataHandlerTests(
+        BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):
         # Check that non-admins or non-topic managers cannot access the
@@ -159,10 +159,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.logout()
 
 
-class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
+class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewTopicHandlerTest, self).setUp()
+        super(NewTopicHandlerTests, self).setUp()
         self.url = feconf.NEW_TOPIC_URL
 
     def test_topic_creation(self):
@@ -189,10 +189,10 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
         self.logout()
 
 
-class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
+class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewSkillHandlerTest, self).setUp()
+        super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
 
     def test_skill_creation(self):
@@ -253,10 +253,10 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.logout()
 
 
-class MergeSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
+class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(MergeSkillHandlerTest, self).setUp()
+        super(MergeSkillHandlerTests, self).setUp()
         self.url = feconf.MERGE_SKILL_URL
 
         self.question_id = question_services.get_new_question_id()

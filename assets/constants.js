@@ -466,6 +466,8 @@ var constants = {
 
   "ENABLE_NEW_STRUCTURES": false,
 
+  "NUM_QUESTIONS_PER_PAGE": 10,
+
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
       "content": {
