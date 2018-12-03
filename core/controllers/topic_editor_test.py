@@ -117,7 +117,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.get_json(
+            self.get_json(
                 '%s/%s?cursor=' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
             self.logout()
