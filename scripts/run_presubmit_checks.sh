@@ -40,7 +40,9 @@
 #
 #   --branch=your_branch or -b=your_branch
 #
-# By default the origin branch is set to develop.
+# By default, if the current branch tip exists on remote origin,
+# the current branch is compared against its tip on GitHub.
+# Otherwise it's compared against 'develop'.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -70,14 +72,22 @@ case $i in
 esac
 done
 
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# If the current branch exists on remote origin, MATCHED_BRANCH_NUM=1
+# else MATCHED_BRANCH_NUM=0
+MATCHED_BRANCH_NUM=$(git ls-remote --heads origin $CURRENT_BRANCH | wc -l)
 # Set the origin branch to develop if it's not specified.
-if [ -z $ORIGIN_BRANCH ];
-then
-  BRANCH=develop
-else
+if [ -n "$ORIGIN_BRANCH" ]; then
   BRANCH=$ORIGIN_BRANCH
+elif [ $MATCHED_BRANCH_NUM == 1 ]; then
+  BRANCH=origin/$CURRENT_BRANCH
+else
+  BRANCH=develop
 fi
+
 FRONT_END_DIR='core/templates/dev/head'
+
+echo "Comparing the current branch with $BRANCH"
 
 if git diff --cached --name-only --diff-filter=ACM ${BRANCH} | grep ${FRONT_END_DIR} --quiet
 then 
