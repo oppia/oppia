@@ -34,10 +34,30 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       controller: [
         '$scope', '$attrs', 'CurrentInteractionService',
         function($scope, $attrs, CurrentInteractionService) {
-          $scope.choices = HtmlEscaperService.escapedJsonToObj(
+          var shuffleChoicesEnabled =
+            ($attrs.shuffleChoicesEnabledWithValue === 'true');
+          var choicesWithValue = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
-          $scope.answer = null;
+          var choicesWithIndex = choicesWithValue.map(function(value, index){
+            return {index: index, value: value};
+          });
 
+          var shuftfeChoices = function(choices) {
+            var currentIndex = choices.length, temporaryValue, randomIndex;
+            while (0 !== currentIndex) {
+              randomIndex = Math.floor(Math.random() * currentIndex);
+              currentIndex -= 1;
+              temporaryValue = choices[currentIndex];
+              choices[currentIndex] = choices[randomIndex];
+              choices[randomIndex] = temporaryValue;
+            }
+            return choices;
+          };
+
+          $scope.choices = shuffleChoicesEnabled ?
+          shuftfeChoices(choicesWithIndex) : choicesWithIndex;
+
+          $scope.answer = null;
           $scope.submitAnswer = function(answer) {
             if (answer === null) {
               return;

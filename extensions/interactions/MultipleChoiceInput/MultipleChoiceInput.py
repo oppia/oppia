@@ -57,6 +57,13 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }, {
+        'name': 'shuffleChoicesEnabled',
+        'description': 'Shuffle answer choices',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]
 
     _answer_visualization_specs = [{
