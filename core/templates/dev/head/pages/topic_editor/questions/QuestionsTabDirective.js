@@ -29,13 +29,17 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
+        'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService) {
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
+            NUM_QUESTIONS_PER_PAGE) {
+          $scope.currentPage = 0;
+
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -44,11 +48,35 @@ oppia.directive('questionsTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
-              TopicEditorStateService.getQuestionSummaries();
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            $scope.isLastPage = TopicEditorStateService.isLastQuestionBatch;
             $scope.misconceptions = [];
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
+          };
+
+          $scope.getQuestionIndex = function(index) {
+            return $scope.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
+          };
+
+          $scope.goToNextPage = function() {
+            $scope.currentPage++;
+            var questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            if (questionSummaries === null) {
+              TopicEditorStateService.fetchQuestionSummaries(
+                $scope.topic.getId(), false
+              );
+            } else {
+              $scope.questionSummaries = questionSummaries;
+            }
+          };
+
+          $scope.goToPreviousPage = function() {
+            $scope.currentPage--;
+            $scope.questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -62,8 +90,9 @@ oppia.directive('questionsTab', [
               $scope.skillId, $scope.question.toBackendDict(true)
             ).then(function() {
               TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId()
+                $scope.topic.getId(), true
               );
+              $scope.currentPage = 0;
             });
           };
 

@@ -599,7 +599,7 @@ class UserStatsMRJobManager(
                         value_per_user * reach * contribution)
                 })
 
-            # if the user is an owner for the exploration, then update dict with
+            # If the user is an owner for the exploration, then update dict with
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
                 mapped_owner_ids.append(contrib_id)

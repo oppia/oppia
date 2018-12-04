@@ -1,4 +1,4 @@
-<md-card class="oppia-editor-card" ng-controller="FeedbackTab">
+<md-card class="oppia-editor-card oppia-feedback-card" ng-controller="FeedbackTab">
   <div ng-if="!activeThread">
     <div ng-if="threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
@@ -140,3 +140,13 @@
     <em ng-if="!userIsLoggedIn">To respond to a feedback thread, please log in.</em>
   </div>
 </md-card>
+
+
+<style>
+  /* Overwrite the default "success" color to a darker shade of green in order
+  to prevent this overshadowing the active action buttons (like "Create New
+  Thread"). */
+  .oppia-feedback-card span.label.label-success {
+    background-color: #038603;
+  }
+</style>

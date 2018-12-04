@@ -58,7 +58,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     getTopicNameFromLearnerUrl: function() {
       var pathname = this.getPathname();
       if (pathname.match(/\/(story|topic)/g)) {
-        return pathname.split('/')[2];
+        return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid URL for topic');
     },

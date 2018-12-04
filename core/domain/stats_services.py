@@ -632,7 +632,7 @@ def _save_stats_model(exploration_stats):
     ExplorationStats domain object.
 
     Args:
-        exploration_stats. ExplorationStats. The exploration statistics domain
+        exploration_stats: ExplorationStats. The exploration statistics domain
             object.
     """
     new_state_stats_mapping = {
@@ -663,7 +663,7 @@ def save_stats_model_transactional(exploration_stats):
     ExplorationStats domain object in a transaction.
 
     Args:
-        exploration_stats. ExplorationStats. The exploration statistics domain
+        exploration_stats: ExplorationStats. The exploration statistics domain
             object.
     """
     transaction_services.run_in_transaction(

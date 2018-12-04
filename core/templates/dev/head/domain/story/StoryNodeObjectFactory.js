@@ -20,9 +20,10 @@
 oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
   function(NODE_ID_PREFIX) {
     var StoryNode = function(
-        id, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds, outline,
-        outlineIsFinalized, explorationId, explorationSummaryObject) {
+        id, title, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds,
+        outline, outlineIsFinalized, explorationId, explorationSummaryObject) {
       this._id = id;
+      this._title = title;
       this._destinationNodeIds = destinationNodeIds;
       this._prerequisiteSkillIds = prerequisiteSkillIds;
       this._acquiredSkillIds = acquiredSkillIds;
@@ -49,6 +50,10 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
       return this._id;
     };
 
+    StoryNode.prototype.getTitle = function() {
+      return this._title;
+    };
+
     StoryNode.prototype.getExplorationId = function() {
       return this._explorationId;
     };
@@ -63,6 +68,10 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
 
     StoryNode.prototype.setOutline = function(outline) {
       this._outline = outline;
+    };
+
+    StoryNode.prototype.setTitle = function(title) {
+      this._title = title;
     };
 
     StoryNode.prototype.getOutlineStatus = function() {
@@ -207,7 +216,8 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
     // story python dict.
     StoryNode.createFromBackendDict = function(storyNodeBackendObject) {
       return new StoryNode(
-        storyNodeBackendObject.id, storyNodeBackendObject.destination_node_ids,
+        storyNodeBackendObject.id, storyNodeBackendObject.title,
+        storyNodeBackendObject.destination_node_ids,
         storyNodeBackendObject.prerequisite_skill_ids,
         storyNodeBackendObject.acquired_skill_ids,
         storyNodeBackendObject.outline,
@@ -217,8 +227,8 @@ oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
       );
     };
 
-    StoryNode.createFromId = function(nodeId) {
-      return new StoryNode(nodeId, [], [], [], '', false, null);
+    StoryNode.createFromIdAndTitle = function(nodeId, title) {
+      return new StoryNode(nodeId, title, [], [], [], '', false, null);
     };
     return StoryNode;
   }

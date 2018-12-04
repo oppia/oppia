@@ -263,7 +263,7 @@ def can_edit_collection(handler):
     """Decorator to check whether the user can edit collection.
 
     Args:
-        handler: The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that checks if
@@ -1616,7 +1616,7 @@ def can_delete_question(handler):
     """Decorator to check whether the user can delete a question.
 
     Args:
-        handler. The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks
@@ -1748,7 +1748,7 @@ def can_edit_story(handler):
     topic.
 
     Args:
-        handler. The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if
@@ -2055,7 +2055,7 @@ def can_delete_topic(handler):
     """Decorator to check whether the user can delete a topic.
 
     Args:
-        handler. The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also
@@ -2139,7 +2139,7 @@ def can_access_topics_and_skills_dashboard(handler):
     dashboard.
 
     Args:
-        handler. The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that also checks if
@@ -2387,6 +2387,21 @@ def get_decorator_for_accepting_suggestion(decorator):
         """
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
+            """Returns a (possibly-decorated) handler to test whether a
+            suggestion can be accepted based on the user actions and roles.
+
+            Args:
+                target_id: str. The target id.
+                suggestion_id: str. The suggestion id.
+                **kwargs: *. Keyword arguments.
+
+            Returns:
+                function. The (possibly-decorated) handler for accepting a
+                    suggestion.
+
+            Raises:
+                NotLoggedInException: The user is not logged in.
+            """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
             user_actions_info = user_services.UserActionsInfo(self.user_id)

@@ -18,7 +18,6 @@
 
 import copy
 import logging
-import urllib
 
 from core.domain import role_services
 from core.domain import subtopic_page_domain
@@ -216,20 +215,16 @@ def get_topics_by_ids(topic_ids):
     return topics
 
 
-def get_topic_by_name(topic_name, quoted=False):
+def get_topic_by_name(topic_name):
     """Returns a domain object representing a topic.
 
     Args:
         topic_name: str. The name of the topic.
-        quoted: boolean. True if the topic_name is url-encoded. False otherwise.
 
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    if quoted:
-        topic_name = urllib.unquote_plus(topic_name)
-
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
     if topic_model is None:
         return None
@@ -509,13 +504,13 @@ def update_topic_and_subtopic_pages(
     """Updates a topic and its subtopic pages. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - topic_id: str. The topic id.
-    - change_list: list(TopicChange and SubtopicPageChange). These changes are
-        applied in sequence to produce the resulting topic.
-    - commit_message: str or None. A description of changes made to the
-        topic.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        topic_id: str. The topic id.
+        change_list: list(TopicChange and SubtopicPageChange). These changes are
+            applied in sequence to produce the resulting topic.
+        commit_message: str or None. A description of changes made to the
+            topic.
 
     Raises:
         ValueError: Current user does not have enough rights to edit a topic.
