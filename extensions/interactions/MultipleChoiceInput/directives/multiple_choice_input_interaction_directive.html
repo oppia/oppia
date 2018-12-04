@@ -1,5 +1,5 @@
 <form ng-submit="submitAnswer(answer)">
-  <div class="multiple-choice-option-container" ng-repeat="choice in choices">
+  <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
     <button class="multiple-choice-option" ng-click="submitAnswer(choice.index)">
       <div class="multiple-choice-radio-button-container">
         <span class="multiple-choice-outer-radio-button">
