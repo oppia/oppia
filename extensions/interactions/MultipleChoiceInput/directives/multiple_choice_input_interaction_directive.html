@@ -1,6 +1,6 @@
 <form ng-submit="submitAnswer(answer)">
-  <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
-    <button class="multiple-choice-option" ng-click="submitAnswer($index)">
+  <div class="multiple-choice-option-container" ng-repeat="choice in choices">
+    <button class="multiple-choice-option" ng-click="submitAnswer(choice.index)">
       <div class="multiple-choice-radio-button-container">
         <span class="multiple-choice-outer-radio-button">
           <span class="multiple-choice-inner-radio-button"></span>
@@ -8,7 +8,7 @@
       </div>
       <div class="multiple-choice-content-container">
         <span>
-          <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice">
+          <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice.value">
           </angular-html-bind>
         </span>
       </div>
