@@ -85,11 +85,11 @@ else
   BRANCH=develop
 fi
 
-FRONT_END_DIR='core/templates/dev/head'
+FRONTEND_DIR='core/templates/dev/head'
 
 echo "Comparing the current branch with $BRANCH"
 
-if git diff --cached --name-only --diff-filter=ACM ${BRANCH} | grep ${FRONT_END_DIR} --quiet
+if [ -n "$(git diff --cached --name-only --diff-filter=ACM ${BRANCH} | grep ${FRONTEND_DIR})" ]
 then 
   # Run frontend unit tests.
   echo 'Running frontend unit tests'
@@ -97,7 +97,7 @@ then
   echo 'Frontend tests passed.'
   echo ''
 else 
-  # If files in FRONT_END_DIR were not changed, skip the tests.
+  # If files in FRONTEND_DIR were not changed, skip the tests.
   echo 'No frontend files were changed.'
   echo 'Skipped frontend tests'
 fi
