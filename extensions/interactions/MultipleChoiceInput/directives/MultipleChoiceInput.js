@@ -42,7 +42,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
             return {index: index, value: value};
           });
 
-          var shuftfeChoices = function(choices) {
+          var shuffleChoices = function(choices) {
             var currentIndex = choices.length, temporaryValue, randomIndex;
             while (0 !== currentIndex) {
               randomIndex = Math.floor(Math.random() * currentIndex);
@@ -55,7 +55,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
           };
 
           $scope.choices = shuffleChoicesEnabled ?
-          shuftfeChoices(choicesWithIndex) : choicesWithIndex;
+          shuffleChoices(choicesWithIndex) : choicesWithIndex;
 
           $scope.answer = null;
           $scope.submitAnswer = function(answer) {

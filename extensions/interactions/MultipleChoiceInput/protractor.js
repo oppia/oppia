@@ -24,7 +24,8 @@ var objects = require('../../objects/protractor.js');
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, richTextInstructionsArray, shuffleChoicesEnabled) {
+var customizeInteraction = function(
+    elem, richTextInstructionsArray, shuffleChoicesEnabled) {
   objects.BooleanEditor(elem.element(by.tagName('schema-based-bool-editor')))
     .setValue(shuffleChoicesEnabled);
   forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
@@ -59,12 +60,12 @@ var submitAnswer = function(elem, answer) {
 
 var answerObjectType = 'NonnegativeInt';
 var testSuite = [{
-  interactionArguments: [[  
-  function(editor) {
-    editor.appendBoldText('right');
-  }, function(editor) {
-    editor.appendItalicText('wrong');
-  }], false],
+  interactionArguments: [[
+    function(editor) {
+      editor.appendBoldText('right');
+    }, function(editor) {
+      editor.appendItalicText('wrong');
+    }], false],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('right');

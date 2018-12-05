@@ -1224,7 +1224,7 @@ tags: []
             question_state_data=self.VERSION_25_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=25
+            question_state_schema_version=26
         )
         question_model.commit(
             owner_id, 'New question created',
