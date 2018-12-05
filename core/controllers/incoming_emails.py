@@ -28,14 +28,15 @@ class IncomingReplyEmailHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
-        feedbackReplyToId = email_services.get_general_feedback_reply_to_id(
-            reply_to_id)
+        feedback_thread_reply_info = (
+            email_services.get_feedback_thread_reply_info_by_reply_to_id(
+                reply_to_id))
 
-        if feedbackReplyToId is None:
+        if feedback_thread_reply_info is None:
             raise self.PageNotFoundException
 
-        user_id = feedbackReplyToId.user_id
-        thread_id = feedbackReplyToId.thread_id
+        user_id = feedback_thread_reply_info.user_id
+        thread_id = feedback_thread_reply_info.thread_id
 
         # Get text message from email.
         msg = list(

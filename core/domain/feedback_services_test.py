@@ -771,22 +771,22 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
             # Check that reply_to id is created for user A.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_a, thread_id)
-            cross_object = email_services.get_general_feedback_reply_to_id(
-                model.reply_to_id)
-            self.assertEqual(model.id, cross_object.id)
-            self.assertEqual(cross_object.user_id, self.user_id_a)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_a, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_a)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'user a message')
             # Check that reply_to id is created for user B.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_b, thread_id)
-            cross_object = email_services.get_general_feedback_reply_to_id(
-                model.reply_to_id)
-            self.assertEqual(model.id, cross_object.id)
-            self.assertEqual(cross_object.user_id, self.user_id_b)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_b, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_b)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):

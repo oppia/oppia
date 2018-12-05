@@ -23,17 +23,34 @@ from core.tests import test_utils
 
 class EmailServicesTest(test_utils.GenericTestBase):
     """Tests for email_services functions."""
-    def test_reply_to_email_objects_are_created_and_queried_correctl(self):
+    def test_reply_info_email_objects_are_created_and_queried_correctly(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user1', 'exploration.exp1.1')
         model.put()
         reply_to_id = model.reply_to_id
-        queried_object = email_services.get_general_feedback_reply_to_id(
-            reply_to_id)
+        queried_object = (
+            email_services.get_feedback_thread_reply_info_by_reply_to_id(
+                reply_to_id))
 
         self.assertEqual(queried_object.reply_to_id, reply_to_id)
         self.assertEqual(queried_object.id, 'user1.exploration.exp1.1')
 
-        queried_object = email_services.get_general_feedback_reply_to_id(
-            'unknown.reply.to.id')
+        queried_object = (
+            email_services.get_feedback_thread_reply_info_by_reply_to_id(
+                'unknown.reply.to.id'))
+        self.assertEqual(queried_object, None)
+
+        queried_object = (
+            email_services
+            .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                'user1', 'exploration.exp1.1'))
+
+        self.assertEqual(queried_object.reply_to_id, reply_to_id)
+        self.assertEqual(queried_object.id, 'user1.exploration.exp1.1')
+
+        queried_object = (
+            email_services
+            .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                'user_unknown', 'invalid_thread_id'))
+
         self.assertEqual(queried_object, None)

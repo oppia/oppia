@@ -15,12 +15,12 @@
 """Domain objects for models relating to emails."""
 
 
-class GeneralFeedbackEmailReplyToId(object):
+class FeedbackThreadReplyInfo(object):
     """Domain object for email reply-to-id objects.
 
     Attributes:
         id: str. The id of the datastore instance.
-        reply_to_id: str. The reply-to-id used in the reply-to field of th
+        reply_to_id: str. The reply-to-id used in the reply-to field of the
             email.
     """
 
@@ -30,7 +30,7 @@ class GeneralFeedbackEmailReplyToId(object):
 
     @property
     def user_id(self):
-        """Returns the user id corresponding to this FeedbackEmailReplyToId
+        """Returns the user id corresponding to this FeedbackThreadReplyInfo
         instance.
 
         Returns:
@@ -40,7 +40,7 @@ class GeneralFeedbackEmailReplyToId(object):
 
     @property
     def entity_type(self):
-        """Returns the entity type extracted from the reply-to id.
+        """Returns the entity type extracted from the instance id.
 
         Returns:
             str. The entity type.
@@ -49,7 +49,7 @@ class GeneralFeedbackEmailReplyToId(object):
 
     @property
     def entity_id(self):
-        """Returns the entity id extracted from the reply-to id.
+        """Returns the entity id extracted from the instance id.
 
         Returns:
             str. The entity id.
@@ -58,7 +58,7 @@ class GeneralFeedbackEmailReplyToId(object):
 
     @property
     def thread_id(self):
-        """Returns the thread id extracted from the reply-to id.
+        """Returns the thread id extracted from the instance id.
 
         Returns:
             str. The thread id.

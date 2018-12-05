@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Tests for Domain objects for models relating to emails."""
+"""Tests for domain objects for models relating to emails."""
 
 from core.domain import email_domain
 from core.tests import test_utils
@@ -20,8 +20,8 @@ from core.tests import test_utils
 
 class EmailDomainTest(test_utils.GenericTestBase):
     """Tests for email_domain classes."""
-    def test_that_general_feedback_reply_to_id_objects_are_created(self):
-        obj = email_domain.GeneralFeedbackEmailReplyToId(
+    def test_that_general_feedback_thread_reply_info_objects_are_created(self):
+        obj = email_domain.FeedbackThreadReplyInfo(
             'user1.exploration.exp1.1', 'reply_to_id1')
         self.assertEqual(obj.id, 'user1.exploration.exp1.1')
         self.assertEqual(obj.reply_to_id, 'reply_to_id1')

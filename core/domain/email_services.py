@@ -20,20 +20,20 @@ from core.platform import models
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
-def get_general_feedback_reply_to_id_from_model(model):
-    """Converts FeedbackEmailReplyToIdModel to a FeedbackEmailReplyToId.
+def get_feedback_thread_reply_info_from_model(model):
+    """Converts GeneralFeedbackEmailReplyToIdModel to a FeedbackThreadReplyInfo.
 
     Args:
-        model: FeedbackEmailReplyToIdModel. The model to be converted.
+        model: GeneralFeedbackEmailReplyToIdModel. The model to be converted.
 
     Returns:
-        FeedbackEmailReplyToId. The resulting domain object.
+        FeedbackThreadReplyInfo. The resulting domain object.
     """
-    return email_domain.GeneralFeedbackEmailReplyToId(
+    return email_domain.FeedbackThreadReplyInfo(
         model.id, model.reply_to_id)
 
 
-def get_general_feedback_reply_to_id(reply_to_id):
+def get_feedback_thread_reply_info_by_reply_to_id(reply_to_id):
     """Gets the domain object corresponding to the model which is fetched by
     reply-to-id field.
 
@@ -41,10 +41,28 @@ def get_general_feedback_reply_to_id(reply_to_id):
         reply_to_id: str. The reply_to_id to search for.
 
     Returns:
-        FeedbackEmailReplyToId or None. The corresponding domain object.
+        FeedbackThreadReplyInfo or None. The corresponding domain object.
     """
     model = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
         reply_to_id)
     if model is None:
         return None
-    return get_general_feedback_reply_to_id_from_model(model)
+    return get_feedback_thread_reply_info_from_model(model)
+
+
+def get_feedback_thread_reply_info_by_user_and_thread_ids(user_id, thread_id):
+    """Gets the domain object corresponding to the model which is fetched by
+    user_id and thread_id.
+
+    Args:
+        user_id: str. The ID of the user.
+        thread_id: str. The ID of the thread.
+
+    Returns:
+        FeedbackThreadReplyInfo or None. The corresponding domain object.
+    """
+    model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+        user_id, thread_id, strict=False)
+    if model is None:
+        return None
+    return get_feedback_thread_reply_info_from_model(model)
