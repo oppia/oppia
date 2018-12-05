@@ -236,7 +236,8 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         feconf.EMAIL_SERVICE_PROVIDER = feconf.EMAIL_SERVICE_PROVIDER_MAILGUN
         from core.platform.email import mailgun_email_services
         self.assertEqual(
-            mailgun_email_services, self.registry_instance.import_email_services())
+            mailgun_email_services,
+            self.registry_instance.import_email_services())
 
     def test_import_email_services_invalid(self):
         """Tests import email services method for when email service provider is
