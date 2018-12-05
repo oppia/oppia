@@ -16,12 +16,10 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import email_services
 from core.domain import feedback_services
-from core.platform import models
-
 from google.appengine.api import mail
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
 class IncomingReplyEmailHandler(base.BaseHandler):
@@ -30,15 +28,15 @@ class IncomingReplyEmailHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
-        model = (
-            email_models.GeneralFeedbackEmailReplyToIdModel
-            .get_by_reply_to_id(reply_to_id))
+        feedback_thread_reply_info = (
+            email_services.get_feedback_thread_reply_info_by_reply_to_id(
+                reply_to_id))
 
-        if model is None:
+        if feedback_thread_reply_info is None:
             raise self.PageNotFoundException
 
-        user_id = model.user_id
-        thread_id = model.thread_id
+        user_id = feedback_thread_reply_info.user_id
+        thread_id = feedback_thread_reply_info.thread_id
 
         # Get text message from email.
         msg = list(
