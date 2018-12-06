@@ -43,7 +43,7 @@ oppia.factory('PlaythroughService', [
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
-    var whitelistedExpIds = null;
+    var whitelistedExpIds = [];
 
     var multipleIncorrectStateName = {};
 

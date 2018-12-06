@@ -58,14 +58,14 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
+    $scope.playthroughsAreVisible =
+      PlaythroughService.isExplorationWhitelisted(
+        ExplorationDataService.explorationId);
+
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     });
-
-    $scope.playthroughsAreVisible =
-      PlaythroughService.isExplorationWhitelisted(
-        ExplorationDataService.explorationId);
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
