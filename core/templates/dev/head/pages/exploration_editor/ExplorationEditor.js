@@ -143,6 +143,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
+        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -166,9 +167,6 @@ oppia.controller('ExplorationEditor', [
         UserEmailPreferencesService.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
-
-        PlaythroughIssuesService.initSession(
-          data.exploration_id, data.version);
 
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();
