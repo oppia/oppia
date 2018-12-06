@@ -115,7 +115,6 @@ oppia.controller('ExplorationEditor', [
             lostChanges, explorationId);
         }
       }).then(function(data) {
-        console.log(angular.toJson(GLOBALS, true));
         ExplorationStatesService.init(data.states);
 
         ExplorationTitleService.init(data.title);
