@@ -21,13 +21,13 @@
 
 describe('Learner Action Render Service', function() {
   beforeEach(module('oppia'));
+  beforeEach(module(function($provide) {
+    $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
+      'expId1'
+    ]);
+  }));
 
   describe('Test learner action render service functions', function() {
-    beforeEach(module(function($provide) {
-      $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
-        'expId1'
-      ]);
-    }));
     beforeEach(inject(function($injector) {
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps = $injector.get('PlaythroughService');
