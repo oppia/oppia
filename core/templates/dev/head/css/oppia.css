@@ -1479,13 +1479,11 @@ pre.oppia-pre-wrapped-text {
 /* These rules must be kept in sync with corresponding rules in
    pages/exploration_player/conversation_skin_directive.html
    (those with '.rte-viewer > p' selectors specifying the same
-   line-height, margin-top and margin-bottom attributes)
+   line-height attribute)
 */
 
 .oppia-rte-editor > p {
   line-height: 1.5;
-  margin-bottom: 18px;
-  margin-top: 18px;
 }
 .oppia-info-card-content p {
   display: block;
