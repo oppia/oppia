@@ -1495,8 +1495,6 @@ pre.oppia-pre-wrapped-text {
 }
 .oppia-rte-content > div > p {
   line-height: 1.5;
-  margin-bottom: 18px;
-  margin-top: 18px;
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
