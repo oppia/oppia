@@ -237,7 +237,8 @@ oppia.factory('PlaythroughService', [
         expStopwatch = StopwatchObjectFactory.create();
       },
       isExplorationWhitelisted: function(explorationId) {
-        return whitelistedExpIds.indexOf(explorationId) !== -1;
+        return whitelistedExpIds !== null &&
+          whitelistedExpIds.indexOf(explorationId) !== -1;
       },
       getPlaythrough: function() {
         return playthrough;
