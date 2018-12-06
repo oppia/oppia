@@ -369,3 +369,14 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class AdminConfig(base.BaseHandler):
+    """Handler for admin config fetching from the front-end."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def get(self):
+        self.render_json({
+            'data': config_domain.Registry.get_config_values()
+        })

@@ -197,6 +197,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
+    get_redirect_route(r'/adminconfig', admin.AdminConfig),
 
     get_redirect_route(
         r'/notifications_dashboard',

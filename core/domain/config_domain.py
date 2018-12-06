@@ -206,6 +206,16 @@ class Registry(object):
     _config_registry = {}
 
     @classmethod
+    def get_config_values(cls):
+        """Returns all of the currently known admin config value as a dict
+        mapping name to value.
+        """
+        return {
+            property_name: instance.value
+            for property_name, instance in cls._config_registry.iteritems()
+        }
+
+    @classmethod
     def init_config_property(cls, name, instance):
         """Initializes _config_registry with keys as the property names and
         values as instances of the specified property.
