@@ -38,9 +38,10 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
-  '$http', '$log', '$rootScope', '$scope', '$templateCache', '$timeout',
-  '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
-  'ContextService', 'EditabilityService', 'ExplorationAdvancedFeaturesService',
+  '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
+  '$uibModal', '$window', 'AdminConfigService', 'AutosaveInfoModalsService',
+  'ChangeListService', 'ContextService', 'EditabilityService',
+  'ExplorationAdvancedFeaturesService',
   'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
   'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
@@ -48,16 +49,17 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationRightsService',
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory', 'PlaythroughService',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
   'StateEditorTutorialFirstTimeService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'ThreadDataService', 'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
-      $http, $log, $rootScope, $scope, $templateCache, $timeout,
-      $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
-      ContextService, EditabilityService, ExplorationAdvancedFeaturesService,
+      $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
+      $uibModal, $window, AdminConfigService, AutosaveInfoModalsService,
+      ChangeListService, ContextService, EditabilityService,
+      ExplorationAdvancedFeaturesService,
       ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
       ExplorationCorrectnessFeedbackService, ExplorationDataService,
       ExplorationInitStateNameService, ExplorationLanguageCodeService,
@@ -65,7 +67,7 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationRightsService,
       ExplorationStatesService, ExplorationTagsService,
       ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      ParamChangesObjectFactory, ParamSpecsObjectFactory, PlaythroughService,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
       StateEditorTutorialFirstTimeService,
@@ -109,13 +111,23 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      ExplorationDataService.getData(function(explorationId, lostChanges) {
-        if (!AutosaveInfoModalsService.isModalOpen()) {
-          AutosaveInfoModalsService.showLostChangesModal(
-            lostChanges, explorationId);
-        }
-      }).then(function(data) {
+      $q.all([
+        AdminConfigService.init(),
+        ExplorationDataService.getData(function(explorationId, lostChanges) {
+          if (!AutosaveInfoModalsService.isModalOpen()) {
+            AutosaveInfoModalsService.showLostChangesModal(
+              lostChanges, explorationId);
+          }
+        }),
+      ]).then(function(results) {
+        var data = results[1];
         ExplorationStatesService.init(data.states);
+
+        PlaythroughService.initSession(
+          data.exploration_id, data.version,
+          AdminConfigService.getConfigValue('record_playthrough_probability'),
+          AdminConfigService.getConfigValue(
+            'whitelisted_exploration_ids_for_playthroughs'));
 
         ExplorationTitleService.init(data.title);
         ExplorationCategoryService.init(data.category);
@@ -131,7 +143,6 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
-        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -155,6 +166,9 @@ oppia.controller('ExplorationEditor', [
         UserEmailPreferencesService.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
+
+        PlaythroughIssuesService.initSession(
+          data.exploration_id, data.version);
 
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();

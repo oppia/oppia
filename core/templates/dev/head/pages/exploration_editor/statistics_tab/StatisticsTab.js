@@ -58,10 +58,6 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
-    $scope.playthroughsAreVisible =
-      PlaythroughService.isExplorationWhitelisted(
-        ExplorationDataService.explorationId);
-
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
@@ -84,6 +80,10 @@ oppia.controller('StatisticsTab', [
           var statesDict = response.exploration.states;
           var states = StatesObjectFactory.createFromBackendDict(statesDict);
           var initStateName = response.exploration.init_state_name;
+
+          $scope.playthroughsAreVisible =
+            PlaythroughService.isExplorationWhitelisted(
+              ExplorationDataService.explorationId);
 
           $scope.statsGraphData = ComputeGraphService.compute(
             initStateName, states);

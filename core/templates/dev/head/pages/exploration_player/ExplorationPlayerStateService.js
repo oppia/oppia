@@ -24,7 +24,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
   'EditableExplorationBackendApiService', 'PlayerPositionService',
   'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
-  'NumberAttemptsService',
+  'NumberAttemptsService', 'AdminConfigService',
   function(
       $log, $q, ExplorationEngineService, PretestEngineService,
       ContextService, UrlService, StateClassifierMappingService,
@@ -32,7 +32,7 @@ oppia.factory('ExplorationPlayerStateService', [
       PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
       EditableExplorationBackendApiService, PlayerPositionService,
       ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
-      NumberAttemptsService) {
+      NumberAttemptsService, AdminConfigService) {
     var _currentEngineService = null;
     var _inPretestMode = false;
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -48,8 +48,10 @@ oppia.factory('ExplorationPlayerStateService', [
         _explorationId, returnDict.exploration.title,
         _version, returnDict.session_id, GLOBALS.collectionId);
       PlaythroughService.initSession(
-        _explorationId, _version, returnDict.record_playthrough_probability,
-        returnDict.whitelisted_exploration_ids_for_playthroughs);
+        _explorationId, _version,
+        AdminConfigService.getConfigValue('record_playthrough_probability'),
+        AdminConfigService.getConfigValue(
+          'whitelisted_exploration_ids_for_playthroughs'));
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
@@ -113,8 +115,9 @@ oppia.factory('ExplorationPlayerStateService', [
               ReadOnlyExplorationBackendApiService.loadExploration(
                 _explorationId, _version),
               PretestQuestionBackendApiService.fetchPretestQuestions(
-                _explorationId, _storyId
-              )]).then(function(returnValues) {
+                _explorationId, _storyId),
+              AdminConfigService.init(),
+            ]).then(function(returnValues) {
               if (returnValues[1].length > 0) {
                 _setPretestMode();
                 _initializeExplorationServices(

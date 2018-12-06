@@ -377,6 +377,4 @@ class AdminConfig(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
-        self.render_json({
-            'data': config_domain.Registry.get_config_values()
-        })
+        self.render_json(config_domain.Registry.get_config_values())
