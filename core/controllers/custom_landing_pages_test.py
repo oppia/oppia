@@ -31,7 +31,7 @@ class FractionLandingPageTest(test_utils.GenericTestBase):
 
     def test_fraction_landing_page_with_viewer_type(self):
         """Test for showing the landing page for fractions,
-        with Teacher viewer type should redirect to teacher type.
+        with student viewer type should respond student type.
         """
         response = self.testapp.get(
             '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL))
