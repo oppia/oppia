@@ -2083,9 +2083,9 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
-        """Converts from version 17 to 18. Version 18 adds a new
-        customization arg to FractionInput interactions which allows
-        you to add custom placeholders.
+        """Converts from version 25 to 26. Version 26 adds a new
+        customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2694,7 +2694,8 @@ class Exploration(object):
     def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
         """Converts a v30 exploration dict into a v31 exploration dict.
 
-        Adds dimensions to all oppia-noninteractive-image tags.
+        adds a new customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
         """
         exploration_dict['schema_version'] = 31
 
