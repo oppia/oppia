@@ -4,8 +4,7 @@
          title="<[getPublishExplorationButtonTooltip()]>">
       <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
-              ng-click="showPublishExplorationModal()"
-              ng-disabled="isExplorationLockedForEditing() || countWarnings()">
+              ng-click="showPublishExplorationModal()">
         <span ng-if="!publishIsInProcess">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">

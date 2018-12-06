@@ -96,15 +96,20 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.showPublishExplorationModal = function() {
-            $scope.publishIsInProcess = true;
-            $scope.loadingDotsAreShown = true;
+            if ($scope.isExplorationLockedForEditing() ||
+              $scope.countWarnings()) {
+              alert('Please save your changes before publishing!');
+            } else {
+              $scope.publishIsInProcess = true;
+              $scope.loadingDotsAreShown = true;
 
-            ExplorationSaveService.showPublishExplorationModal(
-              showLoadingDots, hideLoadingDots)
-              .then(function() {
-                $scope.publishIsInProcess = false;
-                $scope.loadingDotsAreShown = false;
-              });
+              ExplorationSaveService.showPublishExplorationModal(
+                showLoadingDots, hideLoadingDots)
+                .then(function() {
+                  $scope.publishIsInProcess = false;
+                  $scope.loadingDotsAreShown = false;
+                });
+            }
           };
 
           $scope.saveChanges = function() {
