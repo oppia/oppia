@@ -18,11 +18,6 @@
 
 describe('Playthrough service', function() {
   beforeEach(module('oppia'));
-  beforeEach(module(function($provide) {
-    $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
-      'expId1',
-    ]);
-  }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(inject(function($injector) {
@@ -31,6 +26,11 @@ describe('Playthrough service', function() {
       this.ps = $injector.get('PlaythroughService');
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps.initSession(this.expId, this.expVersion, 1.0, [this.expId]);
+    }));
+    beforeEach(module(function($provide) {
+      $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
+        'expId1',
+      ]);
     }));
 
     it('should initialize a session with correct values.', function() {
@@ -246,16 +246,21 @@ describe('Playthrough service', function() {
   });
 
   describe('Test whitelisting functions', function() {
+    beforeEach(module(function($provide) {
+      $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
+        'expId1',
+      ]);
+    }));
+
     beforeEach(inject(function($injector) {
-      this.expId = 'expId1';
       this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
       this.laof = $injector.get('LearnerActionObjectFactory');
-      this.ps.initSession(this.expId, this.expVersion, 1.0, [this.expId]);
+      this.ps.initSession(this.expId, this.expVersion, 1.0);
     }));
 
     it('should not record learner actions for blacklisted exps', function() {
-      this.ps.initSession(this.expId, this.expVersion, 1.0, []);
+      this.ps.initSession('expNotWhitelistedId', this.expVersion, 1.0);
 
       this.ps.recordExplorationStartAction('initStateName1');
       var playthrough = this.ps.getPlaythrough();
