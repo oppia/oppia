@@ -214,13 +214,13 @@ oppia.factory('PlaythroughService', [
       return !isPlayerInSamplePopulation;
     };
 
-    var isExplorationWhitelisted = function() {
+    var isPlaythroughAllowed = function() {
       return whitelistedExpIds.indexOf(playthrough.expId) !== -1;
     };
 
     var isPlaythroughDiscarded = function() {
       return (
-        isPlayerExcludedFromSamplePopulation() || !isExplorationWhitelisted());
+        isPlayerExcludedFromSamplePopulation() || !isPlaythroughAllowed());
     };
 
     return {
@@ -233,6 +233,9 @@ oppia.factory('PlaythroughService', [
         playthrough = PlaythroughObjectFactory.createNew(
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
+      },
+      isExplorationWhitelisted: function(explorationId) {
+        return whitelistedExpIds.indexOf(explorationId) !== -1;
       },
       getPlaythrough: function() {
         return playthrough;
