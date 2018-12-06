@@ -149,7 +149,7 @@ def _execute_branch_cut():
     """Pushes the new release branch to Github.
 
     Raises:
-         AssertionError: 'version: default' was not found in app.yaml
+         AssertionError: 'version: default' was not found in app.yaml.
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()

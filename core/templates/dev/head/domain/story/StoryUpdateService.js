@@ -38,6 +38,7 @@ oppia.constant('STORY_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 oppia.constant('INITIAL_NODE_ID', 'initial_node_id');
 
+oppia.constant('STORY_NODE_PROPERTY_TITLE', 'title');
 oppia.constant('STORY_NODE_PROPERTY_OUTLINE', 'outline');
 oppia.constant('STORY_NODE_PROPERTY_EXPLORATION_ID', 'exploration_id');
 oppia.constant(
@@ -54,7 +55,7 @@ oppia.factory('StoryUpdateService', [
   'STORY_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
   'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_LANGUAGE_CODE',
   'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_OUTLINE',
-  'STORY_NODE_PROPERTY_EXPLORATION_ID',
+  'STORY_NODE_PROPERTY_EXPLORATION_ID', 'STORY_NODE_PROPERTY_TITLE',
   'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', function(
@@ -65,7 +66,7 @@ oppia.factory('StoryUpdateService', [
       STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
       STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE,
       INITIAL_NODE_ID, STORY_NODE_PROPERTY_OUTLINE,
-      STORY_NODE_PROPERTY_EXPLORATION_ID,
+      STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE,
       STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS) {
@@ -227,13 +228,14 @@ oppia.factory('StoryUpdateService', [
        * Creates a story node, adds it to the story and records the change in
        * the undo/redo service.
        */
-      addStoryNode: function(story) {
+      addStoryNode: function(story, nodeTitle) {
         var nextNodeId = story.getStoryContents().getNextNodeId();
         _applyChange(story, CMD_ADD_STORY_NODE, {
-          node_id: nextNodeId
+          node_id: nextNodeId,
+          title: nodeTitle
         }, function(changeDict, story) {
           // Apply.
-          story.getStoryContents().addNode();
+          story.getStoryContents().addNode(nodeTitle);
         }, function(changeDict, story) {
           // Undo.
           var nodeId = _getNodeIdFromChangeDict(changeDict);
@@ -319,6 +321,26 @@ oppia.factory('StoryUpdateService', [
             // Undo.
             story.getStoryContents().setNodeOutline(
               nodeId, oldOutline);
+          });
+      },
+
+      /**
+       * Sets the title of a node of the story and records the change
+       * in the undo/redo service.
+       */
+      setStoryNodeTitle: function(story, nodeId, newTitle) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldTitle = storyNode.getTitle();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_TITLE, nodeId,
+          oldTitle, newTitle,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setNodeTitle(nodeId, newTitle);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setNodeTitle(nodeId, oldTitle);
           });
       },
 

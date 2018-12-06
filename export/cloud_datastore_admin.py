@@ -17,7 +17,6 @@
 Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
-
 """
 
 import datetime
@@ -25,11 +24,13 @@ import httplib
 import json
 import logging
 
-from oppia.export import acl_decorators
+import acl_decorators  # pylint: disable=relative-import
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
 import webapp2
+
+APP_NAME_OPPIASERVER = 'oppiaserver'
 
 
 class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
@@ -44,13 +45,20 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            AssertionError: Bucket url exists and doesn't start with 'gs://'
+            AssertionError: Bucket url exists and doesn't start with 'gs://'.
         """
         GCS_BUCKET_URL_PREFIX = 'gs://'
 
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         app_id = app_identity.get_application_id()
+
+        if app_id != APP_NAME_OPPIASERVER:
+            logging.error('Export service has been pinged. '
+                          'Since this is not production, a real export request '
+                          'has not been initiated.')
+            return
+
         timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
         output_url_prefix = self.request.get('output_url_prefix')

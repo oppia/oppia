@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.search_services."""
+
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rating_services

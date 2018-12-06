@@ -27,15 +27,15 @@ oppia.directive('editorNavigation', [
         '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationRightsService', 'ExplorationWarningsService',
         'RouterService', 'StateEditorTutorialFirstTimeService',
-        'SiteAnalyticsService', 'ThreadDataService',
+        'SiteAnalyticsService', 'ThreadDataService', 'UserService',
         'WindowDimensionsService', 'StateTranslationTutorialFirstTimeService',
-
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
             ExplorationRightsService, ExplorationWarningsService,
             RouterService, StateEditorTutorialFirstTimeService,
-            SiteAnalyticsService, ThreadDataService,
-            WindowDimensionsService, StateTranslationTutorialFirstTimeService) {
+            SiteAnalyticsService, ThreadDataService, UserService,
+            WindowDimensionsService,
+            StateTranslationTutorialFirstTimeService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -54,7 +54,10 @@ oppia.directive('editorNavigation', [
             }
           });
 
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
