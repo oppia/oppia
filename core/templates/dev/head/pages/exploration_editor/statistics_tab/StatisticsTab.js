@@ -67,7 +67,7 @@ oppia.controller('StatisticsTab', [
 
     $scope.isPlaythroughEnabled =
       PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST.indexOf(
-        ExplorationDataService.explorationId);
+        ExplorationDataService.explorationId) !== -1;
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
