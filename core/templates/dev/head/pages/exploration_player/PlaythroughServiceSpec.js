@@ -18,6 +18,11 @@
 
 describe('Playthrough service', function() {
   beforeEach(module('oppia'));
+  beforeEach(module(function($provide) {
+    $provide.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
+      'expId1',
+    ]);
+  }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(inject(function($injector) {
