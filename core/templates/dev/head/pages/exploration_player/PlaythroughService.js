@@ -219,8 +219,7 @@ oppia.factory('PlaythroughService', [
     };
 
     var isPlaythroughDiscarded = function() {
-      return (
-        isPlayerExcludedFromSamplePopulation() || !isPlaythroughAllowed());
+      return isPlayerExcludedFromSamplePopulation() || !isPlaythroughAllowed();
     };
 
     return {
