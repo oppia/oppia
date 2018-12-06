@@ -25,12 +25,14 @@ oppia.controller('StatisticsTab', [
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  'PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE,
+      PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -62,6 +64,10 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     });
+
+    $scope.isPlaythroughEnabled =
+      PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST.indexOf(
+        ExplorationDataService.explorationId);
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
