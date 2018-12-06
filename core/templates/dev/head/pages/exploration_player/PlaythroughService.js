@@ -40,6 +40,8 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
       PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
+    var isInitialized = false;
+
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
@@ -227,15 +229,19 @@ oppia.factory('PlaythroughService', [
       initSession: function(
           explorationId, explorationVersion, playthroughProbability,
           whitelistedExplorationIds) {
+        if (isInitialized) {
+          return;
+        }
         isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
           playthroughProbability);
         whitelistedExpIds = whitelistedExplorationIds;
         playthrough = PlaythroughObjectFactory.createNew(
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
+        isInitialized = true;
       },
       isExplorationWhitelisted: function(explorationId) {
-        return whitelistedExpIds.indexOf(explorationId) !== -1;
+        return isInitialized && whitelistedExpIds.indexOf(explorationId) !== -1;
       },
       getPlaythrough: function() {
         return playthrough;
