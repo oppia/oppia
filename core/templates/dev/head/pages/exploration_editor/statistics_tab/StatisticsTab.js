@@ -65,7 +65,7 @@ oppia.controller('StatisticsTab', [
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     });
 
-    $scope.isPlaythroughEnabled =
+    $scope.playthroughsAreEnabled =
       PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST.indexOf(
         ExplorationDataService.explorationId) !== -1;
 
