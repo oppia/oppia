@@ -48,8 +48,7 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
       PAGE_CONTEXT, PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST,
-      STORE_PLAYTHROUGH_URL,
-  ) {
+      STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
