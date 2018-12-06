@@ -20,17 +20,17 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationStatesService',
-  'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
-  'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
+  'DateTimeFormatService', 'ExplorationDataService', 'ExplorationStatesService',
+  'ReadOnlyExplorationBackendApiService', 'RouterService',
+  'StateImprovementSuggestionService', 'StateRulesStatsService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
-      ExplorationDataService, ComputeGraphService, DateTimeFormatService,
-      StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
+      $http, $scope, $uibModal, AlertsService, ComputeGraphService,
+      DateTimeFormatService, ExplorationDataService, ExplorationStatesService,
+      ReadOnlyExplorationBackendApiService, RouterService,
+      StateImprovementSuggestionService, StateRulesStatsService,
+      StatesObjectFactory, UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
