@@ -22,13 +22,13 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 oppia.controller('StatisticsTab', [
   '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
   'DateTimeFormatService', 'ExplorationDataService', 'ExplorationStatesService',
-  'ReadOnlyExplorationBackendApiService', 'RouterService',
+  'ReadOnlyExplorationBackendApiService', 'RouterService', 'PlaythroughService',
   'StateImprovementSuggestionService', 'StateRulesStatsService',
   'StatesObjectFactory', 'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $http, $scope, $uibModal, AlertsService, ComputeGraphService,
       DateTimeFormatService, ExplorationDataService, ExplorationStatesService,
-      ReadOnlyExplorationBackendApiService, RouterService,
+      ReadOnlyExplorationBackendApiService, RouterService, PlaythroughService,
       StateImprovementSuggestionService, StateRulesStatsService,
       StatesObjectFactory, UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
@@ -62,6 +62,10 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     });
+
+    $scope.playthroughsAreVisible =
+      PlaythroughService.isExplorationWhitelisted(
+        ExplorationDataService.explorationId);
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
