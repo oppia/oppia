@@ -20,8 +20,15 @@ oppia.constant(
   'STORE_PLAYTHROUGH_URL',
   '/explorehandler/store_playthrough/<exploration_id>');
 
+oppia.constant('WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS', [
+  "umPkwp0L1M0-", "MjZzEVOG47_1", "9trAQhj6uUC2", "rfX8jNkPnA-1",
+  "0FBWxCE5egOw", "670bU6d9JGBh", "aHikhPlxYgOH", "-tMgcP1i_4au",
+  "zW39GLG_BdN2", "Xa3B_io-2WI5", "6Q6IyIDkjpYC", "osw1m5Q3jK41"
+]);
+
 oppia.factory('PlaythroughService', [
-  '$http', 'LearnerActionObjectFactory', 'PlaythroughObjectFactory',
+  '$http', 'LearnerActionObjectFactory',
+  'PlaythroughObjectFactory',
   'StopwatchObjectFactory', 'UrlInterpolationService',
   'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
   'ACTION_TYPE_EXPLORATION_QUIT', 'CURRENT_ACTION_SCHEMA_VERSION',
@@ -30,6 +37,7 @@ oppia.factory('PlaythroughService', [
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
   'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
+  'WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS',
   function(
       $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
       StopwatchObjectFactory, UrlInterpolationService,
@@ -39,11 +47,11 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
+      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL,
+      WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
-    var whitelistedExpIds = null;
 
     var multipleIncorrectStateName = {};
 
@@ -215,7 +223,7 @@ oppia.factory('PlaythroughService', [
     };
 
     var isExplorationWhitelisted = function() {
-      return whitelistedExpIds.indexOf(playthrough.expId) !== -1;
+      return WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS.indexOf(playthrough.expId) !== -1;
     };
 
     var isPlaythroughDiscarded = function() {
@@ -225,11 +233,9 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(
-          explorationId, explorationVersion, playthroughProbability,
-          whitelistedExplorationIds) {
+          explorationId, explorationVersion, playthroughProbability) {
         isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
           playthroughProbability);
-        whitelistedExpIds = whitelistedExplorationIds;
         playthrough = PlaythroughObjectFactory.createNew(
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
