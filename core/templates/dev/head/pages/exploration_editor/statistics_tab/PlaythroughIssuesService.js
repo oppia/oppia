@@ -81,7 +81,8 @@ oppia.factory('PlaythroughIssuesService', [
 
     return {
       initSession: function(
-          newExplorationId, newExplorationVersion, newWhitelistedExplorationIds) {
+          newExplorationId, newExplorationVersion,
+          newWhitelistedExplorationIds) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
         whitelistedExplorationIds = newWhitelistedExplorationIds;
