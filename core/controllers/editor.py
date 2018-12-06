@@ -234,6 +234,11 @@ class ExplorationHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        whitelisted_exp_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+        self.values.update({
+            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids
+        })
         self.values.update(exploration_data)
         self.render_json(self.values)
 
