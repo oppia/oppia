@@ -1476,14 +1476,21 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 
+.oppia-rte > p {
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
 /* These rules must be kept in sync with corresponding rules in
    pages/exploration_player/conversation_skin_directive.html
    (those with '.rte-viewer > p' selectors specifying the same
-   line-height attribute)
+   line-height, margin-top and margin-bottom attributes)
 */
 
 .oppia-rte-editor > p {
   line-height: 1.5;
+  margin-bottom: 18px;
+  margin-top: 18px;
 }
 .oppia-info-card-content p {
   display: block;
@@ -1495,6 +1502,8 @@ pre.oppia-pre-wrapped-text {
 }
 .oppia-rte-content > div > p {
   line-height: 1.5;
+  margin-bottom: 18px;
+  margin-top: 18px;
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
