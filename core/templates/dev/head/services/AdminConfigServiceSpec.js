@@ -16,6 +16,7 @@ describe('AdminConfigService', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     this.AdminConfigService = $injector.get('AdminConfigService');
+    this.ADMIN_CONFIG_URL = $injector.get('ADMIN_CONFIG_URL');
     this.$httpBackend = $injector.get('$httpBackend');
   }));
   afterEach(function() {
@@ -27,7 +28,7 @@ describe('AdminConfigService', function() {
     it('calls out to the backend for initialization', function() {
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      this.$httpBackend.expectGET('/adminconfig').respond({
+      this.$httpBackend.expectGET(this.ADMIN_CONFIG_URL).respond({
         'test_parameter_name': true,
       });
 
@@ -41,7 +42,7 @@ describe('AdminConfigService', function() {
 
   describe('.getConfigValue', function() {
     it('returns value fetched from backend', function() {
-      this.$httpBackend.expectGET('/adminconfig').respond({
+      this.$httpBackend.expectGET(this.ADMIN_CONFIG_URL).respond({
         'test_parameter_name': true,
       });
 
@@ -54,7 +55,7 @@ describe('AdminConfigService', function() {
     });
 
     it('returns default value if the value is missing', function() {
-      this.$httpBackend.expectGET('/adminconfig').respond({
+      this.$httpBackend.expectGET(this.ADMIN_CONFIG_URL).respond({
         'test_parameter_name': true,
       });
 
