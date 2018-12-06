@@ -20,7 +20,7 @@ oppia.constant(
   'STORE_PLAYTHROUGH_URL',
   '/explorehandler/store_playthrough/<exploration_id>');
 
-oppia.constant('WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS', [
+oppia.constant('PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST', [
   "umPkwp0L1M0-", "MjZzEVOG47_1", "9trAQhj6uUC2", "rfX8jNkPnA-1",
   "0FBWxCE5egOw", "670bU6d9JGBh", "aHikhPlxYgOH", "-tMgcP1i_4au",
   "zW39GLG_BdN2", "Xa3B_io-2WI5", "6Q6IyIDkjpYC", "osw1m5Q3jK41"
@@ -37,7 +37,7 @@ oppia.factory('PlaythroughService', [
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
   'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
-  'WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS',
+  'PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST',
   function(
       $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
       StopwatchObjectFactory, UrlInterpolationService,
@@ -48,7 +48,7 @@ oppia.factory('PlaythroughService', [
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
       PAGE_CONTEXT, STORE_PLAYTHROUGH_URL,
-      WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS) {
+      PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
@@ -223,7 +223,8 @@ oppia.factory('PlaythroughService', [
     };
 
     var isExplorationWhitelisted = function() {
-      return WHITELISTED_EXPLORATIONS_FOR_PLAYTHROUGHS.indexOf(playthrough.expId) !== -1;
+      return PLAYTHROUGH_ENABLED_EXPLORATION_WHITELIST.indexOf(
+        playthrough.expId) !== -1;
     };
 
     var isPlaythroughDiscarded = function() {
