@@ -96,9 +96,10 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.showPublishExplorationModal = function() {
-            if ($scope.isExplorationLockedForEditing() ||
-              $scope.countWarnings()) {
+            if ($scope.isExplorationLockedForEditing()) {
               alert('Please save your changes before publishing!');
+            } else if ($scope.countWarnings()) {
+              alert('Please resolve the warnings!');
             } else {
               $scope.publishIsInProcess = true;
               $scope.loadingDotsAreShown = true;
