@@ -229,18 +229,20 @@ oppia.factory('PlaythroughService', [
       initSession: function(
           explorationId, explorationVersion, playthroughProbability,
           whitelistedExplorationIds) {
-        if (isInitialized) {
-          return;
+        console.log("Brian");
+        if (!isInitialized) {
+          isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
+            playthroughProbability);
+          whitelistedExpIds = whitelistedExplorationIds || [];
+          console.log(whitelistedExpIds);
+          playthrough = PlaythroughObjectFactory.createNew(
+            null, explorationId, explorationVersion, null, {}, []);
+          expStopwatch = StopwatchObjectFactory.create();
+          isInitialized = true;
         }
-        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
-          playthroughProbability);
-        whitelistedExpIds = whitelistedExplorationIds;
-        playthrough = PlaythroughObjectFactory.createNew(
-          null, explorationId, explorationVersion, null, {}, []);
-        expStopwatch = StopwatchObjectFactory.create();
-        isInitialized = true;
       },
       isExplorationWhitelisted: function(explorationId) {
+        console.log(isInitialized);
         return isInitialized && whitelistedExpIds.indexOf(explorationId) !== -1;
       },
       getPlaythrough: function() {

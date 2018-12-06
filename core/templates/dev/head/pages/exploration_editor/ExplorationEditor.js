@@ -38,41 +38,39 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'ExplorationDataService', 'StateEditorService', 'ExplorationTitleService',
-  'ExplorationCategoryService', 'ExplorationObjectiveService',
-  'ExplorationLanguageCodeService', 'ExplorationRightsService',
-  'ExplorationInitStateNameService', 'ExplorationTagsService',
-  'EditabilityService', 'ExplorationStatesService', 'RouterService',
-  'GraphDataService', 'StateEditorTutorialFirstTimeService',
-  'ExplorationParamSpecsService', 'ExplorationParamChangesService',
-  'ExplorationWarningsService', '$templateCache', 'ContextService',
-  'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
-  'AutosaveInfoModalsService', 'SiteAnalyticsService',
-  'UserEmailPreferencesService', 'ParamChangesObjectFactory',
-  'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
-  'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
-  'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService', 'StateClassifierMappingService',
-  'PlaythroughIssuesService',
+  '$http', '$log', '$rootScope', '$scope', '$templateCache', '$timeout',
+  '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
+  'ContextService', 'EditabilityService', 'ExplorationAdvancedFeaturesService',
+  'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
+  'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
+  'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
+  'ExplorationObjectiveService', 'ExplorationParamChangesService',
+  'ExplorationParamSpecsService', 'ExplorationRightsService',
+  'ExplorationStatesService', 'ExplorationTagsService',
+  'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+  'StateClassifierMappingService', 'StateEditorService',
+  'StateEditorTutorialFirstTimeService',
+  'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+  'ThreadDataService', 'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
-      $scope, $http, $window, $rootScope, $log, $timeout,
-      ExplorationDataService, StateEditorService, ExplorationTitleService,
-      ExplorationCategoryService, ExplorationObjectiveService,
-      ExplorationLanguageCodeService, ExplorationRightsService,
-      ExplorationInitStateNameService, ExplorationTagsService,
-      EditabilityService, ExplorationStatesService, RouterService,
-      GraphDataService, StateEditorTutorialFirstTimeService,
-      ExplorationParamSpecsService, ExplorationParamChangesService,
-      ExplorationWarningsService, $templateCache, ContextService,
-      ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
-      AutosaveInfoModalsService, SiteAnalyticsService,
-      UserEmailPreferencesService, ParamChangesObjectFactory,
-      ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
-      UrlInterpolationService, ExplorationCorrectnessFeedbackService,
-      StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService, StateClassifierMappingService,
-      PlaythroughIssuesService) {
+      $http, $log, $rootScope, $scope, $templateCache, $timeout,
+      $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
+      ContextService, EditabilityService, ExplorationAdvancedFeaturesService,
+      ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
+      ExplorationCorrectnessFeedbackService, ExplorationDataService,
+      ExplorationInitStateNameService, ExplorationLanguageCodeService,
+      ExplorationObjectiveService, ExplorationParamChangesService,
+      ExplorationParamSpecsService, ExplorationRightsService,
+      ExplorationStatesService, ExplorationTagsService,
+      ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+      StateClassifierMappingService, StateEditorService,
+      StateEditorTutorialFirstTimeService,
+      StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+      ThreadDataService, UrlInterpolationService, UserEmailPreferencesService) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -117,6 +115,7 @@ oppia.controller('ExplorationEditor', [
             lostChanges, explorationId);
         }
       }).then(function(data) {
+        console.log(angular.toJson(GLOBALS, true));
         ExplorationStatesService.init(data.states);
 
         ExplorationTitleService.init(data.title);
