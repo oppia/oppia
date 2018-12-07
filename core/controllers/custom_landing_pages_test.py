@@ -49,20 +49,20 @@ class StewardsLandingPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
         response.mustcontain(
-            'Contact us to arrange a pilot with your students.')
+            'Contact us to arrange a pilot with your students')
 
     def test_parents_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('Free, effective lessons you can use at home')
+        response.mustcontain('effective lessons you can use at home')
 
 
     def test_teachers_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('Free, personalized lessons that your students')
+        response.mustcontain('personalized lessons that your students')
 
     def test_volunteers_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
