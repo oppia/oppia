@@ -191,10 +191,8 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         all_ids = [
             model.create('user_id', 'thread_id').reply_to_id
             for _ in xrange(100)]
-        for current_id in all_ids:
-            other_ids = copy.copy(all_ids)
-            other_ids.remove(current_id)
-            assert current_id not in other_ids
+        set_ids = set(all_ids) #Set contains unique values
+        self.assertEqual(len(all_ids), len(set_ids))
 
     def test_create_raises_when_duplicate_ids(self):
         with self.generate_constant_id_ctx, self.assertRaises(Exception):
