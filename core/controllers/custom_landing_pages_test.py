@@ -48,24 +48,22 @@ class StewardsLandingPageTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain(
-            'Contact us to arrange a pilot with your students')
+        response.mustcontain('oppia-stewards-landing-section')
 
     def test_parents_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('effective lessons you can use at home')
-
+        response.mustcontain('oppia-stewards-landing-section')
 
     def test_teachers_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('personalized lessons that your students')
+        response.mustcontain('oppia-stewards-landing-section')
 
     def test_volunteers_landing_page(self):
         response = self.testapp.get(feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('Help improve access to high-quality education')
+        response.mustcontain('oppia-stewards-landing-section')
