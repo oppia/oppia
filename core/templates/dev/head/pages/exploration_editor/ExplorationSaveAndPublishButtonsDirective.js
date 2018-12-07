@@ -98,12 +98,16 @@ oppia.directive('explorationSaveAndPublishButtons', [
           $scope.showPublishExplorationModal = function() {
             if ($scope.isExplorationLockedForEditing() ||
               $scope.countWarnings()) {
-              ExplorationSaveService.showInfoModal(
-                $scope.getPublishExplorationButtonTooltip());
+              var info = {
+                infoMessage: $scope.getPublishExplorationButtonTooltip(),
+                warningCount: $scope.countWarnings(),
+                saveChanges: $scope.saveChanges
+              };
+
+              ExplorationSaveService.showInfoModal(info);
             } else {
               $scope.publishIsInProcess = true;
               $scope.loadingDotsAreShown = true;
-
               ExplorationSaveService.showPublishExplorationModal(
                 showLoadingDots, hideLoadingDots)
                 .then(function() {
@@ -113,7 +117,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
             }
           };
 
-          $scope.saveChanges = function() {
+          $scope.saveChanges = function(publishAfterSave) {
             $scope.saveIsInProcess = true;
             $scope.loadingDotsAreShown = true;
 
@@ -121,6 +125,9 @@ oppia.directive('explorationSaveAndPublishButtons', [
               .then(function() {
                 $scope.saveIsInProcess = false;
                 $scope.loadingDotsAreShown = false;
+                if (publishAfterSave) {
+                  $scope.showPublishExplorationModal();
+                }
               });
           };
         }

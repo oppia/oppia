@@ -266,7 +266,7 @@ oppia.factory('ExplorationSaveService', [
         });
       },
 
-      showInfoModal: function(infoMessage) {
+      showInfoModal: function(info) {
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
@@ -275,7 +275,13 @@ oppia.factory('ExplorationSaveService', [
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
-              $scope.info = infoMessage;
+              $scope.infoMessage = info.infoMessage;
+              $scope.warningCount = info.warningCount;
+
+              $scope.saveDraft = function() {
+                $uibModalInstance.dismiss();
+                info.saveChanges(true);
+              };
 
               $scope.cancel = function() {
                 $uibModalInstance.dismiss();
