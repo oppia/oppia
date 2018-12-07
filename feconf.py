@@ -393,9 +393,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
 
-# No. of questions to be displayed on a page in the topic editor.
-NUM_QUESTIONS_PER_PAGE = 10
-
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
 
@@ -921,6 +918,7 @@ THANKS_PAGE_DESCRIPTION = (
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'

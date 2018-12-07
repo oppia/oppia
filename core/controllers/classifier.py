@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import email_manager
 import feconf
 
 
@@ -123,6 +124,9 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
+            # Send email to admin and admin-specified email recipients.
+            # Other email recipients are specified on admin config page.
+            email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:

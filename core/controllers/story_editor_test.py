@@ -22,11 +22,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
+class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseStoryEditorControllerTest, self).setUp()
+        super(BaseStoryEditorControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -45,7 +45,7 @@ class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
             [self.story_id], [], [], [], 1)
 
 
-class StoryEditorTest(BaseStoryEditorControllerTest):
+class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""

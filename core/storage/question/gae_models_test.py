@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.question.gae_models."""
+
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
