@@ -53,7 +53,7 @@
   <div>
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
-    <attribution-guide ng-if="!iframed"></attribution-guide>
+    <attribution-guide></attribution-guide>
   </div>
   <style>
     .oppia-exploration-h1 {
@@ -75,7 +75,7 @@
 {% endblock %}
 
 {% block footer %}
-  <exploration-footer ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
 {% endblock %}
 
 {% block footer_js %}
