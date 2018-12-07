@@ -1476,7 +1476,7 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 
-.oppia-rte > p {
+.oppia-rte > p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
 }
