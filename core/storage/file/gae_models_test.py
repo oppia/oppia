@@ -118,6 +118,24 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 class FileModelTest(test_utils.GenericTestBase):
     """Tests the FileModel class."""
 
+    def test_reconstitute(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file.png')
+        self.assertEqual(file_model.content, None)
+        file_model._reconstitute( # pylint: disable=protected-access
+            'file_content')
+        self.assertEqual(file_model.content, 'file_content')
+
+    def test_compute_snapshot(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file.png')
+        self.assertEqual(
+            file_model._compute_snapshot(), None) # pylint: disable=protected-access
+        file_model._reconstitute( # pylint: disable=protected-access
+            'file_content')
+        self.assertEqual(
+            file_model._compute_snapshot(), 'file_content') # pylint: disable=protected-access
+
     def test_get_new_id(self):
         with self.assertRaises(NotImplementedError):
             file_models.FileModel.get_new_id('entity1')
@@ -156,6 +174,14 @@ class FileModelTest(test_utils.GenericTestBase):
             actual_model = file_models.FileModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
+    def test_commit(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file1.png')
+        self.assertEqual(file_model.version, 0)
+
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        self.assertEqual(file_model.version, 1)
+
     def test_get_version(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
@@ -169,11 +195,3 @@ class FileModelTest(test_utils.GenericTestBase):
         actual_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
         self.assertEqual(file_model.key, actual_model.key)
-
-    def test_commit(self):
-        file_model = file_models.FileModel.create(
-            'exp_id1', 'path/to/file1.png')
-        self.assertEqual(file_model.version, 0)
-
-        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        self.assertEqual(file_model.version, 1)
