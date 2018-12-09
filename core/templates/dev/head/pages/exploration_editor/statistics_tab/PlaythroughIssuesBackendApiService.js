@@ -95,7 +95,8 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
         } else {
           return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST).then(
             function(response) {
-              whitelistCache = response.data;
+              whitelistCache =
+                response.data['whitelisted_exploration_ids_for_playthroughs'];
               return whitelistCache;
             });
         }
