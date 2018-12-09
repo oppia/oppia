@@ -20,15 +20,15 @@ oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 
 oppia.constant(
+  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
+  '/playthroughdatahandler/whitelist');
+
+oppia.constant(
   'FETCH_PLAYTHROUGH_URL',
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
 oppia.constant(
   'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
-
-oppia.constant(
-  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
-  '/playthroughdatahandler/whitelist');
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
   '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
