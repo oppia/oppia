@@ -629,7 +629,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.FetchPlaythroughHandler),
     get_redirect_route(
         r'/playthroughdatahandler/whitelist',
-        editor.FetchPlaythroughWhitelistHandler)
+        editor.FetchPlaythroughWhitelistHandler),
 
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
