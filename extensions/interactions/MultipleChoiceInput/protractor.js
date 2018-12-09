@@ -25,9 +25,9 @@ var objects = require('../../objects/protractor.js');
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
 var customizeInteraction = function(
-    elem, richTextInstructionsArray, shuffleChoicesEnabled) {
+    elem, richTextInstructionsArray, showChoicesInShuffledOrder) {
   objects.BooleanEditor(elem.element(by.tagName('schema-based-bool-editor')))
-    .setValue(shuffleChoicesEnabled);
+    .setValue(showChoicesInShuffledOrder);
   forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
@@ -65,7 +65,8 @@ var testSuite = [{
       editor.appendBoldText('right');
     }, function(editor) {
       editor.appendItalicText('wrong');
-    }], false],
+    }
+  ], false],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('right');

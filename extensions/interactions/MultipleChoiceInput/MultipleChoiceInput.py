@@ -58,7 +58,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         },
         'default_value': [''],
     }, {
-        'name': 'shuffleChoicesEnabled',
+        'name': 'showChoicesInShuffledOrder',
         'description': 'Shuffle answer choices',
         'schema': {
             'type': 'bool',

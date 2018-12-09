@@ -3820,7 +3820,7 @@ states:
           value:
           - <p>This is </p>value1 <br>for MultipleChoice
           - This is value2<span> for <br>MultipleChoice</span>
-        shuffleChoicesEnabled:
+        showChoicesInShuffledOrder:
           value: true
       default_outcome:
         dest: state2
@@ -4025,7 +4025,7 @@ states:
           value:
           - <p>This is </p><p>value1 <br>for MultipleChoice</p>
           - <p>This is value2 for <br>MultipleChoice</p>
-        shuffleChoicesEnabled:
+        showChoicesInShuffledOrder:
           value: true
       default_outcome:
         dest: state2
