@@ -31,17 +31,17 @@ class RegistryUnitTest(test_utils.GenericTestBase):
     def test_import_models_activity(self):
         """Tests import_models function with activity option."""
         from core.storage.activity import gae_models as activity_models
-        expected_activity_model = (activity_models,)
+        expected_activity_models = (activity_models,)
         self.assertEqual(
-            expected_activity_model,
+            expected_activity_models,
             self.registry_instance.import_models([models.NAMES.activity]))
 
     def test_import_models_audit(self):
         """Tests import_models function with audit option."""
         from core.storage.audit import gae_models as audit_models
-        expected_audit_model = (audit_models,)
+        expected_audit_models = (audit_models,)
         self.assertEqual(
-            expected_audit_model,
+            expected_audit_models,
             self.registry_instance.import_models([models.NAMES.audit]))
 
     def test_import_models_base_model(self):
@@ -143,7 +143,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_statistics(self):
         """Tests import_models function with statistics option."""
-        from core.storage.statistics import gae_models as statistics_models # pylint: disable=line-too-long
+        from core.storage.statistics import gae_models as statistics_models
         expected_statistics_models = (statistics_models,)
         self.assertEqual(
             expected_statistics_models,
@@ -233,21 +233,25 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         """Tests import email services method for when email service provider is
         mailgun.
         """
-        feconf.EMAIL_SERVICE_PROVIDER = feconf.EMAIL_SERVICE_PROVIDER_MAILGUN
-        from core.platform.email import mailgun_email_services
-        self.assertEqual(
-            mailgun_email_services,
-            self.registry_instance.import_email_services())
+        with self.swap(
+            feconf, 'EMAIL_SERVICE_PROVIDER',
+            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+            from core.platform.email import mailgun_email_services
+            self.assertEqual(
+                mailgun_email_services,
+                self.registry_instance.import_email_services())
 
     def test_import_email_services_invalid(self):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        feconf.EMAIL_SERVICE_PROVIDER = 'invalid service provider'
-        with self.assertRaisesRegexp(
-            Exception,
-            'Invalid email service provider: invalid service provider'):
-            self.registry_instance.import_email_services()
+        with self.swap(
+            feconf, 'EMAIL_SERVICE_PROVIDER',
+            'invalid service provider'):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid email service provider: invalid service provider'):
+                self.registry_instance.import_email_services()
 
     def test_import_memcache_services(self):
         """Tests import memcache services function."""
