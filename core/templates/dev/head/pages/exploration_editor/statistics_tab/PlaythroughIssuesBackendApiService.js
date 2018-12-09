@@ -93,12 +93,11 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
         if (whitelistCache !== null) {
           return Promise.resolve(whitelistCache);
         } else {
-          return $http.get(
-            FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST
-          ).then(function(response) {
-            whitelistCache = response.data;
-            return whitelistCache;
-          });
+          return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST).then(
+            function(response) {
+              whitelistCache = response.data;
+              return whitelistCache;
+            });
         }
       },
     };
