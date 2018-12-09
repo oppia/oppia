@@ -219,10 +219,9 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'user_id', 'thread_id', strict=False)
-        print(result.key)
-        print(type((result.key)))
+        
         self.assertNotEqual(result, None)
-        self.assertIn("user_id.thread_id", str(result.key))
+        self.assertIn('user_id.thread_id', str(result.key))
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
