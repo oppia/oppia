@@ -33,8 +33,8 @@ oppia.directive('explorationFooter', [
             $scope, $http, $log, ContextService,
             ExplorationSummaryBackendApiService, WindowDimensionsService) {
           $scope.explorationId = ContextService.getExplorationId();
-
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.iframed = GLOBALS.iframed;
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           WindowDimensionsService.registerOnResizeHook(function() {
