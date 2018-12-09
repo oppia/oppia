@@ -721,7 +721,7 @@ class FetchPlaythroughWhitelistHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_play_exploration
     def get(self):
         self.render_json({
             'whitelisted_exploration_ids_for_playthroughs':
