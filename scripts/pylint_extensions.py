@@ -725,6 +725,40 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
                 pass
 
 
+class BackslashContinuationChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that backslash is not used
+    for continuation.
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'backslash-continuation'
+    priority = -1
+    msgs = {
+        'C0004': (
+            (
+                'Backslash should not be used to break continuation lines. '
+                'Use braces to break long lines.'),
+            'backslash-continuation',
+            'Use braces to break long lines instead of backslash.'
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        file_content = node.stream().readlines()
+        file_length = len(file_content)
+
+        for line_num in xrange(file_length):
+            line = file_content[line_num]
+            if line.rstrip('\r\n').endswith('\\'):
+                self.add_message(
+                    'backslash-continuation', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -735,3 +769,4 @@ def register(linter):
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
+    linter.register_checker(BackslashContinuationChecker(linter))
