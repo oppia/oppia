@@ -17,12 +17,12 @@
  */
 
 oppia.factory('PlaythroughIssuesService', [
-  '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$sce', 'PlaythroughIssuesBackendApiService',
+  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   function(
-      $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+      $sce, PlaythroughIssuesBackendApiService,
+      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
     var issues = null;
     var explorationId = null;
@@ -81,24 +81,27 @@ oppia.factory('PlaythroughIssuesService', [
 
     return {
       initSession: function(
-          newExplorationId, newExplorationVersion,
-          newWhitelistedExplorationIds) {
+          newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        whitelistedExplorationIds = newWhitelistedExplorationIds;
+        PlaythroughIssuesBackendApiService
+          .fetchWhitelistedExplorationsForPlaythroughs().then(
+            function(newWhitelistedExplorationIds) {
+              whitelistedExplorationIds = newWhitelistedExplorationIds;
+            });
       },
       isExplorationWhitelisted: function(explorationId) {
         return whitelistedExplorationIds !== null &&
           whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
       getIssues: function() {
-        return IssuesBackendApiService.fetchIssues(
+        return PlaythroughIssuesBackendApiService.fetchIssues(
           explorationId, explorationVersion).then(function(issues) {
           return issues;
         });
       },
       getPlaythrough: function(playthroughId) {
-        return IssuesBackendApiService.fetchPlaythrough(
+        return PlaythroughIssuesBackendApiService.fetchPlaythrough(
           explorationId, playthroughId).then(function(playthrough) {
           return playthrough;
         });
@@ -127,7 +130,7 @@ oppia.factory('PlaythroughIssuesService', [
         }
       },
       resolveIssue: function(issue) {
-        IssuesBackendApiService.resolveIssue(
+        PlaythroughIssuesBackendApiService.resolveIssue(
           issue, explorationId, explorationVersion);
       }
     };
