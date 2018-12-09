@@ -2,14 +2,14 @@
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the 'License');
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS-IS' BASIS,
+# distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -25,9 +25,7 @@ import feconf
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
-
     """Test the SentEmailModel class."""
-
 
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
@@ -63,8 +61,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'recipient_id', 'Other Email Subject', 'Other Email Body')
 
         self.assertEqual(not_duplicated, False)
-
-
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -155,8 +151,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
 
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
-
-
     """Test the GeneralFeedbackEmailReplyToIdModel class."""
 
     def setUp(self):
@@ -183,7 +177,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created = model.create('other_user_id', 'other_thread_id')
         self.assertNotEqual(created.id, 'user_id.thread_id')
 
-    def test_unique_reply_id_is_unique(self):
+    def test_generated_reply_to_id_is_unique(self):
         # Name is too long for linter.
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
@@ -225,8 +219,10 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'user_id', 'thread_id', strict=False)
-
-        self.assertNotEqual(result, 1)
+        print(result.key)
+        print(type((result.key)))
+        self.assertNotEqual(result, None)
+        self.assertIn("user_id.thread_id", str(result.key))
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
@@ -247,8 +243,8 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             ['user_id_1', 'user_id_2'], 'thread_id')
 
         self.assertEqual(len(result), 2)
-        assert 'user_id_1' in result.keys()
-        assert 'user_id_2' in result.keys()
+        self.assertIn('user_id_1', result.keys())
+        self.assertIn('user_id_2', result.keys())
 
     def test_user_id(self):
         result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
