@@ -174,7 +174,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 email_models.GeneralFeedbackEmailReplyToIdModel))
 
     def test_id_generation_works_correctly(self):
-        #Name is too long for linter.
+        # Name is too long for linter.
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created = model.create('user_id', 'thread_id')
@@ -184,7 +184,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(created.id, 'user_id.thread_id')
 
     def test_unique_reply_id_is_unique(self):
-        #Name is too long for linter.
+        # Name is too long for linter.
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         all_ids = [
@@ -203,7 +203,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             created2.put()
 
     def test_get_by_reply_to_id_works_correctly(self):
-        #Name is too long for linter.
+        # Name is too long for linter.
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created = model.create('user_id', 'thread_id')
@@ -237,7 +237,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 'bad_user_id', 'bad_thread_id') #Should throw
 
     def test_get_multi_by_user_ids_works_correctly(self):
-        #Name is too long for linter.
+        # Name is too long for linter.
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         model.create('user_id_1', 'thread_id')
