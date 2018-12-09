@@ -80,8 +80,7 @@ oppia.factory('PlaythroughIssuesService', [
     };
 
     return {
-      initSession: function(
-          newExplorationId, newExplorationVersion) {
+      initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
 
