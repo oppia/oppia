@@ -149,7 +149,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     sent_datetime_lower_bound='Not a datetime object')
 
 
-
 class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
     """Test the GeneralFeedbackEmailReplyToIdModel class."""
 
