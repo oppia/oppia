@@ -50,9 +50,7 @@ oppia.factory('ExplorationPlayerStateService', [
       PlaythroughService.initSession(
         _explorationId, _version, returnDict.record_playthrough_probability,
         returnDict.whitelisted_exploration_ids_for_playthroughs);
-      PlaythroughIssuesService.initSession(
-        _explorationId, _version,
-        returnDict.whitelisted_exploration_ids_for_playthroughs);
+      PlaythroughIssuesService.initSession(_explorationId, _version);
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
