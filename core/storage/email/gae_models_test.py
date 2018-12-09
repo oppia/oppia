@@ -219,7 +219,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'user_id', 'thread_id', strict=False)
-        
+
         self.assertNotEqual(result, None)
         self.assertIn('user_id.thread_id', str(result.key))
 
