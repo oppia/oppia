@@ -84,6 +84,7 @@ oppia.factory('PlaythroughIssuesService', [
           newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
+
         PlaythroughIssuesBackendApiService
           .fetchWhitelistedExplorationsForPlaythroughs().then(
             function(newWhitelistedExplorationIds) {

@@ -28,7 +28,7 @@ oppia.constant(
 
 oppia.constant(
   'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
-  '/playthroughdatahandler/whitelist')
+  '/playthroughdatahandler/whitelist');
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
   '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
