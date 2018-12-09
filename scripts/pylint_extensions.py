@@ -749,14 +749,12 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = node.stream().readlines()
-        file_length = len(file_content)
-
-        for line_num in xrange(file_length):
-            line = file_content[line_num]
-            if line.rstrip('\r\n').endswith('\\'):
-                self.add_message(
-                    'backslash-continuation', line=line_num + 1)
+        with node.stream() as stream:
+            file_content = stream.readlines()
+            for (line_num, line) in enumerate(file_content):
+                if line.rstrip('\r\n').endswith('\\'):
+                    self.add_message(
+                        'backslash-continuation', line=line_num + 1)
 
 
 def register(linter):
