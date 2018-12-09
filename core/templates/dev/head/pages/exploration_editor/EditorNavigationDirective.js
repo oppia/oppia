@@ -28,7 +28,8 @@ oppia.directive('editorNavigation', [
         'ExplorationRightsService', 'ExplorationWarningsService',
         'RouterService', 'StateEditorTutorialFirstTimeService',
         'SiteAnalyticsService', 'ThreadDataService', 'UserService',
-        'WindowDimensionsService', 'StateTranslationTutorialFirstTimeService',
+        'WindowDimensionsService',
+        'StateTranslationTutorialFirstTimeService',
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
             ExplorationRightsService, ExplorationWarningsService,
