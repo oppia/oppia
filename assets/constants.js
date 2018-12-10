@@ -464,7 +464,7 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_NEW_STRUCTURES": false,
+  "ENABLE_NEW_STRUCTURES": true,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
