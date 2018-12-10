@@ -22,11 +22,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
+class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseCollectionEditorControllerTest, self).setUp()
+        super(BaseCollectionEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -53,11 +53,11 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
         }
 
 
-class CollectionEditorTest(BaseCollectionEditorControllerTest):
+class CollectionEditorTests(BaseCollectionEditorControllerTests):
     COLLECTION_ID = '0'
 
     def setUp(self):
-        super(CollectionEditorTest, self).setUp()
+        super(CollectionEditorTests, self).setUp()
         system_user = user_services.get_system_user()
 
         collection_services.load_demo(self.COLLECTION_ID)

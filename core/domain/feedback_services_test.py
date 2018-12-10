@@ -15,9 +15,10 @@
 """Tests for feedback-related services."""
 import json
 
+from core.domain import email_services
 from core.domain import event_services
 from core.domain import feedback_domain
-from core.domain import feedback_jobs_continuous_test
+from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import user_services
@@ -87,6 +88,28 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
 
 
+class MockFeedbackAnalyticsAggregator(
+        feedback_jobs_continuous.FeedbackAnalyticsAggregator):
+    """A modified FeedbackAnalyticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockFeedbackAnalyticsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockFeedbackAnalyticsMRJobManager(
+        feedback_jobs_continuous.FeedbackAnalyticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockFeedbackAnalyticsAggregator
+
+
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'eid1'
@@ -140,8 +163,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_thread_user_model else [])
 
     def _run_computation(self):
-        (feedback_jobs_continuous_test.ModifiedFeedbackAnalyticsAggregator.
-         start_computation())
+        MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -250,7 +272,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 [self.EXP_ID_1, self.EXP_ID_2])), 1)
 
     def test_get_thread_summaries(self):
-
         feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
@@ -750,24 +771,22 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
             # Check that reply_to id is created for user A.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_a, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_a)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_a, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_a)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'user a message')
             # Check that reply_to id is created for user B.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_b, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_b)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_b, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_b)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):

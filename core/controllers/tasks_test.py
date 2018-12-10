@@ -124,8 +124,8 @@ class TasksTests(test_utils.GenericTestBase):
 
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
-        class FakeActivityRights(object):
 
+        class MockActivityRights(object):
             def __init__(
                     self, exploration_id, owner_ids, editor_ids, translator_ids,
                     viewer_ids, community_owned=False, cloned_from=None,
@@ -146,8 +146,7 @@ class TasksTests(test_utils.GenericTestBase):
                 self.owner_ids = ['121121523518511814218']
 
         email_user_b = self.swap(
-            rights_manager, 'ActivityRights',
-            FakeActivityRights)
+            rights_manager, 'ActivityRights', MockActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {
