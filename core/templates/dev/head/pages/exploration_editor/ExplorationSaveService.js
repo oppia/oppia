@@ -266,32 +266,6 @@ oppia.factory('ExplorationSaveService', [
         });
       },
 
-      showInfoModal: function(info) {
-        var modalInstance = $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'info_modal_directive.html'),
-          backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.infoMessage = info.infoMessage;
-              $scope.warningCount = info.warningCount;
-
-              $scope.saveDraft = function() {
-                $uibModalInstance.dismiss();
-                info.saveChanges(true);
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss();
-              };
-            }
-          ],
-          windowClass: 'oppia-help-modal'
-        });
-      },
-
       showPublishExplorationModal: function(
           onStartLoadingCallback, onEndLoadingCallback) {
         // This is resolved after publishing modals are closed,

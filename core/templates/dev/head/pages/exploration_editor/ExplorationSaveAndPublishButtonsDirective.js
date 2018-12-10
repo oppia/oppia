@@ -96,28 +96,17 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.showPublishExplorationModal = function() {
-            if ($scope.isExplorationLockedForEditing() ||
-              $scope.countWarnings()) {
-              var info = {
-                infoMessage: $scope.getPublishExplorationButtonTooltip(),
-                warningCount: $scope.countWarnings(),
-                saveChanges: $scope.saveChanges
-              };
-
-              ExplorationSaveService.showInfoModal(info);
-            } else {
-              $scope.publishIsInProcess = true;
-              $scope.loadingDotsAreShown = true;
-              ExplorationSaveService.showPublishExplorationModal(
-                showLoadingDots, hideLoadingDots)
-                .then(function() {
-                  $scope.publishIsInProcess = false;
-                  $scope.loadingDotsAreShown = false;
-                });
-            }
+            $scope.publishIsInProcess = true;
+            $scope.loadingDotsAreShown = true;
+            ExplorationSaveService.showPublishExplorationModal(
+              showLoadingDots, hideLoadingDots)
+              .then(function() {
+                $scope.publishIsInProcess = false;
+                $scope.loadingDotsAreShown = false;
+              });
           };
 
-          $scope.saveChanges = function(publishAfterSave) {
+          $scope.saveChanges = function() {
             $scope.saveIsInProcess = true;
             $scope.loadingDotsAreShown = true;
 
@@ -125,10 +114,14 @@ oppia.directive('explorationSaveAndPublishButtons', [
               .then(function() {
                 $scope.saveIsInProcess = false;
                 $scope.loadingDotsAreShown = false;
-                if (publishAfterSave) {
-                  $scope.showPublishExplorationModal();
-                }
               });
+          };
+
+          $scope.showTooltip = function() {
+            if ($scope.isExplorationLockedForEditing() ||
+              $scope.countWarnings() || !$scope.isExplorationSaveable()) {
+              $('.div-disable').tooltip('show');
+            }
           };
         }
       ]

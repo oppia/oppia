@@ -1,10 +1,13 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
   <li ng-if="showPublishButton()">
     <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
-         title="<[getPublishExplorationButtonTooltip()]>">
+         uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
+         tooltip-placement="bottom"
+         ng-class="{'div-disable': isExplorationLockedForEditing() || countWarnings()}" ng-click="showTooltip()">
       <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
-              ng-click="showPublishExplorationModal()">
+              ng-click="showPublishExplorationModal()"
+              ng-disabled="isExplorationLockedForEditing() || countWarnings()">
         <span ng-if="!publishIsInProcess">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
@@ -28,7 +31,10 @@
 
   <li ng-if="isEditableOutsideTutorialMode()">
     <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
-         title="<[getSaveButtonTooltip()]>">
+         uib-tooltip="<[getSaveButtonTooltip()]>"
+         tooltip-placement="bottom"
+         ng-class="{'div-disable': !isExplorationSaveable()}"
+         ng-click="showTooltip()">
       <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
         <span ng-if="!saveIsInProcess">
           <span ng-if="isPrivate()">
@@ -68,3 +74,9 @@
     </div>
   </li>
 </ul>
+
+<style>
+  .div-disable {
+    cursor: default;
+  }
+</style>
