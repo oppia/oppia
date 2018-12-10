@@ -112,8 +112,17 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
+        associated_skill_ids = [link.skill_id for link in (
+            question_services.get_question_skill_links_of_question(
+                question_id))]
+        associated_skills = skill_services.get_multi_skills(
+            associated_skill_ids)
+        associated_skill_dicts = [
+            skill.to_dict() for skill in associated_skills]
+
         self.values.update({
-            'question_dict': question.to_dict()
+            'question_dict': question.to_dict(),
+            'associated_skill_dicts': associated_skill_dicts
         })
         self.render_json(self.values)
 
@@ -154,7 +163,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         question_dict = question_services.get_question_by_id(
             question_id).to_dict()
-        return self.render_json({
+        self.render_json({
             'question_dict': question_dict
         })
 

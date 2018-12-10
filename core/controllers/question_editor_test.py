@@ -216,6 +216,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
+    def setUp(self):
+        """Completes the setup for QuestionSkillLinkHandlerTest."""
+        super(EditableQuestionDataHandlerTest, self).setUp()
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, 'Skill Description')
+        question_services.create_new_question_skill_link(
+            self.question_id, self.skill_id)
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
@@ -239,6 +247,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.assertEqual(
                 response_dict['question_dict']['question_state_data'],
                 self.question.question_state_data.to_dict())
+            self.assertEqual(
+                len(response_dict['associated_skill_dicts']), 1)
+            self.assertEqual(
+                response_dict['associated_skill_dicts'][0]['id'],
+                self.skill_id)
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -251,6 +264,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.assertEqual(
                 response_dict['question_dict']['question_state_data'],
                 self.question.question_state_data.to_dict())
+            self.assertEqual(
+                len(response_dict['associated_skill_dicts']), 1)
+            self.assertEqual(
+                response_dict['associated_skill_dicts'][0]['id'],
+                self.skill_id)
             self.logout()
 
             # Check that question creator can view the data.
@@ -264,6 +282,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.assertEqual(
                 response_dict['question_dict']['question_state_data'],
                 self.question.question_state_data.to_dict())
+            self.assertEqual(
+                len(response_dict['associated_skill_dicts']), 1)
+            self.assertEqual(
+                response_dict['associated_skill_dicts'][0]['id'],
+                self.skill_id)
             self.logout()
 
     def test_delete(self):
