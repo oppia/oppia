@@ -98,6 +98,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           $scope.showPublishExplorationModal = function() {
             $scope.publishIsInProcess = true;
             $scope.loadingDotsAreShown = true;
+
             ExplorationSaveService.showPublishExplorationModal(
               showLoadingDots, hideLoadingDots)
               .then(function() {
