@@ -20,8 +20,9 @@
         </th>
       </tr>
       <tr ng-repeat="question in questionSummaries"
-          class="list-item">
-        <td> <[getQuestionIndex($index)]> </td>
+          class="list-item"
+          ng-click="editQuestion(question)">
+        <td><[getQuestionIndex($index)]></td>
         <td>
           <a class="list-summary">
             <angular-html-bind html-data="question.question_content"></angular-html-bind>
@@ -73,10 +74,32 @@
   </div>
 </md-card>
 
+<div ng-if="questionEditorIsShown">
+  <div style="padding-left: 45%;">
+    <button type="button"
+            class="btn btn-success oppia-editor-publish-button"
+            ng-click="saveQuestion()"
+            ng-disabled="!hasChanges()">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingSaved">Saving...</span>
+      <span class="oppia-save-publish-button-label" ng-if="!questionIsBeingUpdated && !questionIsBeingSaved">Save and Publish Question</span>
+      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingUpdated && !questionIsBeingSaved">Save Changes</span>
+    </button>
+  </div>
+  <question-editor question-id="questionId"
+                   misconceptions="misconceptions"
+                   question="question"
+                   can-edit-question="canEditQuestion">
+  </question-editor>
+</div>
+
 <div ng-if="activeQuestion">
   <question-editor question-id="activeQuestion.getId()"
                    misconceptions="emptyMisconceptionsList"
-                   question-state-data="activeQuestion.getStateData()"
+                   question="activeQuestion"
                    can-edit-question="false">
   </question-editor>
 

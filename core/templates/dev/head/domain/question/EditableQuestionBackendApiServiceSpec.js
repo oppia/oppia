@@ -74,7 +74,8 @@ describe('Editable question backend API service', function() {
         },
         language_code: 'en',
         version: 1
-      }
+      },
+      associated_skill_dicts: []
     };
   }));
 
@@ -95,7 +96,7 @@ describe('Editable question backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.question_dict);
+        sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -126,11 +127,10 @@ describe('Editable question backend API service', function() {
         sampleDataResults);
 
       EditableQuestionBackendApiService.fetchQuestion('0').then(
-        function(questionDict) {
-          question = questionDict;
+        function(data) {
+          question = data.question_dict;
         });
       $httpBackend.flush();
-
       question.question_state_data.content.html = 'New Question Content';
       question.version = '2';
       var questionWrapper = {

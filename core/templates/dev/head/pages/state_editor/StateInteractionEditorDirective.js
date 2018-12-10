@@ -98,10 +98,23 @@ oppia.directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
+          var _updateInteractionPreviewAndAnswerChoices = function() {
+            $scope.interactionId = StateInteractionIdService.savedMemento;
+
+            var currentCustomizationArgs =
+              StateCustomizationArgsService.savedMemento;
+            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
+              currentCustomizationArgs);
+
+            $rootScope.$broadcast(
+              'updateAnswerChoices',
+              StateEditorService.getAnswerChoices(
+                $scope.interactionId, currentCustomizationArgs));
+          };
+
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
-
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
               answerGroups: stateData.interaction.answerGroups,
@@ -113,6 +126,8 @@ oppia.directive('stateInteractionEditor', [
             _updateInteractionPreviewAndAnswerChoices();
             $scope.hasLoaded = true;
           });
+
+          $rootScope.$broadcast('interactionEditorInitialized');
 
           // If a terminal interaction is selected for a state with no content,
           // this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
@@ -408,20 +423,6 @@ oppia.directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             });
-          };
-
-          var _updateInteractionPreviewAndAnswerChoices = function() {
-            $scope.interactionId = StateInteractionIdService.savedMemento;
-
-            var currentCustomizationArgs =
-              StateCustomizationArgsService.savedMemento;
-            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
-              currentCustomizationArgs);
-
-            $rootScope.$broadcast(
-              'updateAnswerChoices',
-              StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
           };
         }
       ]
