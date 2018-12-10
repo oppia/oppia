@@ -33,6 +33,15 @@ oppia.directive('explorationSaveAndPublishButtons', [
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
+          $scope.isSaveDropdownOpen = false;
+
+          $scope.$watch(function() {
+            if ($('.save-div').hasClass('open')) {
+              $scope.isSaveDropdownOpen = true;
+            } else {
+              $scope.isSaveDropdownOpen = false;
+            }
+          });
 
           $scope.showPublishButton = function() {
             return GLOBALS.can_publish && ExplorationRightsService.isPrivate();
