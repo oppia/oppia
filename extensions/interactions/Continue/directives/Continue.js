@@ -40,8 +40,7 @@ oppia.directive('oppiaInteractiveContinue', [
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
 
-          $scope.isInEditorMode = (
-            ContextService.isInExplorationEditorMode());
+          $scope.isInEditorMode = ContextService.isInExplorationEditorMode();
 
           $scope.submitAnswer = function() {
             // We used to show "(Continue)" to indicate a 'continue' action when
