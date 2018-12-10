@@ -118,10 +118,11 @@ oppia.directive('explorationSaveAndPublishButtons', [
               });
           };
 
-          $scope.showTooltip = function() {
-            if ($scope.isExplorationLockedForEditing() ||
+          $scope.showTooltipForDisabledButtons = function(buttonClass) {
+            if (
+              $scope.isExplorationLockedForEditing() ||
               $scope.countWarnings() || !$scope.isExplorationSaveable()) {
-              $('.div-disable').tooltip('show');
+              $(buttonClass).tooltip('show');
             }
           };
         }
