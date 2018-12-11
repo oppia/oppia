@@ -216,7 +216,7 @@ oppia.factory('PlaythroughService', [
     var isPlaythroughDiscarded = function() {
       return isLearnerExcludedFromSamplePopulation() ||
         !PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
-          playthrough.expId)());
+          playthrough.expId);
     };
 
     return {
