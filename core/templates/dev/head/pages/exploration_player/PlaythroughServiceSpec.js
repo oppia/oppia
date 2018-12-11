@@ -252,7 +252,7 @@ describe('Playthrough service', function() {
   describe('Test whitelisting functions', function() {
     it('should not record learner actions for blacklisted exps', function() {
       this.PlaythroughIssuesService.initSession(
-        this.whitelistedExpId, this.expVersion, [this.whitelistedExpId]);
+        this.blacklistedExpId, this.expVersion, [this.whitelistedExpId]);
       this.PlaythroughService.initSession(
         this.blacklistedExpId, this.expVersion, 1.0);
 
