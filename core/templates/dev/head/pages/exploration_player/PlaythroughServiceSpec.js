@@ -27,14 +27,12 @@ describe('Playthrough service', function() {
     this.whitelistedExpId = 'expId1';
     this.blacklistedExpId = 'expId2';
     this.expVersion = 1;
-
-    var whitelistedExpIds = [this.whitelistedExpId];
-    this.PlaythroughIssuesService.initSession(
-      this.whitelistedExpId, this.expVersion, whitelistedExpIds);
   }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(function() {
+      this.PlaythroughIssuesService.initSession(
+        this.whitelistedExpId, this.expVersion, [this.whitelistedExpId]);
       this.PlaythroughService.initSession(
         this.whitelistedExpId, this.expVersion, 1.0);
     });
@@ -253,7 +251,8 @@ describe('Playthrough service', function() {
 
   describe('Test whitelisting functions', function() {
     it('should not record learner actions for blacklisted exps', function() {
-      notWhitelistedExpId = "expId1";
+      this.PlaythroughIssuesService.initSession(
+        this.whitelistedExpId, this.expVersion, [this.whitelistedExpId]);
       this.PlaythroughService.initSession(
         this.blacklistedExpId, this.expVersion, 1.0);
 
