@@ -90,8 +90,8 @@ oppia.factory('PlaythroughIssuesService', [
         } else {
           PlaythroughIssuesBackendApiService
             .fetchWhitelistedExplorationsForPlaythroughs().then(
-              function(whitelist) {
-                whitelistedExplorationIds = whitelist;
+              function(newWhitelistedExplorationIds) {
+                whitelistedExplorationIds = newWhitelistedExplorationIds;
               });
         }
       },
