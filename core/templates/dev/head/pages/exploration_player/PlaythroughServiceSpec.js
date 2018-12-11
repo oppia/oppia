@@ -19,28 +19,30 @@
 describe('Playthrough service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    this.expId = 'expId1';
-    this.expVersion = 1;
     this.PlaythroughService = $injector.get('PlaythroughService');
     this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
     this.LearnerActionObjectFactory =
       $injector.get('LearnerActionObjectFactory');
 
-    this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
+    this.whitelistedExpId = 'expId1';
+    this.blacklistedExpId = 'expId2';
+    this.expVersion = 1;
+
+    var whitelistedExpIds = [this.whitelistedExpId];
+    this.PlaythroughIssuesService.initSession(
+      this.whitelistedExpId, this.expVersion, whitelistedExpIds);
   }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(function() {
-      spyOn(
-        this.PlaythroughIssuesService,
-        'isExplorationEligibleForPlaythroughIssues'
-      ).and.returnValue(true);
+      this.PlaythroughService.initSession(
+        this.whitelistedExpId, this.expVersion, 1.0);
     });
 
     it('should initialize a session with correct values.', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
-      expect(playthrough.expId, this.expId);
+      expect(playthrough.whitelistedExpId, this.whitelistedExpId);
       expect(playthrough.expVersion, this.expVersion);
     });
 
@@ -251,11 +253,9 @@ describe('Playthrough service', function() {
 
   describe('Test whitelisting functions', function() {
     it('should not record learner actions for blacklisted exps', function() {
-      spyOn(
-        this.PlaythroughIssuesService,
-        'isExplorationEligibleForPlaythroughIssues'
-      ).and.returnValue(false);
-      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
+      notWhitelistedExpId = "expId1";
+      this.PlaythroughService.initSession(
+        this.blacklistedExpId, this.expVersion, 1.0);
 
       this.PlaythroughService.recordExplorationStartAction('initStateName1');
       var playthrough = this.PlaythroughService.getPlaythrough();
