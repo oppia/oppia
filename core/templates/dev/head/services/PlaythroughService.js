@@ -221,11 +221,9 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(
-          explorationId, explorationVersion, playthroughProbability,
-          whitelistedExplorationIds) {
+          explorationId, explorationVersion, playthroughProbability) {
         isLearnerInSamplePopulation = _determineIfLearnerIsInSamplePopulation(
           playthroughProbability);
-        whitelistedExpIds = whitelistedExplorationIds;
         playthrough = PlaythroughObjectFactory.createNew(
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
