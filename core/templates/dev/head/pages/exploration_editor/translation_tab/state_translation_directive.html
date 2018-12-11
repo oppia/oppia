@@ -208,6 +208,17 @@
     border-bottom: 2px solid #eee;
     min-height: 400px;
   }
+  .translation-state-content.ng-enter {
+    -moz-transition: min-height 1s;
+    min-height: 999px;
+    -o-transition: min-height 1s;
+    overflow: hidden;
+    transition: min-height 1s;
+    -webkit-transition: min-height 1s;
+  }
+  .translation-state-content.ng-enter.ng-enter-active {
+    min-height: 400px;
+  }
   .translation-state-content {
     margin: auto;
     padding: 20px 30px 20px 30px;
