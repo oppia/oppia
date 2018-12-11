@@ -109,9 +109,9 @@ oppia.factory('PlaythroughService', [
           // Cycle identified.
           var cycleStartIndex = visitedStates.indexOf(destStateName);
           visitedStates.push(destStateName);
-          var cycleString =
-            visitedStates.slice(
-              cycleStartIndex, visitedStates.length).toString();
+          var cycleString = visitedStates.slice(
+            cycleStartIndex, visitedStates.length
+          ).toString();
           if (cycleIdentifier.cycle === cycleString) {
             cycleIdentifier.num_cycles += 1;
           } else {
