@@ -30,6 +30,13 @@ describe('Playthrough service', function() {
   }));
 
   describe('Test playthrough service functions', function() {
+    beforeEach(function() {
+      spyOn(
+        this.PlaythroughIssuesService,
+        'isExplorationEligibleForPlaythroughIssues'
+      ).and.returnValue(true);
+    });
+
     it('should initialize a session with correct values.', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
