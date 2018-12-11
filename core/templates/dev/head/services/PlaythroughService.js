@@ -203,10 +203,9 @@ oppia.factory('PlaythroughService', [
     };
 
     var getFullPlaythroughUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
-        STORE_PLAYTHROUGH_URL, {
-          exploration_id: playthrough.expId
-        });
+      return UrlInterpolationService.interpolateUrl(STORE_PLAYTHROUGH_URL, {
+        exploration_id: playthrough.expId
+      });
     };
 
     var isPlaythroughDiscarded = function() {
