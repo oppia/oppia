@@ -154,20 +154,14 @@ oppia.factory('PlaythroughService', [
             value: multipleIncorrectStateName.num_times_incorrect
           }
         };
-        return;
-      }
-
-      if (isCyclicStateTransitionsIssue()) {
+      } else if (isCyclicStateTransitionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
           state_names: {
             value: cycleIdentifier.cycle.split(',')
           }
         };
-        return;
-      }
-
-      if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
+      } else if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
         playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
         playthrough.issueCustomizationArgs = {
           state_name: {
@@ -180,7 +174,6 @@ oppia.factory('PlaythroughService', [
             value: timeSpentInExpInSecs
           }
         };
-        return;
       }
     };
 
