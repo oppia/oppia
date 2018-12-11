@@ -42,7 +42,7 @@ oppia.factory('PlaythroughService', [
       PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
-    var isPlayerInSamplePopulation = null;
+    var isLearnerInSamplePopulation = null;
 
     var multipleIncorrectStateName = {};
 
@@ -63,7 +63,7 @@ oppia.factory('PlaythroughService', [
       playthrough.actions.push(quitAction);
     };
 
-    var _determineIfPlayerIsInSamplePopulation = function(probability) {
+    var _determineIfLearnerIsInSamplePopulation = function(probability) {
       return Math.random() < probability;
     };
 
@@ -209,12 +209,12 @@ oppia.factory('PlaythroughService', [
         });
     };
 
-    var isPlayerExcludedFromSamplePopulation = function() {
-      return !isPlayerInSamplePopulation;
+    var isLearnerExcludedFromSamplePopulation = function() {
+      return !isLearnerInSamplePopulation;
     };
 
     var isPlaythroughDiscarded = function() {
-      return isPlayerExcludedFromSamplePopulation() ||
+      return isLearnerExcludedFromSamplePopulation() ||
         !PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
           playthrough.expId)());
     };
@@ -223,7 +223,7 @@ oppia.factory('PlaythroughService', [
       initSession: function(
           explorationId, explorationVersion, playthroughProbability,
           whitelistedExplorationIds) {
-        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
+        isLearnerInSamplePopulation = _determineIfLearnerIsInSamplePopulation(
           playthroughProbability);
         whitelistedExpIds = whitelistedExplorationIds;
         playthrough = PlaythroughObjectFactory.createNew(
