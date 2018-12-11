@@ -20,7 +20,7 @@
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
   'ContextService', 'UrlService', 'StateClassifierMappingService',
-  'StatsReportingService', 'PlaythroughService',
+  'StatsReportingService', 'PlaythroughService', 'PlaythroughIssuesService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
   'EditableExplorationBackendApiService', 'PlayerPositionService',
   'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
@@ -28,7 +28,7 @@ oppia.factory('ExplorationPlayerStateService', [
   function(
       $log, $q, ExplorationEngineService, PretestEngineService,
       ContextService, UrlService, StateClassifierMappingService,
-      StatsReportingService, PlaythroughService,
+      StatsReportingService, PlaythroughService, PlaythroughIssuesService,
       PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
       EditableExplorationBackendApiService, PlayerPositionService,
       ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,

@@ -28,6 +28,7 @@ oppia.factory('PlaythroughIssuesService', [
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
+    var whitelistedExplorationIds = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
