@@ -864,7 +864,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers."""
         try:
