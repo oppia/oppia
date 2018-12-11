@@ -244,6 +244,35 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('user_id_1', result.keys())
         self.assertIn('user_id_2', result.keys())
 
+    def test_user_id(self):
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'entity_type.entity_id.thread_id')
+        result_instance = result.key.pairs()[0]
+        user_id = result_instance[1].split('.')[0]
+        self.assertEqual(user_id, 'user_id')
+
+
+    def test_entity_type(self):
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'entity_type.entity_id.thread_id')
+        result_instance = result.key.pairs()[0]
+        entity_type = result_instance[1].split('.')[1]
+        self.assertEqual(entity_type, 'entity_type')
+
+    def test_entity_id(self):
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'entity_type.entity_id.thread_id')
+        result_instance = result.key.pairs()[0]
+        entity_id = result_instance[1].split('.')[2]
+        self.assertEqual(entity_id, 'entity_id')
+
+    def test_thread_id(self):
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'entity_type.entity_id.thread_id')
+        result_instance = result.key.pairs()[0]
+        thread_id = result_instance[1].split('.')[3]
+        self.assertEqual(thread_id, 'entity_type.entity_id.thread_id')
+
 
 class GenerateHashTests(test_utils.GenericTestBase):
 
