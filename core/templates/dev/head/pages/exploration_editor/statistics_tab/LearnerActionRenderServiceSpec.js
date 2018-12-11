@@ -46,7 +46,8 @@ describe('Learner Action Render Service', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
         var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(
+          learnerActions);
 
         expect(displayBlocks).toEqual([[
           this.LearnerActionObjectFactory.createNew(
@@ -95,7 +96,8 @@ describe('Learner Action Render Service', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(
+          learnerActions);
 
         expect(displayBlocks).toEqual([
           [
@@ -235,7 +237,8 @@ describe('Learner Action Render Service', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(
+          learnerActions);
 
         expect(displayBlocks).toEqual([[
           this.LearnerActionObjectFactory.createNew(
@@ -283,12 +286,14 @@ describe('Learner Action Render Service', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+        var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(
+          learnerActions);
 
         expect(displayBlocks.length).toEqual(1);
 
-        var finalBlockHTML = this.LearnerActionRenderService.renderFinalDisplayBlockForMISIssueHTML(
-          displayBlocks[0], 1);
+        var finalBlockHTML =
+          this.LearnerActionRenderService
+            .renderFinalDisplayBlockForMISIssueHTML(displayBlocks[0], 1);
 
         expect(this.$sce.getTrustedHtml(finalBlockHTML)).toEqual(
           '<span class="oppia-issues-learner-action">1. Started exploration ' +
@@ -316,11 +321,13 @@ describe('Learner Action Render Service', function() {
       this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
       var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-      var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
+      var displayBlocks = this.LearnerActionRenderService.getDisplayBlocks(
+        learnerActions);
 
       expect(displayBlocks.length).toEqual(1);
 
-      var blockHTML = this.LearnerActionRenderService.renderDisplayBlockHTML(displayBlocks[0], 1);
+      var blockHTML = this.LearnerActionRenderService.renderDisplayBlockHTML(
+        displayBlocks[0], 1);
 
       expect(this.$sce.getTrustedHtml(blockHTML)).toEqual(
         '<span class="oppia-issues-learner-action">1. Started exploration at ' +
