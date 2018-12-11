@@ -28,7 +28,6 @@ oppia.factory('PlaythroughIssuesService', [
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
-    var whitelistedExplorationIds = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
@@ -90,7 +89,7 @@ oppia.factory('PlaythroughIssuesService', [
               whitelistedExplorationIds = newWhitelistedExplorationIds;
             });
       },
-      isExplorationWhitelisted: function(explorationId) {
+      isExplorationEligibleForPlaythroughIssues: function(explorationId) {
         return whitelistedExplorationIds !== null &&
           whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
