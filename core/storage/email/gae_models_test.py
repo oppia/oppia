@@ -271,7 +271,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             'user_id', 'entity_type.entity_id.thread_id')
         result_instance = result.key.pairs()[0]
         thread_id = result_instance[1].split('.')[3]
-        self.assertEqual(thread_id, 'entity_type.entity_id.thread_id')
+        self.assertEqual(thread_id, 'thread_id')
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
