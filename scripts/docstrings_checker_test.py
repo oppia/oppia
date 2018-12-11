@@ -21,6 +21,7 @@ import docstrings_checker # pylint: disable=relative-import
 
 
 class ASTDocStringCheckerTest(unittest.TestCase):
+    """Class for testing the docstrings_checker script."""
 
     def test_build_regex_from_args_one_arg(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()

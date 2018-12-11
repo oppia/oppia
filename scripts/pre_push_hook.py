@@ -214,6 +214,7 @@ def _collect_files_being_pushed(ref_list, remote):
 
 
 def _get_refs():
+    """Returns the ref list taken from STDIN."""
     # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if ref_list:
@@ -223,6 +224,7 @@ def _get_refs():
 
 
 def _start_linter(files):
+    """Starts the lint checks and returns the returncode of the task."""
     script = os.path.join(SCRIPTS_DIR, LINTER_SCRIPT)
     task = subprocess.Popen([PYTHON_CMD, script, LINTER_FILE_FLAG] + files)
     task.communicate()
@@ -230,6 +232,7 @@ def _start_linter(files):
 
 
 def _start_sh_script(scriptname):
+    """Runs the `start.sh` script and returns the returncode of the task."""
     cmd = ['bash', os.path.join(SCRIPTS_DIR, scriptname)]
     task = subprocess.Popen(cmd)
     task.communicate()
@@ -245,7 +248,7 @@ def _has_uncommitted_files():
 
 
 def _install_hook():
-    # Install script ensures that oppia is root.
+    """Installs the pre_push_hook script. It ensures that oppia is root."""
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
