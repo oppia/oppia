@@ -92,7 +92,7 @@ oppia.factory('PlaythroughIssuesService', [
           newWhitelistedExplorationIds) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        if (whitelistedExplorationIds === undefined) {
+        if (newWhitelistedExplorationIds !== undefined) {
           whitelistedExplorationIds = newWhitelistedExplorationIds;
         } else {
           fetchWhitelistedExplorationsForPlaythroughs();
