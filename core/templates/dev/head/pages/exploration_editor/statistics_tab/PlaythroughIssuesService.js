@@ -78,16 +78,25 @@ oppia.factory('PlaythroughIssuesService', [
       return suggestions;
     };
 
+    var fetchWhitelistedExplorationsForPlaythroughs = function() {
+      PlaythroughIssuesBackendApiService
+        .fetchWhitelistedExplorationsForPlaythroughs().then(
+          function(whitelist) {
+            whitelistedExplorationIds = whitelist;
+          });
+    };
+
     return {
-      initSession: function(newExplorationId, newExplorationVersion) {
+      initSession: function(
+          newExplorationId, newExplorationVersion,
+          newWhitelistedExplorationIds) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-
-        PlaythroughIssuesBackendApiService
-          .fetchWhitelistedExplorationsForPlaythroughs().then(
-            function(newWhitelistedExplorationIds) {
-              whitelistedExplorationIds = newWhitelistedExplorationIds;
-            });
+        if (whitelistedExplorationIds === undefined) {
+          whitelistedExplorationIds = newWhitelistedExplorationIds;
+        } else {
+          fetchWhitelistedExplorationsForPlaythroughs();
+        }
       },
       isExplorationEligibleForPlaythroughIssues: function(explorationId) {
         return whitelistedExplorationIds !== null &&
