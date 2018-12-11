@@ -723,6 +723,7 @@ class FetchPlaythroughWhitelistHandler(EditorHandler):
 
     @acl_decorators.can_play_exploration
     def get(self):
+        """Handle GET requests for the playthrough whitelist of explorations."""
         self.render_json({
             'whitelisted_exploration_ids_for_playthroughs':
                 config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
