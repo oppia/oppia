@@ -244,30 +244,6 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('user_id_1', result.keys())
         self.assertIn('user_id_2', result.keys())
 
-    def test_user_id(self):
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'entity_type.entity_id.thread_id')
-
-        self.assertEqual(result.user_id, 'user_id')
-
-    def test_entity_type(self):
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'entity_type.entity_id.thread_id')
-
-        self.assertEqual(result.entity_type, 'entity_type')
-
-    def test_entity_id(self):
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'entity_type.entity_id.thread_id')
-
-        self.assertEqual(result.entity_id, 'entity_id')
-
-    def test_thread_id(self):
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-            'user_id', 'entity_type.entity_id.thread_id')
-
-        self.assertEqual(result.thread_id, 'entity_type.entity_id.thread_id')
-
 
 class GenerateHashTests(test_utils.GenericTestBase):
 
