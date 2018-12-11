@@ -26,7 +26,7 @@ from google.appengine.ext import ndb
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class NumbersModel(ndb.Model):
+class MockNumbersModel(ndb.Model):
     number = ndb.IntegerProperty()
 
 
@@ -37,18 +37,18 @@ class TestEventHandler(event_services.BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, number):
-        NumbersModel(number=number).put()
+        MockNumbersModel(number=number).put()
 
 
 class EventHandlerUnitTests(test_utils.GenericTestBase):
     """Test basic event handler operations."""
 
     def test_handle_event_method_is_called(self):
-        self.assertEqual(NumbersModel.query().count(), 0)
+        self.assertEqual(MockNumbersModel.query().count(), 0)
         TestEventHandler.record(2)
-        self.assertEqual(NumbersModel.query().count(), 1)
+        self.assertEqual(MockNumbersModel.query().count(), 1)
         self.assertEqual([
-            numbers_model.number for numbers_model in NumbersModel.query()
+            numbers_model.number for numbers_model in MockNumbersModel.query()
         ], [2])
 
 

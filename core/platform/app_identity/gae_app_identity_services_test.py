@@ -14,15 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.platform.app_identity.gae_app_identity_services."""
+
 from constants import constants
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
-class GaeAppIdentityServicesTest(test_utils.GenericTestBase):
+class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(GaeAppIdentityServicesTest, self).setUp()
+        super(GaeAppIdentityServicesTests, self).setUp()
         self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
         self.expected_bucket_name = (
             '%s-resources' % self.expected_application_id)

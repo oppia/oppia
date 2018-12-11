@@ -308,7 +308,7 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminJobOutput(base.BaseHandler):
+class AdminJobOutputHandler(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -322,22 +322,22 @@ class AdminJobOutput(base.BaseHandler):
         })
 
 
-class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=topic_similarities.csv')
-        self.response.write(
-            recommendations_services.get_topic_similarities_as_csv())
+        self.render_downloadable_file(
+            recommendations_services.get_topic_similarities_as_csv(),
+            'topic_similarities.csv', 'text/csv')
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
     """Handler for data extraction query."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):

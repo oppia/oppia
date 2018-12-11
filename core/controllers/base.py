@@ -30,7 +30,6 @@ from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -156,7 +155,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
-        self.preferred_site_language_code = None
 
         if self.user_id:
             user_settings = user_services.get_user_settings(
@@ -174,8 +172,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.preferred_site_language_code = (
-                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
@@ -245,9 +241,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error(
-                    '%s: payload %s',
-                    e, self.payload)
+                logging.error('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
@@ -286,6 +280,13 @@ class BaseHandler(webapp2.RequestHandler):
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+
+    def render_downloadable_file(self, values, filename, content_type):
+        """Prepares downloadable content to be sent to the client."""
+        self.response.headers['Content-Type'] = content_type
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s' % (filename))
+        self.response.write(values)
 
     def _get_logout_url(self, redirect_url_on_logout):
         """Prepares and returns logout url which will be handled
@@ -332,12 +333,8 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'can_create_collections': bool(
-                role_services.ACTION_CREATE_COLLECTION in self.user.actions),
-            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
@@ -420,9 +417,10 @@ class BaseHandler(webapp2.RequestHandler):
             values: dict. The key-value pairs to include in the response.
         """
 
-        if return_type == feconf.HANDLER_TYPE_JSON:
-            self.render_json(values)
-        elif return_type == feconf.HANDLER_TYPE_HTML:
+        method = self.request.environ['REQUEST_METHOD']
+
+        if return_type == feconf.HANDLER_TYPE_HTML and (
+                method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
@@ -430,8 +428,10 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.render_template('pages/error/error.html')
         else:
-            logging.warning('Not a recognized return type: '
-                            'defaulting to render JSON.')
+            if return_type != feconf.HANDLER_TYPE_JSON and (
+                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+                logging.warning('Not a recognized return type: '
+                                'defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):

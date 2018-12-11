@@ -1,5 +1,5 @@
 <div>
-  <[answer.displayed_question]>
+  <span translate="<[answer.displayed_question]>" translate-values="{target: answer.target_string, assumptions: answer.assumptions_string}"></span>
   <div ng-if="answer.correct">
     <pre><[answer.displayed_proof[0]]></pre>
   </div>

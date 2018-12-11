@@ -47,25 +47,25 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$window', '$log',
-  'DateTimeFormatService', 'AlertsService', 'CreatorDashboardBackendApiService',
-  'RatingComputationService', 'ExplorationCreationService',
-  'QuestionObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
-  'ThreadStatusDisplayService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
-  'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+  '$scope', '$q', '$rootScope', '$http', '$log', '$uibModal', '$window',
+  'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
+  'ExplorationCreationService', 'QuestionObjectFactory',
+  'RatingComputationService', 'SuggestionObjectFactory',
+  'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
+  'UserService', 'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
+  'FATAL_ERROR_CODES', 'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $uibModal, $window, $log,
-      DateTimeFormatService, AlertsService, CreatorDashboardBackendApiService,
-      RatingComputationService, ExplorationCreationService,
-      QuestionObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
-      ThreadStatusDisplayService, UrlInterpolationService, FATAL_ERROR_CODES,
-      EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
-      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+      $scope, $q, $rootScope, $http, $log, $uibModal, $window,
+      AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
+      ExplorationCreationService, QuestionObjectFactory,
+      RatingComputationService, SuggestionObjectFactory,
+      SuggestionThreadObjectFactory, ThreadStatusDisplayService,
+      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
+      UserService, EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
+      FATAL_ERROR_CODES, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -86,7 +86,102 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
-    $scope.canCreateCollections = GLOBALS.can_create_collections;
+    $scope.canCreateCollections = null;
+    $rootScope.loadingMessage = 'Loading';
+    var userInfoPromise = UserService.getUserInfoAsync();
+    userInfoPromise.then(function(userInfo) {
+      $scope.canCreateCollections = userInfo.canCreateCollections();
+    });
+
+    var dashboardDataPromise = (
+      CreatorDashboardBackendApiService.fetchDashboardData());
+    dashboardDataPromise.then(
+      function(response) {
+        var responseData = response.data;
+        $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+        $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+        $scope.isCurrentSortDescending = true;
+        $scope.isCurrentSubscriptionSortDescending = true;
+        $scope.explorationsList = responseData.explorations_list;
+        $scope.collectionsList = responseData.collections_list;
+        $scope.subscribersList = responseData.subscribers_list;
+        $scope.dashboardStats = responseData.dashboard_stats;
+        $scope.lastWeekStats = responseData.last_week_stats;
+        $scope.myExplorationsView = responseData.display_preference;
+        $scope.topicSummaries = responseData.topic_summary_dicts;
+        var numberOfCreatedSuggestions = (
+          responseData.threads_for_created_suggestions_list.length);
+        var numberOfSuggestionsToReview = (
+          responseData.threads_for_suggestions_to_review_list.length);
+        $scope.mySuggestionsList = [];
+        for (var i = 0; i < numberOfCreatedSuggestions; i++) {
+          if (responseData.created_suggestions_list.length !==
+              numberOfCreatedSuggestions) {
+            $log.error('Number of suggestions does not match number of ' +
+                       'suggestion threads');
+          }
+          for (var j = 0; j < numberOfCreatedSuggestions; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              responseData.created_suggestions_list[j]);
+            var threadDict = (
+              responseData.threads_for_created_suggestions_list[i]);
+            if (threadDict.thread_id === suggestion.getThreadId()) {
+              var suggestionThread = (
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  threadDict, responseData.created_suggestions_list[j]));
+              $scope.mySuggestionsList.push(suggestionThread);
+            }
+          }
+        }
+        $scope.suggestionsToReviewList = [];
+        for (var i = 0; i < numberOfSuggestionsToReview; i++) {
+          if (responseData.suggestions_to_review_list.length !==
+              numberOfSuggestionsToReview) {
+            $log.error('Number of suggestions does not match number of ' +
+                       'suggestion threads');
+          }
+          for (var j = 0; j < numberOfSuggestionsToReview; j++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              responseData.suggestions_to_review_list[j]);
+            var threadDict = (
+              responseData.threads_for_suggestions_to_review_list[i]);
+            if (threadDict.thread_id === suggestion.getThreadId()) {
+              var suggestionThread = (
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  threadDict, responseData.suggestions_to_review_list[j]));
+              $scope.suggestionsToReviewList.push(suggestionThread);
+            }
+          }
+        }
+
+        if ($scope.dashboardStats && $scope.lastWeekStats) {
+          $scope.relativeChangeInTotalPlays = (
+            $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
+          );
+        }
+
+        if ($scope.explorationsList.length === 0 &&
+          $scope.collectionsList.length > 0) {
+          $scope.activeTab = 'myCollections';
+        } else if ($scope.explorationsList.length === 0 && (
+          $scope.mySuggestionsList.length > 0 ||
+          $scope.suggestionsToReviewList.length > 0)) {
+          $scope.activeTab = 'suggestions';
+        } else {
+          $scope.activeTab = 'myExplorations';
+        }
+      },
+      function(errorResponse) {
+        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+          AlertsService.addWarning('Failed to get dashboard data');
+        }
+      }
+    );
+
+    $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
+      $rootScope.loadingMessage = '';
+    });
+
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -228,7 +323,8 @@ oppia.controller('CreatorDashboard', [
           'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/' +
-          'view_suggestion_edit_exploration_state_content_modal.html');
+          'view_suggestion_edit_exploration_state_content_modal_directive.html'
+        );
       }
 
       $uibModal.open({
@@ -254,10 +350,10 @@ oppia.controller('CreatorDashboard', [
           canReviewActiveThread: function() {
             return $scope.canReviewActiveThread;
           },
-          stateName: function(){
+          stateName: function() {
             return $scope.activeThread.suggestion.stateName;
           },
-          suggestionType: function(){
+          suggestionType: function() {
             return $scope.activeThread.suggestion.suggestionType;
           }
         },
@@ -269,10 +365,10 @@ oppia.controller('CreatorDashboard', [
               $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionStatus, description, oldContent,
               newContent, canReviewActiveThread, stateName, suggestionType) {
-            var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
-              'accepted.';
-            var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
-              'rejected.';
+            var SUGGESTION_ACCEPTED_MSG = (
+              'This suggestion has already been accepted.');
+            var SUGGESTION_REJECTED_MSG = (
+              'This suggestion has already been rejected.');
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
             var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
@@ -282,7 +378,7 @@ oppia.controller('CreatorDashboard', [
             $scope.canReject = $scope.isNotHandled;
             $scope.canAccept = $scope.isNotHandled;
             if (!$scope.isNotHandled) {
-              if (suggestionStatus === SUGGESTION_ACCEPTED){
+              if (suggestionStatus === SUGGESTION_ACCEPTED) {
                 $scope.errorMessage = SUGGESTION_ACCEPTED_MSG;
                 $scope.isSuggestionRejected = false;
               } else {
@@ -305,7 +401,7 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $scope.showSuggestionEditor = false;
+            $scope.suggestionEditorIsShown = false;
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -321,29 +417,32 @@ oppia.controller('CreatorDashboard', [
                 reviewMessage: $scope.reviewMessage
               });
             };
-            $scope.editSuggestion = function(){
-              $scope.showSuggestionEditor = true;
+            $scope.editSuggestion = function() {
+              $scope.suggestionEditorIsShown = true;
             };
-            $scope.cancelReview = function() {
+            $scope.cancel = function() {
               $uibModalInstance.dismiss();
             };
-            $scope.showEditButton = function(){
-              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                !$scope.showSuggestionEditor);
+            $scope.isEditButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                !$scope.suggestionEditorIsShown);
             };
-            $scope.showResubmitButton = function(){
-              return (!$scope.isNotHandled && $scope.isSuggestionRejected &&
-                $scope.showSuggestionEditor);
+            $scope.isResubmitButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                $scope.suggestionEditorIsShown);
             };
-            $scope.disableResubmitButton = function(){
-              return !($scope.summaryMessage &&
+            $scope.isResubmitButtonDisabled = function() {
+              return !(
+                $scope.summaryMessage &&
                 ($scope.suggestionData.newSuggestionHtml.trim() !==
                   newContent.html.trim()));
             };
-            $scope.cancelEditMode = function(){
-              $scope.showSuggestionEditor = false;
+            $scope.cancelEditMode = function() {
+              $scope.suggestionEditorIsShown = false;
             };
-            $scope.resubmitChanges = function(){
+            $scope.resubmitChanges = function() {
               $uibModalInstance.close({
                 action: ACTION_RESUBMIT_SUGGESTION,
                 newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
@@ -356,11 +455,20 @@ oppia.controller('CreatorDashboard', [
           }
         ]
       }).result.then(function(result) {
-        var url, data;
-        if (result.action === 'resubmit' && result.suggestionType ===
-          'edit_exploration_state_content'){
-          url = '/suggestionactionhandler/resubmit/' +
-            $scope.activeThread.suggestion.suggestionId;
+        var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/resubmit/<suggestion_id>');
+        var HANDLE_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
+
+        var url = null;
+        var data = null;
+        if (result.action === 'resubmit' &&
+            result.suggestionType === 'edit_exploration_state_content') {
+          url = UrlInterpolationService.interpolateUrl(
+            RESUBMIT_SUGGESTION_URL_TEMPLATE, {
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
+            }
+          );
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
@@ -375,16 +483,20 @@ oppia.controller('CreatorDashboard', [
             }
           };
         } else {
-          url = '/suggestionactionhandler/' +
-            $scope.activeThread.suggestion.targetType + '/' +
-            $scope.activeThread.suggestion.targetId + '/' +
-            $scope.activeThread.suggestion.suggestionId;
+          url = UrlInterpolationService.interpolateUrl(
+            HANDLE_SUGGESTION_URL_TEMPLATE, {
+              target_type: $scope.activeThread.suggestion.targetType,
+              target_id: $scope.activeThread.suggestion.targetId,
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
+            }
+          );
           data = {
             action: result.action,
             commit_message: result.commitMessage,
             review_message: result.reviewMessage
           };
         }
+
         $http.put(url, data).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
@@ -436,7 +548,6 @@ oppia.controller('CreatorDashboard', [
               $scope, $uibModalInstance) {
             $scope.question = question;
             $scope.topicId = null;
-            $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
             $scope.misconceptions = [];
             $scope.errorMessage = null;
@@ -500,90 +611,5 @@ oppia.controller('CreatorDashboard', [
         $log.error('Error while submitting question');
       });
     };
-
-    $rootScope.loadingMessage = 'Loading';
-    CreatorDashboardBackendApiService.fetchDashboardData().then(
-      function(response) {
-        var responseData = response.data;
-        $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
-        $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
-        $scope.isCurrentSortDescending = true;
-        $scope.isCurrentSubscriptionSortDescending = true;
-        $scope.explorationsList = responseData.explorations_list;
-        $scope.collectionsList = responseData.collections_list;
-        $scope.subscribersList = responseData.subscribers_list;
-        $scope.dashboardStats = responseData.dashboard_stats;
-        $scope.lastWeekStats = responseData.last_week_stats;
-        $scope.myExplorationsView = responseData.display_preference;
-        $scope.topicSummaries = responseData.topic_summary_dicts;
-        var numberOfCreatedSuggestions = (
-          responseData.threads_for_created_suggestions_list.length);
-        var numberOfSuggestionsToReview = (
-          responseData.threads_for_suggestions_to_review_list.length);
-        $scope.mySuggestionsList = [];
-        for (var i = 0; i < numberOfCreatedSuggestions; i++) {
-          if (responseData.created_suggestions_list.length !==
-              numberOfCreatedSuggestions) {
-            $log.error('Number of suggestions does not match number of ' +
-                       'suggestion threads');
-          }
-          for (var j = 0; j < numberOfCreatedSuggestions; j++) {
-            var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              responseData.created_suggestions_list[j]);
-            var threadDict = (
-              responseData.threads_for_created_suggestions_list[i]);
-            if (threadDict.thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  threadDict, responseData.created_suggestions_list[j]));
-              $scope.mySuggestionsList.push(suggestionThread);
-            }
-          }
-        }
-        $scope.suggestionsToReviewList = [];
-        for (var i = 0; i < numberOfSuggestionsToReview; i++) {
-          if (responseData.suggestions_to_review_list.length !==
-              numberOfSuggestionsToReview) {
-            $log.error('Number of suggestions does not match number of ' +
-                       'suggestion threads');
-          }
-          for (var j = 0; j < numberOfSuggestionsToReview; j++) {
-            var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              responseData.suggestions_to_review_list[j]);
-            var threadDict = (
-              responseData.threads_for_suggestions_to_review_list[i]);
-            if (threadDict.thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  threadDict, responseData.suggestions_to_review_list[j]));
-              $scope.suggestionsToReviewList.push(suggestionThread);
-            }
-          }
-        }
-
-        if ($scope.dashboardStats && $scope.lastWeekStats) {
-          $scope.relativeChangeInTotalPlays = (
-            $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
-          );
-        }
-
-        if ($scope.explorationsList.length === 0 &&
-          $scope.collectionsList.length > 0) {
-          $scope.activeTab = 'myCollections';
-        } else if ($scope.explorationsList.length === 0 && (
-          $scope.mySuggestionsList.length > 0 ||
-          $scope.suggestionsToReviewList.length > 0)) {
-          $scope.activeTab = 'suggestions';
-        } else {
-          $scope.activeTab = 'myExplorations';
-        }
-        $rootScope.loadingMessage = '';
-      },
-      function(errorResponse) {
-        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          AlertsService.addWarning('Failed to get dashboard data');
-        }
-      }
-    );
   }
 ]);

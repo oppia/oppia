@@ -393,9 +393,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
 
-# No. of questions to be displayed on a page in the topic editor.
-NUM_QUESTIONS_PER_PAGE = 10
-
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
 
@@ -631,6 +628,11 @@ COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
+CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
+CUSTOM_PARTNERS_LANDING_PAGE_URL = '/partners'
+CUSTOM_TEACHERS_LANDING_PAGE_URL = '/teachers'
+CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -916,6 +918,7 @@ THANKS_PAGE_DESCRIPTION = (
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
