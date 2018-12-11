@@ -85,6 +85,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
+        failing_urls = []
         for route in main.URLS:
             # This was needed for the Django tests to pass (at the time we had
             # a Django branch of the codebase).
@@ -96,8 +97,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            self.assertIn(
-                response.status_int, [200, 302, 400, 401, 404], msg=url)
+            if response.status_int not in [200, 302, 400, 401, 404]:
+                failing_urls.append(url)
+        self.assertEqual(failing_urls, [])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for

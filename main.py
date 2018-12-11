@@ -625,11 +625,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
     get_redirect_route(
-        r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
-        editor.FetchPlaythroughHandler),
-    get_redirect_route(
         r'/playthroughdatahandler/whitelist',
         editor.FetchPlaythroughWhitelistHandler),
+    get_redirect_route(
+        r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
+        editor.FetchPlaythroughHandler),
 
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
