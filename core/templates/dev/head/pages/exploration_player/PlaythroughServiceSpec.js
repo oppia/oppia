@@ -18,16 +18,18 @@
 
 describe('Playthrough service', function() {
   beforeEach(module('oppia'));
+  beforeEach(inject(function($injector) {
+    this.expId = 'expId1';
+    this.expVersion = 1;
+    this.PlaythroughService = $injector.get('PlaythroughService');
+    this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
+    this.LearnerActionObjectFactory =
+      $injector.get('LearnerActionObjectFactory');
+
+    this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
+  }));
 
   describe('Test playthrough service functions', function() {
-    beforeEach(inject(function($injector) {
-      this.expId = 'expId1';
-      this.expVersion = 1;
-      this.PlaythroughService = $injector.get('PlaythroughService');
-      this.laof = $injector.get('LearnerActionObjectFactory');
-      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
-    }));
-
     it('should initialize a session with correct values.', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
@@ -40,7 +42,7 @@ describe('Playthrough service', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createNew(
+        [this.LearnerActionObjectFactory.createNew(
           'ExplorationStart', {
             state_name: {
               value: 'initStateName1'
@@ -55,7 +57,7 @@ describe('Playthrough service', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createNew(
+        [this.LearnerActionObjectFactory.createNew(
           'AnswerSubmit', {
             state_name: {
               value: 'stateName1'
@@ -84,7 +86,7 @@ describe('Playthrough service', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createNew(
+        [this.LearnerActionObjectFactory.createNew(
           'ExplorationQuit', {
             state_name: {
               value: 'stateName1'
@@ -241,15 +243,11 @@ describe('Playthrough service', function() {
   });
 
   describe('Test whitelisting functions', function() {
-    beforeEach(inject(function($injector) {
-      this.expId = 'expId1';
-      this.expVersion = 1;
-      this.PlaythroughService = $injector.get('PlaythroughService');
-      this.laof = $injector.get('LearnerActionObjectFactory');
-      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
-    }));
-
     it('should not record learner actions for blacklisted exps', function() {
+      spyOn(
+        this.PlaythroughIssuesService,
+        'isExplorationEligibleForPlaythroughIssues'
+      ).and.returnValue(false);
       this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
 
       this.PlaythroughService.recordExplorationStartAction('initStateName1');
