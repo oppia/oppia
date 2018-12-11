@@ -548,7 +548,6 @@ oppia.controller('CreatorDashboard', [
               $scope, $uibModalInstance) {
             $scope.question = question;
             $scope.topicId = null;
-            $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
             $scope.misconceptions = [];
             $scope.errorMessage = null;

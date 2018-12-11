@@ -158,6 +158,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_1'))
 
         self.assertEqual(len(question_skill_links), 2)
+        self.assertTrue(isinstance(question_skill_links[0],
+                                   question_domain.QuestionSkillLink))
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
         self.assertItemsEqual(
@@ -296,3 +298,40 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'Entity for class QuestionRightsModel with id '
             'question_id not found'):
             question_services.get_question_rights('question_id')
+
+    def test_get_question_skill_links_of_question(self):
+        # If the question id doesnt exist at all, it returns an empty list.
+        question_skill_links = (
+            question_services.get_question_skill_links_of_question(
+                'non_existent_question_id'))
+        self.assertEqual(len(question_skill_links), 0)
+
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+        question_id_3 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_3, self.editor_id,
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            self.question_id, 'skill_1')
+        question_services.create_new_question_skill_link(
+            question_id_2, 'skill_1')
+        question_services.create_new_question_skill_link(
+            question_id_2, 'skill_2')
+        question_services.create_new_question_skill_link(
+            question_id_3, 'skill_2')
+
+        question_skill_links = (
+            question_services.get_question_skill_links_of_question(
+                question_id_2))
+
+        self.assertTrue(isinstance(question_skill_links[0],
+                                   question_domain.QuestionSkillLink))
+        self.assertEqual(len(question_skill_links), 2)
+        skill_ids = [question_skill.skill_id for question_skill
+                     in question_skill_links]
+        self.assertItemsEqual(
+            skill_ids, ['skill_1', 'skill_2'])
