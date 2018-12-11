@@ -209,12 +209,8 @@ oppia.factory('PlaythroughService', [
         });
     };
 
-    var isLearnerExcludedFromSamplePopulation = function() {
-      return !isLearnerInSamplePopulation;
-    };
-
     var isPlaythroughDiscarded = function() {
-      return isLearnerExcludedFromSamplePopulation() ||
+      return !isLearnerInSamplePopulation ||
         !PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
           playthrough.expId);
     };
