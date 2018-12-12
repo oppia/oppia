@@ -232,7 +232,7 @@ def _start_linter(files):
 
 
 def _start_sh_script(scriptname):
-    """Runs the `start.sh` script and returns the returncode of the task."""
+    """Runs the 'start.sh' script and returns the returncode of the task."""
     cmd = ['bash', os.path.join(SCRIPTS_DIR, scriptname)]
     task = subprocess.Popen(cmd)
     task.communicate()

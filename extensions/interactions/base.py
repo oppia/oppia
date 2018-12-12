@@ -186,7 +186,8 @@ class BaseInteraction(object):
 
     @property
     def _rule_description_strings(self):
-        """Returns a dict of rule names to rule descriptions.
+        """Returns a dict, where the keys are rule names, and the values are the
+        corresponding rule descriptions.
 
         Returns:
             dict(str, str). A dict of rule names to rule descriptions.

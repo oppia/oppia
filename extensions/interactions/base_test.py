@@ -111,12 +111,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     obj_class.normalize(ca_spec['default_value']))
 
     def _validate_dependencies(self, dependency_ids):
-        """Validates all the dependencies given their dependency ids.
+        """Validates all the dependency ids.
 
         Args:
-            dependency_ids: str. A list of dependency ids.
+            dependency_ids: list(str). A list of dependency ids.
         """
-        # Check that all dependency ids are valid.
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
