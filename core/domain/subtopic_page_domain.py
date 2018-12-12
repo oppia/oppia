@@ -257,7 +257,7 @@ class SubtopicPage(object):
         """The new value for the html data field.
 
         Args:
-            new_page_contents: dict. The new html for the subtopic
+            new_page_contents_html_dict: dict. The new html for the subtopic
             page.
         """
         self.page_contents.subtitled_html = (
@@ -267,7 +267,7 @@ class SubtopicPage(object):
         """The new value for the content_ids_to_audio_translations data field.
 
         Args:
-            new_page_contents_audio: dict. The new audio for the subtopic
+            new_page_contents_audio_dict: dict. The new audio for the subtopic
             page.
         """
         self.page_contents.content_ids_to_audio_translations = (

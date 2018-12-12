@@ -43,8 +43,10 @@ oppia.constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 oppia.constant('SUBTOPIC_PROPERTY_TITLE', 'title');
 
-oppia.constant('SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'page_contents_html');
-oppia.constant('SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO', 'page_contents_audio');
+oppia.constant(
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'page_contents_html');
+oppia.constant(
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO', 'page_contents_audio');
 
 oppia.factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
@@ -407,7 +409,8 @@ oppia.factory('TopicUpdateService', [
           });
       },
 
-      setSubtopicPageContentsHtml: function(subtopicPage, subtopicId, newSubtitledHtml) {
+      setSubtopicPageContentsHtml: function(
+          subtopicPage, subtopicId, newSubtitledHtml) {
         var oldSubtitledHtml = angular.copy(
           subtopicPage.getPageContents().getSubtitledHtml());
         _applySubtopicPagePropertyChange(

@@ -279,7 +279,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+                    subtopic_page_domain
+                    .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
                 'old_value': {
                     'html': '',
                     'content_id': 'content'
@@ -339,7 +340,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+                    subtopic_page_domain
+                    .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
                 'old_value': '',
                 'subtopic_id': 2,
                 'new_value': {

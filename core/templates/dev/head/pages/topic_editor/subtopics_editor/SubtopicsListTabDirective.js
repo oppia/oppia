@@ -129,9 +129,11 @@ oppia.directive('subtopicsListTab', [
               }
               if (newHtmlData !==
                     $scope.subtopicPage.getPageContents().getHtml()) {
-                var subtitledHtml = angular.copy($scope.subtopicPage.getPageContents().getSubtitledHtml());
+                var subtitledHtml = angular.copy(
+                  $scope.subtopicPage.getPageContents().getSubtitledHtml());
                 subtitledHtml.setHtml(newHtmlData);
-                TopicUpdateService.setSubtopicPageContentsHtml($scope.subtopicPage, subtopic.getId(), subtitledHtml);
+                TopicUpdateService.setSubtopicPageContentsHtml(
+                  $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
             });
