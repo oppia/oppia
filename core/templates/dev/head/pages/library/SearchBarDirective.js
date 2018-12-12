@@ -43,6 +43,81 @@ oppia.directive('searchBar', [
               }
             )
           );
+          $scope.activeMenuName = '';
+          $scope.ACTION_OPEN = 'open';
+          $scope.ACTION_CLOSE = 'close';
+          $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
+            enter: {
+              shiftKeyIsPressed: false,
+              keyCode: 13
+            },
+            tab: {
+              shiftKeyIsPressed: false,
+              keyCode: 9
+            },
+            shiftTab: {
+              shiftKeyIsPressed: true,
+              keyCode: 9
+            }
+          };
+          /**
+           * Opens the submenu.
+           * @param {object} evt
+           * @param {String} menuName - name of menu, on which
+           * open/close action to be performed (category,language).
+           */
+          $scope.openSubmenu = function(evt, menuName) {
+            // Focus on the current target before opening its submenu.
+            angular.element(evt.currentTarget).focus();
+            $scope.activeMenuName = menuName;
+          };
+          $scope.blurNavigationLinks = function(evt) {
+            // This is required because if about submenu is in open state
+            // and when you hover on library, both will be highlighted,
+            // To avoid that, blur all the a's in nav, so that only one
+            // will be highlighted.
+            $('nav a').blur();
+          };
+          $scope.closeSubmenu = function(evt) {
+            $scope.activeMenuName = '';
+            angular.element(evt.currentTarget).closest('li')
+              .find('a').blur();
+          };
+          $scope.closeSubmenuIfNotMobile = function(evt) {
+            if (DeviceInfoService.isMobileDevice()) {
+              return;
+            }
+            $scope.closeSubmenu(evt);
+          };
+          /**
+           * Handles keydown events on menus.
+           * @param {object} evt
+           * @param {String} menuName - name of menu to perform action
+           * on(category/language)
+           * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
+           * corresponding actions to be performed(open/close).
+           *
+           * @example
+           *  onMenuKeypress($event, 'category', {enter: 'open'})
+           */
+          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
+            var targetEvents = Object.keys(eventsTobeHandled);
+            for (var i = 0; i < targetEvents.length; i++) {
+              var keyCodeSpec =
+                $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+              if (keyCodeSpec.keyCode === evt.keyCode &&
+                evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
+                if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
+                  $scope.openSubmenu(evt, menuName);
+                } else if (eventsTobeHandled[targetEvents[i]] ===
+                  $scope.ACTION_CLOSE) {
+                  $scope.closeSubmenu(evt);
+                } else {
+                  throw Error('Invalid action type.');
+                }
+              }
+            }
+          };
           // TODO(sll): Remove the filter once the App Engine Search API
           // supports 3-letter language codes.
           $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.filter(
