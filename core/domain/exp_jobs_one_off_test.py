@@ -1703,7 +1703,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
         exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -1752,7 +1752,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
         exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -1791,7 +1791,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ViewableExplorationsAudit job on sample exploration.
-        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -1805,7 +1805,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
             owner, self.VALID_EXP_ID, True)
 
         # Start ViewableExplorationsAudit job on sample exploration.
-        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -1816,7 +1816,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
         # Start ViewableExplorationsAudit job on sample exploration.
-        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -1899,7 +1899,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
         expected_output = [
             '[u\'1\', [u\'exp_id0 State2\']]',
             '[u\'2\', [u\'exp_id0 State1\']]'
