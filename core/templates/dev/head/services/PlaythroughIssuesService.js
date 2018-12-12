@@ -87,7 +87,7 @@ oppia.factory('PlaythroughIssuesService', [
        *    be targeting.
        * @param {number} newExplorationVersion - the version of the exploration
        *    the service will be targeting.
-       * @param {string[]?} testOnlyWhitelistedExplorationIds - a utility
+       * @param {string[]=} testOnlyWhitelistedExplorationIds - a utility
        *    parameter for tests to avoid making backend calls. This parameter
        *    allows more explicit testing of the whitelist.
        */
