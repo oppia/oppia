@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.exp_services."""
+
 import StringIO
 import copy
 import datetime
@@ -602,7 +604,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 })], 'Did migration.')
 
 
-class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
+class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
@@ -2500,7 +2502,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        #TODO(frederikcreemers@gmail.com) test max_age here.
+        # TODO(frederikcreemers@gmail.com) test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
@@ -2829,7 +2831,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2873,7 +2875,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             )
         }
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -3353,7 +3355,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
 
-class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
+class GetExplorationAndExplorationRightsTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_and_exploration_rights_object(self):
         exploration_id = self.EXP_ID

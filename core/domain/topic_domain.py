@@ -327,13 +327,13 @@ class Topic(object):
             subtopic_schema_version: int. The current schema version of the
                 subtopic dict.
             next_subtopic_id: int. The id for the next subtopic in the topic.
+            language_code: str. The ISO 639-1 code for the language this
+                topic is written in.
+            version: int. The version of the topic.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
                 topic was last updated.
-            language_code: str. The ISO 639-1 code for the language this
-                topic is written in.
-            version: int. The version of the topic.
         """
         self.id = topic_id
         self.name = name

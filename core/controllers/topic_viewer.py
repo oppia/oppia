@@ -19,6 +19,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import topic_services
+import feconf
 
 
 class TopicViewerPage(base.BaseHandler):
@@ -43,6 +44,7 @@ class TopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):

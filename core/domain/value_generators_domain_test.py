@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.value_generators_domain."""
+
 from core.domain import value_generators_domain
 from core.tests import test_utils
 

@@ -704,8 +704,6 @@ class NormalizedRectangle2D(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        # Moves cur_value to the nearest available value in the range
-        # [min_value, max_value].
         """Returns the normalized coordinates of the rectangle.
 
         Args:
@@ -719,15 +717,24 @@ class NormalizedRectangle2D(BaseObject):
         Raises:
             TypeError: Cannot convert to the NormalizedRectangle2D schema.
         """
-        def clamp(min_value, current_value, max_value):
-            return min(max_value, max(min_value, current_value))
+        def clamp(value):
+            """Clamps a number to range [0, 1].
+
+            Args:
+                value: float. A number to be clamped.
+
+            Returns:
+                float. The clamped value.
+            """
+            return min(0.0, max(value, 1.0))
+
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
-            raw[0][0] = clamp(0.0, raw[0][0], 1.0)
-            raw[0][1] = clamp(0.0, raw[0][1], 1.0)
-            raw[1][0] = clamp(0.0, raw[1][0], 1.0)
-            raw[1][1] = clamp(0.0, raw[1][1], 1.0)
+            raw[0][0] = clamp(raw[0][0])
+            raw[0][1] = clamp(raw[0][1])
+            raw[1][0] = clamp(raw[1][0])
+            raw[1][1] = clamp(raw[1][1])
 
         except Exception:
             raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)

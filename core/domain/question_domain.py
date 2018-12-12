@@ -329,8 +329,7 @@ class Question(object):
 
 
 class QuestionSummary(object):
-    """Domain object for Question Summary.
-    """
+    """Domain object for Question Summary."""
     def __init__(
             self, creator_id, question_id, question_content,
             question_model_created_on=None, question_model_last_updated=None):

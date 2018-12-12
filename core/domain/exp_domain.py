@@ -414,14 +414,14 @@ class Exploration(object):
             param_changes_list: list(dict). List of dict where each dict is
                 used to initialize a ParamChange domain object.
             version: int. The version of the exploration.
-            created_on: datetime.datetime. Date and time when the exploration
-                is created.
-            last_updated: datetime.datetime. Date and time when the exploration
-                was last updated.
             auto_tts_enabled: bool. True if automatic text-to-speech is
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            created_on: datetime.datetime. Date and time when the exploration
+                is created.
+            last_updated: datetime.datetime. Date and time when the exploration
+                was last updated.
         """
         self.id = exploration_id
         self.title = title
@@ -1308,7 +1308,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        # ensure widgets are renamed to be interactions.
+        # Ensure widgets are renamed to be interactions.
         for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue

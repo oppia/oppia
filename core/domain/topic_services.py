@@ -511,13 +511,13 @@ def update_topic_and_subtopic_pages(
     """Updates a topic and its subtopic pages. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - topic_id: str. The topic id.
-    - change_list: list(TopicChange and SubtopicPageChange). These changes are
-        applied in sequence to produce the resulting topic.
-    - commit_message: str or None. A description of changes made to the
-        topic.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        topic_id: str. The topic id.
+        change_list: list(TopicChange and SubtopicPageChange). These changes are
+            applied in sequence to produce the resulting topic.
+        commit_message: str or None. A description of changes made to the
+            topic.
 
     Raises:
         ValueError: Current user does not have enough rights to edit a topic.

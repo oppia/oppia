@@ -189,6 +189,12 @@ oppia.directive('subtopicsListTab', [
             _initEditor();
           };
 
+          $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
+            TopicUpdateService.removeUncategorizedSkill(
+              $scope.topic, skillSummary);
+            _initEditor();
+          };
+
           $scope.createSubtopic = function() {
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
