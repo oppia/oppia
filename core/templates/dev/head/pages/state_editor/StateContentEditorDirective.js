@@ -20,7 +20,7 @@ oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      link: function(scope, element) {
+      link: function(scope, element, conversationSkinCtrl) {
         // This allows the scope to be retrievable during Karma unit testing.
         // See http://stackoverflow.com/a/29833832 for more details.
         element[0].getControllerScope = function() {
@@ -53,6 +53,21 @@ oppia.directive('stateContentEditor', [
 
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
+          $scope.isCardHeightLimitReached = false;
+          $scope.showCardHeightLimitWarning = true;
+
+          $scope.$watch(function() {
+            var height = $('.oppia-learner-view-card-top-section').height();
+            if (height > 630) {
+              $scope.isCardHeightLimitReached = true;
+            } else {
+              $scope.isCardHeightLimitReached = false;
+            }
+          });
+
+          $scope.hideCardHeightLimitWarning = function() {
+            $scope.showCardHeightLimitWarning = false;
+          };
 
           var saveContent = function() {
             StateContentService.saveDisplayedValue();

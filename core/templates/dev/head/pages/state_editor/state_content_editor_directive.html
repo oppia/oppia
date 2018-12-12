@@ -1,3 +1,13 @@
+<div class="shadow-preview-card" aria-hidden="true">
+  <div class="oppia-learner-view-card-content">
+    <div class="oppia-learner-view-card-top-section">
+      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+                         html-data="StateContentService.displayed._html">
+      </angular-html-bind>
+    </div>
+  </div>
+</div>
+
 <div ng-if="!contentEditorIsOpen">
   <div class="protractor-test-edit-content"
        ng-class="{'oppia-editable-section': isEditable()}"
@@ -37,4 +47,42 @@
     <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
     <div style="clear: both;"></div>
   </div>
+  <div ng-if="isCardHeightLimitReached && showCardHeightLimitWarning">
+    <span class="card-height-limit-warning">
+      <i class="material-icons" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
+        This card is quite long, and students might lose interest. Consider shortening it, or breaking it into two cards.
+    </span>
+  </div>
 </div>
+
+<style>
+  .card-height-limit-warning {
+      color:#0277BD;
+      padding-top: 2px;
+  }
+  .shadow-preview-card {
+    left: -30000px;
+    max-width: 560px;
+    position: fixed;
+    top: -30000px;
+  }
+  .rte-viewer > p {
+    line-height: 28px;
+    margin-bottom: 18px;
+    margin-top: 18px;
+  }
+  .rte-viewer > p:first-child {
+    margin-top: 0px;
+  }
+  .rte-viewer > p:last-child {
+    margin-bottom: 0px;
+  }
+
+  .rte-viewer {
+    border-radius: 2px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    text-align: left;
+  }
+</style>
