@@ -155,8 +155,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ReplyToIdModelUnitTests, self).setUp()
 
-        # pylint: disable=unused-argument
-        def _generate_unique_id_for_tests(cls):
+        def _generate_unique_id_for_tests(unused_cls):
             return 'Non_unique_id'
 
         self.generate_constant_id_ctx = self.swap(
