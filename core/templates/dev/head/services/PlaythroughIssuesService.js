@@ -80,12 +80,23 @@ oppia.factory('PlaythroughIssuesService', [
     };
 
     return {
+      /** Prepares the PlaythroughIssuesService for subsequent calls to other
+       * functions.
+       *
+       * @param {string} newExplorationId - the exploration id the service will
+       *    be targeting.
+       * @param {number} newExplorationVersion - the version of the exploration
+       *    the service will be targeting.
+       * @param {string[]} testOnlyWhitelistedExplorationIds - utility parameter
+       *    for tests to avoid making backend calls. This parameter allows more
+       *    explicit testing of the whitelist.
+       */
       initSession: function(
           newExplorationId, newExplorationVersion,
           testOnlyWhitelistedExplorationIds) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        if (testOnlyWhitelistedExplorationIds) {
+        if (testOnlyWhitelistedExplorationIds !== undefined) {
           whitelistedExplorationIds = testOnlyWhitelistedExplorationIds;
         } else {
           PlaythroughIssuesBackendApiService
