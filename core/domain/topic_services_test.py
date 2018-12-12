@@ -248,17 +248,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [subtopic_page_domain.SubtopicPageChange({
             'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
             'property_name': (
-                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
             'old_value': '',
             'subtopic_id': 1,
             'new_value': {
-                'subtitled_html': {
-                    'html': '<p>New Value</p>',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
-                    'content': {}
-                },
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
             }
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -284,25 +279,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
+                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
                 'old_value': {
-                    'subtitled_html': {
-                        'html': '',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '',
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2,
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
                 }
             }),
             topic_domain.TopicChange({
@@ -354,17 +339,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS),
+                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
                 'old_value': '',
                 'subtopic_id': 2,
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
                 }
             }),
         ]

@@ -25,7 +25,8 @@ import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
-SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS = 'page_contents'
+SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
+SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_CREATE_NEW = 'create_new'
@@ -38,7 +39,9 @@ CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 class SubtopicPageChange(object):
     """Domain object for changes made to subtopic_page object."""
 
-    SUBTOPIC_PAGE_PROPERTIES = (SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS,)
+    SUBTOPIC_PAGE_PROPERTIES = (
+        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'subtopic_id',
@@ -250,14 +253,25 @@ class SubtopicPage(object):
         """
         return int(self.id[len(self.topic_id) + 1:])
 
-    def update_page_contents(self, new_page_contents):
+    def update_page_contents_html(self, new_page_contents_html_dict):
         """The new value for the html data field.
 
         Args:
-            new_page_contents: dict. The new page contents for the subtopic
+            new_page_contents: dict. The new html for the subtopic
             page.
         """
-        self.page_contents = SubtopicPageContents.from_dict(new_page_contents)
+        self.page_contents.subtitled_html = (
+            state_domain.SubtitledHtml.from_dict(new_page_contents_html_dict))
+
+    def update_page_contents_audio(self, new_page_contents_audio_dict):
+        """The new value for the content_ids_to_audio_translations data field.
+
+        Args:
+            new_page_contents_audio: dict. The new audio for the subtopic
+            page.
+        """
+        self.page_contents.content_ids_to_audio_translations = (
+            new_page_contents_audio_dict)
 
     def validate(self):
         """Validates various properties of the SubtopicPage object.

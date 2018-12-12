@@ -21,6 +21,7 @@ describe('Topic update service', function() {
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var SkillSummaryObjectFactory = null;
+  var SubtitledHtmlObjectFactory = null;
   var SubtopicPageObjectFactory = null;
   var SubtopicPageContentsObjectFactory = null;
   var UndoRedoService = null;
@@ -31,6 +32,7 @@ describe('Topic update service', function() {
   beforeEach(inject(function($injector) {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
+    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     SubtopicPageContentsObjectFactory =
@@ -649,24 +651,13 @@ describe('Topic update service', function() {
   );
 
   it('should set/unset changes to a subtopic page\'s page content', function() {
-    var newSamplePageContentsDict = {
-      subtitled_html: {
-        html: 'new content',
-        content_id: 'content'
-      },
-      content_ids_to_audio_translations: {
-        content: {
-          en: {
-            filename: 'new_test.mp3',
-            file_size_bytes: 100,
-            needs_update: false
-          }
-        }
-      }
+    var newSampleSubtitledHtmlDict = {
+      html: 'new content',
+      content_id: 'content'
     };
-    var newSamplePageContents =
-      SubtopicPageContentsObjectFactory.createFromBackendDict(
-        newSamplePageContentsDict);
+    var newSampleSubtitledHtml =
+      SubtitledHtmlObjectFactory.createFromBackendDict(
+        newSampleSubtitledHtmlDict);
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
@@ -682,10 +673,23 @@ describe('Topic update service', function() {
         }
       }
     });
-    TopicUpdateService.setSubtopicPageContents(
-      _sampleSubtopicPage, 1, newSamplePageContents);
-    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual(
-      newSamplePageContentsDict);
+    TopicUpdateService.setSubtopicPageContentsHtml(
+      _sampleSubtopicPage, 1, newSampleSubtitledHtml);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'new content',
+        content_id: 'content'
+      },
+      content_ids_to_audio_translations: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
+        }
+      }
+    });
 
     UndoRedoService.undoChange(_sampleSubtopicPage);
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
@@ -707,45 +711,23 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for changing html data',
     function() {
-      var newSamplePageContentsDict = {
-        subtitled_html: {
-          html: 'new content',
-          content_id: 'content'
-        },
-        content_ids_to_audio_translations: {
-          content: {
-            en: {
-              filename: 'new_test.mp3',
-              file_size_bytes: 100,
-              needs_update: false
-            }
-          }
-        }
+      var newSampleSubtitledHtmlDict = {
+        html: 'new content',
+        content_id: 'content'
       };
-      var newSamplePageContents =
-        SubtopicPageContentsObjectFactory.createFromBackendDict(
-          newSamplePageContentsDict);
-      TopicUpdateService.setSubtopicPageContents(
-        _sampleSubtopicPage, 1, newSamplePageContents);
+      var newSampleSubtitledHtml =
+        SubtitledHtmlObjectFactory.createFromBackendDict(
+          newSampleSubtitledHtmlDict);
+      TopicUpdateService.setSubtopicPageContentsHtml(
+        _sampleSubtopicPage, 1, newSampleSubtitledHtml);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_subtopic_page_property',
-        property_name: 'page_contents',
+        property_name: 'page_contents_html',
         subtopic_id: 1,
-        new_value: newSamplePageContents.toBackendDict(),
+        new_value: newSampleSubtitledHtml.toBackendDict(),
         old_value: {
-          subtitled_html: {
-            html: 'test content',
-            content_id: 'content'
-          },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false
-              }
-            }
-          }
+          html: 'test content',
+          content_id: 'content'
         },
         change_affects_subtopic_page: true
       }]);

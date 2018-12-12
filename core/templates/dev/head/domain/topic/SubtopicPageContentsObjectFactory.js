@@ -32,6 +32,11 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       return this._subtitledHtml;
     };
 
+    SubtopicPageContents.prototype.setSubtitledHtml = function(
+        newSubtitledHtml) {
+      this._subtitledHtml = angular.copy(newSubtitledHtml);
+    };
+
     SubtopicPageContents.prototype.getHtml = function() {
       return this._subtitledHtml.getHtml();
     };
@@ -43,6 +48,12 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
     SubtopicPageContents.prototype.getContentIdsToAudioTranslations =
     function() {
       return this._contentIdsToAudioTranslations;
+    };
+
+    SubtopicPageContents.prototype.setContentIdsToAudioTranslations =
+    function(newContentIdsToAudioTranslations) {
+      this._contentIdsToAudioTranslations =
+        angular.copy(newContentIdsToAudioTranslations);
     };
 
     SubtopicPageContents.createDefault = function() {

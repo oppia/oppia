@@ -34,6 +34,7 @@ def get_subtopic_page_from_model(subtopic_page_model):
     Returns:
         SubtopicPage.
     """
+
     return subtopic_page_domain.SubtopicPage(
         subtopic_page_model.id,
         subtopic_page_model.topic_id,
