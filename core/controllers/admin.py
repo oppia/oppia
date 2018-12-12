@@ -305,7 +305,6 @@ class AdminRoleHandler(base.BaseHandler):
         username = self.payload.get('username')
         role = self.payload.get('role')
         topic_id = self.payload.get('topic_id')
-        print "Topic Id: ", topic_id
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -316,12 +315,11 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            print "assigning role"
             user = user_services.UserActionsInfo(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
-        
+
         self.render_json({})
 
 

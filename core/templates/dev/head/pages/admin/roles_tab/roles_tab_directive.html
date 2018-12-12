@@ -82,13 +82,13 @@
             </div>
           </div>
 
-           <div class="form-group" ng-if="updateFormValues.newRole==='TOPIC_MANAGER'">
-              <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Enter Topic for Topic Manager</label>
-              <div class="col-md-8 col-lg-8 col-sm-8">
-                <select ng-options="topic.id as topic.name for topic in topicSummaries" ng-model="updateFormValues.topicId" class="form-control protractor-update-form-role-select">
-                </select>
-              </div>
+          <div class="form-group" ng-if="updateFormValues.newRole==='TOPIC_MANAGER'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Enter Topic for Topic Manager</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="topic.id as topic.name for topic in topicSummaries" ng-model="updateFormValues.topicId" class="form-control protractor-update-form-role-select">
+              </select>
             </div>
+          </div>
           <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!updateFormValues.newRole || !updateFormValues.username || (updateFormValues.newRole==='TOPIC_MANAGER' && !updateFormValues.topicId)" value="update role">Update Role</button>
         </form>
       </md-card>
