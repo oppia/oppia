@@ -1451,3 +1451,457 @@ class InteractionCustomizationArgsValidationJobTests(
         )]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationValidityJobManagerTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_validation_errors_are_not_raised_for_valid_exploration(self):
+        """Checks validation errors are not present for valid exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category',
+            objective='Test Exploration')
+
+        exploration.add_states(['End'])
+        intro_state = exploration.states['Introduction']
+        end_state = exploration.states['End']
+
+        intro_state.update_interaction_id('TextInput')
+        end_state.update_interaction_id('EndExploration')
+
+        default_outcome_dict = {
+            'dest': 'End',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>Introduction</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        end_state.update_interaction_default_outcome(None)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ExplorationValidityJobManager job on unpublished exploration.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(actual_output, [])
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ExplorationValidityJobManager job on published exploration.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+
+        self.assertEqual(actual_output, [])
+
+    def test_strict_validation_errors_are_raised_for_published_exploration(
+            self):
+        """Checks validation errors are not present for valid exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ExplorationValidityJobManager job on unpublished exploration.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(actual_output, [])
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ExplorationValidityJobManager job on published exploration.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = [(
+            '[u\'exp_id0\', '
+            '[u\'This state does not have any interaction specified.\']]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+        exploration.states['Introduction'].update_interaction_id(
+            'TextInput')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ExplorationValidityJobManager job on published exploration.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = [(
+            '[u\'exp_id0\', '
+            '[u"Please fix the following issues before saving this '
+            'exploration: 1. It is impossible to complete the exploration '
+            'from the following states: Introduction '
+            '2. An objective must be specified (in the \'Settings\' tab). "]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+
+class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(InteractionAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_for_all_interactions(self):
+        """Checks (exp, state) pairs are produced for all interactions."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['End'])
+        intro_state = exploration.states['Introduction']
+        end_state = exploration.states['End']
+
+        intro_state.update_interaction_id('TextInput')
+        end_state.update_interaction_id('EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start InteractionAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
+        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.InteractionAuditOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = [
+            '[u\'EndExploration\', [u\'exp_id0 End\']]',
+            '[u\'TextInput\', [u\'exp_id0 Introduction\']]'
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+
+class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ItemSelectionInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks (exp, state) pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('ItemSelectionInput')
+        state2.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict1 = {
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value2 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        content_ids_to_audio_translations_dict = {
+            'content': {},
+            'default_outcome': {},
+            'feedback': {}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(actual_output, [])
+
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = [(
+            '[u\'exp_id0\', '
+            '[u\'State2: <p>This is value3 for ItemSelection</p>\']]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+
+class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ViewableExplorationsAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_output_contains_only_viewable_private_explorations(self):
+        """Checks that only viewable private explorations are present
+        in output.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ViewableExplorationsAudit job on sample exploration.
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(actual_output, [])
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.set_private_viewability_of_exploration(
+            owner, self.VALID_EXP_ID, True)
+
+        # Start ViewableExplorationsAudit job on sample exploration.
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = ['[u\'exp_id0\', [u\'title\']]']
+        self.assertEqual(actual_output, expected_output)
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ViewableExplorationsAudit job on sample exploration.
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(actual_output, [])
+
+
+class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(HintsAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_number_of_hints_tabulated_are_correct(self):
+        """Checks that correct number of hints are tabulated."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        hint_list1 = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state1</p>'
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint2',
+                'html': '<p>Hello, this is html2 for state1</p>'
+            }
+        }]
+
+        hint_list2 = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+
+        content_ids_to_audio_translations_dict1 = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+            'hint2': {}
+        }
+
+        content_ids_to_audio_translations_dict2 = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+        }
+
+        state1.update_interaction_hints(hint_list1)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict1)
+
+        state2.update_interaction_hints(hint_list2)
+        state2.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start HintsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
+        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        expected_output = [
+            '[u\'1\', [u\'exp_id0 State2\']]',
+            '[u\'2\', [u\'exp_id0 State1\']]'
+        ]
+        self.assertEqual(actual_output, expected_output)
