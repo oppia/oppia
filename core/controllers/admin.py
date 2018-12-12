@@ -272,7 +272,6 @@ class AdminRoleHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         view_method = self.request.get('method')
-        topic_summaries = topic_services.get_all_topic_summaries()
 
         if view_method == feconf.VIEW_METHOD_ROLE:
             role = self.request.get(feconf.VIEW_METHOD_ROLE)
