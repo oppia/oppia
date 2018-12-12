@@ -40,7 +40,7 @@ oppia.directive('adminRolesTab', [
         $scope.viewFormValues = {};
         $scope.updateFormValues = {};
         $scope.viewFormValues.method = 'role';
-        
+
         $scope.graphDataLoaded = false;
         // Calculating initStateId and finalStateIds for graphData
         // Since role graph is acyclic, node with no incoming edge
