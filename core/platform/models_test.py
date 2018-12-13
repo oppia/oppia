@@ -54,7 +54,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_classifier(self):
         """Tests import_models function with classifier option."""
-        from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
+        from core.storage.classifier import gae_models as classifier_data_models
         expected_classifier_models = (classifier_data_models,)
         self.assertEqual(
             expected_classifier_models,
@@ -62,7 +62,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_collection(self):
         """Tests import_models function with collection option."""
-        from core.storage.collection import gae_models as collection_models # pylint: disable=line-too-long
+        from core.storage.collection import gae_models as collection_models
         expected_collection_models = (collection_models,)
         self.assertEqual(
             expected_collection_models,
