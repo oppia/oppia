@@ -84,7 +84,7 @@ oppia.controller('StatisticsTab', [
           var initStateName = response.exploration.init_state_name;
 
           $scope.playthroughsAreAvailable =
-            PlaythroughIssuesService.isExplorationWhitelisted(
+            PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
               ExplorationDataService.explorationId);
           $scope.statsGraphData = ComputeGraphService.compute(
             initStateName, states);

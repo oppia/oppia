@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
-describe('IssuesBackendApiService', function() {
+describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.IssuesBackendApiService = $injector.get('IssuesBackendApiService');
+    this.PlaythroughIssuesBackendApiService =
+      $injector.get('PlaythroughIssuesBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');
     this.eif = $injector.get('ExplorationIssueObjectFactory');
     this.pof = $injector.get('PlaythroughObjectFactory');
@@ -67,7 +68,7 @@ describe('IssuesBackendApiService', function() {
         '/issuesdatahandler/7?exp_version=1'
       ).respond(backendIssues);
 
-      this.IssuesBackendApiService.fetchIssues('7', 1).then(
+      this.PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
         successHandler, failureHandler);
       this.$httpBackend.flush();
 
@@ -106,7 +107,7 @@ describe('IssuesBackendApiService', function() {
         '/playthroughdatahandler/7/1'
       ).respond(backendPlaythrough);
 
-      this.IssuesBackendApiService.fetchPlaythrough('7', '1').then(
+      this.PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
         successHandler, failureHandler);
       this.$httpBackend.flush();
 

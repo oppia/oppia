@@ -133,9 +133,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
         StateClassifierMappingService.init(data.state_classifier_mapping);
-        PlaythroughIssuesService.initSession(
-          data.exploration_id, data.version,
-          data.whitelisted_exploration_ids_for_playthroughs);
+        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;

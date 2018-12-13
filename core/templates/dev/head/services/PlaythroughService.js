@@ -21,29 +21,28 @@ oppia.constant(
   '/explorehandler/store_playthrough/<exploration_id>');
 
 oppia.factory('PlaythroughService', [
-  '$http', 'LearnerActionObjectFactory', 'PlaythroughObjectFactory',
-  'StopwatchObjectFactory', 'UrlInterpolationService',
-  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'CURRENT_ACTION_SCHEMA_VERSION',
-  'CURRENT_ISSUE_SCHEMA_VERSION', 'EARLY_QUIT_THRESHOLD_IN_SECS',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$http', 'LearnerActionObjectFactory', 'PlaythroughIssuesService',
+  'PlaythroughObjectFactory', 'StopwatchObjectFactory',
+  'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',
+  'ACTION_TYPE_EXPLORATION_START', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'CURRENT_ACTION_SCHEMA_VERSION', 'CURRENT_ISSUE_SCHEMA_VERSION',
+  'EARLY_QUIT_THRESHOLD_IN_SECS', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
+  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
   'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
   function(
-      $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
-      StopwatchObjectFactory, UrlInterpolationService,
-      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
-      ACTION_TYPE_EXPLORATION_QUIT, CURRENT_ACTION_SCHEMA_VERSION,
-      CURRENT_ISSUE_SCHEMA_VERSION, EARLY_QUIT_THRESHOLD_IN_SECS,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+      $http, LearnerActionObjectFactory, PlaythroughIssuesService,
+      PlaythroughObjectFactory, StopwatchObjectFactory,
+      UrlInterpolationService, ACTION_TYPE_ANSWER_SUBMIT,
+      ACTION_TYPE_EXPLORATION_START, ACTION_TYPE_EXPLORATION_QUIT,
+      CURRENT_ACTION_SCHEMA_VERSION, CURRENT_ISSUE_SCHEMA_VERSION,
+      EARLY_QUIT_THRESHOLD_IN_SECS, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
       PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
-    var isPlayerInSamplePopulation = null;
-    var whitelistedExpIds = null;
+    var isLearnerInSamplePopulation = null;
 
     var multipleIncorrectStateName = {};
 
@@ -64,7 +63,7 @@ oppia.factory('PlaythroughService', [
       playthrough.actions.push(quitAction);
     };
 
-    var _determineIfPlayerIsInSamplePopulation = function(probability) {
+    var _determineIfLearnerIsInSamplePopulation = function(probability) {
       return Math.random() < probability;
     };
 
@@ -110,9 +109,9 @@ oppia.factory('PlaythroughService', [
           // Cycle identified.
           var cycleStartIndex = visitedStates.indexOf(destStateName);
           visitedStates.push(destStateName);
-          var cycleString =
-            visitedStates.slice(
-              cycleStartIndex, visitedStates.length).toString();
+          var cycleString = visitedStates.slice(
+            cycleStartIndex, visitedStates.length
+          ).toString();
           if (cycleIdentifier.cycle === cycleString) {
             cycleIdentifier.num_cycles += 1;
           } else {
@@ -155,20 +154,14 @@ oppia.factory('PlaythroughService', [
             value: multipleIncorrectStateName.num_times_incorrect
           }
         };
-        return;
-      }
-
-      if (isCyclicStateTransitionsIssue()) {
+      } else if (isCyclicStateTransitionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
           state_names: {
             value: cycleIdentifier.cycle.split(',')
           }
         };
-        return;
-      }
-
-      if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
+      } else if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
         playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
         playthrough.issueCustomizationArgs = {
           state_name: {
@@ -181,7 +174,6 @@ oppia.factory('PlaythroughService', [
             value: timeSpentInExpInSecs
           }
         };
-        return;
       }
     };
 
@@ -204,32 +196,22 @@ oppia.factory('PlaythroughService', [
     };
 
     var getFullPlaythroughUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
-        STORE_PLAYTHROUGH_URL, {
-          exploration_id: playthrough.expId
-        });
-    };
-
-    var isPlayerExcludedFromSamplePopulation = function() {
-      return !isPlayerInSamplePopulation;
-    };
-
-    var isExplorationWhitelisted = function() {
-      return whitelistedExpIds.indexOf(playthrough.expId) !== -1;
+      return UrlInterpolationService.interpolateUrl(STORE_PLAYTHROUGH_URL, {
+        exploration_id: playthrough.expId
+      });
     };
 
     var isPlaythroughDiscarded = function() {
-      return (
-        isPlayerExcludedFromSamplePopulation() || !isExplorationWhitelisted());
+      return !isLearnerInSamplePopulation ||
+        !PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
+          playthrough.expId);
     };
 
     return {
       initSession: function(
-          explorationId, explorationVersion, playthroughProbability,
-          whitelistedExplorationIds) {
-        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation(
-          playthroughProbability);
-        whitelistedExpIds = whitelistedExplorationIds;
+          explorationId, explorationVersion, playthroughProbability) {
+        isLearnerInSamplePopulation =
+          _determineIfLearnerIsInSamplePopulation(playthroughProbability);
         playthrough = PlaythroughObjectFactory.createNew(
           null, explorationId, explorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();

@@ -24,27 +24,33 @@ describe('Learner Action Render Service', function() {
 
   describe('Test learner action render service functions', function() {
     beforeEach(inject(function($injector) {
-      this.laof = $injector.get('LearnerActionObjectFactory');
-      this.ps = $injector.get('PlaythroughService');
-      this.lars = $injector.get('LearnerActionRenderService');
-      this.ps.initSession('expId1', 1, 1.0, ['expId1']);
-      this.sce = $injector.get('$sce');
+      this.$sce = $injector.get('$sce');
+      this.LearnerActionObjectFactory =
+        $injector.get('LearnerActionObjectFactory');
+      this.PlaythroughService = $injector.get('PlaythroughService');
+      this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
+      this.LearnerActionRenderService =
+        $injector.get('LearnerActionRenderService');
+
+      this.PlaythroughIssuesService.initSession('expId1', 1, ['expId1']);
+      this.PlaythroughService.initSession('expId1', 1, 1.0);
     }));
 
     it('should split up EarlyQuit learner actions into display blocks.',
       function() {
-        this.ps.recordExplorationStartAction('stateName1');
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordExplorationStartAction('stateName1');
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordExplorationQuitAction('stateName2', 120);
+        this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
-        var learnerActions = this.ps.getPlaythrough().actions;
-        var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var displayBlocks =
+          this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
         expect(displayBlocks).toEqual([[
-          this.laof.createNew(
+          this.LearnerActionObjectFactory.createNew(
             'ExplorationStart', {
               state_name: {
                 value: 'stateName1'
@@ -53,7 +59,7 @@ describe('Learner Action Render Service', function() {
           ),
           jasmine.any(Object),
           jasmine.any(Object),
-          this.laof.createNew(
+          this.LearnerActionObjectFactory.createNew(
             'ExplorationQuit', {
               state_name: {
                 value: 'stateName2'
@@ -68,33 +74,34 @@ describe('Learner Action Render Service', function() {
 
     it('should split up many learner actions into different display blocks.',
       function() {
-        this.ps.recordExplorationStartAction('stateName1');
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordExplorationStartAction('stateName1');
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
-        var learnerActions = this.ps.getPlaythrough().actions;
-        var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var displayBlocks =
+          this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
         expect(displayBlocks).toEqual([
           [
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'AnswerSubmit', {
                 state_name: {
                   value: 'stateName1'
@@ -118,7 +125,7 @@ describe('Learner Action Render Service', function() {
             ),
             jasmine.any(Object),
             jasmine.any(Object),
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'ExplorationQuit', {
                 state_name: {
                   value: 'stateName1'
@@ -130,7 +137,7 @@ describe('Learner Action Render Service', function() {
             )
           ],
           [
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'AnswerSubmit', {
                 state_name: {
                   value: 'stateName3'
@@ -154,7 +161,7 @@ describe('Learner Action Render Service', function() {
             ),
             jasmine.any(Object),
             jasmine.any(Object),
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'AnswerSubmit', {
                 state_name: {
                   value: 'stateName3'
@@ -178,7 +185,7 @@ describe('Learner Action Render Service', function() {
             )
           ],
           [
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'ExplorationStart', {
                 state_name: {
                   value: 'stateName1'
@@ -186,7 +193,7 @@ describe('Learner Action Render Service', function() {
               }, 1
             ),
             jasmine.any(Object),
-            this.laof.createNew(
+            this.LearnerActionObjectFactory.createNew(
               'AnswerSubmit', {
                 state_name: {
                   value: 'stateName2'
@@ -214,26 +221,27 @@ describe('Learner Action Render Service', function() {
 
     it('should assign multiple learner actions at same state to same block.',
       function() {
-        this.ps.recordExplorationStartAction('stateName1');
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordExplorationStartAction('stateName1');
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.ps.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
-        var learnerActions = this.ps.getPlaythrough().actions;
-        var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var displayBlocks =
+          this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
         expect(displayBlocks).toEqual([[
-          this.laof.createNew(
+          this.LearnerActionObjectFactory.createNew(
             'ExplorationStart', {
               state_name: {
                 value: 'stateName1'
@@ -246,7 +254,7 @@ describe('Learner Action Render Service', function() {
           jasmine.any(Object),
           jasmine.any(Object),
           jasmine.any(Object),
-          this.laof.createNew(
+          this.LearnerActionObjectFactory.createNew(
             'ExplorationQuit', {
               state_name: {
                 value: 'stateName1'
@@ -264,28 +272,30 @@ describe('Learner Action Render Service', function() {
         var feedback = {
           _html: 'Try again'
         };
-        this.ps.recordExplorationStartAction('stateName1');
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordExplorationStartAction('stateName1');
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.ps.recordAnswerSubmitAction(
+        this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.ps.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
-        var learnerActions = this.ps.getPlaythrough().actions;
-        var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var displayBlocks =
+          this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
         expect(displayBlocks.length).toEqual(1);
 
-        var finalBlockHTML = this.lars.renderFinalDisplayBlockForMISIssueHTML(
-          displayBlocks[0], 1);
+        var finalBlockHTML =
+          this.LearnerActionRenderService
+            .renderFinalDisplayBlockForMISIssueHTML(displayBlocks[0], 1);
 
-        expect(this.sce.getTrustedHtml(finalBlockHTML)).toEqual(
+        expect(this.$sce.getTrustedHtml(finalBlockHTML)).toEqual(
           '<span class="oppia-issues-learner-action">1. Started exploration ' +
           'at card "stateName1".</span>' +
           '<span class="oppia-issues-learner-action">2. Submitted the ' +
@@ -303,21 +313,23 @@ describe('Learner Action Render Service', function() {
       });
 
     it('should render HTML for learner action display blocks.', function() {
-      this.ps.recordExplorationStartAction('stateName1');
-      this.ps.recordAnswerSubmitAction(
+      this.PlaythroughService.recordExplorationStartAction('stateName1');
+      this.PlaythroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-      this.ps.recordAnswerSubmitAction(
+      this.PlaythroughService.recordAnswerSubmitAction(
         'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      this.ps.recordExplorationQuitAction('stateName2', 120);
+      this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
-      var learnerActions = this.ps.getPlaythrough().actions;
-      var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
+      var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+      var displayBlocks =
+        this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
       expect(displayBlocks.length).toEqual(1);
 
-      var blockHTML = this.lars.renderDisplayBlockHTML(displayBlocks[0], 1);
+      var blockHTML = this.LearnerActionRenderService.renderDisplayBlockHTML(
+        displayBlocks[0], 1);
 
-      expect(this.sce.getTrustedHtml(blockHTML)).toEqual(
+      expect(this.$sce.getTrustedHtml(blockHTML)).toEqual(
         '<span class="oppia-issues-learner-action">1. Started exploration at ' +
         'card "stateName1".</span>' +
         '<span class="oppia-issues-learner-action">2. Pressed "Continue" to ' +
