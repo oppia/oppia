@@ -18,10 +18,10 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'FractionObjectFactory', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ContextService, UrlInterpolationService) {
+      ContextService, FractionObjectFactory, UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -59,6 +59,18 @@ oppia.factory('StateRulesStatsService', [
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
                 var newVizInfo = angular.copy(vizInfo);
+                // If data is a FractionInput, need to change data so that
+                // visualization displays the input in a readable manner.
+                newVizInfo.data.forEach(function(vizInfoDatum) {
+                  var answer = vizInfoDatum.answer;
+                  if ('isNegative' in vizInfoDatum.answer &&
+                      'wholeNumber' in vizInfoDatum.answer &&
+                      'numerator' in vizInfoDatum.answer &&
+                      'denominator' in vizInfoDatum.answer) {
+                    vizInfoDatum.answer =
+                        FractionObjectFactory.fromDict(answer).toString();
+                  }
+                });
                 if (newVizInfo.addressed_info_is_supported) {
                   newVizInfo.data.forEach(function(vizInfoDatum) {
                     vizInfoDatum.is_addressed =
