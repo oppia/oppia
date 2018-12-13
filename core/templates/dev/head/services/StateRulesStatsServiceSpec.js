@@ -140,41 +140,37 @@ describe('State Rules Stats Service', function() {
     });
 
     it('should convert FractionInput into readable strings', function() {
-      var FRACTION_STATE = {
-        name: 'Fraction',
-        interaction: {id: 'FractionInput'}};
-
-      var FRACTION_STATE_RULES_STATS_RESPONSE = {
-        visualizations_info: [{
-          data: [
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 1,
-                denominator: 2
-              },
-              frequency: 3
-            },
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 0,
-                denominator: 1
-              },
-              frequency: 5
-            }]
-        }]
-      };
-
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
+
       $httpBackend.expectGET(
         '/createhandler/state_rules_stats/7/Fraction').respond(
-        FRACTION_STATE_RULES_STATS_RESPONSE);
+        {
+          visualizations_info: [{
+            data: [
+              {
+                answer: {
+                  isNegative: false,
+                  wholeNumber: 0,
+                  numerator: 1,
+                  denominator: 2
+                },
+                frequency: 3
+              },
+              {
+                answer: {
+                  isNegative: false,
+                  wholeNumber: 0,
+                  numerator: 0,
+                  denominator: 1
+                },
+                frequency: 5
+              }]
+          }]
+        });
 
-      StateRulesStatsService.computeStateRulesStats(FRACTION_STATE).then(
+      StateRulesStatsService.computeStateRulesStats({name: 'Fraction',
+        interaction: {id: 'FractionInput'}}).then(
         successHandler, failureHandler);
       $httpBackend.flush();
 
