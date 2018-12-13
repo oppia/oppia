@@ -45,10 +45,10 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         Args:
             answer: dict(str, *). The answer in dict format.
             time_spent_in_card: float. The time spent (in sec) in each card. By
-                default, it's 3.2 sec.
+                default, it's '3.2 sec'.
             session_id: str. The session id. By default, it's 'sid1'.
             classify_category: str. The answer classification category. By
-                default, it's explicit classification.
+                default, it's 'explicit classification'.
 
         Returns:
             dict(str, *). The answer object in dict format.
