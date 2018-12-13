@@ -285,25 +285,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'page_contents',
+                'property_name': 'page_contents_html',
                 'old_value': {
-                    'subtitled_html': {
-                        'html': '',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '',
+                    'content_id': 'content'
                 },
                 'subtopic_id': 1,
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Data</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
                 }
             }, {
                 'change_affects_subtopic_page': False,
@@ -313,24 +303,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'page_contents',
+                'property_name': 'page_contents_html',
                 'old_value': {
-                    'subtitled_html': {
-                        'html': '',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '',
+                    'content_id': 'content'
                 },
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2
             }]
@@ -412,25 +392,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'page_contents',
+                'property_name': 'page_contents_html',
                 'old_value': {
-                    'subtitled_html': {
-                        'html': '',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '',
+                    'content_id': 'content'
                 },
                 'subtopic_id': 1,
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Data</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
                 }
             }, {
                 'change_affects_subtopic_page': False,
@@ -440,24 +410,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'page_contents',
+                'property_name': 'page_contents_html',
                 'old_value': {
-                    'subtitled_html': {
-                        'html': '',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '',
+                    'content_id': 'content'
                 },
                 'new_value': {
-                    'subtitled_html': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content'
-                    },
-                    'content_ids_to_audio_translations': {
-                        'content': {}
-                    },
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2
             }]

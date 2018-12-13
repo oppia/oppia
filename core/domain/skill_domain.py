@@ -337,6 +337,20 @@ class SkillContents(object):
 
                 translation.validate()
 
+        explanation_content_id = set([self.explanation.content_id])
+        worked_example_content_ids = set([example.content_id for example
+                                          in self.worked_examples])
+        content_ids = explanation_content_id.union(worked_example_content_ids)
+
+        audio_content_ids = set(
+            [audio[0] for audio
+             in self.content_ids_to_audio_translations.iteritems()])
+        if content_ids != audio_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain '
+                'all content_ids in worked examples. Expected: %s\n '
+                'Actual: %s' % (content_ids, audio_content_ids))
+
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
 

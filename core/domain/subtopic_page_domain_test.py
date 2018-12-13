@@ -17,6 +17,7 @@
 """Tests for subtopic page domain objects."""
 
 from constants import constants
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
 import utils
@@ -116,3 +117,10 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         self.subtopic_page_contents.content_ids_to_audio_translations = 1
         self._assert_validation_error(
             'Expected content_ids_to_audio_translations to be a dict')
+
+        self.subtopic_page_contents.subtitled_html = (
+            state_domain.SubtitledHtml('1', '<p>Test</p>'))
+        self.subtopic_page_contents.content_ids_to_audio_translations = {}
+        self._assert_validation_error(
+            'Expected content_ids_to_audio_translations to contain '
+            'all content_ids in the subtopic page.')

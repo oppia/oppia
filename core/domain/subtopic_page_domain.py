@@ -149,12 +149,22 @@ class SubtopicPageContents(object):
 
                 translation.validate()
 
+        content_ids = set([self.subtitled_html.content_id])
+
+        audio_content_ids = set(
+            [audio[0] for audio
+             in self.content_ids_to_audio_translations.iteritems()])
+        if content_ids != audio_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain '
+                'all content_ids in the subtopic page. Expected: %s\n '
+                'Actual: %s' % (content_ids, audio_content_ids))
+
     @classmethod
     def create_default_subtopic_page_contents(cls):
         return cls(
             state_domain.SubtitledHtml.create_default_subtitled_html(
-                'content'),
-            {'content': {}})
+                'content'), {'content': {}})
 
     def to_dict(self):
         """Returns a dict representing this SubtopicPageContents domain object.
