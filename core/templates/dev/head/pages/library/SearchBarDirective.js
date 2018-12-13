@@ -71,24 +71,6 @@ oppia.directive('searchBar', [
             angular.element(evt.currentTarget).focus();
             $scope.activeMenuName = menuName;
           };
-          $scope.blurNavigationLinks = function(evt) {
-            // This is required because if about submenu is in open state
-            // and when you hover on library, both will be highlighted,
-            // To avoid that, blur all the a's in nav, so that only one
-            // will be highlighted.
-            $('nav a').blur();
-          };
-          $scope.closeSubmenu = function(evt) {
-            $scope.activeMenuName = '';
-            angular.element(evt.currentTarget).closest('li')
-              .find('a').blur();
-          };
-          $scope.closeSubmenuIfNotMobile = function(evt) {
-            if (DeviceInfoService.isMobileDevice()) {
-              return;
-            }
-            $scope.closeSubmenu(evt);
-          };
           /**
            * Handles keydown events on menus.
            * @param {object} evt
