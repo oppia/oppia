@@ -340,7 +340,7 @@ class SkillContents(object):
         explanation_content_id = set([self.explanation.content_id])
         worked_example_content_ids = set([example.content_id for example
                                           in self.worked_examples])
-        content_ids = explanation_content_id.union(worked_example_content_ids)
+        content_ids = explanation_content_id | worked_example_content_ids
 
         audio_content_ids = set(
             [audio[0] for audio
