@@ -59,9 +59,9 @@ oppia.factory('StateRulesStatsService', [
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
                 var newVizInfo = angular.copy(vizInfo);
-                // If data is a FractionInput, need to change data so that
-                // visualization displays the input in a readable manner.
                 newVizInfo.data.forEach(function(vizInfoDatum) {
+                  // If data is a FractionInput, need to change data so that
+                  // visualization displays the input in a readable manner.
                   if (state.interaction.id === 'FractionInput') {
                     vizInfoDatum.answer =
                         FractionObjectFactory.fromDict(
