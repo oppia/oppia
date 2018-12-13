@@ -71,6 +71,11 @@ oppia.directive('searchBar', [
             angular.element(evt.currentTarget).focus();
             $scope.activeMenuName = menuName;
           };
+          $scope.closeSubmenu = function(evt) {
+            $scope.activeMenuName = '';
+            angular.element(evt.currentTarget).closest('li')
+              .find('a').blur();
+          };
           /**
            * Handles keydown events on menus.
            * @param {object} evt
