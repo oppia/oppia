@@ -62,24 +62,19 @@ oppia.factory('StateRulesStatsService', [
                 // If data is a FractionInput, need to change data so that
                 // visualization displays the input in a readable manner.
                 newVizInfo.data.forEach(function(vizInfoDatum) {
-                  var answer = vizInfoDatum.answer;
-                  if ('isNegative' in vizInfoDatum.answer &&
-                      'wholeNumber' in vizInfoDatum.answer &&
-                      'numerator' in vizInfoDatum.answer &&
-                      'denominator' in vizInfoDatum.answer) {
+                  if (state.interaction.id === 'FractionInput') {
                     vizInfoDatum.answer =
-                        FractionObjectFactory.fromDict(answer).toString();
+                        FractionObjectFactory.fromDict(
+                          vizInfoDatum.answer).toString();
                   }
-                });
-                if (newVizInfo.addressed_info_is_supported) {
-                  newVizInfo.data.forEach(function(vizInfoDatum) {
+                  if (newVizInfo.addressed_info_is_supported) {
                     vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
                           state.name, state, vizInfoDatum.answer,
                           interactionRulesService);
-                  });
-                }
+                  }
+                });
                 return newVizInfo;
               })
           };
