@@ -24,6 +24,7 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
@@ -40,6 +41,40 @@ search_services = models.Registry.import_search_services()
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
     return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
+
+
+def mock_save_original_and_compressed_versions_of_image(
+        user_id, filename, exp_id, original_image_content):
+    filepath = 'image/%s' % filename
+
+    filename_wo_filetype = filename[:filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1:]
+
+    compressed_image_filename = '%s_compressed.%s' % (
+        filename_wo_filetype, filetype)
+    compressed_image_filepath = 'image/%s' % compressed_image_filename
+
+    micro_image_filename = '%s_micro.%s' % (
+        filename_wo_filetype, filetype)
+    micro_image_filepath = 'image/%s' % micro_image_filename
+
+    fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+        'exploration/%s' % exp_id))
+
+    if not fs.isfile(filepath.encode('utf-8')):
+        fs.commit(
+            user_id, filepath.encode('utf-8'), original_image_content,
+            mimetype='image/%s' % filetype)
+
+    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
+        fs.commit(
+            user_id, compressed_image_filepath.encode('utf-8'),
+            original_image_content, mimetype='image/%s' % filetype)
+
+    if not fs.isfile(micro_image_filepath.encode('utf-8')):
+        fs.commit(
+            user_id, micro_image_filepath.encode('utf-8'),
+            original_image_content, mimetype='image/%s' % filetype)
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -1905,3 +1940,150 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             '[u\'2\', [u\'exp_id0 State1\']]'
         ]
         self.assertEqual(actual_output, expected_output)
+
+
+class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(VerifyAllUrlsMatchGcsIdRegexJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_verification_of_image_and_audio_urls(self):
+        """Checks that image and auido urls are verified correctly."""
+
+        with self.swap(constants, 'DEV_MODE', False):
+
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+                raw_image = f.read()
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3')) as f:
+                raw_audio = f.read()
+
+            fs.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs.commit(
+                self.albert_id, 'image/abc.xyz', raw_image,
+                mimetype='image/png'
+            )
+            fs.commit(
+                self.albert_id, 'image/xyz/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs.commit(
+                self.albert_id, 'audio/abc.mp3', raw_audio,
+                mimetype='audio/mp3'
+            )
+            fs.commit(
+                self.albert_id, 'audio/abc.png', raw_audio,
+                mimetype='audio/mp3'
+            )
+            fs.commit(
+                self.albert_id, 'audio/image/abc.mp3', raw_audio,
+                mimetype='audio/mp3'
+            )
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            # Start VerifyAllUrlsMatchGcsIdRegex job on sample exploration.
+            job_id = exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.create_new() # pylint: disable=line-too-long
+            exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.get_output(job_id) # pylint: disable=line-too-long
+            expected_output = [
+                '[u\'File is there in GCS\', 1]',
+                (
+                    '[u\'The url for the entity on GCS is invalid\', '
+                    '[u\'/testbed-test-resources/exp_id0/assets/image/abc.xyz\''
+                    ', u\'/testbed-test-resources/exp_id0/assets/image/xyz/'
+                    'abc.png\', u\'/testbed-test-resources/exp_id0/assets/audio'
+                    '/abc.png\', u\'/testbed-test-resources/exp_id0/assets/'
+                    'audio/image/abc.mp3\']]'
+                )
+            ]
+            self.assertEqual(actual_output, expected_output)
+
+
+class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(CopyToNewDirectoryJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_copying_of_image_and_audio_files(self):
+        """Checks that image and auido files are copied correctly."""
+
+        with self.swap(constants, 'DEV_MODE', False), self.swap(
+            exp_services, 'save_original_and_compressed_versions_of_image',
+            mock_save_original_and_compressed_versions_of_image):
+
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+                raw_image = f.read()
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3')) as f:
+                raw_audio = f.read()
+
+            fs.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs.commit(
+                self.albert_id, 'image/xyz.png', 'file_content',
+                mimetype='image/png'
+            )
+            fs.commit(
+                self.albert_id, 'audio/abc.mp3', raw_audio,
+                mimetype='audio/mp3'
+            )
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            # Start CopyToNewDirectory job on sample exploration.
+            job_id = exp_jobs_one_off.CopyToNewDirectoryJob.create_new()
+            exp_jobs_one_off.CopyToNewDirectoryJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.CopyToNewDirectoryJob.get_output(job_id) # pylint: disable=line-too-long
+            expected_output = [
+                '[u\'Added compressed versions of images in exploration\', '
+                '[u\'exp_id0\']]',
+                '[u\'Copied file\', 1]'
+            ]
+            self.assertEqual(len(actual_output), 3)
+            self.assertEqual(actual_output[0], expected_output[0])
