@@ -666,12 +666,7 @@ class ExplorationMigrationValidationJobForCKEditor(
 
 
 class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the image/audio such that the url instead of
-    {{exp_id}}/assets/image/image.png is
-    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
-    the images as well as renaming the filenames so that they have dimensions
-    as a part of their name.
-    """
+    """One-off job for verifying the image and audio urls."""
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
