@@ -32,6 +32,8 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import stats_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -51,6 +53,9 @@ class AdminPage(base.BaseHandler):
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
             job['can_be_canceled'] = job['is_cancelable'] and any([
                 klass.__name__ == job['job_type']
@@ -101,6 +106,7 @@ class AdminPage(base.BaseHandler):
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.VIEWABLE_ROLES
             },
+            'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data()
         })
 
@@ -297,6 +303,7 @@ class AdminRoleHandler(base.BaseHandler):
     def post(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
+        topic_id = self.payload.get('topic_id')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -305,6 +312,13 @@ class AdminRoleHandler(base.BaseHandler):
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
             username=username)
+
+        if topic_id:
+            user = user_services.UserActionsInfo(user_id)
+            topic_services.assign_role(
+                user_services.get_system_user(), user,
+                topic_domain.ROLE_MANAGER, topic_id)
+
         self.render_json({})
 
 

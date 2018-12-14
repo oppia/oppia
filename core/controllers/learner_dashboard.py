@@ -162,6 +162,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         message_summary_list = []
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
@@ -172,7 +173,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             suggestion_summary = {
                 'suggestion_html': suggestion.change.new_value['html'],
                 'current_content_html': current_content_html,
-                'description': suggestion.description,
+                'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
                     authors_settings[0].profile_picture_data_url)
