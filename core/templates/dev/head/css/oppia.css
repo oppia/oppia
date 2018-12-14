@@ -1460,7 +1460,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
-  word-break: break-word;
+  word-break: break-all;
 }
 
 .oppia-state-content {
