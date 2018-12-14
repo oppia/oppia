@@ -1,7 +1,7 @@
 <!-- label-for-focus-target feature is removed since CKEditor has a
 focusManager to manage the focus activity automatically. -->
 <ck-editor-rte ng-if="!isDisabled()" ng-model="$parent.localValue"
-               ui-config="uiConfig()">
+               ui-config="uiConfig()" style="word-break: break-all;">
 </ck-editor-rte>
 
 <span ng-if="isDisabled()"
