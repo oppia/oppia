@@ -1486,6 +1486,12 @@ pre.oppia-pre-wrapped-text {
    line-height, margin-top and margin-bottom attributes)
 */
 
+/* Line-height is set to 1.846 to ensure that the line-spacing inside
+   a paragraph is consistent both in the editor mode while editing and
+   after saving. The value 1.846 came from
+   /third_party/generated/css/third_party.css.
+*/
+
 .oppia-rte-editor > p {
   line-height: 1.846;
   margin-bottom: 18px;
