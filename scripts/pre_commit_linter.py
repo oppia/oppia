@@ -1725,7 +1725,7 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _fecth_fun(all_files)
+    args_order_messages = _fecth_func(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
