@@ -40,7 +40,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             assert object_class.normalize(item[0]) == item[1], (
                 'Expected %s when normalizing %s as a %s, got %s' %
                 (item[1], item[0], object_class.__name__,
-                object_class.normalize(item[0]))
+                 object_class.normalize(item[0]))
             )
 
         for item in invalid_items:
