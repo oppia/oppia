@@ -1487,7 +1487,7 @@ pre.oppia-pre-wrapped-text {
 */
 
 .oppia-rte-editor > p {
-  line-height: 1.5;
+  line-height: 1.846;
   margin-bottom: 18px;
   margin-top: 18px;
 }
@@ -1500,7 +1500,7 @@ pre.oppia-pre-wrapped-text {
   word-spacing: 0;
 }
 .oppia-rte-content > div > p {
-  line-height: 1.5;
+  line-height: 1.846;
   margin-bottom: 18px;
   margin-top: 18px;
 }
