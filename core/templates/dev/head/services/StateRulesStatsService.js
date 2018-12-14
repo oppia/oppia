@@ -18,10 +18,10 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'FractionObjectFactory', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ContextService, UrlInterpolationService) {
+      ContextService, FractionObjectFactory, UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -59,15 +59,22 @@ oppia.factory('StateRulesStatsService', [
             visualizations_info: response.data.visualizations_info.map(
               function(vizInfo) {
                 var newVizInfo = angular.copy(vizInfo);
-                if (newVizInfo.addressed_info_is_supported) {
-                  newVizInfo.data.forEach(function(vizInfoDatum) {
+                newVizInfo.data.forEach(function(vizInfoDatum) {
+                  // If data is a FractionInput, need to change data so that
+                  // visualization displays the input in a readable manner.
+                  if (state.interaction.id === 'FractionInput') {
+                    vizInfoDatum.answer =
+                        FractionObjectFactory.fromDict(
+                          vizInfoDatum.answer).toString();
+                  }
+                  if (newVizInfo.addressed_info_is_supported) {
                     vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
                           state.name, state, vizInfoDatum.answer,
                           interactionRulesService);
-                  });
-                }
+                  }
+                });
                 return newVizInfo;
               })
           };
