@@ -1169,13 +1169,13 @@ def _fetch_func(all_files):
         and filename.endswith('.py')]
     for filename in files_to_check:
         with open(filename, 'r') as f:
-        ast_file = ast.walk(ast.parse(f.read()))
-        # Gettin function definition.
-        func_def = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-        # Adding filename in the list 
-        func_def = [func_def,[filename]]
-        # Collecting all function definition 
-        func_defs.append(func_def)
+            ast_file = ast.walk(ast.parse(f.read()))
+            # Gettin function definition.
+            func_def = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+            # Adding filename in the list 
+            func_def = [func_def,[filename]]
+            # Collecting all function definition 
+            func_defs.append(func_def)
     summary_messages = _check_args_order(func_defs)
     return summary_messages
 
