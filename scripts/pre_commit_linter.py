@@ -1160,7 +1160,7 @@ def _check_docstrings(all_files):
 
 def _fetch_func(all_files):
     """This function fetch the function
-    definition from all python files
+    definition from all python files.
     """
     summary_messages = []
     func_defs = []
