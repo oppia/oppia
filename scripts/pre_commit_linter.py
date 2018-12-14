@@ -1664,7 +1664,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    # The html tags and attributes check check has an additional
+    # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)

@@ -40,6 +40,19 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
     def _create_answer_dict(
             self, answer, time_spent_in_card=3.2, session_id='sid1',
             classify_category=exp_domain.EXPLICIT_CLASSIFICATION):
+        """Returns the answer dict.
+
+        Args:
+            answer: dict(str, *). The answer in dict format.
+            time_spent_in_card: float. The time spent (in sec) in each card. By
+                default, it's 3.2 sec.
+            session_id: str. The session id. By default, it's 'sid1'.
+            classify_category: str. The answer classification category. By
+                default, it's 'explicit classification'.
+
+        Returns:
+            dict(str, *). The answer object in dict format.
+        """
         return {
             'answer': answer,
             'time_spent_in_sec': time_spent_in_card,
