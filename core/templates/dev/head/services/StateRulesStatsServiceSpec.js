@@ -145,32 +145,30 @@ describe('State Rules Stats Service', function() {
 
       $httpBackend.expectGET(
         '/createhandler/state_rules_stats/7/Fraction').respond(
-        {
-          visualizations_info: [{
-            data: [
-              {
-                answer: {
-                  isNegative: false,
-                  wholeNumber: 0,
-                  numerator: 1,
-                  denominator: 2
-                },
-                frequency: 3
+        {visualizations_info: [{
+          data: [
+            {
+              answer: {
+                isNegative: false,
+                wholeNumber: 0,
+                numerator: 1,
+                denominator: 2
               },
-              {
-                answer: {
-                  isNegative: false,
-                  wholeNumber: 0,
-                  numerator: 0,
-                  denominator: 1
-                },
-                frequency: 5
-              }]
-          }]
-        });
+              frequency: 3
+            },
+            {
+              answer: {
+                isNegative: false,
+                wholeNumber: 0,
+                numerator: 0,
+                denominator: 1
+              },
+              frequency: 5
+            }]
+        }]});
 
-      StateRulesStatsService.computeStateRulesStats({name: 'Fraction',
-        interaction: {id: 'FractionInput'}}).then(
+      StateRulesStatsService.computeStateRulesStats(
+        {name: 'Fraction', interaction: {id: 'FractionInput'}}).then(
         successHandler, failureHandler);
       $httpBackend.flush();
 
