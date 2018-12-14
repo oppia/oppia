@@ -106,7 +106,6 @@ class BaseJobManager(object):
         Returns:
             bool. Whether the job is created using abstract base manager class.
         """
-
         return cls in ABSTRACT_BASE_CLASSES
 
     @classmethod
@@ -501,7 +500,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job which is to be enqueued.
         """
-
         pass
 
     @classmethod
@@ -511,7 +509,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job which was enqueued.
         """
-
         pass
 
     @classmethod
@@ -522,7 +519,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job to be marked as started.
         """
-
         pass
 
     @classmethod
@@ -533,7 +529,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job marked as started.
         """
-
         pass
 
     @classmethod
@@ -544,7 +539,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job marked as completed.
         """
-
         pass
 
     @classmethod
@@ -555,7 +549,6 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job marked as failed.
         """
-
         pass
 
     @classmethod
@@ -566,9 +559,8 @@ class BaseJobManager(object):
         Args:
             job_id: str. The unique ID of the job to be marked as cancelled.
             cancel_message: str. The message to be displayed before
-            cancellation.
+                cancellation.
         """
-
         pass
 
     @classmethod
@@ -580,7 +572,6 @@ class BaseJobManager(object):
             job_id: str. The unique ID of the job marked as cancelled.
             cancel_message: str. The message to be displayed after cancellation.
         """
-
         pass
 
 
@@ -889,9 +880,8 @@ class BaseMapReduceJobManager(BaseJobManager):
         Args:
             job_id: str. The unique ID of the job to be marked as cancelled.
             cancel_message: str. The message to be displayed before
-            cancellation.
+                cancellation.
         """
-
         metadata = cls.get_metadata(job_id)
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
@@ -1084,7 +1074,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as completed.
         """
-
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
@@ -1096,7 +1085,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             job_id: str. The unique ID of the job marked as cancelled.
             cancel_message: str. The message to be displayed after cancellation.
         """
-
         cls._get_continuous_computation_class().on_batch_job_canceled()
 
     @classmethod
@@ -1107,7 +1095,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as failed.
         """
-
         cls._get_continuous_computation_class().on_batch_job_failure()
 
 
