@@ -1157,8 +1157,29 @@ def _check_docstrings(all_files):
 
     return summary_messages
 
+def _fetch_func(all_files):
+    """This function fetch the function
+    definition from all python files
+    """
+    summary_messages = []
+    func_defs = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+        ast_file = ast.walk(ast.parse(f.read()))
+        # Gettin function definition.
+        func_def = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+        # Adding filename in the list 
+        func_def = [func_def,[filename]]
+        # Collecting all function definition 
+        func_defs.append(func_def)
+    summary_messages = _check_args_order(func_defs)
+    return summary_messages
 
-def _check_args_order(all_files):
+def _check_args_order(func_defs):
     """This function ensures that class args(self or cls)
     comes first in the function definition.
     """
@@ -1167,51 +1188,22 @@ def _check_args_order(all_files):
     wrong_ordself_message = ('The first arg of the function should be self')
     wrong_ordcls_message = ('The first arg of the function should be cls')
     summary_messages = []
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
     failed = False
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                if line[0:3] == 'def ':
-                    start = '('
-                    end = ')'
-                    # Finding the index of '('.
-                    while 1:
-                        try:
-                            start_index = line.index(start)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    # Finding the index of ')'.
-                    while 1:
-                        try:
-                            end_index = line.index(end)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    if start_index + 1 != end_index:
-                        # Getting the list of all the arguments.
-                        args_list = line[start_index + 1:end_index].split(', ')
-                        # Check if 'self' exists in args and doesn't come first.
-                        if 'self' in args_list and args_list[0] != 'self':
-                            failed = True
-                            print '%s --> Line %s: %s' % (
-                                filename, line_num + 1,
-                                wrong_ordself_message)
-                        # Check if 'cls' exists in args and doesn't come first.
-                        elif 'cls' in args_list and args_list[0] != 'cls':
-                            failed = True
-                            print '%s --> Line %s: %s' % (
-                                filename, line_num + 1,
-                                wrong_ordcls_message)
+    for files_func in func_defs:
+        for func in files_func[0]:
+            args_list = [arg.id for arg in func.args.args]
+            # Check if 'self' exists in args and doesn't come first.
+            if 'self' in args_list and args_list[0] != 'self':
+                failed = True
+                print '%s --> Line %s: %s' % (
+                    files_func[1][0], func.lineno,
+                    wrong_ordself_message)
+            # Check if 'cls' exists in args and doesn't come first.
+            elif 'cls' in args_list and args_list[0] != 'cls':
+                failed = True
+                print '%s --> Line %s: %s' % (
+                    files_func[1][0], func.lineno,
+                    wrong_ordcls_message)
     print ''
     print '----------------------------------------'
     print ''
@@ -1733,7 +1725,7 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _check_args_order(all_files)
+    args_order_messages = _fecth_fun(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
