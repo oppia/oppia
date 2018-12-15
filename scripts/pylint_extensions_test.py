@@ -201,19 +201,19 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        # pylint: disable=backslash-continuation
+
         with open(filename, 'w') as tmp:
             tmp.write(
-                """message1 = 'abc'\\
-                'cde'\\
-                'xyz'
+                """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+                """'cde'\\\n""" # pylint: disable=backslash-continuation
+                """'xyz'
                 message2 = 'abc\\\\'
                 message3 = (
                     'abc\\\\'
                     'xyz\\\\'
                 )
                 """)
-        # pylint: enable=backslash-continuation
+
         node.file = filename
         node.path = filename
 
