@@ -20,7 +20,8 @@
         </th>
       </tr>
       <tr ng-repeat="question in questionSummaries"
-          class="list-item">
+          class="list-item"
+          ng-click="editQuestion(question)">
         <td> <[getQuestionIndex($index)]> </td>
         <td>
           <a class="list-summary">
