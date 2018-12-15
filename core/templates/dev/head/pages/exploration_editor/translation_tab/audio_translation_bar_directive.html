@@ -114,9 +114,8 @@
 </div>
 <div ng-if="isAudioAvailable && !audioIsUpdating" class="oppia-audio-recording-bar">
   <div class="oppia-content-wrapper">
-    <button
-      class="btn oppia-audio-button"
-      ng-click="playPauseUploadedAudioTranslation()">
+    <button class="btn oppia-audio-button"
+            ng-click="playPauseUploadedAudioTranslation()">
       <i class="material-icons"><[isPlayingUploadedAudio() ? 'pause' : 'play_arrow']></i>
     </button>
   </div>
@@ -258,7 +257,7 @@
     color: white;
     background-color: #01675d;
   }
-  .oppia-cancel-button:hover{
+  .oppia-cancel-button:hover {
     color: white;
     background-color: #858585;
   }
