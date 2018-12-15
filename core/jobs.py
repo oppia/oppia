@@ -1324,7 +1324,7 @@ class BaseContinuousComputationManager(object):
             str. The active realtime layer index of this class.
         """
         def _get_active_realtime_index_transactional():
-            """Finds the Continous Computation Model corresponding to the this
+            """Finds the Continous Computation Model corresponding to this
             class type or inserts it in the database if not found and extracts
             the active realtime layer index.
 
