@@ -87,14 +87,12 @@
   </ng-audio-recorder>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
     <button class="btn oppia-confirm-button"
-            uib-tooltip="Save" tooltip-placement="above"
             ng-click="saveRecordedAudio()">
       Confirm
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
     <button class="btn oppia-cancel-button"
-            uib-tooltip="Cancel" tooltip-placement="above"
             ng-click="cancelRecording()">
       Cancel
     </button>
@@ -106,7 +104,7 @@
       <i class="material-icons">play_arrow</i>
     </button>
   </div>
-  <div class="oppia-content-wrapper">
+  <div class="oppia-content-wrapper oppia-flex-1-wrapper">
     <div class="oppia-audio-bar-info">
       <div>Saving<loading-dots></loading-dots></div>
     </div>
