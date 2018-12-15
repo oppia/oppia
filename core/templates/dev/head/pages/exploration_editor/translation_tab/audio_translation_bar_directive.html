@@ -89,25 +89,17 @@
     </div>
   </ng-audio-recorder>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
-    <button
-      class="btn oppia-audio-button"
-      uib-tooltip="Re-take" tooltip-placement="above"
-      ng-click="reRecord()">
-      <i class="material-icons">&#xE028;</i>
-    </button>
-  </div>
-  <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
-    <button class="btn oppia-audio-button"
+    <button class="btn oppia-confirm-button"
             uib-tooltip="Save" tooltip-placement="above"
             ng-click="saveRecordedAudio()">
-      <i class="material-icons">save</i>
+      Confirm
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
-    <button class="btn oppia-audio-button"
+    <button class="btn oppia-cancel-button"
             uib-tooltip="Cancel" tooltip-placement="above"
             ng-click="cancelRecording()">
-      <i class="material-icons">clear</i>
+      Cancel
     </button>
   </div>
 </div>
@@ -135,12 +127,12 @@
   </div>
   <div class="oppia-content-wrapper">
     <button
-      class="btn oppia-audio-button"
-      ng-disabled="!canTranslate"
-      uib-tooltip="Record new"
-      tooltip-placement="above"
-      ng-click="updateAudio()">
-      <i class="material-icons">&#xE028;</i>
+            class="btn oppia-audio-button"
+            uib-tooltip="Upload audio"
+            tooltip-placement="above"
+            ng-disabled="!canTranslate"
+            ng-click="openAddAudioTranslationModal()">
+      <i class="material-icons">&#xE2C6;</i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
@@ -153,16 +145,7 @@
       <i class="material-icons">&#xE872;</i>
     </button>
   </div>
-  <div class="oppia-content-wrapper">
-    <button
-      class="btn oppia-audio-button"
-      uib-tooltip="Upload audio"
-      tooltip-placement="above"
-      ng-disabled="!canTranslate"
-      ng-click="openAddAudioTranslationModal()">
-      <i class="material-icons">publish</i>
-    </button>
-  </div>
+
   <div class="oppia-content-wrapper" ng-if="!audioNeedsUpdate">
     <button
       class="btn oppia-audio-button"
@@ -170,7 +153,7 @@
       tooltip-placement="above"
       ng-disabled="!canTranslate"
       ng-click="toggleAudioNeedsUpdate()">
-      <i class="material-icons">update</i>
+      <i class="material-icons">warning</i>
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="audioNeedsUpdate">
@@ -180,7 +163,7 @@
       tooltip-placement="above"
       ng-disabled="!canTranslate"
       ng-click="toggleAudioNeedsUpdate()">
-      <i class="material-icons">update</i>
+      <i class="material-icons">warning</i>
       <i class="material-icons oppia-unmark-icon">clear</i>
     </button>
   </div>
@@ -237,7 +220,7 @@
     background-color: #6f6f6f;
     color: white;
     padding: 5px 40px;
-    border-radius: 20px;
+    border-radius: 3px;
     flex: 1;
     text-align: center;
     font-size: 12px;
@@ -252,9 +235,29 @@
     padding-left: 6px;
     transition: background-color .2s cubic-bezier(.35,0,.25,1);
   }
-  .oppia-audio-button:hover {
+  .oppia-confirm-button {
+    color: white;
+    background-color: #009688;
+    width: 63px;
+    border-radius: 3px;
+    padding-left: 6px;
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
+  }
+  .oppia-cancel-button {
+    color: white;
+    background-color: #9a9a9a;
+    width: 57px;
+    border-radius: 3px;
+    padding-left: 6px;
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
+  }
+  .oppia-audio-button:hover, .oppia-confirm-button:hover {
     color: white;
     background-color: #01675d;
+  }
+  .oppia-cancel-button:hover{
+    color: white;
+    background-color: #858585;
   }
   .oppia-audio-button[disabled] {
     background-color: #9a9a9a;
@@ -274,7 +277,7 @@
     background-color: #6f6f6f;
     color: white;
     padding: 5px 40px;
-    border-radius: 20px;
+    border-radius: 3px;
     flex: 1;
     text-align: center;
     font-size: 12px;
@@ -291,7 +294,7 @@
     background-color: #6f6f6f;
     color: white;
     padding: 0 15px;
-    border-radius: 20px;
+    border-radius: 3px;
     text-align: center;
     font-size: 12px;
     height: 38px;
@@ -353,9 +356,9 @@
   audio-translation-bar canvas {
     background: #e4e1d1;
     max-width: unset;
-    border-radius: 50px;
+    border-radius: 3px;
   }
   audio-translation-bar .waveSurfer > wave:first-child {
-    border-radius: 50px;
+    border-radius: 3px;
   }
 </style>
