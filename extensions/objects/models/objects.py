@@ -511,6 +511,16 @@ class LogicQuestion(BaseObject):
         """
 
         def _validate_expression(expression):
+            """Validates the given expression.
+
+            Args:
+                expression: dict(str, *). The expression to be verified in the
+                    dict format.
+
+            Raises:
+                AssertionError: The specified expression is not in the correct
+                    format.
+            """
             assert isinstance(expression, dict)
             assert isinstance(expression['top_kind_name'], basestring)
             assert isinstance(expression['top_operator_name'], basestring)
@@ -518,6 +528,15 @@ class LogicQuestion(BaseObject):
             _validate_expression_array(expression['dummies'])
 
         def _validate_expression_array(array):
+            """Validates the given expression array.
+
+            Args:
+                array: list(dict(str, *)). The expression array to be verified.
+
+            Raises:
+                AssertionError: The specified expression array is not in the
+                    list format.
+            """
             assert isinstance(array, list)
             for item in array:
                 _validate_expression(item)
