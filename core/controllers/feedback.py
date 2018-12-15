@@ -67,7 +67,7 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         self.values.update({
