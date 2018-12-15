@@ -189,3 +189,44 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
+
+
+class BackslashContinuationCheckerTests(unittest.TestCase):
+
+    def test_finds_backslash_continuation(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.BackslashContinuationChecker)
+        checker_test_object.setup_method()
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        # pylint: disable=backslash-continuation
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """message1 = 'abc'\\
+                'cde'\\
+                'xyz'
+                message2 = 'abc\\\\'
+                message3 = (
+                    'abc\\\\'
+                    'xyz\\\\'
+                )
+                """)
+        # pylint: enable=backslash-continuation
+        node.file = filename
+        node.path = filename
+
+        checker_test_object.checker.process_module(node)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='backslash-continuation',
+                line=1
+            ),
+            testutils.Message(
+                msg_id='backslash-continuation',
+                line=2
+            ),
+        ):
+            temp_file.close()
