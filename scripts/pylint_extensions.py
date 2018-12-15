@@ -47,7 +47,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         """Visits each function call in a lint check.
 
         Args:
-            node. Call. The current function call node.
+            node: Call. The current function call node.
         """
         called = checker_utils.safe_infer(node.func)
 
@@ -243,7 +243,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         'W9012': ('Missing return type documentation',
                   'missing-return-type-doc',
                   'Please document the type returned by this method.',
-                  # we can't use the same old_name for two different warnings
+                  # We can't use the same old_name for two different warnings
                   # {'old_names': [('W9007', 'missing-returns-doc')]}.
                  ),
         'W9013': ('Missing yield documentation',
@@ -253,7 +253,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         'W9014': ('Missing yield type documentation',
                   'missing-yield-type-doc',
                   'Please document the type yielded by this method.',
-                  # we can't use the same old_name for two different warnings
+                  # We can't use the same old_name for two different warnings
                   # {'old_names': [('W9009', 'missing-yields-doc')]}.
                  ),
         'W9015': ('"%s" missing in parameter documentation',
@@ -696,8 +696,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node. astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST
+            node: astroid.scoped_nodes.Function. Node for a function or method
+                definition in AST.
         """
 
         try:
@@ -725,6 +725,38 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
                 pass
 
 
+class BackslashContinuationChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that backslash is not used
+    for continuation.
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'backslash-continuation'
+    priority = -1
+    msgs = {
+        'C0004': (
+            (
+                'Backslash should not be used to break continuation lines. '
+                'Use braces to break long lines.'),
+            'backslash-continuation',
+            'Use braces to break long lines instead of backslash.'
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        with node.stream() as stream:
+            file_content = stream.readlines()
+            for (line_num, line) in enumerate(file_content):
+                if line.rstrip('\r\n').endswith('\\'):
+                    self.add_message(
+                        'backslash-continuation', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -735,3 +767,4 @@ def register(linter):
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
+    linter.register_checker(BackslashContinuationChecker(linter))

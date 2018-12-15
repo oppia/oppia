@@ -233,6 +233,7 @@ class TestBase(unittest.TestCase):
             'outline_is_finalized': False,
             'acquired_skill_ids': [],
             'id': 'node_1',
+            'title': 'Chapter 1',
             'prerequisite_skill_ids': []}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
@@ -485,7 +486,9 @@ tags: []
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
-            self.assertEqual(json_response.status_int, 200)
+            self.assertTrue(
+                json_response.status_int < 400 and
+                json_response.status_int >= 200)
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
@@ -931,8 +934,8 @@ tags: []
         """Publish the exploration with the given exploration_id.
 
         Args:
-            exploration_id: str. The ID of the new exploration.
             owner_id: str. The user_id of the owner of the exploration.
+            exploration_id: str. The ID of the new exploration.
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
@@ -1151,7 +1154,6 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
-
         """
         topic_model = topic_models.TopicModel(
             id=topic_id,
@@ -1238,10 +1240,10 @@ tags: []
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            skill_contents: SkillContents. A SkillContents object containing the
-                explanation and examples of the skill.
             misconceptions: list(Misconception). A list of Misconception objects
                 that contains the various misconceptions of the skill.
+            skill_contents: SkillContents. A SkillContents object containing the
+                explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
 

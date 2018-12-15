@@ -194,10 +194,10 @@ class AnswerGroup(object):
         only has one classifier rule.
 
         Args:
+            interaction: InteractionInstance. The interaction object.
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -402,7 +402,8 @@ class InteractionInstance(object):
         solution_dict = (
             Solution.from_dict(
                 interaction_dict['id'], interaction_dict['solution'])
-            if interaction_dict['solution'] else None)
+            if (interaction_dict['solution'] and interaction_dict['id'])
+            else None)
 
         return cls(
             interaction_dict['id'],
@@ -1029,10 +1030,10 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            classifier_model_id: str or None. The classifier model ID
-                associated with this state, if applicable.
             content_ids_to_audio_translations: dict. A dict representing audio
                 translations for corresponding content_id.
+            classifier_model_id: str or None. The classifier model ID
+                associated with this state, if applicable.
         """
         # The content displayed to the reader in this state.
         self.content = content
@@ -1114,7 +1115,8 @@ class State(object):
         if not set(content_id_list) <= set(available_content_ids):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to have all '
-                'of the listed content ids %s' % content_id_list)
+                'of the listed content ids %s, found %s' %
+                (content_id_list, available_content_ids))
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'

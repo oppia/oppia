@@ -360,7 +360,6 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
-
     def _get_all_subscribers_of_creators(self, user_id):
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
@@ -374,7 +373,6 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         return (
             subscriptions_model.creator_ids
             if subscriptions_model else [])
-
 
     def test_subscribe_to_creator(self):
         self.assertEqual(self._get_all_subscribers_of_creators(

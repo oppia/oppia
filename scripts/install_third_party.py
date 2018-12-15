@@ -27,8 +27,8 @@ import zipfile
 
 import common  # pylint: disable=relative-import
 
-#These two lines prevent a "IOError: [Errno socket error]
-#[Errno -2] Name or service not known" error
+# These two lines prevent a "IOError: [Errno socket error]
+# [Errno -2] Name or service not known" error
 # in urllib.urlretrieve, if the user is behind a proxy.
 if 'VAGRANT' in os.environ:
     os.environ['http_proxy'] = ''
@@ -334,6 +334,7 @@ MATHJAX_SUBDIRS_TO_REMOVE = [
 
 
 def _install_third_party_libs():
+    """Installs all the third party libraries."""
     download_manifest_files(MANIFEST_FILE_PATH)
 
     # MathJax is too big. Remove many unneeded files by following these

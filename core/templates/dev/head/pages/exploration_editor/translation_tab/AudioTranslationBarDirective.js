@@ -91,6 +91,7 @@ oppia.directive('audioTranslationBar', [
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
           $scope.showAudioTimer = true;
+          $scope.audioIsCurrentlyBeingSaved = false;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
@@ -206,6 +207,7 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.saveRecordedAudio = function() {
+            $scope.audioIsCurrentlyBeingSaved = true;
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
@@ -227,8 +229,10 @@ oppia.directive('audioTranslationBar', [
               saveContentIdsToAudioTranslationChanges();
               AlertsService.addSuccessMessage(
                 'Succesfuly uploaded recorded audio.');
+              $scope.audioIsCurrentlyBeingSaved = false;
               $scope.initAudioBar();
             }, function(errorResponse) {
+              $scope.audioIsCurrentlyBeingSaved = false;
               AlertsService.addWarning(errorResponse.error);
               $scope.initAudioBar();
             });

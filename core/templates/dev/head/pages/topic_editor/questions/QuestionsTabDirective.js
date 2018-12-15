@@ -29,13 +29,18 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService', function(
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
+        'QuestionUndoRedoService', 'UndoRedoService',
+        'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             TopicEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService) {
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
+            QuestionUndoRedoService, UndoRedoService,
+            NUM_QUESTIONS_PER_PAGE) {
+          $scope.currentPage = 0;
           var _initTab = function() {
             $scope.questionEditorIsShown = false;
             $scope.question = null;
@@ -44,11 +49,42 @@ oppia.directive('questionsTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.questionSummaries =
-              TopicEditorStateService.getQuestionSummaries();
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            $scope.isLastPage = TopicEditorStateService.isLastQuestionBatch;
             $scope.misconceptions = [];
             $scope.questionSuggestionThreads = [];
             $scope.activeQuestion = null;
             $scope.suggestionReviewMessage = null;
+            $scope.questionIsBeingUpdated = false;
+            $scope.questionIsBeingSaved = false;
+            $scope.emptyMisconceptionsList = [];
+          };
+
+          $scope.hasChanges = function() {
+            return QuestionUndoRedoService.hasChanges();
+          };
+
+          $scope.getQuestionIndex = function(index) {
+            return $scope.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
+          };
+
+          $scope.goToNextPage = function() {
+            $scope.currentPage++;
+            var questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
+            if (questionSummaries === null) {
+              TopicEditorStateService.fetchQuestionSummaries(
+                $scope.topic.getId(), false
+              );
+            } else {
+              $scope.questionSummaries = questionSummaries;
+            }
+          };
+
+          $scope.goToPreviousPage = function() {
+            $scope.currentPage--;
+            $scope.questionSummaries =
+              TopicEditorStateService.getQuestionSummaries($scope.currentPage);
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -58,12 +94,62 @@ oppia.directive('questionsTab', [
               AlertsService.addWarning(validationErrors);
               return;
             }
-            EditableQuestionBackendApiService.createQuestion(
-              $scope.skillId, $scope.question.toBackendDict(true)
-            ).then(function() {
-              TopicEditorStateService.fetchQuestionSummaries(
-                $scope.topic.getId()
-              );
+
+            if (!$scope.questionIsBeingUpdated) {
+              $scope.questionIsBeingSaved = true;
+              EditableQuestionBackendApiService.createQuestion(
+                $scope.skillId,
+                $scope.question.toBackendDict(true)
+              ).then(function() {
+                TopicEditorStateService.fetchQuestionSummaries(
+                  $scope.topic.getId(), true
+                );
+                $scope.questionIsBeingSaved = false;
+                $scope.currentPage = 0;
+              });
+            } else {
+              if (QuestionUndoRedoService.hasChanges()) {
+                $scope.questionIsBeingSaved = true;
+                // TODO(tjiang11): Allow user to specify a commit message.
+                EditableQuestionBackendApiService.updateQuestion(
+                  $scope.questionId, $scope.question.getVersion(), 'blank',
+                  QuestionUndoRedoService.getCommittableChangeList()).then(
+                  function() {
+                    QuestionUndoRedoService.clearChanges();
+                    $scope.questionIsBeingSaved = false;
+                    TopicEditorStateService.fetchQuestionSummaries(
+                      $scope.topic.getId(), function() {
+                        _initTab();
+                      }
+                    );
+                  }, function(error) {
+                    AlertsService.addWarning(
+                      error || 'There was an error saving the question.');
+                    $scope.questionIsBeingSaved = false;
+                  });
+              }
+            }
+          };
+
+          $scope.editQuestion = function(questionSummary) {
+            EditableQuestionBackendApiService.fetchQuestion(
+              questionSummary.id).then(function(response) {
+              response.associated_skill_dicts.forEach(function(skillDict) {
+                skillDict.misconceptions.forEach(function(misconception) {
+                  $scope.misconceptions.append(misconception);
+                });
+              });
+              $scope.question =
+                QuestionObjectFactory.createFromBackendDict(
+                  response.question_dict);
+              $scope.questionId = $scope.question.getId();
+              $scope.questionStateData = $scope.question.getStateData();
+              $scope.questionIsBeingUpdated = true;
+
+              $scope.openQuestionEditor();
+            }, function(errorResponse) {
+              AlertsService.addWarning(
+                errorResponse.error || 'Failed to fetch question.');
             });
           };
 
@@ -124,6 +210,7 @@ oppia.directive('questionsTab', [
                     QuestionObjectFactory.createDefaultQuestion();
                   $scope.questionId = $scope.question.getId();
                   $scope.questionStateData = $scope.question.getStateData();
+                  $scope.questionIsBeingUpdated = false;
                   $scope.openQuestionEditor();
                 }, function(error) {
                   AlertsService.addWarning();
