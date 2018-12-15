@@ -90,7 +90,7 @@ oppia.directive('audioTranslationBar', [
           $scope.showRecorderWarning = false;
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
-          $scope.audioIsCurrentlyBeingSaved = false;
+          $scope.showAudioTimer = true;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
@@ -206,7 +206,6 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.saveRecordedAudio = function() {
-            $scope.audioIsCurrentlyBeingSaved = true;
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
@@ -228,10 +227,8 @@ oppia.directive('audioTranslationBar', [
               saveContentIdsToAudioTranslationChanges();
               AlertsService.addSuccessMessage(
                 'Succesfuly uploaded recorded audio.');
-              $scope.audioIsCurrentlyBeingSaved = false;
               $scope.initAudioBar();
             }, function(errorResponse) {
-              $scope.audioIsCurrentlyBeingSaved = false;
               AlertsService.addWarning(errorResponse.error);
               $scope.initAudioBar();
             });
@@ -285,9 +282,11 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.playPauseUploadedAudioTranslation = function(languageCode) {
+            $scope.showAudioTimer = true;
             if (!AudioPlayerService.isPlaying()) {
               if (AudioPlayerService.isTrackLoaded()) {
                 AudioPlayerService.play();
+                $scope.showAudioTimer = true;
               } else {
                 loadAndPlayAudioTranslation();
               }
@@ -303,12 +302,14 @@ oppia.directive('audioTranslationBar', [
 
           $scope.getUploadedAudioTimer = function() {
             if (AudioPlayerService.isTrackLoaded()) {
+              $scope.showAudioTimer = true;
               var currentTime = $filter('formatTimer')(AudioPlayerService
                 .getCurrentTime());
               var duration = $filter('formatTimer')(AudioPlayerService
                 .getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
+              $scope.showAudioTimer = false;
               return '--:-- / --:--';
             }
           };
@@ -325,6 +326,7 @@ oppia.directive('audioTranslationBar', [
               AudioPlayerService.load(audioTranslation.filename)
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
+                  $scope.showAudioTimer = true;
                   AudioPlayerService.play();
                 });
             }
