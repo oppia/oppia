@@ -238,7 +238,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
                                  expected_status_int=404)
         # Check DELETE returns 500 when the skill still has associated
         # questions.
-        constants_swap = self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
+        constants_swap = self.swap(
+            constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
         with constants_swap, skill_has_questions_swap:
