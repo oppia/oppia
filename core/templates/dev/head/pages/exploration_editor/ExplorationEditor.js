@@ -47,6 +47,7 @@ oppia.controller('ExplorationEditor', [
   'GraphDataService', 'StateEditorTutorialFirstTimeService',
   'ExplorationParamSpecsService', 'ExplorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ContextService',
+  'ExplorationAdvancedFeaturesBackendApiService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
   'AutosaveInfoModalsService', 'SiteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
@@ -65,6 +66,7 @@ oppia.controller('ExplorationEditor', [
       GraphDataService, StateEditorTutorialFirstTimeService,
       ExplorationParamSpecsService, ExplorationParamChangesService,
       ExplorationWarningsService, $templateCache, ContextService,
+      ExplorationAdvancedFeaturesBackendApiService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
       AutosaveInfoModalsService, SiteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
@@ -111,29 +113,43 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      ExplorationDataService.getData(function(explorationId, lostChanges) {
-        if (!AutosaveInfoModalsService.isModalOpen()) {
-          AutosaveInfoModalsService.showLostChangesModal(
-            lostChanges, explorationId);
-        }
-      }).then(function(data) {
-        ExplorationStatesService.init(data.states);
+      Promise.all([
+        ExplorationDataService.getData(function(explorationId, lostChanges) {
+          if (!AutosaveInfoModalsService.isModalOpen()) {
+            AutosaveInfoModalsService.showLostChangesModal(
+              lostChanges, explorationId);
+          }
+        }),
+        ExplorationAdvancedFeaturesBackendApiService
+          .fetchExplorationAdvancedFeatures(),
+      ]).then(function(allData) {
+        var explorationData = allData[0];
+        var featuresData = allData[1];
 
-        ExplorationTitleService.init(data.title);
-        ExplorationCategoryService.init(data.category);
-        ExplorationObjectiveService.init(data.objective);
-        ExplorationLanguageCodeService.init(data.language_code);
-        ExplorationInitStateNameService.init(data.init_state_name);
-        ExplorationTagsService.init(data.tags);
+        ExplorationAdvancedFeaturesService.init(explorationData, featuresData);
+
+        ExplorationStatesService.init(explorationData.states);
+
+        ExplorationTitleService.init(explorationData.title);
+        ExplorationCategoryService.init(explorationData.category);
+        ExplorationObjectiveService.init(explorationData.objective);
+        ExplorationLanguageCodeService.init(explorationData.language_code);
+        ExplorationInitStateNameService.init(explorationData.init_state_name);
+        ExplorationTagsService.init(explorationData.tags);
         ExplorationParamSpecsService.init(
-          ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
+          ParamSpecsObjectFactory.createFromBackendDict(
+            explorationData.param_specs));
         ExplorationParamChangesService.init(
-          ParamChangesObjectFactory.createFromBackendList(data.param_changes));
-        ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+          ParamChangesObjectFactory.createFromBackendList(
+            explorationData.param_changes));
+        ExplorationAutomaticTextToSpeechService.init(
+          explorationData.auto_tts_enabled);
         ExplorationCorrectnessFeedbackService.init(
-          data.correctness_feedback_enabled);
-        StateClassifierMappingService.init(data.state_classifier_mapping);
-        PlaythroughIssuesService.initSession(data.exploration_id, data.version);
+          explorationData.correctness_feedback_enabled);
+        StateClassifierMappingService.init(
+          explorationData.state_classifier_mapping);
+        PlaythroughIssuesService.initSession(
+          explorationData.exploration_id, explorationData.version);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -142,21 +158,23 @@ oppia.controller('ExplorationEditor', [
         $scope.explorationInitStateNameService = (
           ExplorationInitStateNameService);
 
-        $scope.currentUserIsAdmin = data.is_admin;
-        $scope.currentUserIsModerator = data.is_moderator;
+        $scope.currentUserIsAdmin = explorationData.is_admin;
+        $scope.currentUserIsModerator = explorationData.is_moderator;
 
-        $scope.currentUser = data.user;
-        $scope.currentVersion = data.version;
+        $scope.currentUser = explorationData.user;
+        $scope.currentVersion = explorationData.version;
 
-        ExplorationAdvancedFeaturesService.init(data);
         ExplorationRightsService.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.translator_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          explorationData.rights.owner_names,
+          explorationData.rights.editor_names,
+          explorationData.rights.translator_names,
+          explorationData.rights.viewer_names, explorationData.rights.status,
+          explorationData.rights.cloned_from,
+          explorationData.rights.community_owned,
+          explorationData.rights.viewable_if_private);
         UserEmailPreferencesService.init(
-          data.email_preferences.mute_feedback_notifications,
-          data.email_preferences.mute_suggestion_notifications);
+          explorationData.email_preferences.mute_feedback_notifications,
+          explorationData.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();
@@ -176,7 +194,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
-            !data.states.hasOwnProperty(
+            !explorationData.states.hasOwnProperty(
               RouterService.getCurrentStateFromLocationPath('gui'))) {
           if (ThreadDataService.getOpenThreadsCount() > 0) {
             RouterService.navigateToFeedbackTab();
@@ -188,13 +206,14 @@ oppia.controller('ExplorationEditor', [
         ExplorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
-        if (data.draft_changes !== null) {
-          ChangeListService.loadAutosavedChangeList(data.draft_changes);
+        if (explorationData.draft_changes !== null) {
+          ChangeListService.loadAutosavedChangeList(
+            explorationData.draft_changes);
         }
 
-        if (data.is_version_of_draft_valid === false &&
-            data.draft_changes !== null &&
-            data.draft_changes.length > 0) {
+        if (explorationData.is_version_of_draft_valid === false &&
+            explorationData.draft_changes !== null &&
+            explorationData.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           AutosaveInfoModalsService.showVersionMismatchModal(
@@ -218,7 +237,8 @@ oppia.controller('ExplorationEditor', [
         }
 
         StateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load, $scope.explorationId);
+          explorationData.show_state_editor_tutorial_on_load,
+          $scope.explorationId);
 
         if (ExplorationRightsService.isPublic()) {
           // Stats are loaded asynchronously after the exploration data because

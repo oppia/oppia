@@ -25,20 +25,23 @@ oppia.directive('editorNavigation', [
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationRightsService', 'ExplorationWarningsService',
-        'RouterService', 'StateEditorTutorialFirstTimeService',
-        'SiteAnalyticsService', 'ThreadDataService', 'UserService',
-        'WindowDimensionsService',
+        'ExplorationAdvancedFeaturesService', 'ExplorationRightsService',
+        'ExplorationWarningsService', 'RouterService',
+        'StateEditorTutorialFirstTimeService', 'SiteAnalyticsService',
+        'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
-            ExplorationRightsService, ExplorationWarningsService,
-            RouterService, StateEditorTutorialFirstTimeService,
-            SiteAnalyticsService, ThreadDataService, UserService,
-            WindowDimensionsService) {
+            ExplorationAdvancedFeaturesService, ExplorationRightsService,
+            ExplorationWarningsService, RouterService,
+            StateEditorTutorialFirstTimeService, SiteAnalyticsService,
+            ThreadDataService, UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
+          $scope.isIssuesTabExposed =
+            ExplorationAdvancedFeaturesService.isIssuesTabExposed();
+          console.log('brianrodri: ' + $scope.isIssuesTabExposed);
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -113,6 +116,7 @@ oppia.directive('editorNavigation', [
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
+          $scope.selectIssuesTab = RouterService.navigateToIssuesTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
 
           WindowDimensionsService.registerOnResizeHook(function() {

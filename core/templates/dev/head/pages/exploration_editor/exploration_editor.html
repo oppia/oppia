@@ -101,6 +101,10 @@
       <div ng-show="getTabStatuses().active === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
       </div>
+
+      <div ng-show="getTabStatuses().active === 'issues'">
+        {% include 'pages/exploration_editor/issues_tab/issues_tab.html' %}
+      </div>
     </div>
   </div>
 
@@ -241,6 +245,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationAdvancedFeaturesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/ExplorationAdvancedFeaturesBackendApiService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>

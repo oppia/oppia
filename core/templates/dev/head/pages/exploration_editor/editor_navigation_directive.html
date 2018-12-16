@@ -95,6 +95,18 @@
     </div>
   </li>
 
+  <li ng-if="isLargeScreen && isIssuesTabExposed" ng-class="{'active': getTabStatuses().active === 'issues'}" ng-click="selectIssuesTab()">
+    <a href="#" uib-tooltip="Issues" tooltip-placement="bottom"
+       class="oppia-editor-navbar-tab-anchor protractor-test-issues-tab">
+      <i class="material-icons">&#xE87F;</i>
+    </a>
+    <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+      <span class="oppia-exploration-open-threads-count">
+        <[getOpenThreadsCount()]>&nbsp;open
+      </span>
+    </div>
+  </li>
+
   <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
     <li uib-dropdown class="uib-dropdown uib-popover" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
         popover-placement="bottom" popover-trigger="'none'"

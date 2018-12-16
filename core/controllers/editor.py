@@ -879,3 +879,16 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
         })
+
+
+class ExplorationFeaturesHandler(EditorHandler):
+    """Returns a list of top N unresolved answers."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests for unresolved answers."""
+        self.render_json({
+            'is_issues_tab_exposed': config_domain.EXPOSE_ISSUES_TAB.value
+        })

@@ -473,6 +473,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
+    get_redirect_route(
+        r'/explorationfeatures', editor.ExplorationFeaturesHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

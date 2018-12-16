@@ -31,6 +31,7 @@ oppia.factory('RouterService', [
     var STATS_TAB = 'stats';
     var HISTORY_TAB = 'history';
     var FEEDBACK_TAB = 'feedback';
+    var ISSUES_TAB = 'issues';
 
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
@@ -78,6 +79,8 @@ oppia.factory('RouterService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
+      } else if (newPath === '/issues') {
+        _tabs.active = ISSUES_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
         _doNavigationWithState(newPath, SLUG_GUI);
@@ -156,7 +159,8 @@ oppia.factory('RouterService', [
         return (
           currentPath === '/translation' || currentPath === '/preview' ||
           currentPath === '/stats' || currentPath === '/settings' ||
-          currentPath === '/history' || currentPath === '/feedback');
+          currentPath === '/history' || currentPath === '/feedback' ||
+          currentPath === '/issues');
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -211,7 +215,11 @@ oppia.factory('RouterService', [
       navigateToFeedbackTab: function() {
         _savePendingChanges();
         $location.path('/feedback');
-      }
+      },
+      navigateToIssuesTab: function() {
+        _savePendingChanges();
+        $location.path('/issues');
+      },
     };
 
     return RouterService;
