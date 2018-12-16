@@ -25,13 +25,15 @@ oppia.directive('createActivityButton', [
       controller: [
         '$scope', '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
-        'SiteAnalyticsService', 'UrlService', 'UserService',
+        'SiteAnalyticsService', 'UrlService', 'UserService', 
+        'ALLOW_YAML_FILE_UPLOAD',
         function(
             $scope, $timeout, $window, $uibModal,
             ExplorationCreationService, CollectionCreationService,
-            SiteAnalyticsService, UrlService, UserService) {
+            SiteAnalyticsService, UrlService, UserService,
+            ALLOW_YAML_FILE_UPLOAD) {
           $scope.creationInProgress = false;
-          $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
+          $scope.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 
           $scope.canCreateCollections = null;
           $scope.userIsLoggedIn = null;

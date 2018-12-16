@@ -601,9 +601,6 @@ EMBEDDED_GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
-# Whether to allow YAML file uploads.
-ALLOW_YAML_FILE_UPLOAD = False
-
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
