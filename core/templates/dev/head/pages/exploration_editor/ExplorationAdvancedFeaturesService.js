@@ -17,7 +17,7 @@
  *               the exploration editor.
  */
 
-oppia.factory('ExplorationAdvancedFeaturesService', ['$http', function($http) {
+oppia.factory('ExplorationAdvancedFeaturesService', [function() {
   var _settings = {
     areParametersEnabled: false,
     isIssuesTabExposed: false,
