@@ -40,6 +40,10 @@ oppia.factory('RouterService', [
       active: MAIN_TAB
     };
 
+    var isIssuesTabExposed = function() {
+      return ExplorationAdvancedFeaturesService.isIssuesTabExposed();
+    };
+
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
     $rootScope.$watch(function() {
@@ -79,8 +83,7 @@ oppia.factory('RouterService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
-      } else if (newPath === '/issues' &&
-        ExplorationAdvancedFeaturesService.isIssuesTabExposed()) {
+      } else if (newPath === '/issues' && isIssuesTabExposed()) {
         _tabs.active = ISSUES_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
@@ -157,8 +160,7 @@ oppia.factory('RouterService', [
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
-        if (currentPath === '/issues' &&
-          ExplorationAdvancedFeaturesService.isIssuesTabExposed()) {
+        if (currentPath === '/issues' && isIssuesTabExposed()) {
           return true;
         }
         return (
