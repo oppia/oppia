@@ -39,8 +39,9 @@ oppia.directive('editorNavigation', [
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          $scope.isIssuesTabExposed =
-            ExplorationAdvancedFeaturesService.isIssuesTabExposed;
+          $scope.isIssuesTabExposed = function() {
+            return ExplorationAdvancedFeaturesService.isIssuesTabExposed();
+          };
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
