@@ -882,13 +882,13 @@ class TopUnresolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationFeaturesHandler(EditorHandler):
-    """Returns a list of top N unresolved answers."""
+    """Returns features the exploration editor is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):
-        """Handles GET requests for unresolved answers."""
+        """Handles GET requests for exploration editor features."""
         self.render_json({
-            'is_issues_tab_exposed': config_domain.EXPOSE_ISSUES_TAB.value
+            'is_issues_tab_exposed': config_domain.IS_ISSUES_TAB_EXPOSED.value,
         })

@@ -275,6 +275,6 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
 
-EXPOSE_ISSUES_TAB = ConfigProperty(
-    'expose_issues_tab', BOOL_SCHEMA,
+IS_ISSUES_TAB_EXPOSED = ConfigProperty(
+    'is_issues_tab_exposed', BOOL_SCHEMA,
     'Exposes the Issues Tab for creators in the exploration editor.', False)
