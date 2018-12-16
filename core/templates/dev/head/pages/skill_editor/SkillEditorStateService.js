@@ -19,22 +19,26 @@
 
 oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+oppia.constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'SkillObjectFactory', 'SkillRightsObjectFactory',
   'EditableSkillBackendApiService', 'SkillRightsBackendApiService',
   'AlertsService', 'UndoRedoService', 'EVENT_SKILL_INITIALIZED',
-  'EVENT_SKILL_REINITIALIZED',
+  'EVENT_SKILL_REINITIALIZED', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   function(
       $rootScope, SkillObjectFactory, SkillRightsObjectFactory,
       EditableSkillBackendApiService, SkillRightsBackendApiService,
       AlertsService, UndoRedoService, EVENT_SKILL_INITIALIZED,
-      EVENT_SKILL_REINITIALIZED) {
+      EVENT_SKILL_REINITIALIZED, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
+    var _questionSummaries = [];
+    var _nextCursorForQuestions = '';
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -60,6 +64,14 @@ oppia.factory('SkillEditorStateService', [
         newBackendSkillRightsObject));
     };
 
+    var _setQuestionSummaries = function(questionSummaries) {
+      _questionSummaries.push(angular.copy(questionSummaries));
+      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
+    };
+    var _setNextQuestionsCursor = function(nextCursor) {
+      _nextCursorForQuestions = nextCursor;
+    };
+
     return {
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
@@ -67,6 +79,13 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
+            EditableSkillBackendApiService.fetchQuestions(
+              skillId, _nextCursorForQuestions).then(
+              function(returnObject) {
+                _setQuestionSummaries(returnObject.questionSummaries);
+                _setNextQuestionsCursor(returnObject.nextCursor);
+              }
+            );
             _skillIsBeingLoaded = false;
           }, function(error) {
             AlertsService.addWarning();
@@ -86,6 +105,33 @@ oppia.factory('SkillEditorStateService', [
 
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
+      },
+
+      isLastQuestionBatch: function(index) {
+        return (
+          _nextCursorForQuestions === null &&
+          index === _questionSummaries.length - 1);
+      },
+
+      fetchQuestionSummaries: function(skillId, resetHistory) {
+        if (resetHistory) {
+          _questionSummaries = [];
+          _nextCursorForQuestions = '';
+        }
+        EditableSkillBackendApiService.fetchQuestions(
+          skillId, _nextCursorForQuestions).then(
+          function(returnObject) {
+            _setQuestionSummaries(returnObject.questionSummaries);
+            _setNextQuestionsCursor(returnObject.nextCursor);
+          }
+        );
+      },
+
+      getQuestionSummaries: function(index) {
+        if (index >= _questionSummaries.length) {
+          return null;
+        }
+        return _questionSummaries[index];
       },
 
       hasLoadedSkill: function() {
