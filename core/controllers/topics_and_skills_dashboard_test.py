@@ -50,7 +50,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
     def _get_csrf_token_for_put(self):
         csrf_token = None
         url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             response = self.testapp.get(url_prefix)
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
@@ -60,7 +60,7 @@ class TopicsAndSkillsDashboardPageTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
             url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
             response = self.testapp.get(url, expect_errors=True)
             self.assertEqual(response.status_int, 404)
@@ -78,7 +78,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.save_new_skill(skill_id, self.admin_id, 'Description')
         skill_services.publish_skill(skill_id, self.admin_id)
         self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, expect_errors=True)
@@ -165,7 +165,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             csrf_token = self._get_csrf_token_for_put()
 
             json_response = self.post_json(
@@ -178,7 +178,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_topic_creation_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
             csrf_token = self._get_csrf_token_for_put()
 
             self.post_json(
@@ -195,7 +195,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             csrf_token = self._get_csrf_token_for_put()
 
             json_response = self.post_json(
@@ -209,7 +209,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
             csrf_token = self._get_csrf_token_for_put()
             self.post_json(
                 self.url, {}, csrf_token=csrf_token, expect_errors=True,
@@ -218,7 +218,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation_in_invalid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             csrf_token = self._get_csrf_token_for_put()
             payload = {
                 'description': 'Skill Description',
@@ -232,7 +232,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             csrf_token = self._get_csrf_token_for_put()
             payload = {
                 'description': 'Skill Description',
@@ -278,7 +278,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(old_links[0].skill_id, old_skill_id)
         self.assertEqual(len(new_links), 0)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             csrf_token = self._get_csrf_token_for_put()
             payload = {
                 'old_skill_id': old_skill_id,
@@ -301,7 +301,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_merge_skill_fails_when_new_structures_not_enabled(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
             csrf_token = self._get_csrf_token_for_put()
             self.post_json(
                 self.url, {}, csrf_token=csrf_token, expect_errors=True,

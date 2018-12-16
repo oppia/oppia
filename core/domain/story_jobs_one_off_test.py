@@ -57,7 +57,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
@@ -92,7 +92,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             story_services.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
@@ -124,7 +124,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(story.schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)

@@ -29,7 +29,7 @@ class TopicViewerPage(base.BaseHandler):
     def get(self, topic_name):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
@@ -50,7 +50,7 @@ class TopicPageDataHandler(base.BaseHandler):
     def get(self, topic_name):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
