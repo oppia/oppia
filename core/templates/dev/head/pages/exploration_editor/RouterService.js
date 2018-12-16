@@ -18,12 +18,12 @@
 
 oppia.factory('RouterService', [
   '$rootScope', '$location', '$window', '$timeout', '$interval',
-  'ExplorationInitStateNameService', 'StateEditorService',
-  'ExplorationStatesService',
+  'ExplorationAdvancedFeaturesService', 'ExplorationInitStateNameService',
+  'StateEditorService', 'ExplorationStatesService',
   function(
       $rootScope, $location, $window, $timeout, $interval,
-      ExplorationInitStateNameService, StateEditorService,
-      ExplorationStatesService) {
+      ExplorationAdvancedFeaturesService, ExplorationInitStateNameService,
+      StateEditorService, ExplorationStatesService) {
     var MAIN_TAB = 'main';
     var TRANSLATION_TAB = 'translation';
     var PREVIEW_TAB = 'preview';
@@ -79,7 +79,8 @@ oppia.factory('RouterService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
-      } else if (newPath === '/issues') {
+      } else if (newPath === '/issues' &&
+        ExplorationAdvancedFeaturesService.isIssuesTabExposed()) {
         _tabs.active = ISSUES_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
@@ -156,11 +157,14 @@ oppia.factory('RouterService', [
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
+        if (currentPath === '/issues' &&
+          ExplorationAdvancedFeaturesService.isIssuesTabExposed()) {
+          return true;
+        }
         return (
           currentPath === '/translation' || currentPath === '/preview' ||
           currentPath === '/stats' || currentPath === '/settings' ||
-          currentPath === '/history' || currentPath === '/feedback' ||
-          currentPath === '/issues');
+          currentPath === '/history' || currentPath === '/feedback');
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
