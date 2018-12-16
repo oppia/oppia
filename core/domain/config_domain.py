@@ -278,5 +278,4 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 EXPOSE_ISSUES_TAB = ConfigProperty(
     'expose_issues_tab', BOOL_SCHEMA,
     'Whether creators will have access to the Issues Tab in the exploration'
-        'editor.',
-    False)
+    'editor.', False)
