@@ -22,6 +22,7 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
+from core.domain import message_count_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import skill_jobs_one_off
@@ -57,6 +58,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     feedback_jobs_one_off.PopulateLastUpdatedFieldOneOffJob,
     feedback_jobs_one_off.ValidateLastUpdatedFieldOneOffJob,
+    message_count_jobs_one_off.PopulateMessageCountOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,

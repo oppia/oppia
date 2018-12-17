@@ -302,6 +302,18 @@ def get_message(thread_id, message_id):
         feedback_models.GeneralFeedbackMessageModel.get(thread_id, message_id))
 
 
+def get_message_count(thread_id):
+    """Fetches the messages count of the given thread.
+    
+    Args:
+        thread_td: str.
+    
+    Returns:
+        int. The count of messages of the given thread.
+    """
+    return feedback_models.GeneralFeedbackMessageModel.get_message_count(thread_id)
+
+
 def get_next_page_of_all_feedback_messages(
         page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Fetches a single page from the list of all feedback messages that have
