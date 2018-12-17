@@ -61,6 +61,7 @@ notifications:
     - henning.benmax@gmail.com
     - tzjiang1@gmail.com
     - apurvabajaj007@gmail.com
+    - nithusha21@yahoo.co.in
     on_success: change
     on_failure: change
   irc:
