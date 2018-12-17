@@ -86,7 +86,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 #Sets the message_count if it is None.
                 item.put()
                 yield ('SUCCESS', item.id)
-            except:
+            except AttributeError:
                 yield ('FAILED', item.id)
         else:
             yield ('SUCCESS', item.id)

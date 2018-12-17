@@ -26,6 +26,7 @@ from core.tests import test_utils
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+
 class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
     """Test for PopulateMessageCountOneOffJob"""
 
