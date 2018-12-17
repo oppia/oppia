@@ -241,7 +241,6 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
-
     """Test that generating hash functionality works as expected."""
 
 
