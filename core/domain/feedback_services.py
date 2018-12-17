@@ -304,14 +304,15 @@ def get_message(thread_id, message_id):
 
 def get_message_count(thread_id):
     """Fetches the messages count of the given thread.
-    
+
     Args:
-        thread_td: str.
-    
+        thread_id: str.
+
     Returns:
         int. The count of messages of the given thread.
     """
-    return feedback_models.GeneralFeedbackMessageModel.get_message_count(thread_id)
+    return feedback_models.GeneralFeedbackMessageModel.get_message_count(
+        thread_id)
 
 
 def get_next_page_of_all_feedback_messages(
