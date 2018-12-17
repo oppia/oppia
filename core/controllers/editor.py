@@ -881,7 +881,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         })
 
 
-class ExplorationFeaturesHandler(EditorHandler):
+class ExplorationEditorFeaturesHandler(EditorHandler):
     """Returns features the exploration editor is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
