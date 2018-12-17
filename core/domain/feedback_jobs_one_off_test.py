@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for message_count related jobs"""
+"""Tests for feedback related jobs"""
 
 import datetime
 
-from core.domain import message_count_jobs_one_off
+from core.domain import feedback_jobs_one_off
 from core.platform import models
 from core.domain import feedback_services
 from core.tests import test_utils
@@ -27,6 +27,7 @@ from core.tests import test_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
+    """Test for PopulateMessageCountOneOffJob"""
 
     def setUp(self):
         super(PopulateMessageCountOneOffJobTest, self).setUp()
@@ -56,9 +57,9 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            message_count_jobs_one_off
+            feedback_jobs_one_off
             .PopulateMessageCountOneOffJob.create_new())
-        message_count_jobs_one_off.PopulateMessageCountOneOffJob.enqueue(
+        feedback_jobs_one_off.PopulateMessageCountOneOffJob.enqueue(
             job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(

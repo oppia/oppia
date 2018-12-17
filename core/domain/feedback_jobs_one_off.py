@@ -16,6 +16,7 @@
 
 from core import jobs
 from core.platform import models
+from core.domain import feedback_services
 
 (feedback_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.email, models.NAMES.user])
@@ -66,3 +67,33 @@ class ValidateLastUpdatedFieldOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, instance_ids):
         yield (key, instance_ids)
+
+
+class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating the message count field."""
+    
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over"""
+        return [feedback_models.GeneralFeedbackThreadModel]
+        
+    @staticmethod
+    def map(item):
+        if item.message_count is None:
+            #Assigning the value of message_count if it is None.
+            item.message_count = feedback_services.get_message_count(item.id)
+            try:
+                #Sets the message_count if it is None.
+                item.put()
+                yield ("SUCCESS",item.id)
+            except:
+        	    yield ("FAILED",item.id)
+        else:
+            yield ("SUCCESS",item.id)
+
+    @staticmethod
+    def reduce(message,thread_ids):
+        if message == "FAILED":
+            yield (message,thread_ids)
+        elif message == "SUCCESS":
+            yield (len(thread_ids))
