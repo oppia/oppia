@@ -353,6 +353,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
+        r'/exploration_editor/features',
+        editor.ExplorationEditorFeaturesHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -473,9 +476,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
-    get_redirect_route(
-        r'/exploration_editor/features',
-        editor.ExplorationEditorFeaturesHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
