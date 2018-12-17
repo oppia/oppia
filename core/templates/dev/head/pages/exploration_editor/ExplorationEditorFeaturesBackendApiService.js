@@ -17,14 +17,21 @@
  *  configured to support.
  */
 
+oppia.constant(
+  'EXPLORATION_FEATURES_URL', '/exploration_editor/features/<exploration_id>');
+
 oppia.factory('ExplorationEditorFeaturesBackendApiService', [
-  '$http', function($http) {
+  '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
+  function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {
     return {
-      fetchExplorationEditorFeatures: function() {
-        return $http.get('/exploration_editor/features').then(
-          function(response) {
-            return response.data;
-          });
+      fetchExplorationEditorFeatures: function(explorationId) {
+        return $http.get(
+          UrlInterpolationService.interpolateUrl(EXPLORATION_FEATURES_URL, {
+            exploration_id: explorationId
+          })
+        ).then(function(response) {
+          return response.data;
+        });
       },
     };
   }]);

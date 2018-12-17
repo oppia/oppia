@@ -119,7 +119,7 @@ oppia.controller('ExplorationEditor', [
           }
         }),
         ExplorationEditorFeaturesBackendApiService
-          .fetchExplorationEditorFeatures(),
+          .fetchExplorationEditorFeatures(ContextService.getExplorationId()),
       ]).then(function(allData) {
         var explorationData = allData[0];
         var featuresData = allData[1];

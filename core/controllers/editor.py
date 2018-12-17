@@ -886,8 +886,8 @@ class ExplorationEditorFeaturesHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
-    def get(self):
+    @acl_decorators.can_edit_exploration
+    def get(self, unused_exploration_id):
         """Handles GET requests for exploration editor features."""
         self.render_json({
             'is_issues_tab_exposed': config_domain.IS_ISSUES_TAB_EXPOSED.value,
