@@ -730,14 +730,16 @@ def _pre_commit_linter(all_files):
         process.start()
 
     number_of_files_to_lint = (
-        len(js_files_to_lint) + len(py_files_to_lint) +
-        len(html_files_to_lint_for_css) + len(css_files_to_lint))
-    timeout_for_lint_process = 0.4 * number_of_files_to_lint
+        len(html_files_to_lint_for_css) + len(css_files_to_lint) +
+        len(js_files_to_lint) + len(py_files_to_lint))
 
-    for process in linting_processes:
-        # Require timeout parameter to prevent against endless waiting for the
-        # linting function to return.
-        process.join(timeout=timeout_for_lint_process)
+    # Require timeout parameter to prevent against endless waiting for the
+    # linting function to return.
+    linting_processes[0].join(
+        timeout=html_files_to_lint_for_css/number_of_files_to_lint)
+    linting_processes[1].join(timeout=css_files_to_lint/number_of_files_to_lint)
+    linting_processes[2].join(timeout=js_files_to_lint/number_of_files_to_lint)
+    linting_processes[3].join(timeout=py_files_to_lint/number_of_files_to_lint)
 
     js_messages = []
     while not js_stdout.empty():
