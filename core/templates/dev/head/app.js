@@ -44,7 +44,7 @@ oppia.constant('LOADING_INDICATOR_URL', '/activity/loadingIndicator.gif');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_ML_CLASSIFIERS', true);
+oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'The current solution does not lead to another card.');
