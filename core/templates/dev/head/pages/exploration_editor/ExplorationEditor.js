@@ -47,8 +47,8 @@ oppia.controller('ExplorationEditor', [
   'GraphDataService', 'StateEditorTutorialFirstTimeService',
   'ExplorationParamSpecsService', 'ExplorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ContextService',
-  'ExplorationAdvancedFeaturesBackendApiService',
-  'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
+  'ExplorationAdvancedFeaturesService',
+  'ExplorationEditorFeaturesBackendApiService', '$uibModal', 'ChangeListService',
   'AutosaveInfoModalsService', 'SiteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
@@ -66,8 +66,8 @@ oppia.controller('ExplorationEditor', [
       GraphDataService, StateEditorTutorialFirstTimeService,
       ExplorationParamSpecsService, ExplorationParamChangesService,
       ExplorationWarningsService, $templateCache, ContextService,
-      ExplorationAdvancedFeaturesBackendApiService,
-      ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
+      ExplorationAdvancedFeaturesService,
+      ExplorationEditorFeaturesBackendApiService, $uibModal, ChangeListService,
       AutosaveInfoModalsService, SiteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
@@ -120,7 +120,7 @@ oppia.controller('ExplorationEditor', [
               lostChanges, explorationId);
           }
         }),
-        ExplorationAdvancedFeaturesBackendApiService
+        ExplorationEditorFeaturesBackendApiService
           .fetchExplorationEditorFeatures(),
       ]).then(function(allData) {
         var explorationData = allData[0];
