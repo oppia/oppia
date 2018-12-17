@@ -22,8 +22,7 @@ oppia.directive('playthroughIssuesDirective', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/statistics_tab/' +
-        'playthrough_issues_directive.html'),
+        '/pages/exploration_editor/statistics_tab/playthrough_issues_directive.html'),
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {
