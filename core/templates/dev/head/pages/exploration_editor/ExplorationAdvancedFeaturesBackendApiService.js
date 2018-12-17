@@ -20,7 +20,7 @@
 oppia.factory('ExplorationAdvancedFeaturesBackendApiService', [
   '$http', function($http) {
     return {
-      fetchExplorationAdvancedFeatures: function() {
+      fetchExplorationEditorFeatures: function() {
         return $http.get('/explorationfeatures').then(function(response) {
           return response.data;
         });
