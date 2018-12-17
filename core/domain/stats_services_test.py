@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.stats_services."""
+
 import operator
 import os
 
@@ -34,13 +36,13 @@ import utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class StatisticsServicesTest(test_utils.GenericTestBase):
+class StatisticsServicesTests(test_utils.GenericTestBase):
     """Test the helper functions and methods defined in the stats_services
     module.
     """
 
     def setUp(self):
-        super(StatisticsServicesTest, self).setUp()
+        super(StatisticsServicesTests, self).setUp()
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
@@ -152,7 +154,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
 
     def test_exploration_changes_effect_on_exp_issues_model(self):
-        """Test the effect of exploration changes on exploration issues model.
+        """Test the effect of exploration changes on exploration issues
+        model.
         """
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -931,26 +934,26 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class ModifiedInteractionAnswerSummariesAggregator(
+class MockInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedInteractionAnswerSummariesMRJobManager
+        return MockInteractionAnswerSummariesMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedInteractionAnswerSummariesMRJobManager(
+class MockInteractionAnswerSummariesMRJobManager(
         stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedInteractionAnswerSummariesAggregator
+        return MockInteractionAnswerSummariesAggregator
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):
@@ -1558,7 +1561,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
     """
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
     INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
     TEXT_INPUT_EXP_ID = 'exp_id0'
     SET_INPUT_EXP_ID = 'exp_id1'
@@ -1586,7 +1589,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
 
     def _run_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -1596,7 +1599,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
     def _rerun_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+        MockInteractionAnswerSummariesAggregator.stop_computation('a')
         self._run_answer_summaries_aggregator()
 
     def _rename_state(
@@ -1915,7 +1918,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             classification_category, 'sid1', 10.0, {}, answer)
 
     def _run_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -1923,7 +1926,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        ModifiedInteractionAnswerSummariesAggregator.stop_computation(
+        MockInteractionAnswerSummariesAggregator.stop_computation(
             feconf.SYSTEM_COMMITTER_ID)
 
     def setUp(self):

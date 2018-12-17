@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for scripts/build.py."""
+
 import StringIO
 import collections
 import os
@@ -121,8 +123,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
-        """Test _insert_hash returns correct filenames with provided hashes.
-        """
+        """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')
         self.assertEqual(

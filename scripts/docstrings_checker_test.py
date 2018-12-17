@@ -14,11 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for scripts/docstrings_checker."""
+
 import unittest
 import docstrings_checker # pylint: disable=relative-import
 
 
-class ASTDocStringCheckerTest(unittest.TestCase):
+class ASTDocstringsCheckerTest(unittest.TestCase):
+    """Class for testing the docstrings_checker script."""
 
     def test_build_regex_from_args_one_arg(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
@@ -68,7 +71,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         func_args = ['arg_name1', 'arg_name2']
         docstring_args = """Description
             Args:
-                arg_name1: description, 
+                arg_name1: description,
                 arg_name2: description
             """
         expected_result = []
@@ -118,7 +121,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         func_args = ['arg_name1', 'arg_name2']
         docstring_args = """Description
             Args:
-                arg_name2: description 
+                arg_name2: description
                 arg_name1: description
             """
         expected_result = ['Arg ordering error in docstring.']
@@ -130,7 +133,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         func_args = ['arg_name1', 'arg_name2']
         docstring_args = """Description
             Args:
-                arg_name1: description involving arg_name2, 
+                arg_name1: description involving arg_name2,
                 arg_name2: description involving arg_name1
             """
         expected_result = []
@@ -142,7 +145,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         func_args = ['this_has_a_substring', 'intermediate_arg', 'substring']
         docstring_args = """Description
             Args:
-                this_has_a_substring: description, 
+                this_has_a_substring: description,
                 intermediate_arg: description,
                 substring: description
             """

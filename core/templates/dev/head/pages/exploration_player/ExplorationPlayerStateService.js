@@ -20,7 +20,7 @@
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
   'ContextService', 'UrlService', 'StateClassifierMappingService',
-  'StatsReportingService', 'PlaythroughService',
+  'StatsReportingService', 'PlaythroughService', 'PlaythroughIssuesService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
   'EditableExplorationBackendApiService', 'PlayerPositionService',
   'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
@@ -28,7 +28,7 @@ oppia.factory('ExplorationPlayerStateService', [
   function(
       $log, $q, ExplorationEngineService, PretestEngineService,
       ContextService, UrlService, StateClassifierMappingService,
-      StatsReportingService, PlaythroughService,
+      StatsReportingService, PlaythroughService, PlaythroughIssuesService,
       PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
       EditableExplorationBackendApiService, PlayerPositionService,
       ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
@@ -48,8 +48,8 @@ oppia.factory('ExplorationPlayerStateService', [
         _explorationId, returnDict.exploration.title,
         _version, returnDict.session_id, GLOBALS.collectionId);
       PlaythroughService.initSession(
-        _explorationId, _version, returnDict.record_playthrough_probability,
-        returnDict.whitelisted_exploration_ids_for_playthroughs);
+        _explorationId, _version, returnDict.record_playthrough_probability);
+      PlaythroughIssuesService.initSession(_explorationId, _version);
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(

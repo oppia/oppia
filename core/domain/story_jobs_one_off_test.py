@@ -28,7 +28,7 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
+class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,7 +36,7 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
     STORY_ID = 'story_id'
 
     def setUp(self):
-        super(StoryMigrationOneOffJobTest, self).setUp()
+        super(StoryMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -57,7 +57,7 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
@@ -92,7 +92,7 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
             story_services.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
@@ -124,7 +124,7 @@ class StoryMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(story.schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)

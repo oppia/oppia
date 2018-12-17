@@ -216,7 +216,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         getattr(expected_job_output[exp_id], prop))
 
 
-class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
+class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
@@ -264,7 +264,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
             exp_first_published, exploration_rights.first_published_msec)
 
 
-class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
+class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob]
@@ -399,7 +399,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             exploration_summary.contributor_ids)
 
 
-class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
+class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
 
@@ -411,7 +411,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
     EMAIL_B = 'emailb@example.com'
 
     def setUp(self):
-        super(ExplorationContributorsSummaryOneOffJobTest, self).setUp()
+        super(ExplorationContributorsSummaryOneOffJobTests, self).setUp()
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
 
@@ -567,7 +567,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 exploration_summary.contributors_summary)
 
 
-class ExplorationMigrationJobTest(test_utils.GenericTestBase):
+class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -577,7 +577,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationMigrationJobTest, self).setUp()
+        super(ExplorationMigrationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -800,7 +800,7 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
 
 
-class ExplorationContentValidationJobForTextAngularTest(
+class ExplorationContentValidationJobForTextAngularTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -811,7 +811,7 @@ class ExplorationContentValidationJobForTextAngularTest(
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationContentValidationJobForTextAngularTest, self).setUp()
+        super(ExplorationContentValidationJobForTextAngularTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -915,7 +915,7 @@ class ExplorationContentValidationJobForTextAngularTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMigrationValidationJobForTextAngularTest(
+class ExplorationMigrationValidationJobForTextAngularTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -927,7 +927,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
 
     def setUp(self):
         super(
-            ExplorationMigrationValidationJobForTextAngularTest, self).setUp()
+            ExplorationMigrationValidationJobForTextAngularTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1020,7 +1020,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
+class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -1030,7 +1030,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(TextAngularValidationAndMigrationTest, self).setUp()
+        super(TextAngularValidationAndMigrationTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1127,7 +1127,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(actual_output), 16)
 
 
-class ExplorationContentValidationJobForCKEditorTest(
+class ExplorationContentValidationJobForCKEditorTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1138,7 +1138,7 @@ class ExplorationContentValidationJobForCKEditorTest(
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationContentValidationJobForCKEditorTest, self).setUp()
+        super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1280,7 +1280,7 @@ class ExplorationContentValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMigrationValidationJobForCKEditorTest(
+class ExplorationMigrationValidationJobForCKEditorTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1292,7 +1292,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
 
     def setUp(self):
         super(
-            ExplorationMigrationValidationJobForCKEditorTest, self).setUp()
+            ExplorationMigrationValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1389,7 +1389,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class InteractionCustomizationArgsValidationJobTest(
+class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1401,7 +1401,7 @@ class InteractionCustomizationArgsValidationJobTest(
 
     def setUp(self):
         super(
-            InteractionCustomizationArgsValidationJobTest, self).setUp()
+            InteractionCustomizationArgsValidationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

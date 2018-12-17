@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for utils.py."""
+
 import copy
 import datetime
 
@@ -21,7 +23,6 @@ import datetime
 from core.tests import test_utils
 import feconf
 import utils
-
 # pylint: enable=relative-import
 
 

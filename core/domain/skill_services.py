@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on skills.
-"""
+"""Commands that can be used to operate on skills."""
 
 import copy
 import logging
@@ -195,6 +194,26 @@ def get_multi_skill_summaries(skill_ids):
         get_skill_summary_from_model(skill_summary_model)
         for skill_summary_model in skill_summaries_models]
     return skill_summaries
+
+
+def get_multi_skills(skill_ids):
+    """Returns a list of skills matching the skill IDs provided.
+
+    Args:
+        skill_ids: list(str). List of skill IDs to get skills for.
+
+    Returns:
+        list(Skill). The list of skills matching the provided IDs.
+    """
+    local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    for skill_id, skill_model in zip(skill_ids, local_skill_models):
+        if skill_model is None:
+            raise Exception('No skill exists for ID %s' % skill_id)
+    skills = [
+        get_skill_from_model(skill_model)
+        for skill_model in local_skill_models
+        if skill_model is not None]
+    return skills
 
 
 def get_skill_summary_from_model(skill_summary_model):
