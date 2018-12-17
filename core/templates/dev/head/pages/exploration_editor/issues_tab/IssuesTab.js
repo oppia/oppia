@@ -18,7 +18,6 @@
  */
 
 oppia.controller('IssuesTab', ['$scope', function($scope) {
-  $scope.openIssueCount = 4;
   $scope.resolvedIssueCount = 13;
   $scope.archivedIssueCount = 30;
 
