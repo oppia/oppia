@@ -74,16 +74,16 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Returns a list of datastore class references to map over"""
+        """Returns a list of datastore class references to map over."""
         return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
     def map(item):
         if item.message_count is None:
-            #Assigning the value of message_count if it is None.
+            # Assigning the value of message_count if it is None.
             item.message_count = feedback_services.get_message_count(item.id)
             try:
-                #Sets the message_count if it is None.
+                # Sets the message_count if it is None.
                 item.put()
                 yield ('SUCCESS', item.id)
             except AttributeError:

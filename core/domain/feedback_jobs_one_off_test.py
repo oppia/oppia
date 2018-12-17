@@ -28,7 +28,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
-    """Test for PopulateMessageCountOneOffJob"""
+    """Test for PopulateMessageCountOneOffJob."""
 
     def setUp(self):
         super(PopulateMessageCountOneOffJobTest, self).setUp()
