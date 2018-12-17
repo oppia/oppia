@@ -1,6 +1,35 @@
 <div ng-controller="IssuesTab" ng-cloak>
-  <md-card class="oppia-editor-card oppia-issues-card md-default-theme">
-    <h2>Issues</h2>
-    <em>The issues tab is still under construction.</em>
-  </md-card>
+  <div class="oppia-dashboard-container issues-tab-dashboard" style="position: relative;">
+    <div class="oppia-dashboard-aggregated-stats" style="margin: auto;">
+      <md-card layout="row">
+        <div class="open-issues stats-card">
+          <!-- TODO: Add I18N translations -->
+          <p class="stat-description">Open Issues</p>
+          <h1 class="stat-value-with-rating">4</h1>
+        </div>
+        <div class="resolved-issues stats-card">
+          <!-- TODO: Add I18N translations -->
+          <p class="stat-description">Resolved Issues</p>
+          <h1 class="stat-value-with-rating">13</h1>
+        </div>
+        <div class="archived-issues stats-card">
+          <!-- TODO: Add I18N translations -->
+          <p class="stat-description">Archived Issues</p>
+          <h1 class="stat-value-with-rating">30</h1>
+        </div>
+      </md-card>
+    </div>
+    <md-card class="oppia-editor-card oppia-issues-card md-default-theme">
+      <h2>Open Issue</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+      sodales varius sapien vitae consequat. Sed eleifend leo sapien, quis
+      egestas nunc consequat ac. Integer eu libero egestas, volutpat mauris
+      non, gravida odio. Integer sapien sapien, laoreet at pellentesque eu,
+      fermentum et enim. Nulla iaculis, nisi at feugiat sodales, mauris diam
+      egestas urna, id malesuada augue nisi vel lectus. Vivamus quis mauris
+      efficitur, facilisis eros ut, condimentum est. Maecenas cursus maximus
+      dolor, tincidunt vestibulum mi tristique eget. Nullam pulvinar bibendum
+      semper.</p>
+    </md-card>
+  </div>
 </div>
