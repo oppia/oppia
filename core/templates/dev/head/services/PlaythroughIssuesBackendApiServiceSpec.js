@@ -23,7 +23,7 @@ describe('PlaythroughIssuesBackendApiService', function() {
     this.PlaythroughIssuesBackendApiService =
       $injector.get('PlaythroughIssuesBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');
-    this.eif = $injector.get('ExplorationIssueObjectFactory');
+    this.piof = $injector.get('PlaythroughIssueObjectFactory');
     this.pof = $injector.get('PlaythroughObjectFactory');
   }));
 
@@ -73,7 +73,7 @@ describe('PlaythroughIssuesBackendApiService', function() {
       this.$httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        backendIssues.map(this.eif.createFromBackendDict));
+        backendIssues.map(this.piof.createFromBackendDict));
       expect(failureHandler).not.toHaveBeenCalled();
     });
 

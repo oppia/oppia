@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ExplorationIssueObjectFactory.
+ * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-describe('Exploration Issue Object Factory', function() {
+describe('Playthrough Issue Object Factory', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.eiof = $injector.get('ExplorationIssueObjectFactory');
+    this.piof = $injector.get('PlaythroughIssueObjectFactory');
   }));
 
   it('should create a new exploration issue', function() {
-    var explorationIssueObject = new this.eiof('EarlyQuit', {}, [], 1, true);
+    var explorationIssueObject = new this.piof('EarlyQuit', {}, [], 1, true);
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
@@ -34,7 +34,7 @@ describe('Exploration Issue Object Factory', function() {
   });
 
   it('should create a new exploration issue from a backend dict', function() {
-    var explorationIssueObject = this.eiof.createFromBackendDict({
+    var explorationIssueObject = this.piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       playthrough_ids: [],
