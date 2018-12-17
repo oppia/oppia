@@ -225,6 +225,75 @@ class TestBase(unittest.TestCase):
         'classifier_model_id': None
     }
 
+    VERSION_21_STATE_DICT = {
+        'END': {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': 'Congratulations, you have finished!'},
+            'content_ids_to_audio_translations': {
+                'content': {}},
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'recommendedExplorationIds': {'value': []}},
+                'default_outcome': None,
+                'hints': [],
+                'id': 'EndExploration',
+                'solution': None
+            },
+            'param_changes': []
+        },
+        'Introduction': {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'content_ids_to_audio_translations': {
+                'content': {},
+                'default_outcome': {},
+                'feedback_1': {}
+            },
+            'interaction': {
+                'answer_groups': [{
+                    'outcome': {
+                        'dest': 'END',
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': 'Correct!'},
+                        'labelled_as_correct': False,
+                        'missing_prerequisite_skill_id': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None},
+                    'rule_specs': [{
+                        'inputs': {'x': 'InputString'},
+                        'rule_type': 'Equals'}],
+                    'tagged_misconception_id': None,
+                    'training_data': ['answer1', 'answer2', 'answer3']}],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'placeholder': {'value': ''},
+                    'rows': {'value': 1}},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': ''},
+                    'labelled_as_correct': False,
+                    'missing_prerequisite_skill_id': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None},
+                'hints': [],
+                'id': 'TextInput',
+                'solution': None
+            },
+            'param_changes': []
+        }
+    }
+
+
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': u'',
@@ -895,6 +964,71 @@ tags: []
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'%s\'.' % title
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+        # Note: Also save state id mappping model for new exploration. If not
+        # saved, it may cause errors in test cases.
+        exploration = exp_services.get_exploration_from_model(exp_model)
+        exp_services.create_and_save_state_id_mapping_model(exploration, [])
+
+    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
+        """Saves a new default exploration with a default version 21 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            title: str. The title of the exploration.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title=title,
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=21,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_21_STATE_DICT,
             param_specs={},
             param_changes=[]
         )

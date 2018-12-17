@@ -673,7 +673,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v21(
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
         exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
@@ -690,8 +690,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 0):
-            with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 0):
+        with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+            with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                 self.process_and_flush_pending_tasks()
 
         new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
