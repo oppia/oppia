@@ -20,7 +20,7 @@ oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      link: function(scope, element, conversationSkinCtrl) {
+      link: function(scope, element) {
         // This allows the scope to be retrievable during Karma unit testing.
         // See http://stackoverflow.com/a/29833832 for more details.
         element[0].getControllerScope = function() {
