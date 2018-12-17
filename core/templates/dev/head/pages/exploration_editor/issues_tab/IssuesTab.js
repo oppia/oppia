@@ -17,5 +17,44 @@
  * editor.
  */
 
-oppia.controller('IssuesTab', [function() {
+oppia.controller('IssuesTab', ['$scope', function($scope) {
+  $scope.openIssueCount = 4;
+  $scope.resolvedIssueCount = 13;
+  $scope.archivedIssueCount = 30;
+
+  var issueTypeMaterialIconMapping = {
+    'Feedback': 'feedback',
+    'Playthrough': 'gamepad',
+    'Unresolved Answer': 'help',
+  };
+
+  $scope.issueTypeToMaterialIcon = function(issueType) {
+    if (issueTypeMaterialIconMapping.hasOwnProperty(issueType)) {
+      return issueTypeMaterialIconMapping[issueType];
+    } else {
+      return 'bug_report';
+    }
+  };
+
+  $scope.openIssueData = [{
+    issue_title: 'Multiple incorrect answers',
+    issue_type: 'Playthrough',
+    issue_description: (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+  }, {
+    issue_title: 'A learner had something to say',
+    issue_type: 'Feedback',
+    issue_description: (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+  }, {
+    issue_title: 'There is a common answer without explicit feedback',
+    issue_type: 'Unresolved Answer',
+    issue_description: (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+  }, {
+    issue_title: 'Learner quit early',
+    issue_type: 'Playthrough',
+    issue_description: (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+  }];
 }]);

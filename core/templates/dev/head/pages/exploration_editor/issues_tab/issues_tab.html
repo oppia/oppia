@@ -1,34 +1,31 @@
-<div ng-controller="IssuesTab" class="oppia-dashboard-container issues-tab-dashboard" style="position: relative;">
+<div ng-controller="IssuesTab"
+     class="oppia-dashboard-container issues-tab-dashboard" style="position: relative;">
   <div class="oppia-dashboard-aggregated-stats" style="margin: auto;">
     <md-card layout="row">
       <div class="open-issues stats-card">
         <!-- TODO: Add I18N translations -->
         <p class="stat-description">Open Issues</p>
-        <h1 class="stat-value-with-rating">4</h1>
+        <h1 class="stat-value-with-rating"><[openIssueCount]></h1>
       </div>
       <div class="resolved-issues stats-card">
         <!-- TODO: Add I18N translations -->
         <p class="stat-description">Resolved Issues</p>
-        <h1 class="stat-value-with-rating">13</h1>
+        <h1 class="stat-value-with-rating"><[resolvedIssueCount]></h1>
       </div>
       <div class="archived-issues stats-card">
         <!-- TODO: Add I18N translations -->
         <p class="stat-description">Archived Issues</p>
-        <h1 class="stat-value-with-rating">30</h1>
+        <h1 class="stat-value-with-rating"><[archivedIssueCount]></h1>
       </div>
     </md-card>
   </div>
-  <md-card class="oppia-editor-card oppia-issues-card md-default-theme">
+  <md-card ng-repeat="issueData in openIssueData"
+           class="oppia-editor-card oppia-issues-card md-default-theme">
     <!-- TODO: Add I18N translations -->
-    <h2>Open Issue</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-    sodales varius sapien vitae consequat. Sed eleifend leo sapien, quis
-    egestas nunc consequat ac. Integer eu libero egestas, volutpat mauris
-    non, gravida odio. Integer sapien sapien, laoreet at pellentesque eu,
-    fermentum et enim. Nulla iaculis, nisi at feugiat sodales, mauris diam
-    egestas urna, id malesuada augue nisi vel lectus. Vivamus quis mauris
-    efficitur, facilisis eros ut, condimentum est. Maecenas cursus maximus
-    dolor, tincidunt vestibulum mi tristique eget. Nullam pulvinar bibendum
-    semper.</p>
+    <h2>
+      <i class="material-icons"><[issueTypeToMaterialIcon(issueData.issue_type)]></i>
+      <[issueData.issue_title]>
+    </h2>
+    <p><[issueData.issue_description]></p>
   </md-card>
 </div>
