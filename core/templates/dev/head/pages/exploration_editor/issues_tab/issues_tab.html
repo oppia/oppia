@@ -3,17 +3,17 @@
   <div class="oppia-dashboard-aggregated-stats" style="margin: auto;">
     <md-card layout="row">
       <div class="open-issues stats-card">
-        <!-- TODO: Add I18N translations -->
+        <!-- TODO: Add translations -->
         <p class="stat-description">Open Issues</p>
         <h1 class="stat-value-with-rating"><[openIssueData.length]></h1>
       </div>
       <div class="resolved-issues stats-card">
-        <!-- TODO: Add I18N translations -->
+        <!-- TODO: Add translations -->
         <p class="stat-description">Resolved Issues</p>
         <h1 class="stat-value-with-rating"><[resolvedIssueCount]></h1>
       </div>
       <div class="archived-issues stats-card">
-        <!-- TODO: Add I18N translations -->
+        <!-- TODO: Add translations -->
         <p class="stat-description">Archived Issues</p>
         <h1 class="stat-value-with-rating"><[archivedIssueCount]></h1>
       </div>
@@ -21,7 +21,7 @@
   </div>
   <md-card ng-repeat="issueData in openIssueData"
            class="oppia-editor-card oppia-issues-card md-default-theme">
-    <!-- TODO: Add I18N translations -->
+    <!-- TODO: Add translations -->
     <h2>
       <i class="material-icons"><[issueTypeToMaterialIcon(issueData.issue_type)]></i>
       <[issueData.issue_title]>
