@@ -30,7 +30,7 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             file_models.FileMetadataModel.get_new_id('entity1')
 
-    def test_get_undeleted_returns_undeleted_instances(self):
+    def test_get_undeleted_with_two_undeleted_models_returns_both(self):
         file_metadata_model1 = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         file_metadata_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -45,6 +45,14 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             file_metadata_model2, file_metadata_model_list[1])
 
+    def test_get_undeleted_with_one_deleted_and_undeleted_model_returns_one(
+            self):
+        file_metadata_model1 = file_models.FileMetadataModel.create(
+            'exp_id1', 'path/to/file1.png')
+        file_metadata_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        file_metadata_model2 = file_models.FileMetadataModel.create(
+            'exp_id1', 'path/to/file2.png')
+        file_metadata_model2.commit(feconf.SYSTEM_COMMITTER_ID, [])
         file_metadata_model2.delete(
             feconf.SYSTEM_COMMITTER_ID, 'Delete second file model')
         file_metadata_model_list = (
@@ -53,27 +61,21 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             file_metadata_model1, file_metadata_model_list[0])
 
-    def test_construct_id_constructs_correct_model_id(self):
-        file_metadata_model_id1 = (
-            file_models.FileMetadataModel._construct_id( # pylint: disable=protected-access
-                'exp_id1', 'path/to/file.png'))
-        file_metadata_model_id2 = (
-            file_models.FileMetadataModel._construct_id( # pylint: disable=protected-access
-                'exp_id1', '/exp_id1/path/to/file.png'))
-
+    def test_create_creates_model_with_correct_id_and_deleted_status_as_true(
+            self):
+        file_metadata_model1 = file_models.FileMetadataModel.create(
+            'exp_id1', 'path/to/file1.png')
+        self.assertEqual(file_metadata_model1.deleted, False)
         self.assertEqual(
-            file_metadata_model_id1, '/exp_id1/path/to/file.png')
-        self.assertEqual(
-            file_metadata_model_id2, '/exp_id1/path/to/file.png')
+            file_metadata_model1.id, '/exp_id1/path/to/file1.png')
 
-    def test_create_creates_model_with_correct_id(self):
-        file_metadata_model = file_models.FileMetadataModel.create(
-            'exp_id1', 'path/to/file.png')
-        self.assertEqual(file_metadata_model.deleted, False)
+        file_metadata_model2 = file_models.FileMetadataModel.create(
+            'exp_id1', '/exp_id1/path/to/file2.png')
+        self.assertEqual(file_metadata_model2.deleted, False)
         self.assertEqual(
-            file_metadata_model.id, '/exp_id1/path/to/file.png')
+            file_metadata_model2.id, '/exp_id1/path/to/file2.png')
 
-    def test_get_model_returns_the_instance_with_desired_id(self):
+    def test_get_model_returns_the_correct_model_if_model_is_present(self):
         file_metadata_model = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -82,14 +84,18 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(actual_model, file_metadata_model)
 
+    def test_get_model_returns_None_if_model_is_absent_and_strict_fail_is_false(
+            self):
         actual_model = file_models.FileMetadataModel.get_model(
             'exp_id1', 'path/to/file2.png')
         self.assertEqual(actual_model, None)
 
+    def test_get_model_raises_error_if_model_is_absent_and_strict_fail_is_true(
+            self):
         with self.assertRaisesRegexp(Exception, (
             'Entity for class FileMetadataModel '
             'with id /exp_id1/path/to/file2.png not found')):
-            actual_model = file_models.FileMetadataModel.get_model(
+            file_models.FileMetadataModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
     def test_get_version_returns_instance_with_desired_version(self):
@@ -118,40 +124,23 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 class FileModelTest(test_utils.GenericTestBase):
     """Tests the FileModel class."""
 
-    def test_reconstitute_changes_the_content_snapshot(self):
-        file_model = file_models.FileModel.create(
-            'exp_id1', 'path/to/file.png')
-        self.assertEqual(file_model.content, None)
-        file_model._reconstitute('file_content') # pylint: disable=protected-access
-        self.assertEqual(file_model.content, 'file_content')
-
-    def test_compute_snapshot_returns_file_content_snapshot(self):
-        file_model = file_models.FileModel.create(
-            'exp_id1', 'path/to/file.png')
-        self.assertEqual(file_model._compute_snapshot(), None) # pylint: disable=protected-access
-        file_model._reconstitute('file_content') # pylint: disable=protected-access
-        self.assertEqual(file_model._compute_snapshot(), 'file_content') # pylint: disable=protected-access
-
     def test_get_new_id_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
             file_models.FileModel.get_new_id('entity1')
 
-    def test_construct_id_constructs_correct_model_id(self):
-        file_model_id1 = file_models.FileModel._construct_id( # pylint: disable=protected-access
-            'exp_id1', 'path/to/file.png')
-        file_model_id2 = file_models.FileModel._construct_id( # pylint: disable=protected-access
-            'exp_id1', '/exp_id1/path/to/file.png')
+    def test_create_creates_model_with_correct_id_and_deleted_status_as_true(
+            self):
+        file_model1 = file_models.FileModel.create(
+            'exp_id1', 'path/to/file1.png')
+        self.assertEqual(file_model1.deleted, False)
+        self.assertEqual(file_model1.id, '/exp_id1/path/to/file1.png')
 
-        self.assertEqual(file_model_id1, '/exp_id1/path/to/file.png')
-        self.assertEqual(file_model_id2, '/exp_id1/path/to/file.png')
+        file_model2 = file_models.FileModel.create(
+            'exp_id1', '/exp_id1/path/to/file2.png')
+        self.assertEqual(file_model2.deleted, False)
+        self.assertEqual(file_model2.id, '/exp_id1/path/to/file2.png')
 
-    def test_create_creates_model_with_correct_id(self):
-        file_model = file_models.FileModel.create(
-            'exp_id1', 'path/to/file.png')
-        self.assertEqual(file_model.deleted, False)
-        self.assertEqual(file_model.id, '/exp_id1/path/to/file.png')
-
-    def test_get_model_returns_the_instance_with_desired_id(self):
+    def test_get_model_returns_the_correct_model_if_model_is_present(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -160,14 +149,18 @@ class FileModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(actual_model, file_model)
 
+    def test_get_model_returns_None_if_model_is_absent_and_strict_fail_is_false(
+            self):
         actual_model = file_models.FileModel.get_model(
             'exp_id1', 'path/to/file2.png')
         self.assertEqual(actual_model, None)
 
+    def test_get_model_raises_error_if_model_is_absent_and_strict_fail_is_true(
+            self):
         with self.assertRaisesRegexp(Exception, (
             'Entity for class FileModel '
             'with id /exp_id1/path/to/file2.png not found')):
-            actual_model = file_models.FileModel.get_model(
+            file_models.FileModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
     def test_commit_updates_version_of_instance(self):
