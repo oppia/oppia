@@ -41,14 +41,16 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             preview: 'Preview',
             settings: 'Settings',
             stats: 'Statistics',
-            history: 'History'
+            history: 'History',
+            issues: 'Issues',
+
           };
 
           $scope.collection = CollectionEditorStateService.getCollection();
 
           $scope.getCurrentTabName = function() {
             return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-              RouterService.getTabStatuses().active];
+              RouterService.getActiveTabName()];
           };
 
           $scope.editCollectionTitle = function() {

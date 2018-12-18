@@ -38,7 +38,7 @@ oppia.factory('RouterService', [
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
 
-    var tabStatus = {active: TABS.MAIN.name};
+    var activeTab = TABS.MAIN.name;
 
     var isIssuesTabEnabled = ExplorationFeaturesService.isIssuesTabEnabled;
 
@@ -62,29 +62,29 @@ oppia.factory('RouterService', [
       $rootScope.$broadcast('externalSave');
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
-        tabStatus.active = TABS.TRANSLATION.name;
+        activeTab = TABS.TRANSLATION.name;
         $rootScope.$broadcast('refreshTranslationTab');
       } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
-        tabStatus.active = TABS.PREVIEW.name;
+        activeTab = TABS.PREVIEW.name;
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
-        tabStatus.active = TABS.SETTINGS.name;
+        activeTab = TABS.SETTINGS.name;
         $rootScope.$broadcast('refreshSettingsTab');
       } else if (newPath === TABS.STATS.path) {
-        tabStatus.active = TABS.STATS.name;
+        activeTab = TABS.STATS.name;
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: false
         });
-        tabStatus.active = TABS.HISTORY.name;
+        activeTab = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
-        tabStatus.active = TABS.FEEDBACK.name;
+        activeTab = TABS.FEEDBACK.name;
       } else if (newPath === TABS.ISSUES.path && isIssuesTabEnabled()) {
-        tabStatus.active = TABS.ISSUES.name;
+        activeTab = TABS.ISSUES.name;
       } else if (newPath.indexOf('/gui/') === 0) {
-        tabStatus.active = TABS.MAIN.name;
+        activeTab = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
       } else {
         if (ExplorationInitStateNameService.savedMemento) {
@@ -153,8 +153,8 @@ oppia.factory('RouterService', [
       savePendingChanges: function() {
         _savePendingChanges();
       },
-      getTabStatuses: function() {
-        return tabStatus;
+      getActiveTabName: function() {
+        return activeTab;
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
@@ -176,7 +176,7 @@ oppia.factory('RouterService', [
           return;
         }
 
-        if (tabStatus.active === TABS.MAIN.name) {
+        if (activeTab === TABS.MAIN.name) {
           $('.oppia-editor-cards-container').fadeOut(function() {
             _actuallyNavigate(SLUG_GUI, stateName);
             // We need to use $apply to update all our bindings. However we
@@ -200,7 +200,7 @@ oppia.factory('RouterService', [
         $location.path(TABS.TRANSLATION.path);
       },
       navigateToPreviewTab: function() {
-        if (tabStatus.active !== TABS.PREVIEW.name) {
+        if (activeTab !== TABS.PREVIEW.name) {
           _savePendingChanges();
           _actuallyNavigate(SLUG_PREVIEW, null);
         }

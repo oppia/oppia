@@ -56,11 +56,11 @@ oppia.directive('editorNavbarBreadcrumb', [
           };
 
           $scope.getCurrentTabName = function() {
-            if (!RouterService.getTabStatuses()) {
+            if (!RouterService.getActiveTabName()) {
               return '';
             } else {
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-                RouterService.getTabStatuses().active];
+                RouterService.getActiveTabName()];
             }
           };
         }

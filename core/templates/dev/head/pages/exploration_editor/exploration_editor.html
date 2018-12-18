@@ -74,35 +74,35 @@
         </div>
       </div>
 
-      <div ng-show="getTabStatuses().active === 'main'">
+      <div ng-show="getActiveTabName() === 'main'">
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-if="getTabStatuses().active === 'translation'">
+      <div ng-if="getActiveTabName() === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-      <div ng-if="getTabStatuses().active === 'preview'">
+      <div ng-if="getActiveTabName() === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'stats'">
+      <div ng-show="getActiveTabName() === 'stats'">
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'settings'">
+      <div ng-show="getActiveTabName() === 'settings'">
         {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'history'">
+      <div ng-show="getActiveTabName() === 'history'">
         {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'feedback'">
+      <div ng-show="getActiveTabName() === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'issues'">
+      <div ng-show="getActiveTabName() === 'issues'">
         {% include 'pages/exploration_editor/issues_tab/issues_tab.html' %}
       </div>
     </div>

@@ -107,7 +107,7 @@ oppia.directive('editorNavigation', [
             ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.ExplorationRightsService = ExplorationRightsService;
-          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.getActiveTabName = RouterService.getActiveTabName;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectTranslationTab = RouterService.navigateToTranslationTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;

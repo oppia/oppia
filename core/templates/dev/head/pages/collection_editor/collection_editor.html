@@ -28,19 +28,19 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <div ng-if="getTabStatuses().active === 'main'">
+    <div ng-if="getActiveTabName() === 'main'">
       <collection-main-tab></collection-main-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'settings'">
+    <div ng-show="getActiveTabName() === 'settings'">
       <collection-settings-tab></collection-settings-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'history'">
+    <div ng-show="getActiveTabName() === 'history'">
       <collection-history-tab></collection-history-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'stats'">
+    <div ng-show="getActiveTabName() === 'stats'">
       <collection-statistics-tab></collection-statistics-tab>
     </div>
   </div>

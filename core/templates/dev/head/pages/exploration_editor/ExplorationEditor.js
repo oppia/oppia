@@ -88,7 +88,7 @@ oppia.controller('ExplorationEditor', [
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
 
-    $scope.getTabStatuses = RouterService.getTabStatuses;
+    $scope.getActiveTabName = RouterService.getActiveTabName;
 
     /** ******************************************
     * Methods affecting the graph visualization.
