@@ -75,13 +75,14 @@ oppia.factory('ExplorationPlayerStateService', [
     var initExplorationPlayerForEditorPreview = function() {
       setExplorationMode();
       EditableExplorationBackendApiService.fetchApplyDraftExploration(
-        explorationId).then(function(returnDict) {
-          ExplorationEngineService.init(
-            returnDict, null, null, null, callback);
-          PlayerCorrectnessFeedbackEnabledService.init(
-            returnDict.correctness_feedback_enabled);
-          NumberAttemptsService.reset();
-        });
+        explorationId
+      ).then(function(returnDict) {
+        ExplorationEngineService.init(
+          returnDict, null, null, null, callback);
+        PlayerCorrectnessFeedbackEnabledService.init(
+          returnDict.correctness_feedback_enabled);
+        NumberAttemptsService.reset();
+      });
     };
 
     var initExplorationPlayerAtSpecificVersion = function() {
