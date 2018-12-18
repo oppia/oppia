@@ -72,55 +72,46 @@ oppia.factory('ExplorationPlayerStateService', [
       currentEngineService = PretestEngineService;
     };
 
-    var initExplorationPlayerForEditorPreview = function() {
+    var initExplorationPlayerForExplorationEditorPreview = function() {
       setExplorationMode();
       EditableExplorationBackendApiService.fetchApplyDraftExploration(
         explorationId
-      ).then(function(returnDict) {
+      ).then(function(explorationData) {
         ExplorationEngineService.init(
-          returnDict, null, null, null, callback);
+          explorationData, null, null, null, callback);
         PlayerCorrectnessFeedbackEnabledService.init(
-          returnDict.correctness_feedback_enabled);
+          explorationData.correctness_feedback_enabled);
         NumberAttemptsService.reset();
       });
     };
 
-    var initExplorationPlayerAtSpecificVersion = function() {
-      Promise.all([
-        ReadOnlyExplorationBackendApiService.loadExploration(
-          explorationId, version),
-        PretestQuestionBackendApiService.fetchPretestQuestions(
-          explorationId, storyId),
-      ]).then(function(returnValues) {
-        if (returnValues[1].length > 0) {
-          setPretestMode();
-          initializeExplorationServices(
-            returnValues[0], true, callback);
-          initializePretestServices(returnValues[1], callback);
-        } else {
-          setExplorationMode();
-          initializeExplorationServices(
-            returnValues[0], false, callback);
-        }
-      });
-    };
+    var initExplorationPlayer = function() {
+      var explorationDataPromise = null;
+      if (version) {
+        explorationDataPromise =
+          ReadOnlyExplorationBackendApiService.loadExploration(
+            explorationId, version);
+      } else {
+        explorationDataPromise =
+          ReadOnlyExplorationBackendApiService.loadLatestExploration(
+            explorationId);
+      }
 
-    var initExplorationPlayerAtLatestVersion = function() {
       Promise.all([
-        ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationId),
+        explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),
-      ]).then(function(returnValues) {
-        if (returnValues[1].length > 0) {
+      ]).then(function(allData) {
+        var explorationData = allData[0];
+        var pretestQuestionsData = allData[1];
+
+        if (pretestQuestionsData.length > 0) {
           setPretestMode();
-          initializeExplorationServices(
-            returnValues[0], true, callback);
-          initializePretestServices(returnValues[1], callback);
+          initializeExplorationServices(explorationData, true, callback);
+          initializePretestServices(pretestQuestionsData, callback);
         } else {
           setExplorationMode();
-          initializeExplorationServices(
-            returnValues[0], false, callback);
+          initializeExplorationServices(explorationData, false, callback);
         }
       });
     };
@@ -148,11 +139,9 @@ oppia.factory('ExplorationPlayerStateService', [
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();
         if (editorPreviewMode) {
-          initExplorationPlayerForEditorPreview();
-        } else if (version) {
-          initExplorationPlayerAtSpecificVersion(version);
+          initExplorationPlayerForExplorationEditorPreview();
         } else {
-          initExplorationPlayerAtLatestVersion();
+          initExplorationPlayer();
         }
       }
     };
