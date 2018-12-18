@@ -16,7 +16,7 @@
 
 """Tests for methods in the issue registry."""
 
-from core.domain import issue_registry
+from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 
 
@@ -26,4 +26,4 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(issue_registry.Registry.get_all_issues()), 3)
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3)

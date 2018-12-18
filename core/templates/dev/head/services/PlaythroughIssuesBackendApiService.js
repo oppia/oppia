@@ -31,12 +31,12 @@ oppia.constant(
   'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
-  '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
+  '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL',
   'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
-      $http, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
+      $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL,
       FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
@@ -72,7 +72,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
         }).then(function(response) {
           var unresolvedIssuesDicts = response.data;
           return unresolvedIssuesDicts.map(
-            ExplorationIssueObjectFactory.createFromBackendDict);
+            PlaythroughIssueObjectFactory.createFromBackendDict);
         });
       },
       fetchPlaythrough: function(expId, playthroughId) {
