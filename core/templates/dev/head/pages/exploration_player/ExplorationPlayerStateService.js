@@ -72,7 +72,7 @@ oppia.factory('ExplorationPlayerStateService', [
       currentEngineService = PretestEngineService;
     };
 
-    var initExplorationPlayerForExplorationEditorPreview = function() {
+    var initExplorationPreviewPlayer = function() {
       setExplorationMode();
       EditableExplorationBackendApiService.fetchApplyDraftExploration(
         explorationId
@@ -139,7 +139,7 @@ oppia.factory('ExplorationPlayerStateService', [
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();
         if (editorPreviewMode) {
-          initExplorationPlayerForExplorationEditorPreview();
+          initExplorationPreviewPlayer();
         } else {
           initExplorationPlayer();
         }
