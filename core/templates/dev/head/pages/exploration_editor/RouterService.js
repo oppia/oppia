@@ -65,27 +65,27 @@ oppia.factory('RouterService', [
       // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
-      if (newPath.indexOf(TAGS.TRANSLATION.path) === 0) {
+      if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         _tabs.active = TABS.TRANSLATION.name;
         $rootScope.$broadcast('refreshTranslationTab');
       } else if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = TABS.PREVIEW.name;
         _doNavigationWithState(newPath, SLUG_PREVIEW);
-      } else if (newPath === TAGS.SETTINGS.path) {
+      } else if (newPath === TABS.SETTINGS.path) {
         _tabs.active = TABS.SETTINGS.name;
         $rootScope.$broadcast('refreshSettingsTab');
-      } else if (newPath === TAGS.STATS.path) {
+      } else if (newPath === TABS.STATS.path) {
         _tabs.active = TABS.STATS.name;
         $rootScope.$broadcast('refreshStatisticsTab');
-      } else if (newPath === TAGS.HISTORY.path) {
+      } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: false
         });
         _tabs.active = TABS.HISTORY.name;
-      } else if (newPath === TAGS.FEEDBACK.path) {
+      } else if (newPath === TABS.FEEDBACK.path) {
         _tabs.active = TABS.FEEDBACK.name;
-      } else if (newPath === TAGS.ISSUES.path && isIssuesTabEnabled()) {
+      } else if (newPath === TABS.ISSUES.path && isIssuesTabEnabled()) {
         _tabs.active = TABS.ISSUES.name;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = TABS.MAIN.name;
@@ -163,13 +163,13 @@ oppia.factory('RouterService', [
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
         return (
-          currentPath === TAGS.TRANSLATION.path ||
-          currentPath === TAGS.PREVIEW.path ||
-          currentPath === TAGS.STATS.path ||
-          currentPath === TAGS.SETTINGS.path ||
-          currentPath === TAGS.HISTORY.path ||
-          currentPath === TAGS.FEEDBACK.path ||
-          (isIssuesTabEnabled() && currentPath === TAGS.ISSUES.path));
+          currentPath === TABS.TRANSLATION.path ||
+          currentPath === TABS.PREVIEW.path ||
+          currentPath === TABS.STATS.path ||
+          currentPath === TABS.SETTINGS.path ||
+          currentPath === TABS.HISTORY.path ||
+          currentPath === TABS.FEEDBACK.path ||
+          (isIssuesTabEnabled() && currentPath === TABS.ISSUES.path));
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -201,7 +201,7 @@ oppia.factory('RouterService', [
       },
       navigateToTranslationTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.TRANSLATION.path);
+        $location.path(TABS.TRANSLATION.path);
       },
       navigateToPreviewTab: function() {
         if (_tabs.active !== TABS.PREVIEW.name) {
@@ -211,23 +211,23 @@ oppia.factory('RouterService', [
       },
       navigateToStatsTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.STATS.path);
+        $location.path(TABS.STATS.path);
       },
       navigateToSettingsTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.SETTINGS.path);
+        $location.path(TABS.SETTINGS.path);
       },
       navigateToHistoryTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.HISTORY.path);
+        $location.path(TABS.HISTORY.path);
       },
       navigateToFeedbackTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.FEEDBACK.path);
+        $location.path(TABS.FEEDBACK.path);
       },
       navigateToIssuesTab: function() {
         _savePendingChanges();
-        $location.path(TAGS.ISSUES.path);
+        $location.path(TABS.ISSUES.path);
       },
     };
 
