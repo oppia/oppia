@@ -42,11 +42,10 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
-      StateClassifierMappingService.init(
-        returnDict.state_classifier_mapping);
+      StateClassifierMappingService.init(returnDict.state_classifier_mapping);
       StatsReportingService.initSession(
-        explorationId, returnDict.exploration.title,
-        version, returnDict.session_id, GLOBALS.collectionId);
+        explorationId, returnDict.exploration.title, version,
+        returnDict.session_id, GLOBALS.collectionId);
       PlaythroughService.initSession(
         explorationId, version, returnDict.record_playthrough_probability);
       PlaythroughIssuesService.initSession(explorationId, version);
@@ -54,8 +53,7 @@ oppia.factory('ExplorationPlayerStateService', [
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
         returnDict.exploration, returnDict.version,
-        returnDict.preferred_audio_language_code,
-        returnDict.auto_tts_enabled,
+        returnDict.preferred_audio_language_code, returnDict.auto_tts_enabled,
         arePretestsAvailable ? function() {} : callback);
     };
 
