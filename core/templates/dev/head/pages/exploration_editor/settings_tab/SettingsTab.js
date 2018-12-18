@@ -25,7 +25,7 @@ oppia.controller('SettingsTab', [
   'ExplorationInitStateNameService', 'ExplorationParamSpecsService',
   'ChangeListService', 'AlertsService', 'ExplorationStatesService',
   'ExplorationParamChangesService', 'ExplorationWarningsService',
-  'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
+  'ExplorationFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'ExplorationAutomaticTextToSpeechService',
@@ -39,7 +39,7 @@ oppia.controller('SettingsTab', [
       ExplorationInitStateNameService, ExplorationParamSpecsService,
       ChangeListService, AlertsService, ExplorationStatesService,
       ExplorationParamChangesService, ExplorationWarningsService,
-      ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
+      ExplorationFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
       ExplorationAutomaticTextToSpeechService,
@@ -173,13 +173,13 @@ oppia.controller('SettingsTab', [
       ExplorationWarningsService.updateWarnings();
     };
 
-    /** ******************************************
+    /********************************************
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
-      ExplorationAdvancedFeaturesService.areParametersEnabled);
+      ExplorationFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
-      ExplorationAdvancedFeaturesService.enableParameters);
+      ExplorationFeaturesService.enableParameters);
 
     $scope.isAutomaticTextToSpeechEnabled = (
       ExplorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
@@ -191,7 +191,7 @@ oppia.controller('SettingsTab', [
     $scope.toggleCorrectnessFeedback = (
       ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
-    /** ******************************************
+    /********************************************
     * Methods for rights management.
     ********************************************/
     $scope.openEditRolesForm = function() {
@@ -217,7 +217,7 @@ oppia.controller('SettingsTab', [
         !ExplorationRightsService.viewableIfPrivate());
     };
 
-    /** ******************************************
+    /********************************************
     * Methods for notifications muting.
     ********************************************/
 
@@ -235,7 +235,7 @@ oppia.controller('SettingsTab', [
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
 
-    /** ******************************************
+    /********************************************
     * Methods relating to control buttons.
     ********************************************/
     $scope.previewSummaryTile = function() {
