@@ -38,9 +38,7 @@ oppia.factory('RouterService', [
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
 
-    var _tabs = {
-      active: TABS.MAIN.name
-    };
+    var _tabs = {active: TABS.MAIN.name};
 
     var isIssuesTabEnabled = ExplorationFeaturesService.isIssuesTabEnabled;
 
