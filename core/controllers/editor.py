@@ -890,5 +890,5 @@ class ExplorationEditorFeaturesHandler(EditorHandler):
     def get(self, unused_exploration_id):
         """Handles GET requests for exploration editor features."""
         self.render_json({
-            'is_issues_tab_exposed': config_domain.IS_ISSUES_TAB_EXPOSED.value,
+            'is_issues_tab_enabled': config_domain.IS_ISSUES_TAB_ENABLED.value,
         })

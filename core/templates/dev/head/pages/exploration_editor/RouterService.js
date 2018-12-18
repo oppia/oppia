@@ -40,8 +40,8 @@ oppia.factory('RouterService', [
       active: MAIN_TAB
     };
 
-    var isIssuesTabExposed = function() {
-      return ExplorationAdvancedFeaturesService.isIssuesTabExposed();
+    var isIssuesTabEnabled = function() {
+      return ExplorationAdvancedFeaturesService.isIssuesTabEnabled();
     };
 
     // When the URL path changes, reroute to the appropriate tab in the
@@ -83,7 +83,7 @@ oppia.factory('RouterService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
-      } else if (newPath === '/issues' && isIssuesTabExposed()) {
+      } else if (newPath === '/issues' && isIssuesTabEnabled()) {
         _tabs.active = ISSUES_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
@@ -160,7 +160,7 @@ oppia.factory('RouterService', [
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
-        if (currentPath === '/issues' && isIssuesTabExposed()) {
+        if (currentPath === '/issues' && isIssuesTabEnabled()) {
           return true;
         }
         return (

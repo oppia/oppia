@@ -20,12 +20,12 @@
 oppia.factory('ExplorationAdvancedFeaturesService', [function() {
   var _settings = {
     areParametersEnabled: false,
-    isIssuesTabExposed: false,
+    isIssuesTabEnabled: false,
   };
 
   return {
     init: function(explorationData, featuresData) {
-      _settings.isIssuesTabExposed = featuresData.is_issues_tab_exposed;
+      _settings.isIssuesTabEnabled = featuresData.is_issues_tab_enabled;
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {
@@ -40,8 +40,8 @@ oppia.factory('ExplorationAdvancedFeaturesService', [function() {
     areParametersEnabled: function() {
       return _settings.areParametersEnabled;
     },
-    isIssuesTabExposed: function() {
-      return _settings.isIssuesTabExposed;
+    isIssuesTabEnabled: function() {
+      return _settings.isIssuesTabEnabled;
     },
     enableParameters: function() {
       _settings.areParametersEnabled = true;
