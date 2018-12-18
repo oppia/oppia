@@ -18,12 +18,11 @@
  */
 
 oppia.constant(
-  'EXPLORATION_EDITOR_FEATURES_URL',
-  '/exploration_editor/features/<exploration_id>');
+  'EXPLORATION_FEATURES_URL', '/exploration_editor/features/<exploration_id>');
 
 oppia.factory('ExplorationFeaturesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'EXPLORATION_EDITOR_FEATURES_URL',
-  function($http, UrlInterpolationService, EXPLORATION_EDITOR_FEATURES_URL) {
+  '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
+  function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {
     return {
       /**
        * Retrieves data regarding features this exploration supports.
@@ -38,7 +37,7 @@ oppia.factory('ExplorationFeaturesBackendApiService', [
       fetchExplorationFeatures: function(explorationId) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            EXPLORATION_EDITOR_FEATURES_URL, {exploration_id: explorationId})
+            EXPLORATION_FEATURES_URL, {exploration_id: explorationId})
         ).then(function(response) {
           return response.data;
         });
