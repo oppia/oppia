@@ -17,13 +17,13 @@
  */
 
 oppia.factory('RouterService', [
-  '$rootScope', '$location', '$window', '$timeout', '$interval',
+  '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
-  'StateEditorService', 'ExplorationStatesService',
+  'ExplorationStatesService', 'StateEditorService',
   function(
-      $rootScope, $location, $window, $timeout, $interval,
+      $interval, $location, $rootScope, $timeout, $window,
       ExplorationFeaturesService, ExplorationInitStateNameService,
-      StateEditorService, ExplorationStatesService) {
+      ExplorationStatesService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
