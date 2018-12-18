@@ -210,7 +210,7 @@ oppia.controller('SettingsTab', [
         !ExplorationRightsService.viewableIfPrivate());
     };
 
-    // Methods for notifications muting.
+    // Methods for muting notifications.
     $scope.muteFeedbackNotifications = function() {
       UserEmailPreferencesService.setFeedbackNotificationPreferences(true);
     };
