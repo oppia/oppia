@@ -52,7 +52,8 @@ oppia.directive('editorNavbarBreadcrumb', [
             settings: 'Settings',
             stats: 'Statistics',
             history: 'History',
-            feedback: 'Feedback'
+            feedback: 'Feedback',
+            issues: 'Issues',
           };
 
           $scope.getCurrentTabName = function() {
