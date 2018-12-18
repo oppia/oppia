@@ -306,7 +306,7 @@ def get_message_count(thread_id):
     """Fetches the messages count of the given thread.
 
     Args:
-        thread_id: str.
+        thread_id: str.The ID of the thread to count messages in.
 
     Returns:
         int. The count of messages of the given thread.

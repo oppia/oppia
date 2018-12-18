@@ -18,7 +18,6 @@ from core import jobs
 from core.domain import feedback_services
 from core.platform import models
 
-
 (feedback_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.email, models.NAMES.user])
 

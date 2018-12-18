@@ -85,6 +85,15 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         thread_id = 'exploration.exp1.1234'
         self.assertEqual(
             feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
+    
+    def test_get_message_count(self):
+        exp_id = '0'
+        feedback_services.create_thread(
+            'exploration', exp_id, None, 'a subject', 'some text')
+        threadlist = feedback_services.get_all_threads(
+            'exploration', exp_id, False)
+        thread_id = threadlist[0].id
+        self.assertEqual(feedback_services.get_message_count(thread_id),1)
 
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
