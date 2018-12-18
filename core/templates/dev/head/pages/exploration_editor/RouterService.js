@@ -42,9 +42,7 @@ oppia.factory('RouterService', [
       active: TABS.MAIN.name
     };
 
-    var isIssuesTabEnabled = function() {
-      return ExplorationFeaturesService.isIssuesTabEnabled();
-    };
+    var isIssuesTabEnabled = ExplorationFeaturesService.isIssuesTabEnabled;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
