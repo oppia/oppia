@@ -41,24 +41,16 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
   };
 
   $scope.openIssueData = [{
-    issue_title: 'Multiple incorrect answers',
+    issue_description: 'I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION',
     issue_type: 'playthrough',
-    issue_description: (
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
-    issue_title: 'A learner had something to say',
+    issue_description: 'I18N_ISSUES_TAB_FEEDBACK_DESCRIPTION',
     issue_type: 'feedback',
-    issue_description: (
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
-    issue_title: 'There is a common answer without explicit feedback',
+    issue_description: 'I18N_ISSUES_TAB_UNRESOLVED_ANSWER_DESCRIPTION',
     issue_type: 'unresolved_answer',
-    issue_description: (
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
-    issue_title: 'Learner quit early',
+    issue_description: 'I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_EARLY_QUIT_DESCRIPTION',
     issue_type: 'playthrough',
-    issue_description: (
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }];
 }]);

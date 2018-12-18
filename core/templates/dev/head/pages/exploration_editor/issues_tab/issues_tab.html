@@ -4,17 +4,17 @@
     <md-card layout="row">
       <div class="open-issues stats-card">
         <!-- TODO: Add translations -->
-        <p class="stat-description">Open Issues</p>
+        <p class="stat-description" translate="I18N_ISSUES_TAB_SUMMARY_OPEN_ISSUES"></p>
         <h1 class="stat-value-with-rating"><[openIssueData.length]></h1>
       </div>
       <div class="resolved-issues stats-card">
         <!-- TODO: Add translations -->
-        <p class="stat-description">Resolved Issues</p>
+        <p class="stat-description" translate="I18N_ISSUES_TAB_SUMMARY_RESOLVED_ISSUES"></p>
         <h1 class="stat-value-with-rating"><[resolvedIssueCount]></h1>
       </div>
       <div class="archived-issues stats-card">
         <!-- TODO: Add translations -->
-        <p class="stat-description">Archived Issues</p>
+        <p class="stat-description" translate="I18N_ISSUES_TAB_SUMMARY_ARCHIVED_ISSUES"></p>
         <h1 class="stat-value-with-rating"><[archivedIssueCount]></h1>
       </div>
     </md-card>
@@ -24,8 +24,7 @@
     <!-- TODO: Add translations -->
     <h2>
       <i class="material-icons"><[issueTypeToMaterialIcon(issueData.issue_type)]></i>
-      <[issueData.issue_title]>
+      <span translate="<[issueData.issue_description]>"></span>
     </h2>
-    <p><[issueData.issue_description]></p>
   </md-card>
 </div>
