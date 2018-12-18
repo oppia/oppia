@@ -18,6 +18,11 @@
  */
 
 oppia.controller('IssuesTab', ['$scope', function($scope) {
+  // NOTE: The constants used in this controller are intentionally hard-coded to
+  // demonstrate that the Issues Tab is configured correctly. The numbers are
+  // arbitrary, and were simply copied from the
+  // [design doc](https://bit.ly/2Bp7YLS).
+
   $scope.resolvedIssueCount = 13;
   $scope.archivedIssueCount = 30;
 
