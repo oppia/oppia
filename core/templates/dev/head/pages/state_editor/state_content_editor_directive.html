@@ -52,7 +52,7 @@
   </div>
   <div ng-if="isCardHeightLimitReached && showCardHeightLimitWarning">
     <span class="oppia-card-height-limit-warning">
-      <i class="material-icons" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
+      <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
       <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
     </span>
   </div>
@@ -60,23 +60,27 @@
 
 <style>
   .oppia-card-height-limit-warning {
-      color: #0277BD;
-      padding-top: 2px;
+    color: #0277BD;
+    padding-top: 2px;
   }
+
   .shadow-preview-card {
     left: -30000px;
     max-width: 560px;
     position: fixed;
     top: -30000px;
   }
+
   .rte-viewer > p {
     line-height: 28px;
     margin-bottom: 18px;
     margin-top: 18px;
   }
+
   .rte-viewer > p:first-child {
     margin-top: 0px;
   }
+
   .rte-viewer > p:last-child {
     margin-bottom: 0px;
   }
