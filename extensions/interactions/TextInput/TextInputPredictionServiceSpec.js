@@ -42,8 +42,8 @@ describe('Text Input Prediction Service', function() {
           if (predictedAnswerGroup === -1) {
             predictedAnswerGroup = 3;
           }
-          
-           expect(predictedAnswerGroup).toEqual(
+
+          expect(predictedAnswerGroup).toEqual(
             trainingData[i].answer_group_index);
         }
       }
