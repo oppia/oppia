@@ -165,7 +165,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 _generate_unique_id_for_tests,
                 email_models.GeneralFeedbackEmailReplyToIdModel))
 
-    def test_id_generation_works_correctly(self):
+    def test_id_generation_is_correctly_formatted(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created = model.create('user_id', 'thread_id')
@@ -192,7 +192,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
                 'user_id', 'thread_id')
             created2.put()
 
-    def test_get_by_reply_to_id_works_correctly(self):
+    def test_get_reply_to_id_can_be_used_to_retrieve_model(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created = model.create('user_id', 'thread_id')
@@ -203,11 +203,19 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(result, None) #There should be a result
         self.assertEqual(result.reply_to_id, created.reply_to_id)
 
+    def test_nonexistent_get_reply_to_id_should_provide_no_model(self):
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created = model.create('user_id', 'thread_id')
+        created.put()
+
+        result = model.get_by_reply_to_id(created.reply_to_id)
+
         result = model.get_by_reply_to_id('non_existent_reply_to_id')
 
         self.assertEqual(result, None)
 
-    def test_get_works_correctly(self):
+    def test_get_can_be_used_to_retrive_model(self):
         created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'thread_id')
         created.put()
@@ -218,31 +226,99 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(result, None)
         self.assertIn('user_id.thread_id', str(result.key))
 
+    def test_get_returns_nothing_with_bad_id_if_not_strict(self):
+        created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+        created.put()
+
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            'bad_user_id', 'bad_thread_id', strict=False) #Should not throw
+            'user_id', 'thread_id', strict=False)
+
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+            'bad_user_id', 'bad_thread_id', strict=False)
         self.assertEqual(result, None)
 
         with self.assertRaises(Exception):
             result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                'bad_user_id', 'bad_thread_id') #Should throw
+                'bad_user_id', 'bad_thread_id')
 
-    def test_get_multi_by_user_ids_works_correctly(self):
+    def test_get_returns_throws_with_bad_id_if_strict(self):
+        created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user_id', 'thread_id')
+        created.put()
+
+        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+            'user_id', 'thread_id', strict=False)
+
+        with self.assertRaises(Exception):
+            result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                'bad_user_id', 'bad_thread_id')
+
+    def test_get_multi_by_user_ids_works_correctly_with_multiple_ids(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
-        model.create('user_id_1', 'thread_id')
-        model.create('user_id_2', 'thread_id')
+        created1 = model.create('user_id_1', 'thread_id')
+        created1.put()
+        created2 = model.create('user_id_2', 'thread_id')
+        created2.put()
 
         result = model.get_multi_by_user_ids(
             ['user_id_1', 'user_id_2'], 'thread_id')
-
+        
         self.assertEqual(len(result), 2)
         self.assertIn('user_id_1', result.keys())
         self.assertIn('user_id_2', result.keys())
+        self.assertEqual(result['user_id_1'], created1)
+        self.assertEqual(result['user_id_2'], created2)
+
+    def test_get_multi_by_user_ids_works_correctly_with_one_id(self):
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created1 = model.create('user_id_1', 'thread_id')
+        created1.put()
+        created2 = model.create('user_id_2', 'thread_id')
+        created2.put()
+
+        result = model.get_multi_by_user_ids(
+            ['user_id_1'], 'thread_id')
+
+        self.assertEqual(len(result), 1)
+        self.assertIn('user_id_1', result.keys())
+        self.assertEqual(result['user_id_1'], created1)
+
+    def test_get_multi_by_user_ids_works_correctly_with_no_id(self):
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created1 = model.create('user_id_1', 'thread_id')
+        created1.put()
+        created2 = model.create('user_id_2', 'thread_id')
+        created2.put()
+
+        result = model.get_multi_by_user_ids(
+            [], 'thread_id')
+
+        self.assertEqual(len(result), 0)
+
+    def test_get_multi_by_user_ids_works_correctly_with_bad_ids(self):
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created1 = model.create('user_id_1', 'thread_id')
+        created1.put()
+        created2 = model.create('user_id_2', 'thread_id')
+        created2.put()
+
+        result = model.get_multi_by_user_ids(
+            ['user_id_1', 'bad_user_id_2'], 'thread_id')
+
+        self.assertEqual(len(result), 2)
+        self.assertIn('user_id_1', result.keys())
+        self.assertIn('bad_user_id_2', result.keys())
+        self.assertEqual(result['user_id_1'], created1)
+        self.assertEqual(result['bad_user_id_2'], None)
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
-
 
     def test_same_inputs_always_gives_same_hashes(self):
         # pylint: disable=protected-access
