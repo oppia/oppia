@@ -232,9 +232,6 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created.put()
 
         result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            'user_id', 'thread_id', strict=False)
-
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'bad_user_id', 'bad_thread_id', strict=False)
         self.assertEqual(result, None)
 
@@ -246,9 +243,6 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'thread_id')
         created.put()
-
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            'user_id', 'thread_id', strict=False)
 
         with self.assertRaises(Exception):
             result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
@@ -264,7 +258,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = model.get_multi_by_user_ids(
             ['user_id_1', 'user_id_2'], 'thread_id')
-        
+
         self.assertEqual(len(result), 2)
         self.assertIn('user_id_1', result.keys())
         self.assertIn('user_id_2', result.keys())
