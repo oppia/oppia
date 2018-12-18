@@ -36,7 +36,7 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
     if (issueTypeMaterialIconMapping.hasOwnProperty(issueType)) {
       return issueTypeMaterialIconMapping[issueType];
     } else {
-      return 'bug_report';
+      return '';
     }
   };
 
