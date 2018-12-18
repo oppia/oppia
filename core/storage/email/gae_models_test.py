@@ -245,7 +245,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created.put()
 
         with self.assertRaises(Exception):
-            result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+            email_models.GeneralFeedbackEmailReplyToIdModel.get(
                 'bad_user_id', 'bad_thread_id')
 
     def test_get_multi_by_user_ids_works_correctly_with_multiple_ids(self):
