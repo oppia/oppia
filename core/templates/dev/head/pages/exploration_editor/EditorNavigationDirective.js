@@ -25,13 +25,13 @@ oppia.directive('editorNavigation', [
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationAdvancedFeaturesService', 'ExplorationRightsService',
+        'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'RouterService',
         'StateEditorTutorialFirstTimeService', 'SiteAnalyticsService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $uibModal, ContextService,
-            ExplorationAdvancedFeaturesService, ExplorationRightsService,
+            ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, RouterService,
             StateEditorTutorialFirstTimeService, SiteAnalyticsService,
             ThreadDataService, UserService, WindowDimensionsService) {
@@ -39,9 +39,8 @@ oppia.directive('editorNavigation', [
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          $scope.isIssuesTabEnabled = function() {
-            return ExplorationAdvancedFeaturesService.isIssuesTabEnabled();
-          };
+          $scope.isIssuesTabEnabled =
+            ExplorationFeaturesService.isIssuesTabEnabled;
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
