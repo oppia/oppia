@@ -86,11 +86,11 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     var initExplorationPlayer = function(callback) {
-      var explorationDataPromise = !!version
-        ? ReadOnlyExplorationBackendApiService.loadExploration(
-            explorationId, version)
-        : ReadOnlyExplorationBackendApiService.loadLatestExploration(
-            explorationId);
+      var explorationDataPromise = version ?
+        ReadOnlyExplorationBackendApiService.loadExploration(
+          explorationId, version) :
+        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationId);
       Promise.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
