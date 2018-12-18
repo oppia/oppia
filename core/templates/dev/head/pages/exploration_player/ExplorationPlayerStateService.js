@@ -18,21 +18,21 @@
  */
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
-  'ContextService', 'UrlService', 'StateClassifierMappingService',
-  'StatsReportingService', 'PlaythroughService', 'PlaythroughIssuesService',
-  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
-  'EditableExplorationBackendApiService', 'PlayerPositionService',
-  'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
-  'NumberAttemptsService',
+  '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
+  'ExplorationEngineService', 'NumberAttemptsService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
+  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
+  'PretestEngineService', 'PretestQuestionBackendApiService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService',
   function(
-      $log, $q, ExplorationEngineService, PretestEngineService,
-      ContextService, UrlService, StateClassifierMappingService,
-      StatsReportingService, PlaythroughService, PlaythroughIssuesService,
-      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
-      EditableExplorationBackendApiService, PlayerPositionService,
-      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
-      NumberAttemptsService) {
+      $log, $q, ContextService, EditableExplorationBackendApiService,
+      ExplorationEngineService, NumberAttemptsService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
+      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
+      PretestEngineService, PretestQuestionBackendApiService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlService) {
     var currentEngineService = null;
     var inPretestMode = false;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
