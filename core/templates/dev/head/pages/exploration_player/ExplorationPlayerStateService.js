@@ -86,17 +86,11 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     var initExplorationPlayer = function(callback) {
-      var explorationDataPromise = null;
-      if (version) {
-        explorationDataPromise =
-          ReadOnlyExplorationBackendApiService.loadExploration(
-            explorationId, version);
-      } else {
-        explorationDataPromise =
-          ReadOnlyExplorationBackendApiService.loadLatestExploration(
+      var explorationDataPromise = !!version
+        ? ReadOnlyExplorationBackendApiService.loadExploration(
+            explorationId, version)
+        : ReadOnlyExplorationBackendApiService.loadLatestExploration(
             explorationId);
-      }
-
       Promise.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
@@ -104,7 +98,6 @@ oppia.factory('ExplorationPlayerStateService', [
       ]).then(function(allData) {
         var explorationData = allData[0];
         var pretestQuestionsData = allData[1];
-
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);
