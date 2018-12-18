@@ -43,41 +43,15 @@ oppia.directive('searchBar', [
               }
             )
           );
-          // $rootScope.activeMenuName = '';
-          // $rootScope.ACTION_OPEN = 'open';
-          // $rootScope.ACTION_CLOSE = 'close';
-          // $rootScope.KEYBOARD_EVENT_TO_KEY_CODES = {
-          //   enter: {
-          //     shiftKeyIsPressed: false,
-          //     keyCode: 13
-          //   },
-          //   tab: {
-          //     shiftKeyIsPressed: false,
-          //     keyCode: 9
-          //   },
-          //   shiftTab: {
-          //     shiftKeyIsPressed: true,
-          //     keyCode: 9
-          //   }
-          // };
           /**
            * Opens the submenu.
            * @param {object} evt
            * @param {String} menuName - name of menu, on which
            * open/close action to be performed (category,language).
            */
-          // $scope.openSubmenu = function(evt, menuName) {
-          //    NavigationService.openSubmenu(evt, menuName);
-          //   // Focus on the current target before opening its submenu.
-          //   //angular.element(evt.currentTarget).focus();
-          //   // $rootScope.activeMenuName = menuName;
-          // };
-          // $scope.closeSubmenu = function(evt) {
-          //   // $rootScope.activeMenuName = '';
-          //    NavigationService.closeSubmenu(evt);
-          //   //angular.element(evt.currentTarget).closest('li')
-          //   //  .find('a').blur();
-          // };
+          $scope.openSubmenu = function(evt, menuName) {
+            NavigationService.openSubmenu(evt, menuName);
+          };
           /**
            * Handles keydown events on menus.
            * @param {object} evt
@@ -93,25 +67,6 @@ oppia.directive('searchBar', [
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled){
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
           };
-
-          // $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-          //   var targetEvents = Object.keys(eventsTobeHandled);
-          //   for (var i = 0; i < targetEvents.length; i++) {
-          //     var keyCodeSpec =
-          //       $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
-          //     if (keyCodeSpec.keyCode === evt.keyCode &&
-          //       evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-          //       if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
-          //         $scope.openSubmenu(evt, menuName);
-          //       } else if (eventsTobeHandled[targetEvents[i]] ===
-          //         $scope.ACTION_CLOSE) {
-          //         $scope.closeSubmenu(evt);
-          //       } else {
-          //         throw Error('Invalid action type.');
-          //       }
-          //     }
-          //   }
-          // };
           // TODO(sll): Remove the filter once the App Engine Search API
           // supports 3-letter language codes.
           $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.filter(

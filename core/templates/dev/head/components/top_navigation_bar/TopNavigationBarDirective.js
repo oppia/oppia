@@ -27,14 +27,14 @@ oppia.directive('topNavigationBar', [
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate',
+        '$scope', '$rootScope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
+        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService', 'DebouncerService',
         'DeviceInfoService',
         function(
-            $scope, $http, $window, $timeout, $translate,
+            $scope, $rootScope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, WindowDimensionsService, DebouncerService,
+            SiteAnalyticsService, NavigationService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
