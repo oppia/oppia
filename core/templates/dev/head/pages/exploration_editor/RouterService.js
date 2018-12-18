@@ -160,13 +160,11 @@ oppia.factory('RouterService', [
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
-        if (currentPath === '/issues' && isIssuesTabEnabled()) {
-          return true;
-        }
         return (
           currentPath === '/translation' || currentPath === '/preview' ||
           currentPath === '/stats' || currentPath === '/settings' ||
-          currentPath === '/history' || currentPath === '/feedback');
+          currentPath === '/history' || currentPath === '/feedback' ||
+          (isIssuesTabEnabled() && currentPath === '/issues'));
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
