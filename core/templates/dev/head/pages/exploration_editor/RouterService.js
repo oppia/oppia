@@ -68,7 +68,7 @@ oppia.factory('RouterService', [
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         _tabs.active = TABS.TRANSLATION.name;
         $rootScope.$broadcast('refreshTranslationTab');
-      } else if (newPath.indexOf('/preview/') === 0) {
+      } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
         _tabs.active = TABS.PREVIEW.name;
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
