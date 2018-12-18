@@ -27,9 +27,9 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
   $scope.archivedIssueCount = 30;
 
   var issueTypeMaterialIconMapping = {
-    'Feedback': 'feedback',
-    'Playthrough': 'gamepad',
-    'Unresolved Answer': 'help',
+    feedback: 'feedback',
+    playthrough: 'gamepad',
+    unresolved_answer: 'help',
   };
 
   $scope.issueTypeToMaterialIcon = function(issueType) {
@@ -42,22 +42,22 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
 
   $scope.openIssueData = [{
     issue_title: 'Multiple incorrect answers',
-    issue_type: 'Playthrough',
+    issue_type: 'playthrough',
     issue_description: (
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
     issue_title: 'A learner had something to say',
-    issue_type: 'Feedback',
+    issue_type: 'feedback',
     issue_description: (
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
     issue_title: 'There is a common answer without explicit feedback',
-    issue_type: 'Unresolved Answer',
+    issue_type: 'unresolved_answer',
     issue_description: (
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }, {
     issue_title: 'Learner quit early',
-    issue_type: 'Playthrough',
+    issue_type: 'playthrough',
     issue_description: (
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
   }];
