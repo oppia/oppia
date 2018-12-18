@@ -72,7 +72,7 @@ oppia.factory('ExplorationPlayerStateService', [
       currentEngineService = PretestEngineService;
     };
 
-    var initExplorationPreviewPlayer = function() {
+    var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       EditableExplorationBackendApiService.fetchApplyDraftExploration(
         explorationId
@@ -85,7 +85,7 @@ oppia.factory('ExplorationPlayerStateService', [
       });
     };
 
-    var initExplorationPlayer = function() {
+    var initExplorationPlayer = function(callback) {
       var explorationDataPromise = null;
       if (version) {
         explorationDataPromise =
@@ -139,9 +139,9 @@ oppia.factory('ExplorationPlayerStateService', [
       initializePlayer: function(callback) {
         PlayerTranscriptService.init();
         if (editorPreviewMode) {
-          initExplorationPreviewPlayer();
+          initExplorationPreviewPlayer(callback);
         } else {
-          initExplorationPlayer();
+          initExplorationPlayer(callback);
         }
       }
     };
