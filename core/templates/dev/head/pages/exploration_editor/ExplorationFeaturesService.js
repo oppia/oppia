@@ -18,14 +18,14 @@
  */
 
 oppia.factory('ExplorationFeaturesService', [function() {
-  var _settings = {
+  var settings = {
     areParametersEnabled: false,
     isIssuesTabEnabled: false,
   };
 
   return {
     init: function(explorationData, featuresData) {
-      _settings.isIssuesTabEnabled = featuresData.is_issues_tab_enabled;
+      settings.isIssuesTabEnabled = featuresData.is_issues_tab_enabled;
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {
@@ -38,13 +38,13 @@ oppia.factory('ExplorationFeaturesService', [function() {
       }
     },
     areParametersEnabled: function() {
-      return _settings.areParametersEnabled;
+      return settings.areParametersEnabled;
     },
     isIssuesTabEnabled: function() {
-      return _settings.isIssuesTabEnabled;
+      return settings.isIssuesTabEnabled;
     },
     enableParameters: function() {
-      _settings.areParametersEnabled = true;
+      settings.areParametersEnabled = true;
     },
   };
 }]);
