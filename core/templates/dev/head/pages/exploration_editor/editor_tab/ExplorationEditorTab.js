@@ -28,8 +28,8 @@ oppia.controller('ExplorationEditorTab', [
       ExplorationInitStateNameService, ExplorationStatesService,
       ExplorationWarningsService, GraphDataService, RouterService,
       StateEditorService, UrlInterpolationService) {
-    $scope.areParametersEnabled = (
-      ExplorationFeaturesService.areParametersEnabled);
+    $scope.areParametersEnabled =
+      ExplorationFeaturesService.areParametersEnabled;
 
     $scope.interactionIsShown = false;
 
