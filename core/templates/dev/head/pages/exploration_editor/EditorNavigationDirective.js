@@ -24,17 +24,17 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'RouterService',
-        'StateEditorTutorialFirstTimeService', 'SiteAnalyticsService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService',
+        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+        'StateEditorTutorialFirstTimeService', 'ThreadDataService',
+        'UserService', 'WindowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $uibModal, ContextService,
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, RouterService,
-            StateEditorTutorialFirstTimeService, SiteAnalyticsService,
-            ThreadDataService, UserService, WindowDimensionsService) {
+            ExplorationWarningsService, RouterService, SiteAnalyticsService,
+            StateEditorTutorialFirstTimeService, ThreadDataService,
+            UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
