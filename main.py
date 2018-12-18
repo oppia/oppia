@@ -354,7 +354,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/exploration_editor/features/<exploration_id>',
-        editor.ExplorationEditorFeaturesHandler),
+        editor.ExplorationFeaturesHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),

@@ -40,10 +40,10 @@ oppia.constant(
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$rootScope', '$scope', '$templateCache', '$timeout',
   '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
-  'ContextService', 'EditabilityService', 'ExplorationAdvancedFeaturesService',
+  'ContextService', 'EditabilityService', 'ExplorationFeaturesService',
   'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
-  'ExplorationEditorFeaturesBackendApiService',
+  'ExplorationFeaturesBackendApiService',
   'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
   'ExplorationObjectiveService', 'ExplorationParamChangesService',
   'ExplorationParamSpecsService', 'ExplorationRightsService',
@@ -58,10 +58,10 @@ oppia.controller('ExplorationEditor', [
   function(
       $http, $log, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
-      ContextService, EditabilityService, ExplorationAdvancedFeaturesService,
+      ContextService, EditabilityService, ExplorationFeaturesService,
       ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
       ExplorationCorrectnessFeedbackService, ExplorationDataService,
-      ExplorationEditorFeaturesBackendApiService,
+      ExplorationFeaturesBackendApiService,
       ExplorationInitStateNameService, ExplorationLanguageCodeService,
       ExplorationObjectiveService, ExplorationParamChangesService,
       ExplorationParamSpecsService, ExplorationRightsService,
@@ -118,13 +118,13 @@ oppia.controller('ExplorationEditor', [
               lostChanges, explorationId);
           }
         }),
-        ExplorationEditorFeaturesBackendApiService
-          .fetchExplorationEditorFeatures(ContextService.getExplorationId()),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          ContextService.getExplorationId()),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var featuresData = combinedData[1];
 
-        ExplorationAdvancedFeaturesService.init(explorationData, featuresData);
+        ExplorationFeaturesService.init(explorationData, featuresData);
 
         ExplorationStatesService.init(explorationData.states);
 

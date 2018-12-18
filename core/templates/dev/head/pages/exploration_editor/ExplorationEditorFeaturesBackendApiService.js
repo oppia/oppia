@@ -21,7 +21,7 @@ oppia.constant(
   'EXPLORATION_EDITOR_FEATURES_URL',
   '/exploration_editor/features/<exploration_id>');
 
-oppia.factory('ExplorationEditorFeaturesBackendApiService', [
+oppia.factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_EDITOR_FEATURES_URL',
   function($http, UrlInterpolationService, EXPLORATION_EDITOR_FEATURES_URL) {
     return {
@@ -35,7 +35,7 @@ oppia.factory('ExplorationEditorFeaturesBackendApiService', [
        * @returns {Object.<string, *>} - Describes the features the given
        *  exploration supports.
        */
-      fetchExplorationEditorFeatures: function(explorationId) {
+      fetchExplorationFeatures: function(explorationId) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
             EXPLORATION_EDITOR_FEATURES_URL, {exploration_id: explorationId})
