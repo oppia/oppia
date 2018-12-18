@@ -886,7 +886,7 @@ class ExplorationEditorFeaturesHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_view_exploration_stats
+    @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests for exploration editor features."""
         self.render_json({
