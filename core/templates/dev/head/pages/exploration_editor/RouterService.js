@@ -18,11 +18,11 @@
 
 oppia.factory('RouterService', [
   '$rootScope', '$location', '$window', '$timeout', '$interval',
-  'ExplorationAdvancedFeaturesService', 'ExplorationInitStateNameService',
+  'ExplorationFeaturesService', 'ExplorationInitStateNameService',
   'StateEditorService', 'ExplorationStatesService',
   function(
       $rootScope, $location, $window, $timeout, $interval,
-      ExplorationAdvancedFeaturesService, ExplorationInitStateNameService,
+      ExplorationFeaturesService, ExplorationInitStateNameService,
       StateEditorService, ExplorationStatesService) {
     var MAIN_TAB = 'main';
     var TRANSLATION_TAB = 'translation';
@@ -41,7 +41,7 @@ oppia.factory('RouterService', [
     };
 
     var isIssuesTabEnabled = function() {
-      return ExplorationAdvancedFeaturesService.isIssuesTabEnabled();
+      return ExplorationFeaturesService.isIssuesTabEnabled();
     };
 
     // When the URL path changes, reroute to the appropriate tab in the
