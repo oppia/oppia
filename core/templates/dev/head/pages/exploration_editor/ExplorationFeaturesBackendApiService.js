@@ -18,7 +18,7 @@
  */
 
 oppia.constant(
-  'EXPLORATION_FEATURES_URL', '/exploration_editor/features/<exploration_id>');
+  'EXPLORATION_FEATURES_URL', '/explorehandler/features/<exploration_id>');
 
 oppia.factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
