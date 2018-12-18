@@ -1,3 +1,6 @@
+<!--
+  Off-screen preview of the learner view card in order to check if the height of the card has exceeded a specified limit.
+-->
 <div class="shadow-preview-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
@@ -48,15 +51,15 @@
     <div style="clear: both;"></div>
   </div>
   <div ng-if="isCardHeightLimitReached && showCardHeightLimitWarning">
-    <span class="card-height-limit-warning">
+    <span class="oppia-card-height-limit-warning">
       <i class="material-icons" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
-        This card is quite long, and students might lose interest. Consider shortening it, or breaking it into two cards.
+      <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
     </span>
   </div>
 </div>
 
 <style>
-  .card-height-limit-warning {
+  .oppia-card-height-limit-warning {
       color:#0277BD;
       padding-top: 2px;
   }
