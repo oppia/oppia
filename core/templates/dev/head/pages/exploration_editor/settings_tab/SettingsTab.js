@@ -172,10 +172,9 @@ oppia.controller('SettingsTab', [
     };
 
     // Methods for enabling advanced features.
-    $scope.areParametersEnabled = (
-      ExplorationFeaturesService.areParametersEnabled);
-    $scope.enableParameters = (
-      ExplorationFeaturesService.enableParameters);
+    $scope.areParametersEnabled =
+      ExplorationFeaturesService.areParametersEnabled;
+    $scope.enableParameters = ExplorationFeaturesService.enableParameters;
 
     $scope.isAutomaticTextToSpeechEnabled = (
       ExplorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
