@@ -41,7 +41,8 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
   };
 
   $scope.openIssueData = [{
-    issue_description: 'I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION',
+    issue_description: ('I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_' +
+                        'MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION'),
     issue_type: 'playthrough',
   }, {
     issue_description: 'I18N_ISSUES_TAB_FEEDBACK_DESCRIPTION',
@@ -50,7 +51,8 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
     issue_description: 'I18N_ISSUES_TAB_UNRESOLVED_ANSWER_DESCRIPTION',
     issue_type: 'unresolved_answer',
   }, {
-    issue_description: 'I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_EARLY_QUIT_DESCRIPTION',
+    issue_description: ('I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_' +
+                        'EARLY_QUIT_DESCRIPTION'),
     issue_type: 'playthrough',
   }];
 }]);
