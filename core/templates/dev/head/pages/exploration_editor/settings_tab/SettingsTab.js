@@ -171,9 +171,7 @@ oppia.controller('SettingsTab', [
       ExplorationWarningsService.updateWarnings();
     };
 
-    /********************************************
-    * Methods for enabling advanced features.
-    ********************************************/
+    // Methods for enabling advanced features.
     $scope.areParametersEnabled = (
       ExplorationFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
@@ -189,9 +187,7 @@ oppia.controller('SettingsTab', [
     $scope.toggleCorrectnessFeedback = (
       ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
-    /********************************************
-    * Methods for rights management.
-    ********************************************/
+    // Methods for rights management.
     $scope.openEditRolesForm = function() {
       $scope.isRolesFormOpen = true;
       $scope.newMemberUsername = '';
@@ -215,10 +211,7 @@ oppia.controller('SettingsTab', [
         !ExplorationRightsService.viewableIfPrivate());
     };
 
-    /********************************************
-    * Methods for notifications muting.
-    ********************************************/
-
+    // Methods for notifications muting.
     $scope.muteFeedbackNotifications = function() {
       UserEmailPreferencesService.setFeedbackNotificationPreferences(true);
     };
@@ -233,9 +226,7 @@ oppia.controller('SettingsTab', [
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
 
-    /********************************************
-    * Methods relating to control buttons.
-    ********************************************/
+    // Methods relating to control buttons.
     $scope.previewSummaryTile = function() {
       AlertsService.clearWarnings();
       $uibModal.open({
