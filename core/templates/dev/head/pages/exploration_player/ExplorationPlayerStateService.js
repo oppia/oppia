@@ -56,8 +56,7 @@ oppia.factory('ExplorationPlayerStateService', [
         returnDict.exploration, returnDict.version,
         returnDict.preferred_audio_language_code,
         returnDict.auto_tts_enabled,
-        arePretestsAvailable ?
-        function() {} : callback);
+        arePretestsAvailable ? function() {} : callback);
     };
 
     var initializePretestServices = function(pretestQuestionDicts, callback) {
