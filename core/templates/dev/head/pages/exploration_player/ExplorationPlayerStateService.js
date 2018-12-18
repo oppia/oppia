@@ -18,7 +18,7 @@
  */
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
+  '$log', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
@@ -26,7 +26,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService',
   function(
-      $log, $q, ContextService, EditableExplorationBackendApiService,
+      $log, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
@@ -86,7 +86,7 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     var initExplorationPlayerAtSpecificVersion = function() {
-      $q.all([
+      Promise.all([
         ReadOnlyExplorationBackendApiService.loadExploration(
           explorationId, version),
         PretestQuestionBackendApiService.fetchPretestQuestions(
@@ -106,7 +106,7 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     var initExplorationPlayerAtLatestVersion = function() {
-      $q.all([
+      Promise.all([
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationId),
         PretestQuestionBackendApiService.fetchPretestQuestions(
