@@ -525,8 +525,8 @@ describe('State editor', function() {
 
   it('should generate warning message if card height limit is exceeded ',
     function() {
-      users.createUser('user1@stateEditor.com', 'user1StateEditor');
-      users.login('user1@stateEditor.com');
+      users.createUser('user@heightWarning.com', 'userHeightWarning');
+      users.login('user@heightWarning.com');
 
       workflow.createExploration();
 
