@@ -110,6 +110,14 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     return {
+      initializePlayer: function(callback) {
+        PlayerTranscriptService.init();
+        if (editorPreviewMode) {
+          initExplorationPreviewPlayer(callback);
+        } else {
+          initExplorationPlayer(callback);
+        }
+      },
       getCurrentEngineService: function() {
         return currentEngineService;
       },
@@ -129,13 +137,5 @@ oppia.factory('ExplorationPlayerStateService', [
       recordNewCardAdded: function() {
         return currentEngineService.recordNewCardAdded();
       },
-      initializePlayer: function(callback) {
-        PlayerTranscriptService.init();
-        if (editorPreviewMode) {
-          initExplorationPreviewPlayer(callback);
-        } else {
-          initExplorationPlayer(callback);
-        }
-      }
     };
   }]);
