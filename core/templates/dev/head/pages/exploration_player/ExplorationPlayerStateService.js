@@ -95,9 +95,9 @@ oppia.factory('ExplorationPlayerStateService', [
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),
-      ]).then(function(allData) {
-        var explorationData = allData[0];
-        var pretestQuestionsData = allData[1];
+      ]).then(function(combinedData) {
+        var explorationData = combinedData[0];
+        var pretestQuestionsData = combinedData[1];
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);
