@@ -725,6 +725,32 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
                 pass
 
 
+class FunctionArgsOrderChecker(checkers.BaseChecker):
+    """Checker for order of arguments. It checks
+       that class arguments comes first."""
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'function-args-order'
+    priority = -1
+    msgs = {
+        'C0004':('Wrong order of arguments '
+                 'self should come first',
+                 'wrong-ord-args-self',
+                 'self should come first',),
+        'C0005':('Wrong order of arguments '
+                 'cls should come first',
+                 'wrong-ord-args-cls',
+                 'cls should come first'),
+    }
+
+    def visit_functiondef(self, node):
+        args_list = [args.name for args in node.args.args]
+        if 'self' in args_list and args_list[0] != 'self':
+            self.add_message('wrong-ord-args-self', node=node)
+        elif 'cls' in args_list and args_list[0] != 'cls':
+            self.add_message('wrong-ord-args-cls', node=node) 
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -735,3 +761,4 @@ def register(linter):
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
+    linter.register_checker(FunctionArgsOrderChecker(linter))

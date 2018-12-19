@@ -1158,70 +1158,6 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _fetch_func(all_files):
-    """This function fetch the function
-    definition from all the python files.
-    """
-    summary_messages = []
-    func_defs = []
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            ast_file = ast.walk(ast.parse(f.read()))
-            # Gettin function definition.
-            func_def = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-            # Adding filename in the list.
-            func_def = [func_def, [filename]]
-            # Collecting all function definition.
-            func_defs.append(func_def)
-    summary_messages = _check_args_order(func_defs)
-    return summary_messages
-
-
-def _check_args_order(func_defs):
-    """This function ensures that class args(self or cls)
-    comes first in the function definition.
-    """
-    print 'Starting arguments order check'
-    print '----------------------------------------'
-    wrong_ordself_message = ('The first arg of the function should be self')
-    wrong_ordcls_message = ('The first arg of the function should be cls')
-    summary_messages = []
-    failed = False
-    for files_func in func_defs:
-        for func in files_func[0]:
-            args_list = [arg.id for arg in func.args.args]
-            # Check if 'self' exists in args and doesn't come first.
-            if 'self' in args_list and args_list[0] != 'self':
-                failed = True
-                print '%s --> Line %s: %s' % (
-                    files_func[1][0], func.lineno,
-                    wrong_ordself_message)
-            # Check if 'cls' exists in args and doesn't come first.
-            elif 'cls' in args_list and args_list[0] != 'cls':
-                failed = True
-                print '%s --> Line %s: %s' % (
-                    files_func[1][0], func.lineno,
-                    wrong_ordcls_message)
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Arguments order check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Arguments order check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-    return summary_messages
-
-
 def _check_html_directive_name(all_files):
     """This function checks that all HTML directives end
     with _directive.html.
@@ -1727,7 +1663,6 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _fetch_func(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
@@ -1739,7 +1674,7 @@ def main():
     all_messages = (
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
-        newline_messages + docstring_messages + args_order_messages +
+        newline_messages + docstring_messages +
         comment_messages + html_tag_and_attribute_messages +
         html_linter_messages + linter_messages + pattern_messages +
         copyright_notice_messages)

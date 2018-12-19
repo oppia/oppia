@@ -187,3 +187,18 @@ class ImportOnlyModulesCheckerTest(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
+
+class FunctionArgsOrderCheckerTest(unittest.TestCase):
+
+    def test_find_function_def(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.FunctionArgsOrderChecker)
+        checker_test_object.setup_method()
+        functiondef_node1 = astroid.extract_node("""
+        def test(self,test_var_one, test_var_two): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_functiondef(functiondef_node1)
