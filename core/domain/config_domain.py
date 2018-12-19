@@ -277,4 +277,5 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
-    'Exposes the Improvements Tab for creators in the exploration editor.', False)
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    False)
