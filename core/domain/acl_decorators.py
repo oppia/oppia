@@ -2352,6 +2352,13 @@ def can_access_topic_viewer_page(handler):
     return test_can_access
 
 
+def can_edit_suggestion(handler):
+
+    def test_can_edit_suggestion(self,suggestion_id):
+        return True
+
+    return test_can_edit_suggestion
+
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in

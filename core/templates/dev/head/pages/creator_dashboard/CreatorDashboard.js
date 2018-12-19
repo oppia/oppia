@@ -318,7 +318,8 @@ oppia.controller('CreatorDashboard', [
       }
     };
 
-    $scope.showSuggestionModal = function() {
+    // Use showSuggestionModal function for both ShowSuggestion Button and EditSuggestion Button.
+    $scope.showSuggestionModal = function(edit_button_show) {
       if ($scope.activeThread.suggestion.suggestionType ===
           'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
@@ -369,6 +370,7 @@ oppia.controller('CreatorDashboard', [
               'This suggestion has already been accepted.');
             var SUGGESTION_REJECTED_MSG = (
               'This suggestion has already been rejected.');
+            var ACTION_EDIT_SUGGESTION = 'edit';
             var ACTION_ACCEPT_SUGGESTION = 'accept';
             var ACTION_REJECT_SUGGESTION = 'reject';
             var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
@@ -401,7 +403,12 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $scope.suggestionEditorIsShown = false;
+            $if(edit_button_show == 0){
+              $scope.suggestionEditorIsShown = false;
+            }
+            else{
+              $scope.suggestionEditorIsShown = true;
+            }
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -418,7 +425,14 @@ oppia.controller('CreatorDashboard', [
               });
             };
             $scope.editSuggestion = function() {
-              $scope.suggestionEditorIsShown = true;
+              $uibModalInstance.close({
+                action: ACTION_EDIT_SUGGESTION,
+                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
+                oldContent: $scope.oldContent
+              });
             };
             $scope.cancel = function() {
               $uibModalInstance.dismiss();
@@ -457,6 +471,8 @@ oppia.controller('CreatorDashboard', [
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
+        var EDIT_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/edit/<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
 
@@ -466,6 +482,26 @@ oppia.controller('CreatorDashboard', [
             result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             RESUBMIT_SUGGESTION_URL_TEMPLATE, {
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
+            }
+          );
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            change: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: result.stateName,
+              old_value: result.oldContent,
+              new_value: {
+                html: result.newSuggestionHtml
+              }
+            }
+          };
+        } else if (result.action === 'edit' &&
+            result.suggestionType === 'edit_exploration_state_content') {
+          url = UrlInterpolationService.interpolateUrl(
+            EDIT_SUGGESTION_URL_TEMPLATE, {
               suggestion_id: $scope.activeThread.suggestion.suggestionId
             }
           );

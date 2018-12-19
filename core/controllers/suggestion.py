@@ -174,3 +174,11 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
+
+
+class EditSuggestionHandler(base.BaseHandler):
+    
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_suggestion)
+    def function(self):
+        print(self.payload.get("action"))
