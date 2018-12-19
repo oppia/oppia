@@ -727,7 +727,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
 
 class FunctionArgsOrderChecker(checkers.BaseChecker):
     """Checker for order of arguments. It checks
-       that class arguments comes first."""
+       that class arguments comes first.
+    """
 
     __implements__ = interfaces.IAstroidChecker
     name = 'function-args-order'
