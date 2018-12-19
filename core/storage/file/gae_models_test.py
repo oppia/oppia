@@ -179,8 +179,14 @@ class FileModelTest(test_utils.GenericTestBase):
         actual_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 1)
         self.assertEqual(file_model.key, actual_model.key)
+        self.assertEqual(file_model.content, actual_model.content)
 
-        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        file_model.content = 'file_contents'
+        commit_cmds = [{
+            'cmd': 'edit'
+        }]
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, commit_cmds)
         actual_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
         self.assertEqual(file_model.key, actual_model.key)
+        self.assertEqual(actual_model.content, 'file_contents')
