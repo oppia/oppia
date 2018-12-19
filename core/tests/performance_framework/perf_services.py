@@ -208,11 +208,11 @@ class SeleniumPerformanceDataFetcher(object):
     def _wait_until_page_load_is_finished(self, time_duration_secs=None):
         """Waits for the complete page to load, otherwise XHR requests
         made post initial page load will not be recorded.
-        
-        Args: 
+
+        Args:
             time_duration_secs: int. Waiting time for page load. Defaults to
             None.
-        """"
+        """
         # Waits for the complete page to load, otherwise XHR requests
         # made post initial page load will not be recorded.
         time.sleep(time_duration_secs or self.DEFAULT_WAIT_DURATION_SECS)
@@ -433,7 +433,7 @@ class SeleniumPerformanceDataFetcher(object):
     
         Args:
             driver: WebDriver instance. The WebDriver instance of the current
-            session        
+            session.        
         """
         self._login_user(driver)
 
@@ -442,7 +442,7 @@ class SeleniumPerformanceDataFetcher(object):
     
         Args:
             driver: WebDriver instance. The WebDriver instance of the current
-            session        
+            session.        
         """
         self._login_user(driver)
         self._reload_demo_explorations(driver)
@@ -452,7 +452,7 @@ class SeleniumPerformanceDataFetcher(object):
     
         Args:
             driver: WebDriver instance. The WebDriver instance of the current
-            session        
+            session.        
         """
         self._login_user(driver)
         self._reload_first_exploration(driver)
@@ -462,7 +462,7 @@ class SeleniumPerformanceDataFetcher(object):
     
         Args:
             driver: WebDriver instance. The WebDriver instance of the current
-            session        
+            session.
         """
         self._login_user(driver)
         self._reload_demo_collections(driver)
@@ -472,7 +472,7 @@ class SeleniumPerformanceDataFetcher(object):
     
         Args:
             driver: WebDriver instance. The WebDriver instance of the current
-            session        
+            session.
         """
         self._login_user(driver)
         self.exploration_url = self._create_exploration(driver)
