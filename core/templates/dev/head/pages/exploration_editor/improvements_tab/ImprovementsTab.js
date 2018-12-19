@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration improvements tab in the exploration
- * editor.
+ * @fileoverview Controllers for the exploration improvements tab in the
+ * exploration editor.
  */
 
 oppia.controller('ImprovementsTab', ['$scope', function($scope) {
   // NOTE: The constants used in this controller are intentionally hard-coded to
-  // demonstrate that the Improvements Tab is configured correctly. The numbers are
-  // arbitrary, and were simply copied from the
+  // demonstrate that the Improvements Tab is configured correctly. The numbers
+  // are arbitrary, and were simply copied from the
   // [design doc](https://bit.ly/2Bp7YLS).
 
   $scope.resolvedIssueCount = 13;
