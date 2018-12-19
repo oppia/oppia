@@ -158,7 +158,7 @@ oppia.directive('ckEditorRte', [
             } else {
               return '<div type="oppia-noninteractive-' + p3 + '"' +
                      'class="oppia-rte-component-container">' + match +
-                     '<div class="oppia-rte-component-overlay"></div></div>';
+                     '</div>';
             }
           });
         };
