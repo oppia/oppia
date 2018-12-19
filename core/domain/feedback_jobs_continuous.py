@@ -89,6 +89,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _increment_open_threads_count():
+            """Increments count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -103,6 +104,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _increment_total_threads_count():
+            """Increments count of total threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -117,6 +119,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _decrement_open_threads_count():
+            """Decrements count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
