@@ -90,6 +90,10 @@
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
+      <div ng-show="getActiveTabName() === 'improvements'">
+        {% include 'pages/exploration_editor/improvements_tab/improvements_tab.html' %}
+      </div>
+
       <div ng-show="getActiveTabName() === 'settings'">
         {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
       </div>
@@ -100,10 +104,6 @@
 
       <div ng-show="getActiveTabName() === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-      </div>
-
-      <div ng-show="getActiveTabName() === 'improvements'">
-        {% include 'pages/exploration_editor/improvements_tab/improvements_tab.html' %}
       </div>
     </div>
   </div>

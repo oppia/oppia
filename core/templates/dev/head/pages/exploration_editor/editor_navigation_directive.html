@@ -75,6 +75,13 @@
     </a>
   </li>
 
+  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
+    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
+       class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
+      <i class="material-icons">trending_up</i>
+    </a>
+  </li>
+
   <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'history'}">
     <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
        disabled="ExplorationRightsService.isCloned()"
@@ -93,13 +100,6 @@
         <[getOpenThreadsCount()]>&nbsp;open
       </span>
     </div>
-  </li>
-
-  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
-    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
-       class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
-      <i class="material-icons">trending_up</i>
-    </a>
   </li>
 
   <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">

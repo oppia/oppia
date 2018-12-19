@@ -30,9 +30,9 @@ oppia.factory('RouterService', [
       PREVIEW: {name: 'preview', path: '/preview'},
       SETTINGS: {name: 'settings', path: '/settings'},
       STATS: {name: 'stats', path: '/stats'},
+      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
       HISTORY: {name: 'history', path: '/history'},
       FEEDBACK: {name: 'feedback', path: '/feedback'},
-      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
     };
 
     var SLUG_GUI = 'gui';
@@ -74,6 +74,9 @@ oppia.factory('RouterService', [
       } else if (newPath === TABS.STATS.path) {
         activeTab = TABS.STATS.name;
         $rootScope.$broadcast('refreshStatisticsTab');
+      } else if (newPath === TABS.IMPROVEMENTS.path &&
+                 isImprovementsTabEnabled()) {
+        activeTab = TABS.IMPROVEMENTS.name;
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
@@ -82,9 +85,6 @@ oppia.factory('RouterService', [
         activeTab = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTab = TABS.FEEDBACK.name;
-      } else if (newPath === TABS.IMPROVEMENTS.path &&
-                 isImprovementsTabEnabled()) {
-        activeTab = TABS.IMPROVEMENTS.name;
       } else if (newPath.indexOf('/gui/') === 0) {
         activeTab = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
@@ -164,11 +164,11 @@ oppia.factory('RouterService', [
           currentPath === TABS.TRANSLATION.path ||
           currentPath === TABS.PREVIEW.path ||
           currentPath === TABS.STATS.path ||
+          (isImprovementsTabEnabled() &&
+            currentPath === TABS.IMPROVEMENTS.path) ||
           currentPath === TABS.SETTINGS.path ||
           currentPath === TABS.HISTORY.path ||
-          currentPath === TABS.FEEDBACK.path ||
-          (isImprovementsTabEnabled() &&
-            currentPath === TABS.IMPROVEMENTS.path));
+          currentPath === TABS.FEEDBACK.path);
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -212,6 +212,10 @@ oppia.factory('RouterService', [
         _savePendingChanges();
         $location.path(TABS.STATS.path);
       },
+      navigateToImprovementsTab: function() {
+        _savePendingChanges();
+        $location.path(TABS.IMPROVEMENTS.path);
+      },
       navigateToSettingsTab: function() {
         _savePendingChanges();
         $location.path(TABS.SETTINGS.path);
@@ -223,10 +227,6 @@ oppia.factory('RouterService', [
       navigateToFeedbackTab: function() {
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
-      },
-      navigateToImprovementsTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.IMPROVEMENTS.path);
       },
     };
 

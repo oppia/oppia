@@ -41,8 +41,8 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             preview: 'Preview',
             settings: 'Settings',
             stats: 'Statistics',
-            history: 'History',
             improvements: 'Improvements',
+            history: 'History',
 
           };
 
