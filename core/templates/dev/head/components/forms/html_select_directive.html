@@ -6,7 +6,7 @@
     </div>
     <span class="caret oppia-html-select-selection-caret"></span>
   </button>
-  <ul uib-dropdown-menu style="max-width: 80%; width: auto; overflow: auto;">
+  <ul uib-dropdown-menu style="max-width: 80%; overflow: auto; width: auto;">
     <li ng-repeat="choice in options" style="float: left;">
       <a>
         <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val" ng-click="select(choice.id)">
@@ -29,22 +29,22 @@
     bottom: 0;
     color: black;
     margin: auto;
+    overflow: auto;
     position: absolute;
     right: 5px;
     top: 0;
-    overflow: auto;
   }
   .oppia-html-select .oppia-html-select-selection {
+    overflow: hidden;    
     padding-right: 20px;
     position: relative;
     text-decoration: none;
     width: inherit;
-    overflow: hidden;
   }
   .oppia-html-select .oppia-html-select-option {
+    margin-right: 10px;    
+    overflow: hidden;    
     padding-top: 10px;
-    overflow: hidden;
-    margin-right: 10px;
   }
   .oppia-html-select .oppia-html-select-option:hover {
     background: #1485E6;

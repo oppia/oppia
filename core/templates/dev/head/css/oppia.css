@@ -1674,8 +1674,8 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-learner-view-card-content {
-  word-wrap: break-word;
   word-break: break-all;
+  word-wrap: break-word;
 }
 
 /* Styles for the collections learner view */
