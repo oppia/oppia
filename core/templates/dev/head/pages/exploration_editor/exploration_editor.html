@@ -90,9 +90,8 @@
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <div ng-show="getActiveTabName() === 'improvements'">
-        {% include 'pages/exploration_editor/improvements_tab/improvements_tab.html' %}
-      </div>
+      <improvements-tab-directive ng-show="getActiveTabName() === 'improvements'">
+      </improvements-tab-directive>
 
       <div ng-show="getActiveTabName() === 'settings'">
         {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
@@ -305,7 +304,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
-  <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/ImprovementsTab.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/ImprovementsTabDirective.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/StateContentEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateInteractionEditorDirective.js"></script>
