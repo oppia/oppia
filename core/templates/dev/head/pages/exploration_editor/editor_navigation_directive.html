@@ -75,7 +75,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
+  <li ng-if="isLargeScreen && userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
