@@ -115,7 +115,8 @@ oppia.directive('editorNavigation', [
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
-          $scope.selectImprovementsTab = RouterService.navigateToImprovementsTab;
+          $scope.selectImprovementsTab =
+            RouterService.navigateToImprovementsTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
 
           WindowDimensionsService.registerOnResizeHook(function() {
