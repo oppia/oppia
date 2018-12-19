@@ -23,7 +23,8 @@ oppia.directive('improvementsTabDirective', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/improvements_tab/improvements_tab.html'),
+        '/pages/exploration_editor/improvements_tab/' +
+        'improvements_tab_directive.html'),
       controller: [
         '$scope', function($scope) {
           // NOTE: The constants used in this controller are intentionally
