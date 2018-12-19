@@ -176,12 +176,14 @@ class PageSessionMetrics(object):
         """Get page load duration.
 
         Args:
-            event_end: str. The event upto which duration measurement is required.
-            event_initial: str. The event from which duration measurement starts.
+            event_end: str. The event upto which duration measurement is
+            required.
+            event_initial: str. The event from which duration measurement
+            starts.
 
         Returns:
-            int. The calculated time duration between event_initial and event_end
-            in milliseconds.
+            int. The calculated time duration between event_initial and
+            event_end in milliseconds.
         """
         # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]

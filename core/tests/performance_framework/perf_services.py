@@ -226,6 +226,12 @@ class SeleniumPerformanceDataFetcher(object):
             None.
             upstream_kbps: int. The upstream speed in kbps. Defaults to None.
             latency: int. The latency of the server. Defaults to None.
+
+        Returns:
+            server: browsermobproxy Server instance. The browsermobproxy
+            Server instance.
+            proxy: proxy instance. The proxy instance with the proxy
+            configurations.
         """
         server = browsermobproxy.Server(BROWSERMOB_PROXY_PATH)
         server.start()

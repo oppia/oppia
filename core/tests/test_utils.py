@@ -459,7 +459,7 @@ tags: []
         Args:
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
-       """
+        """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
@@ -561,20 +561,21 @@ tags: []
         """Sends a post request with the data provided to the url specified.
 
         Args:
-            app: WSGI application. The WSGI application which receives the request
-            and produces response.
+            app: WSGI application. The WSGI application which receives the
+            request and produces response.
             url: str. The URL to send the POST request to.
-            data: To be put in the body of the request. If params is an iterator,
-            it will be urlencoded. If it is a string, it will not be encoded, but
-            placed in the body directly. Can be a collections.OrderedDict with
-            webtest.forms.Upload fields included.
+            data: str. To be put in the body of the request. If params is an
+            iterator, it will be urlencoded. If it is a string, it will
+            not be encoded, but placed in the body directly. Can be a
+            collections.OrderedDict with webtest.forms.Upload fields
+            included.
             expect_errors: bool. Whether errors are expected.
             expected_status_int: int. The expected status code.
             upload_files: list. A list of (fieldname, filename, file_content).
             You can also use just (fieldname, filename) and the file contents
             will be read from disk.
             headers: dict. Extra headers to send.
-        
+
         Returns:
             json_response: webtest.TestResponse instance. The response of the
             POST request.
