@@ -176,6 +176,17 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        """Generates key for the instance of ExpUserLastPlaythroughModel
+        class in the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            key: str. The generated key using user_id and exploration_id
+            in the form [user_id].[exploration_id].
+        """
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
@@ -406,6 +417,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        """Generates key for the instance of ExplorationUserDataModel class in
+        the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            key: str. The generated key using user_id and exploration_id
+            in the form [user_id].[exploration_id].
+        """
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
@@ -486,6 +508,17 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
+        """Generates key for the instance of CollectionProgressModel class in
+        the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_id: str. The id of the exploration.
+
+        Returns:
+            key: str. The generated key using user_id and exploration_id
+            in the form [user_id].[collection_id].
+        """
         return '%s.%s' % (user_id, collection_id)
 
     @classmethod
