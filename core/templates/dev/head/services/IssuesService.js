@@ -17,7 +17,7 @@
  * states based on statistics.
  */
 
-oppia.factory('ImprovementsService', [function() {
+oppia.factory('IssuesService', [function() {
   var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
   return {

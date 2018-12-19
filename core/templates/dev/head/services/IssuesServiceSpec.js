@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('ImprovementsService', function() {
+describe('IssuesService', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    this.ImprovementsService = $injector.get('ImprovementsService');
+    this.IssuesService = $injector.get('IssuesService');
   }));
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', function() {
@@ -23,7 +23,7 @@ describe('ImprovementsService', function() {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
-        this.ImprovementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+        this.IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
           mockState)
       ).toBe(true);
     });
@@ -32,7 +32,7 @@ describe('ImprovementsService', function() {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(
-        this.ImprovementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+        this.IssuesService.isStateForcedToResolveOutstandingUnaddressedAnswers(
           mockState)
       ).toBe(false);
     });
