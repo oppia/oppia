@@ -21,6 +21,13 @@
   response-header .oppia-nested-link {
     color: #0844aa;
     cursor: pointer;
+    max-width: 100px;
+    word-break: break-all;
+    word-wrap: break-word;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
   }
   response-header .oppia-nested-link:hover {
     color: #3f2c76;
@@ -70,7 +77,7 @@
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
     <[getOutcome().dest]>
   </span>
-  <span ng-if="getOutcome() && !isOutcomeLooping() && isCreatingNewState()">
+  <span class="oppia-nested-link" ng-if="getOutcome() && !isOutcomeLooping() && isCreatingNewState()">
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
