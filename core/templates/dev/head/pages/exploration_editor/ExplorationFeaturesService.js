@@ -25,7 +25,8 @@ oppia.factory('ExplorationFeaturesService', [function() {
 
   return {
     init: function(explorationData, featuresData) {
-      settings.isImprovementsTabEnabled = featuresData.is_improvements_tab_enabled;
+      settings.isImprovementsTabEnabled =
+        featuresData.is_improvements_tab_enabled;
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {

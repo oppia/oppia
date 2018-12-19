@@ -40,7 +40,8 @@ oppia.factory('RouterService', [
 
     var activeTab = TABS.MAIN.name;
 
-    var isImprovementsTabEnabled = ExplorationFeaturesService.isImprovementsTabEnabled;
+    var isImprovementsTabEnabled =
+      ExplorationFeaturesService.isImprovementsTabEnabled;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -81,7 +82,8 @@ oppia.factory('RouterService', [
         activeTab = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTab = TABS.FEEDBACK.name;
-      } else if (newPath === TABS.IMPROVEMENTS.path && isImprovementsTabEnabled()) {
+      } else if (newPath === TABS.IMPROVEMENTS.path &&
+                 isImprovementsTabEnabled()) {
         activeTab = TABS.IMPROVEMENTS.name;
       } else if (newPath.indexOf('/gui/') === 0) {
         activeTab = TABS.MAIN.name;
@@ -165,7 +167,8 @@ oppia.factory('RouterService', [
           currentPath === TABS.SETTINGS.path ||
           currentPath === TABS.HISTORY.path ||
           currentPath === TABS.FEEDBACK.path ||
-          (isImprovementsTabEnabled() && currentPath === TABS.IMPROVEMENTS.path));
+          (isImprovementsTabEnabled() &&
+            currentPath === TABS.IMPROVEMENTS.path));
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
