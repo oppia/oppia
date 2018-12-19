@@ -734,13 +734,13 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0004': ('Wrong order of arguments '
-                 'self should come first',
-                 'wrong-ord-args-self',
-                 'self should come first',),
+                  'self should come first',
+                  'wrong-ord-args-self',
+                  'self should come first',),
         'C0005': ('Wrong order of arguments '
-                 'cls should come first',
-                 'wrong-ord-args-cls',
-                 'cls should come first'),
+                  'cls should come first',
+                  'wrong-ord-args-cls',
+                  'cls should come first'),
     }
 
     def visit_functiondef(self, node):
@@ -748,7 +748,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
         if 'self' in args_list and args_list[0] != 'self':
             self.add_message('wrong-ord-args-self', node=node)
         elif 'cls' in args_list and args_list[0] != 'cls':
-            self.add_message('wrong-ord-args-cls', node=node) 
+            self.add_message('wrong-ord-args-cls', node=node)
 
 
 def register(linter):
