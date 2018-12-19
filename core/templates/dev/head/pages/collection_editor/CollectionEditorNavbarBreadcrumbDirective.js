@@ -43,7 +43,6 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             stats: 'Statistics',
             improvements: 'Improvements',
             history: 'History',
-
           };
 
           $scope.collection = CollectionEditorStateService.getCollection();
