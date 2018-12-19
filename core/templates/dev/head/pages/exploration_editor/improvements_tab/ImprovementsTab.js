@@ -50,9 +50,5 @@ oppia.controller('ImprovementsTab', ['$scope', function($scope) {
   }, {
     issue_description: 'I18N_IMPROVEMENTS_TAB_UNRESOLVED_ANSWER_DESCRIPTION',
     issue_type: 'unresolved_answer',
-  }, {
-    issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_ISSUES_' +
-                        'EARLY_QUIT_DESCRIPTION'),
-    issue_type: 'playthrough',
   }];
 }]);
