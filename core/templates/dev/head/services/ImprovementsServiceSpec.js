@@ -23,8 +23,8 @@ describe('ImprovementsService', function() {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
-        this.ImprovementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
-          mockState)
+        this.ImprovementsService
+          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
       ).toBe(true);
     });
 
@@ -32,8 +32,8 @@ describe('ImprovementsService', function() {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(
-        this.ImprovementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
-          mockState)
+        this.ImprovementsService
+          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
       ).toBe(false);
     });
   });
