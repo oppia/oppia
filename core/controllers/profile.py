@@ -223,7 +223,7 @@ class ProfilePictureHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ProfilePictureHandlerByUsername(base.BaseHandler):
+class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """

@@ -18,16 +18,19 @@ from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import skill_services
+import feconf
 
 
 class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_view_skill
     def get(self, skill_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)

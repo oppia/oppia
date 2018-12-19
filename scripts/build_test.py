@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for scripts/build.py."""
+
 import StringIO
 import collections
 import os

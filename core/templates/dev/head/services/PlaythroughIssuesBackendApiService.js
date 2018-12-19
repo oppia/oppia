@@ -20,20 +20,28 @@ oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 
 oppia.constant(
+  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
+  '/playthroughdatahandler/whitelist');
+
+oppia.constant(
   'FETCH_PLAYTHROUGH_URL',
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
 oppia.constant(
   'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
 
-oppia.factory('IssuesBackendApiService', [
-  '$http', 'ExplorationIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
+oppia.factory('PlaythroughIssuesBackendApiService', [
+  '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
+  'UrlInterpolationService', 'FETCH_ISSUES_URL',
+  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
-      $http, ExplorationIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
+      $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
+      UrlInterpolationService, FETCH_ISSUES_URL,
+      FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
+    var whitelistCache = null;
+
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {
@@ -64,7 +72,7 @@ oppia.factory('IssuesBackendApiService', [
         }).then(function(response) {
           var unresolvedIssuesDicts = response.data;
           return unresolvedIssuesDicts.map(
-            ExplorationIssueObjectFactory.createFromBackendDict);
+            PlaythroughIssueObjectFactory.createFromBackendDict);
         });
       },
       fetchPlaythrough: function(expId, playthroughId) {
@@ -80,6 +88,18 @@ oppia.factory('IssuesBackendApiService', [
           exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
         });
-      }
+      },
+      fetchWhitelistedExplorationsForPlaythroughs: function() {
+        if (whitelistCache !== null) {
+          return Promise.resolve(whitelistCache);
+        } else {
+          return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST).then(
+            function(response) {
+              whitelistCache =
+                response.data.whitelisted_exploration_ids_for_playthroughs;
+              return whitelistCache;
+            });
+        }
+      },
     };
   }]);

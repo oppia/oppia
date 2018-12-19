@@ -28,7 +28,7 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
+class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,9 +36,9 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(TopicMigrationOneOffJobTest, self).setUp()
+        super(TopicMigrationOneOffJobTests, self).setUp()
 
-        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
+        self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
 
         # Setup user who will own the test topics.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -60,7 +60,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
             topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
@@ -97,7 +97,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             topic_services.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
             topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
@@ -129,7 +129,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
             topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)

@@ -22,11 +22,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
+class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseStoryEditorControllerTest, self).setUp()
+        super(BaseStoryEditorControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -45,12 +45,12 @@ class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
             [self.story_id], [], [], [], 1)
 
 
-class StoryEditorTest(BaseStoryEditorControllerTest):
+class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
@@ -72,7 +72,7 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
 
     def test_editable_story_handler_get(self):
         # Check that non-admins cannot access the editable story data.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s/%s' % (
@@ -105,7 +105,7 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
@@ -132,7 +132,7 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
             self.assertEqual(json_response['status_code'], 401)
 
     def test_editable_story_handler_delete(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             # Check that admins can delete a story.
             self.login(self.ADMIN_EMAIL)
             self.delete_json(

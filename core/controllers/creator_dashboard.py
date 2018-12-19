@@ -211,7 +211,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if constants.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             topic_summaries = topic_services.get_all_topic_summaries()
             topic_summary_dicts = [
                 summary.to_dict() for summary in topic_summaries]
@@ -324,7 +324,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             'created_suggestions_list': suggestion_dicts_created_by_user,
             'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
         })
-        if constants.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             self.values.update({
                 'topic_summary_dicts': topic_summary_dicts
             })
@@ -396,7 +396,7 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class UploadExploration(base.BaseHandler):
+class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
     @acl_decorators.can_upload_exploration

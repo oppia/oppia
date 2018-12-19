@@ -27,7 +27,7 @@ import feconf
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
-class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
+class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -35,7 +35,7 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
     QUESTION_ID = 'question_id'
 
     def setUp(self):
-        super(QuestionMigrationOneOffJobTest, self).setUp()
+        super(QuestionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test questions.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -60,7 +60,7 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
@@ -93,7 +93,7 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID)
 
         # Start migration job on sample question.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
@@ -124,7 +124,7 @@ class QuestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_schema_version, 25)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)

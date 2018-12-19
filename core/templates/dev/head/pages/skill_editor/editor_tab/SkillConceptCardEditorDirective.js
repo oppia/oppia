@@ -43,7 +43,7 @@ oppia.directive('skillConceptCardEditor', [
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation(),
+                $scope.skill.getConceptCard().getExplanation().getHtml(),
               displayedWorkedExamples:
                 $scope.skill.getConceptCard().getWorkedExamples()
             };
