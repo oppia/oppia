@@ -188,6 +188,7 @@ class ImportOnlyModulesCheckerTest(unittest.TestCase):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
 
+
 class FunctionArgsOrderCheckerTest(unittest.TestCase):
 
     def test_find_function_def(self):

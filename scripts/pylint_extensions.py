@@ -733,11 +733,11 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
     name = 'function-args-order'
     priority = -1
     msgs = {
-        'C0004':('Wrong order of arguments '
+        'C0004': ('Wrong order of arguments '
                  'self should come first',
                  'wrong-ord-args-self',
                  'self should come first',),
-        'C0005':('Wrong order of arguments '
+        'C0005': ('Wrong order of arguments '
                  'cls should come first',
                  'wrong-ord-args-cls',
                  'cls should come first'),
