@@ -25,14 +25,13 @@ oppia.factory('ExplorationFeaturesBackendApiService', [
   function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {
     return {
       /**
-       * Retrieves data regarding features this exploration supports.
+       * Retrieves data regarding the features the given exploration supports.
        *
        * NOTE: This service requires play-access for the Exploration so that the
-       * features can be fetched in the exploration player as well as the
-       * editor.
+       * features can be fetched in both the exploration player and editor.
        *
        * @returns {Object.<string, *>} - Describes the features the given
-       *  exploration supports.
+       *     exploration supports.
        */
       fetchExplorationFeatures: function(explorationId) {
         return $http.get(
