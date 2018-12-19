@@ -32,7 +32,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         super(PopulateMessageCountOneOffJobTest, self).setUp()
         feedback_models.GeneralFeedbackThreadModel(
             id='exp1.thread1', entity_id='exp1', entity_type='state1',
-            original_author_id='author',
+            original_author_id='author', message_count=0,
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()

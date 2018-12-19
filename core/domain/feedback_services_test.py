@@ -274,7 +274,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             id='exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
             entity_type='exploration', entity_id=self.EXP_ID_3,
             original_author_id=self.user_id, subject='Feedback',
-            status=feedback_models.STATUS_CHOICES_OPEN, has_suggestion=False)
+            status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
+            has_suggestion=False)
         thread_3.put()
         feedback_services.create_message(
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
