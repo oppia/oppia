@@ -102,8 +102,8 @@
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
       </div>
 
-      <div ng-show="getActiveTabName() === 'issues'">
-        {% include 'pages/exploration_editor/issues_tab/issues_tab.html' %}
+      <div ng-show="getActiveTabName() === 'improvements'">
+        {% include 'pages/exploration_editor/improvements_tab/improvements_tab.html' %}
       </div>
     </div>
   </div>
@@ -305,7 +305,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
-  <script src="/templates/dev/head/pages/exploration_editor/issues_tab/IssuesTab.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/ImprovementsTab.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/StateContentEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateInteractionEditorDirective.js"></script>
@@ -332,7 +332,7 @@
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
   <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-  <script src="/templates/dev/head/services/IssuesService.js"></script>
+  <script src="/templates/dev/head/services/ImprovementsService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/MessengerService.js"></script>
   <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>

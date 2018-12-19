@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration issues tab in the exploration
+ * @fileoverview Controllers for the exploration improvements tab in the exploration
  * editor.
  */
 
-oppia.controller('IssuesTab', ['$scope', function($scope) {
+oppia.controller('ImprovementsTab', ['$scope', function($scope) {
   // NOTE: The constants used in this controller are intentionally hard-coded to
-  // demonstrate that the Issues Tab is configured correctly. The numbers are
+  // demonstrate that the Improvements Tab is configured correctly. The numbers are
   // arbitrary, and were simply copied from the
   // [design doc](https://bit.ly/2Bp7YLS).
 
@@ -41,17 +41,17 @@ oppia.controller('IssuesTab', ['$scope', function($scope) {
   };
 
   $scope.openIssueData = [{
-    issue_description: ('I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_' +
+    issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_IMPROVEMENTS_' +
                         'MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION'),
     issue_type: 'playthrough',
   }, {
-    issue_description: 'I18N_ISSUES_TAB_FEEDBACK_DESCRIPTION',
+    issue_description: 'I18N_IMPROVEMENTS_TAB_FEEDBACK_DESCRIPTION',
     issue_type: 'feedback',
   }, {
-    issue_description: 'I18N_ISSUES_TAB_UNRESOLVED_ANSWER_DESCRIPTION',
+    issue_description: 'I18N_IMPROVEMENTS_TAB_UNRESOLVED_ANSWER_DESCRIPTION',
     issue_type: 'unresolved_answer',
   }, {
-    issue_description: ('I18N_ISSUES_TAB_PLAYTHROUGH_ISSUES_' +
+    issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_IMPROVEMENTS_' +
                         'EARLY_QUIT_DESCRIPTION'),
     issue_type: 'playthrough',
   }];

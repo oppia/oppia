@@ -42,7 +42,7 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             settings: 'Settings',
             stats: 'Statistics',
             history: 'History',
-            issues: 'Issues',
+            improvements: 'Improvements',
 
           };
 

@@ -39,8 +39,8 @@ oppia.directive('editorNavigation', [
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          $scope.isIssuesTabEnabled =
-            ExplorationFeaturesService.isIssuesTabEnabled;
+          $scope.isImprovementsTabEnabled =
+            ExplorationFeaturesService.isImprovementsTabEnabled;
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -115,7 +115,7 @@ oppia.directive('editorNavigation', [
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
-          $scope.selectIssuesTab = RouterService.navigateToIssuesTab;
+          $scope.selectImprovementsTab = RouterService.navigateToImprovementsTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
 
           WindowDimensionsService.registerOnResizeHook(function() {

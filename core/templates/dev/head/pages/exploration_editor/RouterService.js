@@ -32,7 +32,7 @@ oppia.factory('RouterService', [
       STATS: {name: 'stats', path: '/stats'},
       HISTORY: {name: 'history', path: '/history'},
       FEEDBACK: {name: 'feedback', path: '/feedback'},
-      ISSUES: {name: 'issues', path: '/issues'},
+      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
     };
 
     var SLUG_GUI = 'gui';
@@ -40,7 +40,7 @@ oppia.factory('RouterService', [
 
     var activeTab = TABS.MAIN.name;
 
-    var isIssuesTabEnabled = ExplorationFeaturesService.isIssuesTabEnabled;
+    var isImprovementsTabEnabled = ExplorationFeaturesService.isImprovementsTabEnabled;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -81,8 +81,8 @@ oppia.factory('RouterService', [
         activeTab = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTab = TABS.FEEDBACK.name;
-      } else if (newPath === TABS.ISSUES.path && isIssuesTabEnabled()) {
-        activeTab = TABS.ISSUES.name;
+      } else if (newPath === TABS.IMPROVEMENTS.path && isImprovementsTabEnabled()) {
+        activeTab = TABS.IMPROVEMENTS.name;
       } else if (newPath.indexOf('/gui/') === 0) {
         activeTab = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
@@ -165,7 +165,7 @@ oppia.factory('RouterService', [
           currentPath === TABS.SETTINGS.path ||
           currentPath === TABS.HISTORY.path ||
           currentPath === TABS.FEEDBACK.path ||
-          (isIssuesTabEnabled() && currentPath === TABS.ISSUES.path));
+          (isImprovementsTabEnabled() && currentPath === TABS.IMPROVEMENTS.path));
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -221,9 +221,9 @@ oppia.factory('RouterService', [
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
       },
-      navigateToIssuesTab: function() {
+      navigateToImprovementsTab: function() {
         _savePendingChanges();
-        $location.path(TABS.ISSUES.path);
+        $location.path(TABS.IMPROVEMENTS.path);
       },
     };
 
