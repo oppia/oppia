@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for feedback related jobs"""
+"""Tests for feedback related jobs."""
 
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
@@ -51,6 +51,12 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         feedback_models.GeneralFeedbackMessageModel(
             id='exp2.thread2.1', thread_id='exp2.thread2', message_id=1,
             author_id='author', text='message text').put()
+        feedback_models.GeneralFeedbackThreadModel(
+            id='exp3.thread3', entity_id='exp3', entity_type='state3',
+            original_author_id='author', message_count=0,
+            status=feedback_models.STATUS_CHOICES_OPEN,
+            subject='subject', summary='summary', has_suggestion=False,
+            ).put()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -68,3 +74,5 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self._run_one_off_job()
         self.assertEqual(feedback_services.get_message_count('exp1.thread1'), 2)
         self.assertEqual(feedback_services.get_message_count('exp2.thread2'), 1)
+        self.assertEqual(feedback_services.get_message_count('exp3.thread3'), 0)
+        

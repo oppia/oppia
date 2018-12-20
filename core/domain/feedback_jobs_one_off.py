@@ -78,18 +78,18 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
-    def map(item):
-        if item.message_count is None:
+    def map(thread):
+        if thread.message_count is None:
             # Assigning the value of message_count if it is None.
-            item.message_count = feedback_services.get_message_count(item.id)
+            thread.message_count = feedback_services.get_message_count(thread.id)
             try:
                 # Sets the message_count if it is None.
-                item.put()
-                yield ('SUCCESS', item.id)
+                thread.put()
+                yield ('SUCCESS', thread.id)
             except AttributeError:
-                yield ('FAILED', item.id)
+                yield ('FAILED', thread.id)
         else:
-            yield ('SUCCESS', item.id)
+            yield ('SUCCESS', thread.id)
 
     @staticmethod
     def reduce(message, thread_ids):
