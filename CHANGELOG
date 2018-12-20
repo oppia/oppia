@@ -8,9 +8,9 @@ Updates to landing pages:
 
 Development workflow:
 * Fix #5466: Added check to enforce that all name of controllers end with "Handler" or "Page" (#5878)
-* Fixed part of #5476: Enforce docstring arg order (#5844)
-* Fixes #5843 Changes _check_comment to check for spaces and capitals (#5852)
-* Fixes #5809: Add check to match line breaks in controller dependencies (#5833)
+* Fix part of #5476: Enforce docstring arg order (#5844)
+* Fix #5843: Changes _check_comment to check for spaces and capitals (#5852)
+* Fix #5809: Add check to match line breaks in controller dependencies (#5833)
 * Fix docstrings tests, Swapped if blocks for _check_docstrings (#5752)
 * Remove mobile tests env var for PR builds and add a job for it (#5835)
 * Update bug_report.md (#5866)
@@ -23,10 +23,10 @@ New Structures:
 * Revert some changes in #5810. (#5841)
 
 Improving test coverage:
-* Fixes #5861: Updated Test for Email Truncation (#5915)
+* Fix #5861: Updated Test for Email Truncation (#5915)
 * Fix part of #5134: Added missing tests for question domain. (#5887)
-* Fixes part of #5134: Added backend tests for `core.domain.learner_progress_domain` (#5859)
-* Fix part of #5134 Backend test for core.controllers.tasks (#5840)
+* Fix part of #5134: Added backend tests for `core.domain.learner_progress_domain` (#5859)
+* Fix part of #5134: Backend test for core.controllers.tasks (#5840)
 * Fix #5787: Add a unit test to check blob type for uploaded audio. (#5858)
 
 Code health and documentation:
@@ -39,14 +39,14 @@ Code health and documentation:
 * Added docstring for clamp method and simplified usage. (#5834)
 
 Improvements to editor features
-* Fixes #3691 Implements email functionality for failed ML training job (#5902)
+* Fix #3691: Implements email functionality for failed ML training job (#5902)
 * Fix #5606: Logic Proof Truncation and Display (#5864)
 * Change 'compliment' feedback to use a green background colour. (#5865)
 * Fixes #5746: Added saving log and disabled buttons while saving (#5764)
-* Fix #5777: add statename in translation tab (#5830)
-* Fix #5821 : Adjust placement of accessibility tooltips in the exploration editor. (#5824)
+* Fix #5777: Add statename in translation tab (#5830)
+* Fix #5821: Adjust placement of accessibility tooltips in the exploration editor. (#5824)
 
-Updates to the library and splash paes
+Updates to the library and splash pages
 * Fix #5907: Increase width of search input box such that whole text is visible (#5910)
 * Swap the order of the browse/create buttons on the splash page. (#5828)
 
@@ -62,7 +62,7 @@ Bug fixes:
 * Fix video on fractions landing (#5906)
 * Fix profile picture modal not showing picture when we add it again after discard it (#5891)
 * Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
-* Added atts check for audio bar. (#5880)
+* Added attrs check for audio bar. (#5880)
 * Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
 * Fix #5814: Double edit button in exploration player navbar (#5815)
 * Remove code duplication for calculating answer choices (#5779)
