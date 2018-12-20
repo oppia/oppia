@@ -17,7 +17,7 @@
  * exploration editor.
  */
 
-oppia.directive('improvementsTabDirective', [
+oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

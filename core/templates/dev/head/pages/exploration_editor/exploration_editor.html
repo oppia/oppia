@@ -90,8 +90,8 @@
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <improvements-tab-directive ng-show="getActiveTabName() === 'improvements'">
-      </improvements-tab-directive>
+      <improvements-tab ng-show="getActiveTabName() === 'improvements'">
+      </improvements-tab>
 
       <div ng-show="getActiveTabName() === 'settings'">
         {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
