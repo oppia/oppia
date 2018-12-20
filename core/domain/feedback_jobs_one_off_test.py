@@ -75,4 +75,3 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(feedback_services.get_message_count('exp1.thread1'), 2)
         self.assertEqual(feedback_services.get_message_count('exp2.thread2'), 1)
         self.assertEqual(feedback_services.get_message_count('exp3.thread3'), 0)
-        

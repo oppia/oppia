@@ -104,8 +104,8 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id_2, None, None, None,
             'message 2')
-        self.assertEqual(feedback_services.get_message_count(thread_id_2),2)
-        
+        self.assertEqual(feedback_services.get_message_count(thread_id_2), 2)
+
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
