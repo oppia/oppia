@@ -26,7 +26,7 @@ oppia.directive('sideNavigationBar', [
         'side_navigation_bar_directive.html'),
       controller: ['$scope', '$timeout', function(
           $scope, $timeout) {
-        $scope.currentUrl = $location.path();
+        $scope.currentUrl = window.location.pathname;
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
