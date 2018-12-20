@@ -775,7 +775,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             'Wrong order of arguments in function definition '
             '\'cls\' should come first.',
             'function-args-order-cls',
-            '\'cls\' should come first.'),
+            '\'cls\' should come first'),
     }
 
     def visit_functiondef(self, node):
