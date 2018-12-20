@@ -779,6 +779,15 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
     }
 
     def visit_functiondef(self, node):
+        """Visits every function definition in the
+        python file and check the function arguments
+        order. It then adds a message accordingly.
+
+        Args:
+         node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
+
         args_list = [args.name for args in node.args.args]
         if 'self' in args_list and args_list[0] != 'self':
             self.add_message('function-args-order-self', node=node)
