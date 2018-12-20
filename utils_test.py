@@ -355,6 +355,16 @@ class UtilsTests(test_utils.GenericTestBase):
             'choices': ['']
         }
 
+        expected_customization_args_after_validation1 = {
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': ['']
+        }
+
+        expected_customization_args_after_validation_with_invalid_arg_type1 = (
+            customization_args1d
+        )
+
         # The next four checks are for cases where customization args dict
         # contains all required specs.
 
@@ -364,6 +374,10 @@ class UtilsTests(test_utils.GenericTestBase):
             'ItemSelectionInput',
             customization_args1a,
             ca_specs1
+        )
+        self.assertEqual(
+            expected_customization_args_after_validation1,
+            customization_args1a
         )
 
         # Check if error is produced when arg name is invalid.
@@ -394,6 +408,10 @@ class UtilsTests(test_utils.GenericTestBase):
                     'customization arg extraArg.'
                 )
             )
+            self.assertEqual(
+                expected_customization_args_after_validation1,
+                customization_args1c
+            )
 
         # Check if no error is produced when arg type is not valid.
         utils.validate_customization_args_and_values(
@@ -401,6 +419,11 @@ class UtilsTests(test_utils.GenericTestBase):
             'ItemSelectionInput',
             customization_args1d,
             ca_specs1
+        )
+
+        self.assertEqual(
+            expected_customization_args_after_validation_with_invalid_arg_type1,
+            customization_args1d
         )
 
         ca_specs2 = interaction_registry.Registry.get_interaction_by_id(
@@ -428,6 +451,17 @@ class UtilsTests(test_utils.GenericTestBase):
             'customPlaceholder': {'value': 12}
         }
 
+        expected_customization_args_after_validation2 = {
+            'requireSimplestForm': {'value': False},
+            'allowImproperFraction': {'value': True},
+            'allowNonzeroIntegerPart': {'value': False},
+            'customPlaceholder': {'value': ''}
+        }
+
+        expected_customization_args_after_validation_with_invalid_arg_type2 = (
+            customization_args2d
+        )
+
         # The next four checks are for cases where customization args dict
         # does not contain some of the required specs.
 
@@ -437,6 +471,10 @@ class UtilsTests(test_utils.GenericTestBase):
             'FractionInput',
             customization_args2a,
             ca_specs2
+        )
+        self.assertEqual(
+            expected_customization_args_after_validation2,
+            customization_args2a
         )
 
         # Check if error is produced when arg name is invalid.
@@ -467,6 +505,10 @@ class UtilsTests(test_utils.GenericTestBase):
                     'arg extraArg.'
                 )
             )
+            self.assertEqual(
+                expected_customization_args_after_validation2,
+                customization_args2c
+            )
 
         # Check if no error is produced when arg type is not valid.
         utils.validate_customization_args_and_values(
@@ -474,6 +516,10 @@ class UtilsTests(test_utils.GenericTestBase):
             'FractionInput',
             customization_args2d,
             ca_specs2
+        )
+        self.assertEqual(
+            expected_customization_args_after_validation_with_invalid_arg_type2,
+            customization_args2d
         )
 
         # A general check to see if error are produced when customization args
