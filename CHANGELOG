@@ -42,7 +42,7 @@ Improvements to editor features
 * Fix #3691: Implements email functionality for failed ML training job (#5902)
 * Fix #5606: Logic Proof Truncation and Display (#5864)
 * Change 'compliment' feedback to use a green background colour. (#5865)
-* Fixes #5746: Added saving log and disabled buttons while saving (#5764)
+* Fix #5746: Added saving log and disabled buttons while saving (#5764)
 * Fix #5777: Add statename in translation tab (#5830)
 * Fix #5821: Adjust placement of accessibility tooltips in the exploration editor. (#5824)
 
