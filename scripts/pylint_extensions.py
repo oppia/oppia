@@ -768,14 +768,14 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
     msgs = {
         'C0005': (
             'Wrong order of arguments in function definition '
-            '\'self\' should come first',
+            '\'self\' should come first.',
             'function-args-order-self',
             '\'self\' should come first',),
         'C0006': (
             'Wrong order of arguments in function definition '
-            '\'cls\' should come first',
+            '\'cls\' should come first.',
             'function-args-order-cls',
-            '\'cls\' should come first'),
+            '\'cls\' should come first.'),
     }
 
     def visit_functiondef(self, node):
