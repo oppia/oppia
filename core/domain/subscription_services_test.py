@@ -61,6 +61,16 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
+        """Returns the feedback thread ids to which the user corresponding to
+        the given user id is subscribed to.
+
+        Args:
+            user_id: str. The user id.
+
+        Returns:
+            tuple(str). The tuple containing all the feedback thread ids to
+                which the user is subscribed to.
+        """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         return (
@@ -68,6 +78,16 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             if subscriptions_model else [])
 
     def _get_exploration_ids_subscribed_to(self, user_id):
+        """Returns all the exploration ids of the explorations to which the user
+        has subscribed to.
+
+        Args:
+            user_id: str. The user id.
+
+        Returns:
+            tuple(str). The tuple containing all the exploration ids of the
+                explorations to which the user has subscribed to.
+        """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         return (
@@ -75,6 +95,16 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             if subscriptions_model else [])
 
     def _get_collection_ids_subscribed_to(self, user_id):
+        """Returns all the collection ids of the collections to which the user
+        has subscribed to.
+
+        Args:
+            user_id: str. The user id.
+
+        Returns:
+            tuple(str). The tuple containing all the collection ids of the
+                collections to which the user has subscribed to.
+        """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         return (
@@ -361,6 +391,16 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
     def _get_all_subscribers_of_creators(self, user_id):
+        """Returns all the ids of the subscribers that have subscribed to the
+        creators.
+
+        Args:
+            user_id: str. The user id.
+
+        Returns:
+            tuple(str). The tuple containing all the ids of the subscribers that
+                have subscribed to the creators.
+        """
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
         return (
@@ -368,6 +408,16 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             if subscribers_model else [])
 
     def _get_all_creators_subscribed_to(self, user_id):
+        """Returns all the creator ids of the creators corresponding to the
+        subscription model.
+
+        Args:
+            user_id: str. The user id.
+
+        Returns:
+            tuple(str). The tuple containing all the creator ids corresponding
+                to the subscription model.
+        """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         return (

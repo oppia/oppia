@@ -79,6 +79,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             category='Welcome')
 
     def _get_all_learner_playlist_exp_ids(self, user_id):
+        """Returns the list of all the exploration ids in the playlist of the
+        learner corresponding to the given user id.
+        """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
@@ -87,6 +90,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_model else [])
 
     def _get_all_learner_playlist_collection_ids(self, user_id):
+        """Returns the list of all the collection ids in the playlist of the
+        learner corresponding to the given user id.
+        """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 

@@ -924,6 +924,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 
 
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for last login by the user."""
 
     def setUp(self):
         """Create exploration with two versions."""
@@ -963,7 +964,11 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # Without explicitly defining the type of the patched datetimes, NDB
         # validation checks for datetime.datetime instances fail.
         class PatchedDatetimeType(type):
+            """Validates the datetime instances for failure."""
             def __instancecheck__(cls, other):
+                """Validates whether the given instance is a datatime
+                instance.
+                """
                 return isinstance(other, original_datetime_type)
 
         class MockDatetime11Hours(datetime.datetime):
@@ -998,6 +1003,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for the exploration that is edited at the last."""
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1069,6 +1075,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for the exploration that is created at the last."""
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 
