@@ -246,7 +246,7 @@ class FunctionArgsOrderCheckerTest(unittest.TestCase):
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_functiondef(functiondef_node1)
-        
+
         functiondef_node2 = astroid.extract_node("""
         def test(test_var_one, test_var_two, self): #@
             result = test_var_one + test_var_two
