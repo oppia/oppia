@@ -62,7 +62,7 @@ Bug fixes:
 * Fix video on fractions landing (#5906)
 * Fix profile picture modal not showing picture when we add it again after discard it (#5891)
 * Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
-* Added attrs check for audio bar. (#5880)
+* Added automaticTextToSpeech check for audio bar. (#5880)
 * Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
 * Fix #5814: Double edit button in exploration player navbar (#5815)
 * Remove code duplication for calculating answer choices (#5779)
