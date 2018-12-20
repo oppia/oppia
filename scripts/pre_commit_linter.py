@@ -1682,10 +1682,9 @@ def main():
     all_messages = (
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
-        newline_messages + docstring_messages +
-        comment_messages + html_tag_and_attribute_messages +
-        html_linter_messages + linter_messages + pattern_messages +
-        copyright_notice_messages)
+        newline_messages + docstring_messages + comment_messages +
+        html_tag_and_attribute_messages + html_linter_messages +
+        linter_messages + pattern_messages + copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

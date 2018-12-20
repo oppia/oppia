@@ -254,7 +254,7 @@ class FunctionArgsOrderCheckerTest(unittest.TestCase):
         """)
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='wrong-ord-args-self',
+                msg_id='function-args-order-self',
                 node=functiondef_node2
             ),
         ):
