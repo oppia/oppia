@@ -240,9 +240,6 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main():
     """Run the tests."""
     parsed_args = _PARSER.parse_args()
-    if parsed_args.test_target is not None:
-        if not parsed_args.test_target.endswith('test'):
-            parsed_args.test_target = parsed_args.test_target + '_test'
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
@@ -252,7 +249,10 @@ def main():
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     if parsed_args.test_target:
-        all_test_targets = [parsed_args.test_target]
+        if parsed_args.test_target.endswith('test'):
+            all_test_targets = [parsed_args.test_target]
+        else:
+            all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
