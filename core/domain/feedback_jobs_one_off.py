@@ -82,7 +82,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if thread.message_count is None:
             # Assigning the value of message_count if it is None.
             thread.message_count = feedback_services.get_message_count(
-                                       thread.id)
+                thread.id)
             try:
                 # Sets the message_count if it is None.
                 thread.put()
