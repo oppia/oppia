@@ -476,7 +476,6 @@ class UtilsTests(test_utils.GenericTestBase):
             ca_specs2
         )
 
-
         # A general check to see if error are produced when customization args
         # is not of type dict.
         customization_args3 = 23
