@@ -107,7 +107,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         # Normal end-to-end test.
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=False, expected_status_int=200)
+            expected_status_int=200)
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
                 self.exp_id, self.exploration.version, ['Home']))
@@ -171,7 +171,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
                 # Post ML Job.
                 self.post_json(
                     '/ml/trainedclassifierhandler', self.payload,
-                    expect_errors=True, expected_status_int=500)
+                    expected_status_int=500)
 
                 # Check that there are now emails sent.
                 messages = self.mail_stub.get_sent_messages(
@@ -189,21 +189,21 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             self.post_json(
                 '/ml/trainedclassifierhandler', self.payload,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
 
     def test_error_on_different_signatures(self):
         # Altering data to result in different signatures.
         self.payload['message']['job_id'] = 'different_job_id'
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=True, expected_status_int=401)
+            expected_status_int=401)
 
     def test_error_on_invalid_message(self):
         # Altering message dict to result in invalid dict.
         self.payload['message']['job_id'] = 1
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
 
 
 class NextJobHandlerTest(test_utils.GenericTestBase):
@@ -250,13 +250,13 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
     def test_next_job_handler(self):
         json_response = self.post_json(
             '/ml/nextjobhandler',
-            self.payload, expect_errors=False,
+            self.payload,
             expected_status_int=200)
         self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_jobs_failed([self.job_id])
         json_response = self.post_json(
             '/ml/nextjobhandler',
-            self.payload, expect_errors=False,
+            self.payload,
             expected_status_int=200)
         self.assertEqual(json_response, {})
 
@@ -265,18 +265,18 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             self.post_json(
                 '/ml/nextjobhandler', self.payload,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
 
     def test_error_on_modified_message(self):
         # Altering data to result in different signatures.
         self.payload['message'] = 'different'
         self.post_json(
             '/ml/nextjobhandler', self.payload,
-            expect_errors=True, expected_status_int=401)
+            expected_status_int=401)
 
     def test_error_on_invalid_vm_id(self):
         # Altering vm_id to result in invalid signature.
         self.payload['vm_id'] = 1
         self.post_json(
             '/ml/nextjobhandler', self.payload,
-            expect_errors=True, expected_status_int=401)
+            expected_status_int=401)

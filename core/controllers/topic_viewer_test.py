@@ -59,26 +59,23 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.get_response(
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
-            self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.get_response(
+            self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
-                expect_errors=True, expected_status_int=404)
+                expected_status_int=404)
 
-            self.assertEqual(response.status_int, 404)
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.get_response(
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
-                expect_errors=True, expected_status_int=404)
-            self.assertEqual(response.status_int, 404)
+                expected_status_int=404)
 
 
 class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
@@ -102,4 +99,4 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
-                expect_errors=True, expected_status_int=404)
+                expected_status_int=404)

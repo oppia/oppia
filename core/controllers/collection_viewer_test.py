@@ -41,17 +41,15 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
 
     def test_unpublished_collections_are_invisible_to_logged_out_users(self):
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True, expected_status_int=404)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
 
     def test_unpublished_collections_are_invisible_to_unconnected_users(self):
         self.login(self.NEW_USER_EMAIL)
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True, expected_status_int=404)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_collections_are_invisible_to_other_editors(self):
@@ -60,42 +58,37 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
         self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
 
         self.login(self.OTHER_EDITOR_EMAIL)
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True, expected_status_int=404)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_collections_are_visible_to_their_editors(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_unpublished_collections_are_visible_to_admins(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_published_collections_are_visible_to_logged_out_users(self):
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
 
     def test_published_collections_are_visible_to_logged_in_users(self):
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         self.login(self.NEW_USER_EMAIL)
-        response = self.get_response(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
 
 
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):

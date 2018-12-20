@@ -67,4 +67,4 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             self.get_json(
                 '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id),
-                expect_errors=True, expected_status_int=404)
+                expected_status_int=404)

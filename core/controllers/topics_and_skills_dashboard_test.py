@@ -51,7 +51,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         csrf_token = None
         url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.get_response(url_prefix)
+            response = self.get_html_response(url_prefix)
             csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
@@ -62,9 +62,7 @@ class TopicsAndSkillsDashboardPageTests(BaseTopicsAndSkillsDashboardTests):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             url = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
-            response = self.get_response(url, expect_errors=True,
-                                         expected_status_int=404)
-            self.assertEqual(response.status_int, 404)
+            self.get_html_response(url, expected_status_int=404)
         self.logout()
 
 
@@ -81,10 +79,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.get_json(
-                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, expect_errors=True,
+            self.get_json(
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
                 expected_status_int=401)
-            self.assertEqual(response['status_code'], 401)
             self.logout()
 
             # Check that admins can access the topics and skills dashboard data.
@@ -184,8 +181,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token = self._get_csrf_token_for_put()
 
             self.post_json(
-                self.url, {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=404)
+                self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
 
@@ -214,8 +210,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             csrf_token = self._get_csrf_token_for_put()
             self.post_json(
-                self.url, {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=404)
+                self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_skill_creation_in_invalid_topic(self):
@@ -227,7 +222,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'linked_topic_ids': ['topic']
             }
             json_response = self.post_json(
-                self.url, payload, csrf_token=csrf_token, expect_errors=True,
+                self.url, payload, csrf_token=csrf_token,
                 expected_status_int=400)
             self.assertEqual(json_response['status_code'], 400)
             self.logout()
@@ -306,6 +301,5 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
             csrf_token = self._get_csrf_token_for_put()
             self.post_json(
-                self.url, {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=404)
+                self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
