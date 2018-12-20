@@ -20,11 +20,6 @@
   vertical-align: top;
 }
 
-.multiple-choice-option:hover {
-  color: #115FD4;
-}
-
-.multiple-choice-option:hover .multiple-choice-inner-radio-button,
 .multiple-choice-option:focus .multiple-choice-inner-radio-button {
   background-color: #115FD4;
   border-radius: 50%;
@@ -34,7 +29,6 @@
   width: 8px;
 }
 
-.multiple-choice-option:hover .multiple-choice-outer-radio-button,
 .multiple-choice-option:focus .multiple-choice-outer-radio-button {
   border-color: #115FD4;
 }
