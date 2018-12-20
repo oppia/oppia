@@ -240,6 +240,9 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main():
     """Run the tests."""
     parsed_args = _PARSER.parse_args()
+    if parsed_args.test_target is not None:
+        if not parsed_args.test_target.endswith('test'):
+            parsed_args.test_target = parsed_args.test_target + '_test'
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
