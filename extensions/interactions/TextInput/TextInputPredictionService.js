@@ -40,7 +40,10 @@ oppia.factory('TextInputPredictionService', [
             textInputTokens, cvVocabulary);
           prediction = SVMPredictionService.predict(svmData, textVector);
         }
-        return prediction;
+        if (prediction.getConfidence() > 0.8) {
+          return prediction.getLabel();
+        }
+        return -1;
       }
     };
   }]);
