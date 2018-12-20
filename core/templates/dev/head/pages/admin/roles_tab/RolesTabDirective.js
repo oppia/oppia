@@ -32,6 +32,7 @@ oppia.directive('adminRolesTab', [
       controller: ['$scope', function($scope) {
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
+        $scope.topicSummaries = GLOBALS.TOPIC_SUMMARIES;
         $scope.graphData = GLOBALS.ROLE_GRAPH_DATA;
         $scope.resultRolesVisible = false;
         $scope.result = {};
@@ -101,18 +102,19 @@ oppia.directive('adminRolesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-
           $scope.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ROLE_HANDLER_URL, {
             role: values.newRole,
-            username: values.username
+            username: values.username,
+            topic_id: values.topicId
           }).then(function() {
             $scope.setStatusMessage(
               'Role of ' + values.username +
               ' successfully updated to ' + values.newRole);
             $scope.updateFormValues.username = '';
             $scope.updateFormValues.newRole = '';
+            $scope.updateFormValues.topicId = '';
           }, function(errorResponse) {
             $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);

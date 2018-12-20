@@ -48,7 +48,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
@@ -73,7 +73,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
@@ -103,7 +103,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -134,7 +134,7 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -200,7 +200,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -241,7 +241,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -273,7 +273,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -319,7 +319,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)

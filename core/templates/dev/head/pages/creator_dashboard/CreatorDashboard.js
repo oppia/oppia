@@ -187,7 +187,7 @@ oppia.controller('CreatorDashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-    $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURES;
+    $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURE_PLAYERS;
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
 
@@ -548,7 +548,6 @@ oppia.controller('CreatorDashboard', [
               $scope, $uibModalInstance) {
             $scope.question = question;
             $scope.topicId = null;
-            $scope.questionStateData = $scope.question.getStateData();
             $scope.topicSummaries = topicSummaries;
             $scope.misconceptions = [];
             $scope.errorMessage = null;
