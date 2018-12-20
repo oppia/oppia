@@ -34,7 +34,6 @@ import zipfile
 
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
-import schema_utils # pylint: disable=relative-import
 
 import yaml
 
@@ -815,6 +814,10 @@ def validate_customization_args_and_values(
     for extra_arg in extra_args:
         del customization_args[extra_arg]
 
+    # Importing this at the top of the file causes a circular dependency
+    # as follows:
+    # utils -> schema_utils -> html_cleaner -> rte_component_registry -> utils.
+    import schema_utils # pylint: disable=relative-import
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         try:
