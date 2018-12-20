@@ -210,7 +210,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         self.payload['message']['classifier_data_with_floats_stringified'] = 1
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
 
     def test_error_on_failed_training_job_status(self):
         classifier_training_job_model = (
@@ -222,7 +222,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=True, expected_status_int=500)
+            expected_status_int=500)
 
     def test_error_on_exception_in_store_classifier_data(self):
         classifier_training_job_model = (
@@ -233,7 +233,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
         self.post_json(
             '/ml/trainedclassifierhandler', self.payload,
-            expect_errors=True, expected_status_int=500)
+            expected_status_int=500)
 
 
 class NextJobHandlerTest(test_utils.GenericTestBase):

@@ -24,19 +24,16 @@ class FractionLandingPageTest(test_utils.GenericTestBase):
         """Test for showing the landing page for fractions,
         without any viewer type should redirect to teacher type.
         """
-        response = self.testapp.get(feconf.FRACTIONS_LANDING_PAGE_URL)
-        self.assertEqual(response.status_int, 302)
-        self.assertEqual(response.content_type, 'text/html')
+        response = self.get_html_response(
+            feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
         response.mustcontain('/fractions_landing/teachers')
 
     def test_fraction_landing_page_with_viewer_type(self):
         """Test for showing the landing page for fractions,
         with student viewer type should respond student type.
         """
-        response = self.testapp.get(
+        response = self.get_html_response(
             '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL))
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
         response.mustcontain('/fractions_landing/student')
 
 
@@ -45,27 +42,19 @@ class StewardsLandingPageTest(test_utils.GenericTestBase):
     volunteers, or NGOs).
     """
     def test_nonprofits_landing_page(self):
-        response = self.testapp.get(feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
+        response = self.get_html_response(feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
         response.mustcontain(
             'Let\'s work together to make compelling educational')
 
     def test_parents_landing_page(self):
-        response = self.testapp.get(feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
+        response = self.get_html_response(feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
         response.mustcontain(
             'Help your child learn with our free, engaging lessons')
 
     def test_teachers_landing_page(self):
-        response = self.testapp.get(feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
+        response = self.get_html_response(feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
         response.mustcontain('Oppia\'s free, personalized lessons are a great')
 
     def test_volunteers_landing_page(self):
-        response = self.testapp.get(feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
+        response = self.get_html_response(feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
         response.mustcontain('Help improve access to high-quality education')
