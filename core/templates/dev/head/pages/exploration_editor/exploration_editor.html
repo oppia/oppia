@@ -90,7 +90,7 @@
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <improvements-tab ng-show="getActiveTabName() === 'improvements'">
+      <improvements-tab ng-if="getActiveTabName() === 'improvements'">
       </improvements-tab>
 
       <div ng-show="getActiveTabName() === 'settings'">
