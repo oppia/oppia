@@ -741,7 +741,7 @@ def _pre_commit_linter(all_files):
         # linting function to return.
 
         # try..except block is needed to catch ZeroDivisionError
-        # when there are no Python, JavaScript or CSS files to lint.
+        # when there are no CSS, HTML, JavaScript and Python files to lint.
         try:
             process.join(timeout=(
                 TIMEOUT_MULTIPLIER * len(file_group) / number_of_files_to_lint))
