@@ -591,14 +591,14 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
     def test_get_full_customization_args(self):
         """Test get full customization args method."""
-        ca_specs1 = interaction_registry.Registry.get_interaction_by_id(
+        ca_continue_specs = interaction_registry.Registry.get_interaction_by_id(
             'Continue').customization_arg_specs
 
-        customization_args1a = {
+        complete_customization_args = {
             'buttonText': {'value': 'Please Continue'}
         }
 
-        customization_args1b = {
+        complete_customization_args_with_extra_arg = {
             'buttonText': {'value': 'Please Continue'},
             'extraArg': {'value': ''}
         }
@@ -606,43 +606,46 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # Check if no new key is added to customization arg dict if all specs
         # are present.
         self.assertEqual(
-            customization_args1a,
+            complete_customization_args,
             schema_utils.CustomizationArgsUtil.get_full_customization_args(
-                customization_args1a, ca_specs1
+                complete_customization_args, ca_continue_specs
             )
         )
 
         # Check if no new key is added to customization arg dict and extra keys
         # are not removed if all specs are present.
         self.assertEqual(
-            customization_args1b,
+            complete_customization_args_with_extra_arg,
             schema_utils.CustomizationArgsUtil.get_full_customization_args(
-                customization_args1b, ca_specs1
+                complete_customization_args_with_extra_arg,
+                ca_continue_specs
             )
         )
 
-        ca_specs2 = interaction_registry.Registry.get_interaction_by_id(
-            'FractionInput').customization_arg_specs
+        ca_fraction_input_specs = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'FractionInput').customization_arg_specs
+        )
 
-        customization_args2a = {
+        incomplete_customization_args = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False}
         }
 
-        customization_args2b = {
+        incomplete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False},
             'extraArg': {'value': ''}
         }
 
-        expected_customization_args2a = {
+        expected_complete_customization_args = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
             'customPlaceholder': {'value': ''}
         }
 
-        expected_customization_args2b = {
+        expected_complete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
@@ -653,18 +656,19 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # Check if missing specs are added to customization arg dict without
         # making any other change.
         self.assertEqual(
-            expected_customization_args2a,
+            expected_complete_customization_args,
             schema_utils.CustomizationArgsUtil.get_full_customization_args(
-                customization_args2a, ca_specs2
+                incomplete_customization_args, ca_fraction_input_specs
             )
         )
 
         # Check if missing specs are added to customization arg dict without
         # making any other change and without removing extra args.
         self.assertEqual(
-            expected_customization_args2b,
+            expected_complete_customization_args_with_extra_arg,
             schema_utils.CustomizationArgsUtil.get_full_customization_args(
-                customization_args2b, ca_specs2
+                incomplete_customization_args_with_extra_arg,
+                ca_fraction_input_specs
             )
         )
 
@@ -676,42 +680,45 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         def mock_logging_function(msg, *_):
             observed_log_messages.append(msg)
 
-        ca_specs1 = interaction_registry.Registry.get_interaction_by_id(
-            'ItemSelectionInput').customization_arg_specs
+        ca_item_selection_specs = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput').customization_arg_specs
+        )
 
-        customization_args1a = {
+        complete_customization_args = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': ['']
         }
 
-        customization_args1b = {
+        complete_customization_args_with_invalid_arg_name = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': [''],
             23: {'value': ''}
         }
-        customization_args1c = {
+
+        complete_customization_args_with_extra_arg = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': [''],
             'extraArg': {'value': ''}
         }
 
-        customization_args1d = {
+        complete_customization_args_with_invalid_arg_type = {
             'minAllowableSelectionCount': {'value': 'invalid'},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': ['']
         }
 
-        expected_customization_args_after_validation1 = {
+        expected_customization_args_after_validation = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': ['']
         }
 
-        expected_customization_args_after_validation_with_invalid_arg_type1 = (
-            customization_args1d
+        expected_customization_args_after_validation_with_invalid_arg_type = (
+            complete_customization_args_with_invalid_arg_type
         )
 
         # The next four checks are for cases where customization args dict
@@ -721,12 +728,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
             'interaction',
             'ItemSelectionInput',
-            customization_args1a,
-            ca_specs1
+            complete_customization_args,
+            ca_item_selection_specs
         )
         self.assertEqual(
-            expected_customization_args_after_validation1,
-            customization_args1a
+            expected_customization_args_after_validation,
+            complete_customization_args
         )
 
         # Check if error is produced when arg name is invalid.
@@ -737,8 +744,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
                 'interaction',
                 'ItemSelectionInput',
-                customization_args1b,
-                ca_specs1
+                complete_customization_args_with_invalid_arg_name,
+                ca_item_selection_specs
             )
 
         # Check if error is produced when extra args are present.
@@ -746,8 +753,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
                 'interaction',
                 'ItemSelectionInput',
-                customization_args1c,
-                ca_specs1
+                complete_customization_args_with_extra_arg,
+                ca_item_selection_specs
             )
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -758,57 +765,59 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 )
             )
             self.assertEqual(
-                expected_customization_args_after_validation1,
-                customization_args1c
+                expected_customization_args_after_validation,
+                complete_customization_args_with_extra_arg
             )
 
         # Check if no error is produced when arg type is not valid.
         schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
             'interaction',
             'ItemSelectionInput',
-            customization_args1d,
-            ca_specs1
+            complete_customization_args_with_invalid_arg_type,
+            ca_item_selection_specs
         )
 
         self.assertEqual(
-            expected_customization_args_after_validation_with_invalid_arg_type1,
-            customization_args1d
+            expected_customization_args_after_validation_with_invalid_arg_type,
+            complete_customization_args_with_invalid_arg_type
         )
 
-        ca_specs2 = interaction_registry.Registry.get_interaction_by_id(
-            'FractionInput').customization_arg_specs
+        ca_fraction_input_specs = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'FractionInput').customization_arg_specs
+        )
 
-        customization_args2a = {
+        incomplete_customization_args = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False}
         }
 
-        customization_args2b = {
+        incomplete_customization_args_with_invalid_arg_name = {
             'requireSimplestForm': {'value': False},
             False: {'value': False},
         }
 
-        customization_args2c = {
+        incomplete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False},
             'extraArg': {'value': ''}
         }
 
-        customization_args2d = {
+        incomplete_customization_args_with_invalid_arg_type = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False},
             'customPlaceholder': {'value': 12}
         }
 
-        expected_customization_args_after_validation2 = {
+        expected_customization_args_after_validation = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
             'customPlaceholder': {'value': ''}
         }
 
-        expected_customization_args_after_validation_with_invalid_arg_type2 = (
-            customization_args2d
+        expected_customization_args_after_validation_with_invalid_arg_type = (
+            incomplete_customization_args_with_invalid_arg_type
         )
 
         # The next four checks are for cases where customization args dict
@@ -818,12 +827,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
             'interaction',
             'FractionInput',
-            customization_args2a,
-            ca_specs2
+            incomplete_customization_args,
+            ca_fraction_input_specs
         )
         self.assertEqual(
-            expected_customization_args_after_validation2,
-            customization_args2a
+            expected_customization_args_after_validation,
+            incomplete_customization_args
         )
 
         # Check if error is produced when arg name is invalid.
@@ -834,8 +843,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
                 'interaction',
                 'FractionInput',
-                customization_args2b,
-                ca_specs2
+                incomplete_customization_args_with_invalid_arg_name,
+                ca_fraction_input_specs
             )
 
         # Check if error is produced when extra args are present.
@@ -843,8 +852,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
                 'interaction',
                 'FractionInput',
-                customization_args2c,
-                ca_specs2
+                incomplete_customization_args_with_extra_arg,
+                ca_fraction_input_specs
             )
             self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
@@ -855,33 +864,33 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 )
             )
             self.assertEqual(
-                expected_customization_args_after_validation2,
-                customization_args2c
+                expected_customization_args_after_validation,
+                incomplete_customization_args_with_extra_arg
             )
 
         # Check if no error is produced when arg type is not valid.
         schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
             'interaction',
             'FractionInput',
-            customization_args2d,
-            ca_specs2
+            incomplete_customization_args_with_invalid_arg_type,
+            ca_fraction_input_specs
         )
         self.assertEqual(
-            expected_customization_args_after_validation_with_invalid_arg_type2,
-            customization_args2d
+            expected_customization_args_after_validation_with_invalid_arg_type,
+            incomplete_customization_args_with_invalid_arg_type
         )
 
         # A general check to see if error are produced when customization args
         # is not of type dict.
-        customization_args3 = 23
+        customization_args_with_invalid_type = 23
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected customization args to be a dict, received %s'
-            % customization_args3
+            % customization_args_with_invalid_type
         ):
             schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
                 'interaction',
                 'FractionInput',
-                customization_args3,
-                ca_specs1
+                customization_args_with_invalid_type,
+                ca_fraction_input_specs
             )
