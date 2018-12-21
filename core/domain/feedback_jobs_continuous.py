@@ -220,7 +220,7 @@ class FeedbackAnalyticsMRJobManager(
     def _get_continuous_computation_class(cls):
         """Get class for continuous computaion that computes analytics
         for feedback threads of explorations.
-        
+
         Returns:
             type. Class for continuous computaion of analytics.
         """
