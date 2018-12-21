@@ -25,6 +25,7 @@ from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
 import jinja_utils
+import schema_utils
 import utils
 
 
@@ -269,7 +270,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                utils.get_full_customization_args(
+                schema_utils.CustomizationArgsUtil.get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -398,7 +399,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        utils.validate_customization_args_and_values(
+        schema_utils.CustomizationArgsUtil.validate_customization_args_and_values( #pylint: disable=line-too-long
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
