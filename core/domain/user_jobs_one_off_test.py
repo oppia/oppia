@@ -770,7 +770,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
 
     def _record_play(self, exp_id, state):
-        """Calls StartExplorationEventHandler and records the event
+        """Calls StartExplorationEventHandler and records the 'play' event
         corresponding to the given exploration id.
 
         Args:

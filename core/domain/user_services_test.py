@@ -964,7 +964,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # Without explicitly defining the type of the patched datetimes, NDB
         # validation checks for datetime.datetime instances fail.
         class PatchedDatetimeType(type):
-            """Validates the datetime instances for failure."""
+            """Validates the datetime instances."""
             def __instancecheck__(cls, other):
                 """Validates whether the given instance is a datatime
                 instance.

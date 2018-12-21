@@ -1569,7 +1569,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     NEW_STATE_NAME = 'new state'
 
     def _get_swap_context(self):
-        """Swaps the context in jobs registry."""
+        """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
+        value with ALL_CC_MANAGERS_FOR_TESTS."""
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
@@ -1912,23 +1913,23 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
     def _get_top_state_answer_stats(
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
-        """Returns the top state answer stats corresponding to the given
-        exploration id and state names.
+        """Returns the top answer stats corresponding to the given exploration
+        id and state names.
         """
         return stats_services.get_top_state_answer_stats(exp_id, state_name)
 
     def _get_top_state_unresolved_answer_stats(
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
-        """Returns the top state unresolved answer stats corresponding to the
-        given exploration id and state names.
+        """Returns the top unresolved answer stats corresponding to the given
+        exploration id and state names.
         """
         return stats_services.get_top_state_unresolved_answers(
             exp_id, state_name)
 
     def _get_top_state_answer_stats_multi(
             self, exp_id=EXP_ID, state_names=None):
-        """Returns the top state answer stats corresponding to the given
-        exploration id and state names.
+        """Returns the top answer stats corresponding to the given exploration
+        id and state names.
         """
         if not state_names:
             raise ValueError('Must provide non-empty state names.')

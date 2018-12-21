@@ -792,7 +792,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_play_type):
 
         def _increment_counter():
-            """Increments the count if the realtime model corresponding to the
+            """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.
             """
             realtime_class = cls._get_realtime_datastore_class()

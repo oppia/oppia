@@ -431,9 +431,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             user_id, STORY_ID, strict=False)
 
     def _record_completion(self, user_id, STORY_ID, node_id):
-        """Records the completed node in story context corresponding to the
-        given node id.
-        """
+        """Records the completion of a node in the context of a story."""
         story_services.record_completed_node_in_story_context(
             user_id, STORY_ID, node_id)
 

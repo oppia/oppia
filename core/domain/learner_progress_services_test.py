@@ -88,7 +88,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_collection(self.owner_id, self.COL_ID_3)
 
     def _get_all_completed_exp_ids(self, user_id):
-        """Returns the list of all the completed exploration ids of the learner
+        """Gets the ids of all the explorations completed by the learner
         corresponding to the given user id.
         """
         completed_activities_model = (
@@ -100,7 +100,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_activities_model else [])
 
     def _get_all_completed_collection_ids(self, user_id):
-        """Returns the list of all the completed collection ids of the learner
+        """Gets the ids of all the collections completed by the learner
         corresponding to the given user id.
         """
         completed_activities_model = (
@@ -123,8 +123,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_activities_model else [])
 
     def _get_incomplete_exp_details(self, user_id, exploration_id):
-        """Returns the dict containing all the incomplete exploration details of
-        the learner corresponding to the given user id.
+        """Returns the dict containing all the exploration details that are
+        incompletely played by the learner corresponding to the given user id.
         """
         incomplete_exploration_user_model = (
             user_models.ExpUserLastPlaythroughModel.get(
@@ -140,7 +140,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def _check_if_exp_details_match(
             self, actual_details, details_fetched_from_model):
-        """Verifies the exploration detailes fetched from the model with the
+        """Verifies the exploration details fetched from the model matches the
         actual details.
         """
         self.assertEqual(
@@ -158,8 +158,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             details_fetched_from_model['timestamp']).total_seconds(), 10)
 
     def _get_all_incomplete_collection_ids(self, user_id):
-        """Returns the list of all the incomplete collection ids of the learner
-        corresponding to the given user id.
+        """Returns the list of all the collection ids that are incompletely
+        played by the learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))

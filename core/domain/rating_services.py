@@ -57,7 +57,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         raise Exception('Invalid exploration id %s' % exploration_id)
 
     def _update_user_rating():
-        """Updates the user rating of the exploration and returns the old rating
+        """Updates the user rating of the exploration. Returns the old rating
         before updation.
         """
         exp_user_data_model = user_models.ExplorationUserDataModel.get(

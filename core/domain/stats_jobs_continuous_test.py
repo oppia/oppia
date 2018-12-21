@@ -76,7 +76,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def _get_calc_output_model(
             self, exploration_id, state_name, calculation_id,
             exploration_version=stats_jobs_continuous.VERSION_ALL):
-        """Returns the StateAnswersCalcOutputModel corresponding to the given
+        """Gets the StateAnswersCalcOutputModel corresponding to the given
         calculation_id.
         """
         return stats_models.StateAnswersCalcOutputModel.get_model(
