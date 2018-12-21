@@ -388,7 +388,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
 
 @contextlib.contextmanager
 def _redirect_stdout(new_target):
-    old_target, sys.stdout = sys.stdout, new_target
+    old_target = sys.stdout
+    sys.stdout = new_target
     try:
         yield new_target
     finally:
