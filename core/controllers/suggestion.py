@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
+from core.domain import exp_domain
 import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
@@ -177,8 +178,19 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class EditSuggestionHandler(base.BaseHandler):
-    
-    @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_suggestion)
-    def function(self):
-        print(self.payload.get("action"))
+    #@acl_decorators.get_decorator_for_accepting_suggestion(
+     #   acl_decorators.can_edit_suggestion
+    def put(self, suggestion_id):
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        new_suggestion_content = self.payload.get('change')
+
+        old_suggestion_content = suggestion.change.to_dict()
+
+        old_suggestion_content['old_value'] = new_suggestion_content['old_value']['html']
+        old_suggestion_content['new_value'] = new_suggestion_content['new_value']
+
+        suggestion.change = old_suggestion_content
+        suggestion.change = exp_domain.ExplorationChange(suggestion.change)
+
+        suggestion_services._update_suggestion(suggestion)
+        self.render_json(new_suggestion_content)

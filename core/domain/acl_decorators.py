@@ -2354,7 +2354,7 @@ def can_access_topic_viewer_page(handler):
 
 def can_edit_suggestion(handler):
 
-    def test_can_edit_suggestion(self,suggestion_id):
+    def test_can_edit_suggestion(self):
         return True
 
     return test_can_edit_suggestion

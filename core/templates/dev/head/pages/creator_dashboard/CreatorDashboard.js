@@ -403,7 +403,7 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $if(edit_button_show == 0){
+            if(edit_button_show == 0){
               $scope.suggestionEditorIsShown = false;
             }
             else{
@@ -439,8 +439,7 @@ oppia.controller('CreatorDashboard', [
             };
             $scope.isEditButtonShown = function() {
               return (
-                !$scope.isNotHandled && $scope.isSuggestionRejected &&
-                !$scope.suggestionEditorIsShown);
+                $scope.isNotHandled && $scope.suggestionEditorIsShown);
             };
             $scope.isResubmitButtonShown = function() {
               return (
@@ -509,10 +508,10 @@ oppia.controller('CreatorDashboard', [
             action: result.action,
             summary_message: result.summaryMessage,
             change: {
-              cmd: 'edit_state_property',
               property_name: 'content',
-              state_name: result.stateName,
+              cmd: 'edit_state_property',
               old_value: result.oldContent,
+              state_name: result.stateName,
               new_value: {
                 html: result.newSuggestionHtml
               }
@@ -532,7 +531,6 @@ oppia.controller('CreatorDashboard', [
             review_message: result.reviewMessage
           };
         }
-
         $http.put(url, data).then(function() {
           for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
             if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
