@@ -20,3 +20,4 @@
 - [ ] The PR is assigned to an appropriate reviewer.
   - If you're a new contributor, please ask on [Gitter](https://gitter.im/oppia/oppia-chat) for someone to assign a reviewer.
   - If you're not sure who the appropriate reviewer is, please assign to the issue's "owner" -- see the "talk-to" label on the issue.
+- [ ] The PR content has removed this checklist after all other items are done.
