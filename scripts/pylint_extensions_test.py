@@ -234,7 +234,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
 
 class FunctionArgsOrderCheckerTest(unittest.TestCase):
 
-    def test_find_function_def(self):
+    def test_finds_function_def(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.FunctionArgsOrderChecker)
