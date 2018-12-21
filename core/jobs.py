@@ -214,7 +214,7 @@ class BaseJobManager(object):
         Returns:
             list(str). The compressed stringified output values.
         """
-        _MAX_OUTPUT_LEN_CHARS = 900000
+        _max_output_len_chars = 900000
 
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
@@ -234,7 +234,7 @@ class BaseJobManager(object):
 
         # Truncate outputs to fit within given max length.
         remaining_len = (
-            _MAX_OUTPUT_LEN_CHARS if test_only_max_output_len_chars is None else
+            _max_output_len_chars if test_only_max_output_len_chars is None else
             test_only_max_output_len_chars)
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)

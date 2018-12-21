@@ -32,7 +32,16 @@ good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
 dummy-variables-rgx=_|unused_*
 
 # Regular expression which should match good variable names
-variable-rgx=[a-z_]+$
+variable-rgx=[a-z_][a-z0-9_]*$
+
+# Regular expression matching correct attribute names
+attr-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Regular expression matching correct argument names
+argument-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Regular expression matching correct module names
+module-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
 # Regular expression which should only match function or class names that do
 # not require a docstring.

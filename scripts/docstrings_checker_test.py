@@ -36,7 +36,7 @@ class ASTDocStringCheckerTest(unittest.TestCase):
         result = docstring_checker.build_regex_from_args(args)
         self.assertEqual(result, expected_result)
 
-    def test_build_regex_from_args_empty_list_returns_None(self):
+    def test_build_regex_from_args_empty_list_returns_none(self):
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         args = []
         expected_result = None

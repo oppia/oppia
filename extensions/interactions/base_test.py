@@ -110,17 +110,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
-        _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
+        _answer_visualizations_specs_schema = [
             ('id', basestring), ('options', dict),
             ('calculation_id', basestring),
             ('addressed_info_is_supported', bool)]
-        _ANSWER_VISUALIZATION_KEYS = [
-            item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
+        _answer_visualization_keys = [
+            item[0] for item in _answer_visualizations_specs_schema]
 
         # Check that the keys and the types of their values are correct.
         for spec in answer_visualization_specs:
-            self.assertItemsEqual(spec.keys(), _ANSWER_VISUALIZATION_KEYS)
-            for key, item_type in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA:
+            self.assertItemsEqual(spec.keys(), _answer_visualization_keys)
+            for key, item_type in _answer_visualizations_specs_schema:
                 self.assertTrue(isinstance(spec[key], item_type))
                 if item_type == basestring:
                     self.assertTrue(spec[key])
