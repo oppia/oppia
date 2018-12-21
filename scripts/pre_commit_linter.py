@@ -737,10 +737,15 @@ def _pre_commit_linter(all_files):
 
     timeout_multiplier = 1000
     for file_group, process in zip(file_groups_to_lint, linting_processes):
-        # Require timeout parameter to prevent against endless waiting for the
-        # linting function to return.
-        process.join(timeout=(
-            timeout_multiplier * len(file_group) / number_of_files_to_lint))
+        # try..except block is needed to catch ZeroDivisionError
+        # when there are no CSS, HTML, JavaScript and Python files to lint.
+        try:
+            # Require timeout parameter to prevent against endless
+            # waiting for the linting function to return.
+            process.join(timeout=(
+                timeout_multiplier * len(file_group) / number_of_files_to_lint))
+        except ZeroDivisionError:
+            break
 
     js_messages = []
     while not js_stdout.empty():
