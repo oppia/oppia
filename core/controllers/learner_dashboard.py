@@ -34,7 +34,7 @@ class LearnerDashboardPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
+            'nav_mode': 'learner_dashboard'
         })
         self.render_template(
             'pages/learner_dashboard/learner_dashboard.html',

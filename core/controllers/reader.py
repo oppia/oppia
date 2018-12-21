@@ -148,7 +148,7 @@ def _get_exploration_player_data(
         'meta_name': exploration.title,
         # Note that this overwrites the value in base.py.
         'meta_description': utils.capitalize_string(exploration.objective),
-        'nav_mode': feconf.NAV_MODE_EXPLORE,
+        'nav_mode': 'explore',
     }
 
 

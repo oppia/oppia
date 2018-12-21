@@ -37,7 +37,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
+            'nav_mode': 'topics_and_skills_dashboard'
         })
         self.render_template(
             'pages/topics_and_skills_dashboard/'
