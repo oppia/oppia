@@ -139,6 +139,7 @@ oppia.run([
             button: componentDefn.tooltip,
             inline: isInline,
             template: componentTemplate,
+            draggable: false,
             edit: function(event) {
               editor.fire('lockSnapshot', {
                 dontUpdate: true
