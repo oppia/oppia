@@ -218,10 +218,22 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def _get_continuous_computation_class(cls):
+        """Get class for continuous computaion that computes analytics
+        for feedback threads of explorations.
+        
+        Returns:
+            type. Class for continuous computaion of analytics.
+        """
         return FeedbackAnalyticsAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Get the list of classes that this class maps over
+
+        Returns:
+            list(GeneralFeedbackThreadModel). List of classes of feedback
+            thread models.
+        """
         return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
