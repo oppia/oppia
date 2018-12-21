@@ -249,9 +249,16 @@ def main():
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     if parsed_args.test_target:
-        if parsed_args.test_target.endswith('test'):
+        if parsed_args.test_target.endswith('_test'):
             all_test_targets = [parsed_args.test_target]
         else:
+            print ''
+            print '.....................................................'
+            print 'WARNING : test_target flag should contain test file.'
+            print '.....................................................'
+            print ''
+            time.sleep(3)
+            print 'Redirecting to its corresponding test file.'
             all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
