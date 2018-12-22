@@ -23,7 +23,7 @@ oppia.factory('PredictionResultOjectFactory', [function() {
     this.predictionConfidence = confidence;
   };
 
-  predictionResult.create = function(label, confidence) {
+  predictionResult.createNew = function(label, confidence) {
     return new predictionResult(label, confidence);
   };
 
@@ -37,4 +37,3 @@ oppia.factory('PredictionResultOjectFactory', [function() {
 
   return predictionResult;
 }]);
-

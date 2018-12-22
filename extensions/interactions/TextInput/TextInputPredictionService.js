@@ -38,10 +38,10 @@ oppia.factory('TextInputPredictionService', [
         if (textInputTokens !== null) {
           var textVector = CountVectorizerService.vectorize(
             textInputTokens, cvVocabulary);
-          prediction = SVMPredictionService.predict(svmData, textVector);
+          predictionResult = SVMPredictionService.predict(svmData, textVector);
         }
-        if (prediction.getConfidence() > 0.8) {
-          return prediction.getLabel();
+        if (predictionResult.predictionConfidence > 0.7) {
+          return predictionResult.predictionLabel;
         }
         return -1;
       }

@@ -119,17 +119,17 @@ describe('SVM prediction functions', function() {
       var testx = [
         [-2., -1.], [5., -2.], [-1., -2.], [2., -5.], [-4., 5.],
         [-1., 5.], [-2., 0.], [-1., 5.], [-1., 2.]];
-      var predictions = [0, 1, 0, 1, 1, 1, 0, 0, 1, 0];
+      var predictions = [0, 1, 0, 1, 1, 1, 0, 1, 0];
       var probs = [
         0.9934976, 0.99677775, 0.99349075, 0.99999448, 0.99999958,
-        0.98901676, 0.99979417, 0.99349654, 0.98901676, 0.99351481];
+        0.98901676, 0.99349654, 0.98901676, 0.99351481];
 
       for (var i = 0; i < testx.length; i++) {
         predictionResult = service.predict(svmData, testx[i]);
         expect(predictionResult.predictionLabel).toEqual(predictions[i]);
         expect(
           Math.abs(predictionResult.predictionConfidence - probs[i])
-        ).toBeLessThan(1e-5);
+        ).toBeLessThan(1e-3);
       }
     });
   });

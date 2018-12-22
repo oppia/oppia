@@ -298,9 +298,9 @@ oppia.factory('CodeReplPredictionService', [
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
-        prediction = SVMPredictionService.predict(svmData, programVector);
-        if (prediction.getConfidence() > 0.8) {
-          return prediction.getLabel();
+        predictionResult = SVMPredictionService.predict(svmData, programVector);
+        if (predictionResult.predictionConfidence > 0.5) {
+          return predictionResult.predictionLabel;
         }
         return -1;
       }
