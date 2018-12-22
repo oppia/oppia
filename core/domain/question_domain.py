@@ -223,7 +223,7 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
+        interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_state_data.interaction
@@ -256,7 +256,7 @@ class Question(object):
 
         if (
                 (interaction.solution is None) and
-                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
+                (interaction_specs[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
