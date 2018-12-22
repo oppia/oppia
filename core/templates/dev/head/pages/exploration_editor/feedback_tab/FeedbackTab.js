@@ -125,7 +125,7 @@ oppia.controller('FeedbackTab', [
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
-    $scope.showSuggestionModal = function() {
+    $scope.showSuggestionModal = function(edit_button_show) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
@@ -174,12 +174,20 @@ oppia.controller('FeedbackTab', [
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
+            var ACTION_EDIT_SUGGESTION = 'edit';
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canEdit = EditabilityService.isEditable();
             $scope.canReject = $scope.canEdit && $scope.isNotHandled;
             $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
-
+            if(edit_button_show == 0){
+              $scope.suggestionEditorIsShown = false;
+              $scope.canAccept = true;
+            }
+            else{
+              $scope.suggestionEditorIsShown = true;
+              $scope.canAccept = false;
+            }
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
@@ -211,6 +219,17 @@ oppia.controller('FeedbackTab', [
                 // For now, we default to assuming that the changes are
                 // sufficiently small as to warrant no updates.
                 audioUpdateRequired: false
+              });
+            };
+
+            $scope.editSuggestion = function() {
+              $uibModalInstance.close({
+                action: ACTION_EDIT_SUGGESTION,
+                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
+                oldContent: $scope.oldContent
               });
             };
 
@@ -254,6 +273,26 @@ oppia.controller('FeedbackTab', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
+          if(result.action == ACTION_EDIT_SUGGESTION ){
+            url = UrlInterpolationService.interpolateUrl(
+              EDIT_SUGGESTION_URL_TEMPLATE, {
+                suggestion_id: $scope.activeThread.suggestion.suggestionId
+              }
+            );
+            data =  {
+              action: result.action,
+              summary_message: result.summaryMessage,
+              change: {
+                property_name: 'content',
+                cmd: 'edit_state_property',
+                old_value: result.oldContent,
+                state_name: result.stateName,
+                new_value: {
+                  html: result.newSuggestionHtml
+                }
+              }
+            };
+          }
           }, function() {
             $log.error('Error resolving suggestion');
           });

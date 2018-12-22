@@ -181,6 +181,11 @@ class EditSuggestionHandler(base.BaseHandler):
     #@acl_decorators.get_decorator_for_accepting_suggestion(
      #   acl_decorators.can_edit_suggestion
     def put(self, suggestion_id):
+        """Edits the submitted suggestion.
+
+        Args:
+            suggestion_id: str. id of suggestion to be edit.
+        """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         new_suggestion_content = self.payload.get('change')
 
