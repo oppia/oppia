@@ -404,7 +404,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Commit commands which are required to generate state id mapping for
         # given version of exploration from previous version of exploration.
-        RELEVANT_COMMIT_CMDS = [
+        relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,
             exp_domain.CMD_RENAME_STATE,
             exp_domain.CMD_DELETE_STATE,
@@ -453,7 +453,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             change_list = [
                 exp_domain.ExplorationChange(change_cmd)
                 for change_cmd in snapshot['commit_cmds']
-                if change_cmd['cmd'] in RELEVANT_COMMIT_CMDS
+                if change_cmd['cmd'] in relevant_commit_cmds
             ]
 
             try:

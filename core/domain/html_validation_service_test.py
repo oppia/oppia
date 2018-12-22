@@ -1034,21 +1034,21 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
 
-        EXP_ID = 'eid'
-        OWNER_ID = 'Admin'
+        exp_id = 'eid'
+        owner_id = 'Admin'
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % EXP_ID))
-        fs.commit(OWNER_ID, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'image/abc3.png', raw_image, mimetype='image/png')
+            fs_domain.ExplorationFileSystem('exploration/%s' % exp_id))
+        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    EXP_ID, test_case['html_content']),
+                    exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_add_dimensions_to_image_tags_when_no_filepath_specified(self):
@@ -1097,20 +1097,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
 
-        EXP_ID = 'eid'
-        OWNER_ID = 'Admin'
+        exp_id = 'eid'
+        owner_id = 'Admin'
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % EXP_ID))
-        fs.commit(OWNER_ID, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(OWNER_ID, 'image/abc3.png', raw_image, mimetype='image/png')
+            fs_domain.ExplorationFileSystem('exploration/%s' % exp_id))
+        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
+        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    EXP_ID, test_case['html_content']),
+                    exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):

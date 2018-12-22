@@ -511,14 +511,14 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
     print 'Linting %s Python files' % num_py_files
 
-    _BATCH_SIZE = 50
+    _batch_size = 50
     current_batch_start_index = 0
 
     while current_batch_start_index < len(files_to_lint):
         # Note that this index is an exclusive upper bound -- i.e., the current
         # batch of files ranges from 'start_index' to 'end_index - 1'.
         current_batch_end_index = min(
-            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+            current_batch_start_index + _batch_size, len(files_to_lint))
         current_files_to_lint = files_to_lint[
             current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
@@ -735,7 +735,7 @@ def _pre_commit_linter(all_files):
     number_of_files_to_lint = sum(
         len(file_group) for file_group in file_groups_to_lint)
 
-    TIMEOUT_MULTIPLIER = 1000
+    timeout_multiplier = 1000
     for file_group, process in zip(file_groups_to_lint, linting_processes):
         # try..except block is needed to catch ZeroDivisionError
         # when there are no CSS, HTML, JavaScript and Python files to lint.
@@ -743,7 +743,7 @@ def _pre_commit_linter(all_files):
             # Require timeout parameter to prevent against endless
             # waiting for the linting function to return.
             process.join(timeout=(
-                TIMEOUT_MULTIPLIER * len(file_group) / number_of_files_to_lint))
+                timeout_multiplier * len(file_group) / number_of_files_to_lint))
         except ZeroDivisionError:
             break
 
