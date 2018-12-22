@@ -210,9 +210,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
-        STORY_ID = story_services.get_new_story_id()
+        story_id = story_services.get_new_story_id()
         self.save_new_story(
-            STORY_ID, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes'
         )
         changelist = [
             story_domain.StoryChange({
@@ -221,10 +221,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'title': 'Title 1'
             })
         ]
-        story_services.update_story('user', STORY_ID, changelist, 'Added node.')
-        SKILL_ID = skill_services.get_new_skill_id()
+        story_services.update_story('user', story_id, changelist, 'Added node.')
+        skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            SKILL_ID, 'user', 'Description')
+            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -237,7 +237,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [SKILL_ID],
+            'new_value': [skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -248,7 +248,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'node_id': 'node_1'
         })]
         story_services.update_story(
-            'user', STORY_ID, change_list, 'Updated Node 1.')
+            'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
@@ -258,20 +258,20 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, SKILL_ID)
+            question_id, skill_id)
         question_services.create_new_question_skill_link(
-            question_id_2, SKILL_ID)
+            question_id_2, skill_id)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s&cursor=' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID))
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
             next_cursor = json_response_1['next_start_cursor']
 
             self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
             json_response_2 = self.get_json(
                 '%s/%s?story_id=%s&cursor=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id,
                     next_cursor))
             self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
             self.assertNotEqual(
@@ -280,7 +280,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, STORY_ID),
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
             expect_errors=True)
         self.assertEqual(response.status_int, 400)
 
