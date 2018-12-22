@@ -14,7 +14,6 @@
 
 """Tests for various static pages (like the About page)."""
 
-from core.controllers import pages
 from core.tests import test_utils
 import feconf
 
@@ -40,7 +39,7 @@ class SplashPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/html')
 
     def test_splash_page_with_c_value(self):
-        """Test for splash page when c value is included"""
+        """Test for splash page when c value is included."""
         response = self.testapp.get('/splash?c=c')
         self.assertEqual(response.status_int, 302)
         self.assertEqual(response.content_type, 'text/html')
@@ -152,10 +151,11 @@ class ConsoleErrorPageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/console_errors')
         self.assertEqual(response.status_int, 200)
 
+
 class MaintenancePageTest(test_utils.GenericTestBase):
 
     def test_maintenance_page(self):
-        """Test for maintenance page"""
+        """Test for maintenance page."""
         feconf.ENABLE_MAINTENANCE_MODE = True
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
             response = self.testapp.get('/admin')
