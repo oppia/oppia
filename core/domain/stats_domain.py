@@ -20,10 +20,10 @@ import numbers
 import sys
 
 from core.domain import action_registry
+from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import interaction_registry
-from core.domain import issue_registry
-from core.domain import state_domain
+from core.domain import playthrough_issue_registry
 from core.platform import models
 import feconf
 import utils
@@ -609,13 +609,13 @@ class Playthrough(object):
                     type(self.issue_customization_args)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_type(
+            issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
-        state_domain.validate_customization_args_and_values(
+        customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
@@ -662,9 +662,9 @@ class ExplorationIssue(object):
         return {
             'issue_type': self.issue_type,
             'issue_customization_args': (
-                state_domain.get_full_customization_args(
+                customization_args_util.get_full_customization_args(
                     self.issue_customization_args,
-                    issue_registry.Registry.get_issue_by_type(
+                    playthrough_issue_registry.Registry.get_issue_by_type(
                         self.issue_type).customization_arg_specs)),
             'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
@@ -754,13 +754,13 @@ class ExplorationIssue(object):
                     type(self.schema_version)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_type(
+            issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
-        state_domain.validate_customization_args_and_values(
+        customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
@@ -803,7 +803,7 @@ class LearnerAction(object):
         return {
             'action_type': self.action_type,
             'action_customization_args': (
-                state_domain.get_full_customization_args(
+                customization_args_util.get_full_customization_args(
                     self.action_customization_args,
                     action_registry.Registry.get_action_by_type(
                         self.action_type).customization_arg_specs)),
@@ -869,7 +869,7 @@ class LearnerAction(object):
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type)
 
-        state_domain.validate_customization_args_and_values(
+        customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
 

@@ -207,9 +207,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
-        'message': 'Please remove pylint exculsion if it is unnecessary or '
+        'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
-                   'The id to message list can be seen '
+                   'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -261,7 +261,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -511,14 +511,14 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
     print 'Linting %s Python files' % num_py_files
 
-    _BATCH_SIZE = 50
+    _batch_size = 50
     current_batch_start_index = 0
 
     while current_batch_start_index < len(files_to_lint):
         # Note that this index is an exclusive upper bound -- i.e., the current
         # batch of files ranges from 'start_index' to 'end_index - 1'.
         current_batch_end_index = min(
-            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+            current_batch_start_index + _batch_size, len(files_to_lint))
         current_files_to_lint = files_to_lint[
             current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
@@ -729,10 +729,23 @@ def _pre_commit_linter(all_files):
         process.daemon = False
         process.start()
 
-    for process in linting_processes:
-        # Require timeout parameter to prevent against endless waiting for the
-        # linting function to return.
-        process.join(timeout=200)
+    file_groups_to_lint = [
+        html_files_to_lint_for_css, css_files_to_lint,
+        js_files_to_lint, py_files_to_lint]
+    number_of_files_to_lint = sum(
+        len(file_group) for file_group in file_groups_to_lint)
+
+    timeout_multiplier = 1000
+    for file_group, process in zip(file_groups_to_lint, linting_processes):
+        # try..except block is needed to catch ZeroDivisionError
+        # when there are no CSS, HTML, JavaScript and Python files to lint.
+        try:
+            # Require timeout parameter to prevent against endless
+            # waiting for the linting function to return.
+            process.join(timeout=(
+                timeout_multiplier * len(file_group) / number_of_files_to_lint))
+        except ZeroDivisionError:
+            break
 
     js_messages = []
     while not js_stdout.empty():
@@ -1664,7 +1677,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    # The html tags and attributes check check has an additional
+    # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)

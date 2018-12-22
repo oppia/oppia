@@ -32,7 +32,20 @@ good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
 dummy-variables-rgx=_|unused_*
 
 # Regular expression which should match good variable names
-variable-rgx=[a-z_]+
+variable-rgx=[a-z_][a-z0-9_]*$
+
+# Regular expression matching correct attribute names
+attr-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Regular expression matching correct argument names
+argument-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Regular expression matching correct module names
+module-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Regular expression which should only match function or class names that do
+# not require a docstring.
+no-docstring-rgx=test_[a-z_]*|[A-Za-z]*Tests|Mock[A-Za-z]*|mock_[a-z_]*|setUp|tearDown|__.*__
 
 [DESIGN]
 
@@ -54,7 +67,7 @@ ignore-imports=yes
 
 [MESSAGES CONTROL]
 
-disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,invalid-name,len-as-condition,missing-docstring,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
+disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,len-as-condition,missing-docstring,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
 
 [REPORTS]
 

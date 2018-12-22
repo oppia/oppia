@@ -82,7 +82,7 @@ oppia.directive('topNavigationBar', [
             'topic_editor', 'story_editor'];
           $scope.NAV_MODE = GLOBALS.NAV_MODE;
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
+          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
           $scope.logoutUrl = GLOBALS.logoutUrl;

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.user.gae_models."""
+
 import datetime
 
 from core.platform import models
@@ -221,13 +223,13 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object, None)
 
     def test_get_multi_success(self):
-        SKILL_IDS = [
+        skill_ids = [
             user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_ID, self.SKILL_ID_1),
             user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_ID, self.SKILL_ID_2)]
         retrieved_object = user_models.UserSkillMasteryModel.get_multi(
-            SKILL_IDS)
+            skill_ids)
 
         self.assertEqual(retrieved_object[0].user_id, 'user_id')
         self.assertEqual(retrieved_object[0].skill_id, 'skill_id_1')
@@ -237,9 +239,9 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object[1].degree_of_mastery, 0.5)
 
     def test_get_multi_failure(self):
-        SKILL_IDS = ['unknown_model_id_1', 'unknown_model_id_2']
+        skill_ids = ['unknown_model_id_1', 'unknown_model_id_2']
         retrieved_object = user_models.UserSkillMasteryModel.get_multi(
-            SKILL_IDS)
+            skill_ids)
 
         self.assertEqual(retrieved_object, [None, None])
 
@@ -249,13 +251,13 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        scoreModels = (user_models.UserContributionScoringModel
-                       .get_all_scores_of_user('user1'))
-        self.assertEqual(len(scoreModels), 1)
-        self.assertEqual(scoreModels[0].id, 'category1.user1')
-        self.assertEqual(scoreModels[0].user_id, 'user1')
-        self.assertEqual(scoreModels[0].score_category, 'category1')
-        self.assertEqual(scoreModels[0].score, 1)
+        score_models = (user_models.UserContributionScoringModel
+                        .get_all_scores_of_user('user1'))
+        self.assertEqual(len(score_models), 1)
+        self.assertEqual(score_models[0].id, 'category1.user1')
+        self.assertEqual(score_models[0].user_id, 'user1')
+        self.assertEqual(score_models[0].score_category, 'category1')
+        self.assertEqual(score_models[0].score, 1)
 
     def test_create_entry_already_exists_failure(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
