@@ -230,3 +230,32 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
             ),
         ):
             temp_file.close()
+
+
+class FunctionArgsOrderCheckerTest(unittest.TestCase):
+
+    def test_finds_function_def(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.FunctionArgsOrderChecker)
+        checker_test_object.setup_method()
+        functiondef_node1 = astroid.extract_node("""
+        def test(self,test_var_one, test_var_two): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_functiondef(functiondef_node1)
+
+        functiondef_node2 = astroid.extract_node("""
+        def test(test_var_one, test_var_two, self): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='function-args-order-self',
+                node=functiondef_node2
+            ),
+        ):
+            checker_test_object.checker.visit_functiondef(functiondef_node2)
