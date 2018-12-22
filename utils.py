@@ -761,3 +761,4 @@ def cache(regular_function):
             cached_function_calls[arguments] = regular_function(*args, **kwargs)
         return cached_function_calls[arguments]
     return caching_regular_function
+
