@@ -265,4 +265,3 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.calls, 1)
         self.assertEqual(regular_function(1), 1)
         self.assertEqual(call_counter.calls, 1)
-
