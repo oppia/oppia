@@ -731,3 +731,32 @@ def get_hashable_value(value):
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
     pass
+
+
+def cache(regular_function):
+    """Decorator for caching the results of a regular function.
+
+    A regular function is a function that **always** returns the same output
+    when given the same inputs, for example:
+
+        >>> if x == y:
+        ...     assert f(x) == f(y)
+
+    However this is more flexible as it can accept any number of args and
+    kwargs.
+
+    The regular function must additionally receive only hashable arguments,
+    which is necessary to remember calls.
+    """
+    cached_function_calls = {}
+    def caching_regular_function(*args, **kwargs):
+        arguments = ()
+        if args:
+            arguments += tuple(args)
+        if kwargs:
+            arguments += tuple(
+                sorted(kwargs.iteritems(), key=operator.itemgetter(0)))
+        if arguments not in cached_function_calls:
+            cached_function_calls[arguments] = regular_function(*args, **kwargs)
+        return cached_function_calls[arguments]
+    return caching_regular_function

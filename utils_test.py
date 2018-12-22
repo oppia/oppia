@@ -245,3 +245,24 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_is_valid_language_code(self):
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
+
+    def test_cached_functions_get_called_exactly_once(self):
+        class _CallCounter(object):
+            """Counts the number of times instances of this class are called."""
+            def __init__(self):
+                self.calls = 0
+            def __call__(self):
+                self.calls += 1
+        call_counter = _CallCounter()
+
+        @utils.cache
+        def regular_function(x):
+            call_counter()
+            return x
+
+        self.assertEqual(call_counter.calls, 0)
+        self.assertEqual(regular_function(1), 1)
+        self.assertEqual(call_counter.calls, 1)
+        self.assertEqual(regular_function(1), 1)
+        self.assertEqual(call_counter.calls, 1)
+
