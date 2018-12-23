@@ -339,18 +339,15 @@ class _FileCache(object):
 
     @classmethod
     def _get_data(cls, file_cache_key):
-        with cls._get_lock(file_cache_key):
+        with cls._CACHE_LOCK_DICT_LOCK:
+            file_cache_lock = cls._CACHE_LOCK_DICT[file_cache_key]
+        with file_cache_lock:
             if file_cache_key not in cls._CACHE_DATA_DICT:
                 with open(file_cache_key.filename, file_cache_key.mode) as f:
                     lines = f.readlines()
                 cls._CACHE_DATA_DICT[file_cache_key] = (
                     cls._FileCacheData(''.join(lines), tuple(lines)))
         return cls._CACHE_DATA_DICT[file_cache_key]
-
-    @classmethod
-    def _get_lock(cls, file_cache_key):
-        with cls._CACHE_LOCK_DICT_LOCK:
-            return cls._CACHE_LOCK_DICT[file_cache_key]
 
 
 def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
