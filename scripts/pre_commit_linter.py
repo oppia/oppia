@@ -823,13 +823,6 @@ def _check_newline_character(all_files):
                 '%s --> Please ensure that this file ends with exactly one '
                 'newline char.' % filename)
 
-        with open(filename, 'rb') as f:
-            if total_num_chars == 1:
-            elif total_num_chars > 1:
-                f.seek(-2, 2)
-                if not (f.read(1) != '\n' and f.read(1) == '\n'):
-                    errors_found += 1
-
     if errors_found:
         summary_message = '%s   Newline character checks failed' % (
             _MESSAGE_TYPE_FAILED)
