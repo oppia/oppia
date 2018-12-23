@@ -318,7 +318,7 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
 class _FileCache(object):
-    """Provides thread-safe cached access to file content."""
+    """Provides thread-safe access to cached file content."""
     _FileCacheKey = collections.namedtuple('_FileCacheKey', 'filename, mode')
     _FileCacheData = (
         collections.namedtuple('_FileCacheData', 'data, data_as_lines'))
@@ -336,11 +336,6 @@ class _FileCache(object):
         return cls._get_data(cls._FileCacheKey(filename, mode)).data_as_lines
 
     @classmethod
-    def _get_lock(cls, file_cache_key):
-        with cls._CACHE_LOCK_DICT_LOCK:
-            return cls._CACHE_LOCK_DICT[file_cache_key]
-
-    @classmethod
     def _get_data(cls, file_cache_key):
         with cls._get_lock(file_cache_key):
             if file_cache_key not in cls._CACHE_DATA_DICT:
@@ -349,6 +344,11 @@ class _FileCache(object):
                 cls._CACHE_DATA_DICT[file_cache_key] = (
                     cls._FileCacheData(''.join(lines), tuple(lines)))
         return cls._CACHE_DATA_DICT[file_cache_key]
+
+    @classmethod
+    def _get_lock(cls, file_cache_key):
+        with cls._CACHE_LOCK_DICT_LOCK:
+            return cls._CACHE_LOCK_DICT[file_cache_key]
 
 
 def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
