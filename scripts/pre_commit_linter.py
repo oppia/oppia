@@ -1523,7 +1523,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
 
             if not line.lstrip().startswith(tuple(list_of_attrs)):
                 continue
-            if (indentation_of_first_attribute != leading_spaces_count):
+            if indentation_of_first_attribute != leading_spaces_count:
                 line_num_of_error = line_number + line_num
                 print (
                     '%s --> Attribute for tag %s on line '
