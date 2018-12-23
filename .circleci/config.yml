@@ -61,12 +61,12 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests
+      - lint_tests:
           requires:
             - setup
-      - frontend_tests
+      - frontend_tests:
           requires:
             - setup
-      - backend_tests
+      - backend_tests:
           requires:
             - setup
