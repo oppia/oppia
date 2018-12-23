@@ -30,6 +30,7 @@ jobs:
             - ../oppia_tools/
 
   lint_tests:
+    <<: *job_defaults
     steps:
       - run:
           name: Run lint tests
@@ -43,6 +44,7 @@ jobs:
             - third_party/
 
   frontend_tests:
+    <<: *job_defaults
     steps:
       - run:
           name: Run frontend tests
@@ -50,6 +52,7 @@ jobs:
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
 
   backend_tests:
+    <<: *job_defaults
     steps:
     - run:
         name: Run backend tests
