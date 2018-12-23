@@ -13,9 +13,8 @@ anchor_for_installing_dependencies: &install_dependencies
 
 version: 2
 jobs:
-  lint_tests:
+  setup:
     <<: *job_defaults
-
     steps:
       - checkout
       - restore_cache:
@@ -29,8 +28,11 @@ jobs:
           paths:
             - ../node_modules/
             - ../oppia_tools/
+
+  lint_tests:
+    steps:
       - run:
-          name: Run tests
+          name: Run lint tests
           command: |
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py
@@ -40,8 +42,31 @@ jobs:
           paths:
             - third_party/
 
+  frontend_tests:
+    steps:
+      - run:
+          name: Run frontend tests
+          command: |
+            bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
+
+  backend_tests:
+    steps:
+    - run:
+        name: Run backend tests
+        command: |
+          bash scripts/run_backend_tests.sh --exclude_load_tests
+
 workflows:
   version: 2
   circleci_tests:
     jobs:
+      - setup
       - lint_tests
+          requires:
+            - setup
+      - frontend_tests
+          requires:
+            - setup
+      - backend_tests
+          requires:
+            - setup
