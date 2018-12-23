@@ -16,6 +16,7 @@ jobs:
   setup:
     <<: *job_defaults
     steps:
+      - checkout
       - restore_cache:
           keys:
             - setup-files-cache
