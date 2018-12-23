@@ -1,0 +1,34 @@
+var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
+
+anchor_for_job_defaults: &job_defaults
+  working_directory: ~/oppia
+  docker:
+    - image: *docker_image
+
+anchor_for_installing_dependencies: &install_dependencies
+  name: Install dependencies
+  command: |
+    source scripts/setup.sh || exit 1
+    source scripts/setup_gae.sh || exit 1
+
+version: 2
+jobs:
+  lint_tests:
+    <<: *job_defaults
+
+    steps:
+      - checkout
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: Run tests
+          command: |
+            bash scripts/install_third_party.sh
+            python scripts/third_party_size_check.py
+            python scripts/pre_commit_linter.py --path=.
+
+workflows:
+  version: 2
+  circleci_tests:
+    jobs:
+      - lint_tests
