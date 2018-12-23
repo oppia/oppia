@@ -18,15 +18,27 @@ jobs:
 
     steps:
       - checkout
-
+      - restore_cache:
+          keys:
+            - setup-files-cache
+            - third-party-cache
       - run:
           <<: *install_dependencies
+      - save_cache:
+          key: setup-files-cache
+          paths:
+            - ../node_modules/
+            - ../oppia_tools/
       - run:
           name: Run tests
           command: |
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py
             python scripts/pre_commit_linter.py --path=.
+      - save_cache:
+          key: third-party-cache
+          paths:
+            - third_party/
 
 workflows:
   version: 2
