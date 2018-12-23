@@ -50,9 +50,11 @@ Note that the root folder MUST be named 'oppia'.
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import HTMLParser
+import StringIO
 import argparse
 import ast
 import collections
+import contextlib
 import fnmatch
 import multiprocessing
 import os
@@ -417,6 +419,16 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
+@contextlib.contextmanager
+def _redirect_stdout(new_target):
+    old_target = sys.stdout
+    sys.stdout = new_target
+    try:
+        yield new_target
+    finally:
+        sys.stdout = old_target
+
+
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
@@ -557,18 +569,21 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        # This line invokes Pylint and prints its output to the console.
-        pylinter = lint.Run(
-            current_files_to_lint + [config_pylint],
-            exit=False).linter
-        # These lines invoke Pycodestyle.
-        style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(
-            paths=current_files_to_lint)
-        # This line prints Pycodestyle's output to the console.
-        pycodestyle_report.print_statistics()
+        target_stdout = StringIO.StringIO()
+        with _redirect_stdout(target_stdout):
+            # This line invokes Pylint and prints its output
+            # to the target stdout.
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                exit=False).linter
+            # These lines invoke Pycodestyle and print its output
+            # to the target stdout.
+            style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
+            pycodestyle_report = style_guide.check_files(
+                paths=current_files_to_lint)
 
         if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            result.put(target_stdout.getvalue())
             are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
