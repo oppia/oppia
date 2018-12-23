@@ -11,6 +11,11 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
+anchor_for_restoring_cache: &restore_cache
+  keys:
+    - setup-files-cache
+    - third-party-cache
+
 version: 2
 jobs:
   setup:
@@ -18,9 +23,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys:
-            - setup-files-cache
-            - third-party-cache
+          <<: *restore_cache
       - run:
           <<: *install_dependencies
       - save_cache:
@@ -33,6 +36,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - restore_cache:
+          <<: *restore_cache
       - run:
           name: Run lint tests
           command: |
@@ -48,6 +53,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - restore_cache:
+          <<: *restore_cache
       - run:
           name: Run frontend tests
           command: |
@@ -57,10 +64,12 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - restore_cache:
+          <<: *restore_cache
       - run:
-        name: Run backend tests
-        command: |
-          bash scripts/run_backend_tests.sh --exclude_load_tests
+          name: Run backend tests
+          command: |
+            bash scripts/run_backend_tests.sh --exclude_load_tests
 
 workflows:
   version: 2
