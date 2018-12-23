@@ -16,7 +16,6 @@ jobs:
   setup:
     <<: *job_defaults
     steps:
-      - checkout
       - restore_cache:
           keys:
             - setup-files-cache
@@ -32,6 +31,7 @@ jobs:
   lint_tests:
     <<: *job_defaults
     steps:
+      - checkout
       - run:
           name: Run lint tests
           command: |
@@ -46,6 +46,7 @@ jobs:
   frontend_tests:
     <<: *job_defaults
     steps:
+      - checkout
       - run:
           name: Run frontend tests
           command: |
@@ -54,7 +55,8 @@ jobs:
   backend_tests:
     <<: *job_defaults
     steps:
-    - run:
+      - checkout
+      - run:
         name: Run backend tests
         command: |
           bash scripts/run_backend_tests.sh --exclude_load_tests
