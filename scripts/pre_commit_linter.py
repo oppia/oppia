@@ -332,7 +332,7 @@ class _FileCache(object):
         return cls._get_data(cls._FileCacheKey(filename, mode)).data
 
     @classmethod
-    def readlines(cls, filename, mode='r'):
+    def read_lines(cls, filename, mode='r'):
         return cls._get_data(cls._FileCacheKey(filename, mode)).data_as_lines
 
     @classmethod
@@ -340,7 +340,7 @@ class _FileCache(object):
         with cls._get_lock(file_cache_key):
             if file_cache_key not in cls._CACHE_DATA_DICT:
                 with open(file_cache_key.filename, file_cache_key.mode) as f:
-                    lines = f.readlines()
+                    lines = f.read_lines()
                 cls._CACHE_DATA_DICT[file_cache_key] = (
                     cls._FileCacheData(''.join(lines), tuple(lines)))
         return cls._CACHE_DATA_DICT[file_cache_key]
@@ -391,7 +391,7 @@ def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
     Returns:
         a list of files in excludeFiles.
     """
-    return list(_FileCache.readlines(eslintignore_path))
+    return list(_FileCache.read_lines(eslintignore_path))
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -999,7 +999,7 @@ def _check_comments(all_files):
     space_regex = re.compile(r'^#[^\s].*$')
     capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
-        file_content = _FileCache.readlines(filename)
+        file_content = _FileCache.read_lines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
@@ -1093,7 +1093,7 @@ def _check_docstrings(all_files):
     is_docstring = False
     is_class_or_function = False
     for filename in files_to_check:
-        file_content = _FileCache.readlines(filename)
+        file_content = _FileCache.read_lines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
@@ -1592,7 +1592,7 @@ def _check_html_tags_and_attributes(all_files, debug=False):
 
     for filename in html_files_to_lint:
         file_content = _FileCache.read(filename)
-        file_lines = _FileCache.readlines(filename)
+        file_lines = _FileCache.read_lines(filename)
         parser = CustomHTMLParser(filename, file_lines, debug)
         parser.feed(file_content)
 
@@ -1645,7 +1645,7 @@ def _check_for_copyright_notice(all_files):
 
     for filename in all_files_to_check:
         has_copyright_notice = False
-        for line in _FileCache.readlines(filename)[:5]:
+        for line in _FileCache.read_lines(filename)[:5]:
             if re.search(regexp_to_check, line):
                 has_copyright_notice = True
                 break
