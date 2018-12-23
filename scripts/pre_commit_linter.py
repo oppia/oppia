@@ -340,7 +340,7 @@ class _FileCache(object):
         with cls._get_lock(file_cache_key):
             if file_cache_key not in cls._CACHE_DATA_DICT:
                 with open(file_cache_key.filename, file_cache_key.mode) as f:
-                    lines = f.read_lines()
+                    lines = f.readlines()
                 cls._CACHE_DATA_DICT[file_cache_key] = (
                     cls._FileCacheData(''.join(lines), tuple(lines)))
         return cls._CACHE_DATA_DICT[file_cache_key]
