@@ -319,7 +319,7 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
-class _FileCache(object):
+class FileCache(object):
     """Provides thread-safe access to cached file content."""
     _FileCacheData = (
         collections.namedtuple('_FileCacheData', 'content, content_as_lines'))
@@ -390,7 +390,7 @@ def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
     Returns:
         a list of files in excludeFiles.
     """
-    return list(_FileCache.readlines(eslintignore_path))
+    return list(FileCache.readlines(eslintignore_path))
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -824,7 +824,7 @@ def _check_newline_character(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
 
     for filename in all_files:
-        content = _FileCache.read(filename, mode='rb')
+        content = FileCache.read(filename, mode='rb')
         files_checked += 1
         if len(content) == 1:
             errors_found += 1
@@ -905,7 +905,7 @@ def _check_bad_patterns(all_files):
             )]
     failed = False
     for filename in all_files:
-        content = _FileCache.read(filename)
+        content = FileCache.read(filename)
         total_files_checked += 1
         for pattern in BAD_PATTERNS:
             if (pattern in content and
@@ -1011,7 +1011,7 @@ def _check_comments(all_files):
     space_regex = re.compile(r'^#[^\s].*$')
     capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
-        file_content = _FileCache.readlines(filename)
+        file_content = FileCache.readlines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
@@ -1105,7 +1105,7 @@ def _check_docstrings(all_files):
     is_docstring = False
     is_class_or_function = False
     for filename in files_to_check:
-        file_content = _FileCache.readlines(filename)
+        file_content = FileCache.readlines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
@@ -1178,7 +1178,7 @@ def _check_docstrings(all_files):
     # order as they appear in the function definition.
     docstring_checker = docstrings_checker.ASTDocStringChecker()
     for filename in files_to_check:
-        ast_file = ast.walk(ast.parse(_FileCache.read(filename)))
+        ast_file = ast.walk(ast.parse(FileCache.read(filename)))
         func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
         for func in func_defs:
             func_result = docstring_checker.check_docstrings_arg_order(func)
@@ -1223,7 +1223,7 @@ def _check_html_directive_name(all_files):
         r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
         r'(?P<directive_name>[^\)]+)')
     for filename in files_to_check:
-        content = _FileCache.read(filename)
+        content = FileCache.read(filename)
         total_files_checked += 1
         matched_patterns = re.findall(pattern_to_match, content)
         for matched_pattern in matched_patterns:
@@ -1282,7 +1282,7 @@ def _check_directive_scope(all_files):
     failed = False
     summary_messages = []
     for filename in files_to_check:
-        content = _FileCache.read(filename)
+        content = FileCache.read(filename)
         parsed_dict = _validate_and_parse_js_file(filename, content)
         # Parse the body of the content as nodes.
         parsed_nodes = parsed_dict['body']
@@ -1413,7 +1413,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
         r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
         r'function\((?P<function_parameters>[\S\s]*?)\)')
     for filename in files_to_check:
-        content = _FileCache.read(filename)
+        content = FileCache.read(filename)
         matched_patterns = re.findall(pattern_to_match, content)
         for matched_pattern in matched_patterns:
             stringfied_dependencies, function_parameters = matched_pattern
@@ -1603,8 +1603,8 @@ def _check_html_tags_and_attributes(all_files, debug=False):
     summary_messages = []
 
     for filename in html_files_to_lint:
-        file_content = _FileCache.read(filename)
-        file_lines = _FileCache.readlines(filename)
+        file_content = FileCache.read(filename)
+        file_lines = FileCache.readlines(filename)
         parser = CustomHTMLParser(filename, file_lines, debug)
         parser.feed(file_content)
 
@@ -1657,7 +1657,7 @@ def _check_for_copyright_notice(all_files):
 
     for filename in all_files_to_check:
         has_copyright_notice = False
-        for line in _FileCache.readlines(filename)[:5]:
+        for line in FileCache.readlines(filename)[:5]:
             if re.search(regexp_to_check, line):
                 has_copyright_notice = True
                 break
