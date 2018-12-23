@@ -21,7 +21,6 @@ import datetime
 import hashlib
 import imghdr
 import json
-import operator
 import os
 import random
 import re
