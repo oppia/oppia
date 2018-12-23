@@ -61,7 +61,6 @@ import subprocess
 import sys
 import threading
 import time
-import functools
 
 import docstrings_checker  # pylint: disable=relative-import
 
@@ -1512,8 +1511,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                             self.filename, value, attr,
                             tag, line_number))
 
-        for line_num, line in enumerate(
-                str.splitlines(starttag_text)):
+        for line_num, line in enumerate(str.splitlines(starttag_text)):
             if line_num == 0:
                 continue
 
@@ -1525,9 +1523,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
 
             if not line.lstrip().startswith(tuple(list_of_attrs)):
                 continue
-            if (
-                    indentation_of_first_attribute != (
-                        leading_spaces_count)):
+            if (indentation_of_first_attribute != leading_spaces_count):
                 line_num_of_error = line_number + line_num
                 print (
                     '%s --> Attribute for tag %s on line '
@@ -1648,7 +1644,7 @@ def _check_for_copyright_notice(all_files):
 
     for filename in all_files_to_check:
         has_copyright_notice = False
-        for line_num, line in FileCache.readlines(filename)[:5]:
+        for line in FileCache.readlines(filename)[:5]:
             if re.search(regexp_to_check, line):
                 has_copyright_notice = True
                 break
