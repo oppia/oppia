@@ -16,6 +16,9 @@ anchor_for_restoring_cache: &restore_cache
     - setup-files-cache
     - third-party-cache
 
+anchor_for_restoring_build_cache: &restore_build_cache
+  key: build-cache
+
 version: 2
 jobs:
   setup:
@@ -71,6 +74,25 @@ jobs:
           command: |
             bash scripts/run_backend_tests.sh --exclude_load_tests
 
+  e2e_tests_accessiblity:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *restore_cache
+          <<: *restore_build_cache
+      - run:
+          name: Run e2e tests accessiblity
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
+      - save_cache:
+          key: build-cache
+          paths:
+            - backend_prod_files/templates/head/
+            - build/templates/head/
+            - backend_prod_files/extensions/
+            - build/extensions/
+
 workflows:
   version: 2
   circleci_tests:
@@ -83,5 +105,8 @@ workflows:
           requires:
             - setup
       - backend_tests:
+          requires:
+            - setup
+      - e2e_tests_accessiblity:
           requires:
             - setup
