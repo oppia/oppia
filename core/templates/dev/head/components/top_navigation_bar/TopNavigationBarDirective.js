@@ -84,24 +84,24 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          $scope.activeMenuName = '';
+          //$scope.activeMenuName = '';
           $scope.logoutUrl = GLOBALS.logoutUrl;
-          $scope.ACTION_OPEN = 'open';
-          $scope.ACTION_CLOSE = 'close';
-          $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
-            enter: {
-              shiftKeyIsPressed: false,
-              keyCode: 13
-            },
-            tab: {
-              shiftKeyIsPressed: false,
-              keyCode: 9
-            },
-            shiftTab: {
-              shiftKeyIsPressed: true,
-              keyCode: 9
-            }
-          };
+          //$scope.ACTION_OPEN = 'open';
+          //$scope.ACTION_CLOSE = 'close';
+          // $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
+          //   enter: {
+          //     shiftKeyIsPressed: false,
+          //     keyCode: 13
+          //   },
+          //   tab: {
+          //     shiftKeyIsPressed: false,
+          //     keyCode: 9
+          //   },
+          //   shiftTab: {
+          //     shiftKeyIsPressed: true,
+          //     keyCode: 9
+          //   }
+          // };
           $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
@@ -128,8 +128,9 @@ oppia.directive('topNavigationBar', [
            */
           $scope.openSubmenu = function(evt, menuName) {
             // Focus on the current target before opening its submenu.
-            angular.element(evt.currentTarget).focus();
-            $scope.activeMenuName = menuName;
+            NavigationService.openSubmenu(evt, menuName);
+            // angular.element(evt.currentTarget).focus();
+            // $scope.activeMenuName = menuName;
           };
           $scope.blurNavigationLinks = function(evt) {
             // This is required because if about submenu is in open state
@@ -139,9 +140,10 @@ oppia.directive('topNavigationBar', [
             $('nav a').blur();
           };
           $scope.closeSubmenu = function(evt) {
-            $scope.activeMenuName = '';
-            angular.element(evt.currentTarget).closest('li')
-              .find('a').blur();
+            NavigationService.closeSubmenu(evt, menuName);
+            // $scope.activeMenuName = '';
+            // angular.element(evt.currentTarget).closest('li')
+            //   .find('a').blur();
           };
           $scope.closeSubmenuIfNotMobile = function(evt) {
             if (DeviceInfoService.isMobileDevice()) {
@@ -161,31 +163,26 @@ oppia.directive('topNavigationBar', [
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
            */
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-            var targetEvents = Object.keys(eventsTobeHandled);
-            for (var i = 0; i < targetEvents.length; i++) {
-              var keyCodeSpec =
-                $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
-              if (keyCodeSpec.keyCode === evt.keyCode &&
-                evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-                if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
-                  $scope.openSubmenu(evt, menuName);
-                } else if (eventsTobeHandled[targetEvents[i]] ===
-                  $scope.ACTION_CLOSE) {
-                  $scope.closeSubmenu(evt);
-                } else {
-                  throw Error('Invalid action type.');
-                }
-              }
-            }
-          };
-          // Close the submenu if focus or click occurs anywhere outside of
-          // the menu or outside of its parent (which opens submenu on hover).
-          angular.element(document).on('click', function(evt) {
-            if (!angular.element(evt.target).closest('li').length) {
-              $scope.activeMenuName = '';
-              $scope.$apply();
-            }
-          });
+            NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+          }
+          // $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
+          //   var targetEvents = Object.keys(eventsTobeHandled);
+          //   for (var i = 0; i < targetEvents.length; i++) {
+          //     var keyCodeSpec =
+          //       $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+          //     if (keyCodeSpec.keyCode === evt.keyCode &&
+          //       evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
+          //       if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
+          //         $scope.openSubmenu(evt, menuName);
+          //       } else if (eventsTobeHandled[targetEvents[i]] ===
+          //         $scope.ACTION_CLOSE) {
+          //         $scope.closeSubmenu(evt);
+          //       } else {
+          //         throw Error('Invalid action type.');
+          //       }
+          //     }
+          //   }
+          // };
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
