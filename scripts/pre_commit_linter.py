@@ -1000,13 +1000,13 @@ def _check_comments(all_files):
         file_content = FileCache.readlines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
-            line = file_content[line_num].lstrip().rstrip()
+            line = file_content[line_num].strip()
             next_line = ''
             previous_line = ''
             if line_num + 1 < file_length:
-                next_line = file_content[line_num + 1].lstrip().rstrip()
+                next_line = file_content[line_num + 1].strip()
             if line_num > 0:
-                previous_line = file_content[line_num - 1].lstrip().rstrip()
+                previous_line = file_content[line_num - 1].strip()
 
             if line.startswith('#') and not next_line.startswith('#'):
                 # Check that the comment ends with the proper punctuation.
@@ -1094,11 +1094,11 @@ def _check_docstrings(all_files):
         file_content = FileCache.readlines(filename)
         file_length = len(file_content)
         for line_num in range(file_length):
-            line = file_content[line_num].lstrip().rstrip()
+            line = file_content[line_num].strip()
             prev_line = ''
 
             if line_num > 0:
-                prev_line = file_content[line_num - 1].lstrip().rstrip()
+                prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
             if (prev_line.startswith('class ') or
@@ -1510,7 +1510,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                             self.filename, value, attr,
                             tag, line_number))
 
-        for line_num, line in enumerate(str.splitlines(starttag_text)):
+        for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
                 continue
 
