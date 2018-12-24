@@ -226,8 +226,8 @@ class SeleniumPerformanceDataFetcher(object):
             upstream_kbps: int. The upstream speed in kbps. Defaults to None.
             latency: int. The latency of the server. Defaults to None.
         Returns:
-            server: server. The browsermobproxy server.
-            proxy: proxy. The proxy with the specified configuration.
+            tuple(server, proxy): A tuple consisting of the server and the
+                proxy as a pair.
         """
         server = browsermobproxy.Server(BROWSERMOB_PROXY_PATH)
         server.start()
@@ -388,7 +388,8 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished()
 
     def _reload_demo_collections(self, driver):
-        """Reload demo collections.
+        """Reloads demo collections.
+        
         Args:
             driver: driver. The WebDriver of the current session.
         """

@@ -88,7 +88,8 @@ class TestBase(unittest.TestCase):
 
         Args:
             session_count: int. Number of page load sessions used to
-            collect timing metrics. Defaults to DEFAULT_SESSION_SAMPLE_COUNT.
+                collect timing metrics. Defaults to
+                DEFAULT_SESSION_SAMPLE_COUNT.
         """
         page_session_metrics_list = []
 
@@ -106,7 +107,8 @@ class TestBase(unittest.TestCase):
 
         Args:
             session_count: Number of page load sessions used to
-            collect timing metrics. Defaults to DEFAULT_SESSION_SAMPLE_COUNT.
+                collect timing metrics. Defaults to
+                DEFAULT_SESSION_SAMPLE_COUNT.
         """
         page_session_metrics_list = []
 
@@ -124,7 +126,7 @@ class TestBase(unittest.TestCase):
         Args:
             page_config: dict. The page configuration parameters.
             append_username: bool. Whether to append username to the
-            page URL.
+                page URL.
         """
         self.page_url = self._get_complete_url(
             self.BASE_URL, page_config['url'])
@@ -148,8 +150,8 @@ class TestBase(unittest.TestCase):
                 self.page_url, self.username)
 
     def _test_total_page_size(self):
-        """Checks whether the total page size is under limit of uncached
-        session size.
+        """Checks whether the total page size is under the limit of
+        uncached session size.
         """
         self._record_page_metrics_from_uncached_session()
 
@@ -158,8 +160,8 @@ class TestBase(unittest.TestCase):
             self.size_limit_uncached_bytes)
 
     def _test_total_page_size_for_cached_session(self):
-        """Checks whether the total page size is under limit of cached
-        session size.
+        """Checks whether the total page size is under the limit of
+        cached session size.
         """
         self._record_page_metrics_from_cached_session()
 

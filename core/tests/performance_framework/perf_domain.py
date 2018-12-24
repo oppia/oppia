@@ -282,7 +282,7 @@ class MultiplePageSessionMetrics(object):
         self._validate()
 
     def _validate(self):
-        """Checks whether the page metrics are in the form of a list."""
+        """Checks whether the page metrics are in the list format."""
         if not isinstance(self.page_metrics, list):
             raise utils.ValidationError(
                 'Expected page_session_metrics to be a list, '

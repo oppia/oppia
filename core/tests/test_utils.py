@@ -563,19 +563,19 @@ tags: []
             app: WSGI application. The WSGI application which receives the request
                 and produces response.
             url: str. The URL to send the POST request to.
-            data: To be put in the body of the request. If params is an iterator,
+            data: *. To be put in the body of the request. If params is an iterator,
                 it will be urlencoded. If it is a string, it will not be encoded,
                 but placed in the body directly. Can be a collections.OrderedDict
                 with webtest.forms.Upload fields included.
             expect_errors: bool. Whether errors are expected.
             expected_status_int: int. The expected status code.
-            upload_files: list. A list of (fieldname, filename, file_content).
+            upload_files: list(tuple). A list of (fieldname, filename, file_content).
                 You can also use just (fieldname, filename) and the file contents
                 will be read from disk.
-            headers: dict. Extra headers to send.
+            headers: dict(str, *). Extra headers to send.
         
         Returns:
-            json_response: webtest.TestResponse instance. The response of the
+            webtest.TestResponse instance: The response of the
                 POST request.
         """
         json_response = app.post(
