@@ -421,6 +421,7 @@ class VersionedModel(BaseModel):
     version = ndb.IntegerProperty(default=0)
 
     def _require_not_marked_deleted(self):
+        """Checks whether the model instance is deleted."""
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
@@ -429,6 +430,7 @@ class VersionedModel(BaseModel):
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
     def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot."""
         self.populate(**snapshot_dict)
         return self
 
