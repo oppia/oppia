@@ -389,7 +389,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _reload_demo_collections(self, driver):
         """Reloads demo collections.
-        
+
         Args:
             driver: driver. The WebDriver of the current session.
         """
@@ -419,7 +419,7 @@ class SeleniumPerformanceDataFetcher(object):
         return new_exploration_url
 
     def _setup_login(self, driver):
-        """Sets up user login
+        """Sets up user login.
     
         Args:
             driver: driver. The WebDriver of the current session.
