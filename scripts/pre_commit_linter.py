@@ -323,8 +323,8 @@ class FileCache(object):
     """Provides thread-safe access to cached file content."""
 
     _CACHE_DATA_DICT = {}
-    _CACHE_DATA_LOCK_DICT = {}
-    _CACHE_DATA_LOCK_DICT_LOCK = threading.Lock()
+    _CACHE_LOCK_DICT = {}
+    _CACHE_LOCK_DICT_LOCK = threading.Lock()
 
     @classmethod
     def read(cls, filename, mode='r'):
@@ -338,11 +338,11 @@ class FileCache(object):
     def _get_data(cls, filename, mode):
         key = (filename, mode)
         if key not in cls._CACHE_DATA_DICT:
-            if key not in cls._CACHE_DATA_LOCK_DICT:
-                with cls._CACHE_DATA_LOCK_DICT_LOCK:
-                    if key not in cls._CACHE_DATA_LOCK_DICT:
-                        cls._CACHE_DATA_LOCK_DICT[key] = threading.Lock()
-            with cls._CACHE_DATA_LOCK_DICT[key]:
+            if key not in cls._CACHE_LOCK_DICT:
+                with cls._CACHE_LOCK_DICT_LOCK:
+                    if key not in cls._CACHE_LOCK_DICT:
+                        cls._CACHE_LOCK_DICT[key] = threading.Lock()
+            with cls._CACHE_LOCK_DICT[key]:
                 if key not in cls._CACHE_DATA_DICT:
                     with open(filename, mode) as f:
                         lines = f.readlines()
