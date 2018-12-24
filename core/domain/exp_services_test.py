@@ -48,6 +48,15 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def _count_at_least_editable_exploration_summaries(user_id):
+    """Counts exp summaries that are at least editable by the given user.
+
+    Args:
+        user_id: unicode. The id of the given user.
+
+    Returns:
+        int. number of exp summaries that are at least editable by the
+            given user.
+    """
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
@@ -195,6 +204,16 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
+        """Creates search query from list of arguments.
+
+        Args:
+            terms: list(str). A list of terms to be added in the query.
+            categories: list(str). A list of categories to be added in the query.
+            languages: list(str). A list of languages to be added in the query.
+
+        Returns:
+            str. A search query string.
+        """
         query = ' '.join(terms)
         if categories:
             query += ' category=(' + ' OR '.join([
@@ -2461,6 +2480,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         # puts to the event log are asynchronous.
         @transaction_services.toplevel_wrapper
         def populate_datastore():
+            """Populate database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(
                 self.EXP_ID_1, self.albert_id)
 
@@ -2687,6 +2707,16 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual([albert_id], exploration_summary.contributor_ids)
 
     def _check_contributors_summary(self, exp_id, expected):
+        """Check if contributors summary of the given exp is same as expected.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            expected: dict. Expected summary.
+
+        Raises:
+            AssertionError: Contributors summary of the given exp is not same
+                as expected.
+        """
         contributors_summary = exp_services.get_exploration_summary_by_id(
             exp_id).contributors_summary
         self.assertEqual(expected, contributors_summary)
