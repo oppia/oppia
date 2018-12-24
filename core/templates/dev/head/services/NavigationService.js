@@ -81,4 +81,4 @@ oppia.factory('NavigationService', [
       }
     };
     return navigation;
-}])
+  }]);

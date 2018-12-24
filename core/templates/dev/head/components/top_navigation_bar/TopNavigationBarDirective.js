@@ -29,13 +29,13 @@ oppia.directive('topNavigationBar', [
       controller: [
         '$scope', '$rootScope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService', 'DebouncerService',
-        'DeviceInfoService',
+        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
+        'DebouncerService', 'DeviceInfoService',
         function(
             $scope, $rootScope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, WindowDimensionsService, DebouncerService,
-            DeviceInfoService) {
+            SiteAnalyticsService, NavigationService, WindowDimensionsService,
+            DebouncerService, DeviceInfoService) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
           $scope.isSuperAdmin = null;
@@ -84,10 +84,10 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          //$scope.activeMenuName = '';
+          // $scope.activeMenuName = '';
           $scope.logoutUrl = GLOBALS.logoutUrl;
-          //$scope.ACTION_OPEN = 'open';
-          //$scope.ACTION_CLOSE = 'close';
+          // $scope.ACTION_OPEN = 'open';
+          // $scope.ACTION_CLOSE = 'close';
           // $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
           //   enter: {
           //     shiftKeyIsPressed: false,
@@ -164,15 +164,17 @@ oppia.directive('topNavigationBar', [
            */
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
-          }
-          // $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
+          };
+          // $scope.onMenuKeypress = function(evt, menuName, 
+          // eventsTobeHandled) {
           //   var targetEvents = Object.keys(eventsTobeHandled);
           //   for (var i = 0; i < targetEvents.length; i++) {
           //     var keyCodeSpec =
           //       $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
           //     if (keyCodeSpec.keyCode === evt.keyCode &&
           //       evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-          //       if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
+          //       if (eventsTobeHandled[targetEvents[i]]
+          // === $scope.ACTION_OPEN) {
           //         $scope.openSubmenu(evt, menuName);
           //       } else if (eventsTobeHandled[targetEvents[i]] ===
           //         $scope.ACTION_CLOSE) {
