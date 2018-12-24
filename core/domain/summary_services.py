@@ -499,7 +499,7 @@ def get_library_groups(language_codes):
             categories: list(str). List of categories.
 
         Returns:
-            str. Generaeted query.
+            str. Generated query.
         """
         # This assumes that 'categories' is non-empty.
         return 'category=("%s")%s' % (

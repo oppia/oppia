@@ -184,8 +184,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            key: str. The generated key using user_id and exploration_id
-            in the form [user_id].[exploration_id].
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[exploration_id].
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -425,8 +425,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            key: str. The generated key using user_id and exploration_id
-            in the form [user_id].[exploration_id].
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[exploration_id].
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -516,8 +516,8 @@ class CollectionProgressModel(base_models.BaseModel):
             collection_id: str. The id of the exploration.
 
         Returns:
-            key: str. The generated key using user_id and exploration_id
-            in the form [user_id].[collection_id].
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[collection_id].
         """
         return '%s.%s' % (user_id, collection_id)
 
