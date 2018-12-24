@@ -33,7 +33,7 @@ oppia.factory('NavigationService', [
         shiftKeyIsPressed: true,
         keyCode: 9
       }
-    };      
+    };
     var navigation = {};
     /**
     * Opens the submenu.

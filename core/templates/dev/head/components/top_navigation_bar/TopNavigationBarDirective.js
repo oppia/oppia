@@ -165,7 +165,7 @@ oppia.directive('topNavigationBar', [
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
           };
-          // $scope.onMenuKeypress = function(evt, menuName, 
+          // $scope.onMenuKeypress = function(evt, menuName,
           // eventsTobeHandled) {
           //   var targetEvents = Object.keys(eventsTobeHandled);
           //   for (var i = 0; i < targetEvents.length; i++) {
