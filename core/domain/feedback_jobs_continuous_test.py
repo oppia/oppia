@@ -59,7 +59,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
     def _get_swap_context(self):
         """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
-        value with ALL_CC_MANAGERS_FOR_TESTS."""
+        value with ALL_CC_MANAGERS_FOR_TESTS.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
@@ -441,7 +442,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
     def _get_swap_context(self):
         """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
-        value with ALL_CC_MANAGERS_FOR_TESTS."""
+        value with ALL_CC_MANAGERS_FOR_TESTS.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
