@@ -33,8 +33,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(job_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.exploration])
+(job_models, exp_models, base_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model])
 search_services = models.Registry.import_search_services()
 
 
@@ -229,6 +229,13 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
+            # Check that ExpSummariesCreationOneOff job yields no output.
+            self.assertEqual(
+                exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
+                    job_id),
+                []
+            )
+
             # Get and check job output.
             actual_job_output = exp_services.get_all_exploration_summaries()
             self.assertEqual(
@@ -296,6 +303,19 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertEqual(
             exp_first_published, exploration_rights.first_published_msec)
+
+        # Test to check that no action is performed on deleted exploration.
+        exp_services.delete_exploration(owner_id, self.EXP_ID)
+
+        job_id = job_class.create_new()
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class ExplorationRightsModel with id exp_id not found'
+        ):
+            rights_manager.get_exploration_rights(self.EXP_ID)
 
 
 class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
@@ -432,6 +452,29 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
             feconf.MIGRATION_BOT_USERNAME,
             exploration_summary.contributor_ids)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        exp_id = '100'
+        exploration = self.save_new_valid_exploration(
+            exp_id, user_a_id)
+        exp_services.delete_exploration(user_a_id, exp_id)
+
+        # Run the ExpSummariesContributorsOneOff job.
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class ExpSummaryModel with id 100 not found'
+        ):
+            exp_services.get_exploration_summary_by_id(exploration.id)
+
 
 class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
@@ -479,6 +522,13 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
+
+        # Check that ExplorationContributorsSummaryOneOff job yields no output.
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
+                job_id),
+            []
+        )
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
@@ -600,6 +650,28 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                 system_id,
                 exploration_summary.contributors_summary)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        exp_id = '100'
+        exploration = self.save_new_valid_exploration(
+            exp_id, user_a_id)
+        exp_services.delete_exploration(user_a_id, exp_id)
+
+        # Run the ExplorationContributorsSummaryOneOff job.
+        job_id = (
+            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new()) #pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class ExpSummaryModel with id 100 not found'
+        ):
+            exp_services.get_exploration_summary_by_id(exploration.id)
+
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
@@ -703,6 +775,20 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
+    def test_migration_job_produces_no_output(self):
+        exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
+            []
+        )
+
 
 class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
     """Tests for the ExplorationStateIdMapping one off job."""
@@ -800,6 +886,23 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertEqual(mapping.exploration_version, 4)
         self.assertEqual(mapping.largest_state_id_used, 2)
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+
+        # Start ExplorationStateIdMapping job on published exploration.
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationStateIdMappingJob.get_output(job_id),
+            []
+        )
 
 
 class ExplorationContentValidationJobForTextAngularTests(
@@ -1021,6 +1124,38 @@ class ExplorationMigrationValidationJobForTextAngularTests(
         ]
         self.assertEqual(actual_output, expected_output)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationMigrationValidationJobForTextAngular.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
 
 class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
@@ -1127,6 +1262,39 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
         # exploration, but there are 16 validation errors in the old
         # exploration.
         self.assertEqual(len(actual_output), 16)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationContentValidationJobForTextAngular.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
 
 
 class ExplorationContentValidationJobForCKEditorTests(
@@ -1281,6 +1449,40 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         self.assertEqual(actual_output, expected_output)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationContentValidationJobForCKEditor.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
 
 class ExplorationMigrationValidationJobForCKEditorTests(
         test_utils.GenericTestBase):
@@ -1390,6 +1592,40 @@ class ExplorationMigrationValidationJobForCKEditorTests(
 
         self.assertEqual(actual_output, expected_output)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationMigrationValidationJobForCKEditor.
+        job_id = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
 
 class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
@@ -1486,6 +1722,45 @@ class InteractionCustomizationArgsValidationJobTests(
         )]
 
         self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': (
+                '<p><oppia-noninteractive-link text-with-value="'
+                '&amp;quot;What is a link?&amp;quot;" url-with-'
+                'value="&amp;quot;htt://link.com&amp'
+                ';quot;"></oppia-noninteractive-link></p>'
+            ),
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start InteractionCustomizationArgsValidationJob.
+        job_id = (
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
 
 
 class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
@@ -1612,6 +1887,31 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         )]
         self.assertEqual(actual_output, expected_output)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationValidityJobManager job.
+        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
+        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id),
+            []
+        )
+
 
 class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
 
@@ -1656,6 +1956,26 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
             '[u\'TextInput\', [u\'exp_id0 Introduction\']]'
         ]
         self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start InteractionAuditOneOff job.
+        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
+        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(job_id),
+            []
+        )
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -1798,6 +2118,78 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         )]
         self.assertEqual(actual_output, expected_output)
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('ItemSelectionInput')
+
+        content_ids_to_audio_translations_dict = {
+            'content': {},
+            'default_outcome': {},
+            'feedback': {}
+        }
+
+        customization_args_dict = {
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
+        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
+                job_id),
+            []
+        )
+
 
 class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
@@ -1857,6 +2249,32 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
         actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
         self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.set_private_viewability_of_exploration(
+            owner, self.VALID_EXP_ID, True)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ViewableExplorationsAudit job on sample exploration.
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
+        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id),
+            []
+        )
 
 
 class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -1940,6 +2358,53 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             '[u\'2\', [u\'exp_id0 State1\']]'
         ]
         self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Checks that correct number of hints are tabulated."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        hint_list = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state1</p>'
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint2',
+                'html': '<p>Hello, this is html2 for state1</p>'
+            }
+        }]
+
+        content_ids_to_audio_translations_dict = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+            'hint2': {}
+        }
+
+        state1.update_interaction_hints(hint_list)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start HintsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
+        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id),
+            []
+        )
 
 
 class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
