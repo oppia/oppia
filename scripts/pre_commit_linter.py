@@ -53,7 +53,6 @@ import HTMLParser
 import StringIO
 import argparse
 import ast
-import collections
 import contextlib
 import fnmatch
 import multiprocessing
