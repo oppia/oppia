@@ -90,7 +90,6 @@ class SkillEditorPage(base.BaseHandler):
 
         self.values.update({
             'skill_id': skill.id,
-            'nav_mode': 'create',
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),

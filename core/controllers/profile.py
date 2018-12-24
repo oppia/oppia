@@ -41,7 +41,6 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'nav_mode': 'profile',
             'PROFILE_USERNAME': user_settings.username,
         })
         self.render_template('pages/profile/profile.html')
@@ -106,7 +105,6 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-            'nav_mode': 'profile',
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
@@ -260,7 +258,6 @@ class SignupPage(base.BaseHandler):
 
         self.values.update({
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
-            'nav_mode': 'signup',
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
         self.render_template('pages/signup/signup.html')

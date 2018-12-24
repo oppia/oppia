@@ -36,9 +36,6 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'nav_mode': 'topics_and_skills_dashboard'
-        })
         self.render_template(
             'pages/topics_and_skills_dashboard/'
             'topics_and_skills_dashboard.html', redirect_url_on_logout='/')

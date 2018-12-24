@@ -65,7 +65,6 @@ class NotificationsDashboardPage(base.BaseHandler):
     def get(self):
         self.values.update({
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
-            'nav_mode': 'creator_dashboard',
         })
         self.render_template(
             'pages/notifications_dashboard/notifications_dashboard.html',
@@ -138,7 +137,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'nav_mode': 'creator_dashboard',
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
