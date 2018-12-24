@@ -321,33 +321,33 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 
 class FileCache(object):
     """Provides thread-safe access to cached file content."""
-    _FileCacheData = (
-        collections.namedtuple('_FileCacheData', 'content, content_as_lines'))
 
     _CACHE_DATA_DICT = {}
-    _CACHE_DATA_LOCK_DICT = collections.defaultdict(threading.Lock)
+    _CACHE_DATA_LOCK_DICT = {}
     _CACHE_DATA_LOCK_DICT_LOCK = threading.Lock()
 
     @classmethod
     def read(cls, filename, mode='r'):
-        return cls._get_data(filename, mode).content
+        return cls._get_data(filename, mode)[0]
 
     @classmethod
     def readlines(cls, filename, mode='r'):
-        return cls._get_data(filename, mode).content_as_lines
+        return cls._get_data(filename, mode)[1]
 
     @classmethod
     def _get_data(cls, filename, mode):
-        file_cache_key = (filename, mode)
-        with cls._CACHE_DATA_LOCK_DICT_LOCK:
-            cache_data_lock = cls._CACHE_DATA_LOCK_DICT[file_cache_key]
-        with cache_data_lock:
-            if file_cache_key not in cls._CACHE_DATA_DICT:
-                with open(filename, mode) as f:
-                    lines = f.readlines()
-                cls._CACHE_DATA_DICT[file_cache_key] = (
-                    cls._FileCacheData(''.join(lines), tuple(lines)))
-        return cls._CACHE_DATA_DICT[file_cache_key]
+        key = (filename, mode)
+        if key not in cls._CACHE_DATA_DICT:
+            if key not in cls._CACHE_DATA_LOCK_DICT:
+                with cls._CACHE_DATA_LOCK_DICT_LOCK:
+                    if key not in cls._CACHE_DATA_LOCK_DICT:
+                        cls._CACHE_DATA_LOCK_DICT[key] = threading.Lock()
+            with cls._CACHE_DATA_LOCK_DICT[key]:
+                if key not in cls._CACHE_DATA_DICT:
+                    with open(filename, mode) as f:
+                        lines = f.readlines()
+                    cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
+        return cls._CACHE_DATA_DICT[key]
 
 
 def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
