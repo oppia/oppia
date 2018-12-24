@@ -33,9 +33,6 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
-        })
         self.render_template(
             'pages/learner_dashboard/learner_dashboard.html',
             redirect_url_on_logout='/')

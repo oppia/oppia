@@ -49,7 +49,6 @@ class StoryEditorPage(base.BaseHandler):
         self.values.update({
             'story_id': story.id,
             'story_title': story.title,
-            'nav_mode': feconf.NAV_MODE_STORY_EDITOR
         })
 
         self.render_template(

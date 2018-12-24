@@ -39,7 +39,6 @@ class CollectionPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': rights_manager.check_can_edit_activity(
                 self.user, collection_rights),
             'is_logged_in': bool(self.user_id),

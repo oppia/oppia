@@ -61,7 +61,6 @@ class CollectionEditorPage(CollectionEditorHandler):
 
         self.values.update({
             'collection_id': collection.id,
-            'nav_mode': feconf.NAV_MODE_CREATE,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (

@@ -85,7 +85,6 @@ class LibraryPage(base.BaseHandler):
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
                 else feconf.LIBRARY_PAGE_DESCRIPTION),
-            'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
@@ -163,7 +162,6 @@ class LibraryGroupPage(base.BaseHandler):
         self.values.update({
             'meta_description': (
                 feconf.LIBRARY_GROUP_PAGE_DESCRIPTION),
-            'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),

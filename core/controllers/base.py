@@ -359,13 +359,6 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        # nav_mode is used as part of the GLOBALS object in the frontend, but
-        # not every backend handler declares a nav_mode. Thus, the following
-        # code is a failsafe to ensure that the nav_mode key is added to all
-        # page requests.
-        if 'nav_mode' not in values:
-            values['nav_mode'] = ''
-
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
 
