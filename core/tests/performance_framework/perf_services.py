@@ -319,7 +319,7 @@ class SeleniumPerformanceDataFetcher(object):
 
         Args:
             driver: driver. The WebDriver of the current session.
-            
+
         Returns:
             bool. Whether the current user is logged in.
         """
@@ -351,6 +351,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _complete_signup(self, driver):
         """Completes the process of signing up a user.
+
         Args:
             driver: driver. The WebDriver of the current session.
         """
@@ -366,6 +367,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _reload_demo_explorations(self, driver):
         """Reloads demo explorations.
+        
         Args:
             driver: driver. The WebDriver of the current session.
         """
@@ -379,6 +381,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _reload_first_exploration(self, driver):
         """Reloads first exploration.
+
         Args:
             driver: driver. The WebDriver of the current session.
         """

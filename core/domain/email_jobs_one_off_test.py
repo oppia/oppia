@@ -46,11 +46,12 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
         def _generate_hash_for_tests(
                 cls, recipient_id, email_subject, email_body):
             """Generates hash for tests.
-            
+
             Args:
                 recipient_id: str. ID of the recipient.
                 email_subject: str. Subject of the email.
                 email_body: str. Body of the email.
+                
             Returns:
                 str. Empty if recipient_id is 'recipient_id2',
                     None if 'recipient_id1' and 'Email Hash'

@@ -509,9 +509,11 @@ class CollectionProgressModel(base_models.BaseModel):
     def _generate_id(cls, user_id, collection_id):
         """Generates key for the instance of CollectionProgressModel class in
         the required format with the arguments provided.
+
         Args:
             user_id: str. The id of the user.
             collection_id: str. The id of the exploration.
+            
         Returns:
             str. The generated key using user_id and exploration_id
                 of the form [user_id].[collection_id].

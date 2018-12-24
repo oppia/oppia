@@ -559,6 +559,7 @@ tags: []
             self, app, url, data, expect_errors=False, expected_status_int=200,
             upload_files=None, headers=None):
         """Sends a post request with the data provided to the url specified.
+        
         Args:
             app: WSGI application. The WSGI application which receives the request
                 and produces response.
