@@ -381,18 +381,6 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
-    """Collects excludeFiles from .eslintignore file.
-
-    Args:
-        eslintignore_path: str. Path to .eslintignore file.
-
-    Returns:
-        a list of files in excludeFiles.
-    """
-    return list(FileCache.readlines(eslintignore_path))
-
-
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     """Recursively collects all files in directory and
     subdirectories of specified path.
@@ -665,8 +653,7 @@ def _get_all_files():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            excluded_glob_patterns = _get_glob_patterns_excluded_from_eslint(
-                eslintignore_path)
+            excluded_glob_patterns = FileCache.readlines(eslintignore_path)
             all_files = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif parsed_args.files:
