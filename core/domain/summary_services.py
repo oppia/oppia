@@ -494,9 +494,10 @@ def get_library_groups(language_codes):
 
     def _generate_query(categories):
         """Generates query based on the categories and language codes.
-        
+
         Args:
             categories: list(str). List of categories.
+
         Returns:
             str. Generated query.
         """

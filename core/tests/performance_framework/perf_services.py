@@ -225,6 +225,7 @@ class SeleniumPerformanceDataFetcher(object):
                 None.
             upstream_kbps: int. The upstream speed in kbps. Defaults to None.
             latency: int. The latency of the server. Defaults to None.
+
         Returns:
             tuple(server, proxy): A tuple consisting of the server and the
                 proxy as a pair.
@@ -318,6 +319,7 @@ class SeleniumPerformanceDataFetcher(object):
 
         Args:
             driver: driver. The WebDriver of the current session.
+            
         Returns:
             bool. Whether the current user is logged in.
         """
