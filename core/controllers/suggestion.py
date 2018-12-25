@@ -193,7 +193,7 @@ class EditSuggestionHandler(base.BaseHandler):
         old_suggestion_content = suggestion.change.to_dict()
         old_suggestion_content['new_value'] = new_suggestion_content[
             'new_value']
-
+        # pylint: disable=bad-option-value
         suggestion.change = old_suggestion_content
         suggestion.change = exp_domain.ExplorationChange(suggestion.change)
         suggestion_services._update_suggestion(suggestion) # pylint: disable=W0212
