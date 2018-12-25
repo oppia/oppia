@@ -178,9 +178,10 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class EditSuggestionHandler(base.BaseHandler):
-    #@acl_decorators.get_decorator_for_accepting_suggestion(
-     #   acl_decorators.can_edit_suggestion
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_suggestion)
     def put(self, suggestion_id):
+        #print()
         """Edits the submitted suggestion.
 
         Args:
@@ -190,8 +191,6 @@ class EditSuggestionHandler(base.BaseHandler):
         new_suggestion_content = self.payload.get('change')
 
         old_suggestion_content = suggestion.change.to_dict()
-
-        old_suggestion_content['old_value'] = new_suggestion_content['old_value']['html']
         old_suggestion_content['new_value'] = new_suggestion_content['new_value']
 
         suggestion.change = old_suggestion_content
