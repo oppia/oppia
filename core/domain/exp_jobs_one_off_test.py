@@ -776,6 +776,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
     def test_migration_job_produces_no_output(self):
+        """Test that migration job produces no output."""
         exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -2360,7 +2361,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
-        """Checks that correct number of hints are tabulated."""
+        """Test that no action is performed on deleted explorations."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
