@@ -51,9 +51,9 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
                 recipient_id: str. ID of the recipient.
                 email_subject: str. Subject of the email.
                 email_body: str. Body of the email.
-                
+
             Returns:
-                str. Empty if recipient_id is 'recipient_id2', None if 
+                str. Empty if recipient_id is 'recipient_id2', None if
                     'recipient_id1' and 'Email Hash' otherwise.
             """
 
