@@ -174,11 +174,13 @@ class PageSessionMetrics(object):
 
     def _get_duration_millisecs(self, event_end, event_initial):
         """Get page load duration.
+
         Args:
             event_end: str. The event upto which duration measurement is
                 required.
             event_initial: str. The event from which duration measurement
                 starts.
+
         Returns:
             int. The calculated time duration between event_initial and
                 event_end in milliseconds.

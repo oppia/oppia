@@ -103,7 +103,7 @@ class TestBase(unittest.TestCase):
 
     def _record_average_page_timings_from_cached_session(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
-        """Record average page timings from cached session.
+        """Records average page timings from cached session.
 
         Args:
             session_count: Number of page load sessions used to

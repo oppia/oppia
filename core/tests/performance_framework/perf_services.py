@@ -220,6 +220,7 @@ class SeleniumPerformanceDataFetcher(object):
     def _setup_proxy_server(self, downstream_kbps=None, upstream_kbps=None,
                             latency=None):
         """Sets up a browsermobproxy server.
+
         Args:
             downstream_kbps: int. The downstream speed in kbps. Defaults to
                 None.
@@ -335,6 +336,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _login_user(self, driver):
         """Logs in a user and gets the cookie of the current session.
+        
         Args:
             driver: driver. The WebDriver of the current session.
         """
