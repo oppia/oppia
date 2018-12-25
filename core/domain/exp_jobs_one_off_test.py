@@ -304,10 +304,22 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_first_published, exploration_rights.first_published_msec)
 
-        # Test to check that no action is performed on deleted exploration.
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, owner_id, end_state_name='End')
+        rights_manager.publish_exploration(owner, self.EXP_ID)
+
         exp_services.delete_exploration(owner_id, self.EXP_ID)
 
-        job_id = job_class.create_new()
+        job_id = (
+            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
+        )
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -671,6 +683,27 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             'Entity for class ExpSummaryModel with id 100 not found'
         ):
             exp_services.get_exploration_summary_by_id(exploration.id)
+
+    def test_job_yields_no_output(self):
+        """Test that ExplorationContributorsSummaryOneOff job yields
+        no output.
+        """
+
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title')
+
+        # Run the ExplorationContributorsSummaryOneOff job.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
+                job_id),
+            []
+        )
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
