@@ -230,7 +230,6 @@ $scope.showSuggestionModal = function(edit_button_show) {
                 suggestionType: $scope.suggestionType,
                 oldContent: $scope.currentContent
               });
-              console.log($scope.currentContent)
             };
 
             $scope.rejectSuggestion = function() {
@@ -297,7 +296,7 @@ $scope.showSuggestionModal = function(edit_button_show) {
             });
          }  // Closing else statememt
          $http.put(url, data).then(function() {
-            console.log("submit succesfully");
+
           }, function() {
               $log.error('Error resolving suggestion');
         }); // closing http method
