@@ -206,7 +206,7 @@ oppia.controller('FeedbackTab', [
             $scope.newContent = newContent;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
-
+            console.log($scope.newContent);
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -225,7 +225,7 @@ oppia.controller('FeedbackTab', [
             $scope.editSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_EDIT_SUGGESTION,
-                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                newSuggestionHtml: $scope.newContent,
                 summaryMessage: $scope.summaryMessage,
                 stateName: $scope.stateName,
                 suggestionType: $scope.suggestionType,
@@ -273,26 +273,6 @@ oppia.controller('FeedbackTab', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-          if(result.action == ACTION_EDIT_SUGGESTION ){
-            url = UrlInterpolationService.interpolateUrl(
-              EDIT_SUGGESTION_URL_TEMPLATE, {
-                suggestion_id: $scope.activeThread.suggestion.suggestionId
-              }
-            );
-            data =  {
-              action: result.action,
-              summary_message: result.summaryMessage,
-              change: {
-                property_name: 'content',
-                cmd: 'edit_state_property',
-                old_value: result.oldContent,
-                state_name: result.stateName,
-                new_value: {
-                  html: result.newSuggestionHtml
-                }
-              }
-            };
-          }
           }, function() {
             $log.error('Error resolving suggestion');
           });

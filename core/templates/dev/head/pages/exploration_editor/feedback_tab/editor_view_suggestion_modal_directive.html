@@ -15,11 +15,11 @@
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
       <div class="oppia-suggestion-review-panel" ng-show="!suggestionEditorIsShown">
-        <angular-html-bind html-data="newContent.html">
+        <angular-html-bind html-data="newContent">
         </angular-html-bind>
       </div>
       <div ng-show="suggestionEditorIsShown">
-        <ck-editor-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-rte>
+        <ck-editor-rte ng-model="newContent"></ck-editor-rte>
         <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
     </div>
