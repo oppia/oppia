@@ -318,8 +318,7 @@ oppia.controller('CreatorDashboard', [
       }
     };
 
-    // Use showSuggestionModal function for both ShowSuggestion Button and EditSuggestion Button.
-    $scope.showSuggestionModal = function(edit_button_show) {
+    $scope.showSuggestionModal = function(EditButtonShow) {
       if ($scope.activeThread.suggestion.suggestionType ===
           'edit_exploration_state_content') {
         templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
@@ -403,10 +402,9 @@ oppia.controller('CreatorDashboard', [
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
             $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            if(edit_button_show == 0){
+            if (EditButtonShow === 0){
               $scope.suggestionEditorIsShown = false;
-            }
-            else{
+            } else {
               $scope.suggestionEditorIsShown = true;
             }
             $scope.acceptSuggestion = function() {
