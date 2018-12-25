@@ -14,9 +14,13 @@
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel">
+      <div class="oppia-suggestion-review-panel" ng-show="!suggestionEditorIsShown">
         <angular-html-bind html-data="newContent">
         </angular-html-bind>
+      </div>
+      <div ng-show="suggestionEditorIsShown">
+        <ck-editor-rte ng-model="newContent"></ck-editor-rte>
+        <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
     </div>
   </section>
@@ -35,6 +39,7 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-danger" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
-  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+  <button class="btn btn-danger" ng-show="canEdit && isNotHandled && canAccept" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled && canAccept" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+  <button class="btn btn-info" ng-show="suggestionEditorIsShown" ng-click="editSuggestion()">Edit</button>
 </div>

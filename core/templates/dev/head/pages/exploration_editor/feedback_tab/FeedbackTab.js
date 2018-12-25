@@ -125,7 +125,7 @@ oppia.controller('FeedbackTab', [
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
-    $scope.showSuggestionModal = function() {
+$scope.showSuggestionModal = function(edit_button_show) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
@@ -174,12 +174,20 @@ oppia.controller('FeedbackTab', [
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
+            var ACTION_EDIT_SUGGESTION = 'edit';
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canEdit = EditabilityService.isEditable();
             $scope.canReject = $scope.canEdit && $scope.isNotHandled;
             $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
-
+            if(edit_button_show == 0){
+              $scope.suggestionEditorIsShown = false;
+              $scope.canAccept = true;
+            }
+            else{
+              $scope.suggestionEditorIsShown = true;
+              $scope.canAccept = false;
+            }
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
@@ -198,7 +206,6 @@ oppia.controller('FeedbackTab', [
             $scope.newContent = newContent;
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
-
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
@@ -211,6 +218,17 @@ oppia.controller('FeedbackTab', [
                 // For now, we default to assuming that the changes are
                 // sufficiently small as to warrant no updates.
                 audioUpdateRequired: false
+              });
+            };
+
+            $scope.editSuggestion = function() {
+              $uibModalInstance.close({
+                action: ACTION_EDIT_SUGGESTION,
+                newSuggestionHtml: $scope.newContent,
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
+                oldContent: $scope.currentContent
               });
             };
 
@@ -227,36 +245,62 @@ oppia.controller('FeedbackTab', [
           }
         ]
       }).result.then(function(result) {
-        ThreadDataService.resolveSuggestion(
-          $scope.activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
-            ThreadDataService.fetchThreads(function() {
-              $scope.setActiveThread($scope.activeThread.threadId);
-            });
-            // Immediately update editor to reflect accepted suggestion.
-            if (result.action === ACTION_ACCEPT_SUGGESTION) {
-              var suggestion = $scope.activeThread.getSuggestion();
-
-              var stateName = suggestion.stateName;
-              var stateDict = ExplorationDataService.data.states[stateName];
-              var state = StateObjectFactory.createFromBackendDict(
-                stateName, stateDict);
-              state.content.setHtml(
-                $scope.activeThread.getReplacementHtmlFromSuggestion());
-              if (result.audioUpdateRequired) {
-                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                  state.content.getContentId());
-              }
-              ExplorationDataService.data.version += 1;
-              ExplorationStatesService.setState(stateName, state);
-              $rootScope.$broadcast('refreshVersionHistory', {
-                forceRefresh: true
-              });
-              $rootScope.$broadcast('refreshStateEditor');
+        if(result.action == 'edit'){
+          url = UrlInterpolationService.interpolateUrl(
+            '/suggestionactionhandler/edit/<suggestion_id>', {
+              suggestion_id: $scope.activeThread.suggestion.suggestionId
             }
+          ); // end url object 
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            change: {
+              property_name: 'content',
+              cmd: 'edit_state_property',
+              old_value: result.oldContent,
+              state_name: result.stateName,
+              new_value: {
+                html: result.newSuggestionHtml
+              }
+            }  // closing change object 
+          };  // closing data object
+        }     // closing if statememnt
+        else{
+          ThreadDataService.resolveSuggestion(
+            $scope.activeThread.threadId, result.action, result.commitMessage,
+            result.reviewMessage, result.audioUpdateRequired, function() {
+              ThreadDataService.fetchThreads(function() {
+                $scope.setActiveThread($scope.activeThread.threadId);
+              });
+              // Immediately update editor to reflect accepted suggestion.
+              if (result.action === ACTION_ACCEPT_SUGGESTION) {
+                var suggestion = $scope.activeThread.getSuggestion();
+
+                var stateName = suggestion.stateName;
+                var stateDict = ExplorationDataService.data.states[stateName];
+                var state = StateObjectFactory.createFromBackendDict(
+                  stateName, stateDict);
+                state.content.setHtml(
+                  $scope.activeThread.getReplacementHtmlFromSuggestion());
+                if (result.audioUpdateRequired) {
+                  state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                    state.content.getContentId());
+                }
+                ExplorationDataService.data.version += 1;
+                ExplorationStatesService.setState(stateName, state);
+                $rootScope.$broadcast('refreshVersionHistory', {
+                  forceRefresh: true
+                });
+                $rootScope.$broadcast('refreshStateEditor');
+              }
+            });
+         }  // Closing else statememt
+         $http.put(url, data).then(function() {
+
           }, function() {
-            $log.error('Error resolving suggestion');
-          });
+              $log.error('Error resolving suggestion');
+        }); // closing http method
+
       });
     };
 

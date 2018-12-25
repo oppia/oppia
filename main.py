@@ -511,6 +511,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToTopicActionHandler),
     get_redirect_route(
+        r'%s/edit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.EditSuggestionHandler),
+    get_redirect_route(
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
     get_redirect_route(
