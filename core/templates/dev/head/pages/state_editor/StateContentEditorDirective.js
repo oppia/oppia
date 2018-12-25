@@ -63,13 +63,11 @@ oppia.directive('stateContentEditor', [
             } else {
               $scope.isCardHeightLimitReached = false;
             }
-            if (!$scope.showCardHeightLimitWarning) {
-              cardHeightWatcher();
-            }
           });
 
           $scope.hideCardHeightLimitWarning = function() {
             $scope.showCardHeightLimitWarning = false;
+            cardHeightWatcher();
           };
 
           var saveContent = function() {
