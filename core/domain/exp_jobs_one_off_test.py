@@ -535,13 +535,6 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        # Check that ExplorationContributorsSummaryOneOff job yields no output.
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
-                job_id),
-            []
-        )
-
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
 
