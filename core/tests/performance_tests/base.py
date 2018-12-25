@@ -67,16 +67,14 @@ class TestBase(unittest.TestCase):
         self.data_fetcher.load_url(self.page_url)
 
     def _record_page_metrics_from_uncached_session(self):
-        """Records the page metrics from uncached session for a given page
-        URL.
+        """Records the page metrics from uncached session for a given page URL.
         """
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_uncached_session(
                 self.page_url))
 
     def _record_page_metrics_from_cached_session(self):
-        """Records the page metrics from cached session for a given page
-        URL.
+        """Records the page metrics from cached session for a given page URL.
         """
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_cached_session(
@@ -125,8 +123,7 @@ class TestBase(unittest.TestCase):
 
         Args:
             page_config: dict. The page configuration parameters.
-            append_username: bool. Whether to append username to the
-                page URL.
+            append_username: bool. Whether to append username to the page URL.
         """
         self.page_url = self._get_complete_url(
             self.BASE_URL, page_config['url'])
