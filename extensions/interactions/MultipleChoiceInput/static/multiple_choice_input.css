@@ -8,7 +8,7 @@
   color: #0D48A1;
   text-align: left;
   /* This is needed so that images stay bounded by the container in Firefox. */
-  /* Also, width is not fixed. This prevents the accidental selection of option by limiting the selection area to the text and radio button. */
+  /* This also limits the selection area of the option to the text and radio button. */
   width: auto;
 }
 
