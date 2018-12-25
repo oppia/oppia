@@ -125,7 +125,7 @@ oppia.controller('FeedbackTab', [
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
-$scope.showSuggestionModal = function(edit_button_show) {
+    $scope.showSuggestionModal = function(edit_button_show) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
