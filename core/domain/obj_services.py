@@ -31,6 +31,9 @@ class Registry(object):
 
     @classmethod
     def _refresh_registry(cls):
+        """Refreshes the registry by adding new object instances to the
+        registry.
+        """
         cls.objects_dict.clear()
 
         # Add new object instances to the registry.
