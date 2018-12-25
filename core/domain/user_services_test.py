@@ -924,7 +924,9 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 
 
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
-    """Integration tests for last login by the user."""
+    """Integration tests for testing that the last login time for a user updates
+    correctly.
+    """
 
     def setUp(self):
         """Create exploration with two versions."""
@@ -1003,7 +1005,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
-    """Integration tests for the exploration that is edited at the last."""
+    """Integration tests for testing the time the user last edited an
+    exploration updates correctly.
+    """
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1075,7 +1079,9 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
-    """Integration tests for the exploration that is created at the last."""
+    """Integration tests for the time the user last created an exploration
+    updates correctly.
+    """
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 

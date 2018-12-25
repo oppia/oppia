@@ -112,8 +112,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_activities_model else [])
 
     def _get_all_incomplete_exp_ids(self, user_id):
-        """Returns the list of all the incomplete exploration ids of the learner
-        corresponding to the given user id.
+        """Gets the ids of all the explorations not fully completed by the
+        learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
