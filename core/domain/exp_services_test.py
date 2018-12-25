@@ -54,8 +54,8 @@ def _count_at_least_editable_exploration_summaries(user_id):
         user_id: unicode. The id of the given user.
 
     Returns:
-        int. number of exp summaries that are at least editable by the
-            given user.
+        int. The number of exploration summaries that are at least editable
+            by the given user.
     """
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -2480,7 +2480,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         # puts to the event log are asynchronous.
         @transaction_services.toplevel_wrapper
         def populate_datastore():
-            """Populate database according to the sequence."""
+            """Populates the database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(
                 self.EXP_ID_1, self.albert_id)
 
@@ -2711,7 +2711,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         Args:
             exp_id: str. The id of the exploration.
-            expected: dict. Expected summary.
+            expected: dict(unicode, int). Expected summary.
 
         Raises:
             AssertionError: Contributors summary of the given exp is not same
