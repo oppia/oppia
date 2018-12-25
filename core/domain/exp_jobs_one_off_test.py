@@ -229,13 +229,6 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
-            # Check that ExpSummariesCreationOneOff job yields no output.
-            self.assertEqual(
-                exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
-                    job_id),
-                []
-            )
-
             # Get and check job output.
             actual_job_output = exp_services.get_all_exploration_summaries()
             self.assertEqual(
@@ -256,78 +249,39 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         getattr(actual_job_output[exp_id], prop),
                         getattr(expected_job_output[exp_id], prop))
 
+    def test_exp_summaries_creation_job_produces_no_output(self):
+        """Test that ExpSummariesCreationOneOff job produces no output."""
 
-class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
+        with self.swap(
+            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
+            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
+            ):
 
-    EXP_ID = 'exp_id'
+            self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+            self.login(self.ADMIN_EMAIL)
+            admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+            self.set_admins([self.ADMIN_USERNAME])
+            admin = user_services.UserActionsInfo(admin_id)
 
-    def test_first_published_time_of_exploration_that_is_unpublished(self):
-        """This tests that, if an exploration is published, unpublished, and
-        then published again, the job uses the first publication time as the
-        value for first_published_msec.
-        """
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+            exp_id = '1'
+            self.save_new_valid_exploration(
+                exp_id,
+                admin_id,
+                title='title',
+                category='category')
+            rights_manager.publish_exploration(admin, exp_id)
 
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.UserActionsInfo(owner_id)
-        admin = user_services.UserActionsInfo(admin_id)
+            # Run ExpSummariesCreationOneOff job on sample exploration.
+            job_id = (
+                exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
+            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
-        self.save_new_valid_exploration(
-            self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner, self.EXP_ID)
-        job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
-        job_id = job_class.create_new()
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-
-        # Test to see whether first_published_msec was correctly updated.
-        exp_first_published = exploration_rights.first_published_msec
-        exp_rights_model = exp_models.ExplorationRightsModel.get(self.EXP_ID)
-        last_updated_time_msec = utils.get_time_in_millisecs(
-            exp_rights_model.last_updated)
-        self.assertLess(
-            exp_first_published, last_updated_time_msec)
-
-        rights_manager.unpublish_exploration(admin, self.EXP_ID)
-        rights_manager.publish_exploration(owner, self.EXP_ID)
-        job_id = job_class.create_new()
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Test to see whether first_published_msec remains the same despite the
-        # republication.
-        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertEqual(
-            exp_first_published, exploration_rights.first_published_msec)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.UserActionsInfo(owner_id)
-
-        self.save_new_valid_exploration(
-            self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner, self.EXP_ID)
-
-        exp_services.delete_exploration(owner_id, self.EXP_ID)
-
-        job_id = (
-            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
-        )
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExplorationRightsModel with id exp_id not found'
-        ):
-            rights_manager.get_exploration_rights(self.EXP_ID)
+            self.assertEqual(
+                exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
+                    job_id),
+                []
+            )
 
 
 class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
@@ -677,8 +631,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         ):
             exp_services.get_exploration_summary_by_id(exploration.id)
 
-    def test_job_yields_no_output(self):
-        """Test that ExplorationContributorsSummaryOneOff job yields
+    def test_exploration_contributors_summary_job_produces_no_output(self):
+        """Test that ExplorationContributorsSummaryOneOff job produces
         no output.
         """
 
@@ -699,1095 +653,77 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         )
 
 
-class ExplorationMigrationJobTests(test_utils.GenericTestBase):
+class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
+    EXP_ID = 'exp_id'
 
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(ExplorationMigrationJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_migration_job_does_not_convert_up_to_date_exp(self):
-        """Tests that the exploration migration job does not convert an
-        exploration that is already the latest states schema version.
+    def test_first_published_time_of_exploration_that_is_unpublished(self):
+        """This tests that, if an exploration is published, unpublished, and
+        then published again, the job uses the first publication time as the
+        value for first_published_msec.
         """
-        # Create a new, default exploration that should not be affected by the
-        # job.
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
-        init_state.interaction.default_outcome = None
-        exp_services.save_new_exploration(self.albert_id, exploration)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
-        yaml_before_migration = exploration.to_yaml()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
 
-        # Start migration job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Verify the exploration is exactly the same after migration.
-        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
-        self.assertEqual(
-            updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
-        after_converted_yaml = updated_exp.to_yaml()
-        self.assertEqual(after_converted_yaml, yaml_before_migration)
-
-    def test_migration_job_does_not_have_validation_fail_on_default_exp(self):
-        """Tests that the exploration migration job does not have a validation
-        failure for a default exploration (of states schema version 0), due to
-        the exploration having a null interaction ID in its initial state.
-        """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
-
-        # Start migration job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Verify the new exploration has been migrated by the job.
-        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(
-            updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
-
-        # Ensure the states structure within the exploration was changed.
-        self.assertNotEqual(
-            updated_exp.to_dict()['states'], self.VERSION_0_STATES_DICT)
-
-    def test_migration_job_skips_deleted_explorations(self):
-        """Tests that the exploration migration job skips deleted explorations
-        and does not attempt to migrate.
-        """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
-
-        # Note: This creates a summary based on the upgraded model (which is
-        # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
-            self.NEW_EXP_ID, None)
-
-        # Delete the exploration before migration occurs.
-        exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
-
-        # Ensure the exploration is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-
-        # Start migration job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-
-        # This running without errors indicates the deleted exploration is
-        # being ignored, since otherwise exp_services.get_exploration_by_id
-        # (used within the job) will raise an error.
-        self.process_and_flush_pending_tasks()
-
-        # Ensure the exploration is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-
-    def test_migration_job_produces_no_output(self):
-        """Test that migration job produces no output."""
-        exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        # Start migration job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
-            []
-        )
-
-
-class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
-    """Tests for the ExplorationStateIdMapping one off job."""
-
-    EXP_ID = 'eid'
-
-    def setUp(self):
-        """Initialize owner before each test case."""
-        super(ExplorationStateIdMappingJobTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
-    def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
-        """Tests that mapreduce job works correctly when the only first
-        exploration version exists.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
+        self.save_new_valid_exploration(
+            self.EXP_ID, owner_id, end_state_name='End')
+        rights_manager.publish_exploration(owner, self.EXP_ID)
+        job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
+        job_id = job_class.create_new()
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+        # Test to see whether first_published_msec was correctly updated.
+        exp_first_published = exploration_rights.first_published_msec
+        exp_rights_model = exp_models.ExplorationRightsModel.get(self.EXP_ID)
+        last_updated_time_msec = utils.get_time_in_millisecs(
+            exp_rights_model.last_updated)
+        self.assertLess(
+            exp_first_published, last_updated_time_msec)
 
+        rights_manager.unpublish_exploration(admin, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
+        job_id = job_class.create_new()
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 1)
-        self.assertEqual(mapping.largest_state_id_used, 0)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-    def test_that_mapreduce_job_works(self):
-        """Test that mapreduce job is working as expected."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state 2',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'new state'
-            })], 'Modify states')
-
-        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
-
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
-
-        self.process_and_flush_pending_tasks()
-
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 1)
-        self.assertEqual(mapping.largest_state_id_used, 0)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0,
-            'new state': 1
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 2)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 2)
-        self.assertEqual(mapping.largest_state_id_used, 1)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0,
-            'new state 2': 2
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 3)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 3)
-        self.assertEqual(mapping.largest_state_id_used, 2)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 4)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 4)
-        self.assertEqual(mapping.largest_state_id_used, 2)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+        # Test to see whether first_published_msec remains the same despite the
+        # republication.
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertEqual(
+            exp_first_published, exploration_rights.first_published_msec)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
 
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+        self.save_new_valid_exploration(
+            self.EXP_ID, owner_id, end_state_name='End')
+        rights_manager.publish_exploration(owner, self.EXP_ID)
 
-        # Start ExplorationStateIdMapping job on published exploration.
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        exp_services.delete_exploration(owner_id, self.EXP_ID)
 
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationStateIdMappingJob.get_output(job_id),
-            []
-        )
-
-
-class ExplorationContentValidationJobForTextAngularTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(ExplorationContentValidationJobForTextAngularTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_validation_job(self):
-        """Tests that the exploration validation job validates the content
-        without skipping any tags.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<blockquote><p>Hello, this <i>is</i> state1 '
-                '</p></blockquote><pre>I\'m looking for a particular '
-                '<b>Hello Oppia</b> message.</pre><p> Don\'t you want to '
-                'say hello? You can learn more about oppia '
-                '<oppia-noninteractive-link url-with-value="&amp;quot;'
-                'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
-                'here&amp;quot;"></oppia-noninteractive-link></p>'
-            )
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': (
-                '<pre>Hello, this is state2.</pre><blockquote>'
-                '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
-                'You can see this equation <b><oppia-noninteractive-math'
-                'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
-                'quot;"></oppia-noninteractive-math></b></p>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
-        expected_output = []
-
-        self.assertEqual(actual_output, expected_output)
-
-        default_outcome_dict = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<p>Sorry, it doesn\'t look like your <span>program '
-                    '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to do something?</p></blockquote> Can do this by '
-                    'using statement like prints. <br> You can ask any if you '
-                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
-                    'https://www.example.com&amp;quot;" text-with-value="'
-                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        state1.update_interaction_default_outcome(default_outcome_dict)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
-
-        expected_output = [
-            '[u\'br\', [u\'[document]\']]',
-            '[u\'invalidTags\', [u\'span\']]',
-            '[u\'oppia-noninteractive-link\', [u\'[document]\']]',
-            (
-                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
-                'like your <span>program </span>prints output</p>.<blockquote>'
-                '<p> Could you get it to do something?</p></blockquote> '
-                'Can do this by using statement like prints. <br> You can '
-                'ask any if you have<oppia-noninteractive-link text-with-value'
-                '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
-                'https://www.example.com&amp;quot;">'
-                '</oppia-noninteractive-link>.\']]'
-            )
-        ]
-
-        self.assertEqual(actual_output, expected_output)
-
-
-class ExplorationMigrationValidationJobForTextAngularTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            ExplorationMigrationValidationJobForTextAngularTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_migration_job(self):
-        """Validates migration process for TextAngular."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                'Here is test case <a href="https://github.com">hello<b><i>'
-                'testing</i></b>in <b>progress</b><p>for migration</p>'
-            )
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': (
-                'Here is test case <a href="https://github.com">'
-                '<oppia-noninteractive-link url-with-value="&amp;quot;'
-                'https://github.com&amp;quot;" text-with-value="abc">'
-                '</oppia-noninteractive-link><p> testing in progress</p>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<p>Sorry, it doesn\'t look like your <span>program '
-                    '</span>prints output</p>.<blockquote><p> Could you get '
-                    'it to do something?</p></blockquote> Can do this by '
-                    'using statement like prints. <br> You can ask any if you '
-                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
-                    'https://www.example.com&amp;quot;" text-with-value="'
-                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><li>This is last case</li><oppia-noninteractive-image '
-                    'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                    '</oppia-noninteractive-image></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start MigrationValidation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
-        expected_output = [
-            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
-            (
-                '[u\'strings\', '
-                '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
-                'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                '</oppia-noninteractive-image></ol>\']]'
-            )
-        ]
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': '<code>Hello</code>',
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        # Start ExplorationMigrationValidationJobForTextAngular.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
-
-
-class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(TextAngularValidationAndMigrationTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_textangular_validation_and_migration(self):
-        """Tests that the exploration validation and migration job for
-        TextAngular RTE.
-        """
-        test_file_path = os.path.join(
-            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
-        with open(test_file_path, 'r') as f:
-            json_data = json.load(f)
-        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        state_list = []
-        for index in range(len(test_cases)):
-            state_list.append('State%d' % index)
-
-        exploration.add_states(state_list)
-
-        for index, state_name in enumerate(state_list):
-            state = exploration.states[state_name]
-            content_dict = {
-                'html': test_cases[index]['html_content'],
-                'content_id': 'content'
-            }
-            state.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start validation job on exploration.
         job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
-
-        # Test that validation fails before migration.
-        self.assertEqual(len(actual_output), 16)
-
-        exploration_dict = exploration.to_dict()
-        # We need to create a brand-new exploration here in addition to the old
-        # one (rather than just overwriting the old one), because state id
-        # mapping model is generated when each (exp, version) is saved for
-        # first time. Hence when an exisiting exploration is overwritten
-        # state id mapping model throws an error that mapping already exists.
-        new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
-            exploration_dict)
-        # This is done to ensure that exploration is not passed through CKEditor
-        # Migration pipeline.
-        new_exp_dict['id'] = self.NEW_EXP_ID
-        new_exp_dict['schema_version'] = 29
-        new_exp_dict['states_schema_version'] = 24
-        new_exploration = exp_domain.Exploration.from_dict(new_exp_dict)
-        new_states = new_exp_dict['states']
-
-        for index, state_name in enumerate(state_list):
-            new_html = new_states[state_name]['content']['html']
-
-            # Test that html matches the expected format after migration.
-            self.assertEqual(
-                new_html, unicode(test_cases[index]['expected_output']))
-
-        exp_services.save_new_exploration(self.albert_id, new_exploration)
-
-        # Start validation job on updated exploration.
-        job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
-            job_id)
-
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
-
-        # Test that validation passes after migration.
-        # There should be no validation errors in the new (updated)
-        # exploration, but there are 16 validation errors in the old
-        # exploration.
-        self.assertEqual(len(actual_output), 16)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': '<code>Hello</code>',
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        # Start ExplorationContentValidationJobForTextAngular.
-        job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
+            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         )
-
-
-class ExplorationContentValidationJobForCKEditorTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-    def test_for_validation_job(self):
-        """Tests that the exploration validation job validates the content
-        without skipping any tags.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p>Lorem ipsum </p><p> Hello this is oppia </p>'
-            )
-        }
-
-        state1.update_content(content1_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
-        expected_output = []
-
-        self.assertEqual(actual_output, expected_output)
-
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p>Lorem <span>ipsum </span></p> Hello this is '
-                '<code>oppia </code>'
-            )
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
-                'is test case to check image tag inside p tag</p>'
-            )
-        }
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&'
-                'amp;lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
-                '&amp;quot;" heading-with-value="&amp;quot;'
-                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
-                    '</b>progress</pre>'
-
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
-
-        expected_output = [
-            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
-            '[u\'ol\', [u\'ol\']]',
-            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
-            '[u\'p\', [u\'pre\']]',
-            (
-                '[u\'strings\', '
-                '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
-                'oppia </code>\', u\'<pre>Hello this is <b> testing <oppia-'
-                'noninteractive-image filepath-with-value="amp;quot;random.'
-                'png&amp;quot;"></oppia-noninteractive-image>'
-                ' in </b>progress</pre>\', '
-                'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
-                'u\'<p><oppia-noninteractive-image filepath-with-value="'
-                'amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>'
-                'Hello this is test case to check '
-                'image tag inside p tag</p>\', '
-                'u\'<oppia-noninteractive-collapsible content-'
-                'with-value="&amp;quot;&amp;lt;pre&amp;gt;&amp;lt;'
-                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
-                'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
-                'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>\']]'
-            )
-        ]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': '<code>Hello</code>',
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        # Start ExplorationContentValidationJobForCKEditor.
-        job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
-
-
-class ExplorationMigrationValidationJobForCKEditorTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            ExplorationMigrationValidationJobForCKEditorTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_migration_job(self):
-        """Validates migration process for CKEditor."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p>Lorem <span>ipsum </span></p> Hello this is '
-                '<code>oppia </code>'
-            )
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
-                'is test case to check image tag inside p tag</p>'
-            )
-        }
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
-                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
-                '&amp;quot;" heading-with-value="&amp;quot;'
-                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;random.png&amp;quot;">'
-                    '</oppia-noninteractive-image> in </b>progress</pre>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start migrationvalidation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue( # pylint: disable=line-too-long
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id))
-        expected_output = [
-            '[u\'invalidTags\', [u\'code\', u\'span\']]',
-            '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
-            '</p> Hello this is <code>oppia </code>\']]'
-        ]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': '<code>Hello</code>',
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        # Start ExplorationMigrationValidationJobForCKEditor.
-        job_id = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
-
-
-class InteractionCustomizationArgsValidationJobTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            InteractionCustomizationArgsValidationJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_customization_arg_validation_job(self):
-        """Validates customization args for rich text components."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-        state1.update_content(content1_dict)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        state3.update_content(content3_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start CustomizationArgsValidation job on sample exploration.
-        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
-
-        expected_output = [(
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\']]'
-        ), (
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
-            'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
-            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
-        )]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': (
-                '<p><oppia-noninteractive-link text-with-value="'
-                '&amp;quot;What is a link?&amp;quot;" url-with-'
-                'value="&amp;quot;htt://link.com&amp'
-                ';quot;"></oppia-noninteractive-link></p>'
-            ),
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        # Start InteractionCustomizationArgsValidationJob.
-        job_id = (
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class ExplorationRightsModel with id exp_id not found'
+        ):
+            rights_manager.get_exploration_rights(self.EXP_ID)
 
 
 class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
@@ -1936,6 +872,124 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id),
+            []
+        )
+
+
+class ExplorationMigrationJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationMigrationJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_job_does_not_convert_up_to_date_exp(self):
+        """Tests that the exploration migration job does not convert an
+        exploration that is already the latest states schema version.
+        """
+        # Create a new, default exploration that should not be affected by the
+        # job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('EndExploration')
+        init_state.interaction.default_outcome = None
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
+        yaml_before_migration = exploration.to_yaml()
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the exploration is exactly the same after migration.
+        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
+        after_converted_yaml = updated_exp.to_yaml()
+        self.assertEqual(after_converted_yaml, yaml_before_migration)
+
+    def test_migration_job_does_not_have_validation_fail_on_default_exp(self):
+        """Tests that the exploration migration job does not have a validation
+        failure for a default exploration (of states schema version 0), due to
+        the exploration having a null interaction ID in its initial state.
+        """
+        self.save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the new exploration has been migrated by the job.
+        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
+
+        # Ensure the states structure within the exploration was changed.
+        self.assertNotEqual(
+            updated_exp.to_dict()['states'], self.VERSION_0_STATES_DICT)
+
+    def test_migration_job_skips_deleted_explorations(self):
+        """Tests that the exploration migration job skips deleted explorations
+        and does not attempt to migrate.
+        """
+        self.save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+
+        # Note: This creates a summary based on the upgraded model (which is
+        # fine). A summary is needed to delete the exploration.
+        exp_services.create_exploration_summary(
+            self.NEW_EXP_ID, None)
+
+        # Delete the exploration before migration occurs.
+        exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
+
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+
+        # This running without errors indicates the deleted exploration is
+        # being ignored, since otherwise exp_services.get_exploration_by_id
+        # (used within the job) will raise an error.
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the exploration is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+    def test_exploration_migration_job_produces_no_output(self):
+        """Test that Exploration Migration job produces no output."""
+        exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
             []
         )
 
@@ -2304,6 +1358,121 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         )
 
 
+class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationStateIdMapping one off job."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner before each test case."""
+        super(ExplorationStateIdMappingJobTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
+        """Tests that mapreduce job works correctly when the only first
+        exploration version exists.
+        """
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+    def test_that_mapreduce_job_works(self):
+        """Test that mapreduce job is working as expected."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            })], 'Add state name')
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state 2',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state'
+            })], 'Modify states')
+
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state': 1
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 2)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 2)
+        self.assertEqual(mapping.largest_state_id_used, 1)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state 2': 2
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 3)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 3)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 4)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 4)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+
+        # Start ExplorationStateIdMapping job on published exploration.
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationStateIdMappingJob.get_output(job_id),
+            []
+        )
+
+
 class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -2430,6 +1599,613 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id),
+            []
+        )
+
+
+class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(TextAngularValidationAndMigrationTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_textangular_validation_and_migration(self):
+        """Tests that the exploration validation and migration job for
+        TextAngular RTE.
+        """
+        test_file_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file_path, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        state_list = []
+        for index in range(len(test_cases)):
+            state_list.append('State%d' % index)
+
+        exploration.add_states(state_list)
+
+        for index, state_name in enumerate(state_list):
+            state = exploration.states[state_name]
+            content_dict = {
+                'html': test_cases[index]['html_content'],
+                'content_id': 'content'
+            }
+            state.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id))
+
+        # Test that validation fails before migration.
+        self.assertEqual(len(actual_output), 16)
+
+        exploration_dict = exploration.to_dict()
+        # We need to create a brand-new exploration here in addition to the old
+        # one (rather than just overwriting the old one), because state id
+        # mapping model is generated when each (exp, version) is saved for
+        # first time. Hence when an exisiting exploration is overwritten
+        # state id mapping model throws an error that mapping already exists.
+        new_exp_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+            exploration_dict)
+        # This is done to ensure that exploration is not passed through CKEditor
+        # Migration pipeline.
+        new_exp_dict['id'] = self.NEW_EXP_ID
+        new_exp_dict['schema_version'] = 29
+        new_exp_dict['states_schema_version'] = 24
+        new_exploration = exp_domain.Exploration.from_dict(new_exp_dict)
+        new_states = new_exp_dict['states']
+
+        for index, state_name in enumerate(state_list):
+            new_html = new_states[state_name]['content']['html']
+
+            # Test that html matches the expected format after migration.
+            self.assertEqual(
+                new_html, unicode(test_cases[index]['expected_output']))
+
+        exp_services.save_new_exploration(self.albert_id, new_exploration)
+
+        # Start validation job on updated exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            job_id)
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id))
+
+        # Test that validation passes after migration.
+        # There should be no validation errors in the new (updated)
+        # exploration, but there are 16 validation errors in the old
+        # exploration.
+        self.assertEqual(len(actual_output), 16)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationContentValidationJobForTextAngular.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
+
+class ExplorationMigrationValidationJobForTextAngularTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMigrationValidationJobForTextAngularTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_migration_job(self):
+        """Validates migration process for TextAngular."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">hello<b><i>'
+                'testing</i></b>in <b>progress</b><p>for migration</p>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">'
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'https://github.com&amp;quot;" text-with-value="abc">'
+                '</oppia-noninteractive-link><p> testing in progress</p>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to do something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><li>This is last case</li><oppia-noninteractive-image '
+                    'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                    '</oppia-noninteractive-image></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MigrationValidation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id))
+        expected_output = [
+            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
+            (
+                '[u\'strings\', '
+                '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                '</oppia-noninteractive-image></ol>\']]'
+            )
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationMigrationValidationJobForTextAngular.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
+
+class ExplorationContentValidationJobForCKEditorTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_validation_job(self):
+        """Tests that the exploration validation job validates the content
+        without skipping any tags.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem ipsum </p><p> Hello this is oppia </p>'
+            )
+        }
+
+        state1.update_content(content1_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+        expected_output = []
+
+        self.assertEqual(actual_output, expected_output)
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            )
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&'
+                'amp;lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<pre>Hello this is <b> testing '
+                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '</b>progress</pre>'
+
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+
+        expected_output = [
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
+            '[u\'ol\', [u\'ol\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
+            '[u\'p\', [u\'pre\']]',
+            (
+                '[u\'strings\', '
+                '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
+                'oppia </code>\', u\'<pre>Hello this is <b> testing <oppia-'
+                'noninteractive-image filepath-with-value="amp;quot;random.'
+                'png&amp;quot;"></oppia-noninteractive-image>'
+                ' in </b>progress</pre>\', '
+                'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
+                'u\'<p><oppia-noninteractive-image filepath-with-value="'
+                'amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>'
+                'Hello this is test case to check '
+                'image tag inside p tag</p>\', '
+                'u\'<oppia-noninteractive-collapsible content-'
+                'with-value="&amp;quot;&amp;lt;pre&amp;gt;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
+                'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
+                'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>\']]'
+            )
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationContentValidationJobForCKEditor.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
+
+
+class ExplorationMigrationValidationJobForCKEditorTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMigrationValidationJobForCKEditorTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_migration_job(self):
+        """Validates migration process for CKEditor."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            )
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<pre>Hello this is <b> testing '
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;random.png&amp;quot;">'
+                    '</oppia-noninteractive-image> in </b>progress</pre>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start migrationvalidation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue( # pylint: disable=line-too-long
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id))
+        expected_output = [
+            '[u\'invalidTags\', [u\'code\', u\'span\']]',
+            '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
+            '</p> Hello this is <code>oppia </code>\']]'
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': '<code>Hello</code>',
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start ExplorationMigrationValidationJobForCKEditor.
+        job_id = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id),
             []
         )
 
@@ -2579,3 +2355,139 @@ class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
             ]
             self.assertEqual(len(actual_output), 3)
             self.assertEqual(actual_output[0], expected_output[0])
+
+
+class InteractionCustomizationArgsValidationJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            InteractionCustomizationArgsValidationJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_customization_arg_validation_job(self):
+        """Validates customization args for rich text components."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        state3.update_content(content3_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start CustomizationArgsValidation job on sample exploration.
+        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
+
+        expected_output = [(
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
+            'png&amp;quot;"></oppia-noninteractive-image>\']]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
+            'https://\'; received htt://link.com", '
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
+            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
+            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+        )]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': (
+                '<p><oppia-noninteractive-link text-with-value="'
+                '&amp;quot;What is a link?&amp;quot;" url-with-'
+                'value="&amp;quot;htt://link.com&amp'
+                ';quot;"></oppia-noninteractive-link></p>'
+            ),
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        state1.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        # Start InteractionCustomizationArgsValidationJob.
+        job_id = (
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output( # pylint: disable=line-too-long
+                job_id),
+            []
+        )
