@@ -125,7 +125,7 @@ oppia.controller('FeedbackTab', [
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
-    $scope.showSuggestionModal = function(edit_button_show) {
+    $scope.showSuggestionModal = function(EditButtonShow) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
@@ -180,11 +180,10 @@ oppia.controller('FeedbackTab', [
             $scope.canReject = $scope.canEdit && $scope.isNotHandled;
             $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
-            if(edit_button_show == 0){
+            if (EditButtonShow === 0){
               $scope.suggestionEditorIsShown = false;
               $scope.canAccept = true;
-            }
-            else{
+            } else {
               $scope.suggestionEditorIsShown = true;
               $scope.canAccept = false;
             }
@@ -245,12 +244,12 @@ oppia.controller('FeedbackTab', [
           }
         ]
       }).result.then(function(result) {
-        if(result.action == 'edit'){
+        if (result.action === 'edit'){
           url = UrlInterpolationService.interpolateUrl(
             '/suggestionactionhandler/edit/<suggestion_id>', {
               suggestion_id: $scope.activeThread.suggestion.suggestionId
             }
-          ); // end url object 
+          );// end url object
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
@@ -262,10 +261,9 @@ oppia.controller('FeedbackTab', [
               new_value: {
                 html: result.newSuggestionHtml
               }
-            }  // closing change object 
-          };  // closing data object
-        }     // closing if statememnt
-        else{
+            }// closing change object
+          };// closing data object
+        } else {
           ThreadDataService.resolveSuggestion(
             $scope.activeThread.threadId, result.action, result.commitMessage,
             result.reviewMessage, result.audioUpdateRequired, function() {
@@ -283,8 +281,9 @@ oppia.controller('FeedbackTab', [
                 state.content.setHtml(
                   $scope.activeThread.getReplacementHtmlFromSuggestion());
                 if (result.audioUpdateRequired) {
-                  state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                    state.content.getContentId());
+                  state.contentIdsToAudioTranslations.
+                    markAllAudioAsNeedingUpdate(
+                      state.content.getContentId());
                 }
                 ExplorationDataService.data.version += 1;
                 ExplorationStatesService.setState(stateName, state);
@@ -294,13 +293,12 @@ oppia.controller('FeedbackTab', [
                 $rootScope.$broadcast('refreshStateEditor');
               }
             });
-         }  // Closing else statememt
-         $http.put(url, data).then(function() {
+        }// Closing else statememt
+        $http.put(url, data).then(function() {
 
-          }, function() {
-              $log.error('Error resolving suggestion');
-        }); // closing http method
-
+        }, function() {
+          $log.error('Error resolving suggestion');
+        });// closing http method
       });
     };
 
