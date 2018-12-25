@@ -182,6 +182,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The id of the user.
             exploration_id: str. The id of the exploration.
+
         Returns:
             str. The generated key using user_id and exploration_id
                 of the form [user_id].[exploration_id].
@@ -420,9 +421,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExplorationUserDataModel class in
         the required format with the arguments provided.
+        
         Args:
             user_id: str. The id of the user.
             exploration_id: str. The id of the exploration.
+
         Returns:
             str. The generated key using user_id and exploration_id
                 of the form [user_id].[exploration_id].
