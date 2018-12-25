@@ -196,4 +196,4 @@ class EditSuggestionHandler(base.BaseHandler):
 
         suggestion.change = old_suggestion_content
         suggestion.change = exp_domain.ExplorationChange(suggestion.change)
-        suggestion_services._update_suggestion(suggestion)     # pylint: disable=W0212
+        suggestion_services._update_suggestion(suggestion)     # pylint: disable=Access to a protected member %s of a client class
