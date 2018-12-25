@@ -66,6 +66,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
 
     def _record_start(self, exp_id, exp_version, state_name, session_id):
+        """Calls StartExplorationEventHandler and starts recording the
+        exploration events corresponding to the given exploration id.
+        """
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state_name, session_id, {},
             feconf.PLAY_TYPE_NORMAL)
@@ -73,6 +76,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def _get_calc_output_model(
             self, exploration_id, state_name, calculation_id,
             exploration_version=stats_jobs_continuous.VERSION_ALL):
+        """Gets the StateAnswersCalcOutputModel corresponding to the given
+        calculation_id.
+        """
         return stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
 
