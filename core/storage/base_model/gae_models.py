@@ -430,7 +430,16 @@ class VersionedModel(BaseModel):
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
     def _reconstitute(self, snapshot_dict):
-        """Populates the model instance with the snapshot."""
+        """Populates the model instance with the snapshot.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            self: the class instance. The instance of the model class
+                populated with the the snapshot.
+        """
         self.populate(**snapshot_dict)
         return self
 
