@@ -265,6 +265,7 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
+        """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_mail(
@@ -312,6 +313,7 @@ def _send_bulk_mail(
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     def _send_bulk_mail_in_transaction(instance_id=None):
+        """Sends the emails in bulk to the recipients."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_bulk_mail(
