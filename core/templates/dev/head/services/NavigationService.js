@@ -15,12 +15,13 @@
 /**
  * @fileoverview Factory for navigating the page with tab and shift-tab
  */
-oppia.factory('NavigationService', [
-  '$rootScope', function($rootScope) {
-    $rootScope.activeMenuName = '';
-    $rootScope.ACTION_OPEN = 'open';
-    $rootScope.ACTION_CLOSE = 'close';
-    $rootScope.KEYBOARD_EVENT_TO_KEY_CODES = {
+oppia.factory('NavigationService', function() {
+
+    var navigation = {};
+    navigation.activeMenuName = '';
+    navigation.ACTION_OPEN = 'open';
+    navigation.ACTION_CLOSE = 'close';
+    navigation.KEYBOARD_EVENT_TO_KEY_CODES = {
       enter: {
         shiftKeyIsPressed: false,
         keyCode: 13
@@ -32,9 +33,8 @@ oppia.factory('NavigationService', [
       shiftTab: {
         shiftKeyIsPressed: true,
         keyCode: 9
-      }
+      }    
     };
-    var navigation = {};
     /**
     * Opens the submenu.
     * @param {object} evt
@@ -43,12 +43,14 @@ oppia.factory('NavigationService', [
     */
     navigation.openSubmenu = function(evt, menuName) {
       // Focus on the current target before opening its submenu.
-      $rootScope.activeMenuName = menuName;
-      return angular.element(evt.currentTarget).focus();
+      //$rootScope.activeMenuName = menuName;
+      navigation.activeMenuName = menuName;
+      angular.element(evt.currentTarget).focus();
     };
     navigation.closeSubmenu = function(evt) {
-      $rootScope.activeMenuName = '';
-      return angular.element(evt.currentTarget).closest('li')
+      // $rootScope.activeMenuName = '';
+      navigation.activeMenuName = '';
+      angular.element(evt.currentTarget).closest('li')
         .find('a').blur();
     };
     /**
@@ -66,13 +68,13 @@ oppia.factory('NavigationService', [
       var targetEvents = Object.keys(eventsTobeHandled);
       for (var i = 0; i < targetEvents.length; i++) {
         var keyCodeSpec =
-          $rootScope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+          navigation.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
         if (keyCodeSpec.keyCode === evt.keyCode &&
           evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-          if (eventsTobeHandled[targetEvents[i]] === $rootScope.ACTION_OPEN) {
+          if (eventsTobeHandled[targetEvents[i]] === navigation.ACTION_OPEN) {
             navigation.openSubmenu(evt, menuName);
           } else if (eventsTobeHandled[targetEvents[i]] ===
-            $rootScope.ACTION_CLOSE) {
+            navigation.ACTION_CLOSE) {
             navigation.closeSubmenu(evt);
           } else {
             throw Error('Invalid action type.');
@@ -81,4 +83,4 @@ oppia.factory('NavigationService', [
       }
     };
     return navigation;
-  }]);
+  });

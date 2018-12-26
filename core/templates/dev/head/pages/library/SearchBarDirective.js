@@ -45,6 +45,9 @@ oppia.directive('searchBar', [
               }
             )
           );
+          $scope.ACTION_OPEN = NavigationService.ACTION_OPEN;
+          $scope.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+          $scope.KEYBOARD_EVENT_TO_KEY_CODES = NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
           /**
            * Opens the submenu.
            * @param {object} evt
@@ -68,6 +71,7 @@ oppia.directive('searchBar', [
 
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled){
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+            $scope.activeMenuName = NavigationService.activeMenuName;
           };
           // TODO(sll): Remove the filter once the App Engine Search API
           // supports 3-letter language codes.

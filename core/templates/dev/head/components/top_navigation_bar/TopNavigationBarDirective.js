@@ -102,7 +102,9 @@ oppia.directive('topNavigationBar', [
           $scope.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
-
+          $scope.ACTION_OPEN = NavigationService.ACTION_OPEN;
+          $scope.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+          $scope.KEYBOARD_EVENT_TO_KEY_CODES = NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
           /**
            * Opens the submenu.
            * @param {object} evt
@@ -142,7 +144,17 @@ oppia.directive('topNavigationBar', [
            */
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+            $scope.activeMenuName = NavigationService.activeMenuName;
           };
+
+          // Close the submenu if focus or click occurs anywhere outside of
+          // the menu or outside of its parent (which opens submenu on hover).
+          angular.element(document).on('click', function(evt) {
+            if (!angular.element(evt.target).closest('li').length) {
+              $scope.activeMenuName = '';
+              $scope.$apply();
+            }
+          });
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
