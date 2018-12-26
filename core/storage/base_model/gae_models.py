@@ -438,7 +438,7 @@ class VersionedModel(BaseModel):
 
         Returns:
             VersionedModel. The instance of the VersionedModel class populated
-            with the the snapshot.
+                with the the snapshot.
         """
         self.populate(**snapshot_dict)
         return self
