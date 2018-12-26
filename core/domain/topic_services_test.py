@@ -291,6 +291,25 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content'
                 }
             }),
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'property_name': (
+                    subtopic_page_domain
+                    .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO),
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
+                'subtopic_id': 2
+            }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
                 'old_subtopic_id': None,
@@ -318,6 +337,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page.page_contents.subtitled_html.html,
             '<p>New Value</p>')
+        self.assertEqual(
+            subtopic_page.page_contents
+            .content_ids_to_audio_translations['content']['en'].to_dict(),
+            {
+                'filename': 'test.mp3',
+                'file_size_bytes': 100,
+                'needs_update': False
+            })
 
         # Making sure everything resets when an error is encountered anywhere.
         changelist = [

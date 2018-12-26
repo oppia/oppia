@@ -172,18 +172,37 @@ class SubtopicPageContents(object):
         Returns:
             A dict, mapping all fields of SubtopicPageContents instance.
         """
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                self.content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    state_domain.AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
             'content_ids_to_audio_translations': (
-                self.content_ids_to_audio_translations),
+                content_ids_to_audio_translations_dict),
         }
 
     @classmethod
     def from_dict(cls, page_contents_dict):
+        content_ids_to_audio_translations = {
+            content_id: {
+                language_code: state_domain.AudioTranslation.from_dict(
+                    audio_translation_dict)
+                for language_code, audio_translation_dict in
+                audio_translations.iteritems()
+            } for content_id, audio_translations in (
+                page_contents_dict['content_ids_to_audio_translations']
+                .iteritems())
+        }
         return cls(
             state_domain.SubtitledHtml.from_dict(
                 page_contents_dict['subtitled_html']),
-            page_contents_dict['content_ids_to_audio_translations'])
+            content_ids_to_audio_translations)
 
 
 class SubtopicPage(object):
@@ -197,8 +216,8 @@ class SubtopicPage(object):
         Args:
             subtopic_page_id: str. The unique ID of the subtopic page.
             topic_id: str. The ID of the topic that this subtopic is a part of.
-            page_contents: SubtopicPageContents. The html and audio translations
-                to be surfaced to the learner.
+            page_contents: SubtopicPageContents. The html and audio
+                translations to be surfaced to the learner.
             language_code: str. The ISO 639-1 code for the language this
                 subtopic page is written in.
             version: int. The current version of the subtopic.
@@ -256,7 +275,7 @@ class SubtopicPage(object):
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def get_subtopic_id_from_subtopic_page_id(self):
-        """Returns the subtopic id from the subtopic page id of the object.
+        """Returns the id from the subtopic page id of the object.
 
         Returns:
             int. The subtopic_id of the object.
@@ -280,8 +299,15 @@ class SubtopicPage(object):
             new_page_contents_audio_dict: dict. The new audio for the subtopic
             page.
         """
-        self.page_contents.content_ids_to_audio_translations = (
-            new_page_contents_audio_dict)
+        self.page_contents.content_ids_to_audio_translations = {
+            content_id: {
+                language_code: state_domain.AudioTranslation.from_dict(
+                    audio_translation_dict)
+                for language_code, audio_translation_dict in
+                audio_translations.iteritems()
+            } for content_id, audio_translations in (
+                new_page_contents_audio_dict.iteritems())
+        }
 
     def validate(self):
         """Validates various properties of the SubtopicPage object.
