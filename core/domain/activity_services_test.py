@@ -34,14 +34,39 @@ class ActivityServicesTests(test_utils.GenericTestBase):
     COL_ID_2 = 'COL_ID_2'
 
     def _create_exploration_reference(self, exploration_id):
+        """Creates the activity reference object for the exploration.
+		
+		Args:
+			exploration_id: str. The id of the published exploration. 
+		
+		Returns:
+			activity_domain.ActivityReference: obj. Domain object for the activity reference.
+		"""
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
     def _create_collection_reference(self, collection_id):
+        """Creates the activity reference object for the collection.
+		
+		Args:
+			collection_id: str. The id of the collection. 
+		
+		Returns: 
+			activity_domain.ActivityReference: Obj. Domain object for the activity reference.
+		"""
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
     def _compare_lists(self, reference_list_1, reference_list_2):
+        """Compares the hash values of items in two dictionaries.
+		
+		Args:
+			reference_list_1:  dict(str, str). 
+			reference_list_2:  dict(str, str).
+			
+		Raises:
+			AssertionError: Hash for first item does not equal hash for second item.
+        """
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
         hashes_2 = [reference.get_hash() for reference in reference_list_2]
         self.assertEqual(hashes_1, hashes_2)
