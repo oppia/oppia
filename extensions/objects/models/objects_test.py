@@ -26,25 +26,27 @@ import schema_utils_test
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     """Tests normalization of typed objects."""
 
-    def check_normalization(self, cls, mappings, invalid_items):
+    def check_normalization(self, object_class, mappings, invalid_items):
         """Test that values are normalized correctly.
 
         Args:
-          cls: the class whose normalize() method is to be tested.
+          object_class: the class whose normalize() method is to be tested.
           mappings: a list of 2-element tuples. The first element of
             each item is expected to be normalized to the second.
           invalid_items: a list of values. Each of these is expected to raise
             a TypeError when normalized.
         """
         for item in mappings:
-            assert cls.normalize(item[0]) == item[1], (
+            assert object_class.normalize(item[0]) == item[1], (
                 'Expected %s when normalizing %s as a %s, got %s' %
-                (item[1], item[0], cls.__name__, cls.normalize(item[0]))
+                (
+                    item[1], item[0],
+                    object_class.__name__, object_class.normalize(item[0]))
             )
 
         for item in invalid_items:
             with self.assertRaises(Exception):
-                cls.normalize(item)
+                object_class.normalize(item)
 
     def test_boolean_validation(self):
         """Tests objects of type Boolean."""
@@ -440,6 +442,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def _create_fraction_dict(
             self, is_negative, whole_number, numerator, denominator):
+        """Returns the fraction object in the dict format.
+
+        Args:
+            is_negative: bool. Whether the given fraction is negative.
+            whole_number: int. The whole number of the fraction.
+            numerator: int. The numerator part of the fraction.
+            denominator: int. The denominator part of the fraction.
+
+        Returns:
+            dict(str, *). The fraction object.
+        """
         return {
             'isNegative': is_negative,
             'wholeNumber': whole_number,

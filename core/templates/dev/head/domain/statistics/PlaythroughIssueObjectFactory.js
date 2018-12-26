@@ -17,7 +17,7 @@
  *     Issue domain objects.
  */
 
-oppia.factory('ExplorationIssueObjectFactory', [function() {
+oppia.factory('PlaythroughIssueObjectFactory', [function() {
   /**
    * @constructor
    * @param {string} issueType - type of an issue.

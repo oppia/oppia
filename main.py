@@ -575,6 +575,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_QUESTION_URL,
+        skill_editor.SkillEditorQuestionHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
     get_redirect_route(
@@ -624,6 +627,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
+    get_redirect_route(
+        r'/playthroughdatahandler/whitelist',
+        editor.FetchPlaythroughWhitelistHandler),
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),

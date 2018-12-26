@@ -342,10 +342,14 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
 
 p {
   line-height: 1.2;
-  margin: 0;
+  margin-bottom: 18px;
   text-align: left;
   word-spacing: 0;
   word-break: break-word;
+}
+
+p:last-child {
+  margin: 0px;
 }
 
 .oppia-long-text p {
@@ -1482,10 +1486,14 @@ pre.oppia-pre-wrapped-text {
    line-height, margin-top and margin-bottom attributes)
 */
 
+/* Line-height is set to 1.846 to ensure that the line-spacing inside
+   a paragraph is consistent both in the editor mode while editing and
+   after saving. The value 1.846 came from
+   /third_party/generated/css/third_party.css.
+*/
+
 .oppia-rte-editor > p {
-  line-height: 1.5;
-  margin-bottom: 18px;
-  margin-top: 18px;
+  line-height: 1.846;
 }
 .oppia-info-card-content p {
   display: block;
@@ -1496,9 +1504,7 @@ pre.oppia-pre-wrapped-text {
   word-spacing: 0;
 }
 .oppia-rte-content > div > p {
-  line-height: 1.5;
-  margin-bottom: 18px;
-  margin-top: 18px;
+  line-height: 1.846;
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */

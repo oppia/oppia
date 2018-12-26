@@ -187,7 +187,7 @@ oppia.controller('CreatorDashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-    $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURES;
+    $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURE_PLAYERS;
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
 
