@@ -27,12 +27,12 @@ oppia.directive('topNavigationBar', [
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$http', '$window', '$timeout', '$translate',
+        '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService',
         function(
-            $scope, $rootScope, $http, $window, $timeout, $translsate,
+            $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService) {
@@ -80,7 +80,7 @@ oppia.directive('topNavigationBar', [
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
             'topic_editor', 'story_editor'];
-          $scope.currentUrl = window.location.pathname.split("/")[1];
+          $scope.currentUrl = window.location.pathname.split('/')[1];
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -104,7 +104,8 @@ oppia.directive('topNavigationBar', [
           };
           $scope.ACTION_OPEN = NavigationService.ACTION_OPEN;
           $scope.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-          $scope.KEYBOARD_EVENT_TO_KEY_CODES = NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+          $scope.KEYBOARD_EVENT_TO_KEY_CODES =
+          NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
           /**
            * Opens the submenu.
            * @param {object} evt
