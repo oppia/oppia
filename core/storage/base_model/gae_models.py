@@ -437,8 +437,8 @@ class VersionedModel(BaseModel):
                 property values.
 
         Returns:
-            self: the class instance. The instance of the model class
-                populated with the the snapshot.
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
         """
         self.populate(**snapshot_dict)
         return self
