@@ -495,6 +495,9 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
     """
 
     def _get_stored_total(self):
+        """Returns the total summed values of all the MockNumbersModel instances
+        stored in a MockSumModel instance.
+        """
         sum_model = MockSumModel.get_by_id(SUM_MODEL_ID)
         return sum_model.total if sum_model else 0
 
@@ -789,6 +792,9 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_play_type):
 
         def _increment_counter():
+            """Increments the count, if the realtime model corresponding to the
+            active real-time model id exists.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
