@@ -161,7 +161,6 @@ class TopicEditorPage(base.BaseHandler):
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
-            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
