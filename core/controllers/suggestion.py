@@ -180,7 +180,7 @@ class SuggestionListHandler(base.BaseHandler):
 class EditSuggestionHandler(base.BaseHandler):
     # @acl_decorators.get_decorator_for_accepting_suggestion(
     #     acl_decorators.can_edit_suggestion)
-    # TODO regarding permissions
+    # TODO regarding permissions,
     def put(self, suggestion_id):
         """Edits the submitted suggestion.
 
