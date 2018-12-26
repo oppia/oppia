@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for navigating the page with tab and shift-tab
+ * @fileoverview Factory for navigating the top navigation bar with
+ * tab and shift-tab.
  */
 oppia.factory('NavigationService', [function(){
   var navigation = {};
