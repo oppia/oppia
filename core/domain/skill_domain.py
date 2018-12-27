@@ -345,11 +345,12 @@ class SkillContents(object):
         audio_content_ids = set(
             [audio[0] for audio
              in self.content_ids_to_audio_translations.iteritems()])
-        if content_ids != audio_content_ids:
+        if content_ids < audio_content_ids:
             raise utils.ValidationError(
                 'Expected content_ids_to_audio_translations to contain '
-                'all content_ids in worked examples. Expected: %s\n '
-                'Actual: %s' % (content_ids, audio_content_ids))
+                'only content_ids in worked examples and explanation. '
+                'content_ids_to_audio_translations: %s. '
+                'content IDs found: %s', audio_content_ids, content_ids)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
