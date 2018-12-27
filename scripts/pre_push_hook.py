@@ -126,6 +126,11 @@ def _git_diff_name_status(left, right, diff_filter=''):
             # after the last tab character.
             file_list.append(FileDiff(line[0], line[line.rfind('\t') + 1:]))
         return file_list
+    elif err.startswith('fatal: bad revision'):
+        print ('Please set upstream for the lint checks to run efficiently. '
+               'You can learn more about it here -> '
+               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
+        sys.exit(1)
     else:
         raise ValueError(err)
 
@@ -274,7 +279,7 @@ def main():
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
-    remote = args.remote
+    remote = 'upstream'
     if args.install:
         _install_hook()
         sys.exit(0)
