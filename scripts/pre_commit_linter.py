@@ -50,8 +50,10 @@ Note that the root folder MUST be named 'oppia'.
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import HTMLParser
+import StringIO
 import argparse
 import ast
+import contextlib
 import fnmatch
 import multiprocessing
 import os
@@ -384,6 +386,16 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
+@contextlib.contextmanager
+def _redirect_stdout(new_target):
+    old_target = sys.stdout
+    sys.stdout = new_target
+    try:
+        yield new_target
+    finally:
+        sys.stdout = old_target
+
+
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
@@ -511,31 +523,34 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
     print 'Linting %s Python files' % num_py_files
 
-    _BATCH_SIZE = 50
+    _batch_size = 50
     current_batch_start_index = 0
 
     while current_batch_start_index < len(files_to_lint):
         # Note that this index is an exclusive upper bound -- i.e., the current
         # batch of files ranges from 'start_index' to 'end_index - 1'.
         current_batch_end_index = min(
-            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+            current_batch_start_index + _batch_size, len(files_to_lint))
         current_files_to_lint = files_to_lint[
             current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        # This line invokes Pylint and prints its output to the console.
-        pylinter = lint.Run(
-            current_files_to_lint + [config_pylint],
-            exit=False).linter
-        # These lines invoke Pycodestyle.
-        style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(
-            paths=current_files_to_lint)
-        # This line prints Pycodestyle's output to the console.
-        pycodestyle_report.print_statistics()
+        target_stdout = StringIO.StringIO()
+        with _redirect_stdout(target_stdout):
+            # This line invokes Pylint and prints its output
+            # to the target stdout.
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                exit=False).linter
+            # These lines invoke Pycodestyle and print its output
+            # to the target stdout.
+            style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
+            pycodestyle_report = style_guide.check_files(
+                paths=current_files_to_lint)
 
         if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            result.put(target_stdout.getvalue())
             are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
@@ -735,7 +750,7 @@ def _pre_commit_linter(all_files):
     number_of_files_to_lint = sum(
         len(file_group) for file_group in file_groups_to_lint)
 
-    TIMEOUT_MULTIPLIER = 1000
+    timeout_multiplier = 1000
     for file_group, process in zip(file_groups_to_lint, linting_processes):
         # try..except block is needed to catch ZeroDivisionError
         # when there are no CSS, HTML, JavaScript and Python files to lint.
@@ -743,7 +758,7 @@ def _pre_commit_linter(all_files):
             # Require timeout parameter to prevent against endless
             # waiting for the linting function to return.
             process.join(timeout=(
-                TIMEOUT_MULTIPLIER * len(file_group) / number_of_files_to_lint))
+                timeout_multiplier * len(file_group) / number_of_files_to_lint))
         except ZeroDivisionError:
             break
 
