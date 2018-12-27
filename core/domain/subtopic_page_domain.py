@@ -159,7 +159,7 @@ class SubtopicPageContents(object):
                 'Expected content_ids_to_audio_translations to contain '
                 'only content_ids in worked examples and explanation. '
                 'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s', audio_content_ids, content_ids)
+                'content IDs found: %s' % audio_content_ids, content_ids)
 
     @classmethod
     def create_default_subtopic_page_contents(cls):

@@ -350,7 +350,7 @@ class SkillContents(object):
                 'Expected content_ids_to_audio_translations to contain '
                 'only content_ids in worked examples and explanation. '
                 'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s', audio_content_ids, content_ids)
+                'content IDs found: %s' % audio_content_ids, content_ids)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
