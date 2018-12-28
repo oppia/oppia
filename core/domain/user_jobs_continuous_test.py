@@ -92,6 +92,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     def _get_expected_activity_created_dict(
             self, user_id, activity_id, activity_title, activity_type,
             commit_type, last_updated_ms):
+        """Returns the dict containing expected activity details."""
         return {
             'activity_id': activity_id,
             'activity_title': activity_title,
@@ -104,18 +105,27 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
         }
 
     def _get_most_recent_exp_snapshot_created_on_ms(self, exp_id):
+        """Returns the most recent snapshot of the exploration corresponding to
+        the given exploration id.
+        """
         most_recent_snapshot = exp_services.get_exploration_snapshots_metadata(
             exp_id)[-1]
         return most_recent_snapshot['created_on_ms']
 
     def _get_most_recent_collection_snapshot_created_on_ms(
             self, collection_id):
+        """Returns the most recent snapshot of the collection corresponding to
+        the given collection id.
+        """
         most_recent_snapshot = (
             collection_services.get_collection_snapshots_metadata(
                 collection_id)[-1])
         return most_recent_snapshot['created_on_ms']
 
     def _get_test_context(self):
+        """Swaps ALL_CONTINUOUS_COMPUTATION_MANAGERS with
+        ALL_CC_MANAGERS_FOR_TESTS in jobs registry.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
@@ -660,6 +670,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         return ['user%d' % i for i in range(count)]
 
     def _create_exploration(self, exp_id, user_id):
+        """Creates the default exploration with the given exploration id and
+        then, returns its instance.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         exp_services.save_new_exploration(user_id, exploration)
         return exploration
@@ -685,6 +698,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 user_id, exp_id, rating)
 
     def _record_exploration_rating(self, exp_id, ratings):
+        """Records the exploration rating corresponding to the given exploration
+        id.
+        """
         user_ids = self._generate_user_ids(len(ratings))
         self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
@@ -694,6 +710,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def _record_exploration_rating_for_user(
             self, exp_id, user_id, rating, old_rating=None):
+        """Records the exploration rating provided by the user corresponding to
+        the given user id.
+        """
         self.process_and_flush_pending_tasks()
         event_services.RateExplorationEventHandler.record(
             exp_id, user_id, rating, old_rating)
