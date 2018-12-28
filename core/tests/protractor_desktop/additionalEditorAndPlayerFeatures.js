@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the full exploration editor.
- */
+* @fileoverview End-to-end tests for additional features of the exploration
+* editor and player. Additional features include those features without which
+* an exploration can still be published. These include hints, solutions,
+* refresher explorations, state parameters, etc.
+*/
 
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -47,8 +51,21 @@ describe('Full exploration editor', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
   });
+
+  it('should walk through the tutorial when user repeatedly clicks Next',
+    function() {
+      users.createUser(
+        'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+      users.login('userTutorial@stateEditor.com');
+
+      workflow.createExplorationAndStartTutorial();
+      explorationEditorMainTab.startTutorial();
+      explorationEditorMainTab.playTutorial();
+      explorationEditorMainTab.finishTutorial();
+      users.logout();
+    }
+  );
 
   it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
@@ -322,6 +339,47 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
+  it('uses hints and solutions in an exploration', function() {
+    var explorationPlayerPage = (
+      new ExplorationPlayerPage.ExplorationPlayerPage());
+    users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
+
+    // Creator creates and publishes an exploration.
+    users.login('user1@hintsAndSolutions.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('Introduction');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('What language is Oppia?'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Finnish');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+    explorationEditorMainTab.addHint('Try language of Finland');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'Finnish',
+      explanation: 'Finland language'
+    });
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    general.moveToPlayer();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('What language is Oppia?'));
+    explorationPlayerPage.submitAnswer('TextInput', 'Roman');
+    explorationPlayerPage.viewHint();
+    explorationPlayerPage.submitAnswer('TextInput', 'Greek');
+
+    explorationPlayerPage.viewSolution();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+    users.logout();
+  });
+  
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
