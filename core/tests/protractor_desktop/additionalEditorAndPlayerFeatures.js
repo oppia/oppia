@@ -379,7 +379,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
-  
+
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
