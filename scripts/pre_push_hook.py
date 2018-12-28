@@ -208,29 +208,20 @@ def _collect_files_being_pushed(ref_list, remote):
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
-        # Git reports the following for an empty / non existing branch
-        # sha1: '0000000000000000000000000000000000000000'.
-        if set(remote_sha1) != {'0'}:
+        # Get the difference to remote/develop.
+        try:
+            modified_files = _compare_to_remote(
+                remote, branch, remote_branch='develop')
+        except ValueError:
+            # Give up, return all files in repo.
             try:
-                modified_files = _compare_to_remote(remote, branch)
+                modified_files = _git_diff_name_status(
+                    GIT_NULL_COMMIT, sha1)
             except ValueError as e:
                 print e.message
                 sys.exit(1)
-        else:
-            # Get the difference to origin/develop instead.
-            try:
-                modified_files = _compare_to_remote(
-                    remote, branch, remote_branch='develop')
-            except ValueError:
-                # Give up, return all files in repo.
-                try:
-                    modified_files = _git_diff_name_status(
-                        GIT_NULL_COMMIT, sha1)
-                except ValueError as e:
-                    print e.message
-                    sys.exit(1)
-        files_to_lint = _extract_files_to_lint(modified_files)
-        collected_files[branch] = (modified_files, files_to_lint)
+    files_to_lint = _extract_files_to_lint(modified_files)
+    collected_files[branch] = (modified_files, files_to_lint)
 
     for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         if modified_files:
