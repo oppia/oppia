@@ -1,4 +1,0 @@
-ref_list:
-[GitRef(local_ref='refs/heads/lint-checks', local_sha1='9b52b602c56f99145457e57370622325889d4b60', remote_ref='refs/heads/lint-checks', remote_sha1='628cf13995d30f8fba47ef1c3ef8056eb7879faa')]
-fatal: bad revision 'upstream/lint-checks'
-
