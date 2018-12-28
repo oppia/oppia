@@ -39,6 +39,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 # pylint: disable=protected-access
 def _count_at_least_editable_collection_summaries(user_id):
+    """Returns the count of collection summaries that are atleast editable."""
     return len(collection_services._get_collection_summary_dicts_from_models(
         collection_models.CollectionSummaryModel.get_at_least_editable(
             user_id=user_id)))
@@ -132,9 +133,15 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
     EXP_ID_2 = '2_exploration_id'
 
     def _get_progress_model(self, user_id, collection_id):
+        """Returns the CollectionProgressModel for the given user id and
+        collection id.
+        """
         return user_models.CollectionProgressModel.get(user_id, collection_id)
 
     def _record_completion(self, user_id, collection_id, exploration_id):
+        """Records the played exploration in the collection by the user
+        corresponding to the given user id.
+        """
         collection_services.record_played_exploration_in_collection_context(
             user_id, collection_id, exploration_id)
 
@@ -334,6 +341,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
 
     def _create_search_query(self, terms, categories):
+        """Returns the search query derived from terms and categories."""
         query = ' '.join(terms)
         if categories:
             query += ' category=(' + ' OR '.join([
@@ -1342,6 +1350,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         # puts to the event log are asynchronous.
         @transaction_services.toplevel_wrapper
         def populate_datastore():
+            """A top level wrapper to populate the datastore."""
             collection_1 = self.save_new_valid_collection(
                 self.COLLECTION_ID_1, self.albert_id)
 
@@ -1508,6 +1517,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             [albert_id, bob_id])
 
     def _check_contributors_summary(self, collection_id, expected):
+        """Checks the contributors summary with the expected summary."""
         contributors_summary = collection_services.get_collection_summary_by_id(
             collection_id).contributors_summary
         self.assertEqual(expected, contributors_summary)

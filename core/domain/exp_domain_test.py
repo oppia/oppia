@@ -4256,6 +4256,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         exploration.add_states([second_state_name])
 
         def _get_default_state_dict(content_str, dest_name):
+            """Gets the default state dict of the exploration."""
             return {
                 'classifier_model_id': None,
                 'content': {

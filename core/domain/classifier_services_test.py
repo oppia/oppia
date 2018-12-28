@@ -45,6 +45,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self._init_classify_inputs('16')
 
     def _init_classify_inputs(self, exploration_id):
+        """Initializes all the classification inputs of the exploration
+        corresponding to the given exploration id.
+        """
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
