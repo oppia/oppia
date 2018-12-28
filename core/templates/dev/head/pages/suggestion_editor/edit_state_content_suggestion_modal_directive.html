@@ -1,0 +1,93 @@
+<div class="modal-header">
+  <h3 translate="<[heading]>"></h3>
+</div>
+
+<div class="modal-body">
+  <section ng-class="['oppia-suggestion-review-container', {'oppia-edit-mode': isInCreatorMode && suggestionEditorIsShown}]">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong translate="I18N_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind ng-if="(isInEditorMode && currentContent) || (!isInEditorMode && oldContent)" ng-attr-html-data="[isInCreatorMode ? oldContent.html: isInLearnerMode ? oldContent: currentContent]">
+        </angular-html-bind>
+        <div ng-if="(!isInEditorMode && !oldContent) || (isInEditorMode && !currentContent)" style="color: red;" translate="I18N_SUGGESTION_NO_CURRENT_STATE"></div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong translate="I18N_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
+      <div class="oppia-suggestion-review-panel" ng-show="!isInCreatorMode || !suggestionEditorIsShown">
+        <angular-html-bind ng-attr-html-data="[isInCreatorMode ? newContent.html: newContent]">
+        </angular-html-bind>
+      </div>
+      <div aria-hidden="!isInCreatorMode" ng-show="isInCreatorMode && suggestionEditorIsShown">
+        <ck-editor-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-rte>
+        <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
+      </div>
+    </div>
+  </section>
+  <div style="margin-top: 20px; margin-left: 10px;" aria-hidden="!isInCreatorMode" ng-show="isInCreatorMode && canReviewActiveThread">
+    Review message (required if rejecting):
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+  <div style="margin-top: 20px; margin-left: 10px;" aria-hidden="!isInLearnerMode"
+       ng-show="isInLearnerMode">
+    <span translate="I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION"></span>
+    <div class="oppia-suggestion-review-panel">
+      <angular-html-bind html-data="description">
+      </angular-html-bind>
+    </div>
+  </div>
+  <div style="margin-top: 20px; margin-left: 10px;" aria-hidden="!isInEditorMode" ng-show="isInEditorMode && canAccept">
+    Review message (required if rejecting):
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
+  </div>
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept" for editor only>
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer" aria-hidden="!isInCreatorMode" ng-if="isInCreatorMode">
+  <div ng-show="errorMessage && !isResubmitButtonShown()" class="oppia-suggestion-review-error">
+    <[ errorMessage ]>
+  </div>
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-info" ng-if="isEditButtonShown()" ng-click="editSuggestion()">Edit</button>
+  <button class="btn btn-primary" ng-if="isResubmitButtonShown()" ng-disabled="isResubmitButtonDisabled()" ng-click="resubmitChanges()">Submit Changes</button>
+  <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
+</div>
+
+<div class="modal-footer" aria-hidden="!isInLearnerMode" ng-if="isInLearnerMode">
+  <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+</div>
+
+<div class="modal-footer" aria-hidden="!isInEditorMode" ng-if="isInEditorMode">
+  <div ng-show="errorMessage" class="oppia-suggestion-review-error">
+    <[ errorMessage ]>
+  </div>
+  <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-danger" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+</div>
+
+<style type="text/css">
+
+.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(1) {
+  width: 100%;
+  height: 35%;
+}
+.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(2) {
+  width: 100%;
+  height: 55%;
+  margin-top: 30px;
+}
+.oppia-edit-mode .oppia-rte {
+  max-height: 100px;
+  overflow-y: scroll;
+}
+.oppia-edit-mode .oppia-review-message {
+  margin-top: 10px;
+}
+</style>
