@@ -132,11 +132,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('content_id_2', '<p>Hello 2</p>')
         ]
         self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id_1': {}
+            'content_id_3': {}
         }
         self._assert_validation_error(
             'Expected content_ids_to_audio_translations to contain '
-            'all content_ids in worked examples.')
+            'only content_ids in worked examples and explanation.')
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'

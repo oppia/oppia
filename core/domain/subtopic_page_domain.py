@@ -154,12 +154,13 @@ class SubtopicPageContents(object):
         audio_content_ids = set(
             [audio[0] for audio
              in self.content_ids_to_audio_translations.iteritems()])
-        if content_ids < audio_content_ids:
-            raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to contain '
-                'only content_ids in worked examples and explanation. '
-                'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s' % audio_content_ids, content_ids)
+        for c in audio_content_ids:
+            if c not in content_ids:
+                raise utils.ValidationError(
+                    'Expected content_ids_to_audio_translations to contain '
+                    'only content_ids in worked examples and explanation. '
+                    'content_ids_to_audio_translations: %s. '
+                    'content IDs found: %s' % (audio_content_ids, content_ids))
 
     @classmethod
     def create_default_subtopic_page_contents(cls):
