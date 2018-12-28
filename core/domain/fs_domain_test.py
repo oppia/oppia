@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for filesystem-related domain objects."""
+import logging
 import os
 
 from constants import constants
@@ -24,6 +25,9 @@ from core.tests import test_utils
 import feconf
 
 app_identity_services = models.Registry.import_app_identity_services()
+(file_models,) = models.Registry.import_models([
+    models.NAMES.file
+])
 
 
 class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
@@ -39,6 +43,9 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.commit(self.user_email, 'abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
+    def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
+        self.fs.commit(self.user_email, 'abc.png', 'file_contents')
+
         with open(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3')) as f:
@@ -47,6 +54,32 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'The maximum allowed file size is 1 MB.'):
             self.fs.commit(self.user_email, 'large_file.png', raw_bytes)
+
+    def test_get_save_raises_error_when_metadata_and_data_are_not_in_sync(self):
+        observed_log_messages = []
+
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'error', mock_logging_function):
+            self.fs.commit(self.user_email, 'abc.png', 'file_contents')
+
+            data = file_models.FileModel.get_model(
+                'exploration/eid', 'assets/abc.png')
+            data.delete(self.user_email, '', True)
+
+            with self.assertRaisesRegexp(
+                IOError, r'File abc\.png .* not found'):
+                self.fs.get('abc.png')
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Metadata and data for file abc.png (version None) are '
+                    'out of sync.'
+                )
+            )
 
     def test_delete(self):
         self.assertFalse(self.fs.isfile('abc.png'))
