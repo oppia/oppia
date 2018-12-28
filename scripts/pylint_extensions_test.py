@@ -189,3 +189,73 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
+
+
+class BackslashContinuationCheckerTests(unittest.TestCase):
+
+    def test_finds_backslash_continuation(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.BackslashContinuationChecker)
+        checker_test_object.setup_method()
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+                """'cde'\\\n""" # pylint: disable=backslash-continuation
+                """'xyz'
+                message2 = 'abc\\\\'
+                message3 = (
+                    'abc\\\\'
+                    'xyz\\\\'
+                )
+                """)
+
+        node.file = filename
+        node.path = filename
+
+        checker_test_object.checker.process_module(node)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='backslash-continuation',
+                line=1
+            ),
+            testutils.Message(
+                msg_id='backslash-continuation',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+
+class FunctionArgsOrderCheckerTest(unittest.TestCase):
+
+    def test_finds_function_def(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.FunctionArgsOrderChecker)
+        checker_test_object.setup_method()
+        functiondef_node1 = astroid.extract_node("""
+        def test(self,test_var_one, test_var_two): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_functiondef(functiondef_node1)
+
+        functiondef_node2 = astroid.extract_node("""
+        def test(test_var_one, test_var_two, self): #@
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='function-args-order-self',
+                node=functiondef_node2
+            ),
+        ):
+            checker_test_object.checker.visit_functiondef(functiondef_node2)

@@ -80,9 +80,9 @@ oppia.directive('topNavigationBar', [
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
             'topic_editor', 'story_editor'];
-          $scope.NAV_MODE = GLOBALS.NAV_MODE;
+          $scope.currentUrl = window.location.pathname.split("/")[1];
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURES;
+          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
           $scope.logoutUrl = GLOBALS.logoutUrl;
@@ -102,9 +102,9 @@ oppia.directive('topNavigationBar', [
               keyCode: 9
             }
           };
-          $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
+          $scope.userMenuIsShown = ($scope.currentUrl !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
-            NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
+            NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');

@@ -60,7 +60,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
@@ -98,7 +98,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             skill_services.get_skill_by_id(self.SKILL_ID)
 
         # Start migration job on sample skill.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
@@ -141,7 +141,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
