@@ -37,6 +37,8 @@ import shutil
 import subprocess
 import sys
 
+import git
+
 # pylint: enable=wrong-import-order
 
 
@@ -94,6 +96,33 @@ def _start_subprocess_for_result(cmd):
     return out, err
 
 
+def _get_remote_name():
+    """Get the remote name of the local repository.
+    Returns:
+        str. The remote name of the local repository.
+    """
+    remote_name = ''
+    remote_num = 0
+    # Get the current repository.
+    repo = git.Repo(os.getcwd())
+    for remote in repo.remotes:
+        remote_url = list(remote.urls)[0]
+        if remote_url.endswith('oppia/oppia.git'):
+            remote_num += 1
+            remote_name = remote.name
+
+    if remote_num == 0:
+        print ('Warning: Please set upstream for the lint checks to run '
+               'efficiently. You can learn more about it here -> '
+               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
+        return
+    elif remote_num > 1:
+        print ('Warning: Please keep only one remote branch for oppia:develop '
+               'to run the lint checks efficiently.\n')
+        return
+    return remote_name
+
+
 def _git_diff_name_status(left, right, diff_filter=''):
     """Compare two branches/commits etc with git.
     Parameter:
@@ -126,11 +155,6 @@ def _git_diff_name_status(left, right, diff_filter=''):
             # after the last tab character.
             file_list.append(FileDiff(line[0], line[line.rfind('\t') + 1:]))
         return file_list
-    elif err.startswith('fatal: bad revision'):
-        print ('Please set upstream for the lint checks to run efficiently. '
-               'You can learn more about it here -> '
-               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
-        sys.exit(1)
     else:
         raise ValueError(err)
 
@@ -279,7 +303,8 @@ def main():
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
-    remote = 'upstream'
+    remote = _get_remote_name()
+    remote = remote if remote else args.remote
     if args.install:
         _install_hook()
         sys.exit(0)
