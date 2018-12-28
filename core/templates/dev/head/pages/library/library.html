@@ -95,7 +95,7 @@
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
-            <div class="row oppia-library-group-header-container">
+            <div class="oppia-library-group-header-container">
               <h2 ng-class="{'active': activeGroupIndex === $index}" class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="showFullResultsPage(group.categories, group.full_results_url)" tabindex="0">
                   <span translate="<[group.header_i18n_id]>"></span>
@@ -274,6 +274,11 @@
         width: -moz-calc(80% - 120px);
         width: -o-calc(80% - 120px);
         width: calc(80% - 120px);
+      }
+    }
+    @media(max-width: 390px) {
+      .oppia-library-group-header {
+        margin-left: 11.25%;
       }
     }
     .oppia-library-group-header a, .oppia-library-group-header span {
