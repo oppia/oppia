@@ -27,6 +27,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
 
     def _get_exploration_stats_from_dict(self, exploration_stats_dict):
+        """Converts and returns the ExplorationStats object from the given
+        exploration stats dict.
+        """
         state_stats_mapping = {}
         for state_name in exploration_stats_dict['state_stats_mapping']:
             state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
