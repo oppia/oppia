@@ -208,8 +208,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         Args:
             terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the
-                query.
+            categories: list(str). A list of categories to be added in the query.
             languages: list(str). A list of languages to be added in the query.
 
         Returns:
