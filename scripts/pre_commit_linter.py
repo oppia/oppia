@@ -772,14 +772,13 @@ def _pre_commit_linter(all_files):
     print '----------------------------------------'
     summary_messages = []
 
-    while css_in_html_result.qsize() != 0:
-        summary_messages.append(css_in_html_result.get())
-    while css_result.qsize() != 0:
-        summary_messages.append(css_result.get())
-    while js_result.qsize() != 0:
-        summary_messages.append(js_result.get())
-    while py_result.qsize() != 0:
-        summary_messages.append(py_result.get())
+    result_queues = [
+        css_in_html_result, css_result,
+        js_result, py_result]
+
+    for result_queue in result_queues:
+        while not result_queue.empty():
+            summary_messages.append(result_queue.get())
 
     print '\n'.join(summary_messages)
     print ''
