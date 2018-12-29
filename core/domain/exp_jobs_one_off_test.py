@@ -1010,8 +1010,11 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
 
-    def test_exp_state_pairs_are_produced_for_all_interactions(self):
-        """Checks (exp, state) pairs are produced for all interactions."""
+    def test_exp_state_pairs_are_produced_for_all_interactions_in_single_exp(
+            self):
+        """Checks (exp, state) pairs are produced for all interactions
+        when there is single exploration.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1035,6 +1038,51 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             '[u\'EndExploration\', [u\'exp_id0 End\']]',
+            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_exp_state_pairs_are_produced_for_all_interactions_in_multiple_exps(
+            self):
+        """Checks (exp, state) pairs are produced for all interactions
+        when there are multiple explorations.
+        """
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration1.add_states(['End'])
+        intro_state = exploration1.states['Introduction']
+        end_state = exploration1.states['End']
+
+        intro_state.update_interaction_id('TextInput')
+        end_state.update_interaction_id('EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+
+        exploration2.add_states(['End'])
+        intro_state = exploration2.states['Introduction']
+        end_state = exploration2.states['End']
+
+        intro_state.update_interaction_id('ItemSelectionInput')
+        end_state.update_interaction_id('EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+
+        # Start InteractionAuditOneOff job on sample explorations.
+        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
+        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
+                job_id))
+        expected_output = [
+            '[u\'EndExploration\', [u\'exp_id0 End\', u\'exp_id1 End\']]',
+            '[u\'ItemSelectionInput\', [u\'exp_id1 Introduction\']]',
             '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
         self.assertEqual(actual_output, expected_output)
 
@@ -1495,8 +1543,10 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
 
-    def test_number_of_hints_tabulated_are_correct(self):
-        """Checks that correct number of hints are tabulated."""
+    def test_number_of_hints_tabulated_are_correct_in_single_exp(self):
+        """Checks that correct number of hints are tabulated when
+        there is single exploration.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -1558,6 +1608,98 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             '[u\'1\', [u\'exp_id0 State2\']]',
             '[u\'2\', [u\'exp_id0 State1\']]'
         ]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_number_of_hints_tabulated_are_correct_in_multiple_exps(self):
+        """Checks that correct number of hints are tabulated when
+        there are multiple explorations.
+        """
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration1.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration1.states['State1']
+        state2 = exploration1.states['State2']
+
+        hint_list1 = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state1</p>'
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint2',
+                'html': '<p>Hello, this is html2 for state1</p>'
+            }
+        }]
+
+        hint_list2 = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state2</p>'
+            }
+        }]
+
+        content_ids_to_audio_translations_dict1 = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+            'hint2': {}
+        }
+
+        content_ids_to_audio_translations_dict2 = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+        }
+
+        state1.update_interaction_hints(hint_list1)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict1)
+
+        state2.update_interaction_hints(hint_list2)
+        state2.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+
+        exploration2.add_states(['State1', 'State2'])
+
+        state1 = exploration2.states['State1']
+
+        hint_list1 = [{
+            'hint_content': {
+                'content_id': 'hint1',
+                'html': '<p>Hello, this is html1 for state1</p>'
+            }
+        }]
+
+        content_ids_to_audio_translations_dict1 = {
+            'content': {},
+            'default_outcome': {},
+            'hint1': {},
+        }
+
+        state1.update_interaction_hints(hint_list1)
+        state1.update_content_ids_to_audio_translations(
+            content_ids_to_audio_translations_dict1)
+
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+
+        # Start HintsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
+        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
+        expected_output = [
+            '[u\'2\', [u\'exp_id0 State1\']]',
+            '[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
