@@ -279,9 +279,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
             self.assertEqual(
                 exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
-                    job_id),
-                []
-            )
+                    job_id), [])
 
 
 class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
@@ -437,8 +435,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExpSummaryModel with id 100 not found'
-        ):
+            'Entity for class ExpSummaryModel with id 100 not found'):
             exp_services.get_exploration_summary_by_id(exploration.id)
 
 
@@ -485,7 +482,10 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             })], 'Changed Objective.')
 
         # Run the job to compute contributors summary.
-        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new()
+        )
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -524,7 +524,10 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributors summary.
-        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new()
+        )
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -536,7 +539,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
-        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+        self.assertEqual(
+            2, exploration_summary.contributors_summary[user_a_id])
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are
@@ -568,7 +572,10 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributor summary.
-        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new()
+        )
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -594,7 +601,9 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                 })], 'Changed title.')
 
         # Run the job to compute the contributor summary.
-        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new())
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -621,14 +630,14 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # Run the ExplorationContributorsSummaryOneOff job.
         job_id = (
-            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new()) #pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new())
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExpSummaryModel with id 100 not found'
-        ):
+            'Entity for class ExpSummaryModel with id 100 not found'):
             exp_services.get_exploration_summary_by_id(exploration.id)
 
     def test_exploration_contributors_summary_job_produces_no_output(self):
@@ -642,15 +651,15 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id, title='Exploration Title')
 
         # Run the ExplorationContributorsSummaryOneOff job.
-        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContributorsSummaryOneOffJob.create_new())
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
             exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
-                job_id),
-            []
-        )
+                job_id), [])
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
@@ -714,15 +723,13 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(owner_id, self.EXP_ID)
 
         job_id = (
-            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
-        )
+            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExplorationRightsModel with id exp_id not found'
-        ):
+            'Entity for class ExplorationRightsModel with id exp_id not found'):
             rights_manager.get_exploration_rights(self.EXP_ID)
 
 
@@ -778,7 +785,9 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ExplorationValidityJobManager.get_output(
+                job_id))
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
@@ -791,7 +800,9 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ExplorationValidityJobManager.get_output(
+                job_id))
 
         self.assertEqual(actual_output, [])
 
@@ -808,7 +819,9 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ExplorationValidityJobManager.get_output(
+                job_id))
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
@@ -821,7 +834,9 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ExplorationValidityJobManager.get_output(
+                job_id))
         expected_output = [(
             '[u\'exp_id0\', '
             '[u\'This state does not have any interaction specified.\']]'
@@ -840,14 +855,15 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationValidityJobManager.get_output(job_id))
         expected_output = [(
             '[u\'exp_id0\', '
             '[u"Please fix the following issues before saving this '
             'exploration: 1. It is impossible to complete the exploration '
             'from the following states: Introduction '
-            '2. An objective must be specified (in the \'Settings\' tab). "]]'
-        )]
+            '2. An objective must be specified (in the \'Settings\' tab). "]]')]
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -872,8 +888,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id),
-            []
-        )
+            [])
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
@@ -990,8 +1005,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
-            []
-        )
+            [])
 
 
 class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -1031,11 +1045,12 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.InteractionAuditOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
+                job_id))
         expected_output = [
             '[u\'EndExploration\', [u\'exp_id0 End\']]',
-            '[u\'TextInput\', [u\'exp_id0 Introduction\']]'
-        ]
+            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -1055,8 +1070,7 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.InteractionAuditOneOffJob.get_output(job_id),
-            []
-        )
+            [])
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -1143,7 +1157,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
+                job_id))
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
@@ -1192,7 +1208,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
+                job_id))
         expected_output = [(
             '[u\'exp_id0\', '
             '[u\'State2: <p>This is value3 for ItemSelection</p>\']]'
@@ -1267,9 +1285,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
-                job_id),
-            []
-        )
+                job_id), [])
 
 
 class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
@@ -1303,7 +1319,9 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
+                job_id))
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
@@ -1317,7 +1335,9 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
+                job_id))
         expected_output = ['[u\'exp_id0\', [u\'title\']]']
         self.assertEqual(actual_output, expected_output)
 
@@ -1328,7 +1348,9 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
+                job_id))
         self.assertEqual(actual_output, [])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -1354,8 +1376,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id),
-            []
-        )
+            [])
 
 
 class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
@@ -1469,8 +1490,7 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.ExplorationStateIdMappingJob.get_output(job_id),
-            []
-        )
+            [])
 
 
 class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -1599,8 +1619,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id),
-            []
-        )
+            [])
 
 
 class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
@@ -1651,14 +1670,15 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
         # Start validation job on exploration.
         job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.get_output(job_id))
 
         # Test that validation fails before migration.
         self.assertEqual(len(actual_output), 16)
@@ -1690,8 +1710,9 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
         # Start validation job on updated exploration.
         job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
             job_id)
 
         with self.swap(
@@ -1700,8 +1721,8 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.get_output(job_id))
 
         # Test that validation passes after migration.
         # There should be no validation errors in the new (updated)
@@ -1731,16 +1752,16 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
         # Start ExplorationContentValidationJobForTextAngular.
         job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForTextAngular.get_output(job_id),
+            [])
 
 
 class ExplorationMigrationValidationJobForTextAngularTests(
@@ -1828,14 +1849,15 @@ class ExplorationMigrationValidationJobForTextAngularTests(
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start MigrationValidation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
-            job_id)
+        job_class = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular)
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id))
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForTextAngular.get_output(job_id))
         expected_output = [
             '[u\'oppia-noninteractive-image\', [u\'ol\']]',
             (
@@ -1868,16 +1890,16 @@ class ExplorationMigrationValidationJobForTextAngularTests(
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         # Start ExplorationMigrationValidationJobForTextAngular.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
-            job_id)
+        job_class = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular)
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForTextAngular.get_output(job_id),
+            [])
 
 
 class ExplorationContentValidationJobForCKEditorTests(
@@ -1920,13 +1942,16 @@ class ExplorationContentValidationJobForCKEditorTests(
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.get_output(job_id))
         expected_output = []
 
         self.assertEqual(actual_output, expected_output)
@@ -1996,13 +2021,16 @@ class ExplorationContentValidationJobForCKEditorTests(
         state2.update_interaction_default_outcome(default_outcome_dict2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.get_output(job_id))
 
         expected_output = [
             '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
@@ -2055,16 +2083,16 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         # Start ExplorationContentValidationJobForCKEditor.
         job_id = (
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.get_output(job_id),
+            [])
 
 
 class ExplorationMigrationValidationJobForCKEditorTests(
@@ -2159,14 +2187,16 @@ class ExplorationMigrationValidationJobForCKEditorTests(
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start migrationvalidation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue( # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForCKEditor.create_new())
+        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id))
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForCKEditor.get_output(job_id))
         expected_output = [
             '[u\'invalidTags\', [u\'code\', u\'span\']]',
             '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
@@ -2198,16 +2228,16 @@ class ExplorationMigrationValidationJobForCKEditorTests(
 
         # Start ExplorationMigrationValidationJobForCKEditor.
         job_id = (
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+            exp_jobs_one_off
+            .ExplorationMigrationValidationJobForCKEditor.get_output(job_id),
+            [])
 
 
 class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
@@ -2272,11 +2302,15 @@ class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.albert_id, exploration)
 
             # Start VerifyAllUrlsMatchGcsIdRegex job on sample exploration.
-            job_id = exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.create_new() # pylint: disable=line-too-long
+            job_id = (
+                exp_jobs_one_off
+                .VerifyAllUrlsMatchGcsIdRegexJob.create_new())
             exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
-            actual_output = exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.get_output(job_id) # pylint: disable=line-too-long
+            actual_output = (
+                exp_jobs_one_off
+                .VerifyAllUrlsMatchGcsIdRegexJob.get_output(job_id))
             expected_output = [
                 '[u\'File is there in GCS\', 1]',
                 (
@@ -2347,7 +2381,8 @@ class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.CopyToNewDirectoryJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
-            actual_output = exp_jobs_one_off.CopyToNewDirectoryJob.get_output(job_id) # pylint: disable=line-too-long
+            actual_output = exp_jobs_one_off.CopyToNewDirectoryJob.get_output(
+                job_id)
             expected_output = [
                 '[u\'Added compressed versions of images in exploration\', '
                 '[u\'exp_id0\']]',
@@ -2430,12 +2465,16 @@ class InteractionCustomizationArgsValidationJobTests(
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start CustomizationArgsValidation job on sample exploration.
-        job_id = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.create_new())
         exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
-        actual_output = exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output(job_id) # pylint: disable=line-too-long
+        actual_output = (
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.get_output(job_id))
 
         expected_output = [(
             '[u\'Invalid filepath\', '
@@ -2481,13 +2520,13 @@ class InteractionCustomizationArgsValidationJobTests(
 
         # Start InteractionCustomizationArgsValidationJob.
         job_id = (
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.create_new()) # pylint: disable=line-too-long
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.create_new())
         exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.get_output( # pylint: disable=line-too-long
-                job_id),
-            []
-        )
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.get_output(job_id),
+            [])
