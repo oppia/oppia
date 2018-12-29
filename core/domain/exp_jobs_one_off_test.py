@@ -101,6 +101,15 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         'title': 'Title 5'
     }]
 
+    def setUp(self):
+        super(ExpSummariesCreationOneOffJobTest, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
     def test_all_exps_public(self):
         """Test summary batch job if all explorations are public."""
         self._run_batch_job_once_and_verify_output(
@@ -128,22 +137,16 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 'status': default_status
             }
 
-            self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-            self.login(self.ADMIN_EMAIL)
-            admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-            self.set_admins([self.ADMIN_USERNAME])
-            admin = user_services.UserActionsInfo(admin_id)
-
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
             exp_id = '100'
             self.save_new_valid_exploration(
                 exp_id,
-                admin_id,
+                self.admin_id,
                 title=default_spec['title'],
                 category=default_spec['category'])
             exploration = exp_services.get_exploration_by_id(exp_id)
-            exp_services.delete_exploration(admin_id, exp_id)
+            exp_services.delete_exploration(self.admin_id, exp_id)
 
             # Get dummy explorations.
             num_exps = len(exp_specs)
@@ -155,14 +158,14 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 spec.update(exp_specs[ind])
                 self.save_new_valid_exploration(
                     exp_id,
-                    admin_id,
+                    self.admin_id,
                     title=spec['title'],
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
                 # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(admin, exp_id)
+                    rights_manager.publish_exploration(self.admin, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
@@ -193,8 +196,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.editor_ids,
                     exp_rights_model.translator_ids,
                     exp_rights_model.viewer_ids,
-                    [admin_id],
-                    {admin_id: 1},
+                    [self.admin_id],
+                    {self.admin_id: 1},
                     exploration.version,
                     exploration_model_created_on,
                     exploration_model_last_updated,
@@ -257,19 +260,13 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
 
-            self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-            self.login(self.ADMIN_EMAIL)
-            admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-            self.set_admins([self.ADMIN_USERNAME])
-            admin = user_services.UserActionsInfo(admin_id)
-
             exp_id = '1'
             self.save_new_valid_exploration(
                 exp_id,
-                admin_id,
+                self.admin_id,
                 title='title',
                 category='category')
-            rights_manager.publish_exploration(admin, exp_id)
+            rights_manager.publish_exploration(self.admin, exp_id)
 
             # Run ExpSummariesCreationOneOff job on sample exploration.
             job_id = (
@@ -294,15 +291,20 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
     EMAIL_A = 'emaila@example.com'
     EMAIL_B = 'emailb@example.com'
 
+    def setUp(self):
+        super(ExpSummariesContributorsOneOffJobTests, self).setUp()
+
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
     def test_contributors_for_valid_contribution(self):
         """Test that if only one commit is made, that the contributor
         list consists of that contributor's user id.
         """
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id)
+            self.EXP_ID, self.user_a_id)
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
@@ -311,24 +313,22 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
-            [user_a_id], exploration_summary.contributor_ids)
+            [self.user_a_id], exploration_summary.contributor_ids)
 
     def test_repeat_contributors(self):
         """Test that if the same user makes more than one commit that changes
         the content of an exploration, the user is only represented once in the
         list of contributors for that exploration.
         """
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Original Title')
+            self.EXP_ID, self.user_a_id, title='Original Title')
         exploration_model = exp_models.ExplorationModel.get(
             self.EXP_ID, strict=True, version=None)
         exploration_model.title = 'New title'
         exploration_model.commit(
-            user_a_id, 'Changed title.', [])
+            self.user_a_id, 'Changed title.', [])
 
         # Run the job to compute the contributor ids.
         job_id = (
@@ -341,30 +341,25 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
-            [user_a_id], exploration_summary.contributor_ids)
+            [self.user_a_id], exploration_summary.contributor_ids)
 
     def test_contributors_with_only_reverts_not_counted(self):
         """Test that contributors who have only done reverts do not
         have their user id appear in the contributor list.
         """
-        # Sign up two users.
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        self.signup(self.EMAIL_B, self.USERNAME_B)
-        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Original Title')
+            self.EXP_ID, self.user_a_id, title='Original Title')
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'New title'
         })]
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, change_list, 'Changed title.')
+            self.user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
         # Have the second user revert version 2 to version 1.
-        exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
+        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 2, 1)
 
         # Run the job to compute the contributor ids.
         job_id = (
@@ -376,7 +371,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         # who only reverted.
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
-        self.assertEqual([user_a_id], exploration_summary.contributor_ids)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
 
     def test_nonhuman_committers_not_counted(self):
         """Test that only human committers are counted as contributors."""
@@ -419,13 +414,10 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         exp_id = '100'
         exploration = self.save_new_valid_exploration(
-            exp_id, user_a_id)
-        exp_services.delete_exploration(user_a_id, exp_id)
+            exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
 
         # Run the ExpSummariesContributorsOneOff job.
         job_id = (
@@ -455,27 +447,28 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
 
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
     def test_contributors_for_valid_nonrevert_contribution(self):
         """Test that if only non-revert commits are made by
         contributor then the contributions summary shows same
         exact number of commits for that contributor's ID.
         """
 
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         # Let USER A make three commits.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Exploration Title')
+            self.EXP_ID, self.user_a_id, title='Exploration Title')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
             })], 'Changed title.')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
@@ -493,35 +486,32 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             exploration.id)
 
         self.assertEqual(
-            3, exploration_summary.contributors_summary[user_a_id])
+            3, exploration_summary.contributors_summary[self.user_a_id])
 
     def test_contributors_with_only_reverts_not_included(self):
         """Test that if only reverts are made by contributor then the
         contributions summary shouldn’t contain that contributor’s ID.
         """
 
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-
         # Let USER A make three commits.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Exploration Title 1')
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
             })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
             })], 'Changed Objective.')
 
         # Let the second user revert version 3 to version 2.
-        exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
+        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributors summary.
         job_id = (
@@ -535,12 +525,13 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             exploration.id)
 
         # Check that the contributors_summary does not contains user_b_id.
-        self.assertNotIn(user_b_id, exploration_summary.contributors_summary)
+        self.assertNotIn(
+            self.user_b_id, exploration_summary.contributors_summary)
 
         # Check that the User A has only 2 commits after user b has reverted
         # to version 2.
         self.assertEqual(
-            2, exploration_summary.contributors_summary[user_a_id])
+            2, exploration_summary.contributors_summary[self.user_a_id])
 
     def test_reverts_not_counted(self):
         """Test that if both non-revert commits and revert are
@@ -550,26 +541,24 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         shouldn't be counted either.
         """
 
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         # Let USER A make 3 non-revert commits.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Exploration Title')
+            self.EXP_ID, self.user_a_id, title='Exploration Title')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
             })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
             })], 'Changed Objective.')
 
         # Let USER A revert version 3 to version 2.
-        exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
+        exp_services.revert_exploration(self.user_a_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributor summary.
         job_id = (
@@ -582,7 +571,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         # Check that USER A's number of contributions is equal to 2.
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
-        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
+        self.assertEqual(
+            2, exploration_summary.contributors_summary[self.user_a_id])
 
     def test_nonhuman_committers_not_counted(self):
         """Test that only human committers are counted as contributors."""
@@ -621,12 +611,10 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         exp_id = '100'
         exploration = self.save_new_valid_exploration(
-            exp_id, user_a_id)
-        exp_services.delete_exploration(user_a_id, exp_id)
+            exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
 
         # Run the ExplorationContributorsSummaryOneOff job.
         job_id = (
@@ -644,11 +632,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         """Test that ExplorationContributorsSummaryOneOff job produces
         no output.
         """
-
-        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-
         self.save_new_valid_exploration(
-            self.EXP_ID, user_a_id, title='Exploration Title')
+            self.EXP_ID, self.user_a_id, title='Exploration Title')
 
         # Run the ExplorationContributorsSummaryOneOff job.
         job_id = (
@@ -666,23 +651,27 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
+    def setUp(self):
+        super(OneOffExplorationFirstPublishedJobTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
         then published again, the job uses the first publication time as the
         value for first_published_msec.
         """
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.UserActionsInfo(owner_id)
-        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
-            self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner, self.EXP_ID)
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
@@ -697,8 +686,8 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(admin, self.EXP_ID)
-        rights_manager.publish_exploration(owner, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -712,15 +701,11 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.UserActionsInfo(owner_id)
-
         self.save_new_valid_exploration(
-            self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner, self.EXP_ID)
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
-        exp_services.delete_exploration(owner_id, self.EXP_ID)
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
         job_id = (
             exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
