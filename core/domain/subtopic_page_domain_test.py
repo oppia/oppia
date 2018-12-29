@@ -191,10 +191,12 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 
         self.subtopic_page_contents.subtitled_html = (
             state_domain.SubtitledHtml('1', '<p>Test</p>'))
-        self.subtopic_page_contents.content_ids_to_audio_translations = {}
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content_id_3': {}
+        }
         self._assert_validation_error(
             'Expected content_ids_to_audio_translations to contain '
-            'all content_ids in the subtopic page.')
+            'only content_ids in the subtopic page.')
 
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {

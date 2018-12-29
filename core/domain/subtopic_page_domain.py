@@ -158,7 +158,7 @@ class SubtopicPageContents(object):
             if c not in content_ids:
                 raise utils.ValidationError(
                     'Expected content_ids_to_audio_translations to contain '
-                    'only content_ids in worked examples and explanation. '
+                    'only content_ids in the subtopic page. '
                     'content_ids_to_audio_translations: %s. '
                     'content IDs found: %s' % (audio_content_ids, content_ids))
 
