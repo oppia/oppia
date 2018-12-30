@@ -301,6 +301,7 @@ def main():
         sys.exit(0)
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
+    print collected_files
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
         print ('Your repo is in a dirty state which prevents the linting from'
@@ -311,6 +312,7 @@ def main():
             if not modified_files and not files_to_lint:
                 continue
             if files_to_lint:
+                print 'aaaaaaaaaa'
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
