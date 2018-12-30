@@ -337,11 +337,7 @@ oppia.controller('ExplorationEditor', [
         'At any time, you can click the <b>preview</b> button to play ' +
         'through your exploration.'),
       placement: 'bottom'
-    },];
-    
-    if (GLOBALS.can_edit) {
-      $scope.EDITOR_TUTORIAL_OPTIONS.push(
-        {
+    }, {
           type: 'element',
           selector: _ID_TUTORIAL_SAVE_BUTTON,
           heading: 'Save',
@@ -370,9 +366,7 @@ oppia.controller('ExplorationEditor', [
             '    </a>' +
             '  </li>' +
             '</ul>')
-        }
-      );
-    }
+        }];
     
     // Replace the ng-joyride template with one that uses <[...]> interpolators
     // instead of/ {{...}} interpolators.
