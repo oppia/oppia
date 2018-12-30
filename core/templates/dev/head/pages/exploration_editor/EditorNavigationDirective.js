@@ -58,6 +58,8 @@ oppia.directive('editorNavigation', [
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
+          $scope.can_edit = GLOBALS.can_edit;
+
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
             SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
