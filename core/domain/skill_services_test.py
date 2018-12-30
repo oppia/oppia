@@ -14,13 +14,14 @@
 
 """Tests the methods defined in skill services."""
 
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import user_services
+import datetime
+
+import feconf
+from core.domain import skill_domain, skill_services, state_domain, \
+    user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
+
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -32,6 +33,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     USER_ID = 'user'
     MISCONCEPTION_ID_1 = 1
     MISCONCEPTION_ID_2 = 2
+    LANGUAGE_CODE = 'python'
+    VERSION = 1
+    MISCONCEPTION_COUNT = 2
+    CREATED_ON = datetime.datetime.now()
+    LAST_UPDATED_ON = datetime.datetime.now()
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
@@ -60,13 +66,72 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=misconceptions,
             skill_contents=skill_contents)
 
-    def test_compute_summary(self):
+    def test_compute_summary_of_skill(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
 
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
+
+    def test_create_skill_summary(self):
+        skill_services.create_skill_summary(self.SKILL_ID)
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False)
+
+        self.assertEqual(skill_summary.id, self.SKILL_ID)
+        self.assertEqual(skill_summary.description, 'Description')
+        self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
+
+    def test_save_skill_summary(self):
+        summary = skill_domain.SkillSummary(
+        self.SKILL_ID, 'Description', self.LANGUAGE_CODE,
+        self.VERSION, self.MISCONCEPTION_COUNT, 0,
+        self.CREATED_ON, self.LAST_UPDATED_ON
+        )
+        skill_services.save_skill_summary(summary)
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False)
+        self.assertEqual(skill_summary.id, self.SKILL_ID)
+        self.assertEqual(skill_summary.description, 'Description')
+        self.assertEqual(skill_summary.language_code, self.LANGUAGE_CODE)
+        self.assertEqual(skill_summary.misconception_count, self.MISCONCEPTION_COUNT)
+        self.assertEqual(skill_summary.worked_examples_count, 0)
+        self.assertEqual(skill_summary.skill_model_created_on, self.CREATED_ON)
+        self.assertEqual(skill_summary.skill_model_last_updated, self.LAST_UPDATED_ON)
+
+    def test_delete_skill_summary(self):
+        skill_services.delete_skill_summary(self.SKILL_ID)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_create_skill(self):
+        initial_version = self.skill.version
+        skill_services._create_skill(self.USER_ID, self.skill, "New skill created", [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW})])
+        self.assertEqual(self.skill.version, initial_version + 1)
+        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
+
+    def test_save_new_skill(self):
+        skill_services.save_new_skill(self.USER_ID, self.skill)
+        skill_commit_log_entry = (
+            skill_models.SkillCommitLogEntryModel.get_commit(self.SKILL_ID, 1)
+        )
+        self.assertEqual(skill_commit_log_entry.commit_message, 'New skill created.')
+        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
+        self.assertNotEqual(skill_services.get_skill_by_id(self.SKILL_ID, strict=False), None)
+
+    def test_save_skill(self):
+        initial_version = self.skill.version
+        skill_services._save_skill(self.USER_ID, self.skill, "New skill created.", [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW})])
+        skill_commit_log_entry = (
+            skill_models.SkillCommitLogEntryModel.get_commit(self.SKILL_ID, 1)
+        )
+        self.assertEqual(skill_commit_log_entry.commit_message, 'New skill created.')
+
+        self.assertEqual(self.skill.version, initial_version + 1)
+        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -188,6 +253,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
+
+    def test_create_new_skill_rights(self):
+        skill_services.create_new_skill_rights(self.SKILL_ID, self.USER_ID)
+        skill_rights = skill_services.get_skill_rights(self.SKILL_ID, strict=False)
+        self.assertEqual(skill_rights.id, self.SKILL_ID)
+        self.assertEqual(skill_rights.creator_id, self.USER_ID)
+        self.assertEqual(skill_rights.skill_is_private, True)
 
     def test_merge_skill(self):
         changelist = [
