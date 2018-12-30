@@ -150,10 +150,12 @@ fi
 
 # Install GitPython.
 echo Checking if GitPython is installed in third_party
-if [ ! -d "$TOOLS_DIR/GitPython" ]; then
+if [ ! -d "$TOOLS_DIR/GitPython-2.1.11" ]; then
   echo Installing GitPython
-
-  pip install gitpython --target="$TOOLS_DIR/GitPython"
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o GitPython-2.1.11.tar.gz -L https://files.pythonhosted.org/packages/4d/e8/98e06d3bc954e3c5b34e2a579ddf26255e762d21eb24fede458eff654c51/GitPython-2.1.11.tar.gz
+  tar xzf GitPython-2.1.11.tar.gz -C $TOOLS_DIR
+  rm GitPython-2.1.11.tar.gz
 fi
 
 # Install pycodestyle.
