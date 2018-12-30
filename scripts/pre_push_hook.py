@@ -203,11 +203,10 @@ def _collect_files_being_pushed(ref_list, remote):
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
-    remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
+    for branch, sha1 in zip(branches, hashes):
         # Get the difference to remote/develop.
         try:
             modified_files = _compare_to_remote(
@@ -220,8 +219,8 @@ def _collect_files_being_pushed(ref_list, remote):
             except ValueError as e:
                 print e.message
                 sys.exit(1)
-    files_to_lint = _extract_files_to_lint(modified_files)
-    collected_files[branch] = (modified_files, files_to_lint)
+        files_to_lint = _extract_files_to_lint(modified_files)
+        collected_files[branch] = (modified_files, files_to_lint)
 
     for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         if modified_files:

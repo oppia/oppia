@@ -150,7 +150,7 @@ fi
 
 # Install GitPython.
 echo Checking if GitPython is installed in third_party
-if [! -d "$TOOLS_DIR/GitPython"]; then
+if [ ! -d "$TOOLS_DIR/GitPython" ]; then
   echo Installing GitPython
 
   pip install gitpython --target="$TOOLS_DIR/GitPython"
