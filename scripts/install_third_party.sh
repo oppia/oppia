@@ -148,6 +148,14 @@ if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
   rm isort-4.2.15.tar.gz
 fi
 
+# Install GitPython.
+echo Checking if GitPython is installed in third_party
+if [! -d "$TOOLS_DIR/GitPython"]; then
+  echo Installing GitPython
+
+  pip install gitpython --target="$TOOLS_DIR/GitPython"
+fi
+
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
 if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
