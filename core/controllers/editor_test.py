@@ -1965,9 +1965,9 @@ class EditorFirstTimeTutorialIntegrationTest(BaseEditorControllerTests):
         """ Testing of the firsttime translation tutorial http requests."""
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         # Check if method returns 200 http status.
         self.post_json(
             '/createhandler/started_translation_tutorial_event/%s'
-            % self.EXP_ID, {}, csrf_token=self.csrf_token,
+            % self.EXP_ID, {}, csrf_token=csrf_token,
             expect_errors=False, expected_status_int=200)
