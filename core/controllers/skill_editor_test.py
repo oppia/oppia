@@ -50,6 +50,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             [], [], [self.skill_id], [], 1)
 
     def _get_csrf_token_for_put(self):
+        """Gets the csrf token."""
         csrf_token = None
         url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
@@ -58,6 +59,9 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         return csrf_token
 
     def _delete_skill_model_and_memcache(self, user_id, skill_id):
+        """Deletes skill model and memcache corresponding to the given skill
+        id.
+        """
         skill_model = skill_models.SkillModel.get(skill_id)
         skill_model.delete(user_id, 'Delete skill model.')
         skill_memcache_key = skill_services._get_skill_memcache_key(skill_id) # pylint: disable=protected-access
@@ -66,13 +70,16 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
     def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,
             unused_commit_message):
+        """Raises update skill exception."""
         raise utils.ValidationError()
 
     def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
+        """Returns None."""
         return None
 
     def _mock_publish_skill_raise_exception(
             self, unused_skill_id, unused_committer_id):
+        """Raises publish skill exception."""
         raise Exception()
 
 

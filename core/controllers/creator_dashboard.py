@@ -164,12 +164,28 @@ class CreatorDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
 
         def _get_intro_card_color(category):
+            """Returns the intro card color according to the category.
+
+            Args:
+                category: str. The category of the exploration.
+
+            Returns:
+                str. The intro card color according to the category.
+            """
             return (
                 constants.CATEGORIES_TO_COLORS[category] if
                 category in constants.CATEGORIES_TO_COLORS else
                 constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
+            """Returns the rounded average rating of the exploration.
+
+            Args:
+                rating: int. The rating of the exploration.
+
+            Returns:
+                int. The rounded average value of rating.
+            """
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were

@@ -98,6 +98,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
 
 def _dict_to_search_document(d):
+    """Returns and converts the document dict into objects."""
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
 
@@ -118,6 +119,9 @@ def _dict_to_search_document(d):
 
 
 def _make_fields(key, value):
+    """Returns the fields corresponding to the key value pair according to the
+    type of value.
+    """
     if isinstance(value, list):
         _validate_list(key, value)
         return [_make_fields(key, v)[0] for v in value]
@@ -305,6 +309,7 @@ def search(query_string, index, cursor=None,
 
 
 def _string_to_sort_expressions(input_string):
+    """Returns the sorted expression of the input string."""
     sort_expressions = []
     s_tokens = input_string.split()
     for expression in s_tokens:
@@ -338,6 +343,7 @@ def get_document_from_index(doc_id, index):
 
 
 def _search_document_to_dict(doc):
+    """Converts and returns the search document into a dict format."""
     d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
     for field in doc.fields:
