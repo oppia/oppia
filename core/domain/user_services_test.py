@@ -508,7 +508,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.parse_date_from_string(test_datetime_strings[2])
         with self.assertRaises(ValueError):
             user_services.parse_date_from_string(test_datetime_strings[3])
-
+    
+    def test_record_user_started_state_translation_tutorial(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_services.create_new_user(user_id, 'user@example.com')
+        user_services.set_username(user_id, username)
+        user_services.record_user_started_state_translation_tutorial(user_id)
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertIsInstance(
+            user_settings.last_started_state_translation_tutorial,
+            datetime.datetime)
+        self.assertTrue(user_settings.last_started_state_translation_tutorial 
+            is not None)
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
