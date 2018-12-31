@@ -787,6 +787,7 @@ class StartedTutorialEventHandler(EditorHandler):
     def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
+        self.render_json({})
 
 
 class StartedTranslationTutorialEventHandler(EditorHandler):
@@ -797,7 +798,7 @@ class StartedTranslationTutorialEventHandler(EditorHandler):
         """Handles GET requests."""
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
-
+        self.render_json({})
 
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
