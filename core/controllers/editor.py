@@ -800,6 +800,7 @@ class StartedTranslationTutorialEventHandler(EditorHandler):
             self.user_id)
         self.render_json({})
 
+
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
