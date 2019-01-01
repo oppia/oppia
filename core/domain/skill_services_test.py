@@ -20,7 +20,10 @@ import feconf
 from core.domain import skill_domain, skill_services, state_domain, \
     user_services
 from core.domain.skill_domain import CMD_DELETE_SKILL_MISCONCEPTION, \
-    SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_PROPERTY_DESCRIPTION
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY, SKILL_CONTENTS_PROPERTY_EXPLANATION, \
+    SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, \
+    SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK, \
+    SKILL_MISCONCEPTIONS_PROPERTY_NAME, SKILL_PROPERTY_DESCRIPTION
 from core.platform import models
 from core.tests import test_utils
 
@@ -67,6 +70,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_ID, self.USER_ID, 'Description',
             misconceptions=self.misconceptions,
             skill_contents=self.skill_contents)
+
+    def test_migrate_skill_contents_to_latest_schema(self):
+        self.skill.skill_contents_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d skill schemas at '
+            'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+            skill_services._migrate_skill_contents_to_latest_schema({'schema_version': self.skill.skill_contents_schema_version, 'skill_contents': self.skill_contents})
+        #self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
     def test_compute_summary_of_skill(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -197,10 +208,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Name'
             })
         ]
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a commit message, received none.'):
             skill_services.update_skill(self.USER_ID, self.SKILL_ID, changelist, None)
-
-            self.assertTrue('Expected a commit message, received none.' in context.valuerror)
 
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist,
@@ -443,6 +453,22 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist2, self.USER_ID)
         self.assertEqual(skill_return.language_code, 'TestSkillId')
 
+        change_list = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_LANGUAGE_CODE),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        change_list[0].property_name = SKILL_CONTENTS_PROPERTY_EXPLANATION
+        with self.assertRaises(Exception) as cont:
+            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+
+            self.assertTrue('Invalid change dict.' in cont.exception)
+
         new_explanation = state_domain.SubtitledHtml(
                     '1', 'testExplanation')
         changelist3 = [
@@ -473,9 +499,94 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         for worked_example in skill_return.skill_contents.worked_examples:
             self.assertEqual(worked_example.to_dict(), new_example)
 
+        change_list = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_LANGUAGE_CODE),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        change_list[0].cmd = CMD_UPDATE_SKILL_CONTENTS_PROPERTY
+        with self.assertRaises(Exception) as cont:
+            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+
+            self.assertTrue('Invalid change dict.' in cont.exception)
+
+        changelist5 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME,
+                'id': self.MISCONCEPTION_ID_1,
+                'old_value': '',
+                'new_value': 'Newname'
+            })
+        ]
+
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist5, self.USER_ID)
+        self.assertEqual(skill_return.misconceptions[0].to_dict()['name'], 'Newname')
+
+        changelist5 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
+                'id': self.MISCONCEPTION_ID_1,
+                'old_value': '',
+                'new_value': 'NewNotes'
+            })
+        ]
+
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist5, self.USER_ID)
+        self.assertEqual(skill_return.misconceptions[0].to_dict()['notes'], 'NewNotes')
+
+        changelist5 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+                'id': self.MISCONCEPTION_ID_1,
+                'old_value': '',
+                'new_value': 'NewFeedback'
+            })
+        ]
+
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist5, self.USER_ID)
+        self.assertEqual(skill_return.misconceptions[0].to_dict()['feedback'], 'NewFeedback')
+
+        change_list = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        change_list[0].property_name = SKILL_CONTENTS_PROPERTY_EXPLANATION
+        with self.assertRaises(Exception) as cont:
+            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+
+            self.assertTrue('Invalid change dict.' in cont.exception)
 
 
-
+    def test_get_multi_skill_summaries(self):
+        self.save_new_skill(
+            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+        self.save_new_skill(
+            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+        skill_summaries = skill_services.get_multi_skill_summaries(['skill_a', 'skill_b'])
+        self.assertEqual(skill_summaries[0].to_dict(), skill_services.get_skill_summary_by_id('skill_a', strict=False).to_dict())
+        self.assertEqual(skill_summaries[1].to_dict(), skill_services.get_skill_summary_by_id('skill_b', strict=False).to_dict())
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
