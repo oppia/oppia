@@ -366,7 +366,7 @@ oppia.controller('ExplorationEditor', [
         '    </a>' +
         '  </li>' +
         '</ul>')
-    }]; 
+    }];
         
     // Replace the ng-joyride template with one that uses <[...]> interpolators
     // instead of/ {{...}} interpolators.
