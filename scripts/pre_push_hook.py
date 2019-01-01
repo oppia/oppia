@@ -38,10 +38,11 @@ import subprocess
 import sys
 
 
+# Add GitPython to sys.path, then only it can be imported.
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 GIT_PYTHON_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11')
 sys.path.insert(0, GIT_PYTHON_PATH)
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, import-error
 
 import git # isort:skip
 
