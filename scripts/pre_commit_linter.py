@@ -750,7 +750,7 @@ def _pre_commit_linter(all_files):
     number_of_files_to_lint = sum(
         len(file_group) for file_group in file_groups_to_lint)
 
-    timeout_multiplier = 1000
+    timeout_multiplier = 2000
     for file_group, process in zip(file_groups_to_lint, linting_processes):
         # try..except block is needed to catch ZeroDivisionError
         # when there are no CSS, HTML, JavaScript and Python files to lint.
@@ -771,10 +771,15 @@ def _pre_commit_linter(all_files):
     print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
-    summary_messages.append(css_in_html_result.get())
-    summary_messages.append(css_result.get())
-    summary_messages.append(js_result.get())
-    summary_messages.append(py_result.get())
+
+    result_queues = [
+        css_in_html_result, css_result,
+        js_result, py_result]
+
+    for result_queue in result_queues:
+        while not result_queue.empty():
+            summary_messages.append(result_queue.get())
+
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
