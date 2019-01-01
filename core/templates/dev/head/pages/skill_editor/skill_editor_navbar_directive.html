@@ -55,7 +55,7 @@
     </button>
   </li>
   <li style="width: 40px;"
-      ng-class="{'uib-dropdown': getWarningsCount(), 'active': getTabStatuses().active === 'main'}"
+      ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
       ng-attr-uib-dropdown="<[getWarningsCount()]>"
       ng-click="selectMainTab()">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
@@ -78,7 +78,7 @@
   </li>
   <li class="icon"
       style="margin-right: 20px;"
-      ng-class="{'active': getTabStatuses().active === 'questions'}"
+      ng-class="{'active': getActiveTabName() === 'questions'}"
       ng-click="selectQuestionsTab()">
     <a uib-tooltip="Questions" tooltip-placement="bottom">
       <i class="material-icons">library_books</i>
