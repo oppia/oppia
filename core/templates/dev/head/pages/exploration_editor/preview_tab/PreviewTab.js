@@ -18,25 +18,25 @@
  */
 
 oppia.controller('PreviewTab', [
-  '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
-  'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
-  'ExplorationCategoryService', 'StateEditorService', 'ContextService',
-  'ExplorationInitStateNameService', 'ExplorationParamChangesService',
-  'ExplorationParamSpecsService', 'ExplorationStatesService',
-  'ExplorationTitleService', 'ExplorationEngineService',
-  'ParameterMetadataService', 'ParamChangeObjectFactory',
-  'NumberAttemptsService', 'EditableExplorationBackendApiService',
-  'UrlInterpolationService', 'PlayerCorrectnessFeedbackEnabledService',
+  '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
+  'EditableExplorationBackendApiService', 'ExplorationCategoryService',
+  'ExplorationDataService', 'ExplorationEngineService',
+  'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+  'ExplorationParamChangesService', 'ExplorationParamSpecsService',
+  'ExplorationStatesService', 'ExplorationTitleService', 'LearnerParamsService',
+  'NumberAttemptsService', 'ParamChangeObjectFactory',
+  'ParameterMetadataService', 'PlayerCorrectnessFeedbackEnabledService',
+  'StateEditorService', 'UrlInterpolationService',
   function(
-      $scope, $uibModal, $q, $timeout, LearnerParamsService,
-      ExplorationDataService, ExplorationAdvancedFeaturesService,
-      ExplorationCategoryService, StateEditorService, ContextService,
-      ExplorationInitStateNameService, ExplorationParamChangesService,
-      ExplorationParamSpecsService, ExplorationStatesService,
-      ExplorationTitleService, ExplorationEngineService,
-      ParameterMetadataService, ParamChangeObjectFactory,
-      NumberAttemptsService, EditableExplorationBackendApiService,
-      UrlInterpolationService, PlayerCorrectnessFeedbackEnabledService) {
+      $q, $scope, $timeout, $uibModal, ContextService,
+      EditableExplorationBackendApiService, ExplorationCategoryService,
+      ExplorationDataService, ExplorationEngineService,
+      ExplorationFeaturesService, ExplorationInitStateNameService,
+      ExplorationParamChangesService, ExplorationParamSpecsService,
+      ExplorationStatesService, ExplorationTitleService, LearnerParamsService,
+      NumberAttemptsService, ParamChangeObjectFactory,
+      ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
+      StateEditorService, UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
     ExplorationDataService.getData().then(function() {
       var initStateNameForPreview = StateEditorService.getActiveStateName();
@@ -85,7 +85,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.showParameterSummary = function() {
-      return (ExplorationAdvancedFeaturesService.areParametersEnabled() &&
+      return (ExplorationFeaturesService.areParametersEnabled() &&
               !angular.equals({}, $scope.allParams));
     };
 

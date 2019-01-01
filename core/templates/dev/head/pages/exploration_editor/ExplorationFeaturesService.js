@@ -17,19 +17,16 @@
  *               the exploration editor.
  */
 
-oppia.factory('ExplorationAdvancedFeaturesService', [function() {
-  var _settings = {
-    areParametersEnabled: false
+oppia.factory('ExplorationFeaturesService', [function() {
+  var settings = {
+    areParametersEnabled: false,
+    isImprovementsTabEnabled: false,
   };
 
   return {
-    areParametersEnabled: function() {
-      return _settings.areParametersEnabled;
-    },
-    enableParameters: function() {
-      _settings.areParametersEnabled = true;
-    },
-    init: function(explorationData) {
+    init: function(explorationData, featuresData) {
+      settings.isImprovementsTabEnabled =
+        featuresData.is_improvements_tab_enabled;
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {
@@ -40,6 +37,15 @@ oppia.factory('ExplorationAdvancedFeaturesService', [function() {
           }
         }
       }
-    }
+    },
+    areParametersEnabled: function() {
+      return settings.areParametersEnabled;
+    },
+    isImprovementsTabEnabled: function() {
+      return settings.isImprovementsTabEnabled;
+    },
+    enableParameters: function() {
+      settings.areParametersEnabled = true;
+    },
   };
 }]);

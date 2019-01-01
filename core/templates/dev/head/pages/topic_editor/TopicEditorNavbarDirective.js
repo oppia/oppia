@@ -39,7 +39,7 @@ oppia.directive('topicEditorNavbar', [
           $scope.validationIssues = [];
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
-          $scope.getTabStatuses = TopicEditorRoutingService.getTabStatuses;
+          $scope.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
           $scope.selectMainTab = TopicEditorRoutingService.navigateToMainTab;
           $scope.selectSubtopicsTab =
             TopicEditorRoutingService.navigateToSubtopicsTab;

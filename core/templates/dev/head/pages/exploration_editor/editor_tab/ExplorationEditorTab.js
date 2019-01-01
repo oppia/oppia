@@ -17,19 +17,19 @@
  */
 
 oppia.controller('ExplorationEditorTab', [
-  '$scope', '$rootScope', 'StateEditorService', 'ExplorationStatesService',
-  'ExplorationAdvancedFeaturesService', 'UrlInterpolationService',
-  'ExplorationInitStateNameService', 'GraphDataService', 'RouterService',
-  'ExplorationCorrectnessFeedbackService', 'AlertsService',
-  'ContextService', 'ExplorationWarningsService',
+  '$rootScope', '$scope', 'AlertsService', 'ContextService',
+  'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
+  'ExplorationInitStateNameService', 'ExplorationStatesService',
+  'ExplorationWarningsService', 'GraphDataService', 'RouterService',
+  'StateEditorService', 'UrlInterpolationService',
   function(
-      $scope, $rootScope, StateEditorService, ExplorationStatesService,
-      ExplorationAdvancedFeaturesService, UrlInterpolationService,
-      ExplorationInitStateNameService, GraphDataService, RouterService,
-      ExplorationCorrectnessFeedbackService, AlertsService,
-      ContextService, ExplorationWarningsService) {
-    $scope.areParametersEnabled = (
-      ExplorationAdvancedFeaturesService.areParametersEnabled);
+      $rootScope, $scope, AlertsService, ContextService,
+      ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
+      ExplorationInitStateNameService, ExplorationStatesService,
+      ExplorationWarningsService, GraphDataService, RouterService,
+      StateEditorService, UrlInterpolationService) {
+    $scope.areParametersEnabled =
+      ExplorationFeaturesService.areParametersEnabled;
 
     $scope.interactionIsShown = false;
 

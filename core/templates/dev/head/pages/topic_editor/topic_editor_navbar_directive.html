@@ -52,7 +52,7 @@
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
+  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
       <i class="material-icons">&#xE254;</i>
     </a>
@@ -73,13 +73,13 @@
     </ul>
   </li>
 
-  <li ng-class="{'active': getTabStatuses().active === 'subtopics'}" class="icon">
+  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="icon">
     <a uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
       <i class="material-icons">library_books</i>
     </a>
   </li>
 
-  <li style="margin-right: 20px;" ng-class="{'active': getTabStatuses().active === 'questions'}" class="icon">
+  <li style="margin-right: 20px;" ng-class="{'active': getActiveTabName() === 'questions'}" class="icon">
     <a uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
       <i class="material-icons">question_answer</i>
     </a>

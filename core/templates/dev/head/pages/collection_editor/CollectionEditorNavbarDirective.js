@@ -49,7 +49,7 @@ oppia.directive('collectionEditorNavbar', [
           $scope.isSaveInProgress = (
             CollectionEditorStateService.isSavingCollection);
 
-          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.getActiveTabName = RouterService.getActiveTabName;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
           $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
