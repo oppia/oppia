@@ -19,6 +19,8 @@ import datetime
 import feconf
 from core.domain import skill_domain, skill_services, state_domain, \
     user_services
+from core.domain.skill_domain import CMD_DELETE_SKILL_MISCONCEPTION, \
+    SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_PROPERTY_DESCRIPTION
 from core.platform import models
 from core.tests import test_utils
 
@@ -41,11 +43,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
-        skill_contents = skill_domain.SkillContents(
+        self.skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
                     state_domain.SubtitledHtml('2', 'Example 1')], {})
-        misconceptions = [skill_domain.Misconception(
+        self.misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
@@ -63,8 +65,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description',
-            misconceptions=misconceptions,
-            skill_contents=skill_contents)
+            misconceptions=self.misconceptions,
+            skill_contents=self.skill_contents)
 
     def test_compute_summary_of_skill(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -74,64 +76,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
 
-    def test_create_skill_summary(self):
-        skill_services.create_skill_summary(self.SKILL_ID)
-        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False)
-
-        self.assertEqual(skill_summary.id, self.SKILL_ID)
-        self.assertEqual(skill_summary.description, 'Description')
-        self.assertEqual(skill_summary.misconception_count, 1)
-        self.assertEqual(skill_summary.worked_examples_count, 1)
-
-    def test_save_skill_summary(self):
-        summary = skill_domain.SkillSummary(
-        self.SKILL_ID, 'Description', self.LANGUAGE_CODE,
-        self.VERSION, self.MISCONCEPTION_COUNT, 0,
-        self.CREATED_ON, self.LAST_UPDATED_ON
-        )
-        skill_services.save_skill_summary(summary)
-        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False)
-        self.assertEqual(skill_summary.id, self.SKILL_ID)
-        self.assertEqual(skill_summary.description, 'Description')
-        self.assertEqual(skill_summary.language_code, self.LANGUAGE_CODE)
-        self.assertEqual(skill_summary.misconception_count, self.MISCONCEPTION_COUNT)
-        self.assertEqual(skill_summary.worked_examples_count, 0)
-        self.assertEqual(skill_summary.skill_model_created_on, self.CREATED_ON)
-        self.assertEqual(skill_summary.skill_model_last_updated, self.LAST_UPDATED_ON)
-
     def test_delete_skill_summary(self):
         skill_services.delete_skill_summary(self.SKILL_ID)
         self.assertEqual(
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
-
-    def test_create_skill(self):
-        initial_version = self.skill.version
-        skill_services._create_skill(self.USER_ID, self.skill, "New skill created", [skill_domain.SkillChange({
-            'cmd': skill_domain.CMD_CREATE_NEW})])
-        self.assertEqual(self.skill.version, initial_version + 1)
-        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
-
-    def test_save_new_skill(self):
-        skill_services.save_new_skill(self.USER_ID, self.skill)
-        skill_commit_log_entry = (
-            skill_models.SkillCommitLogEntryModel.get_commit(self.SKILL_ID, 1)
-        )
-        self.assertEqual(skill_commit_log_entry.commit_message, 'New skill created.')
-        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
-        self.assertNotEqual(skill_services.get_skill_by_id(self.SKILL_ID, strict=False), None)
-
-    def test_save_skill(self):
-        initial_version = self.skill.version
-        skill_services._save_skill(self.USER_ID, self.skill, "New skill created.", [skill_domain.SkillChange({
-            'cmd': skill_domain.CMD_CREATE_NEW})])
-        skill_commit_log_entry = (
-            skill_models.SkillCommitLogEntryModel.get_commit(self.SKILL_ID, 1)
-        )
-        self.assertEqual(skill_commit_log_entry.commit_message, 'New skill created.')
-
-        self.assertEqual(self.skill.version, initial_version + 1)
-        self.assertNotEqual(skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False), None)
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -163,6 +112,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
+
+    def test_get_skill_rights(self):
+        self.assertEqual(skill_services.get_skill_rights(skill_services.get_new_skill_id(), strict=False), None)
+
 
     def test_get_skill_descriptions_by_ids(self):
         self.save_new_skill(
@@ -244,6 +197,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Name'
             })
         ]
+        with self.assertRaises(ValueError) as context:
+            skill_services.update_skill(self.USER_ID, self.SKILL_ID, changelist, None)
+
+            self.assertTrue('Expected a commit message, received none.' in context.valuerror)
+
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist,
             'Updated misconception name.')
@@ -253,13 +211,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
-
-    def test_create_new_skill_rights(self):
-        skill_services.create_new_skill_rights(self.SKILL_ID, self.USER_ID)
-        skill_rights = skill_services.get_skill_rights(self.SKILL_ID, strict=False)
-        self.assertEqual(skill_rights.id, self.SKILL_ID)
-        self.assertEqual(skill_rights.creator_id, self.USER_ID)
-        self.assertEqual(skill_rights.skill_is_private, True)
 
     def test_merge_skill(self):
         changelist = [
@@ -360,6 +311,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
         self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
 
+    def test_get_all_unpublished_skill_rights(self):
+        skill_rights = skill_services.get_all_unpublished_skill_rights()
+        for skill_rights_obj in skill_rights:
+            self.assertNotEqual(skill_services.get_skill_rights(skill_rights_obj.id, strict=False), None)
+
+        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
+        skill_rights = skill_services.get_all_unpublished_skill_rights()
+        for skill_rights_obj in skill_rights:
+            self.assertNotEqual(skill_services.get_skill_rights(skill_rights_obj.id, strict=False), self.SKILL_ID)
+
     def test_get_multi_skills(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
@@ -381,6 +342,140 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'No skill exists for ID skill_c'):
             skill_services.get_multi_skills(['skill_a', 'skill_c'])
+
+    def test_skill_has_associated_questions(self):
+        self.assertFalse(skill_services.skill_has_associated_questions(self.SKILL_ID))
+
+    def test_publish_skill(self):
+        new_id = skill_services.get_new_skill_id()
+        with self.assertRaises(Exception) as context:
+            skill_services.publish_skill(new_id, self.USER_ID)
+
+            self.assertTrue('The given skill does not exist.' in context.exception)
+
+        with self.assertRaises(Exception) as context:
+            skill_services.publish_skill(self.SKILL_ID, 'user_temp')
+
+            self.assertTrue('The user does not have enough rights to publish the skill.' in context.exception)('strict', ) 
+
+        self.save_new_skill(
+            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+
+        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
+            self.user_id_admin)
+        for skill_rights_obj in skill_rights:
+            skill_services.publish_skill(skill_rights_obj.id, self.user_id_admin)
+        with self.assertRaises(Exception) as context:
+            skill_services.publish_skill('skill_b', self.user_id_admin)
+
+            self.assertTrue('The skill is already published.' in context.exception)('strict', )
+
+    def test_save_skill(self):
+        with self.assertRaises(Exception) as context:
+            skill_services._save_skill(self.USER_ID, self.skill, 'Commit message', [])
+
+            self.assertTrue('Unexpected error: received an invalid change list when trying to '
+            'save skill %s: %s' % (self.SKILL_ID, []) in context.exception)
+
+        new_skill_id = skill_services.get_new_skill_id()
+        skill_model = skill_models.SkillModel.get_by_id(new_skill_id)
+        self.assertEqual(skill_model, None)
+        self.save_new_skill(
+            new_skill_id, self.USER_ID, 'Description 2', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml(
+                    '1', 'Explanation'), [
+                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'id': new_skill_id,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        skill_services._save_skill(self.USER_ID, skill_services.get_skill_by_id(new_skill_id), 'Commit message', changelist)
+        skill_model = skill_models.SkillModel.get_by_id(new_skill_id)
+        self.assertNotEqual(skill_model, None)
+
+        new_skill = skill_services.get_skill_by_id(new_skill_id)
+        self.assertEqual(new_skill.version, skill_model.version)
+        #new_skill.version += 1
+        with self.assertRaises(Exception) as context:
+            skill_services.save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
+
+            self.assertTrue('Unexpected error: trying to update version %s of skill '
+                'from version %s. Please reload the page and try again.'
+                % (skill_models.SkillModel.get_by_id(new_skill_id).version, new_skill.version) in context.exception)
+
+    def test_apply_change_list(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_DESCRIPTION),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        with self.assertRaises(Exception) as cont:
+            skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist, self.USER_ID)
+
+            self.assertTrue('The user does not have enough rights to edit the skill description.' in cont.exception)
+        changelist2 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_LANGUAGE_CODE),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
+        ]
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist2, self.USER_ID)
+        self.assertEqual(skill_return.language_code, 'TestSkillId')
+
+        new_explanation = state_domain.SubtitledHtml(
+                    '1', 'testExplanation')
+        changelist3 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION),
+                'id': 0,
+                'old_value': '',
+                'new_value': new_explanation.to_dict()
+            })
+        ]
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist3, self.USER_ID)
+        self.assertEqual(skill_return.skill_contents.explanation.to_dict(), new_explanation.to_dict())
+
+        new_example = state_domain.SubtitledHtml('2', 'TestExample').to_dict()
+        changelist4 = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES),
+                'id': 0,
+                'old_value': '',
+                'new_value': [new_example]
+            })
+        ]
+        skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist4, self.USER_ID)
+        for worked_example in skill_return.skill_contents.worked_examples:
+            self.assertEqual(worked_example.to_dict(), new_example)
+
+
+
+
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
