@@ -894,5 +894,5 @@ class ExplorationFeaturesHandler(EditorHandler):
             'is_improvements_tab_enabled':
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
             'playthrough_recording_enabled':
-                exploration_id in (
+                exploration_id in whitelisted_exploration_ids_for_playthroughs,
         })
