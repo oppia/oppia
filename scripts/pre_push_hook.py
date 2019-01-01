@@ -37,10 +37,16 @@ import shutil
 import subprocess
 import sys
 
-import git
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+GIT_PYTHON_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11')
+sys.path.insert(0, GIT_PYTHON_PATH)
+# pylint: disable=wrong-import-position
+
+import git # isort:skip
+
+# pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
-
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
