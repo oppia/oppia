@@ -101,7 +101,7 @@ oppia.directive('topNavigationBar', [
             var data;
             $http.get('/generate_login_url', loginGenerationConfig).then(
               function(response) {
-                data = response.data
+                data = response.data;
                 $timeout(function() {
                   $window.location = data.login_url;
                 }, 150);
