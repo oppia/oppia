@@ -392,3 +392,19 @@ class UserInfoHandler(base.BaseHandler):
             'username': user_settings.username,
             'user_is_logged_in': True
         })
+
+
+class LoginUrlHandler(base.BaseHandler):
+
+    @acl_decorators.open_access
+    def get(self):
+        if self.user_id:
+            login_url = None
+        else:
+            target_url = (
+                '/' if self.request.GET.items()[0][1].endswith(
+                    feconf.SPLASH_URL)
+                else self.request.GET.items()[0][1])
+            login_url = (
+                current_user_services.create_login_url(target_url))
+        self.render_json({'login_url': login_url})

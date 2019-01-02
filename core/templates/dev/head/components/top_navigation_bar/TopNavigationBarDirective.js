@@ -89,11 +89,23 @@ oppia.directive('topNavigationBar', [
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
+          var url_parameters = {
+            current_url: $window.location.href
+          };
+          var login_generation_config = {
+            params: url_parameters
+          };
+
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            $timeout(function() {
-              $window.location = GLOBALS.loginUrl;
-            }, 150);
+            var data;
+            $http.get('/generate_login_url', login_generation_config).then(
+              function(response) {
+              data = response.data
+              $timeout(function() {
+                $window.location = data.login_url;
+              }, 150);    
+            });    
           };
 
           $scope.googleSignInIconUrl = (
