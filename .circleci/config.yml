@@ -11,7 +11,7 @@ anchor_for_installing_dependencies: &install_dependencies
     sudo apt-get install lsb-release libappindicator3-1
     curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
     sudo dpkg -i google-chrome.deb
-    sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+    sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
     rm google-chrome.deb
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
