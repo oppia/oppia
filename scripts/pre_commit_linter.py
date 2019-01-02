@@ -1350,6 +1350,54 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+def _check_sorted_imports(all_files):
+    """This function checks that the imports are sorted
+    according to di-order rule of  angular plugin of eslint.
+    """
+    print 'Starting sorted imports check'
+    print '----------------------------------------'
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    properties_to_check = ['controller', 'directive', 'factory']
+    failed = False
+    summary_messages = []
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_nodes = parsed_dict['body']
+        for parsed_node in parsed_nodes:
+            if parsed_node['type'] != 'ExpressionStatement':
+                continue
+            expression = parsed_node['expression']
+            if expression['type'] != 'CallExpression':
+                continue
+            if expression['callee']['type'] != 'MemberExpression':
+                continue
+            property_name = expression['callee']['property']['name']
+            if property_name not in properties_to_check:
+                continue
+            arguments = expression['arguments']
+            arguments = arguments[1:]
+            for argument in arguments:
+                if argument['type'] != 'ArrayExpression':
+                    continue
+                literal_args = []
+                function_args = []
+                elements = argument['elements']
+                for element in elements:
+                    if element['type'] == 'Literal':
+                 	    literal_args.append(str(element['value']))
+                    elif element['type'] == 'FunctionExpression':
+                   	    func_args = element['params']
+                  	    for func_arg in func_args:
+                            function_args.append(str(func_arg['name']))
+            
+            
+            
+    
 def _match_line_breaks_in_controller_dependencies(all_files):
     """This function checks whether the line breaks between the dependencies
     listed in the controller of a directive or service exactly match those
