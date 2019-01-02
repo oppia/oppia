@@ -74,9 +74,15 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
-      EditableExplorationBackendApiService.fetchApplyDraftExploration(
-        explorationId
-      ).then(function(explorationData) {
+      Promise.all([
+        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          explorationId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
+      ]).then(function(combinedData) {
+        var explorationData = combinedData[0];
+        var featuresData  = combinedData[1];
+        ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, callback);
         PlayerCorrectnessFeedbackEnabledService.init(
@@ -95,9 +101,13 @@ oppia.factory('ExplorationPlayerStateService', [
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var pretestQuestionsData = combinedData[1];
+        var featuresData = combinedData[2];
+        ExplorationFeaturesService.init(explorationData, featuresData);
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);

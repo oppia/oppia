@@ -34,8 +34,6 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
-    var whitelistCache = null;
-
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {

@@ -23,24 +23,25 @@ describe('Playthrough service', function() {
     this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
     this.LearnerActionObjectFactory =
       $injector.get('LearnerActionObjectFactory');
+    this.ExplorationFeaturesService =
+      $injector.get('ExplorationFeaturesService');
 
-    this.whitelistedExpId = 'expId1';
-    this.blacklistedExpId = 'expId2';
+    this.expId = 'expId1';
     this.expVersion = 1;
   }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(function() {
-      this.PlaythroughIssuesService.initSession(
-        this.whitelistedExpId, this.expVersion, [this.whitelistedExpId]);
-      this.PlaythroughService.initSession(
-        this.whitelistedExpId, this.expVersion, 1.0);
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(true);
+      this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
     });
 
     it('should initialize a session with correct values.', function() {
       var playthrough = this.PlaythroughService.getPlaythrough();
 
-      expect(playthrough.whitelistedExpId, this.whitelistedExpId);
+      expect(playthrough.whitelistedExpId, this.expId);
       expect(playthrough.expVersion, this.expVersion);
     });
 
@@ -251,10 +252,10 @@ describe('Playthrough service', function() {
 
   describe('Test whitelisting functions', function() {
     it('should not record learner actions for blacklisted exps', function() {
-      this.PlaythroughIssuesService.initSession(
-        this.blacklistedExpId, this.expVersion, [this.whitelistedExpId]);
-      this.PlaythroughService.initSession(
-        this.blacklistedExpId, this.expVersion, 1.0);
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(false);
+      this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
 
       this.PlaythroughService.recordExplorationStartAction('initStateName1');
       var playthrough = this.PlaythroughService.getPlaythrough();
