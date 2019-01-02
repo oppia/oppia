@@ -98,6 +98,15 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
 
 def _dict_to_search_document(d):
+    """Returns the given dict as search document.
+    Args:
+      - d: a dictionary, key in the dictionary is a field name and the
+          corresponding value is the field's value.
+    Returns:
+      - the given dictionary as a document.
+    Raises:
+      - ValueError: raised when invalid values are given.
+    """
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
 
@@ -118,6 +127,17 @@ def _dict_to_search_document(d):
 
 
 def _make_fields(key, value):
+    """Returns a list of fields instantiated using given field name and
+       values.
+    Args:
+      - key: name of the field, a string.
+      - value: values of the field. Data type can be string, numeric type,
+          datetime.date, datetime.datetime or list of such types.
+    Returns:
+      - a list of fields.
+    Raises:
+      - ValueError: raised when invalid values are given.
+    """
     if isinstance(value, list):
         _validate_list(key, value)
         return [_make_fields(key, v)[0] for v in value]
@@ -305,6 +325,18 @@ def search(query_string, index, cursor=None,
 
 
 def _string_to_sort_expressions(input_string):
+    """Returns a list of sort expressions instantiated using input_string.
+    Args:
+      - input_string: a string indicating how to sort results. This should be a
+        string of space separated values. Each value should start with a '+' or
+        a '-' character indicating whether to sort in ascending or descending
+        order respectively. This character should be followed by a field name
+        to sort on.
+    Returns:
+      - a list of sort expressions.
+    Raises:
+      - ValueError: raised when invalid values are given.
+    """
     sort_expressions = []
     s_tokens = input_string.split()
     for expression in s_tokens:
@@ -326,11 +358,11 @@ def _string_to_sort_expressions(input_string):
 def get_document_from_index(doc_id, index):
     """Returns a document with a give doc_id(s) from the index.
 
-    args:
+    Args:
       - doc_id: a doc_id as a string.
       - index: the name of an index, a string.
 
-    returns
+    Returns:
       - the requested document as a dict.
     """
     index = gae_search.Index(index)
@@ -338,6 +370,13 @@ def get_document_from_index(doc_id, index):
 
 
 def _search_document_to_dict(doc):
+    """Returns the given search document as dictionary containing
+       field names and values present in the document.
+    Args:
+      - doc: search document.
+    Returns:
+      - given document as dictionary.
+    """
     d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
     for field in doc.fields:
