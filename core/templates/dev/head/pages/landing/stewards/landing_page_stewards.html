@@ -126,10 +126,10 @@
       </div>
     </div>
 
-    <div class="oppia-stewards-landing-section" style="background-color: #e8e7e3; max-width: 90%; padding-bottom: 300px;">
+    <div class="oppia-stewards-landing-section" style="background-color: #e8e7e3; max-width: 90%; padding-bottom: 50px;">
       <section style="padding: 30px;">
         <!--A container to make a grid with a fixed column-->
-        <main class="row">
+        <main class="row" style="display: flex;">
           <div class="column oppia-stewards-sidebar" ng-if="!windowIsNarrow">
             <ul class="primary">
               <li ng-class="{active: isActiveTab(TAB_NAME_PARENTS)}"><a ng-click="setActiveTabName(TAB_NAME_PARENTS)">Parents</a></li>
@@ -485,11 +485,11 @@
       float: left;
       height: 500px;
       margin-left: 20px;
-      width: 60%;
     }
     .oppia-stewards-main-content-buttons {
       display: block;
       margin: 40px auto 0;
+      text-align: center;
     }
     .oppia-stewards-landing-top-section {
       margin-left: 60px;
