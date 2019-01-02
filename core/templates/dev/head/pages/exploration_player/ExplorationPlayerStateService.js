@@ -81,7 +81,7 @@ oppia.factory('ExplorationPlayerStateService', [
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
-        var featuresData  = combinedData[1];
+        var featuresData = combinedData[1];
         ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, callback);
