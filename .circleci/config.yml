@@ -34,8 +34,8 @@ jobs:
       - save_cache:
           key: setup-files-cache
           paths:
-            - ../node_modules/
-            - ../oppia_tools/
+            - /home/circleci/node_modules
+            - /home/circleci/oppia_tools
 
   lint_tests:
     <<: *job_defaults
@@ -53,7 +53,7 @@ jobs:
       - save_cache:
           key: third-party-cache
           paths:
-            - ./third_party/
+            - /home/circleci/oppia/third_party
 
   frontend_tests:
     <<: *job_defaults
@@ -94,10 +94,10 @@ jobs:
       - save_cache:
           key: build-cache
           paths:
-            - backend_prod_files/templates/head/
-            - build/templates/head/
-            - backend_prod_files/extensions/
-            - build/extensions/
+            - /home/circleci/oppia/backend_prod_files/templates/head
+            - /home/circleci/oppia/build/templates/head
+            - /home/circleci/oppia/backend_prod_files/extensions
+            - /home/circleci/oppia/build/extensions
 
 workflows:
   version: 2
