@@ -148,14 +148,22 @@ if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
   rm isort-4.2.15.tar.gz
 fi
 
-# Install GitPython.
+# Install GitPython and its dependencies.
 echo Checking if GitPython is installed in third_party
 if [ ! -d "$TOOLS_DIR/GitPython-2.1.11" ]; then
-  echo Installing GitPython
+  echo Installing GitPython and its dependencies
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
   curl -o GitPython-2.1.11.tar.gz -L https://files.pythonhosted.org/packages/4d/e8/98e06d3bc954e3c5b34e2a579ddf26255e762d21eb24fede458eff654c51/GitPython-2.1.11.tar.gz
   tar xzf GitPython-2.1.11.tar.gz -C $TOOLS_DIR
   rm GitPython-2.1.11.tar.gz
+  # Install gitdb.
+  curl -o gitdb-0.6.4.tar.gz -L https://files.pythonhosted.org/packages/e3/95/7e5d7261feb46c0539ac5e451be340ddd64d78c5118f2d893b052c76fe8c/gitdb-0.6.4.tar.gz
+  tar xzf gitdb-0.6.4.tar.gz -C $TOOLS_DIR
+  rm gitdb-0.6.4.tar.gz
+  # Install smmap.
+  curl -o smmap-0.9.0.tar.gz -L https://files.pythonhosted.org/packages/bc/aa/b744b3761fff1b10579df996a2d2e87f124ae07b8336e37edc89cc502f86/smmap-0.9.0.tar.gz
+  tar xzf smmap-0.9.0.tar.gz -C $TOOLS_DIR
+  rm smmap-0.9.0.tar.gz
 fi
 
 # Install pycodestyle.
