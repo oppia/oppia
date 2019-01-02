@@ -17,11 +17,11 @@
  */
 
 oppia.factory('PlaythroughIssuesService', [
-  '$sce', 'ExplorationFeaturesService', 'PlaythroughIssuesBackendApiService',
+  '$sce', 'PlaythroughIssuesBackendApiService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, ExplorationFeaturesService, PlaythroughIssuesBackendApiService,
+      $sce, PlaythroughIssuesBackendApiService,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;

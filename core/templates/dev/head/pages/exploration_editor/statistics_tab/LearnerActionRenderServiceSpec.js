@@ -31,9 +31,13 @@ describe('Learner Action Render Service', function() {
       this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
       this.LearnerActionRenderService =
         $injector.get('LearnerActionRenderService');
+      this.ExplorationFeaturesService =
+        $injector.get('ExplorationFeaturesService');
 
-      this.PlaythroughIssuesService.initSession('expId1', 1, ['expId1']);
+      this.PlaythroughIssuesService.initSession('expId1', 1);
       this.PlaythroughService.initSession('expId1', 1, 1.0);
+      spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(true);
     }));
 
     it('should split up EarlyQuit learner actions into display blocks.',
