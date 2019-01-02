@@ -1,7 +1,7 @@
 var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
 anchor_for_job_defaults: &job_defaults
-  working_directory: ~/oppia
+  working_directory: /home/circleci/oppia
   docker:
     - image: *docker_image
 
@@ -53,7 +53,7 @@ jobs:
       - save_cache:
           key: third-party-cache
           paths:
-            - third_party/
+            - ./third_party/
 
   frontend_tests:
     <<: *job_defaults
