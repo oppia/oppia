@@ -877,6 +877,6 @@ class ExplorationFeaturesHandler(EditorHandler):
         self.render_json({
             'is_improvements_tab_enabled':
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
-            'playthrough_recording_enabled':
+            'is_playthrough_recording_enabled':
                 exploration_id in whitelisted_exploration_ids_for_playthroughs,
         })
