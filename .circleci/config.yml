@@ -11,10 +11,11 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
-anchor_for_restoring_cache: &restore_cache
-  keys:
-    - setup-files-cache
-    - third-party-cache
+anchor_for_restoring_setup_cache: &restore_setup_cache
+  key: setup-files-cache
+
+anchor_for_restoring_third_party_cache: &restore_third_party_cache
+  key: third-party-cache
 
 anchor_for_restoring_build_cache: &restore_build_cache
   key: build-cache
@@ -26,7 +27,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *restore_cache
+          <<: *restore_setup_cache
+          <<: *restore_third_party_cache
       - run:
           <<: *install_dependencies
       - save_cache:
@@ -40,7 +42,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *restore_cache
+          <<: *restore_setup_cache
+          <<: *restore_third_party_cache
       - run:
           name: Run lint tests
           command: |
@@ -49,15 +52,15 @@ jobs:
             python scripts/pre_commit_linter.py --path=.
       - save_cache:
           key: third-party-cache
-          paths:
-            - third_party/
+          path: third_party/
 
   frontend_tests:
     <<: *job_defaults
     steps:
       - checkout
       - restore_cache:
-          <<: *restore_cache
+          <<: *restore_setup_cache
+          <<: *restore_third_party_cache
       - run:
           name: Run frontend tests
           command: |
@@ -68,7 +71,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *restore_cache
+          <<: *restore_setup_cache
+          <<: *restore_third_party_cache
       - run:
           name: Run backend tests
           command: |
@@ -79,7 +83,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *restore_cache
+          <<: *restore_setup_cache
+          <<: *restore_third_party_cache
           <<: *restore_build_cache
       - run:
           name: Run e2e tests accessiblity
