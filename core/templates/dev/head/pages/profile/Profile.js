@@ -96,8 +96,8 @@ oppia.controller('Profile', [
         if ($scope.userNotLoggedIn) {
           var data;
           $http.get('/generate_login_url', config).then(function(response) {
-            data = response.data
-          });    
+            data = response.data;
+          });
           $window.location.href = data.login_url;
         } else {
           if (!$scope.isAlreadySubscribed) {
