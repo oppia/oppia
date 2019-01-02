@@ -24,15 +24,15 @@ oppia.controller('StatisticsTab', [
   'ExplorationStatesService', 'ExplorationDataService', 'ComputeGraphService',
   'DateTimeFormatService', 'StatesObjectFactory',
   'StateImprovementSuggestionService', 'ReadOnlyExplorationBackendApiService',
-  'UrlInterpolationService', 'PlaythroughIssuesService', 'RouterService',
-  'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  'UrlInterpolationService', 'RouterService', 'StateRulesStatsService',
+  'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationFeaturesService,
       ExplorationStatesService, ExplorationDataService, ComputeGraphService,
       DateTimeFormatService, StatesObjectFactory,
       StateImprovementSuggestionService, ReadOnlyExplorationBackendApiService,
-      UrlInterpolationService, PlaythroughIssuesService, RouterService,
-      StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
+      UrlInterpolationService, RouterService, StateRulesStatsService,
+      IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
