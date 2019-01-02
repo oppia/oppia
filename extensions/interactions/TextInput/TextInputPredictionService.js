@@ -29,7 +29,12 @@ oppia.factory('TextInputPredictionService', [
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
-        var prediction = -1;
+
+        // Upon investigation it was deterimined that Oppia-ml's text predictor
+        // predicted the category of 3 when given an empty(zero) vector. To 
+        // maintain consistency with Oppia-ml, the frontend will also default to 3
+        // when given an empty(zero) vector.
+        var prediction = 3;
         var svmData = classifierData.SVM;
 
         // Tokenize the text input.
