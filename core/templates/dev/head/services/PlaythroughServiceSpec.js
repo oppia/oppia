@@ -20,22 +20,22 @@ describe('Playthrough service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     this.PlaythroughService = $injector.get('PlaythroughService');
-    this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
     this.LearnerActionObjectFactory =
       $injector.get('LearnerActionObjectFactory');
     this.ExplorationFeaturesService =
       $injector.get('ExplorationFeaturesService');
-
-    this.expId = 'expId1';
-    this.expVersion = 1;
   }));
 
   describe('Test playthrough service functions', function() {
     beforeEach(function() {
+      this.expId = 'expId1';
+      this.expVersion = 1;
+      this.playthroughRecordingProbability = 1.0;
+
+      this.PlaythroughService.initSession(
+        this.expId, this.expVersion, this.playthroughRecordingProbability);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
-      this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
-      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
     });
 
     it('should initialize a session with correct values.', function() {
@@ -211,7 +211,7 @@ describe('Playthrough service', function() {
 
     it(
       'should analyze a playthrough for cyclic state transitions issue for a ' +
-        'cycle starting at a later point in the playthrough.',
+      'cycle starting at a later point in the playthrough.',
       function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
         this.PlaythroughService.recordAnswerSubmitAction(
@@ -239,7 +239,6 @@ describe('Playthrough service', function() {
         this.PlaythroughService.recordPlaythrough();
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         // The cycle is stateName2->stateName3->stateName2.
         expect(playthrough.issueCustomizationArgs).toEqual({
@@ -250,16 +249,23 @@ describe('Playthrough service', function() {
       });
   });
 
-  describe('Test whitelisting functions', function() {
-    it('should not record learner actions for blacklisted exps', function() {
+  describe('Test recording disabled', function() {
+    beforeEach(function() {
+      this.expId = 'expId1';
+      this.expVersion = 1;
+      this.playthroughRecordingProbability = 1.0;
+
+      this.PlaythroughService.initSession(
+        this.expId, this.expVersion, this.playthroughRecordingProbability);
+    });
+
+    it('should not record learner actions if recording disabled', function() {
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(false);
-      this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
-      this.PlaythroughService.initSession(this.expId, this.expVersion, 1.0);
 
       this.PlaythroughService.recordExplorationStartAction('initStateName1');
-      var playthrough = this.PlaythroughService.getPlaythrough();
 
+      var playthrough = this.PlaythroughService.getPlaythrough();
       expect(playthrough.actions).toEqual([]);
     });
   });
