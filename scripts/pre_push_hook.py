@@ -38,7 +38,7 @@ import subprocess
 import sys
 
 
-# Add GitPython to sys.path, then only it can be imported.
+# Insert GitPython to sys.path so that it can be imported.
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 GIT_PYTHON_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11')
 sys.path.insert(0, GIT_PYTHON_PATH)
@@ -118,7 +118,7 @@ def _get_remote_name():
             remote_num += 1
             remote_name = remote.name
 
-    if remote_num == 0:
+    if not remote_num:
         print ('Warning: Please set upstream for the lint checks to run '
                'efficiently. You can learn more about it here -> '
                'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
