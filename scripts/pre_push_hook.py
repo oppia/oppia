@@ -105,6 +105,7 @@ def _start_subprocess_for_result(cmd):
 
 def _get_remote_name():
     """Get the remote name of the local repository.
+
     Returns:
         str. The remote name of the local repository.
     """
