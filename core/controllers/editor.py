@@ -862,21 +862,3 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
         })
-
-
-class ExplorationFeaturesHandler(EditorHandler):
-    """Returns features the given exploration is configured to support."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
-        """Handles GET requests for an exploration's features."""
-        whitelisted_exploration_ids_for_playthroughs = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        self.render_json({
-            'is_improvements_tab_enabled':
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
-            'is_playthrough_recording_enabled':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs,
-        })
