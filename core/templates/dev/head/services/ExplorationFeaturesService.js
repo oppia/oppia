@@ -28,7 +28,7 @@ oppia.factory('ExplorationFeaturesService', [function() {
     init: function(explorationData, featuresData) {
       settings.isImprovementsTabEnabled =
         featuresData.is_improvements_tab_enabled;
-      settings.isImprovementsTabEnabled =
+      settings.isPlaythroughRecordingEnabled =
         featuresData.is_playthrough_recording_enabled;
       if (explorationData.param_changes &&
           explorationData.param_changes.length > 0) {
