@@ -52,7 +52,8 @@ jobs:
             python scripts/pre_commit_linter.py --path=.
       - save_cache:
           key: third-party-cache
-          path: third_party/
+          paths:
+            - third_party/
 
   frontend_tests:
     <<: *job_defaults
