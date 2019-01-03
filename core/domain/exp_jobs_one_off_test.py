@@ -77,6 +77,23 @@ def mock_save_original_and_compressed_versions_of_image(
             original_image_content, mimetype='image/%s' % filetype)
 
 
+def run_job_for_deleted_exp(
+        self, job_class, check_error=False,
+        error_type=None, error_msg=None, function_to_be_called=None,
+        exp_id=None):
+
+    job_id = job_class.create_new()
+    job_class.enqueue(job_id)
+    self.process_and_flush_pending_tasks()
+
+    if check_error:
+        with self.assertRaisesRegexp(error_type, error_msg):
+            function_to_be_called(exp_id)
+
+    else:
+        self.assertEqual(job_class.get_output(job_id), [])
+
+
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
@@ -415,20 +432,16 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         """Test that no action is performed on deleted explorations."""
 
         exp_id = '100'
-        exploration = self.save_new_valid_exploration(
-            exp_id, self.user_a_id)
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
         exp_services.delete_exploration(self.user_a_id, exp_id)
 
-        # Run the ExpSummariesContributorsOneOff job.
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExpSummaryModel with id 100 not found'):
-            exp_services.get_exploration_summary_by_id(exploration.id)
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
+            check_error=True,
+            error_type=base_models.BaseModel.EntityNotFoundError,
+            error_msg='Entity for class ExpSummaryModel with id 100 not found',
+            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            exp_id=exp_id)
 
 
 class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -612,21 +625,16 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         """Test that no action is performed on deleted explorations."""
 
         exp_id = '100'
-        exploration = self.save_new_valid_exploration(
-            exp_id, self.user_a_id)
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
         exp_services.delete_exploration(self.user_a_id, exp_id)
 
-        # Run the ExplorationContributorsSummaryOneOff job.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new())
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExpSummaryModel with id 100 not found'):
-            exp_services.get_exploration_summary_by_id(exploration.id)
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
+            check_error=True,
+            error_type=base_models.BaseModel.EntityNotFoundError,
+            error_msg='Entity for class ExpSummaryModel with id 100 not found',
+            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            exp_id=exp_id)
 
     def test_exploration_contributors_summary_job_produces_no_output(self):
         """Test that ExplorationContributorsSummaryOneOff job produces
@@ -707,15 +715,15 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-        job_id = (
-            exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        with self.assertRaisesRegexp(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class ExplorationRightsModel with id exp_id not found'):
-            rights_manager.get_exploration_rights(self.EXP_ID)
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+            check_error=True,
+            error_type=base_models.BaseModel.EntityNotFoundError,
+            error_msg=(
+                'Entity for class ExplorationRightsModel with id '
+                'exp_id not found'),
+            function_to_be_called=rights_manager.get_exploration_rights,
+            exp_id=self.EXP_ID)
 
 
 class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
@@ -866,14 +874,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ExplorationValidityJobManager job.
-        job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
-        exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationValidityJobManager.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExplorationValidityJobManager)
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
@@ -1096,14 +1098,8 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start InteractionAuditOneOff job.
-        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
-        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.InteractionAuditOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -1311,14 +1307,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
-        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
-                job_id), [])
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ItemSelectionInteractionOneOffJob)
 
 
 class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
@@ -1402,14 +1392,8 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ViewableExplorationsAudit job on sample exploration.
-        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
-        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ViewableExplorationsAuditJob)
 
 
 class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
@@ -1516,14 +1500,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-        # Start ExplorationStateIdMapping job on published exploration.
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationStateIdMappingJob.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExplorationStateIdMappingJob)
 
 
 class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -1739,14 +1717,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start HintsAuditOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
-        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(self, exp_jobs_one_off.HintsAuditOneOffJob)
 
 
 class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
@@ -1877,18 +1848,9 @@ class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ExplorationContentValidationJobForTextAngular.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContentValidationJobForTextAngular.create_new())
-        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off
-            .ExplorationContentValidationJobForTextAngular.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular)
 
 
 class ExplorationMigrationValidationJobForTextAngularTests(
@@ -2016,17 +1978,9 @@ class ExplorationMigrationValidationJobForTextAngularTests(
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ExplorationMigrationValidationJobForTextAngular.
-        job_class = (
+        run_job_for_deleted_exp(
+            self,
             exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular)
-        job_id = job_class.create_new()
-        job_class.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off
-            .ExplorationMigrationValidationJobForTextAngular.get_output(job_id),
-            [])
 
 
 class ExplorationContentValidationJobForCKEditorTests(
@@ -2208,18 +2162,9 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ExplorationContentValidationJobForCKEditor.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContentValidationJobForCKEditor.create_new())
-        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off
-            .ExplorationContentValidationJobForCKEditor.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor)
 
 
 class ExplorationMigrationValidationJobForCKEditorTests(
@@ -2353,18 +2298,9 @@ class ExplorationMigrationValidationJobForCKEditorTests(
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start ExplorationMigrationValidationJobForCKEditor.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationMigrationValidationJobForCKEditor.create_new())
-        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off
-            .ExplorationMigrationValidationJobForCKEditor.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor)
 
 
 class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
@@ -2645,15 +2581,6 @@ class InteractionCustomizationArgsValidationJobTests(
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        # Start InteractionCustomizationArgsValidationJob.
-        job_id = (
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.create_new())
-        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.get_output(job_id),
-            [])
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
