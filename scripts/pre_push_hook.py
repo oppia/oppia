@@ -37,8 +37,24 @@ import shutil
 import subprocess
 import sys
 
-# pylint: enable=wrong-import-order
 
+# Insert GitPython and its requirements to sys.path so that it can be imported.
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PATHS = [
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'smmap-0.9.0'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'gitdb-0.6.4'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11'),
+]
+
+for path in _PATHS:
+    sys.path.insert(0, path)
+
+# pylint: disable=wrong-import-position
+
+import git # isort:skip
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -92,6 +108,34 @@ def _start_subprocess_for_result(cmd):
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
+
+
+def _get_remote_name():
+    """Get the remote name of the local repository.
+
+    Returns:
+        str. The remote name of the local repository.
+    """
+    remote_name = ''
+    remote_num = 0
+    # Get the current repository.
+    repo = git.Repo(os.getcwd())
+    for remote in repo.remotes:
+        remote_url = list(remote.urls)[0]
+        if remote_url.endswith('oppia/oppia.git'):
+            remote_num += 1
+            remote_name = remote.name
+
+    if not remote_num:
+        print ('Warning: Please set upstream for the lint checks to run '
+               'efficiently. You can learn more about it here -> '
+               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
+        return
+    elif remote_num > 1:
+        print ('Warning: Please keep only one remote branch for oppia:develop '
+               'to run the lint checks efficiently.\n')
+        return
+    return remote_name
 
 
 def _git_diff_name_status(left, right, diff_filter=''):
@@ -174,32 +218,22 @@ def _collect_files_being_pushed(ref_list, remote):
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
-    remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
-        # Git reports the following for an empty / non existing branch
-        # sha1: '0000000000000000000000000000000000000000'.
-        if set(remote_sha1) != {'0'}:
+    for branch, sha1 in zip(branches, hashes):
+        # Get the difference to remote/develop.
+        try:
+            modified_files = _compare_to_remote(
+                remote, branch, remote_branch='develop')
+        except ValueError:
+            # Give up, return all files in repo.
             try:
-                modified_files = _compare_to_remote(remote, branch)
+                modified_files = _git_diff_name_status(
+                    GIT_NULL_COMMIT, sha1)
             except ValueError as e:
                 print e.message
                 sys.exit(1)
-        else:
-            # Get the difference to origin/develop instead.
-            try:
-                modified_files = _compare_to_remote(
-                    remote, branch, remote_branch='develop')
-            except ValueError:
-                # Give up, return all files in repo.
-                try:
-                    modified_files = _git_diff_name_status(
-                        GIT_NULL_COMMIT, sha1)
-                except ValueError as e:
-                    print e.message
-                    sys.exit(1)
         files_to_lint = _extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
@@ -274,7 +308,8 @@ def main():
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
-    remote = args.remote
+    remote = _get_remote_name()
+    remote = remote if remote else args.remote
     if args.install:
         _install_hook()
         sys.exit(0)
