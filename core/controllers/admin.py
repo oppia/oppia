@@ -222,14 +222,14 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload an exploration in production.')
 
     def _reload_collection(self, collection_id):
-        """Reloads the collection in production corresponding to the given
+        """Reloads the collection in dev_mode corresponding to the given
         collection id.
 
         Args:
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception: Cannot reload a collection in dev_mode.
         """
         if constants.DEV_MODE:
             logging.info(
