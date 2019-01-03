@@ -25,19 +25,22 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService',
+        'SkillRightsBackendApiService', 'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService,
+            SkillRightsBackendApiService, SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillRights = (
             SkillEditorStateService.getSkillRights());
-
+          $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
+          $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
+          $scope.selectQuestionsTab =
+            SkillEditorRoutingService.navigateToQuestionsTab;
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
           $scope.validationIssues = [];
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;

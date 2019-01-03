@@ -82,6 +82,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
     def _validate_customization_arg_specs(self, customization_args):
+        """Validates the customization arg specs for the interaction.
+
+        Args:
+            customization_args: list(dict(str, *)). The customization args for
+                the interaction.
+        """
         for ca_spec in customization_args:
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value']))
@@ -105,22 +111,32 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     obj_class.normalize(ca_spec['default_value']))
 
     def _validate_dependencies(self, dependency_ids):
-        # Check that all dependency ids are valid.
+        """Validates all the dependency ids.
+
+        Args:
+            dependency_ids: list(str). A list of dependency ids.
+        """
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
-        _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
+        """Validates all the answer_visualization_specs for the interaction.
+
+        Args:
+            answer_visualization_specs: list(dict(str, *)). The answer
+                visualization specs to be validated.
+        """
+        _answer_visualizations_specs_schema = [
             ('id', basestring), ('options', dict),
             ('calculation_id', basestring),
             ('addressed_info_is_supported', bool)]
-        _ANSWER_VISUALIZATION_KEYS = [
-            item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
+        _answer_visualization_keys = [
+            item[0] for item in _answer_visualizations_specs_schema]
 
         # Check that the keys and the types of their values are correct.
         for spec in answer_visualization_specs:
-            self.assertItemsEqual(spec.keys(), _ANSWER_VISUALIZATION_KEYS)
-            for key, item_type in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA:
+            self.assertItemsEqual(spec.keys(), _answer_visualization_keys)
+            for key, item_type in _answer_visualizations_specs_schema:
                 self.assertTrue(isinstance(spec[key], item_type))
                 if item_type == basestring:
                     self.assertTrue(spec[key])
@@ -135,6 +151,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         return names
 
     def _get_linear_interaction_ids(self):
+        """Returns the ids of all linear interactions.
+
+        Returns:
+            list(str). The list of linear interaction ids.
+        """
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         return [
@@ -180,6 +201,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             }])
 
     def test_interaction_rules(self):
+        """Tests the interaction rules."""
         def _check_num_interaction_rules(interaction_id, expected_num):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
@@ -192,6 +214,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             _check_num_interaction_rules('FakeObjType', 0)
 
     def test_interaction_rule_descriptions_in_dict(self):
+        """Tests the interaction rule descriptions in dict format."""
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'NumericInput')
         self.assertEqual(interaction.to_dict()['rule_descriptions'], {

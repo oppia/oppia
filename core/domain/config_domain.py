@@ -274,3 +274,8 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
+
+IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
+    'is_improvements_tab_enabled', BOOL_SCHEMA,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    False)

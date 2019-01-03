@@ -82,7 +82,6 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
         SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
         iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
@@ -182,6 +181,7 @@
 
     <script src="/templates/dev/head/services/AlertsService.js"></script>
     <script src="/templates/dev/head/services/ContextService.js"></script>
+    <script src="/templates/dev/head/services/NavigationService.js"></script>
     <script src="/templates/dev/head/services/UtilsService.js"></script>
     <script src="/templates/dev/head/services/DebouncerService.js"></script>
     <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
