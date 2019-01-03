@@ -406,8 +406,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             if feedback_thread_user_model else [])
 
     def _get_message_ids_in_a_thread(self, thread_id):
-        """Gets the message ids in the thread corresponding to the given thread
-        id.
+        """Gets the ids of messages in the thread corresponding to the given
+        thread id.
         """
         messages = feedback_services.get_messages(thread_id)
 

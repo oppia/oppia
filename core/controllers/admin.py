@@ -209,7 +209,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in dev_mode.
+            Exception: Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -229,7 +229,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in dev_mode.
+            Exception: Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(

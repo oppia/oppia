@@ -135,7 +135,7 @@ def _make_fields(key, value):
 
     Args:
         key: str. The name of the field.
-        value: str. The field value.
+        value: *. The field value.
 
     Returns:
         list(*). A list of fields.
@@ -382,7 +382,7 @@ def _search_document_to_dict(doc):
         doc: Document. The document to be converted into dict format.
 
     Returns:
-        dict(str, str). The document in dict format containing fields.
+        dict(str, str). The document in dict format.
     """
     d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
