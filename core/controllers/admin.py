@@ -202,14 +202,14 @@ class AdminHandler(base.BaseHandler):
             raise
 
     def _reload_exploration(self, exploration_id):
-        """Reloads the exploration in production corresponding to the given
+        """Reloads the exploration in dev_mode corresponding to the given
         exploration id.
 
         Args:
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception: Cannot reload an exploration in dev_mode.
         """
         if constants.DEV_MODE:
             logging.info(

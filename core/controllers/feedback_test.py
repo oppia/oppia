@@ -394,8 +394,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, thread_id):
-        """Gets the message ids of the thread read by the user corresponding to
-        the given user id.
+        """Gets the ids of messages in the thread read by the user corresponding
+        to the given user id.
         """
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(

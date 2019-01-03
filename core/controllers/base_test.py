@@ -538,7 +538,7 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         def get(self):
-            """Raises InternalErrorException."""
+            """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
     def test_error_response_for_get_request_of_type_json_has_json_format(self):

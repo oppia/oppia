@@ -167,7 +167,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             """Returns the intro card color according to the category.
 
             Args:
-                category: str. The category of the exploration.
+                category: str. The category of the lesson.
 
             Returns:
                 str. The intro card color according to the category.
@@ -178,13 +178,14 @@ class CreatorDashboardHandler(base.BaseHandler):
                 constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
-            """Returns the rounded average rating of the exploration.
+            """Returns the rounded average rating to display on the creator
+            dashboard.
 
             Args:
-                rating: int. The rating of the exploration.
+                rating: float. The rating of the lesson.
 
             Returns:
-                int. The rounded average value of rating.
+                float. The rounded average value of rating.
             """
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 

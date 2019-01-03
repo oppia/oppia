@@ -70,16 +70,16 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
     def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,
             unused_commit_message):
-        """Raises update skill exception."""
+        """Mocks skill updates. Always fails by raising a validation error."""
         raise utils.ValidationError()
 
     def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
-        """Returns None."""
+        """Mocks get_skill_rights. Returns None."""
         return None
 
     def _mock_publish_skill_raise_exception(
             self, unused_skill_id, unused_committer_id):
-        """Raises publish skill exception."""
+        """Mocks publishing skills. Always fails by raising an exception."""
         raise Exception()
 
 

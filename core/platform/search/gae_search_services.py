@@ -98,7 +98,18 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
 
 def _dict_to_search_document(d):
-    """Returns and converts the document dict into objects."""
+    """Returns and converts the document dict into objects.
+
+    Args:
+        d: dict(str, str). A dict containing field names as keys and
+            corresponding field values as values.
+
+    Returns:
+        Document. The document containing fields.
+
+    Raises:
+        ValueError: The given document is not in the dict format.
+    """
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
 
@@ -121,6 +132,17 @@ def _dict_to_search_document(d):
 def _make_fields(key, value):
     """Returns the fields corresponding to the key value pair according to the
     type of value.
+
+    Args:
+        key: str. The name of the field.
+        value: str. The field value.
+
+    Returns:
+        list(*). A list of fields.
+
+    Raises:
+        ValueError: The type of field value is not list, basestring, Number or
+            datetime.
     """
     if isinstance(value, list):
         _validate_list(key, value)
@@ -309,7 +331,18 @@ def search(query_string, index, cursor=None,
 
 
 def _string_to_sort_expressions(input_string):
-    """Returns the sorted expression of the input string."""
+    """Returns the sorted expression of the input string.
+
+    Args:
+        input_string: str. The input string to be sorted.
+
+    Returns:
+        list(SortExpression). A list of sorted expressions.
+
+    Raises:
+        ValueError: Fields in the sort expression do not start with '+' or '-'
+            to indicate sort direction.
+    """
     sort_expressions = []
     s_tokens = input_string.split()
     for expression in s_tokens:
@@ -343,7 +376,14 @@ def get_document_from_index(doc_id, index):
 
 
 def _search_document_to_dict(doc):
-    """Converts and returns the search document into a dict format."""
+    """Converts and returns the search document into a dict format.
+
+    Args:
+        doc: Document. The document to be converted into dict format.
+
+    Returns:
+        dict(str, str). The document in dict format containing fields.
+    """
     d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
     for field in doc.fields:
