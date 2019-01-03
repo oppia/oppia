@@ -394,17 +394,30 @@ class UserInfoHandler(base.BaseHandler):
         })
 
 
-class LoginUrlHandler(base.BaseHandler):
+class LoginUrlHandlerPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        login_url = None
         if self.user_id:
             login_url = None
+            self.render_json({'login_url': login_url})
         else:
-            target_url = (
-                '/' if self.request.GET.items()[0][1].endswith(
-                    feconf.SPLASH_URL)
-                else self.request.GET.items()[0][1])
-            login_url = (
-                current_user_services.create_login_url(target_url))
-        self.render_json({'login_url': login_url})
+            if self.request.GET.items():
+                if self.request.GET.items()[0]:
+                    target_url = (
+                        '/' if self.request.GET.items()[0][1].endswith(
+                            feconf.SPLASH_URL)
+                        else self.request.GET.items()[0][1])
+                    login_url = (
+                        current_user_services.create_login_url(target_url))
+                    self.render_json({'login_url': login_url})
+                else:
+                    raise self.InvalidInputException(
+                        'Empty GET parameters passed'
+                    )
+            else:
+                raise self.InvalidInputException(
+                    'Expected URL in the GET request parameters, None '
+                    'passed'
+                )

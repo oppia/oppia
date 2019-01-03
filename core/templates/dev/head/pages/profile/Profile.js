@@ -94,11 +94,13 @@ oppia.controller('Profile', [
 
       $scope.changeSubscriptionStatus = function() {
         if ($scope.userNotLoggedIn) {
-          var data;
           $http.get('/generate_login_url', config).then(function(response) {
-            data = response.data;
+            if (response.data !== null) {
+              if (response.data.login_url !== null) {
+                $window.location = data.login_url;
+              }
+            }
           });
-          $window.location.href = data.login_url;
         } else {
           if (!$scope.isAlreadySubscribed) {
             $scope.isAlreadySubscribed = true;

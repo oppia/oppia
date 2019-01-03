@@ -98,12 +98,14 @@ oppia.directive('topNavigationBar', [
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            var data;
             $http.get('/generate_login_url', loginGenerationConfig).then(
               function(response) {
-                data = response.data;
                 $timeout(function() {
-                  $window.location = data.login_url;
+                  if (response.data !== null) {
+                    if (response.data.login_url !== null) {
+                      $window.location = response.data.login_url;
+                    }
+                  }
                 }, 150);
               }
             );
