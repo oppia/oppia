@@ -76,8 +76,24 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-            skill_services._migrate_skill_contents_to_latest_schema({'schema_version': self.skill.skill_contents_schema_version, 'skill_contents': self.skill_contents})
-        #self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+            skill_services._migrate_skill_contents_to_latest_schema({'schema_version': self.skill.skill_contents_schema_version, 'skill_contents': self.misconceptions})
+        self.skill.skill_contents_schema_version = 1
+        skill_services._migrate_skill_contents_to_latest_schema({'schema_version': self.skill.skill_contents_schema_version, 'skill_contents': self.skill_contents})
+        self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+
+
+    def test_migrate_misconceptions_to_latest_schema(self):
+        self.skill.skill_misconceptions_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d misconception schemas at '
+            'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            skill_services._migrate_misconceptions_to_latest_schema({'schema_version': self.skill.skill_misconceptions_schema_version, 'misconceptions': self.skill.misconceptions})
+        self.skill.misconceptions_schema_version = 1
+        skill_services._migrate_misconceptions_to_latest_schema({'schema_version': self.skill.misconceptions_schema_version, 'misconceptions': self.skill.misconceptions})
+        self.assertEqual(self.skill.misconceptions_schema_version, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+
+    def test_get_skill_memcache_key(self):
+        self.assertEqual(skill_services._get_skill_memcache_key(self.SKILL_ID, 1), 'skill-version:%s:%s' % (self.SKILL_ID, 1))
 
     def test_compute_summary_of_skill(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -102,8 +118,23 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_skill_from_model(self):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill = skill_services.get_skill_from_model(skill_model)
-
         self.assertEqual(skill.to_dict(), self.skill.to_dict())
+
+        initial_version = skill_model.skill_contents_schema_version
+        skill_model.skill_contents_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d skill schemas at '
+            'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+            skill_services.get_skill_from_model(skill_model)
+        skill_model.skill_contents_schema_version = initial_version
+
+        initial_version = skill_model.misconceptions_schema_version
+        skill_model.misconceptions_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d misconception schemas at '
+            'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            skill_services.get_skill_from_model(skill_model)
+        skill_model.misconceptions_schema_version = initial_version
 
     def test_get_skill_summary_from_model(self):
         skill_summary_model = skill_models.SkillSummaryModel.get(self.SKILL_ID)
