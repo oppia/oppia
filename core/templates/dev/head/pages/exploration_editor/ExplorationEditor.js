@@ -337,43 +337,37 @@ oppia.controller('ExplorationEditor', [
         'At any time, you can click the <b>preview</b> button to play ' +
         'through your exploration.'),
       placement: 'bottom'
-    },];
-    
-    if (GLOBALS.can_edit) {
-      $scope.EDITOR_TUTORIAL_OPTIONS.push(
-        {
-          type: 'element',
-          selector: _ID_TUTORIAL_SAVE_BUTTON,
-          heading: 'Save',
-          text: (
-            'When you\'re done making changes, ' +
-            'be sure to save your work.<br><br>'),
-          placement: 'bottom'
-        }, {
-          type: 'title',
-          heading: 'Tutorial Complete',
-          text: (
-            '<h2>Now for the fun part...</h2>' +
-            'That\'s the end of the tour! ' +
-            'To finish up, here are some things we suggest: ' +
-            '<ul>' +
-            '  <li>' +
-            '    Create your first card!' +
-            '  </li>' +
-            '  <li>' +
-            '    Preview your exploration.' +
-            '  </li>' +
-            '  <li>' +
-            '    Check out more resources in the ' +
-            '    <a href="https://oppia.github.io/#/" target="_blank">' +
-            '      Help Center.' +
-            '    </a>' +
-            '  </li>' +
-            '</ul>')
-        }
-      );
-    }
-    
+    }, {
+      type: 'element',
+      selector: _ID_TUTORIAL_SAVE_BUTTON,
+      heading: 'Save',
+      text: (
+        'When you\'re done making changes, ' +
+        'be sure to save your work.<br><br>'),
+      placement: 'bottom'
+    }, {
+      type: 'title',
+      heading: 'Tutorial Complete',
+      text: (
+        '<h2>Now for the fun part...</h2>' +
+        'That\'s the end of the tour! ' +
+        'To finish up, here are some things we suggest: ' +
+        '<ul>' +
+        '  <li>' +
+        '    Create your first card!' +
+        '  </li>' +
+        '  <li>' +
+        '    Preview your exploration.' +
+        '  </li>' +
+        '  <li>' +
+        '    Check out more resources in the ' +
+        '    <a href="https://oppia.github.io/#/" target="_blank">' +
+        '      Help Center.' +
+        '    </a>' +
+        '  </li>' +
+        '</ul>')
+    }];
+
     // Replace the ng-joyride template with one that uses <[...]> interpolators
     // instead of/ {{...}} interpolators.
     var ngJoyrideTemplate = $templateCache.get('ng-joyride-title-tplv1.html');
