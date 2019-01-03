@@ -8,7 +8,8 @@
   color: #0D48A1;
   text-align: left;
   /* This is needed so that images stay bounded by the container in Firefox. */
-  width: 100%;
+  /* This also limits the selection area of the option to the text and radio button. */
+  width: auto;
 }
 
 .multiple-choice-radio-button-container {
