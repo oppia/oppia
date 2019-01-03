@@ -16,7 +16,7 @@
  * @fileoverview Factory for navigating the top navigation bar with
  * tab and shift-tab.
  */
-oppia.factory('NavigationService', [function(){
+oppia.factory('NavigationService', [function() {
   var navigation = {};
   navigation.activeMenuName = '';
   navigation.ACTION_OPEN = 'open';
