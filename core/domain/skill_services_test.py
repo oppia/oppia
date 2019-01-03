@@ -20,6 +20,7 @@ import feconf
 from core.domain import skill_domain, skill_services, state_domain, \
     user_services
 from core.domain.skill_domain import CMD_DELETE_SKILL_MISCONCEPTION, \
+    CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, \
     CMD_UPDATE_SKILL_CONTENTS_PROPERTY, SKILL_CONTENTS_PROPERTY_EXPLANATION, \
     SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, \
     SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK, \
@@ -596,6 +597,28 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         change_list[0].property_name = SKILL_CONTENTS_PROPERTY_EXPLANATION
+        with self.assertRaises(Exception) as cont:
+            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+
+            self.assertTrue('Invalid change dict.' in cont.exception)
+
+        change_list = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+                'from_version': self.skill.skill_contents_schema_version,
+                'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            })
+        ]
+        skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+        self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+
+        change_list[0].cmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
+        change_list[0].from_version = self.skill.misconceptions_schema_version
+        change_list[0].to_version = feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
+        self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+
+        change_list[0].cmd = skill_domain.CMD_PUBLISH_SKILL
         with self.assertRaises(Exception) as cont:
             skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
 
