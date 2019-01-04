@@ -38,7 +38,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         rights_manager.publish_exploration(
             user_services.UserActionsInfo(self.editor_id), self.EXP_ID)
 
-    def get_features_json(self, exp_id=EXP_ID):
+    def get_features_json(self, exp_id):
         return self.get_json('/explorehandler/features/%s' % exp_id)
 
 
@@ -52,7 +52,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
 
         with exploration_is_whitelisted_context:
-            json_response = self.get_features_json(exp_id=self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
@@ -61,7 +61,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
 
         with nothing_is_whitelisted_context:
-            json_response = self.get_features_json(exp_id=self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
 
@@ -76,7 +76,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
 
         with improvements_tab_enabled_context:
-            json_response = self.get_features_json()
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
@@ -86,7 +86,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
         with improvements_tab_disabled_context:
-            json_response = self.get_features_json()
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertFalse(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
