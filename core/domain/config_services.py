@@ -14,6 +14,8 @@
 
 """Services for configuration properties."""
 
+import contextlib
+
 from core.domain import config_domain
 from core.platform import models
 
@@ -25,10 +27,12 @@ CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 def set_property(committer_id, name, value):
     """Sets a property value. The property must already be registered.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
         value: str. The value of the property.
+
     Raises:
         Exception: No config property with the specified name is found.
     """
@@ -42,9 +46,11 @@ def set_property(committer_id, name, value):
 
 def revert_property(committer_id, name):
     """Reverts a property value to the default value.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
+
     Raises:
         Exception: No config property with the specified name is found.
     """
@@ -54,3 +60,42 @@ def revert_property(committer_id, name):
         raise Exception('No config property with name %s found.' % name)
 
     set_property(committer_id, name, config_property.default_value)
+
+
+@contextlib.contextmanager
+def swapped_property_context(committer_id, name, new_value):
+    """Returns a context manager which temporarily sets the property to the
+    given value, returning to the previous value at exit.
+
+    Performs two sequential commits by the given committer_id:
+        1. Set to new value.
+        2. Set to old value.
+
+    Example:
+        >>> set_property('id1', 'foo', 2)
+        >>> config_domain.Registry.get_config_property('foo').value
+        2
+        >>> with swapped_property_context('id1', 'foo', 3):
+        ...     config_domain.Registry.get_config_property('foo').value
+        3
+        ...
+        >>> config_domain.Registry.get_config_property('foo').value
+        2
+
+    Args:
+        committer_id: str. The user ID of the committer.
+        name: str. The name of the property.
+        new_value: str. The value of the property.
+
+    Raises:
+        Exception: No config property with the specified name is found.
+    """
+    config_property = config_domain.Registry.get_config_property(name)
+    if config_property is None:
+        raise Exception('No config property with name %s found.' % name)
+    old_value = config_property.value
+    try:
+        set_property(committer_id, name, new_value)
+        yield config_property.value
+    finally:
+        set_property(committer_id, name, old_value)
