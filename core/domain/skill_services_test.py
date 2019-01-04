@@ -390,15 +390,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_publish_skill(self):
         new_id = skill_services.get_new_skill_id()
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(
+            Exception, 'The given skill does not exist.'):
             skill_services.publish_skill(new_id, self.USER_ID)
 
-            self.assertTrue('The given skill does not exist.' in context.exception)
-
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(
+            Exception, 'The user does not have enough rights to publish the skill.'):
             skill_services.publish_skill(self.SKILL_ID, 'user_temp')
-
-            self.assertTrue('The user does not have enough rights to publish the skill.' in context.exception)('strict', ) 
 
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
@@ -411,10 +409,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin)
         for skill_rights_obj in skill_rights:
             skill_services.publish_skill(skill_rights_obj.id, self.user_id_admin)
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(
+            Exception, 'The skill is already published.'):
             skill_services.publish_skill('skill_b', self.user_id_admin)
-
-            self.assertTrue('The skill is already published.' in context.exception)('strict', )
 
     def test_save_skill(self):
         with self.assertRaises(Exception) as context:
@@ -423,11 +420,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.assertTrue('Unexpected error: received an invalid change list when trying to '
             'save skill %s: %s' % (self.SKILL_ID, []) in context.exception)
 
-        new_skill_id = skill_services.get_new_skill_id()
-        skill_model = skill_models.SkillModel.get_by_id(new_skill_id)
-        self.assertEqual(skill_model, None)
         self.save_new_skill(
-            new_skill_id, self.USER_ID, 'Description 2', misconceptions=[],
+            'skill_a', self.USER_ID, 'Description 2', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
@@ -438,24 +432,30 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                'id': new_skill_id,
+                'id': 'skill_a',
                 'old_value': '',
                 'new_value': 'TestSkillId'
             })
         ]
-        skill_services._save_skill(self.USER_ID, skill_services.get_skill_by_id(new_skill_id), 'Commit message', changelist)
-        skill_model = skill_models.SkillModel.get_by_id(new_skill_id)
-        self.assertNotEqual(skill_model, None)
+        skill_model = skill_models.SkillModel.get_by_id('skill_a')
 
-        new_skill = skill_services.get_skill_by_id(new_skill_id)
+        new_skill = skill_services.get_skill_by_id('skill_a')
         self.assertEqual(new_skill.version, skill_model.version)
-        #new_skill.version += 1
+        new_skill.version = skill_model.version + 1
         with self.assertRaises(Exception) as context:
-            skill_services.save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
+            skill_services._save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
 
             self.assertTrue('Unexpected error: trying to update version %s of skill '
                 'from version %s. Please reload the page and try again.'
-                % (skill_models.SkillModel.get_by_id(new_skill_id).version, new_skill.version) in context.exception)
+                % (skill_model.version, new_skill.version) in context.exception)
+
+        new_skill.version = skill_model.version - 1
+        with self.assertRaises(Exception) as context:
+            skill_services._save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
+
+            self.assertTrue('Trying to update version %s of skill from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (skill_model.version, new_skill.version) in context.exception)
 
     def test_apply_change_list(self):
         changelist = [
@@ -468,10 +468,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'TestSkillId'
             })
         ]
-        with self.assertRaises(Exception) as cont:
-            skill_return = skill_services.apply_change_list(self.SKILL_ID, changelist, self.USER_ID)
+        with self.assertRaisesRegexp(
+            Exception, 'The user does not have enough rights to edit the skill description.'):
+            skill_services.apply_change_list(self.SKILL_ID, changelist, self.USER_ID)
 
-            self.assertTrue('The user does not have enough rights to edit the skill description.' in cont.exception)
         changelist2 = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -542,10 +542,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         change_list[0].cmd = CMD_UPDATE_SKILL_CONTENTS_PROPERTY
-        with self.assertRaises(Exception) as cont:
-            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-
-            self.assertTrue('Invalid change dict.' in cont.exception)
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
 
         changelist5 = [
             skill_domain.SkillChange({
@@ -597,10 +596,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         change_list[0].property_name = SKILL_CONTENTS_PROPERTY_EXPLANATION
-        with self.assertRaises(Exception) as cont:
-            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-
-            self.assertTrue('Invalid change dict.' in cont.exception)
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
 
         change_list = [
             skill_domain.SkillChange({
@@ -619,10 +617,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.skill_contents_schema_version, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
         change_list[0].cmd = skill_domain.CMD_PUBLISH_SKILL
-        with self.assertRaises(Exception) as cont:
-            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-
-            self.assertTrue('Invalid change dict.' in cont.exception)
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
 
 
     def test_get_multi_skill_summaries(self):
