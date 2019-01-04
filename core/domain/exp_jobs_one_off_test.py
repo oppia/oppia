@@ -1241,8 +1241,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
                 job_id))
         expected_output = [(
-            '[u\'exp_id0\', '
-            '[u\'State2: <p>This is value3 for ItemSelection</p>\']]'
+            u'[u\'exp_id0\', '
+            u'[u\'State2: <p>This is value3 for ItemSelection</p>\']]'
         )]
         self.assertEqual(actual_output, expected_output)
 
@@ -1676,8 +1676,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
         expected_output = [
-            '[u\'2\', [u\'exp_id0 State1\']]',
-            '[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
+            u'[u\'2\', [u\'exp_id0 State1\']]',
+            u'[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
