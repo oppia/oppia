@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the page that allows learners to play through an exploration."""
+"""Tests for accessing the features Oppia provides to users."""
 
 from core.domain import config_domain
 from core.domain import rights_manager
