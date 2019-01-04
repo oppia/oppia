@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for features of Oppia."""
+"""Controllers for fetching the features Oppia provides to its users."""
 
 from core.controllers import base
 from core.domain import acl_decorators
