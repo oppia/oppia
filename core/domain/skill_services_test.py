@@ -16,18 +16,21 @@
 
 import datetime
 
-from core.domain import skill_domain, skill_services, state_domain, user_services
-from core.domain.skill_domain import (CMD_DELETE_SKILL_MISCONCEPTION, 
-                                      CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, 
-                                      CMD_UPDATE_SKILL_CONTENTS_PROPERTY, 
-                                      SKILL_CONTENTS_PROPERTY_EXPLANATION, 
-                                      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, 
-                                      SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK, 
-                                      SKILL_MISCONCEPTIONS_PROPERTY_NAME, 
-                                      SKILL_PROPERTY_DESCRIPTION)
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import state_domain
+from core.domain import user_services
+from core.domain.skill_domain import CMD_DELETE_SKILL_MISCONCEPTION
+from core.domain.skill_domain import \
+    CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
+from core.domain.skill_domain import CMD_UPDATE_SKILL_CONTENTS_PROPERTY
+from core.domain.skill_domain import SKILL_CONTENTS_PROPERTY_EXPLANATION
+from core.domain.skill_domain import SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
+from core.domain.skill_domain import SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
+from core.domain.skill_domain import SKILL_MISCONCEPTIONS_PROPERTY_NAME
+from core.domain.skill_domain import SKILL_PROPERTY_DESCRIPTION
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
