@@ -201,9 +201,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
-        STORY_ID = story_services.get_new_story_id()
+        story_id = story_services.get_new_story_id()
         self.save_new_story(
-            STORY_ID, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes'
         )
         changelist = [
             story_domain.StoryChange({
@@ -212,10 +212,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'title': 'Title 1'
             })
         ]
-        story_services.update_story('user', STORY_ID, changelist, 'Added node.')
-        SKILL_ID = skill_services.get_new_skill_id()
+        story_services.update_story('user', story_id, changelist, 'Added node.')
+        skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            SKILL_ID, 'user', 'Description')
+            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -228,7 +228,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [SKILL_ID],
+            'new_value': [skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -239,7 +239,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'node_id': 'node_1'
         })]
         story_services.update_story(
-            'user', STORY_ID, change_list, 'Updated Node 1.')
+            'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
@@ -249,20 +249,20 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, SKILL_ID)
+            question_id, skill_id)
         question_services.create_new_question_skill_link(
-            question_id_2, SKILL_ID)
+            question_id_2, skill_id)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s&cursor=' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID))
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
             next_cursor = json_response_1['next_start_cursor']
 
             self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
             json_response_2 = self.get_json(
                 '%s/%s?story_id=%s&cursor=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id,
                     next_cursor))
             self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
             self.assertNotEqual(
@@ -271,7 +271,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
         self.get_json(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, STORY_ID),
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
             expected_status_int=400)
 
         self.get_json(
@@ -479,12 +479,14 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def _get_exploration_ids_from_summaries(self, summaries):
+        """Returns the sorted list of all the exploration ids from summaries."""
         return sorted([summary['id'] for summary in summaries])
 
     def _get_recommendation_ids(
             self, exploration_id, collection_id=None,
             include_system_recommendations=None,
             author_recommended_ids_str='[]'):
+        """Gets the recommended exploration ids from the summaries."""
         collection_id_param = (
             '&collection_id=%s' % collection_id
             if collection_id is not None else '')
@@ -512,13 +514,21 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
     # desirable.
 
     def _set_recommendations(self, exp_id, recommended_ids):
+        """Sets the recommendations in the exploration corresponding to the
+        given exploration id.
+        """
         recommendations_services.set_recommendations(exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
+        """Completes the exploration within the collection. Records that the
+        exploration has been played by the user in the context of the
+        collection.
+        """
         collection_services.record_played_exploration_in_collection_context(
             self.new_user_id, self.COL_ID, exp_id)
 
     def _complete_entire_collection_in_order(self):
+        """Completes the entire collection in order."""
         self._complete_exploration_in_collection(self.EXP_ID_19)
         self._complete_exploration_in_collection(self.EXP_ID_20)
         self._complete_exploration_in_collection(self.EXP_ID_21)

@@ -197,6 +197,7 @@ class EditorTests(BaseEditorControllerTests):
         csrf_token = self.get_csrf_token_from_response(response)
 
         def _get_payload(new_state_name, version=None):
+            """Gets the payload in the dict format."""
             result = {
                 'change_list': [{
                     'cmd': 'add_state',
@@ -209,6 +210,9 @@ class EditorTests(BaseEditorControllerTests):
             return result
 
         def _put_and_expect_400_error(payload):
+            """Puts a request with no version number and hence, expects 400
+            error.
+            """
             return self.put_json(
                 '/createhandler/data/0', payload,
                 csrf_token=csrf_token, expected_status_int=400)
@@ -1770,6 +1774,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         'new_value': 1}]
 
     def _create_explorations_for_tests(self):
+        """Creates the mock explorations for testing."""
         self.save_new_valid_exploration(self.EXP_ID1, self.owner_id)
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         exploration.add_states(['State A'])
@@ -1778,6 +1783,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
 
     def _create_exp_user_data_model_objects_for_tests(self):
+        """Creates the ExplorationUserDataModel objects for testing."""
         # Explorations with draft set.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, self.EXP_ID1), user_id=self.owner_id,

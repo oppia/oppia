@@ -757,6 +757,43 @@ class BackslashContinuationChecker(checkers.BaseChecker):
                         'backslash-continuation', line=line_num + 1)
 
 
+class FunctionArgsOrderChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks the order of arguments in function
+    definition.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'function-args-order'
+    priority = -1
+    msgs = {
+        'C0005': (
+            'Wrong order of arguments in function definition '
+            '\'self\' should come first.',
+            'function-args-order-self',
+            '\'self\' should come first',),
+        'C0006': (
+            'Wrong order of arguments in function definition '
+            '\'cls\' should come first.',
+            'function-args-order-cls',
+            '\'cls\' should come first'),
+    }
+
+    def visit_functiondef(self, node):
+        """Visits every function definition in the python file and check the
+        function arguments order. It then adds a message accordingly.
+
+        Args:
+         node: astroid.scoped_nodes.Function. Node for a function or method
+                definition in the AST.
+        """
+
+        args_list = [args.name for args in node.args.args]
+        if 'self' in args_list and args_list[0] != 'self':
+            self.add_message('function-args-order-self', node=node)
+        elif 'cls' in args_list and args_list[0] != 'cls':
+            self.add_message('function-args-order-cls', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -768,3 +805,4 @@ def register(linter):
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
+    linter.register_checker(FunctionArgsOrderChecker(linter))

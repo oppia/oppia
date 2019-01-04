@@ -759,9 +759,25 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         return self.CURRENT_DATE_AS_STRING
 
     def _rate_exploration(self, user_id, exp_id, rating):
+        """Assigns rating to the exploration corresponding to the given
+        exploration id.
+
+        Args:
+            user_id: str. The user id.
+            exp_id: str. The exploration id.
+            rating: int. The rating to be assigned to the given exploration.
+        """
         rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
 
     def _record_play(self, exp_id, state):
+        """Calls StartExplorationEventHandler and records the 'play' event
+        corresponding to the given exploration id.
+
+        Args:
+            exp_id: str. The exploration id.
+            state: dict(str, *). The state of the exploration corresponding to
+                the given id.
+        """
         event_services.StartExplorationEventHandler.record(
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)

@@ -535,6 +535,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -582,6 +583,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -627,6 +629,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -843,6 +846,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         def _generate_hash_for_tests(
                 unused_cls, unused_recipient_id, unused_email_subject,
                 unused_email_body):
+            """Returns the generated hash for tests."""
             return 'Email Hash'
 
         self.generate_hash_ctx = self.swap(
@@ -861,6 +865,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -912,6 +917,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)

@@ -31,7 +31,8 @@ describe('State Rules Stats Service', function() {
       var TEXT_INPUT_STATE = {interaction: {id: 'TextInput'}};
 
       expect(
-        StateRulesStatsService.stateSupportsIssuesOverview(TEXT_INPUT_STATE)
+        StateRulesStatsService.stateSupportsImprovementsOverview(
+          TEXT_INPUT_STATE)
       ).toBe(true);
     });
 

@@ -37,7 +37,7 @@ describe('SidebarStatusService', function() {
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
 
-  it('should toggle the sidebar to open and then close', function(){
+  it('should toggle the sidebar to open and then close', function() {
     SidebarStatusService.toggleSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
     SidebarStatusService.toggleSidebar();
@@ -45,7 +45,7 @@ describe('SidebarStatusService', function() {
   });
 
 
-  it('should falsify pendingSidebarClick on document click', function(){
+  it('should falsify pendingSidebarClick on document click', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.onDocumentClick();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);

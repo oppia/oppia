@@ -653,6 +653,15 @@ def publish_story(story_id, committer_id):
         Exception. The user does not have enough rights to publish the story.
     """
     def _are_nodes_valid_for_publishing(story_nodes):
+        """Validates the story nodes before publishing.
+
+        Args:
+            story_nodes: list(dict(str, *)). The list of story nodes dicts.
+
+        Raises:
+            Exception: The story node doesn't contain any exploration id or the
+                exploration id is invalid or isn't published yet.
+        """
         exploration_id_list = []
         for node in story_nodes:
             if not node.exploration_id:

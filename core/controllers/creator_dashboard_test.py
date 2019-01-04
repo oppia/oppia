@@ -141,6 +141,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
+        """Runs the User Stats Aggregator job."""
         MockUserStatsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(

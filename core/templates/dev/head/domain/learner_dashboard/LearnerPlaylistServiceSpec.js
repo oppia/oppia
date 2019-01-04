@@ -42,7 +42,7 @@ describe('Learner playlist service factory', function() {
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
   }));
 
-  beforeEach(function(){
+  beforeEach(function() {
     addToLearnerPlaylistUrl = (
       UrlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
@@ -55,7 +55,7 @@ describe('Learner playlist service factory', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully add playlist to play later list', function(){
+  it('should successfully add playlist to play later list', function() {
     var response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
@@ -73,7 +73,7 @@ describe('Learner playlist service factory', function() {
   });
 
   it('should not add playlist to play later list' +
-    'and show belongs to completed or incomplete list', function(){
+    'and show belongs to completed or incomplete list', function() {
     var response = {
       belongs_to_completed_or_incomplete_list: true,
       belongs_to_subscribed_activities: false,
@@ -91,7 +91,7 @@ describe('Learner playlist service factory', function() {
   });
 
   it('should not add playlist to play later list' +
-    'and show belongs to subscribed activities', function(){
+    'and show belongs to subscribed activities', function() {
     var response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: true,
@@ -109,7 +109,7 @@ describe('Learner playlist service factory', function() {
   });
 
   it('should not add playlist to play later list' +
-    'and show playlist limit exceeded', function(){
+    'and show playlist limit exceeded', function() {
     var response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,

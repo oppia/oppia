@@ -68,6 +68,7 @@ def get_user_id_from_email(email):
     Returns None if the email address does not correspond to a valid user id.
     """
     class _FakeUser(ndb.Model):
+        """A fake user class."""
         _use_memcache = False
         _use_cache = False
         user = ndb.UserProperty(required=True)
