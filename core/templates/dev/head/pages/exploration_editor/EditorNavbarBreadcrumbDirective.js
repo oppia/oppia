@@ -51,16 +51,17 @@ oppia.directive('editorNavbarBreadcrumb', [
             preview: 'Preview',
             settings: 'Settings',
             stats: 'Statistics',
+            improvements: 'Improvements',
             history: 'History',
-            feedback: 'Feedback'
+            feedback: 'Feedback',
           };
 
           $scope.getCurrentTabName = function() {
-            if (!RouterService.getTabStatuses()) {
+            if (!RouterService.getActiveTabName()) {
               return '';
             } else {
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-                RouterService.getTabStatuses().active];
+                RouterService.getActiveTabName()];
             }
           };
         }

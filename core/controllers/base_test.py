@@ -350,14 +350,21 @@ class LogoutPageTests(test_utils.GenericTestBase):
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
+    """Tests for I18n dicts."""
 
     def _extract_keys_from_json_file(self, filename):
+        """Returns the extracted keys from the json file corresponding to the
+        given filename.
+        """
         return sorted(json.loads(utils.get_file_contents(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n', filename)
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
+        """Returns the extracted keys from the html file corresponding to the
+        given filename.
+        """
         # The \b is added at the start to ensure that keys ending with
         # '_I18N_IDS' do not get matched. Instances of such keys can be found
         # in learner_dashboard.html.
@@ -527,9 +534,11 @@ class I18nDictsTests(test_utils.GenericTestBase):
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
+        """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         def get(self):
+            """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
     def test_error_response_for_get_request_of_type_json_has_json_format(self):

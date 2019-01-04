@@ -878,3 +878,17 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
         })
+
+
+class ExplorationFeaturesHandler(EditorHandler):
+    """Returns features the given exploration is configured to support."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_play_exploration
+    def get(self, unused_exploration_id):
+        """Handles GET requests for an exploration's features."""
+        self.render_json({
+            'is_improvements_tab_enabled':
+                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
+        })

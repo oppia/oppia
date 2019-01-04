@@ -358,7 +358,7 @@
               <div class="oppia-learner-playlist-tiles"
                    ng-repeat="tile in explorationPlaylist track by $index"
                    ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
-                   style="height: 145px;">
+                   style="height: 145px; display: block;">
                 <i class="remove-icon fa fa-times"
                    ng-show="showRemoveIcon"
                    aria-hidden="true"
@@ -367,7 +367,7 @@
                    uib-tooltip="Remove"
                    tooltip-placement="top">
                 </i>
-                <exploration-summary-tile style="height: 145px; display: block;"
+                <exploration-summary-tile style="height: 145px;"
                                           exploration-id="tile.id"
                                           exploration-title="tile.title"
                                           last-updated-msec="tile.last_updated_msec"

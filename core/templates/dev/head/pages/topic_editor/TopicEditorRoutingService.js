@@ -24,9 +24,7 @@ oppia.factory('TopicEditorRoutingService', [
     var SUBTOPICS_TAB = 'subtopics';
     var QUESTIONS_TAB = 'questions';
 
-    var _tabs = {
-      active: MAIN_TAB
-    };
+    var activeTabName = MAIN_TAB;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // topic editor page.
@@ -43,17 +41,17 @@ oppia.factory('TopicEditorRoutingService', [
       }
 
       if (newPath === '/') {
-        _tabs.active = MAIN_TAB;
+        activeTabName = MAIN_TAB;
       } else if (newPath === '/subtopics') {
-        _tabs.active = SUBTOPICS_TAB;
+        activeTabName = SUBTOPICS_TAB;
       } else if (newPath === '/questions') {
-        _tabs.active = QUESTIONS_TAB;
+        activeTabName = QUESTIONS_TAB;
       }
     });
 
     var TopicEditorRouterService = {
-      getTabStatuses: function() {
-        return _tabs;
+      getActiveTabName: function() {
+        return activeTabName;
       },
       navigateToMainTab: function() {
         $location.path('');

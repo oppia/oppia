@@ -74,31 +74,34 @@
         </div>
       </div>
 
-      <div ng-show="getTabStatuses().active === 'main'">
+      <div ng-show="getActiveTabName() === 'main'">
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
-      <div ng-if="getTabStatuses().active === 'translation'">
+      <div ng-if="getActiveTabName() === 'translation'">
         <translation-tab></translation-tab>
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-      <div ng-if="getTabStatuses().active === 'preview'">
+      <div ng-if="getActiveTabName() === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'stats'">
+      <div ng-show="getActiveTabName() === 'stats'">
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'settings'">
+      <improvements-tab ng-if="getActiveTabName() === 'improvements'">
+      </improvements-tab>
+
+      <div ng-show="getActiveTabName() === 'settings'">
         {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'history'">
+      <div ng-show="getActiveTabName() === 'history'">
         {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
       </div>
 
-      <div ng-show="getTabStatuses().active === 'feedback'">
+      <div ng-show="getActiveTabName() === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
       </div>
     </div>
@@ -240,7 +243,8 @@
   <script src="/templates/dev/head/pages/exploration_editor/UserEmailPreferencesService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationEditor.js"></script>
-  <script src="/templates/dev/head/pages/exploration_editor/ExplorationAdvancedFeaturesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/ExplorationFeaturesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/ExplorationFeaturesBackendApiService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>
@@ -300,6 +304,8 @@
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/ImprovementsTabDirective.js"></script>
+
   <script src="/templates/dev/head/pages/state_editor/StateContentEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateInteractionEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateHintsEditorDirective.js"></script>
@@ -325,7 +331,7 @@
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
   <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-  <script src="/templates/dev/head/services/IssuesService.js"></script>
+  <script src="/templates/dev/head/services/ImprovementsService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/MessengerService.js"></script>
   <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
