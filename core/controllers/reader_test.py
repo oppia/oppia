@@ -490,12 +490,14 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def _get_exploration_ids_from_summaries(self, summaries):
+        """Returns the sorted list of all the exploration ids from summaries."""
         return sorted([summary['id'] for summary in summaries])
 
     def _get_recommendation_ids(
             self, exploration_id, collection_id=None,
             include_system_recommendations=None,
             author_recommended_ids_str='[]'):
+        """Gets the recommended exploration ids from the summaries."""
         collection_id_param = (
             '&collection_id=%s' % collection_id
             if collection_id is not None else '')
@@ -523,13 +525,21 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
     # desirable.
 
     def _set_recommendations(self, exp_id, recommended_ids):
+        """Sets the recommendations in the exploration corresponding to the
+        given exploration id.
+        """
         recommendations_services.set_recommendations(exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
+        """Completes the exploration within the collection. Records that the
+        exploration has been played by the user in the context of the
+        collection.
+        """
         collection_services.record_played_exploration_in_collection_context(
             self.new_user_id, self.COL_ID, exp_id)
 
     def _complete_entire_collection_in_order(self):
+        """Completes the entire collection in order."""
         self._complete_exploration_in_collection(self.EXP_ID_19)
         self._complete_exploration_in_collection(self.EXP_ID_20)
         self._complete_exploration_in_collection(self.EXP_ID_21)
