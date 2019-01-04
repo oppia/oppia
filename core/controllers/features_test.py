@@ -12,81 +12,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for accessing the features Oppia provides to users."""
+"""Tests for fetching the features Oppia provides to its users."""
 
 from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
+
+
+def exploration_features_url(exp_id):
+    """Builds URL for getting the features a given exploration supports."""
+    return '%s/%s' % (feconf.EXPLORATION_FEATURES_PREFIX, exp_id)
 
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
-
     EXP_ID = 'expId1'
 
     def setUp(self):
         super(ExplorationFeaturesTestBase, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.save_new_valid_exploration(
+            self.EXP_ID, editor_id, title='Explore!', end_state_name='END')
+        editor_actions_info = user_services.UserActionsInfo(editor_id)
+        rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
+
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.editor_id, title='My Exploration',
-            end_state_name='END')
-        rights_manager.publish_exploration(
-            user_services.UserActionsInfo(self.editor_id), self.EXP_ID)
-
-    def get_features_json(self, exp_id):
-        return self.get_json('/explorehandler/features/%s' % exp_id)
-
 
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
-
-    WHITELIST_CONFIG_PROPERTY_NAME = (
+    WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = (
         config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name)
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         exploration_is_whitelisted_context = self.swap_property_value_context(
-            self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
+            self.admin_id, self.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.EXP_ID])
 
         with exploration_is_whitelisted_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
         nothing_is_whitelisted_context = self.swap_property_value_context(
-            self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
+            self.admin_id, self.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [])
 
         with nothing_is_whitelisted_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
 
 
 class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
-
-    IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME = (
-        config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name)
+    IS_IMPROVEMENTS_TAB_ENABLED = config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name
 
     def test_improvements_tab_enabled(self):
-        improvements_tab_enabled_context = self.swap_property_value_context(
-            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
+        improvements_tab_is_enabled_context = self.swap_property_value_context(
+            self.admin_id, self.IS_IMPROVEMENTS_TAB_ENABLED, True)
 
-        with improvements_tab_enabled_context:
-            json_response = self.get_features_json(self.EXP_ID)
+        with improvements_tab_is_enabled_context:
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertTrue(
-            json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
+        self.assertTrue(json_response['is_improvements_tab_enabled'])
 
     def test_improvements_tab_disabled(self):
-        improvements_tab_disabled_context = self.swap_property_value_context(
-            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
+        improvements_tab_is_disabled_context = self.swap_property_value_context(
+            self.admin_id, self.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
-        with improvements_tab_disabled_context:
-            json_response = self.get_features_json(self.EXP_ID)
+        with improvements_tab_is_disabled_context:
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(
-            json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
+        self.assertFalse(json_response['is_improvements_tab_enabled'])
