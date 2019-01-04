@@ -48,7 +48,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name)
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
-        exploration_is_whitelisted_context = self.swap_property_value(
+        exploration_is_whitelisted_context = self.swap_property_value_context(
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
 
         with exploration_is_whitelisted_context:
@@ -57,7 +57,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
-        nothing_is_whitelisted_context = self.swap_property_value(
+        nothing_is_whitelisted_context = self.swap_property_value_context(
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
 
         with nothing_is_whitelisted_context:
@@ -72,7 +72,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
         config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name)
 
     def test_improvements_tab_enabled(self):
-        improvements_tab_enabled_context = self.swap_property_value(
+        improvements_tab_enabled_context = self.swap_property_value_context(
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
 
         with improvements_tab_enabled_context:
@@ -82,7 +82,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
 
     def test_improvements_tab_disabled(self):
-        improvements_tab_disabled_context = self.swap_property_value(
+        improvements_tab_disabled_context = self.swap_property_value_context(
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
         with improvements_tab_disabled_context:

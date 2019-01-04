@@ -1383,7 +1383,7 @@ tags: []
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
-    def swap_property_value(self, committer_id, name, newvalue):
+    def swap_property_value_context(self, committer_id, name, newvalue):
         """Swap a config property's value within the context of a 'with'
         statement.
 
