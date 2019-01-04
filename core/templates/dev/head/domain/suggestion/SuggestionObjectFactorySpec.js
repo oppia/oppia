@@ -27,7 +27,7 @@ describe('Suggestion object factory', function() {
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
-  it('should create a new suggestion from a backend dict.', function(){
+  it('should create a new suggestion from a backend dict.', function() {
     suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',

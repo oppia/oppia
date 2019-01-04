@@ -263,7 +263,7 @@ oppia.factory('ImagePreloaderService', [
         return _filenamesOfImageCurrentlyDownloading;
       },
       getImageUrl: function(filename) {
-        return $q(function(resolve, reject){
+        return $q(function(resolve, reject) {
           if (AssetsBackendApiService.isCached(filename) ||
               _isInFailedDownload(filename)) {
             _getImageUrl(filename, resolve, reject);

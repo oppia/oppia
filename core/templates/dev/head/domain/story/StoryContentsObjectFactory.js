@@ -197,7 +197,7 @@ oppia.factory('StoryContentsObjectFactory', [
             nodesQueue.push(nodeId);
           }
         }
-        for (var i = 0; i < nodeIsVisited.length; i++){
+        for (var i = 0; i < nodeIsVisited.length; i++) {
           if (!nodeIsVisited[i]) {
             _disconnectedNodeIds.push(nodeIds[i]);
             issues.push(

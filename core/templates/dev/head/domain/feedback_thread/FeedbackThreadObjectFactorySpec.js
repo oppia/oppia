@@ -24,7 +24,7 @@ describe('Feedback thread object factory', function() {
     FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
   }));
 
-  it('should create a new feedback thread from a backend dict.', function(){
+  it('should create a new feedback thread from a backend dict.', function() {
     feedbackThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',

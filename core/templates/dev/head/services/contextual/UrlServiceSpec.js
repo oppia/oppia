@@ -118,24 +118,24 @@ describe('Url Service', function() {
       UrlService.getTopicNameFromLearnerUrl()
     ).toBe('topic name');
     mockLocation.pathname = '/topc/abcdefgijklm';
-    expect(function(){
+    expect(function() {
       UrlService.getTopicNameFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
   });
 
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
-    expect(function(){
+    expect(function() {
       UrlService.getStoryIdFromUrl();
     }).toThrow();
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm/012345678901';
-    expect(function(){
+    expect(function() {
       UrlService.getStoryIdFromUrl();
     }).toThrow();
 
     mockLocation.pathname = '/story_editor/abcdefgijlm/012345678901';
-    expect(function(){
+    expect(function() {
       UrlService.getStoryIdFromUrl();
     }).toThrow();
 
