@@ -1388,8 +1388,8 @@ tags: []
         statement.
 
         Implemented by a sequence of two commits:
-            1.  commiter_id will commit "name" as the value: newvalue.
-            2.  commiter_id will commit "name" as the original value (read just
+            1.  comitter_id will commit "name" as the value: newvalue.
+            2.  comitter_id will commit "name" as the original value (read just
                 before the 1st commit).
 
         Args:
