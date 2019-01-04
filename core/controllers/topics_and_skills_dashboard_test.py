@@ -48,6 +48,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             [self.linked_skill_id], [], 1)
 
     def _get_csrf_token_for_put(self):
+        """Gets the csrf token."""
         csrf_token = None
         url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):

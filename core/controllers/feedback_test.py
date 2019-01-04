@@ -394,6 +394,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, thread_id):
+        """Gets the ids of messages in the thread read by the user corresponding
+        to the given user id.
+        """
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
@@ -403,6 +406,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             if feedback_thread_user_model else [])
 
     def _get_message_ids_in_a_thread(self, thread_id):
+        """Gets the ids of messages in the thread corresponding to the given
+        thread id.
+        """
         messages = feedback_services.get_messages(thread_id)
 
         return [message.message_id for message in messages]

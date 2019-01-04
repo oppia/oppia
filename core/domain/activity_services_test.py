@@ -34,14 +34,21 @@ class ActivityServicesTests(test_utils.GenericTestBase):
     COL_ID_2 = 'COL_ID_2'
 
     def _create_exploration_reference(self, exploration_id):
+        """Creates and returns the exploration reference corresponding to the
+        given exploration id.
+        """
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
     def _create_collection_reference(self, collection_id):
+        """Creates and returns the collection reference corresponding to the
+        given collection id.
+        """
         return activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
     def _compare_lists(self, reference_list_1, reference_list_2):
+        """Compares the hashed values of the two given reference lists."""
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
         hashes_2 = [reference.get_hash() for reference in reference_list_2]
         self.assertEqual(hashes_1, hashes_2)
