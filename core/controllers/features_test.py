@@ -39,7 +39,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
             end_state_name='END')
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
-    def get_features(self, exp_id):
+    def get_features_json(self, exp_id):
         return self.get_json('/explorehandler/features/%s' % exp_id)
 
 
@@ -53,7 +53,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
 
         with exp_id_whitelisted_context:
-            json_response = self.get_features(self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
@@ -62,7 +62,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
 
         with empty_whitelist_context:
-            json_response = self.get_features(self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
 
@@ -77,7 +77,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
 
         with improvement_tab_enabled_context:
-            json_response = self.get_features(self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
@@ -87,7 +87,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
         with improvement_tab_disabled_context:
-            json_response = self.get_features(self.EXP_ID)
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertFalse(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
