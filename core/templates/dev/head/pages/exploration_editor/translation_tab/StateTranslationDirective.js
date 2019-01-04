@@ -99,6 +99,7 @@ oppia.directive('stateTranslation', [
                 .getContentId();
             }
             $scope.activatedTabId = tabId;
+            sessionStorage.setItem('activatedTabId', $scope.activatedTabId);
           };
 
           $scope.summarizeDefaultOutcome = function(
@@ -289,7 +290,7 @@ oppia.directive('stateTranslation', [
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
-            if (sessionStorage.getItem('activatedTabId' !== null)) {
+            if (sessionStorage.getItem('activatedTabId') !== null) {
               $scope.onTabClick(sessionStorage.getItem('activatedTabId'));
             } else {
               $scope.activatedTabId = $scope.TAB_ID_CONTENT;
