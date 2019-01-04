@@ -15,7 +15,6 @@
 """Tests for the page that allows learners to play through an exploration."""
 
 from core.domain import config_domain
-from core.domain import config_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -85,7 +84,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
     def test_improvement_tab_disabled(self):
         improvement_tab_disabled_context = self.swap_property_value(
-            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
+            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
         with improvement_tab_disabled_context:
             json_response = self.get_features(self.EXP_ID)
