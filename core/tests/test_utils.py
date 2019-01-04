@@ -1387,9 +1387,9 @@ tags: []
         """Swap a config property's value in the context of a 'with' statement.
 
         Performs a sequence of two commits:
-            1.  comitter_id will commit the property identified by "name" as the
+            1.  committer_id will commit the property identified by "name" as the
                 new value.
-            2.  comitter_id will commit the property identified by "name" as the
+            2.  committer_id will commit the property identified by "name" as the
                 original value; the original value is whichever value gets read
                 just before the first commit.
 
