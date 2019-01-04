@@ -15,10 +15,9 @@
 """Tests for the page that allows learners to play through an exploration."""
 
 from core.domain import config_services
-from core.domain import rights_services
+from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ExplorationPlaythroughRecordingFeatureTest(test_utils.GenericTestBase):
