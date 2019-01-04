@@ -29,6 +29,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
 
     def _get_image_url(self, exp_id, filename):
+        """Gets the image URL."""
         return str(
             '%s/%s/assets/image/%s' %
             (self.ASSET_HANDLER_URL_PREFIX, exp_id, filename))
