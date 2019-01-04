@@ -48,21 +48,21 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name)
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
-        exploration_in_whitelisted_context = self.swap_property_value_context(
+        exploration_in_whitelist_context = self.swap_property_value_context(
             self.admin_id, self.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.EXP_ID])
 
-        with exploration_in_whitelisted_context:
+        with exploration_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
-        nothing_in_whitelisted_context = self.swap_property_value_context(
+        nothing_in_whitelist_context = self.swap_property_value_context(
             self.admin_id, self.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [])
 
-        with nothing_in_whitelisted_context:
+        with nothing_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
