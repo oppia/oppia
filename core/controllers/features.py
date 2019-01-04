@@ -18,7 +18,6 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import config_domain
 import feconf
-import utils
 
 
 class ExplorationFeaturesHandler(base.BaseHandler):
