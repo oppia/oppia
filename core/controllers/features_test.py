@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ class ExplorationPlaythroughRecordingFeatureTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationPlaythroughRecordingFeatureTest, self).setUp()
+
         # An editor signs up.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -63,6 +64,7 @@ class ExplorationPlaythroughRecordingFeatureTest(test_utils.GenericTestBase):
     def tearDown(self):
         config_services.revert_property(
             self.admin_id, 'whitelisted_exploration_ids_for_playthroughs')
+
         super(ExplorationPlaythroughRecordingFeatureTest, self).tearDown()
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
