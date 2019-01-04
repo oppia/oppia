@@ -50,18 +50,19 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name)
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
-        # Add exploration id to the whitelist.
-        with self.swap_property_value(
-                self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME,
-                [self.EXP_ID]):
+        exp_id_whitelisted_context = self.swap_property_value(
+            self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
+
+        with exp_id_whitelisted_context:
             json_response = self.get_features(self.EXP_ID)
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
-        # Clear the whitelist
-        with self.swap_property_value(
-                self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, []):
+        empty_whitelist_context = self.swap_property_value(
+            self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
+
+        with empty_whitelist_context:
             json_response = self.get_features(self.EXP_ID)
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
@@ -73,18 +74,20 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
         config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name)
 
     def test_improvement_tab_enabled(self):
-        with self.swap_property_value(
-                self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME,
-                True):
+        improvement_tab_enabled_context = self.swap_property_value(
+            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
+
+        with improvement_tab_enabled_context:
             json_response = self.get_features(self.EXP_ID)
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
 
     def test_improvement_tab_disabled(self):
-        with self.swap_property_value(
-                self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME,
-                False):
+        improvement_tab_disabled_context = self.swap_property_value(
+            self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
+
+        with improvement_tab_disabled_context:
             json_response = self.get_features(self.EXP_ID)
 
         self.assertFalse(
