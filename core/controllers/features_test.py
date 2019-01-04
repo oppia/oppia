@@ -71,21 +71,21 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
     IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME = (
         config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name)
 
-    def test_improvement_tab_enabled(self):
-        improvement_tab_enabled_context = self.swap_property_value(
+    def test_improvements_tab_enabled(self):
+        improvements_tab_enabled_context = self.swap_property_value(
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
 
-        with improvement_tab_enabled_context:
+        with improvements_tab_enabled_context:
             json_response = self.get_features_json()
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
 
-    def test_improvement_tab_disabled(self):
-        improvement_tab_disabled_context = self.swap_property_value(
+    def test_improvements_tab_disabled(self):
+        improvements_tab_disabled_context = self.swap_property_value(
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
-        with improvement_tab_disabled_context:
+        with improvements_tab_disabled_context:
             json_response = self.get_features_json()
 
         self.assertFalse(
