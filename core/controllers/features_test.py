@@ -23,10 +23,7 @@ from core.tests import test_utils
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 
-    ADMIN_EMAIL = 'admin@oppia.org'
-    ADMIN_USERNAME = 'user1'
-    EDITOR_EMAIL = 'editor@oppia.org'
-    EDITOR_USERNAME = 'user2'
+    EXP_ID = 'expId1'
 
     def setUp(self):
         super(ExplorationFeaturesTestBase, self).setUp()
@@ -38,9 +35,10 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-    def swapped_property_context(self, name, value):
-        return config_services.swapped_property_context(
-            self.admin_id, name, value)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
     def get_features(self, exp_id):
         return self.get_json('/explorehandler/features/%s' % exp_id)
@@ -48,34 +46,22 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
-    EXP_ID = 'expId1'
     WHITELIST_CONFIG_PROPERTY_NAME = (
         config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name)
 
-    def setUp(self):
-        super(ExplorationPlaythroughRecordingFeatureTest, self).setUp()
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.editor_id, title='My Exploration',
-            end_state_name='END')
-        rights_manager.publish_exploration(self.editor, self.EXP_ID)
-
-    def tearDown(self):
-        config_services.revert_property(
-            self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME)
-        super(ExplorationPlaythroughRecordingFeatureTest, self).tearDown()
-
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         # Add exploration id to the whitelist.
-        with self.swapped_property_context(
-                self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID]):
+        with self.swap_property_value(
+                self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME,
+                [self.EXP_ID]):
             json_response = self.get_features(self.EXP_ID)
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
         # Clear the whitelist
-        with self.swapped_property_context(
-                self.WHITELIST_CONFIG_PROPERTY_NAME, []):
+        with self.swap_property_value(
+                self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, []):
             json_response = self.get_features(self.EXP_ID)
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
@@ -83,28 +69,22 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
 class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
-    EXP_ID = 'exp1'
     IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME = (
         config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name)
 
-    def setUp(self):
-        super(ExplorationImprovementsTabFeatureTest, self).setUp()
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.editor_id, title='My Exploration',
-            end_state_name='END')
-        rights_manager.publish_exploration(self.editor, self.EXP_ID)
-
     def test_improvement_tab_enabled(self):
-        with self.swapped_property_context(
-                self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True):
+        with self.swap_property_value(
+                self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME,
+                True):
             json_response = self.get_features(self.EXP_ID)
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
 
     def test_improvement_tab_disabled(self):
-        with self.swapped_property_context(
-                self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False):
+        with self.swap_property_value(
+                self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME,
+                False):
             json_response = self.get_features(self.EXP_ID)
 
         self.assertFalse(

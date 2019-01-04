@@ -28,6 +28,7 @@ import unittest
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
@@ -1380,6 +1381,33 @@ tags: []
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_property_value(self, committer_id, name, newvalue):
+        """Swap a config property's value within the context of a 'with'
+        statement.
+
+        Implemented by a sequence of two commits:
+            1.  commiter_id will commit "name" as the value: newvalue.
+            2.  commiter_id will commit "name" as the original value (read just
+                before the 1st commit).
+
+        Args:
+            committer_id: str. The user ID of the committer.
+            name: str. The name of the property.
+            value: str. The value of the property.
+        Raises:
+            Exception: No config property with the specified name is found.
+        """
+        config_property = config_domain.Registry.get_config_property(name)
+        if config_property is None:
+            raise Exception('No config property with name %s found.' % name)
+        oldvalue = config_property.value
+        try:
+            config_property.set_value(committer_id, newvalue)
+            yield
+        finally:
+            config_property.set_value(committer_id, oldvalue)
 
 
 class AppEngineTestBase(TestBase):
