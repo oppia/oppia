@@ -1387,11 +1387,19 @@ tags: []
         """Swap a config property's value in the context of a 'with' statement.
 
         Performs a sequence of two commits:
-            1.  committer_id will commit the property identified by "name" as the
-                new value.
-            2.  committer_id will commit the property identified by "name" as the
-                original value; the original value is whichever value gets read
-                just before the first commit.
+            1.  committer_id will commit the property identified by "name" to
+                the new value.
+            2.  committer_id will commit the property identified by "name" to
+                the original value; the original value is whichever value gets
+                read just before the first commit.
+
+        NOTE: This method is not thread-safe!
+
+        NOTE: self.swap_property_value_context and other context managers that
+        are created using contextlib.contextmanager use generators that yield
+        exactly once. This means that you can only use them once after
+        construction, otherwise, the generator will immediately raise
+        StopIteration, and contextlib will raise a RuntimeError.
 
         Args:
             committer_id: str. The user ID of the committer.
@@ -1404,12 +1412,6 @@ tags: []
 
         Raises:
             Exception: No config property with the specified name is found.
-
-        NOTE: self.swap_property_value_context and other context managers that
-        are created using contextlib.contextmanager use generators that yield
-        exactly once. This means that you can only use them once after
-        construction, otherwise, the generator will immediately raise
-        StopIteration, and contextlib will raise a RuntimeError.
         """
         config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
