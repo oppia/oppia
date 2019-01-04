@@ -289,7 +289,14 @@ oppia.directive('stateTranslation', [
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
-            $scope.onTabClick($scope.TAB_ID_CONTENT);
+            if (sessionStorage.getItem('activatedTabId' !== null)) {
+              $scope.onTabClick(sessionStorage.getItem('activatedTabId'));
+          }
+            else {
+              $scope.activatedTabId = $scope.TAB_ID_CONTENT;
+              sessionStorage.setItem('activatedTabId', $scope.activatedTabId);
+              $scope.onTabClick(sessionStorage.getItem('activatedTabId'));
+          }
           };
 
           // TODO(DubeySandeep): We need to call initStateTranslation() here in
