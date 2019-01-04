@@ -1383,22 +1383,22 @@ tags: []
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
-    def swap_property_value_context(self, committer_id, name, newvalue):
+    def swap_property_value_context(self, committer_id, name, value):
         """Swap a config property's value within the context of a 'with'
         statement.
 
         Implemented by a sequence of two commits:
-            1.  comitter_id will commit "name" as the value: newvalue.
+            1.  comitter_id will commit "name" as the value: value.
             2.  comitter_id will commit "name" as the original value (read just
                 before the 1st commit).
 
         Args:
             committer_id: str. The user ID of the committer.
             name: str. The name of the property.
-            newvalue: str. The value of the property.
+            value: str. The value of the property.
 
         Yields:
-            A context manager which will set the property value to newvalue once
+            A context manager which will set the property value to value once
             entered, then reset it to the previous value after exit.
 
         Raises:
@@ -1413,12 +1413,12 @@ tags: []
         config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('No config property with name %s found.' % name)
-        oldvalue = config_property.value
-        config_property.set_value(committer_id, newvalue)
+        original_value = config_property.value
+        config_property.set_value(committer_id, value)
         try:
             yield
         finally:
-            config_property.set_value(committer_id, oldvalue)
+            config_property.set_value(committer_id, original_value)
 
 
 class AppEngineTestBase(TestBase):

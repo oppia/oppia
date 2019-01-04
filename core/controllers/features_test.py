@@ -22,7 +22,7 @@ import feconf
 
 
 def exploration_features_url(exp_id):
-    """Builds the URL for getting features the given exploration supports."""
+    """Returns URL for getting which features the given exploration supports."""
     return '%s/%s' % (feconf.EXPLORATION_FEATURES_PREFIX, exp_id)
 
 
@@ -40,16 +40,15 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_committer_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         exploration_in_whitelist_context = self.swap_property_value_context(
-            self.admin_id,
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name,
-            [self.EXP_ID])
+            self.admin_committer_id,
+            'whitelisted_exploration_ids_for_playthroughs', value=[self.EXP_ID])
 
         with exploration_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
@@ -58,9 +57,8 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
         nothing_in_whitelist_context = self.swap_property_value_context(
-            self.admin_id,
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.name,
-            [])
+            self.admin_committer_id,
+            'whitelisted_exploration_ids_for_playthroughs', value=[])
 
         with nothing_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
@@ -70,22 +68,18 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
 class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
-    def test_improvements_tab_enabled(self):
+    def test_improvements_tab_is_enabled(self):
         improvements_tab_is_enabled_context = self.swap_property_value_context(
-            self.admin_id,
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name,
-            True)
+            self.admin_committer_id, 'is_improvements_tab_enabled', value=True)
 
         with improvements_tab_is_enabled_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
-    def test_improvements_tab_disabled(self):
+    def test_improvements_tab_is_disabled(self):
         improvements_tab_is_disabled_context = self.swap_property_value_context(
-            self.admin_id,
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name,
-            False)
+            self.admin_committer_id, 'is_improvements_tab_enabled', value=False)
 
         with improvements_tab_is_disabled_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
