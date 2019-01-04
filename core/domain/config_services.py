@@ -14,8 +14,6 @@
 
 """Services for configuration properties."""
 
-import contextlib
-
 from core.domain import config_domain
 from core.platform import models
 
