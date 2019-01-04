@@ -1384,13 +1384,14 @@ tags: []
 
     @contextlib.contextmanager
     def swap_property_value_context(self, committer_id, name, value):
-        """Swap a config property's value within the context of a 'with'
-        statement.
+        """Swap a config property's value in the context of a 'with' statement.
 
-        Implemented by a sequence of two commits:
-            1.  comitter_id will commit "name" as the value: value.
-            2.  comitter_id will commit "name" as the original value (read just
-                before the 1st commit).
+        Performs a sequence of two commits:
+            1.  comitter_id will commit the property identified by "name" as the
+                new value.
+            2.  comitter_id will commit the property identified by "name" as the
+                original value; the original value is whichever value gets read
+                just before the first commit.
 
         Args:
             committer_id: str. The user ID of the committer.
@@ -1398,8 +1399,8 @@ tags: []
             value: str. The value of the property.
 
         Yields:
-            A context manager which will set the property value to value once
-            entered, then reset it to the previous value after exit.
+            A context manager which will set the property to value once entered,
+            then reset it to its original value after exit.
 
         Raises:
             Exception: No config property with the specified name is found.
