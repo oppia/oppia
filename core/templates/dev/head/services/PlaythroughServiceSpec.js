@@ -249,7 +249,7 @@ describe('Playthrough service', function() {
       });
   });
 
-  describe('Test recording disabled', function() {
+  describe('Test playthrough recording disabled', function() {
     beforeEach(function() {
       this.expId = 'expId1';
       this.expVersion = 1;
