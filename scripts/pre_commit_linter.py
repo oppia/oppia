@@ -1380,24 +1380,70 @@ def _check_sorted_imports(all_files):
             if property_name not in properties_to_check:
                 continue
             arguments = expression['arguments']
+            if arguments[0]['type'] == 'Literal':
+                property_value = str(arguments[0]['value'])
             arguments = arguments[1:]
             for argument in arguments:
                 if argument['type'] != 'ArrayExpression':
                     continue
                 literal_args = []
                 function_args = []
+                dollar_imports = []
+                regular_imports = []
+                constant_imports = []
                 elements = argument['elements']
                 for element in elements:
                     if element['type'] == 'Literal':
-                 	    literal_args.append(str(element['value']))
+                        literal_args.append(str(element['value']))
                     elif element['type'] == 'FunctionExpression':
-                   	    func_args = element['params']
-                  	    for func_arg in func_args:
+                        func_args = element['params']
+                        for func_arg in func_args:
                             function_args.append(str(func_arg['name']))
-            
-            
-            
-    
+                for arg in function_args:
+                    if arg.startswith('$'):
+                        dollar_imports.append(arg)
+                    elif (re.match(r'[a-z]', arg)):
+                        constant_imports.append(arg)
+                    else:
+                        regular_imports.append(arg)
+                dollar_imports.sort()
+                regular_imports.sort()
+                constant_imports.sort()
+                sorted_imports = dollar_imports + regular_imports + constant_imports
+                if sorted_imports != function_args:
+                    failed = True
+                    print (
+       	                'Please ensure that %s in %s, the injected dependecies should be in the following manner.'
+       	                'Firstly dollar imports in sorted form, then regular imports in sorted form'
+       	                'and then constant imports in sorted form.' % (property_value, filename))
+       	        if sorted_imports != literal_args:
+       	            failed = True
+       	            print (
+       	                'Please ensure that %s in %s, the dependecies literally mentioned should be '
+       	                'in the following manner. Firstly dollar imports in sorted form, then regular'
+       	                'imports in sorted form and then constant imports in sorted form.'
+       	                % (property_value, filename))
+
+    if failed:
+        summary_message = (
+            '%s   Sorted imports check failed' % (
+                _MESSAGE_TYPE_FAILED))
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s  Sorted imports check passed' % (
+                _MESSAGE_TYPE_SUCCESS))
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def _match_line_breaks_in_controller_dependencies(all_files):
     """This function checks whether the line breaks between the dependencies
     listed in the controller of a directive or service exactly match those
