@@ -14,7 +14,6 @@
 
 """Tests for fetching the features Oppia provides to its users."""
 
-from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
