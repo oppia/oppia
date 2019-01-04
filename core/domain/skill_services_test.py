@@ -16,7 +16,6 @@
 
 import datetime
 
-import feconf
 from core.domain import skill_domain, skill_services, state_domain, user_services
 from core.domain.skill_domain import (CMD_DELETE_SKILL_MISCONCEPTION, 
                                       CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, 
@@ -29,6 +28,7 @@ from core.domain.skill_domain import (CMD_DELETE_SKILL_MISCONCEPTION,
 from core.platform import models
 from core.tests import test_utils
 
+import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
