@@ -1414,8 +1414,8 @@ tags: []
         if config_property is None:
             raise Exception('No config property with name %s found.' % name)
         oldvalue = config_property.value
+        config_property.set_value(committer_id, newvalue)
         try:
-            config_property.set_value(committer_id, newvalue)
             yield
         finally:
             config_property.set_value(committer_id, oldvalue)
