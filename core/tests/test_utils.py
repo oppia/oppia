@@ -1404,11 +1404,11 @@ tags: []
         Raises:
             Exception: No config property with the specified name is found.
 
-        NOTE: self.swap and other context managers that are created using
-        contextlib.contextmanager use generators that yield exactly once. This
-        means that you can only use them once after construction, otherwise,
-        the generator will immediately raise StopIteration, and contextlib will
-        raise a RuntimeError.
+        NOTE: self.swap_property_value_context and other context managers that
+        are created using contextlib.contextmanager use generators that yield
+        exactly once. This means that you can only use them once after
+        construction, otherwise, the generator will immediately raise
+        StopIteration, and contextlib will raise a RuntimeError.
         """
         config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
