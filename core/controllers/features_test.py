@@ -23,9 +23,9 @@ from core.tests import test_utils
 class ExplorationPlaythroughRecordingFeatureTest(test_utils.GenericTestBase):
 
     ADMIN_EMAIL = 'admin@oppia.org'
-    ADMIN_USERNAME = 'admin'
+    ADMIN_USERNAME = 'user1'
     EDITOR_EMAIL = 'editor@oppia.org'
-    EDITOR_USERNAME = 'editor'
+    EDITOR_USERNAME = 'user2'
 
     WHITELISTED_EXP_ID = 'expId1'
     NON_WHITELISTED_EXP_ID = 'expId2'
