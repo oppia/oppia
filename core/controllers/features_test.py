@@ -22,7 +22,7 @@ import feconf
 
 
 def exploration_features_url(exp_id):
-    """Builds URL for getting the features the given exploration supports."""
+    """Builds the URL for getting features the given exploration supports."""
     return '%s/%s' % (feconf.EXPLORATION_FEATURES_PREFIX, exp_id)
 
 
