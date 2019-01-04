@@ -1395,9 +1395,20 @@ tags: []
         Args:
             committer_id: str. The user ID of the committer.
             name: str. The name of the property.
-            value: str. The value of the property.
+            newvalue: str. The value of the property.
+
+        Yields:
+            A context manager which will set the property value to newvalue once
+            entered, then reset it to the previous value after exit.
+
         Raises:
             Exception: No config property with the specified name is found.
+
+        NOTE: self.swap and other context managers that are created using
+        contextlib.contextmanager use generators that yield exactly once. This
+        means that you can only use them once after construction, otherwise,
+        the generator will immediately raise StopIteration, and contextlib will
+        raise a RuntimeError.
         """
         config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
