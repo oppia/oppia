@@ -52,7 +52,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
 
         with exploration_is_whitelisted_context:
-            json_response = self.get_features_json()
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
@@ -61,7 +61,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
 
         with nothing_is_whitelisted_context:
-            json_response = self.get_features_json()
+            json_response = self.get_features_json(self.EXP_ID)
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
 
