@@ -28,6 +28,7 @@ from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import features
 from core.controllers import feedback
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
@@ -366,7 +367,7 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.PretestHandler),
     get_redirect_route(
         r'/explorehandler/features/<exploration_id>',
-        reader.ExplorationFeaturesHandler),
+        features.ExplorationFeaturesHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),

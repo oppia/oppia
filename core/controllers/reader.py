@@ -1013,25 +1013,3 @@ class FlagExplorationHandler(base.BaseHandler):
             self.payload.get('report_text'),
             self.user_id)
         self.render_json(self.values)
-
-
-class ExplorationFeaturesHandler(base.BaseHandler):
-    """Returns features the given exploration is configured to support."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
-        """Handles GET requests for an exploration's features.
-
-        Args:
-            exploration_id: str. The ID of the exploration.
-        """
-        whitelisted_exploration_ids_for_playthroughs = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        self.render_json({
-            'is_improvements_tab_enabled':
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
-            'is_playthrough_recording_enabled':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs,
-        })
