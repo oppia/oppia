@@ -28,18 +28,17 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         super(ExplorationFeaturesTestBase, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title='My Exploration',
             end_state_name='END')
-        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+        rights_manager.publish_exploration(
+            user_services.UserActionsInfo(self.editor_id), self.EXP_ID)
 
-    def get_features_json(self, exp_id):
+    def get_features_json(self, exp_id=EXP_ID):
         return self.get_json('/explorehandler/features/%s' % exp_id)
 
 
@@ -53,7 +52,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [self.EXP_ID])
 
         with exploration_is_whitelisted_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_features_json()
 
         self.assertTrue(json_response['is_playthrough_recording_enabled'])
 
@@ -62,7 +61,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.WHITELIST_CONFIG_PROPERTY_NAME, [])
 
         with nothing_is_whitelisted_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_features_json()
 
         self.assertFalse(json_response['is_playthrough_recording_enabled'])
 
@@ -77,7 +76,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, True)
 
         with improvement_tab_enabled_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_features_json()
 
         self.assertTrue(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
@@ -87,7 +86,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
             self.admin_id, self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME, False)
 
         with improvement_tab_disabled_context:
-            json_response = self.get_features_json(self.EXP_ID)
+            json_response = self.get_features_json()
 
         self.assertFalse(
             json_response[self.IMPROVEMENTS_TAB_CONFIG_PROPERTY_NAME])
