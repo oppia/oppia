@@ -67,46 +67,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=self.misconceptions,
             skill_contents=self.skill_contents)
 
-    def test_migrate_skill_contents_to_latest_schema(self):
-        self.skill.skill_contents_schema_version = 0
-        with self.assertRaisesRegexp(
-            Exception, 'Sorry, we can only process v1-v%d skill schemas at '
-            'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-            skill_services._migrate_skill_contents_to_latest_schema({
-                'schema_version': self.skill.skill_contents_schema_version,
-                'skill_contents': self.skill_contents})
-        self.skill.skill_contents_schema_version = 1
-        skill_services._migrate_skill_contents_to_latest_schema({
-            'schema_version': self.skill.skill_contents_schema_version,
-            'skill_contents': self.skill_contents})
-        self.assertEqual(
-            self.skill.skill_contents_schema_version,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
-
-
-    def test_migrate_misconceptions_to_latest_schema(self):
-        self.skill.skill_misconceptions_schema_version = 0
-        schema_version = self.skill.skill_misconceptions_schema_version
-        with self.assertRaisesRegexp(
-            Exception,
-            'Sorry, we can only process v1-v%d misconception schemas at '
-            'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-            skill_services._migrate_misconceptions_to_latest_schema({
-                'schema_version': schema_version,
-                'misconceptions': self.skill.misconceptions})
-        self.skill.misconceptions_schema_version = 1
-        skill_services._migrate_misconceptions_to_latest_schema({
-            'schema_version': self.skill.misconceptions_schema_version,
-            'misconceptions': self.skill.misconceptions})
-        self.assertEqual(
-            self.skill.misconceptions_schema_version,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
-
-    def test_get_skill_memcache_key(self):
-        self.assertEqual(
-            skill_services._get_skill_memcache_key(self.SKILL_ID, version=1),
-            'skill-version:%s:%s' % (self.SKILL_ID, 1))
-
     def test_compute_summary_of_skill(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
 
@@ -433,55 +393,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'The skill is already published.'):
             skill_services.publish_skill('skill_b', self.user_id_admin)
 
-    def test_save_skill(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'Unexpected error: received an invalid '
-            'change list when trying to '
-            'save skill %s: ' % (self.SKILL_ID)):
-            skill_services._save_skill(
-                self.USER_ID, self.skill, 'Commit message', [])
-
-
-        self.save_new_skill(
-            'skill_a', self.USER_ID, 'Description 2', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml(
-                    '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
-
-        changelist = [
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                'id': 'skill_a',
-                'old_value': '',
-                'new_value': 'TestSkillId'
-            })
-        ]
-        skill_model = skill_models.SkillModel.get_by_id('skill_a')
-
-        new_skill = skill_services.get_skill_by_id('skill_a')
-        self.assertEqual(new_skill.version, skill_model.version)
-        new_skill.version = skill_model.version + 1
-        with self.assertRaisesRegexp(
-            Exception, 'Unexpected error: trying to update version %s of skill '
-            'from version %s. Please reload the page and try again.'
-            % (skill_model.version, new_skill.version)):
-            skill_services._save_skill(
-                self.USER_ID, new_skill, 'Commit message', changelist)
-
-
-        new_skill.version = skill_model.version - 1
-        with self.assertRaisesRegexp(
-            Exception, 'Trying to update version %s of skill from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (skill_model.version, new_skill.version)):
-            skill_services._save_skill(
-                self.USER_ID, new_skill, 'Commit message', changelist)
-
-
     def test_apply_change_list(self):
         changelist = [
             skill_domain.SkillChange({
@@ -657,8 +568,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.skill.skill_contents_schema_version,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
-        newCmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
-        change_list[0].cmd = newCmd
+        cmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
+        change_list[0].cmd = cmd
         change_list[0].from_version = self.skill.misconceptions_schema_version
         change_list[0].to_version = feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
         skill_services.apply_change_list(
