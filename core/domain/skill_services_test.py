@@ -86,16 +86,17 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_migrate_misconceptions_to_latest_schema(self):
         self.skill.skill_misconceptions_schema_version = 0
+        schema_version = self.skill.skill_misconceptions_schema_version
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
             skill_services._migrate_misconceptions_to_latest_schema({
-                'schema_version': self.skill.skill_misconceptions_schema_version,
+                'schema_version': schema_version,
                 'misconceptions': self.skill.misconceptions})
         self.skill.misconceptions_schema_version = 1
         skill_services._migrate_misconceptions_to_latest_schema({
-            'schema_version': self.skill.misconceptions_schema_version, 
+            'schema_version': self.skill.misconceptions_schema_version,
             'misconceptions': self.skill.misconceptions})
         self.assertEqual(
             self.skill.misconceptions_schema_version,
@@ -412,7 +413,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.publish_skill(new_id, self.USER_ID)
 
         with self.assertRaisesRegexp(
-            Exception, 
+            Exception,
             'The user does not have enough rights to publish the skill.'):
             skill_services.publish_skill(self.SKILL_ID, 'user_temp')
 
@@ -434,7 +435,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_save_skill(self):
         with self.assertRaisesRegexp(
-            Exception, 
+            Exception,
             'Unexpected error: received an invalid '
             'change list when trying to '
             'save skill %s: ' % (self.SKILL_ID)):
@@ -656,8 +657,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.skill.skill_contents_schema_version,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
-        new_cmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
-        change_list[0].cmd = new_cmd
+        newCmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
+        change_list[0].cmd = newCmd
         change_list[0].from_version = self.skill.misconceptions_schema_version
         change_list[0].to_version = feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
         skill_services.apply_change_list(
