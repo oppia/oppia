@@ -1407,8 +1407,12 @@ tags: []
             value: str. The value of the property.
 
         Yields:
-            A context manager which will set the property to value once entered,
-            then reset it to its original value after exit.
+            None - implementation detail of the contextlib.contextmanager
+            decorator. Do not use this as a generator, but as a one-time with
+            statement object, for example:
+                >>> with swap_property_value_context('admin_id', 'foo', 3):
+                ...     config_domain.Registry.get_config_property('foo').value
+                3
 
         Raises:
             Exception: No config property with the specified name is found.
