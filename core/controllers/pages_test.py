@@ -37,6 +37,8 @@ class SplashPageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/splash')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain('I18N_SPLASH_TITLE')
+
 
     def test_splash_page_with_c_value(self):
         """Test for splash page when c value is included."""
@@ -52,8 +54,7 @@ class GetStartedPageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/get_started')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain(
-            'I18N_GET_STARTED_PAGE_HEADING', 'I18N_GET_STARTED_PAGE_HEADING')
+        response.mustcontain('I18N_GET_STARTED_PAGE_HEADING')
 
 
 class TeachPageTest(test_utils.GenericTestBase):
@@ -63,6 +64,7 @@ class TeachPageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/teach')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain('I18N_TEACH_PAGE_HEADING')
 
 
 class ContactPageTest(test_utils.GenericTestBase):
@@ -111,6 +113,7 @@ class TermsPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/html')
 
 
+
 class PrivacyPageTest(test_utils.GenericTestBase):
 
     def test_privacy_page(self):
@@ -156,7 +159,6 @@ class MaintenancePageTest(test_utils.GenericTestBase):
 
     def test_maintenance_page(self):
         """Test for maintenance page."""
-        feconf.ENABLE_MAINTENANCE_MODE = True
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
             response = self.testapp.get('/admin')
             self.assertEqual(response.status_int, 302)
