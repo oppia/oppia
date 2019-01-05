@@ -1354,12 +1354,14 @@ tags: []
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
 
-        Example usage:
-
-            import math
-            with self.swap(math, 'sqrt', lambda x: 42):
-                print math.sqrt(16.0)  # prints 42
-            print math.sqrt(16.0)  # prints 4 as expected.
+        Example:
+            >>> import math
+            >>> with self.swap(math, 'sqrt', lambda x: 42):
+            ...     print math.sqrt(16.0)
+            42
+            ...
+            >>> print math.sqrt(16.0)
+            4
 
         Note that this does not work directly for classmethods. In this case,
         you will need to import the 'types' module, as follows:
@@ -1397,7 +1399,7 @@ tags: []
           - This method is not thread-safe!
           - self.swap_property_value_context and other context managers created
             using contextlib.contextmanager use generators that yield exactly
-            once. This means you can only use them once after construction,
+            once. This means that you can only use them once after construction,
             otherwise, the generator will immediately raise StopIteration and
             contextlib will consequentially raise a RuntimeError.
 
@@ -1408,8 +1410,8 @@ tags: []
 
         Yields:
             None - implementation detail of the contextlib.contextmanager
-            decorator. Do not use this as a generator but as a one-time with
-            statement object, for example:
+            decorator. Do not use this as a generator, but as a one-time with
+            statement object. For example:
                 >>> foo_as_3_context = (
                 ...     self.swap_property_value_context('admin_id', 'foo', 3))
                 >>> with foo_as_3_context:
