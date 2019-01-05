@@ -77,7 +77,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_services._migrate_skill_contents_to_latest_schema({'schema_version': self.skill.skill_contents_schema_version, 'skill_contents': self.skill_contents})
         self.assertEqual(
             self.skill.skill_contents_schema_version, 
-                         feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
 
     def test_migrate_misconceptions_to_latest_schema(self):
@@ -419,7 +419,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_save_skill(self):
         with self.assertRaisesRegexp(
             Exception, 'Unexpected error: received an invalid change list when trying to '
-                            'save skill %s: ' % (self.SKILL_ID)):
+            'save skill %s: ' % (self.SKILL_ID)):
             skill_services._save_skill(self.USER_ID, self.skill, 'Commit message', [])
 
 
@@ -447,16 +447,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         new_skill.version = skill_model.version + 1
         with self.assertRaisesRegexp(
             Exception, 'Unexpected error: trying to update version %s of skill '
-                            'from version %s. Please reload the page and try again.'
-                            % (skill_model.version, new_skill.version)):
+            'from version %s. Please reload the page and try again.'
+            % (skill_model.version, new_skill.version)):
             skill_services._save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
 
 
         new_skill.version = skill_model.version - 1
         with self.assertRaisesRegexp(
             Exception, 'Trying to update version %s of skill from version %s, '
-                            'which is too old. Please reload the page and try again.'
-                            % (skill_model.version, new_skill.version)):
+            'which is too old. Please reload the page and try again.'
+            % (skill_model.version, new_skill.version)):
             skill_services._save_skill(self.USER_ID, new_skill, 'Commit message', changelist)
 
 
@@ -499,10 +499,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         change_list[0].property_name = skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
-        with self.assertRaises(Exception) as cont:
-            skill_return = skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-
-            self.assertTrue('Invalid change dict.' in cont.exception)
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
 
         new_explanation = state_domain.SubtitledHtml(
             '1', 'testExplanation')
@@ -612,15 +611,17 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-        self.assertEqual(self.skill.skill_contents_schema_version, 
-                         feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+        self.assertEqual(
+            self.skill.skill_contents_schema_version, 
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
         change_list[0].cmd = skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
         change_list[0].from_version = self.skill.misconceptions_schema_version
         change_list[0].to_version = feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
         skill_services.apply_change_list(self.SKILL_ID, change_list, self.USER_ID)
-        self.assertEqual(self.skill.skill_contents_schema_version, 
-                         feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+        self.assertEqual(
+            self.skill.skill_contents_schema_version, 
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
         change_list[0].cmd = skill_domain.CMD_PUBLISH_SKILL
         with self.assertRaisesRegexp(
@@ -641,9 +642,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
                         state_domain.SubtitledHtml('2', 'Example 1')], {}))
-        skill_summaries = skill_services.get_multi_skill_summaries(['skill_a', 'skill_b'])
-        self.assertEqual(skill_summaries[0].to_dict(), 
-                         skill_services.get_skill_summary_by_id('skill_a', strict=False).to_dict())
+        skill_summaries = skill_services.get_multi_skill_summaries(
+            ['skill_a', 'skill_b'])
+        self.assertEqual(
+            skill_summaries[0].to_dict(), 
+            skill_services.get_skill_summary_by_id(
+                'skill_a', strict=False).to_dict())
         self.assertEqual(skill_summaries[1].to_dict(), 
                          skill_services.get_skill_summary_by_id('skill_b', strict=False).to_dict())
 
