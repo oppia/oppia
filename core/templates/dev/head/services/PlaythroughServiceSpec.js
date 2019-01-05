@@ -56,7 +56,7 @@ describe('PlaythroughService', function() {
       it('gets placed into the actions playthrough.actions array', function() {
         this.PlaythroughService.recordExplorationStartAction('initStateName1');
 
-      var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughService.getPlaythrough();
         expect(playthrough.actions).toEqual([
           this.LearnerActionObjectFactory.createNew(
             'ExplorationStart', {state_name: {value: 'initStateName1'}}, 1),
@@ -218,7 +218,7 @@ describe('PlaythroughService', function() {
         this.expId, this.expVersion, this.playthroughRecordingProbability);
     });
 
-    it('should not record learner actions if recording disabled', function() {
+    it('should not record learner actions', function() {
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(false);
 
