@@ -1355,6 +1355,7 @@ tags: []
         getattr and setattr, such as class instances, modules, ...
 
         Example usage:
+
             import math
             with self.swap(math, 'sqrt', lambda x: 42):
                 print math.sqrt(16.0)  # prints 42
