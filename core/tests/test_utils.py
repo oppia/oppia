@@ -1393,13 +1393,13 @@ tags: []
                 the original value; the original value is whichever value gets
                 read just before the first commit.
 
-        NOTE: This method is not thread-safe!
-
-        NOTE: self.swap_property_value_context and other context managers that
-        are created using contextlib.contextmanager use generators that yield
-        exactly once. This means that you can only use them once after
-        construction, otherwise, the generator will immediately raise
-        StopIteration, and contextlib will raise a RuntimeError.
+        NOTE:
+          - This method is not thread-safe!
+          - self.swap_property_value_context and other context managers created
+            using contextlib.contextmanager use generators that yield exactly
+            once.  This means that you can only use them once after
+            construction, otherwise, the generator will immediately raise
+            StopIteration, and contextlib will raise a RuntimeError.
 
         Args:
             committer_id: str. The user ID of the committer.
@@ -1408,9 +1408,11 @@ tags: []
 
         Yields:
             None - implementation detail of the contextlib.contextmanager
-            decorator. Do not use this as a generator, but as a one-time with
+            decorator. Do not use this as a generator but as a one-time with
             statement object, for example:
-                >>> with swap_property_value_context('admin_id', 'foo', 3):
+                >>> foo_as_3_context = (
+                ...     self.swap_property_value_context('admin_id', 'foo', 3))
+                >>> with foo_as_3_context:
                 ...     config_domain.Registry.get_config_property('foo').value
                 3
 
