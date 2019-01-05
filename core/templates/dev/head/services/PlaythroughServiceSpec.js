@@ -85,7 +85,7 @@ describe('PlaythroughService', function() {
     });
 
     describe('.recordAnswerSubmitAction', function() {
-      it('should record exploration quit action.', function() {
+      it('gets placed into the actions playthrough.actions array', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var playthrough = this.PlaythroughService.getPlaythrough();
@@ -100,7 +100,7 @@ describe('PlaythroughService', function() {
     });
 
     describe('.recordPlaythrough', function() {
-      it('should identify multiple incorrect submissions', function() {
+      it('identifies multiple incorrect submissions', function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
         this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
@@ -123,7 +123,7 @@ describe('PlaythroughService', function() {
         });
       });
 
-      it('should identify early quits', function() {
+      it('identifies early quits', function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
         this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
@@ -139,7 +139,7 @@ describe('PlaythroughService', function() {
           jasmine.objectContaining({state_name: {value: 'stateName1'}}));
       });
 
-      it('identify cyclic state transitions', function() {
+      it('identifies cyclic state transitions', function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
         this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
@@ -172,7 +172,7 @@ describe('PlaythroughService', function() {
         });
       });
 
-      it('identify p-shaped cyclic state transitions', function() {
+      it('identifies p-shaped cyclic state transitions', function() {
         // A p-shaped cycle looks like:
         // [1] -> [2] -> [3] -> [4]
         //                ^      v
@@ -208,17 +208,13 @@ describe('PlaythroughService', function() {
     });
   });
 
-  describe('disabling recording playthroughs of an exploration', function() {
-    beforeEach(function() {
+  describe('disabling recording playthroughs for an exploration', function() {
+    it('should not record learner actions', function() {
       this.expId = 'expId1';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
-
       this.PlaythroughService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
-    });
-
-    it('should not record learner actions', function() {
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(false);
 
