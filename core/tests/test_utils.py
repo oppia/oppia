@@ -1397,9 +1397,9 @@ tags: []
           - This method is not thread-safe!
           - self.swap_property_value_context and other context managers created
             using contextlib.contextmanager use generators that yield exactly
-            once.  This means that you can only use them once after
-            construction, otherwise, the generator will immediately raise
-            StopIteration, and contextlib will raise a RuntimeError.
+            once. This means you can only use them once after construction,
+            otherwise, the generator will immediately raise StopIteration and
+            contextlib will consequentially raise a RuntimeError.
 
         Args:
             committer_id: str. The user ID of the committer.
