@@ -1354,14 +1354,11 @@ tags: []
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
 
-        Example:
-            >>> import math
-            >>> with self.swap(math, 'sqrt', lambda x: 42):
-            ...     print math.sqrt(16.0)
-            42
-            ...
-            >>> print math.sqrt(16.0)
-            4
+        Example usage:
+            import math
+            with self.swap(math, 'sqrt', lambda x: 42):
+                print math.sqrt(16.0)  # prints 42
+            print math.sqrt(16.0)  # prints 4 as expected.
 
         Note that this does not work directly for classmethods. In this case,
         you will need to import the 'types' module, as follows:
