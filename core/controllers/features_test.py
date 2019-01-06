@@ -26,7 +26,7 @@ def exploration_features_url(exp_id):
 
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
-    EXP_ID = 'expId1'
+    EXP_ID = 'expId'
 
     def setUp(self):
         super(ExplorationFeaturesTestBase, self).setUp()
