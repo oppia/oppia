@@ -140,9 +140,9 @@ describe('CodeRepl prediction service', function() {
           // -1 is returned when the prediction probability is less than the
           // threshold.
           if (predictedAnswerGroup !== -1) {
-              if (predictedAnswerGroup === trainingData[i].answer_group_index) {
-                correctPredictions++;
-              }
+            if (predictedAnswerGroup === trainingData[i].answer_group_index) {
+              correctPredictions++;
+            }
             totalAnswers++;
           }
         }
