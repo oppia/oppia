@@ -21,14 +21,23 @@ describe('Learner Action Object Factory', function() {
 
   beforeEach(inject(function($injector) {
     this.laof = $injector.get('LearnerActionObjectFactory');
+    this.LEARNER_ACTION_LATEST_SCHEMA_VERSION =
+      $injector.get('LEARNER_ACTION_LATEST_SCHEMA_VERSION');
   }));
 
   it('should create a new learner action', function() {
-    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, 1);
+    var learnerActionObject = this.laof.createNew('AnswerSubmit', {});
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
-    expect(learnerActionObject.schemaVersion).toEqual(1);
+    expect(learnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_LATEST_SCHEMA_VERSION);
+  });
+
+  it('should use a specific schema version if provided', function() {
+    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, -5);
+
+    expect(learnerActionObject.schemaVersion).toEqual(-5);
   });
 
   it('should create a new learner action from a backend dict', function() {
