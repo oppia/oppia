@@ -17,11 +17,11 @@
  *     Action domain objects.
  */
 
-oppia.constant('LEARNER_ACTION_LATEST_SCHEMA_VERSION', 1);
+oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
 
 oppia.factory('LearnerActionObjectFactory', [
-  'LEARNER_ACTION_LATEST_SCHEMA_VERSION',
-  function(LEARNER_ACTION_LATEST_SCHEMA_VERSION) {
+  'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
+  function(LEARNER_ACTION_SCHEMA_LATEST_VERSION) {
     /**
      * @constructor
      * @param {string} actionType - type of an action.
@@ -43,13 +43,13 @@ oppia.factory('LearnerActionObjectFactory', [
      * @property {string} actionType - type of an action
      * @property {Object.<string, *>} actionCustomizationArgs - customization
      *   dict for an action
-     * @property {number} [schemaVersion=LEARNER_ACTION_LATEST_SCHEMA_VERSION]
+     * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
      *   - schema version of the class instance.
      * @returns {LearnerAction}
      */
     LearnerAction.createNew = function(
         actionType, actionCustomizationArgs, schemaVersion) {
-      schemaVersion = schemaVersion || LEARNER_ACTION_LATEST_SCHEMA_VERSION;
+      schemaVersion = schemaVersion || LEARNER_ACTION_SCHEMA_LATEST_VERSION;
       return new LearnerAction(
         actionType, actionCustomizationArgs, schemaVersion);
     };

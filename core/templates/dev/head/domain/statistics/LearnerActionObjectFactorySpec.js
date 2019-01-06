@@ -21,8 +21,8 @@ describe('Learner Action Object Factory', function() {
 
   beforeEach(inject(function($injector) {
     this.laof = $injector.get('LearnerActionObjectFactory');
-    this.LEARNER_ACTION_LATEST_SCHEMA_VERSION =
-      $injector.get('LEARNER_ACTION_LATEST_SCHEMA_VERSION');
+    this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =
+      $injector.get('LEARNER_ACTION_SCHEMA_LATEST_VERSION');
   }));
 
   it('should create a new learner action', function() {
@@ -31,7 +31,7 @@ describe('Learner Action Object Factory', function() {
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
     expect(learnerActionObject.schemaVersion)
-      .toEqual(this.LEARNER_ACTION_LATEST_SCHEMA_VERSION);
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
   it('should use a specific schema version if provided', function() {
