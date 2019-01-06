@@ -28,7 +28,7 @@ describe('PlaythroughService', function() {
 
   describe('.initSession', function() {
     it('stores the correct values', function() {
-      this.expId = 'expId1';
+      this.expId = 'expId';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
 
@@ -43,7 +43,7 @@ describe('PlaythroughService', function() {
 
   describe('recording exploration playthroughs', function() {
     beforeEach(function() {
-      this.expId = 'expId1';
+      this.expId = 'expId';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
       this.PlaythroughService.initSession(
@@ -210,7 +210,7 @@ describe('PlaythroughService', function() {
 
   describe('disabling recording playthroughs for an exploration', function() {
     it('should not record learner actions', function() {
-      this.expId = 'expId1';
+      this.expId = 'expId';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
       this.PlaythroughService.initSession(
