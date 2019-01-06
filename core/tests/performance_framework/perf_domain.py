@@ -176,7 +176,7 @@ class PageSessionMetrics(object):
         """Get page load duration.
 
         Args:
-            event_end: str. The event upto which duration measurement is
+            event_end: str. The event up to which duration measurement is
                 required.
             event_initial: str. The event from which duration measurement
                 starts.

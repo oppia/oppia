@@ -559,25 +559,25 @@ tags: []
             self, app, url, data, expect_errors=False, expected_status_int=200,
             upload_files=None, headers=None):
         """Sends a post request with the data provided to the url specified.
-        
-        Args:
-            app: WSGI application. The WSGI application which receives the request
-                and produces response.
+
+        Params:
+            app: WSGI application. The WSGI application which receives the
+                request and produces response.
             url: str. The URL to send the POST request to.
-            data: *. To be put in the body of the request. If params is an iterator,
-                it will be urlencoded. If it is a string, it will not be encoded,
-                but placed in the body directly. Can be a collections.OrderedDict
-                with webtest.forms.Upload fields included.
+            data: *. To be put in the body of the request. If params is an
+                iterator, it will be urlencoded. If it is a string, it will
+                not be encoded, but placed in the body directly. Can be a
+                collections.OrderedDict with webtest.forms.Upload fields
+                included.
             expect_errors: bool. Whether errors are expected.
             expected_status_int: int. The expected status code.
-            upload_files: list(tuple). A list of (fieldname, filename, file_content).
-                You can also use just (fieldname, filename) and the file contents
-                will be read from disk.
+            upload_files: list(tuple). A list of (fieldname, filename,
+                file_content). You can also use just (fieldname, filename) and
+                the file contents will be read from disk.
             headers: dict(str, *). Extra headers to send.
-        
+
         Returns:
-            webtest.TestResponse instance: The response of the
-                POST request.
+            webtest.TestResponse: The response of the POST request.
         """
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,

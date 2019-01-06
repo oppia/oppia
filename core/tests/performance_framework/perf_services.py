@@ -225,11 +225,11 @@ class SeleniumPerformanceDataFetcher(object):
             downstream_kbps: int. The downstream speed in kbps. Defaults to
                 None.
             upstream_kbps: int. The upstream speed in kbps. Defaults to None.
-            latency: int. The latency of the server. Defaults to None.
+            latency: int. The latency of the server in ms. Defaults to None.
 
         Returns:
-            tuple(server, proxy): A tuple consisting of the server and the
-                proxy as a pair.
+            tuple(Server, dict): A tuple consisting of the Server object and
+                the proxy as a pair.
         """
         server = browsermobproxy.Server(BROWSERMOB_PROXY_PATH)
         server.start()
@@ -293,7 +293,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Adds a cookie to the current session.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         if self.dev_appserver_login_cookie:
             driver.get('%s%s' % (self.BASE_URL, feconf.ROBOTS_TXT_URL))
@@ -303,7 +303,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Stops the proxy server.
 
         Args:
-            server: server. The browsermobproxy server to be stopped.
+            server: Server. The browsermobproxy server to be stopped.
         """
         server.stop()
 
@@ -311,7 +311,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Quits the driver and close every associated window.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.quit()
 
@@ -319,7 +319,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Checks whether a user is already logged in.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
 
         Returns:
             bool. Whether the current user is logged in.
@@ -336,9 +336,9 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _login_user(self, driver):
         """Logs in a user and gets the cookie of the current session.
-        
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.get(self.BASE_URL + self.LOGIN_URL)
         elem = driver.find_element_by_name('email')
@@ -355,7 +355,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Completes the process of signing up a user.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.get(self.BASE_URL + feconf.SIGNUP_URL)
         self._wait_until_page_load_is_finished()
@@ -369,9 +369,9 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _reload_demo_explorations(self, driver):
         """Reloads demo explorations.
-        
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.get(self.BASE_URL + feconf.ADMIN_URL)
         self._wait_until_page_load_is_finished()
@@ -385,7 +385,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Reloads first exploration.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.get(self.BASE_URL + feconf.ADMIN_URL)
         self._wait_until_page_load_is_finished()
@@ -398,7 +398,7 @@ class SeleniumPerformanceDataFetcher(object):
         """Reloads demo collections.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         driver.get(self.BASE_URL + feconf.ADMIN_URL)
         self._wait_until_page_load_is_finished()
@@ -412,7 +412,10 @@ class SeleniumPerformanceDataFetcher(object):
         """Creates a new exploration.
 
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
+
+        Returns:
+            str. The URL of the newly created exploration.
         """
         driver.get(self.BASE_URL + feconf.CREATOR_DASHBOARD_URL)
         driver.find_element_by_css_selector(
@@ -427,44 +430,44 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _setup_login(self, driver):
         """Sets up user login.
-    
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         self._login_user(driver)
 
     def _setup_reload_demo_explorations(self, driver):
         """Sets up demo explorations reload.
-    
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         self._login_user(driver)
         self._reload_demo_explorations(driver)
 
     def _setup_reload_first_exploration(self, driver):
         """Sets up first exploration reload.
-    
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         self._login_user(driver)
         self._reload_first_exploration(driver)
 
     def _setup_reload_demo_collections(self, driver):
         """Sets up demo collection reload.
-    
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         self._login_user(driver)
         self._reload_demo_collections(driver)
 
     def _setup_create_exploration(self, driver):
         """Logs in the user and sets new exploration URL.
-    
+
         Args:
-            driver: driver. The WebDriver of the current session.
+            driver: Webdriver. The WebDriver instance of the current session.
         """
         self._login_user(driver)
         self.exploration_url = self._create_exploration(driver)
