@@ -8,7 +8,7 @@
   <p>
     <span ng-if="isExplorationPrivate">(Optional)</span>
     Please enter a brief description of what you have changed:
-    <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
+    <textarea rows="3" cols="50" style="resize: vertical" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
   </p>
   <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
     <span ng-if="!showDiff">Show Changes</span>
