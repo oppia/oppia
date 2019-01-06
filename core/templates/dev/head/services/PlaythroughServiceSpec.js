@@ -63,7 +63,7 @@ describe('PlaythroughService', function() {
         expect(playthrough.actions).toEqual([
           this.LearnerActionObjectFactory.createNew('ExplorationStart', {
             state_name: {value: 'initStateName1'},
-          }, 1),
+          }),
         ]);
       });
     });
@@ -82,7 +82,7 @@ describe('PlaythroughService', function() {
             submitted_answer: {value: 'Hello'},
             feedback: {value: 'Try again'},
             time_spent_state_in_msecs: {value: 30},
-          }, 1),
+          }),
         ]);
       });
     });
@@ -96,7 +96,7 @@ describe('PlaythroughService', function() {
           this.LearnerActionObjectFactory.createNew('ExplorationQuit', {
             state_name: {value: 'stateName1'},
             time_spent_in_state_in_msecs: {value: 120}
-          }, 1),
+          }),
         ]);
       });
     });
