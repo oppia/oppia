@@ -1383,7 +1383,7 @@ tags: []
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
-    def swap_property_value_context(self, committer_id, name, value):
+    def swap_property_value_context(self, name, value, committer_id):
         """Swap a config property's value in the context of a 'with' statement.
 
         Performs a sequence of two commits:
@@ -1402,9 +1402,9 @@ tags: []
             contextlib will consequentially raise a RuntimeError.
 
         Args:
-            committer_id: str. The user ID of the committer.
             name: str. The name of the property.
             value: str. The value of the property.
+            committer_id: str. The user ID of the committer.
 
         Yields:
             None - implementation detail of the contextlib.contextmanager

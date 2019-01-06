@@ -39,15 +39,15 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_committer_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         exploration_in_whitelist_context = self.swap_property_value_context(
-            self.admin_committer_id,
-            'whitelisted_exploration_ids_for_playthroughs', value=[self.EXP_ID])
+            'whitelisted_exploration_ids_for_playthroughs', value=[self.EXP_ID],
+            committer_id=self.admin_id)
 
         with exploration_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
@@ -56,8 +56,8 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_not_record_playthroughs_in_non_whitelisted_explorations(self):
         nothing_in_whitelist_context = self.swap_property_value_context(
-            self.admin_committer_id,
-            'whitelisted_exploration_ids_for_playthroughs', value=[])
+            'whitelisted_exploration_ids_for_playthroughs', value=[],
+            committer_id=self.admin_id)
 
         with nothing_in_whitelist_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
@@ -69,7 +69,8 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
     def test_improvements_tab_is_enabled(self):
         improvements_tab_is_enabled_context = self.swap_property_value_context(
-            self.admin_committer_id, 'is_improvements_tab_enabled', value=True)
+            'is_improvements_tab_enabled', value=True,
+            committer_id=self.admin_id)
 
         with improvements_tab_is_enabled_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
@@ -78,7 +79,8 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
     def test_improvements_tab_is_disabled(self):
         improvements_tab_is_disabled_context = self.swap_property_value_context(
-            self.admin_committer_id, 'is_improvements_tab_enabled', value=False)
+            'is_improvements_tab_enabled', value=False,
+            committer_id=self.admin_id)
 
         with improvements_tab_is_disabled_context:
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
