@@ -122,7 +122,7 @@ oppia.factory('ExplorationSaveService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'exploration_publish_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.publish = $uibModalInstance.close;
