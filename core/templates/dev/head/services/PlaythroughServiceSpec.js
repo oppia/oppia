@@ -36,8 +36,8 @@ describe('PlaythroughService', function() {
         this.expId, this.expVersion, this.playthroughRecordingProbability);
 
       var playthrough = this.PlaythroughService.getPlaythrough();
-      expect(playthrough.whitelistedExpId, this.expId);
-      expect(playthrough.expVersion, this.expVersion);
+      expect(playthrough.expId).toEqual(this.expId);
+      expect(playthrough.expVersion).toEqual(this.expVersion);
     });
   });
 
