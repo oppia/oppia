@@ -20,13 +20,15 @@
  * must be changed if there are any changes in corresponding classifier training
  * function on Oppia-ml.
  */
+oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
 
 oppia.factory('CodeReplPredictionService', [
   'WinnowingPreprocessingService', 'SVMPredictionService',
   'PythonProgramTokenizer', 'PythonProgramTokenType',
-  'CountVectorizerService', function(
+  'CountVectorizerService', 'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
       WinnowingPreprocessingService, SVMPredictionService,
-      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService) {
+      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService,
+      CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
     // The string with which all the variable and method names need to be
     // replaced.
     var TOKEN_NAME_VAR = 'V';
@@ -299,7 +301,8 @@ oppia.factory('CodeReplPredictionService', [
           tokenizedProgram, cvVocabulary);
 
         predictionResult = SVMPredictionService.predict(svmData, programVector);
-        if (predictionResult.predictionConfidence > 0.7) {
+        if (predictionResult.predictionConfidence >
+            CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
           return predictionResult.predictionLabel;
         }
         return -1;

@@ -20,12 +20,13 @@
  * must be changed if there are any changes in corresponding classifier training
  * function on Oppia-ml.
  */
+oppia.constant('TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', 0.7);
 
 oppia.factory('TextInputPredictionService', [
   'SVMPredictionService', 'TextInputTokenizer',
-  'CountVectorizerService', function(
+  'CountVectorizerService', 'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', function(
       SVMPredictionService, TextInputTokenizer,
-      CountVectorizerService) {
+      CountVectorizerService, TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
@@ -40,7 +41,8 @@ oppia.factory('TextInputPredictionService', [
             textInputTokens, cvVocabulary);
           predictionResult = SVMPredictionService.predict(svmData, textVector);
         }
-        if (predictionResult.predictionConfidence > 0.7) {
+        if (predictionResult.predictionConfidence >
+            TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
           return predictionResult.predictionLabel;
         }
         return -1;
