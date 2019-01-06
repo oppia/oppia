@@ -96,4 +96,4 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
         # Send email to Oppia.
         self.post_email(
             recipient_email, self.USER_A_EMAIL, 'feedback email reply',
-            'New reply', expect_errors=True, expected_status_int=404)
+            'New reply', expected_status_int=404)

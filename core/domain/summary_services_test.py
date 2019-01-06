@@ -258,7 +258,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with self.swap(

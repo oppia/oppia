@@ -44,7 +44,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
         """Test handler for new subscriptions to creators."""
 
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
@@ -77,7 +77,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Test another user subscription.
         self.login(self.USER2_EMAIL)
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         self.post_json(
@@ -99,7 +99,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Add one subscription to editor.
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
@@ -108,7 +108,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Add another subscription.
         self.login(self.USER2_EMAIL)
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
@@ -140,7 +140,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
         # Unsubscribing another user.
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX, payload,
