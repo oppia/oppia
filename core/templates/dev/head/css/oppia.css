@@ -730,6 +730,13 @@ textarea {
   background-color: #06b9ac;
   color: #fff;
 }
+/* This animation is for smooth change in color navbar-tabs  */
+.oppia-navbar-tabs li a{
+  -webkit-transition: all .25s ease;
+  -moz-transition: all .25s ease;
+  -o-transition: all .25s ease;
+  transition: all .25s ease;
+}
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {
   text-decoration: none;
@@ -764,9 +771,18 @@ textarea {
   height: 56px;
 }
 
+
 .navbar-default .uib-dropdown-menu {
   background: #fff;
+
   margin-top: 0;
+  /* top: 35px; */
+  /* visibility: hidden; */
+  -webkit-transition: all 3s ease;
+  -moz-transition: all 3s ease;
+  -o-transition: all 3s ease;
+  transition: all 3s ease;
+
 }
 
 .navbar-default .navbar-nav .open > a:hover {
@@ -880,6 +896,7 @@ textarea {
   .nav .uib-dropdown:hover > .uib-dropdown-menu > li > a {
     color: #009688;
   }
+
   .nav .uib-dropdown:hover > .uib-dropdown-menu > li > a:hover {
     background-color: #eee;
     color: #888;
