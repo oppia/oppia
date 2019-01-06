@@ -28,7 +28,6 @@ oppia.factory('LearnerActionObjectFactory', [
      * @param {Object.<string, *>} actionCustomizationArgs - customization dict
      *   for an action.
      * @param {number} schemaVersion - schema version of the class instance.
-     *   Defaults to the latest schema version.
      */
     var LearnerAction = function(
       actionType, actionCustomizationArgs, schemaVersion) {
