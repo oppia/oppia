@@ -42,8 +42,13 @@ describe('SVM prediction functions', function() {
     });
 
     it('should give correct labels and confidence estimations', function() {
+      // This is classifier data of a pretrained SVM classifier trained
+      // on a synthetic dataset created for the purpose of testing SVM
+      // prediction service. The classes in the classifier data are equivalent
+      // to two non-default answer groups of the training data of some
+      // exploration.
       var svmData = {
-        classes: [0.0, 1.0],
+        classes: [0, 1],
         kernel_params: {
           kernel: 'rbf', coef0: 0.0, degree: 3, gamma: 0.5},
         intercept: [0.04554340162799716],

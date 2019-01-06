@@ -57,7 +57,13 @@ oppia.factory('SVMPredictionService', [
         return kvalues;
       },
 
-      multiclassProbability: function(nClasses, pairwiseProb) {
+      // Find multiclass probabilities.
+      // NOTE: This function is implemented as it is given in LibSVM.
+      // For more information on exact approach used, read following paper:
+      // https://www.csie.ntu.edu.tw/~cjlin/papers/svmprob/svmprob.pdf
+      // Also take a look at implementation by LibSVM:
+      // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
+      calculateMulticlassProbabilities: function(nClasses, pairwiseProb) {
         var Q = [];
         for (var i = 0; i < nClasses; i++) {
           Q.push([]);
@@ -131,7 +137,7 @@ oppia.factory('SVMPredictionService', [
         }
 
         if (iter >= maxIter) {
-          $log.info('Exceeds maxIter in multiclassProbability');
+          $log.info('Exceeds maxIter in calculateMulticlassProbabilities');
         }
 
         return P;
@@ -223,24 +229,19 @@ oppia.factory('SVMPredictionService', [
           }
         }
 
-        // Find multiclass probabilities.
-        // NOTE: This function is implemented as it is given in LibSVM.
-        // For more information on exact approach used, read following paper:
-        // https://www.csie.ntu.edu.tw/~cjlin/papers/svmprob/svmprob.pdf
-        // Also take a look at implementation by LibSVM:
-        // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
-        probs = this.multiclassProbability(classes.length, pairwiseProb);
+        var probabilities = this.calculateMulticlassProbabilities(
+          classes.length, pairwiseProb);
 
         var maxProbIdx = 0;
         for (var i = 1; i < classes.length; i++) {
-          if (probs[i] > probs[maxProbIdx]) {
+          if (probabilities[i] > probabilities[maxProbIdx]) {
             maxProbIdx = i;
           }
         }
 
         var predictedLabel = classes[maxProbIdx];
         var prediction = PredictionResultOjectFactory.createNew(
-          predictedLabel, probs[maxProbIdx]);
+          predictedLabel, probabilities[maxProbIdx]);
         return prediction;
       }
     };

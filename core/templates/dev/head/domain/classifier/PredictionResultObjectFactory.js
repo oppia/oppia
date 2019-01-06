@@ -18,6 +18,17 @@
  */
 
 oppia.factory('PredictionResultOjectFactory', [function() {
+  /**
+   * Stores the prediction result for an answer as returned by the
+   * various prediction services used in Oppia for Machine Learning based
+   * predictions.
+   *
+   * @param {integer} label - the class label predicted by prediction service.
+   *   Label represents the index  of the predicted answer group.
+   * @param {float} confidence - The confidence that prediction service has in
+   *   its prediction label. The value is probability (between 0 and 1) that
+   *   answer belongs to predicted answer group.
+   */
   var predictionResult = function(label, confidence) {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;

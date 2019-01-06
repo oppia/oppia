@@ -299,7 +299,7 @@ oppia.factory('CodeReplPredictionService', [
           tokenizedProgram, cvVocabulary);
 
         predictionResult = SVMPredictionService.predict(svmData, programVector);
-        if (predictionResult.predictionConfidence > 0.5) {
+        if (predictionResult.predictionConfidence > 0.7) {
           return predictionResult.predictionLabel;
         }
         return -1;

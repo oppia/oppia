@@ -137,7 +137,7 @@ oppia.factory('AnswerClassificationService', [
               if (predictionService) {
                 var predictedAnswerGroupIndex = predictionService.predict(
                   classifier.classifierData, answer);
-                if (predictedAnswerGroupIndex == -1) {
+                if (predictedAnswerGroupIndex === -1) {
                   answerClassificationResult = (
                     AnswerClassificationResultObjectFactory.createNew(
                       defaultOutcome, answerGroups.length, 0,

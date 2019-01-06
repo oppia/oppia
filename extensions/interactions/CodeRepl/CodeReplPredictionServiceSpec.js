@@ -112,8 +112,13 @@ describe('CodeRepl prediction service', function() {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
-          expect(predictedAnswerGroup).toEqual(
-            testData[i].answer_group_index);
+          // Ignore the prediction if predicted answer group is -1 since
+          // -1 is returned when the prediction probability is less than the
+          // threshold in which case default answer is shown to the learner.
+          if (predictedAnswerGroup !== -1) {
+            expect(predictedAnswerGroup).toEqual(
+              testData[i].answer_group_index);
+          }
         }
       }
     });
@@ -131,10 +136,15 @@ describe('CodeRepl prediction service', function() {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, trainingData[i].answers[j]);
-          if (predictedAnswerGroup === trainingData[i].answer_group_index) {
-            correctPredictions++;
+          // Ignore the prediction if predicted answer group is -1 since
+          // -1 is returned when the prediction probability is less than the
+          // threshold.
+          if (predictedAnswerGroup !== -1) {
+              if (predictedAnswerGroup === trainingData[i].answer_group_index) {
+                correctPredictions++;
+              }
+            totalAnswers++;
           }
-          totalAnswers++;
         }
       }
       expect((correctPredictions * 100) / totalAnswers).not.toBeLessThan(85.0);
