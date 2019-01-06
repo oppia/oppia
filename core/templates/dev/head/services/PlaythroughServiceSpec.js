@@ -48,6 +48,7 @@ describe('PlaythroughService', function() {
       this.expId = 'expId';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
+
       this.PlaythroughService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
@@ -55,7 +56,7 @@ describe('PlaythroughService', function() {
     });
 
     describe('.recordExplorationStartAction', function() {
-      it('gets placed into the actions playthrough.actions array', function() {
+      it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordExplorationStartAction('initStateName1');
 
         var playthrough = this.PlaythroughService.getPlaythrough();
@@ -67,7 +68,7 @@ describe('PlaythroughService', function() {
     });
 
     describe('.recordAnswerSubmitAction', function() {
-      it('gets placed into the actions playthrough.actions array', function() {
+      it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
@@ -87,7 +88,7 @@ describe('PlaythroughService', function() {
     });
 
     describe('.recordAnswerSubmitAction', function() {
-      it('gets placed into the actions playthrough.actions array', function() {
+      it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var playthrough = this.PlaythroughService.getPlaythrough();
