@@ -560,8 +560,8 @@ tags: []
             upload_files=None, headers=None):
         """Sends a post request with the data provided to the url specified.
 
-        Params:
-            app: WSGI application. The WSGI application which receives the
+        Args:
+            app: TestApp. The WSGI application which receives the
                 request and produces response.
             url: str. The URL to send the POST request to.
             data: *. To be put in the body of the request. If params is an
