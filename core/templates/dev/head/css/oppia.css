@@ -730,7 +730,7 @@ textarea {
   background-color: #06b9ac;
   color: #fff;
 }
-/* This animation is for smooth change in color navbar-tabs  */
+/* This animation is for smooth cha nge in color navbar-tabs  */
 .oppia-navbar-tabs li a{
   -webkit-transition: all .25s ease;
   -moz-transition: all .25s ease;
