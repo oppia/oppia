@@ -122,10 +122,12 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Model that inherits the BaseSnapshotMetadataModel for testing."""
     pass
 
 
 class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Model that inherits the BaseSnapshotContentModel for testing."""
     pass
 
 
@@ -136,6 +138,7 @@ class TestVersionedModel(base_models.VersionedModel):
 
 
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Model that inherits the BaseCommitLogEntryModel for testing."""
     @classmethod
     def _get_instance_id(cls, target_entity_id, version):
         """A function that returns the id of the log in BaseCommitLogEntryModel.

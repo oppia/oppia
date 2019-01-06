@@ -45,28 +45,50 @@ class TestBase(unittest.TestCase):
         self.preload_option = None
 
     def _initialize_data_fetcher(self):
+        """Initializes SeleniumPerformanceDataFetcher instance."""
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
             browser=perf_services.BROWSER_CHROME, username=self.username,
             preload_option=self.preload_option)
 
     def _get_complete_url(self, base_url, page_url_short):
+        """Returns the absolute URL by joining the base_url and page_url_short.
+
+        Args:
+            base_url: str. The base URL.
+            page_url_short: str. The relative page URL to be joined to base_url.
+
+        Returns:
+            str. The resulting joined URL.
+        """
         return urlparse.urljoin(base_url, page_url_short)
 
     def _load_page_to_cache_server_resources(self):
+        """Loads page for server side caching."""
         self.data_fetcher.load_url(self.page_url)
 
     def _record_page_metrics_from_uncached_session(self):
+        """Records the page metrics from uncached session for a given page
+        URL.
+        """
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_uncached_session(
                 self.page_url))
 
     def _record_page_metrics_from_cached_session(self):
+        """Records the page metrics from cached session for a given page URL."""
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_cached_session(
                 self.page_url))
 
     def _record_average_page_timings_from_uncached_session(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
+        """Records average page timings from uncached session.
+
+        Args:
+            session_count: int. Number of page load sessions used to
+                collect timing metrics. Defaults to
+                DEFAULT_SESSION_SAMPLE_COUNT.
+        """
         page_session_metrics_list = []
 
         for _ in range(session_count):
@@ -79,6 +101,13 @@ class TestBase(unittest.TestCase):
 
     def _record_average_page_timings_from_cached_session(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
+        """Records average page timings from cached session.
+
+        Args:
+            session_count: Number of page load sessions used to
+                collect timing metrics. Defaults to
+                DEFAULT_SESSION_SAMPLE_COUNT.
+        """
         page_session_metrics_list = []
 
         for _ in range(session_count):
@@ -90,6 +119,12 @@ class TestBase(unittest.TestCase):
             page_session_metrics_list)
 
     def _set_page_config(self, page_config, append_username=False):
+        """Sets the page configuration parameters.
+
+        Args:
+            page_config: dict. The page configuration parameters.
+            append_username: bool. Whether to append username to the page URL.
+        """
         self.page_url = self._get_complete_url(
             self.BASE_URL, page_config['url'])
 
@@ -112,6 +147,9 @@ class TestBase(unittest.TestCase):
                 self.page_url, self.username)
 
     def _test_total_page_size(self):
+        """Checks whether the total page size is under the limit of
+        uncached session size.
+        """
         self._record_page_metrics_from_uncached_session()
 
         self.assertLessEqual(
@@ -119,6 +157,9 @@ class TestBase(unittest.TestCase):
             self.size_limit_uncached_bytes)
 
     def _test_total_page_size_for_cached_session(self):
+        """Checks whether the total page size is under the limit of
+        cached session size.
+        """
         self._record_page_metrics_from_cached_session()
 
         self.assertLessEqual(
@@ -126,6 +167,9 @@ class TestBase(unittest.TestCase):
             self.size_limit_cached_bytes)
 
     def _test_page_load_time(self):
+        """Checks whether the total page load time is under uncached session
+        time limit.
+        """
         self._record_average_page_timings_from_uncached_session()
 
         self.assertLessEqual(
@@ -133,6 +177,9 @@ class TestBase(unittest.TestCase):
             self.load_time_limit_uncached_ms)
 
     def _test_page_load_time_for_cached_session(self):
+        """Checks whether the total page load time is under cached session
+        time limit.
+        """
         self._record_average_page_timings_from_cached_session()
 
         self.assertLessEqual(
