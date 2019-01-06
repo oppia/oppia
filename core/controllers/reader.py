@@ -271,8 +271,8 @@ class ExplorationHandler(base.BaseHandler):
         state_classifier_mapping = {}
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
-                exploration_id, exploration.version, exploration.states))
-        for index, state_name in enumerate(exploration.states):
+                exploration_id, exploration.version, exploration.states.keys()))
+        for index, state_name in enumerate(exploration.states.keys()):
             if classifier_training_jobs[index] is not None:
                 classifier_data = classifier_training_jobs[
                     index].classifier_data
