@@ -498,7 +498,7 @@ tags: []
         Returns:
             webtest.TestResponse. The test response.
         """
-        if params:
+        if params is not None:
             self.assertTrue(isinstance(params, dict))
 
         expect_errors = False
@@ -584,7 +584,7 @@ tags: []
         Returns:
             webtest.TestResponse. The test response.
         """
-        if params:
+        if params is not None:
             self.assertTrue(isinstance(params, dict))
 
         response = self.testapp.get(url, params, expect_errors=True)
@@ -609,7 +609,7 @@ tags: []
 
     def get_json(self, url, params=None, expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
-        if params:
+        if params is not None:
             self.assertTrue(isinstance(params, dict))
 
         expect_errors = False

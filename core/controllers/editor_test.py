@@ -613,8 +613,7 @@ param_changes: []
         # Check download to zip file.
         # Download to zip file using download handler.
         download_url = '/createhandler/download/%s' % exp_id
-        response = self.get_custom_response(
-            download_url, expected_content_type='text/plain')
+        response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'

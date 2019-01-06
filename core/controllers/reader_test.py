@@ -500,7 +500,6 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
-        self.get_html_response('/explore/%s' % exploration_id)
         summaries = self.get_json(recommendations_url)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)
 
