@@ -451,7 +451,7 @@ def create_classifier_training_job_for_reverted_exploration(
 
     Args:
         exploration: Exploration. Exploration domain object.
-        exploration_to_revert_to: Exploration. Exploration to which revert to.
+        exploration_to_revert_to: Exploration. Exploration to revert to.
     """
     classifier_training_jobs_for_old_version = get_classifier_training_jobs(
         exploration.id, exploration_to_revert_to.version,

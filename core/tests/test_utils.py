@@ -1001,7 +1001,8 @@ tags: []
 
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
-        dictionary.
+        dictionary. Version 21 is where training data of exploration is stored
+        with the states dict.
 
         This function should only be used for creating explorations in tests
         involving migration of datastore explorations that use an old states
