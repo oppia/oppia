@@ -394,7 +394,7 @@ class UserInfoHandler(base.BaseHandler):
         })
 
 
-class LoginUrlHandlerPage(base.BaseHandler):
+class UrlHandlerPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
@@ -406,9 +406,9 @@ class LoginUrlHandlerPage(base.BaseHandler):
             if self.request.GET.items():
                 if self.request.GET.items()[0]:
                     target_url = (
-                        '/' if self.request.GET.items()[0][1].endswith(
+                        '/' if self.request.get('current_url').endswith(
                             feconf.SPLASH_URL)
-                        else self.request.GET.items()[0][1])
+                        else self.request.get('current_url'))
                     login_url = (
                         current_user_services.create_login_url(target_url))
                     self.render_json({'login_url': login_url})

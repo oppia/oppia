@@ -89,24 +89,15 @@ oppia.directive('topNavigationBar', [
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
-          var urlParameters = {
-            current_url: $window.location.href
-          };
-          var loginGenerationConfig = {
-            params: urlParameters
-          };
-
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            $http.get('/generate_login_url', loginGenerationConfig).then(
-              function(response) {
-                $timeout(function() {
-                  if (response.data !== null) {
-                    if (response.data.login_url !== null) {
-                      $window.location = response.data.login_url;
-                    }
-                  }
-                }, 150);
+            UserService.getLoginAndLogoutUrls().then(
+              function(urlObject) {
+                if (urlObject.login_url) {
+                  $timeout(function() {
+                    $window.location = urlObject.login_url;
+                  }, 150);
+                }
               }
             );
           };
