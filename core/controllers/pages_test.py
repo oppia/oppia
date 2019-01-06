@@ -21,8 +21,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
 
     def test_about_page(self):
         """Test the About page."""
-        response = self.testapp.get('/about')
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/about')
         self.assertEqual(response.content_type, 'text/html')
         response.mustcontain(
             'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
