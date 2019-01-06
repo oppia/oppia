@@ -500,10 +500,8 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
-        response = self.get_html_response('/explore/%s' % exploration_id)
-        csrf_token = self.get_csrf_token_from_response(response)
-        summaries = self.get_json(
-            recommendations_url, params=csrf_token)['summaries']
+        self.get_html_response('/explore/%s' % exploration_id)
+        summaries = self.get_json(recommendations_url)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)
 
     # TODO(bhenning): Add tests for ensuring system explorations are properly

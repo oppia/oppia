@@ -66,8 +66,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_response(self._get_image_url('0', filename),
-                                     expected_content_type='image/png')
+        response = self.get_custom_response(
+            self._get_image_url('0', filename),
+            expected_content_type='image/png')
         self.assertEqual(response.body, raw_image)
 
     def test_non_matching_extensions_are_detected(self):

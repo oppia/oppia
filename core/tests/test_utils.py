@@ -483,32 +483,30 @@ tags: []
         """Returns the expected logout URL."""
         return current_user_services.create_logout_url(slug)
 
-    def get_response(
+    def _get_response(
             self, url, expected_content_type, params=None,
             expected_status_int=200):
         """Get a response, transformed to a Python object.
 
         Args:
             url: str. The URL to fetch the response.
-
             expected_content_type: str. The content type to expect.
-
-            params: str or dict. A query string, or a dictionary that will be
-            encoded into a query string.
-
+            params: dict. A dictionary that will be encoded into a query string.
             expected_status_int: int. The integer status code to expect. Will
-            be 200 if not specified.
+                be 200 if not specified.
 
         Returns:
             webtest.TestResponse. The test response.
         """
-        have_errors = False
-        if expected_status_int >= 400 and (
-                expected_status_int < 600):
-            have_errors = True
+        if params:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
 
         response = self.testapp.get(
-            url, params, expect_errors=have_errors,
+            url, params, expect_errors=expect_errors,
             status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -519,12 +517,11 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
-        if not have_errors:
+        if not expect_errors:
             self.assertTrue(response.status_int >= 200 and
                             response.status_int < 400)
         else:
-            self.assertTrue(response.status_int >= 400 and
-                            response.status_int < 600)
+            self.assertTrue(response.status_int >= 400)
         self.assertEqual(
             response.content_type, expected_content_type)
 
@@ -535,18 +532,40 @@ tags: []
 
         Args:
             url: str. The URL to fetch the response.
-
-            params: str or dict. A query string, or a dictionary that will be
-            encoded into a query string.
-
+            params: dict. A dictionary that will be encoded into a query string.
             expected_status_int: int. The integer status code to expect. Will
-            be 200 if not specified.
+                be 200 if not specified.
 
         Returns:
             webtest.TestResponse. The test response.
         """
-        response = self.get_response(
+        response = self._get_response(
             url, 'text/html', params=params,
+            expected_status_int=expected_status_int)
+
+        return response
+
+    def get_custom_response(
+            self, url, expected_content_type, params=None,
+            expected_status_int=200):
+        """Get a response other than HTML or JSON, transformed to a Python
+        object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_content_type: str. The content type to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will
+                be 200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        self.assertNotIn(
+            expected_content_type, ['text/html', 'application/json'])
+
+        response = self._get_response(
+            url, expected_content_type, params=params,
             expected_status_int=expected_status_int)
 
         return response
@@ -558,16 +577,16 @@ tags: []
 
         Args:
             url: str. The URL to fetch the response.
-
             expected_status_int_list: list(int). A list of integer status
-            code to expect.
-
-            params: str or dict. A query string, or a dictionary that will be
-            encoded into a query string.
+                code to expect.
+            params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
             webtest.TestResponse. The test response.
         """
+        if params:
+            self.assertTrue(isinstance(params, dict))
+
         response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
@@ -581,9 +600,7 @@ tags: []
                 json_response.status_int >= 200 and
                 json_response.status_int < 400)
         else:
-            self.assertTrue(
-                json_response.status_int >= 400 and
-                json_response.status_int < 600)
+            self.assertTrue(json_response.status_int >= 400)
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
@@ -592,12 +609,14 @@ tags: []
 
     def get_json(self, url, params=None, expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
-        have_errors = False
-        if expected_status_int >= 400 and (
-                expected_status_int < 600):
-            have_errors = True
+        if params:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.get(
-            url, params, expect_errors=have_errors,
+            url, params, expect_errors=expect_errors,
             status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -608,7 +627,7 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, have_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def post_json(self, url, payload, csrf_token=None,
                   expected_status_int=200, upload_files=None):
@@ -617,13 +636,12 @@ tags: []
         if csrf_token:
             data['csrf_token'] = csrf_token
 
-        have_errors = False
-        if expected_status_int >= 400 and (
-                expected_status_int < 600):
-            have_errors = True
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=have_errors,
+            expect_errors=expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -635,16 +653,18 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
 
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, have_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
-        have_errors = False
-        if expected_status_int >= 400 and (
-                expected_status_int < 600):
-            have_errors = True
+        if params:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.delete(
-            url, params, expect_errors=have_errors,
+            url, params, expect_errors=expect_errors,
             status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -655,7 +675,7 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, have_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def _send_post_request(
             self, app, url, data, expect_errors,
@@ -708,12 +728,11 @@ tags: []
         if csrf_token:
             data['csrf_token'] = csrf_token
 
-        have_errors = False
-        if expected_status_int >= 400 and (
-                expected_status_int < 600):
-            have_errors = True
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.put(
-            str(url), data, expect_errors=have_errors)
+            str(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -723,7 +742,7 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, have_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
