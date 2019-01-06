@@ -73,7 +73,7 @@ oppia.factory('UserService', [
         var loginGenerationConfig = {
           params: urlParameters
         };
-        return $http.get('/url_handler', loginGenerationConfig).then(
+        return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
             if (response.data !== null) {
               return {
