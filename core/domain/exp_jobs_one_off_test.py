@@ -16,6 +16,7 @@
 
 """Tests for Exploration-related jobs."""
 
+import datetime
 import json
 import os
 
@@ -32,8 +33,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(job_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.exploration])
+(job_models, exp_models, classifier_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.classifier])
 search_services = models.Registry.import_search_services()
 
 
@@ -667,6 +668,42 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+    def test_migration_job_creates_appropriate_classifier_models(self):
+        """Tests that the exploration migration job creates appropriate
+        classifier data models for explorations.
+        """
+        self.save_new_exp_with_states_schema_v21(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        initial_state_name = exploration.states.keys()[0]
+        # Store classifier model for the new exploration.
+        classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
+            'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
+            datetime.datetime.utcnow(), {}, initial_state_name,
+            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+        # Store training job model for the classifier model.
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            self.NEW_EXP_ID, exploration.version, initial_state_name,
+            classifier_model_id)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    self.process_and_flush_pending_tasks()
+
+        new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        initial_state_name = new_exploration.states.keys()[0]
+        self.assertLess(exploration.version, new_exploration.version)
+        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
+            self.NEW_EXP_ID, new_exploration.version,
+            [initial_state_name])[0]
+        self.assertEqual(
+            classifier_exp_mapping_model.job_id, classifier_model_id)
 
 
 class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):

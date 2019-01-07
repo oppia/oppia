@@ -28,11 +28,11 @@
 
 {% block content %}
   <div ng-controller="SkillEditor">
-    <div ng-if="getTabStatuses().active === 'main'">
+    <div ng-if="getActiveTabName() === 'main'">
       <skill-editor-main-tab></skill-editor-main-tab>
     </div>
 
-    <div ng-if="getTabStatuses().active === 'questions'">
+    <div ng-if="getActiveTabName() === 'questions'">
       <questions-tab></questions-tab>
     </div>
   </div>

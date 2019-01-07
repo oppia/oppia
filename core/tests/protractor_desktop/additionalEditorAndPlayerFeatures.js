@@ -94,12 +94,12 @@ describe('Full exploration editor', function() {
     general.moveToPlayer();
     explorationPlayerPage.submitAnswer('Continue');
     element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons){
+      by.css('.protractor-test-back-button')).then(function(buttons) {
       expect(buttons.length).toBe(1);
     });
     explorationPlayerPage.submitAnswer('LogicProof');
     element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons){
+      by.css('.protractor-test-back-button')).then(function(buttons) {
       expect(buttons.length).toBe(0);
     });
 

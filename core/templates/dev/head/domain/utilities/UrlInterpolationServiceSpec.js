@@ -287,10 +287,10 @@ describe('URL Interpolation Service', function() {
     expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
     expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
     expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
-    expect(function(){
+    expect(function() {
       uis.getStoryUrl('', {});
     }).toThrowError('Empty path passed in method.');
-    expect(function(){
+    expect(function() {
       uis.getStoryUrl('storyId', {});
     }).toThrowError('Path must start with \'/\': \'storyId\'.');
   });

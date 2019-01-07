@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to help identify and manage issues in exploration
+ * @fileoverview Service to help identify and manage improvements in exploration
  * states based on statistics.
  */
 
-oppia.factory('IssuesService', [function() {
+oppia.factory('ImprovementsService', [function() {
   var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
   return {
