@@ -590,13 +590,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+        init_state.interaction.hints.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', {})))
         self._assert_validation_error(
             exploration,
             r'Expected state content_ids_to_audio_translations to have all '
             r'of the listed content ids \[\'content\', \'default_outcome\', '
             r'\'hint_1\'\]')
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+        init_state.interaction.hints.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', {})))
         self._assert_validation_error(
             exploration, 'Found a duplicate content id hint_1')
 

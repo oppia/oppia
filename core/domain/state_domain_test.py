@@ -458,13 +458,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Add hint and delete hint.
-        init_state.add_hint(state_domain.SubtitledHtml('hint_2', 'new hint'))
+        init_state.interaction.hints.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_2', 'new hint')))
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             'new hint')
-        init_state.add_hint(
-            state_domain.SubtitledHtml('hint_3', 'hint three'))
-        init_state.delete_hint(1)
+        init_state.interaction.hints.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_3', 'hint three')))
+
+        if len(init_state.interaction.hints) <= 1:
+            raise IndexError('Hint index out of range')
+        del init_state.interaction.hints[1]
+
         init_state.update_content_ids_to_audio_translations({
             'content': {},
             'default_outcome': {},
@@ -486,7 +493,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+        init_state.interaction.hints.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', {})))
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
