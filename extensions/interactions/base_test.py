@@ -203,6 +203,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def test_interaction_rules(self):
         """Tests the interaction rules."""
         def _check_num_interaction_rules(interaction_id, expected_num):
+            """Checks the number of rules in the interaction corresponding to
+            the given interaction id.
+            """
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
             self.assertEqual(len(interaction.rules_dict), expected_num)

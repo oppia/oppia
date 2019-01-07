@@ -34,11 +34,13 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         class MockWrapper(test_utils.FunctionWrapper):
 
             def pre_call_hook(self, args):
+                """Mock pre call hook."""
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
             def post_call_hook(self, args, result):
+                """Mock post call hook."""
                 order.append('after')
                 testcase.assertEqual(result, 'foobar')
                 testcase.assertEqual(args.get('posarg'), 'foo')
