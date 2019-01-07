@@ -17,8 +17,8 @@ suggestions.
 """
 
 from core.domain import email_manager
-from core.domain import exp_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_domain

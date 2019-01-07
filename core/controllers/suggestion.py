@@ -177,7 +177,7 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class EditSuggestionHandler(base.BaseHandler):
-    # TODO. Work for permissions regarding
+    # TODO. Work for permissions regarding.
     def put(self, suggestion_id):
         """Edits the submitted suggestion.
         Args:
