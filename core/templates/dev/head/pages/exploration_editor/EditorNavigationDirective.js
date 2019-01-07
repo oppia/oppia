@@ -24,16 +24,18 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationRightsService', 'ExplorationWarningsService',
-        'RouterService', 'StateEditorTutorialFirstTimeService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+        'ExplorationFeaturesService', 'ExplorationRightsService',
+        'ExplorationWarningsService', 'RouterService',
+        'StateEditorTutorialFirstTimeService',
         'StateTranslationTutorialFirstTimeService',
         'SiteAnalyticsService', 'ThreadDataService', 'UserService',
         'WindowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $uibModal, ContextService,
-            ExplorationRightsService, ExplorationWarningsService,
-            RouterService, StateEditorTutorialFirstTimeService,
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
+            ExplorationFeaturesService, ExplorationRightsService,
+            ExplorationWarningsService, RouterService,
+            StateEditorTutorialFirstTimeService,
             StateTranslationTutorialFirstTimeService,
             SiteAnalyticsService, ThreadDataService, UserService,
             WindowDimensionsService) {
