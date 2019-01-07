@@ -180,7 +180,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         all_ids = [
             model.create('user_id', 'thread_id').reply_to_id
             for _ in xrange(100)]
-        set_ids = set(all_ids) #Set contains unique values
+        set_ids = set(all_ids) # Set contains unique values
         self.assertEqual(len(all_ids), len(set_ids))
 
     def test_create_raises_when_duplicate_ids(self):
@@ -200,7 +200,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         result = model.get_by_reply_to_id(created.reply_to_id)
 
-        self.assertNotEqual(result, None) #There should be a result
+        self.assertNotEqual(result, None) # There should be a result
         self.assertEqual(result.reply_to_id, created.reply_to_id)
 
     def test_nonexistent_get_reply_to_id_should_provide_no_model(self):
