@@ -18,6 +18,7 @@ suggestions.
 
 from core.domain import email_manager
 from core.domain import exp_services
+from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_domain
@@ -147,7 +148,7 @@ def get_all_stale_suggestions():
 
 
 def _update_suggestion(suggestion):
-    """Updates the given suggestion.
+    """Updates the given suggestion in database.
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
@@ -163,6 +164,24 @@ def _update_suggestion(suggestion):
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
+
+
+def edit_suggestion(suggestion, new_suggestion):
+    """Edits the submitted suggestion.
+
+    Args:
+        suggestion: obj. suggestion to be changed.
+        new_suggestion: dict(str, str). Dictionary contains the new suggestion.
+        The keys and values are as follows:
+
+    Returns:
+        suggestion: obj. Returns the edited suggestion.
+    """
+    old_suggestion_content = suggestion.change.to_dict()
+    old_suggestion_content['new_value'] = new_suggestion['new_value']
+    suggestion.change = old_suggestion_content
+    suggestion.change = exp_domain.ExplorationChange(suggestion.change)
+    _update_suggestion(suggestion)
 
 
 def mark_review_completed(suggestion, status, reviewer_id):

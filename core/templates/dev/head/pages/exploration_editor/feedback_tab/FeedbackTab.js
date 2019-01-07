@@ -179,6 +179,8 @@ oppia.controller('FeedbackTab', [
             $scope.canReject = $scope.canEdit && $scope.isNotHandled;
             $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
+            $scope.suggestionEditorIsShown = false;
+            $scope.saveButton = false;
 
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
@@ -218,6 +220,42 @@ oppia.controller('FeedbackTab', [
               $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION,
                 reviewMessage: $scope.reviewMessage
+              });
+            };
+
+            $scope.editSuggestion = function() {
+              $scope.suggestionEditorIsShown = true;
+              $scope.isNotHandled = true;
+              $scope.saveButton = true;
+            };
+
+            $scope.saveSuggestion = function() {
+              $scope.suggestionEditorIsShown = false;
+              $scope.saveButton = false;
+
+              url = UrlInterpolationService.interpolateUrl(
+                '/suggestionactionhandler/edit/<suggestion_id>', {
+                  suggestion_id: ThreadDataService.data.suggestionThreads[0].
+                    suggestion.suggestionId
+                });
+
+              data = {
+                action: 'edit',
+                summary_message: $scope.summaryMessage,
+                change: {
+                  cmd: 'edit_state_property',
+                  property_name: 'content',
+                  state_name: ThreadDataService.data.suggestionThreads[0].
+                    suggestion.stateName,
+                  old_value: $scope.currentContent,
+                  new_value: {
+                    html: $scope.newContent
+                  }
+                }
+              };
+
+              $http.put(url, data).then(function() {
+
               });
             };
 

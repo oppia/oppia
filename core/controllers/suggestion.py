@@ -174,3 +174,15 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
+
+
+class EditSuggestionHandler(base.BaseHandler):
+    # TODO. Work for permissions regarding
+    def put(self, suggestion_id):
+        """Edits the submitted suggestion.
+        Args:
+            suggestion_id: str. id of suggestion to be edit.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        new_suggestion = self.payload.get('change')
+        suggestion_services.edit_suggestion(suggestion, new_suggestion)
