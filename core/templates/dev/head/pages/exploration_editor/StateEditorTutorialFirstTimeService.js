@@ -24,8 +24,6 @@ oppia.factory('StateEditorTutorialFirstTimeService', [
 
     var STARTED_TUTORIAL_EVENT_URL = '/createhandler/started_tutorial_event';
 
-    var canEdit = GLOBALS.can_edit;
-
     return {
       // After the first call to it in a client session, this does nothing.
       init: function(firstTime, expId) {
@@ -33,7 +31,7 @@ oppia.factory('StateEditorTutorialFirstTimeService', [
           _currentlyInFirstVisit = false;
         }
 
-        if (_currentlyInFirstVisit && canEdit) {
+        if (_currentlyInFirstVisit && GLOBALS.can_edit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
