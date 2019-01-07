@@ -71,28 +71,44 @@ exports.config = {
       'protractor/accessibility.js'
     ],
 
+    additionalEditorAndPlayerFeatures: [
+      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    ],
+
     collections: [
       'protractor_desktop/collections.js'
     ],
 
-    editorAndPlayer: [
-      'protractor_desktop/editorAndPlayer.js',
-    ],
-
-    editorFeatures: [
-      'protractor_desktop/editorFeatures.js'
+    coreEditorAndPlayerFeatures: [
+      'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
     embedding: [
       'protractor_desktop/embedding.js'
     ],
 
+    explorationFeedbackTab: [
+      'protractor_desktop/explorationFeedbackTab.js'
+    ],
+
+    explorationHistoryTab: [
+      'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationTranslationTab: [
+      'protractor_desktop/explorationTranslationTab.js'
+    ],
+
+    explorationStatisticsTab: [
+      'protractor_desktop/explorationStatisticsTab.js'
+    ],
+
     extensions: [
       'protractor_desktop/extensions.js'
     ],
 
-    learnerDashboardSubscriptionsAndFeedbackThreads: [
-      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
+    learnerDashboard: [
+      'protractor_desktop/learnerDashboard.js'
     ],
 
     learner: [
@@ -103,16 +119,24 @@ exports.config = {
       'protractor/libraryFlow.js'
     ],
 
+    navigation: [
+      'protractor_desktop/navigation.js'
+    ],
+
+    preferences: [
+      'protractor_desktop/preferences.js'
+    ],
+
     profileMenu: [
       'protractor/profileMenuFlow.js'
     ],
 
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
+    profileFeatures: [
+      'protractor_desktop/profileFeatures.js'
     ],
 
-    stateEditor: [
-      'protractor_desktop/stateEditor.js',
+    publication: [
+      'protractor_desktop/publicationAndLibrary.js'
     ],
 
     subscriptions: [
