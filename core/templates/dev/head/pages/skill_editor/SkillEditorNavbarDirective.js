@@ -37,7 +37,7 @@ oppia.directive('skillEditorNavbar', [
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillRights = (
             SkillEditorStateService.getSkillRights());
-          $scope.getTabStatuses = SkillEditorRoutingService.getTabStatuses;
+          $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
           $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
           $scope.selectQuestionsTab =
             SkillEditorRoutingService.navigateToQuestionsTab;

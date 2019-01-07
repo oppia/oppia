@@ -92,7 +92,6 @@ def _get_exploration_player_data(
         - 'is_private': bool. Whether the exploration is private or not.
         - 'meta_name': str. Title of exploration.
         - 'meta_description': str. Objective of exploration.
-        - 'nav_mode': str. 'explore'.
     """
     try:
         exploration = exp_services.get_exploration_by_id(
@@ -148,7 +147,6 @@ def _get_exploration_player_data(
         'meta_name': exploration.title,
         # Note that this overwrites the value in base.py.
         'meta_description': utils.capitalize_string(exploration.objective),
-        'nav_mode': feconf.NAV_MODE_EXPLORE,
     }
 
 
@@ -273,8 +271,8 @@ class ExplorationHandler(base.BaseHandler):
         state_classifier_mapping = {}
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
-                exploration_id, exploration.version, exploration.states))
-        for index, state_name in enumerate(exploration.states):
+                exploration_id, exploration.version, exploration.states.keys()))
+        for index, state_name in enumerate(exploration.states.keys()):
             if classifier_training_jobs[index] is not None:
                 classifier_data = classifier_training_jobs[
                     index].classifier_data

@@ -65,7 +65,6 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
     def test_get_concept_card_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 404)
+                expected_status_int=404)

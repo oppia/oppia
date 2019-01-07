@@ -65,7 +65,6 @@ class NotificationsDashboardPage(base.BaseHandler):
     def get(self):
         self.values.update({
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
         })
         self.render_template(
             'pages/notifications_dashboard/notifications_dashboard.html',
@@ -138,7 +137,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
@@ -166,12 +164,29 @@ class CreatorDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
 
         def _get_intro_card_color(category):
+            """Returns the intro card color according to the category.
+
+            Args:
+                category: str. The category of the lesson.
+
+            Returns:
+                str. The intro card color according to the category.
+            """
             return (
                 constants.CATEGORIES_TO_COLORS[category] if
                 category in constants.CATEGORIES_TO_COLORS else
                 constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
+            """Returns the rounded average rating to display on the creator
+            dashboard.
+
+            Args:
+                rating: float. The rating of the lesson.
+
+            Returns:
+                float. The rounded average value of rating.
+            """
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were

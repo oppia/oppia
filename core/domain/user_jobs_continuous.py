@@ -387,6 +387,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _refresh_average_ratings(user_id, rating, old_rating):
+            """Refreshes the average ratings in the given realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+                rating: int. The new rating of the exploration.
+                old_rating: int. The old rating of the exploration before
+                    refreshing.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -413,6 +421,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _increment_total_plays_count(user_id):
+            """Increments the total plays count of the exploration in the
+            realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
