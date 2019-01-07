@@ -178,6 +178,17 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        """Generates key for the instance of ExpUserLastPlaythroughModel
+        class in the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[exploration_id].
+        """
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
@@ -207,7 +218,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
-            instance which matches with the given user_id and exploration_id.
+                instance which matches with the given user_id and
+                exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
@@ -364,7 +376,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             UserStatsModel. Either an existing one which matches the
-            given user_id, or the newly created one if it did not already exist.
+                given user_id, or the newly created one if it did not already
+                exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -408,6 +421,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        """Generates key for the instance of ExplorationUserDataModel class in
+        the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[exploration_id].
+        """
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
@@ -423,7 +447,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The newly created
-            ExplorationUserDataModel instance.
+                ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -440,7 +464,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-            which matches with the given user_id and exploration_id.
+                which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
@@ -457,7 +481,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-            which matches with the given user_ids and exploration_id.
+                which matches with the given user_ids and exploration_id.
         """
         instance_ids = (
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
@@ -488,6 +512,17 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
+        """Generates key for the instance of CollectionProgressModel class in
+        the required format with the arguments provided.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_id: str. The id of the exploration.
+
+        Returns:
+            str. The generated key using user_id and exploration_id
+                of the form [user_id].[collection_id].
+        """
         return '%s.%s' % (user_id, collection_id)
 
     @classmethod
@@ -503,7 +538,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
-            instance.
+                instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -520,7 +555,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
-            matches the given user_id and collection_id.
+                matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
@@ -557,8 +592,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. Either an existing one which
-            matches the given user_id and collection_id, or the newly created
-            one if it does not already exist.
+                matches the given user_id and collection_id, or the newly
+                created one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -610,7 +645,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The newly created StoryProgressModel
-            instance.
+                instance.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
@@ -629,7 +664,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The StoryProgressModel instance which
-            matches the given user_id and story_id.
+                matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return super(StoryProgressModel, cls).get(
@@ -646,7 +681,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             list(StoryProgressModel). The list of StoryProgressModel
-            instances which matches the given user_id and story_ids.
+                instances which matches the given user_id and story_ids.
         """
         instance_ids = [cls._generate_id(user_id, story_id)
                         for story_id in story_ids]
@@ -669,8 +704,8 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. Either an existing one which
-            matches the given user_id and story_id, or the newly created
-            one if it does not already exist.
+                matches the given user_id and story_id, or the newly created
+                one if it does not already exist.
         """
         instance_model = cls.get(user_id, story_id, strict=False)
         if instance_model is not None:

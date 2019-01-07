@@ -17,17 +17,18 @@
  */
 
 oppia.factory('PlaythroughIssuesService', [
-  '$sce', 'IssuesBackendApiService', 'ISSUE_TYPE_EARLY_QUIT',
+  '$sce', 'PlaythroughIssuesBackendApiService',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   function(
-      $sce, IssuesBackendApiService, ISSUE_TYPE_EARLY_QUIT,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
+      $sce, PlaythroughIssuesBackendApiService,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
+    var whitelistedExplorationIds = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
@@ -79,18 +80,44 @@ oppia.factory('PlaythroughIssuesService', [
     };
 
     return {
-      initSession: function(newExplorationId, newExplorationVersion) {
+      /** Prepares the PlaythroughIssuesService for subsequent calls to other
+       * functions.
+       *
+       * @param {string} newExplorationId - the exploration id the service will
+       *    be targeting.
+       * @param {number} newExplorationVersion - the version of the exploration
+       *    the service will be targeting.
+       * @param {string[]=} testOnlyWhitelistedExplorationIds - a utility
+       *    parameter for tests to avoid making backend calls. This parameter
+       *    allows more explicit testing of the whitelist.
+       */
+      initSession: function(
+          newExplorationId, newExplorationVersion,
+          testOnlyWhitelistedExplorationIds) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
+        if (testOnlyWhitelistedExplorationIds !== undefined) {
+          whitelistedExplorationIds = testOnlyWhitelistedExplorationIds;
+        } else {
+          PlaythroughIssuesBackendApiService
+            .fetchWhitelistedExplorationsForPlaythroughs().then(
+              function(newWhitelistedExplorationIds) {
+                whitelistedExplorationIds = newWhitelistedExplorationIds;
+              });
+        }
+      },
+      isExplorationEligibleForPlaythroughIssues: function(explorationId) {
+        return whitelistedExplorationIds !== null &&
+          whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
       getIssues: function() {
-        return IssuesBackendApiService.fetchIssues(
+        return PlaythroughIssuesBackendApiService.fetchIssues(
           explorationId, explorationVersion).then(function(issues) {
           return issues;
         });
       },
       getPlaythrough: function(playthroughId) {
-        return IssuesBackendApiService.fetchPlaythrough(
+        return PlaythroughIssuesBackendApiService.fetchPlaythrough(
           explorationId, playthroughId).then(function(playthrough) {
           return playthrough;
         });
@@ -119,7 +146,7 @@ oppia.factory('PlaythroughIssuesService', [
         }
       },
       resolveIssue: function(issue) {
-        IssuesBackendApiService.resolveIssue(
+        PlaythroughIssuesBackendApiService.resolveIssue(
           issue, explorationId, explorationVersion);
       }
     };

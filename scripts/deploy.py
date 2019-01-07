@@ -198,6 +198,7 @@ def _get_current_release_version():
 
 
 def _execute_deployment():
+    """Executes the deployment process after doing the prerequisite checks."""
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()

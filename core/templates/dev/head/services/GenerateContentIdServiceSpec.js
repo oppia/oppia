@@ -62,7 +62,7 @@ describe('GenerateContentIdService', function() {
       .toEqual('worked_example_2');
   });
 
-  it('should throw error for unknown content id', function(){
+  it('should throw error for unknown content id', function() {
     expect(function() {
       gcis.getNextId('xyz');
     }).toThrowError('Unknown component name provided.');

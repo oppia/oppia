@@ -493,6 +493,14 @@ def get_library_groups(language_codes):
             '" OR "'.join(language_codes))
 
     def _generate_query(categories):
+        """Generates query based on the categories and language codes.
+
+        Args:
+            categories: list(str). List of categories.
+
+        Returns:
+            str. Generated query.
+        """
         # This assumes that 'categories' is non-empty.
         return 'category=("%s")%s' % (
             '" OR "'.join(categories), language_codes_suffix)

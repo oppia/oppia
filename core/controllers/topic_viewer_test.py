@@ -58,33 +58,30 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
     def test_any_user_can_access_topic_viewer_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
-            self.assertEqual(response.status_int, 200)
 
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
-                expect_errors=True)
+                expected_status_int=404)
 
-            self.assertEqual(response.status_int, 404)
 
     def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.testapp.get(
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 404)
+                expected_status_int=404)
 
 
 class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
     def test_get(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
             expected_dict = {
@@ -99,8 +96,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', False):
-            response = self.testapp.get(
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 404)
+                expected_status_int=404)

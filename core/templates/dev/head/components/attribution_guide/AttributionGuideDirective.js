@@ -28,6 +28,7 @@ oppia.directive('attributionGuide', [
         '$scope', 'BrowserCheckerService', function(
             $scope, BrowserCheckerService) {
           $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
+          $scope.iframed = GLOBALS.iframed;
         }
       ]
     };
