@@ -95,12 +95,12 @@ exports.config = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
-    explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
-    ],
-
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
+    ],
+
+    explorationTranslationTab: [
+      'protractor_desktop/explorationTranslationTab.js'
     ],
 
     extensions: [
@@ -127,12 +127,12 @@ exports.config = {
       'protractor_desktop/preferences.js'
     ],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
     profileFeatures: [
       'protractor_desktop/profileFeatures.js'
+    ],
+
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
     ],
 
     publication: [
