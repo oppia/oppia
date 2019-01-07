@@ -71,8 +71,8 @@ var ExplorationEditorTranslationTab = function() {
   };
   this.playTutorial = function() {
     var tutorialTabHeadings = [
-      'Translations in Oppia',
-      'Select Language',
+      'Translations In Oppia',
+      'Choose Language',
       'Choose State You Want to Translate',
       'Choose Section You Want to Translate',
       'Uploading Audio',
