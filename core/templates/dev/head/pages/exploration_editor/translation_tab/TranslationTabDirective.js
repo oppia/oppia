@@ -28,7 +28,7 @@ oppia.directive('translationTab', [
       scope: {},
       link: function(scope) {
         scope.$broadcast('refreshTranslationTab');
-        ExplorationDataService.getData().then(function(data){
+        ExplorationDataService.getData().then(function(data) {
           StateTranslationTutorialFirstTimeService.init(
             data.show_state_translation_tutorial_on_load,
             ContextService.getExplorationId()
@@ -216,23 +216,23 @@ oppia.directive('translationTab', [
           $templateCache.put('ng-joyride-title-tplv1.html',
             ngJoyrideTemplate);
 
-          $scope.leaveTutorial = function(){
+          $scope.leaveTutorial = function() {
             EditabilityService.onEndTutorial();
             $scope.$apply();
             StateTranslationTutorialFirstTimeService.markTutorialFinished();
             $scope.translationTutorial = false;
           };
 
-          $scope.onFinishTutorial = function(){
+          $scope.onFinishTutorial = function() {
             $scope.leaveTutorial();
           };
 
-          $scope.onSkipTutorial = function(){
+          $scope.onSkipTutorial = function() {
             $scope.leaveTutorial();
           };
 
           $scope.translationTutorial = false;
-          $scope.onStartTutorial = function(){
+          $scope.onStartTutorial = function() {
             if (GLOBALS.can_translate) {
               $scope.translationTutorial = true;
             }
