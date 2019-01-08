@@ -928,7 +928,7 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
       'NumericInput', forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
+      'two', true, 'Equals', 6);
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
     explorationEditorMainTab.addHint('This is hint1.');
@@ -937,7 +937,7 @@ describe('Exploration translation', function() {
       correctAnswer: 6,
       explanation: 'This is solution.'
     });
-    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.moveToState('two');
     explorationEditorMainTab.setContent(
       forms.toRichText('This is second card.'));
     explorationEditorMainTab.setInteraction('Continue');
@@ -971,6 +971,50 @@ describe('Exploration translation', function() {
       'this is card 1'));
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
+  });
+
+  it('the active translation subtab should not change on saving draft', function() {
+  	users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
+    users.login('user@translationSubTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('one');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'two', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('two');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is second card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'final card', true, 'Equals', 7);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 7,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('two');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorPage.navigateToTranslationTab_feedback();
+    explorationEditorPage.saveChanges();
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   });
 
   afterEach(function() {
