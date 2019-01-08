@@ -405,21 +405,15 @@ class UrlHandler(base.BaseHandler):
             login_url = None
             self.render_json({'login_url': login_url})
         else:
-            if self.request:
-                if self.request.get('current_url'):
-                    target_url = (
-                        '/' if self.request.get('current_url').endswith(
-                            feconf.SPLASH_URL)
-                        else self.request.get('current_url'))
-                    login_url = (
-                        current_user_services.create_login_url(target_url))
-                    self.render_json({'login_url': login_url})
-                else:
-                    raise self.InvalidInputException(
-                        'Empty GET parameters passed'
-                    )
+            if self.request and self.request.get('current_url'):
+                target_url = (
+                    '/' if self.request.get('current_url').endswith(
+                        feconf.SPLASH_URL)
+                    else self.request.get('current_url'))
+                login_url = (
+                    current_user_services.create_login_url(target_url))
+                self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(
-                    'Expected URL in the GET request parameters, None '
-                    'passed'
+                    'Incomplete or empty GET parameters passed'
                 )
