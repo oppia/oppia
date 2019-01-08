@@ -26,7 +26,7 @@ describe('PlaythroughService', function() {
       $injector.get('ExplorationFeaturesService');
   }));
 
-  describe('.initSession', function() {
+  describe('.initSession()', function() {
     it('stores the correct values', function() {
       this.expId = 'expId';
       this.expVersion = 1;
@@ -55,7 +55,7 @@ describe('PlaythroughService', function() {
         .and.returnValue(true);
     });
 
-    describe('.recordExplorationStartAction', function() {
+    describe('.recordExplorationStartAction()', function() {
       it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordExplorationStartAction('initStateName1');
 
@@ -68,7 +68,7 @@ describe('PlaythroughService', function() {
       });
     });
 
-    describe('.recordAnswerSubmitAction', function() {
+    describe('.recordAnswerSubmitAction()', function() {
       it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
@@ -87,7 +87,7 @@ describe('PlaythroughService', function() {
       });
     });
 
-    describe('.recordAnswerSubmitAction', function() {
+    describe('.recordAnswerSubmitAction()', function() {
       it('adds a learner action object to the actions array', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
@@ -101,7 +101,7 @@ describe('PlaythroughService', function() {
       });
     });
 
-    describe('.recordPlaythrough', function() {
+    describe('.recordPlaythrough()', function() {
       it('identifies multiple incorrect submissions', function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
         this.PlaythroughService.recordAnswerSubmitAction(
