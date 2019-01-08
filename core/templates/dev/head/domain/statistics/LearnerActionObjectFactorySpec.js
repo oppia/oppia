@@ -34,10 +34,15 @@ describe('Learner Action Object Factory', function() {
       .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
-  it('should use a specific schema version if provided', function() {
-    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, -5);
+  it('should throw if the schema version is not a positive int', function() {
+    expect(function() { return this.laof.createNew('AnswerSubmit', {}, -1); })
+      .toThrow(new Error('given invalid schema version'));
+  });
 
-    expect(learnerActionObject.schemaVersion).toEqual(-5);
+  it('should use a specific schema version if provided', function() {
+    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, 99);
+
+    expect(learnerActionObject.schemaVersion).toEqual(99);
   });
 
   it('should create a new learner action from a backend dict', function() {

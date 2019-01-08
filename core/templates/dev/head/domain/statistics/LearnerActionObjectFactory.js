@@ -31,6 +31,10 @@ oppia.factory('LearnerActionObjectFactory', [
      */
     var LearnerAction = function(
         actionType, actionCustomizationArgs, schemaVersion) {
+      if (schemaVersion < 1) {
+        throw new Error('given invalid schema version');
+      }
+
       /** @type {string} */
       this.actionType = actionType;
       /** @type {Object.<string, *>} */
