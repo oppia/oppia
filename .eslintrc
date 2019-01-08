@@ -192,6 +192,22 @@
     "wrap-iife": [
       "error",
       "any"
+    ],
+    "function-paren-newline": [
+      "error",
+      "multiline"
+    ],
+    "array-bracket-newline": [
+      "error",
+      {
+        "multiline": true
+      }
+    ],
+    "object-curly-newline": [
+      "error",
+      {
+        "multiline": true
+      }
     ]
   }
 }
