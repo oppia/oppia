@@ -234,9 +234,13 @@ oppia.controller('FeedbackTab', [
               $scope.saveButton = false;
 
               url = UrlInterpolationService.interpolateUrl(
-                '/suggestionactionhandler/edit/<suggestion_id>', {
+                '/suggestionactionhandler/edit/<exploration_id>/<target_id>/' +
+                  '<suggestion_id>', {
+                  exploration_id: ExplorationDataService.explorationId,
                   suggestion_id: ThreadDataService.data.suggestionThreads[0].
-                    suggestion.suggestionId
+                    suggestion.suggestionId,
+                  target_id: ThreadDataService.data.suggestionThreads[0].
+                    threadId
                 });
 
               data = {

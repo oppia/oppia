@@ -39,8 +39,8 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-info" ng-click="editSuggestion()" ng-if="!saveButton && isNotHandled">Edit</button>
-  <button class="btn btn-info" ng-click="saveSuggestion()" ng-if="suggestionEditorIsShown && saveButton">Save</button>
+  <button class="btn btn-info" ng-click="editSuggestion()" ng-if="!saveButton && isNotHandled && canEdit">Edit</button>
+  <button class="btn btn-info" ng-click="saveSuggestion()" ng-if="suggestionEditorIsShown && saveButton && canEdit">Save</button>
   <button class="btn btn-danger" ng-show="canEdit && isNotHandled && !suggestionEditorIsShown" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled && !suggestionEditorIsShown" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
 </div>
