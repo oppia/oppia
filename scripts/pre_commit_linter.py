@@ -331,14 +331,19 @@ class FileCache(object):
 
     @classmethod
     def read(cls, filename, mode='r'):
+        """Returns the data read from the file."""
         return cls._get_data(filename, mode)[0]
 
     @classmethod
     def readlines(cls, filename, mode='r'):
+        """Returns the tuple containing data line by line as read from the
+        file.
+        """
         return cls._get_data(filename, mode)[1]
 
     @classmethod
     def _get_cache_lock(cls, key):
+        """Returns the cache lock corresponding to the given key."""
         if key not in cls._CACHE_LOCK_DICT:
             with cls._CACHE_LOCK_DICT_LOCK:
                 if key not in cls._CACHE_LOCK_DICT:
@@ -347,6 +352,9 @@ class FileCache(object):
 
     @classmethod
     def _get_data(cls, filename, mode):
+        """Returns the collected data from the file corresponding to the given
+        filename.
+        """
         key = (filename, mode)
         if key not in cls._CACHE_DATA_DICT:
             with cls._get_cache_lock(key):
@@ -413,6 +421,7 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
 
 @contextlib.contextmanager
 def _redirect_stdout(new_target):
+    """Redirect stdout to the new target."""
     old_target = sys.stdout
     sys.stdout = new_target
     try:
