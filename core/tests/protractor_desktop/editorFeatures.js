@@ -974,7 +974,7 @@ describe('Exploration translation', function() {
   });
 
   it('the active translation subtab should not change on saving draft', function() {
-  	users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
+    users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
     users.login('user@translationSubTab.com');
     workflow.createExploration();
 
