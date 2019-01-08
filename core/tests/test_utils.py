@@ -28,7 +28,6 @@ import unittest
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
@@ -1537,53 +1536,6 @@ tags: []
             yield
         finally:
             setattr(obj, attr, original)
-
-    @contextlib.contextmanager
-    def swap_property_value_context(self, name, value, committer_id):
-        """Swap a config property's value in the context of a 'with' statement.
-
-        Performs a sequence of two commits:
-            1.  committer_id will commit the property identified by "name" to
-                the new value.
-            2.  committer_id will commit the property identified by "name" to
-                the original value; the original value is whichever value gets
-                read just before the first commit.
-
-        NOTE:
-          - This method is not thread-safe!
-          - self.swap_property_value_context and other context managers created
-            using contextlib.contextmanager use generators that yield exactly
-            once. This means that you can only use them once after construction,
-            otherwise, the generator will immediately raise StopIteration and
-            contextlib will consequentially raise a RuntimeError.
-
-        Args:
-            name: str. The name of the property.
-            value: str. The value of the property.
-            committer_id: str. The user ID of the committer.
-
-        Yields:
-            None - implementation detail of the contextlib.contextmanager
-            decorator. Do not use this as a generator, but as a one-time with
-            statement object. For example:
-                >>> foo_as_3_context = (
-                ...     self.swap_property_value_context('admin_id', 'foo', 3))
-                >>> with foo_as_3_context:
-                ...     config_domain.Registry.get_config_property('foo').value
-                3
-
-        Raises:
-            Exception: No config property with the specified name is found.
-        """
-        config_property = config_domain.Registry.get_config_property(name)
-        if config_property is None:
-            raise Exception('No config property with name %s found.' % name)
-        original_value = config_property.value
-        config_property.set_value(committer_id, value)
-        try:
-            yield
-        finally:
-            config_property.set_value(committer_id, original_value)
 
 
 class AppEngineTestBase(TestBase):
