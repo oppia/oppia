@@ -189,7 +189,6 @@ oppia.factory('ExplorationSaveService', [
           }
           $log.info('Changes to this exploration were saved successfully.');
           ChangeListService.discardAllChanges();
-          $rootScope.$broadcast('initExplorationPage');
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
