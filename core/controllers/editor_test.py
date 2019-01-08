@@ -1950,4 +1950,4 @@ class EditorFirstTimeTutorialIntegrationTest(BaseEditorControllerTests):
         self.post_json(
             '/createhandler/started_translation_tutorial_event/%s'
             % self.EXP_ID, {}, csrf_token=csrf_token,
-            expect_errors=False, expected_status_int=200)
+            expected_status_int=200)
