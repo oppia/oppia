@@ -18,7 +18,7 @@
             <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
               <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <div ng-if="hasPageLoaded && showSelectCategoryDropdown()">
+                <div ng-if="hasPageLoaded && showSelect2Dropdown()">
                   <select2-dropdown id="explorationCategory"
                                     class="protractor-test-exploration-category-input"
                                     item="explorationCategoryService.displayed"
@@ -58,7 +58,7 @@
             <div class="form-group">
               <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <div ng-if="hasPageLoaded">
+                <div ng-if="hasPageLoaded && showSelect2Dropdown()">
                   <select2-dropdown item="$parent.explorationTagsService.displayed"
                                     choices="$parent.explorationTagsService.displayed"
                                     allow-multiple-choices="true"

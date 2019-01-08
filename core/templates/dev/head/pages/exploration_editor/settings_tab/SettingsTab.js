@@ -64,9 +64,9 @@ oppia.controller('SettingsTab', [
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
-    // This is needed to make select2 re-load the category data
-    // if user have changed the category while publishing exploration.
-    $scope.showSelectCategoryDropdown = function() {
+    // This is needed to make select2 re-load the dom if user have
+    // changed/added new value while publishing exploration.
+    $scope.showSelect2Dropdown = function() {
       return RouterService.getActiveTabName() === 'settings';
     };
 
