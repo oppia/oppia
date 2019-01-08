@@ -35,8 +35,9 @@ describe('Learner Action Object Factory', function() {
   });
 
   it('should throw if the schema version is not a positive int', function() {
-    expect(function() { return this.laof.createNew('AnswerSubmit', {}, -1); })
-      .toThrow(new Error('given invalid schema version'));
+    expect(function() {
+      return this.laof.createNew('AnswerSubmit', {}, -1);
+    }).toThrow(new Error('given invalid schema version'));
   });
 
   it('should use a specific schema version if provided', function() {
