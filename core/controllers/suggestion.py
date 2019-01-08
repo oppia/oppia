@@ -178,12 +178,15 @@ class SuggestionListHandler(base.BaseHandler):
 
 class EditSuggestionHandler(base.BaseHandler):
     """Handler for editing the submitted suggestion by reviwer before
-    accepting."""
+    accepting.
+    """
 
     @acl_decorators.can_edit_exploration
     def put(self, exploration_id, target_id, suggestion_id):# pylint: disable=unused-argument
         """Edits the submitted suggestion.
         Args:
+            exploration_id: str. id of exploration.
+            target_id: str. target id.
             suggestion_id: str. id of suggestion to be edit.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
