@@ -395,6 +395,7 @@ class UserInfoHandler(base.BaseHandler):
 
 
 class UrlHandler(base.BaseHandler):
+    """The handler for generating login URL."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -402,8 +403,7 @@ class UrlHandler(base.BaseHandler):
     def get(self):
         login_url = None
         if self.user_id:
-            login_url = None
-            self.render_json({'login_url': login_url})
+            self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
                 target_url = (
