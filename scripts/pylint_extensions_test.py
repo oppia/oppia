@@ -232,7 +232,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class FunctionArgsOrderCheckerTest(unittest.TestCase):
+class FunctionArgsOrderCheckerTests(unittest.TestCase):
 
     def test_finds_function_def(self):
         checker_test_object = testutils.CheckerTestCase()
