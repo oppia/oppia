@@ -479,8 +479,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        if len(init_state.interaction.hints) <= 1:
-            raise IndexError('Hint index out of range')
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
 
