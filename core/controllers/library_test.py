@@ -45,8 +45,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
     def test_library_page(self):
         """Test access to the library page."""
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('Library - Oppia')
 
     def test_library_handler_demo_exploration(self):
@@ -199,11 +198,9 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def test_library_group_pages(self):
         """Test access to the top rated and recently published pages."""
-        response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(feconf.LIBRARY_TOP_RATED_URL)
 
-        response = self.testapp.get(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
 
     def test_handler_for_recently_published_library_group_page(self):
         """Test library handler for recently published group page."""

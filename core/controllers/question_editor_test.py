@@ -70,22 +70,22 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.post(
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
                 '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                {}, csrf_token=csrf_token, expected_status_int=401)
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
             question_dict['id'] = None
             self.post_json(
                 '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
                     'question_dict': question_dict
-                }, csrf_token=csrf_token, expect_errors=False,
-                expected_status_int=200)
+                }, csrf_token=csrf_token, expected_status_int=200)
             all_models = question_models.QuestionModel.get_all()
             questions = [
                 question_services.get_question_from_model(model)
@@ -95,15 +95,14 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             question_dict = self.question.to_dict()
             question_dict['id'] = None
             self.post_json(
                 '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
                     'question_dict': question_dict
-                }, csrf_token=csrf_token, expect_errors=False,
-                expected_status_int=200)
+                }, csrf_token=csrf_token)
             all_models = question_models.QuestionModel.get_all()
             questions = [
                 question_services.get_question_from_model(model)
@@ -129,25 +128,23 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     def test_post(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
-            response = self.testapp.post(
-                '%s/%s/%s' % (
-                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                    self.skill_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
-
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
-                ), {}, csrf_token=csrf_token, expect_errors=False,
-                expected_status_int=200)
+                ), {}, csrf_token=csrf_token, expected_status_int=401)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), {}, csrf_token=csrf_token)
             question_summaries, _ = (
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
@@ -156,14 +153,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
                     self.skill_id
-                ), {}, csrf_token=csrf_token, expect_errors=False,
-                expected_status_int=200)
+                ), {}, csrf_token=csrf_token)
             question_summaries, _ = (
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
@@ -180,12 +176,11 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id_2, self.skill_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                ), expected_status_int=401)
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
@@ -193,7 +188,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
-                ), expect_errors=False)
+                ))
             question_summaries, _ = (
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
@@ -206,7 +201,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
                     self.skill_id
-                ), expect_errors=False)
+                ))
             question_summaries, _ = (
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
@@ -230,11 +225,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             # Check that non-admin and topic_manager cannot access the editor
             # data.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                expected_status_int=401)
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
@@ -312,14 +306,13 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             payload['commit_message'] = 'update question data'
 
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
                 payload,
-                csrf_token=csrf_token,
-                expect_errors=False)
+                csrf_token=csrf_token)
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
             self.assertEqual(
@@ -332,28 +325,22 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                     self.question_id), payload,
-                csrf_token=csrf_token,
-                expect_errors=True,
-                expected_status_int=404)
+                csrf_token=csrf_token, expected_status_int=404)
             del payload['commit_message']
             payload['change_list'] = change_list
             self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                     self.question_id), payload,
-                csrf_token=csrf_token,
-                expect_errors=True,
-                expected_status_int=404)
+                csrf_token=csrf_token, expected_status_int=404)
             payload['commit_message'] = 'update question data'
             self.put_json(
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,
-                csrf_token=csrf_token,
-                expect_errors=True,
-                expected_status_int=404)
+                csrf_token=csrf_token, expected_status_int=404)
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             payload = {}
             new_question_data = self._create_valid_question_data('GHI')
@@ -368,9 +355,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                payload,
-                csrf_token=csrf_token,
-                expect_errors=False)
+                payload, csrf_token=csrf_token)
 
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
@@ -383,7 +368,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
             # Check that the question creator can edit the question.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
             payload = {}
             new_question_data = self._create_valid_question_data('GHI')
@@ -398,9 +383,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                payload,
-                csrf_token=csrf_token,
-                expect_errors=False)
+                payload, csrf_token=csrf_token)
 
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
