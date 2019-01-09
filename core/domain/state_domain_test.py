@@ -429,12 +429,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        init_state.update_interaction_hints([{
+        hints_list = []
+        hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
                 'html': 'hint one'
             },
-        }])
+        })
+        init_state.update_interaction_hints(hints_list)
 
         solution = {
             'answer_is_exclusive': False,
@@ -457,20 +459,30 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.id, solution))
         exploration.validate()
 
-        # Add hint and delete hint.
-        init_state.interaction.hints.append(
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_2', 'new hint')))
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': 'new hint'
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
+
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             'new hint')
-        init_state.interaction.hints.append(
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_3', 'hint three')))
+
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_3',
+                'html': 'hint three'
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
 
         if len(init_state.interaction.hints) <= 1:
             raise IndexError('Hint index out of range')
-        del init_state.interaction.hints[1]
+        del hints_list[1]
+        init_state.update_interaction_hints(hints_list)
 
         init_state.update_content_ids_to_audio_translations({
             'content': {},
