@@ -50,7 +50,7 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
-  var NumericalStatus = 
+  var NumericalStatus =
     element(by.css('.protractor-test-translation-NumericalStatus'));
 
   var _selectLanguage = function(language) {
@@ -93,8 +93,8 @@ var ExplorationEditorTranslationTab = function() {
     expect(solutionTabText.getText()).toMatch(content);
   };
 
-    this.expectNumericalStatusToMatch = function(content) {
-  expect(NumericalStatus.getText()).toMatch(content);
+  this.expectNumericalStatusToMatch = function(content) {
+    expect(NumericalStatus.getText()).toMatch(content);
   };
 
   this.changeTranslationLanguage = function(language) {
