@@ -692,7 +692,7 @@ describe('Issues visualization', function() {
     workflow.publishExploration();
 
     adminPage.editConfigProperty(
-      'The list of exploration IDs for recording playthrough issues',
+      'The set of exploration IDs for recording playthrough issues',
       'List',
       function(elem) {
         elem.addItem('Unicode').setValue(expId);
