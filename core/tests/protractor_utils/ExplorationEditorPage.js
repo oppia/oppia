@@ -177,7 +177,8 @@ var ExplorationEditorPage = function() {
   };
   this.navigateToTranslationTabFeedback = function() {
     waitFor.elementToBeClickable(
-      navigateToTranslationTabButtonFeedback, 'Translation tab is not clickable');
+      navigateToTranslationTabButtonFeedback,
+       'Translation tab is not clickable');
     navigateToTranslationTabButtonFeedback.click();
     waitFor.pageToFullyLoad();
   };

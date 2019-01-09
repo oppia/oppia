@@ -973,7 +973,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  fit('the translation subtab should not change on saving draft', function() {
+  it('the translation subtab should not change on saving draft', function() {
     users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
     users.login('user@translationSubTab.com');
     workflow.createExploration();
