@@ -919,49 +919,49 @@ describe('Exploration translation', function() {
 
   it('should have all the state contents with correct numerical status',
     function() {
-    users.createUser('user@translationTab.com', 'userTranslationTab');
-    users.login('user@translationTab.com');
-    workflow.createExploration();
+      users.createUser('user@translationTab.com', 'userTranslationTab');
+      users.login('user@translationTab.com');
+      workflow.createExploration();
 
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'This is solution.'
-    });
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('This is second card.'));
-    explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
+      explorationEditorMainTab.setStateName('first');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'This is first card.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
+        'NumericInput', forms.toRichText('This is feedback1.'),
+        'second', true, 'Equals', 6);
+      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+      explorationEditorMainTab.addHint('This is hint1.');
+      explorationEditorMainTab.addHint('This is hint2.');
+      explorationEditorMainTab.addSolution('NumericInput', {
+        correctAnswer: 6,
+        explanation: 'This is solution.'
+      });
+      explorationEditorMainTab.moveToState('second');
+      explorationEditorMainTab.setContent(
+        forms.toRichText('This is second card.'));
+      explorationEditorMainTab.setInteraction('Continue');
+      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.setDestination('final card', true, null);
+      // Setup a terminating state.
+      explorationEditorMainTab.moveToState('final card');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorMainTab.moveToState('first');
+      explorationEditorPage.saveChanges();
 
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.expectContentTabContentToMatch(
-      'This is first card.');
-    explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
-      ['This is feedback1.', 'This is default_outcome.']);
-    explorationEditorTranslationTab.expectSolutionTabContentToMatch(
-      'This is solution.');
-    explorationEditorTranslationTab.expectHintsTabContentsToMatch(
-      ['This is hint1.', 'This is hint2.']);
-    explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(0/8)');
-    users.logout();
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.expectContentTabContentToMatch(
+        'This is first card.');
+      explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
+        ['This is feedback1.', 'This is default_outcome.']);
+      explorationEditorTranslationTab.expectSolutionTabContentToMatch(
+        'This is solution.');
+      explorationEditorTranslationTab.expectHintsTabContentsToMatch(
+        ['This is hint1.', 'This is hint2.']);
+      explorationEditorTranslationTab.expectNumericalStatusToMatch(
+        '(0/8)');
+      users.logout();
   });
 
   it('should change translation language correctly', function() {
