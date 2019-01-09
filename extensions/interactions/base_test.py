@@ -205,6 +205,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         def _check_num_interaction_rules(interaction_id, expected_num):
             """Checks the number of rules in the interaction corresponding to
             the given interaction id.
+
+            Args:
+                interaction_id: str. The interaction id.
+                expected_num: int. The expected number of rules for the
+                    interaction.
             """
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
