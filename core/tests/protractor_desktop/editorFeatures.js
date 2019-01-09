@@ -930,7 +930,8 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.addResponse(
         'NumericInput', forms.toRichText('This is feedback1.'),
         'second', true, 'Equals', 6);
-      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      var responseEditor =
+        explorationEditorMainTab.getResponseEditor('default');
       responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
       explorationEditorMainTab.addHint('This is hint1.');
       explorationEditorMainTab.addHint('This is hint2.');
@@ -942,7 +943,8 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.setContent(
         forms.toRichText('This is second card.'));
       explorationEditorMainTab.setInteraction('Continue');
-      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      var responseEditor =
+        explorationEditorMainTab.getResponseEditor('default');
       responseEditor.setDestination('final card', true, null);
       // Setup a terminating state.
       explorationEditorMainTab.moveToState('final card');
@@ -962,7 +964,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.expectNumericalStatusToMatch(
         '(0/8)');
       users.logout();
-  });
+    });
 
   it('should change translation language correctly', function() {
     users.createUser('user@translationTabLang.com', 'userTranslationTabLang');
