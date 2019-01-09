@@ -178,7 +178,7 @@ var ExplorationEditorPage = function() {
   this.navigateToTranslationTabFeedback = function() {
     waitFor.elementToBeClickable(
       navigateToTranslationTabButtonFeedback,
-       'Translation tab is not clickable');
+      'Translation tab is not clickable');
     navigateToTranslationTabButtonFeedback.click();
     waitFor.pageToFullyLoad();
   };
