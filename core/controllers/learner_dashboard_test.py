@@ -21,7 +21,7 @@ from core.tests import test_utils
 import feconf
 
 
-class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
+class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
@@ -41,7 +41,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
     COL_TITLE_3 = 'Collection title 3'
 
     def setUp(self):
-        super(LearnerDashboardHandlerTests, self).setUp()
+        super(LearnerDashboardHandlerTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -239,20 +239,19 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             [self.COL_ID_3])
 
 
-class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
+class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
 
     EXP_ID_1 = '0'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
+        super(LearnerDashboardFeedbackThreadHandlerTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID_1)
 
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID_1)
+        response = self.testapp.get('/create/%s' % self.EXP_ID_1)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
@@ -278,7 +277,6 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list']
         first_message = messages_summary[0]
-
         self.assertDictContainsSubset({
             'text': 'a sample message',
             'author_username': 'editor'
@@ -301,10 +299,35 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         messages_summary = response_dict['message_summary_list']
 
         # Check the summary of the second message.
-        second_message = messages_summary[1]
+        second_message = messages_summary[-1]
         self.assertDictContainsSubset({
             'text': 'Message 1',
             'author_username': 'editor'
         }, second_message)
 
         self.logout()
+
+    def test_feedback_without_author_settings(self):
+        self.post_json(
+            '/explorehandler/give_feedback/%s' % self.EXP_ID_1,
+            {
+                'state_name': '',
+                'feedback': 'This is an anonymous feedback message.',
+            }
+        )
+
+        self.login(self.EDITOR_EMAIL)
+        response_dict = self.get_json(
+            '%s/%s' %
+            (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+
+        # Get the message summary of the thread.
+        thread_url = '%s/%s' % (
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list']
+
+        self.assertEqual(messages_summary[-1]['author_username'], None)
+        self.assertEqual(messages_summary[-1]['author_picture_data_url'], None)
