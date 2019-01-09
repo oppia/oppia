@@ -973,7 +973,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('the active translation subtab should not change on saving draft', function() {
+  fit('the translation subtab should not change on saving draft', function() {
     users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
     users.login('user@translationSubTab.com');
     workflow.createExploration();
@@ -1012,9 +1012,10 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.moveToState('two');
     explorationEditorPage.navigateToTranslationTab();
-    explorationEditorPage.navigateToTranslationTab_feedback();
+    explorationEditorPage.navigateToTranslationTab_Feedback();
     explorationEditorPage.saveChanges();
-    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   });
 
   afterEach(function() {
