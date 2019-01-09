@@ -914,6 +914,7 @@ describe('Exploration translation', function() {
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
   });
 
@@ -973,11 +974,17 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('the translation subtab should not change on saving draft', function() {
+  it('should maintain its active sub-tab on saving draft and publishing changes'
+  	, function() {
     users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
     users.login('user@translationSubTab.com');
     workflow.createExploration();
-
+    
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Check');
+    explorationEditorSettingsTab.setCategory('Algorithms');
+    explorationEditorSettingsTab.setObjective('To check the translation tab');
+    explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.setStateName('one');
     explorationEditorMainTab.setContent(forms.toRichText(
       'This is first card.'));
@@ -1014,6 +1021,16 @@ describe('Exploration translation', function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorPage.navigateToTranslationTabFeedback();
     explorationEditorPage.saveChanges();
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+
+    workflow.publishExploration()
+
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.addHint('This is hint3.');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorPage.navigateToTranslationTabFeedback();
+     explorationEditorPage.saveChanges('Ok');
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   });

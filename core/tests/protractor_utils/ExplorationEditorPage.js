@@ -88,7 +88,7 @@ var ExplorationEditorPage = function() {
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
   var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
-  var navigateToTranslationTabButtonFeedback = element(
+  var TranslationTabFeedbackButton = element(
     by.css('.protractor-test-translation-feedback-tab'));
 
   /*
@@ -177,9 +177,9 @@ var ExplorationEditorPage = function() {
   };
   this.navigateToTranslationTabFeedback = function() {
     waitFor.elementToBeClickable(
-      navigateToTranslationTabButtonFeedback,
-      'Translation tab is not clickable');
-    navigateToTranslationTabButtonFeedback.click();
+      TranslationTabFeedbackButton,
+      'Feedback sub tab of translation tab is not clickable');
+    TranslationTabFeedbackButton.click();
     waitFor.pageToFullyLoad();
   };
 };
