@@ -12,10 +12,8 @@ addons:
 
 branches:
   only:
-  - master
-  - develop
-  - /^release-\d+\.\d+\.\d+$/
-  - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
+  - gh-pages
+  - /.*/
 
 env:
   matrix:
