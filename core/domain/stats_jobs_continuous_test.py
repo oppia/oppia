@@ -38,34 +38,37 @@ EMPTY_STATE_HIT_COUNTS_DICT = {
 }
 
 
-class ModifiedInteractionAnswerSummariesAggregator(
+class MockInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedInteractionAnswerSummariesMRJobManager
+        return MockInteractionAnswerSummariesMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedInteractionAnswerSummariesMRJobManager(
+class MockInteractionAnswerSummariesMRJobManager(
         stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedInteractionAnswerSummariesAggregator
+        return MockInteractionAnswerSummariesAggregator
 
 
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
 
     def _record_start(self, exp_id, exp_version, state_name, session_id):
+        """Calls StartExplorationEventHandler and starts recording the
+        exploration events corresponding to the given exploration id.
+        """
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state_name, session_id, {},
             feconf.PLAY_TYPE_NORMAL)
@@ -73,6 +76,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def _get_calc_output_model(
             self, exploration_id, state_name, calculation_id,
             exploration_version=stats_jobs_continuous.VERSION_ALL):
+        """Gets the StateAnswersCalcOutputModel corresponding to the given
+        calculation_id.
+        """
         return stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
 
@@ -132,7 +138,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 time_spent, params, 'answer3')
 
             # Run job on exploration with answers.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -215,7 +221,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp_services.delete_exploration('fake@user.com', exp_id)
 
             # Now run the job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -270,7 +276,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 'answer1')
 
             # Run the answers aggregation job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -325,8 +331,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 'answer1')
 
             # Run the aggregator again.
-            ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.stop_computation('a')
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -424,7 +430,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(exp.version, 2)
 
             # Run the answers aggregation job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -521,7 +527,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(exp.version, 2)
 
             # Run the answers aggregation job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -651,7 +657,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(exp.version, 4)
 
             # Run the answers aggregation job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -745,7 +751,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, ['answer1', 'answer2'])
 
             # Run the aggregator job.
-            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            MockInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)

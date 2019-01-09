@@ -22,11 +22,11 @@ from core.tests import test_utils
 import feconf
 
 
-class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
+class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseStoryEditorControllerTest, self).setUp()
+        super(BaseStoryEditorControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -45,40 +45,37 @@ class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
             [self.story_id], [], [], [], 1)
 
 
-class StoryEditorTest(BaseStoryEditorControllerTest):
+class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_html_response(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                    self.story_id), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    self.story_id), expected_status_int=401)
             self.logout()
 
             # Check that admins can access and edit in the editor
             # page.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(
+            self.get_html_response(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
                     self.story_id))
-            self.assertEqual(response.status_int, 200)
             self.logout()
 
     def test_editable_story_handler_get(self):
         # Check that non-admins cannot access the editable story data.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                    self.story_id), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    self.story_id), expected_status_int=401)
             self.logout()
 
             # Check that admins can access the editable story data.
@@ -105,8 +102,8 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            response = self.get_html_response(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
                     self.story_id))
@@ -123,16 +120,14 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
             self.logout()
 
             # Check that non-admins cannot edit a story.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
                     self.story_id),
-                change_cmd, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
     def test_editable_story_handler_delete(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             # Check that admins can delete a story.
             self.login(self.ADMIN_EMAIL)
             self.delete_json(
@@ -143,9 +138,8 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
 
             # Check that non-admins cannot delete a story.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                    self.story_id), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    self.story_id), expected_status_int=401)
             self.logout()

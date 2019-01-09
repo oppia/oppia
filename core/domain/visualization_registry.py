@@ -32,6 +32,7 @@ class Registry(object):
 
     @classmethod
     def _refresh_registry(cls):
+        """Clears and adds new visualization instances to the registry."""
         cls.visualizations_dict.clear()
 
         # Add new visualization instances to the registry.

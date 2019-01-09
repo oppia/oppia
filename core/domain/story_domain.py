@@ -33,6 +33,7 @@ STORY_NODE_PROPERTY_DESTINATION_NODE_IDS = 'destination_node_ids'
 STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
+STORY_NODE_PROPERTY_TITLE = 'title'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
@@ -54,6 +55,12 @@ CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
 
+CMD_CHANGE_ROLE = 'change_role'
+CMD_PUBLISH_STORY = 'publish_story'
+CMD_UNPUBLISH_STORY = 'unpublish_story'
+
+ROLE_MANAGER = 'manager'
+ROLE_NONE = 'none'
 # The prefix for all node ids of a story.
 NODE_ID_PREFIX = 'node_'
 
@@ -68,7 +75,7 @@ class StoryChange(object):
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
-        STORY_NODE_PROPERTY_EXPLORATION_ID)
+        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
 
     STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
 
@@ -108,6 +115,7 @@ class StoryChange(object):
 
         if self.cmd == CMD_ADD_STORY_NODE:
             self.node_id = change_dict['node_id']
+            self.title = change_dict['title']
         elif self.cmd == CMD_DELETE_STORY_NODE:
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
@@ -165,13 +173,14 @@ class StoryNode(object):
     """
 
     def __init__(
-            self, node_id, destination_node_ids,
+            self, node_id, title, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
 
         Args:
             node_id: str. The unique id for each node.
+            title: str. The title of the story node.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -190,6 +199,7 @@ class StoryNode(object):
                 outlines) without linking an exploration to any node.
         """
         self.id = node_id
+        self.title = title
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -244,6 +254,7 @@ class StoryNode(object):
         """
         return {
             'id': self.id,
+            'title': self.title,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -263,7 +274,8 @@ class StoryNode(object):
             StoryNode. The corresponding StoryNode domain object.
         """
         node = cls(
-            node_dict['id'], node_dict['destination_node_ids'],
+            node_dict['id'], node_dict['title'],
+            node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
             node_dict['outline_is_finalized'], node_dict['exploration_id'])
@@ -271,17 +283,18 @@ class StoryNode(object):
         return node
 
     @classmethod
-    def create_default_story_node(cls, node_id):
+    def create_default_story_node(cls, node_id, title):
         """Returns a StoryNode domain object with default values.
 
         Args:
             node_id: str. The id of the node.
+            title: str. The title of the node.
 
         Returns:
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, [], [], [], '', False, None)
+        return cls(node_id, title, [], [], [], '', False, None)
 
     def validate(self):
         """Validates various properties of the story node.
@@ -300,6 +313,11 @@ class StoryNode(object):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
+
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' %
+                self.title)
 
         if not isinstance(self.outline_is_finalized, bool):
             raise utils.ValidationError(
@@ -385,7 +403,8 @@ class StoryContents(object):
             raise utils.ValidationError(
                 'Expected nodes field to be a list, received %s' % self.nodes)
 
-        StoryNode.require_valid_node_id(self.initial_node_id)
+        if len(self.nodes) > 0:
+            StoryNode.require_valid_node_id(self.initial_node_id)
         StoryNode.require_valid_node_id(self.next_node_id)
 
         initial_node_is_present = False
@@ -413,63 +432,70 @@ class StoryContents(object):
                     'The node with id %s is out of bounds.' % node.id)
             node_id_list.append(node.id)
 
-        if not initial_node_is_present:
-            raise utils.ValidationError('Expected starting node to exist.')
+        if len(self.nodes) > 0:
+            if not initial_node_is_present:
+                raise utils.ValidationError('Expected starting node to exist.')
 
-        if len(node_id_list) > len(set(node_id_list)):
-            raise utils.ValidationError(
-                'Expected all node ids to be distinct.')
-
-        # nodes_queue stores the pending nodes to visit in the story that are
-        # unlocked, in a 'queue' form with a First In First Out structure.
-        nodes_queue = []
-        is_node_visited = [False] * len(self.nodes)
-        starting_node_index = self.get_node_index(self.initial_node_id)
-        nodes_queue.append(self.nodes[starting_node_index].id)
-
-        # The user is assumed to have all the prerequisite skills of the
-        # starting node before starting the story. Also, this list models the
-        # skill IDs acquired by a learner as they progress through the story.
-        simulated_skill_ids = self.nodes[
-            starting_node_index].prerequisite_skill_ids
-
-        # The following loop employs a Breadth First Search from the given
-        # starting node and makes sure that the user has acquired all the
-        # prerequisite skills required by the destination nodes 'unlocked' by
-        # visiting a particular node by the time that node is finished.
-        while len(nodes_queue) > 0:
-            current_node_id = nodes_queue.pop()
-            current_node_index = self.get_node_index(current_node_id)
-            is_node_visited[current_node_index] = True
-            current_node = self.nodes[current_node_index]
-
-            for skill_id in current_node.acquired_skill_ids:
-                simulated_skill_ids.append(skill_id)
-
-            for node_id in current_node.destination_node_ids:
-                node_index = self.get_node_index(node_id)
-                # The following condition checks whether the destination node
-                # for a particular node, has already been visited, in which case
-                # the story would have loops, which are not allowed.
-                if is_node_visited[node_index]:
-                    raise utils.ValidationError(
-                        'Loops are not allowed in stories.')
-                destination_node = self.nodes[node_index]
-                if not (set(destination_node.prerequisite_skill_ids).issubset(
-                        simulated_skill_ids)):
-                    raise utils.ValidationError(
-                        'The prerequisite skills ' +
-                        ' '.join(set(destination_node.prerequisite_skill_ids) -
-                                 set(simulated_skill_ids)) +
-                        ' were not completed before the node with id %s'
-                        ' was unlocked.' % node_id)
-                nodes_queue.append(node_id)
-
-        for index, node_visited in enumerate(is_node_visited):
-            if not node_visited:
+            if len(node_id_list) > len(set(node_id_list)):
                 raise utils.ValidationError(
-                    'The node with id %s is disconnected from the '
-                    'story graph.' % self.nodes[index].id)
+                    'Expected all node ids to be distinct.')
+
+            # nodes_queue stores the pending nodes to visit in the story that
+            # are unlocked, in a 'queue' form with a First In First Out
+            # structure.
+            nodes_queue = []
+            is_node_visited = [False] * len(self.nodes)
+            starting_node_index = self.get_node_index(self.initial_node_id)
+            nodes_queue.append(self.nodes[starting_node_index].id)
+
+            # The user is assumed to have all the prerequisite skills of the
+            # starting node before starting the story. Also, this list models
+            # the skill IDs acquired by a learner as they progress through the
+            # story.
+            simulated_skill_ids = self.nodes[
+                starting_node_index].prerequisite_skill_ids
+
+            # The following loop employs a Breadth First Search from the given
+            # starting node and makes sure that the user has acquired all the
+            # prerequisite skills required by the destination nodes 'unlocked'
+            # by visiting a particular node by the time that node is finished.
+            while len(nodes_queue) > 0:
+                current_node_id = nodes_queue.pop()
+                current_node_index = self.get_node_index(current_node_id)
+                is_node_visited[current_node_index] = True
+                current_node = self.nodes[current_node_index]
+
+                for skill_id in current_node.acquired_skill_ids:
+                    simulated_skill_ids.append(skill_id)
+
+                for node_id in current_node.destination_node_ids:
+                    node_index = self.get_node_index(node_id)
+                    # The following condition checks whether the destination
+                    # node for a particular node, has already been visited, in
+                    # which case the story would have loops, which are not
+                    # allowed.
+                    if is_node_visited[node_index]:
+                        raise utils.ValidationError(
+                            'Loops are not allowed in stories.')
+                    destination_node = self.nodes[node_index]
+                    if not (
+                            set(
+                                destination_node.prerequisite_skill_ids
+                            ).issubset(simulated_skill_ids)):
+                        raise utils.ValidationError(
+                            'The prerequisite skills ' +
+                            ' '.join(
+                                set(destination_node.prerequisite_skill_ids) -
+                                set(simulated_skill_ids)) +
+                            ' were not completed before the node with id %s'
+                            ' was unlocked.' % node_id)
+                    nodes_queue.append(node_id)
+
+            for index, node_visited in enumerate(is_node_visited):
+                if not node_visited:
+                    raise utils.ValidationError(
+                        'The node with id %s is disconnected from the '
+                        'story graph.' % self.nodes[index].id)
 
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
@@ -689,12 +715,7 @@ class Story(object):
         """
         # Initial node id for a new story.
         initial_node_id = '%s1' % NODE_ID_PREFIX
-        story_contents = StoryContents(
-            [
-                StoryNode.create_default_story_node(initial_node_id)
-            ],
-            initial_node_id, StoryNode.get_incremented_node_id(
-                initial_node_id))
+        story_contents = StoryContents([], None, initial_node_id)
         return cls(
             story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
@@ -757,12 +778,13 @@ class Story(object):
         """
         self.language_code = language_code
 
-    def add_node(self, desired_node_id):
+    def add_node(self, desired_node_id, node_title):
         """Adds a new default node with the id as story_contents.next_node_id.
 
         Args:
             desired_node_id: str. The node id to be given to the new node in the
                 story.
+            node_title: str. The title for the new story node.
 
         Raises:
             Exception: The desired_node_id differs from
@@ -773,9 +795,11 @@ class Story(object):
                 'The node id %s does not match the expected '
                 'next node id for the story.' % desired_node_id)
         self.story_contents.nodes.append(
-            StoryNode.create_default_story_node(desired_node_id))
+            StoryNode.create_default_story_node(desired_node_id, node_title))
         self.story_contents.next_node_id = (
             StoryNode.get_incremented_node_id(self.story_contents.next_node_id))
+        if self.story_contents.initial_node_id is None:
+            self.story_contents.initial_node_id = desired_node_id
 
     def _check_exploration_id_already_present(self, exploration_id):
         """Returns whether a node with the given exploration id is already
@@ -807,9 +831,12 @@ class Story(object):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         if node_id == self.story_contents.initial_node_id:
-            raise ValueError(
-                'The node with id %s is the starting node for the story, '
-                'change the starting node before deleting it.' % node_id)
+            if len(self.story_contents.nodes) == 1:
+                self.story_contents.initial_node_id = None
+            else:
+                raise ValueError(
+                    'The node with id %s is the starting node for the story, '
+                    'change the starting node before deleting it.' % node_id)
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
                 node.destination_node_ids.remove(node_id)
@@ -830,6 +857,22 @@ class Story(object):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].outline = new_outline
+
+    def update_node_title(self, node_id, new_title):
+        """Updates the title field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_title: str. The new title of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].title = new_title
 
     def mark_node_outline_as_finalized(self, node_id):
         """Updates the outline_is_finalized field of the node with the given
@@ -1018,3 +1061,101 @@ class StorySummary(object):
             'title': self.title,
             'description': self.description
         }
+
+
+class StoryRights(object):
+    """Domain object for story rights."""
+
+    def __init__(self, story_id, manager_ids, story_is_published):
+        """Constructs a StoryRights domain object.
+
+        Args:
+            story_id: str. The id of the story.
+            manager_ids: list(str). The id of the users who have been assigned
+                as managers for the story.
+            story_is_published: bool. Whether the story is viewable by a
+                learner.
+        """
+        self.id = story_id
+        self.manager_ids = manager_ids
+        self.story_is_published = story_is_published
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend.
+
+        Returns:
+            dict. A dict version of StoryRights suitable for use by the
+                frontend.
+        """
+        return {
+            'story_id': self.id,
+            'manager_names': self.manager_ids,
+            'story_is_published': self.story_is_published
+        }
+
+    def is_manager(self, user_id):
+        """Checks whether given user is a manager of the story.
+
+        Args:
+            user_id: str or None. Id of the user.
+
+        Returns:
+            bool. Whether user is a manager of this story.
+        """
+        return bool(user_id in self.manager_ids)
+
+
+class StoryRightsChange(object):
+    """Domain object for changes made to a story rights object."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'assignee_id', 'new_role', 'old_role'
+    ]
+
+    def __init__(self, change_dict):
+        """Initialize a StoryRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'change_role' (with assignee_id, new_role and old_role)
+                - 'create_new'
+                - 'publish_story'
+                - 'unpublish_story'
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CHANGE_ROLE:
+            self.assignee_id = change_dict['assignee_id']
+            self.new_role = change_dict['new_role']
+            self.old_role = change_dict['old_role']
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        elif self.cmd == CMD_PUBLISH_STORY:
+            pass
+        elif self.cmd == CMD_UNPUBLISH_STORY:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the StoryRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of StoryRightsChange instance.
+        """
+        story_rights_change_dict = {}
+        story_rights_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                story_rights_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return story_rights_change_dict

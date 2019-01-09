@@ -26,14 +26,28 @@ from google.appengine.ext import ndb
 
 
 def create_login_url(slug):
-    """Creates a login url."""
+    """Creates a login url.
+
+    Args:
+        slug: str. The URL to redirect to after login.
+
+    Returns:
+        str. The correct login URL that includes the page to redirect to.
+    """
     return users.create_login_url(
         dest_url=utils.set_url_query_parameter(
             feconf.SIGNUP_URL, 'return_url', slug))
 
 
 def create_logout_url(slug):
-    """Creates a logout url."""
+    """Creates a logout url.
+
+    Args:
+        slug: str. The URL to redirect to after logout.
+
+    Returns:
+        str. The correct logout URL that includes the page to redirect to.
+    """
     logout_url = utils.set_url_query_parameter('/logout', 'return_url', slug)
     return logout_url
 
@@ -54,6 +68,7 @@ def get_user_id_from_email(email):
     Returns None if the email address does not correspond to a valid user id.
     """
     class _FakeUser(ndb.Model):
+        """A fake user class."""
         _use_memcache = False
         _use_cache = False
         user = ndb.UserProperty(required=True)

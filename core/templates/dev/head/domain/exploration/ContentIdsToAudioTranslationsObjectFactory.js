@@ -135,7 +135,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       for (contentId in this._contentIdsToAudioTranslations) {
         var audioTanslations = this._contentIdsToAudioTranslations[contentId];
         var audioTranslationsDict = {};
-        Object.keys(audioTanslations).forEach(function(lang){
+        Object.keys(audioTanslations).forEach(function(lang) {
           audioTranslationsDict[lang] = audioTanslations[lang].toBackendDict();
         });
         contentIdsToAudioTranslationsDict[contentId] = audioTranslationsDict;
@@ -152,7 +152,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
         var audioTanslationsDict = (
           contentIdsToAudioTranslationsDict[contentId]);
         var audioTranslations = {};
-        Object.keys(audioTanslationsDict).forEach(function(langCode){
+        Object.keys(audioTanslationsDict).forEach(function(langCode) {
           audioTranslations[langCode] = (
             AudioTranslationObjectFactory.createFromBackendDict(
               audioTanslationsDict[langCode]));

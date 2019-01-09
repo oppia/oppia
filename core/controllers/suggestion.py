@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
+import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -109,7 +110,7 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         if len(suggestion_id.split('.')) != 3:
@@ -151,6 +152,8 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):

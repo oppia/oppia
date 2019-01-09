@@ -50,14 +50,17 @@ Note that the root folder MUST be named 'oppia'.
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import HTMLParser
+import StringIO
 import argparse
 import ast
+import contextlib
 import fnmatch
 import multiprocessing
 import os
 import re
 import subprocess
 import sys
+import threading
 import time
 
 import docstrings_checker  # pylint: disable=relative-import
@@ -207,9 +210,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
-        'message': 'Please remove pylint exculsion if it is unnecessary or '
+        'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
-                   'The id to message list can be seen '
+                   'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -241,7 +244,8 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', '*.mp3', '*.mp4')
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -261,7 +265,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -290,6 +294,9 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'smmap-0.9.0'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'gitdb-0.6.4'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
@@ -313,6 +320,82 @@ from pylint import lint  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
+
+
+class FileCache(object):
+    """Provides thread-safe access to cached file content."""
+
+    _CACHE_DATA_DICT = {}
+    _CACHE_LOCK_DICT = {}
+    _CACHE_LOCK_DICT_LOCK = threading.Lock()
+
+    @classmethod
+    def read(cls, filename, mode='r'):
+        """Returns the data read from the file.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            str. The data read from the file.
+        """
+        return cls._get_data(filename, mode)[0]
+
+    @classmethod
+    def readlines(cls, filename, mode='r'):
+        """Returns the tuple containing data line by line as read from the
+        file.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            tuple(str). The tuple containing data line by line as read from the
+                file.
+        """
+        return cls._get_data(filename, mode)[1]
+
+    @classmethod
+    def _get_cache_lock(cls, key):
+        """Returns the cache lock corresponding to the given key.
+
+        Args:
+            key: str. The key corresponding to which the cache lock is to be
+                found.
+
+        Returns:
+            str. The cache lock corresponding to the given key.
+        """
+        if key not in cls._CACHE_LOCK_DICT:
+            with cls._CACHE_LOCK_DICT_LOCK:
+                if key not in cls._CACHE_LOCK_DICT:
+                    cls._CACHE_LOCK_DICT[key] = threading.Lock()
+        return cls._CACHE_LOCK_DICT[key]
+
+    @classmethod
+    def _get_data(cls, filename, mode):
+        """Returns the collected data from the file corresponding to the given
+        filename.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            tuple(str, tuple(str)). The tuple containing data read from the file
+                as first element and tuple containing the text line by line as
+                second element.
+        """
+        key = (filename, mode)
+        if key not in cls._CACHE_DATA_DICT:
+            with cls._get_cache_lock(key):
+                if key not in cls._CACHE_DATA_DICT:
+                    with open(filename, mode) as f:
+                        lines = f.readlines()
+                    cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
+        return cls._CACHE_DATA_DICT[key]
 
 
 def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
@@ -346,21 +429,6 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
-    """Collects excludeFiles from .eslintignore file.
-
-    Args:
-        eslintignore_path: str. Path to .eslintignore file.
-
-    Returns:
-        a list of files in excludeFiles.
-    """
-    file_data = []
-    with open(eslintignore_path) as f:
-        file_data.extend(f.readlines())
-    return file_data
-
-
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     """Recursively collects all files in directory and
     subdirectories of specified path.
@@ -382,6 +450,24 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
                         excluded_glob_patterns]):
                 files_in_directory.append(filename)
     return files_in_directory
+
+
+@contextlib.contextmanager
+def _redirect_stdout(new_target):
+    """Redirect stdout to the new target.
+
+    Args:
+        new_target: TextIOWrapper. The new target to which stdout is redirected.
+
+    Yields:
+        TextIOWrapper. The new target.
+    """
+    old_target = sys.stdout
+    sys.stdout = new_target
+    try:
+        yield new_target
+    finally:
+        sys.stdout = old_target
 
 
 def _lint_css_files(
@@ -511,31 +597,34 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
     print 'Linting %s Python files' % num_py_files
 
-    _BATCH_SIZE = 50
+    _batch_size = 50
     current_batch_start_index = 0
 
     while current_batch_start_index < len(files_to_lint):
         # Note that this index is an exclusive upper bound -- i.e., the current
         # batch of files ranges from 'start_index' to 'end_index - 1'.
         current_batch_end_index = min(
-            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+            current_batch_start_index + _batch_size, len(files_to_lint))
         current_files_to_lint = files_to_lint[
             current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        # This line invokes Pylint and prints its output to the console.
-        pylinter = lint.Run(
-            current_files_to_lint + [config_pylint],
-            exit=False).linter
-        # These lines invoke Pycodestyle.
-        style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(
-            paths=current_files_to_lint)
-        # This line prints Pycodestyle's output to the console.
-        pycodestyle_report.print_statistics()
+        target_stdout = StringIO.StringIO()
+        with _redirect_stdout(target_stdout):
+            # This line invokes Pylint and prints its output
+            # to the target stdout.
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                exit=False).linter
+            # These lines invoke Pycodestyle and print its output
+            # to the target stdout.
+            style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
+            pycodestyle_report = style_guide.check_files(
+                paths=current_files_to_lint)
 
         if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            result.put(target_stdout.getvalue())
             are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
@@ -620,8 +709,7 @@ def _get_all_files():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            excluded_glob_patterns = _get_glob_patterns_excluded_from_eslint(
-                eslintignore_path)
+            excluded_glob_patterns = FileCache.readlines(eslintignore_path)
             all_files = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif parsed_args.files:
@@ -729,10 +817,23 @@ def _pre_commit_linter(all_files):
         process.daemon = False
         process.start()
 
-    for process in linting_processes:
-        # Require timeout parameter to prevent against endless waiting for the
-        # linting function to return.
-        process.join(timeout=200)
+    file_groups_to_lint = [
+        html_files_to_lint_for_css, css_files_to_lint,
+        js_files_to_lint, py_files_to_lint]
+    number_of_files_to_lint = sum(
+        len(file_group) for file_group in file_groups_to_lint)
+
+    timeout_multiplier = 2000
+    for file_group, process in zip(file_groups_to_lint, linting_processes):
+        # try..except block is needed to catch ZeroDivisionError
+        # when there are no CSS, HTML, JavaScript and Python files to lint.
+        try:
+            # Require timeout parameter to prevent against endless
+            # waiting for the linting function to return.
+            process.join(timeout=(
+                timeout_multiplier * len(file_group) / number_of_files_to_lint))
+        except ZeroDivisionError:
+            break
 
     js_messages = []
     while not js_stdout.empty():
@@ -743,10 +844,15 @@ def _pre_commit_linter(all_files):
     print 'Summary of Errors:'
     print '----------------------------------------'
     summary_messages = []
-    summary_messages.append(css_in_html_result.get())
-    summary_messages.append(css_result.get())
-    summary_messages.append(js_result.get())
-    summary_messages.append(py_result.get())
+
+    result_queues = [
+        css_in_html_result, css_result,
+        js_result, py_result]
+
+    for result_queue in result_queues:
+        while not result_queue.empty():
+            summary_messages.append(result_queue.get())
+
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
@@ -758,33 +864,26 @@ def _check_newline_character(all_files):
     """
     print 'Starting newline-at-EOF checks'
     print '----------------------------------------'
-    total_files_checked = 0
-    total_error_count = 0
+    errors_found = 0
+    files_checked = 0
     summary_messages = []
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
-    failed = False
-    for filename in all_files:
-        with open(filename, 'rb') as f:
-            total_files_checked += 1
-            total_num_chars = 0
-            for line in f:
-                total_num_chars += len(line)
-            if total_num_chars == 1:
-                failed = True
-                print '%s --> Error: Only one character in file' % filename
-                total_error_count += 1
-            elif total_num_chars > 1:
-                f.seek(-2, 2)
-                if not (f.read(1) != '\n' and f.read(1) == '\n'):
-                    failed = True
-                    print (
-                        '%s --> Please ensure that this file ends'
-                        'with exactly one newline char.' % filename)
-                    total_error_count += 1
 
-    if failed:
+    for filename in all_files:
+        content = FileCache.read(filename, mode='rb')
+        files_checked += 1
+        if len(content) == 1:
+            errors_found += 1
+            print '%s --> Error: Only one character in file.' % filename
+        elif len(content) >= 2 and not re.match(r'[^\n]\n', content[-2:]):
+            errors_found += 1
+            print (
+                '%s --> Please ensure that this file ends with exactly one '
+                'newline char.' % filename)
+
+    if errors_found:
         summary_message = '%s   Newline character checks failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
@@ -796,12 +895,11 @@ def _check_newline_character(all_files):
     print ''
     print '----------------------------------------'
     print ''
-    if total_files_checked == 0:
-        print 'There are no files to be checked.'
+    if files_checked:
+        print '(%s files checked, %s errors found)\n%s' % (
+            files_checked, errors_found, summary_message)
     else:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        print summary_message
+        print 'There are no files to be checked.'
 
     return summary_messages
 
@@ -855,44 +953,43 @@ def _check_bad_patterns(all_files):
             )]
     failed = False
     for filename in all_files:
-        with open(filename) as f:
-            content = f.read()
-            total_files_checked += 1
-            for pattern in BAD_PATTERNS:
-                if (pattern in content and
-                        not _is_filename_excluded_for_bad_patterns_check(
-                            pattern, filename)):
+        content = FileCache.read(filename)
+        total_files_checked += 1
+        for pattern in BAD_PATTERNS:
+            if (pattern in content and
+                    not _is_filename_excluded_for_bad_patterns_check(
+                        pattern, filename)):
+                failed = True
+                print '%s --> %s' % (
+                    filename, BAD_PATTERNS[pattern]['message'])
+                total_error_count += 1
+
+        if filename.endswith('.js'):
+            for regexp in BAD_PATTERNS_JS_REGEXP:
+                if _check_bad_pattern_in_file(filename, content, regexp):
                     failed = True
-                    print '%s --> %s' % (
-                        filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
 
-            if filename.endswith('.js'):
-                for regexp in BAD_PATTERNS_JS_REGEXP:
-                    if _check_bad_pattern_in_file(filename, content, regexp):
-                        failed = True
-                        total_error_count += 1
+        if filename.endswith('.html'):
+            for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
+                if _check_bad_pattern_in_file(filename, content, regexp):
+                    failed = True
+                    total_error_count += 1
 
-            if filename.endswith('.html'):
-                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                    if _check_bad_pattern_in_file(filename, content, regexp):
-                        failed = True
-                        total_error_count += 1
+        if filename.endswith('.py'):
+            for regexp in BAD_PATTERNS_PYTHON_REGEXP:
+                if _check_bad_pattern_in_file(filename, content, regexp):
+                    failed = True
+                    total_error_count += 1
 
-            if filename.endswith('.py'):
-                for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                    if _check_bad_pattern_in_file(filename, content, regexp):
-                        failed = True
-                        total_error_count += 1
-
-            if filename == 'constants.js':
-                for pattern in REQUIRED_STRINGS_CONSTANTS:
-                    if pattern not in content:
-                        failed = True
-                        print '%s --> %s' % (
-                            filename,
-                            REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
-                        total_error_count += 1
+        if filename == 'constants.js':
+            for pattern in REQUIRED_STRINGS_CONSTANTS:
+                if pattern not in content:
+                    failed = True
+                    print '%s --> %s' % (
+                        filename,
+                        REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
+                    total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
         summary_messages.append(summary_message)
@@ -962,50 +1059,49 @@ def _check_comments(all_files):
     space_regex = re.compile(r'^#[^\s].*$')
     capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                next_line = ''
-                previous_line = ''
-                if line_num + 1 < file_length:
-                    next_line = file_content[line_num + 1].lstrip().rstrip()
-                if line_num > 0:
-                    previous_line = file_content[line_num - 1].lstrip().rstrip()
+        file_content = FileCache.readlines(filename)
+        file_length = len(file_content)
+        for line_num in range(file_length):
+            line = file_content[line_num].strip()
+            next_line = ''
+            previous_line = ''
+            if line_num + 1 < file_length:
+                next_line = file_content[line_num + 1].strip()
+            if line_num > 0:
+                previous_line = file_content[line_num - 1].strip()
 
-                if line.startswith('#') and not next_line.startswith('#'):
-                    # Check that the comment ends with the proper punctuation.
-                    last_char_is_invalid = line[-1] not in (
-                        ALLOWED_TERMINATING_PUNCTUATIONS)
-                    no_word_is_present_in_excluded_phrases = not any(
-                        word in line for word in EXCLUDED_PHRASES)
-                    if last_char_is_invalid and (
-                            no_word_is_present_in_excluded_phrases):
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
-
-                # Check that comment starts with a space and is not a shebang
-                # expression at the start of a bash script which loses function
-                # when a space is added.
-                if space_regex.match(line) and not line.startswith('#!'):
-                    message = (
-                        'There should be a space at the beginning '
-                        'of the comment.')
+            if line.startswith('#') and not next_line.startswith('#'):
+                # Check that the comment ends with the proper punctuation.
+                last_char_is_invalid = line[-1] not in (
+                    ALLOWED_TERMINATING_PUNCTUATIONS)
+                no_word_is_present_in_excluded_phrases = not any(
+                    word in line for word in EXCLUDED_PHRASES)
+                if last_char_is_invalid and (
+                        no_word_is_present_in_excluded_phrases):
                     failed = True
                     print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
 
-                # Check that comment starts with a capital letter.
-                if not previous_line.startswith('#') and (
-                        capital_regex.match(line)):
-                    message = (
-                        'There should be a capital letter'
-                        ' to begin the content of the comment.')
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num + 1, message)
+            # Check that comment starts with a space and is not a shebang
+            # expression at the start of a bash script which loses function
+            # when a space is added.
+            if space_regex.match(line) and not line.startswith('#!'):
+                message = (
+                    'There should be a space at the beginning '
+                    'of the comment.')
+                failed = True
+                print '%s --> Line %s: %s' % (
+                    filename, line_num + 1, message)
+
+            # Check that comment starts with a capital letter.
+            if not previous_line.startswith('#') and (
+                    capital_regex.match(line)):
+                message = (
+                    'There should be a capital letter'
+                    ' to begin the content of the comment.')
+                failed = True
+                print '%s --> Line %s: %s' % (
+                    filename, line_num + 1, message)
 
     print ''
     print '----------------------------------------'
@@ -1057,89 +1153,87 @@ def _check_docstrings(all_files):
     is_docstring = False
     is_class_or_function = False
     for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                prev_line = ''
+        file_content = FileCache.readlines(filename)
+        file_length = len(file_content)
+        for line_num in range(file_length):
+            line = file_content[line_num].strip()
+            prev_line = ''
 
-                if line_num > 0:
-                    prev_line = file_content[line_num - 1].lstrip().rstrip()
+            if line_num > 0:
+                prev_line = file_content[line_num - 1].strip()
 
-                # Check if it is a docstring and not some multi-line string.
-                if (prev_line.startswith('class ') or
-                        prev_line.startswith('def ')) or (
-                            is_class_or_function):
-                    is_class_or_function = True
-                    if prev_line.endswith('):') and (
-                            line.startswith('"""')):
-                        is_docstring = True
-                        is_class_or_function = False
+            # Check if it is a docstring and not some multi-line string.
+            if (prev_line.startswith('class ') or
+                    prev_line.startswith('def ')) or (
+                        is_class_or_function):
+                is_class_or_function = True
+                if prev_line.endswith('):') and (
+                        line.startswith('"""')):
+                    is_docstring = True
+                    is_class_or_function = False
 
-                # Check if single line docstring span two lines.
-                if line == '"""' and prev_line.startswith('"""') and (
-                        is_docstring):
+            # Check if single line docstring span two lines.
+            if line == '"""' and prev_line.startswith('"""') and (
+                    is_docstring):
+                failed = True
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, single_line_docstring_message)
+                is_docstring = False
+
+            # Check for single line docstring.
+            elif re.match(r'^""".+"""$', line) and is_docstring:
+                # Check for punctuation at line[-4] since last three
+                # characters are double quotes.
+                if (len(line) > 6) and (
+                        line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                     failed = True
                     print '%s --> Line %s: %s' % (
-                        filename, line_num, single_line_docstring_message)
-                    is_docstring = False
+                        filename, line_num + 1, missing_period_message)
+                is_docstring = False
 
-                # Check for single line docstring.
-                elif re.match(r'^""".+"""$', line) and is_docstring:
-                    # Check for punctuation at line[-4] since last three
-                    # characters are double quotes.
-                    if (len(line) > 6) and (
-                            line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+            # Check for multiline docstring.
+            elif line.endswith('"""') and is_docstring:
+                # Case 1: line is """. This is correct for multiline
+                # docstring.
+                if line == '"""':
+                    # Check for empty line before the end of docstring.
+                    if prev_line == '':
                         failed = True
                         print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, missing_period_message)
-                    is_docstring = False
-
-                # Check for multiline docstring.
-                elif line.endswith('"""') and is_docstring:
-                    # Case 1: line is """. This is correct for multiline
-                    # docstring.
-                    if line == '"""':
-                        # Check for empty line before the end of docstring.
-                        if prev_line == '':
+                            filename, line_num, previous_line_message)
+                    # Check for punctuation at end of docstring.
+                    else:
+                        last_char_is_invalid = prev_line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        no_word_is_present_in_excluded_phrases = not any(
+                            word in prev_line for word in EXCLUDED_PHRASES)
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num, previous_line_message)
-                        # Check for punctuation at end of docstring.
-                        else:
-                            last_char_is_invalid = prev_line[-1] not in (
-                                ALLOWED_TERMINATING_PUNCTUATIONS)
-                            no_word_is_present_in_excluded_phrases = not any(
-                                word in prev_line for word in EXCLUDED_PHRASES)
-                            if last_char_is_invalid and (
-                                    no_word_is_present_in_excluded_phrases):
-                                failed = True
-                                print '%s --> Line %s: %s' % (
-                                    filename, line_num, missing_period_message)
+                                filename, line_num, missing_period_message)
 
-                    # Case 2: line contains some words before """. """ should
-                    # shift to next line.
-                    elif not any(word in line for word in EXCLUDED_PHRASES):
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, multiline_docstring_message)
+                # Case 2: line contains some words before """. """ should
+                # shift to next line.
+                elif not any(word in line for word in EXCLUDED_PHRASES):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, multiline_docstring_message)
 
-                    is_docstring = False
+                is_docstring = False
 
     # Check that the args in the docstring are listed in the same
     # order as they appear in the function definition.
     docstring_checker = docstrings_checker.ASTDocStringChecker()
     for filename in files_to_check:
-        with open(filename, 'r') as f:
-            ast_file = ast.walk(ast.parse(f.read()))
-            func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-            for func in func_defs:
-                func_result = docstring_checker.check_docstrings_arg_order(func)
-                for error_line in func_result:
-                    print '%s --> Func %s: %s' % (
-                        filename, func.name, error_line)
-                    failed = True
+        ast_file = ast.walk(ast.parse(FileCache.read(filename)))
+        func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+        for func in func_defs:
+            func_result = docstring_checker.check_docstrings_arg_order(func)
+            for error_line in func_result:
+                print '%s --> Func %s: %s' % (
+                    filename, func.name, error_line)
+                failed = True
 
     print ''
     print '----------------------------------------'
@@ -1177,8 +1271,7 @@ def _check_html_directive_name(all_files):
         r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
         r'(?P<directive_name>[^\)]+)')
     for filename in files_to_check:
-        with open(filename) as f:
-            content = f.read()
+        content = FileCache.read(filename)
         total_files_checked += 1
         matched_patterns = re.findall(pattern_to_match, content)
         for matched_pattern in matched_patterns:
@@ -1237,8 +1330,7 @@ def _check_directive_scope(all_files):
     failed = False
     summary_messages = []
     for filename in files_to_check:
-        with open(filename) as f:
-            content = f.read()
+        content = FileCache.read(filename)
         parsed_dict = _validate_and_parse_js_file(filename, content)
         # Parse the body of the content as nodes.
         parsed_nodes = parsed_dict['body']
@@ -1369,8 +1461,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
         r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
         r'function\((?P<function_parameters>[\S\s]*?)\)')
     for filename in files_to_check:
-        with open(filename) as f:
-            content = f.read()
+        content = FileCache.read(filename)
         matched_patterns = re.findall(pattern_to_match, content)
         for matched_pattern in matched_patterns:
             stringfied_dependencies, function_parameters = matched_pattern
@@ -1481,8 +1572,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                             self.filename, value, attr,
                             tag, line_number))
 
-        for line_num, line in enumerate(
-                str.splitlines(starttag_text)):
+        for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
                 continue
 
@@ -1494,9 +1584,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
 
             if not line.lstrip().startswith(tuple(list_of_attrs)):
                 continue
-            if (
-                    indentation_of_first_attribute != (
-                        leading_spaces_count)):
+            if indentation_of_first_attribute != leading_spaces_count:
                 line_num_of_error = line_number + line_num
                 print (
                     '%s --> Attribute for tag %s on line '
@@ -1563,17 +1651,16 @@ def _check_html_tags_and_attributes(all_files, debug=False):
     summary_messages = []
 
     for filename in html_files_to_lint:
-        with open(filename, 'r') as f:
-            file_content = f.read()
-            file_lines = file_content.split('\n')
-            parser = CustomHTMLParser(filename, file_lines, debug)
-            parser.feed(file_content)
+        file_content = FileCache.read(filename)
+        file_lines = FileCache.readlines(filename)
+        parser = CustomHTMLParser(filename, file_lines, debug)
+        parser.feed(file_content)
 
-            if len(parser.tag_stack) != 0:
-                raise TagMismatchException('Error in file %s' % filename)
+        if len(parser.tag_stack) != 0:
+            raise TagMismatchException('Error in file %s' % filename)
 
-            if parser.failed:
-                failed = True
+        if parser.failed:
+            failed = True
 
     if failed:
         summary_message = '%s   HTML tag and attribute check failed' % (
@@ -1618,14 +1705,10 @@ def _check_for_copyright_notice(all_files):
 
     for filename in all_files_to_check:
         has_copyright_notice = False
-        with open(filename, 'r') as f:
-            for line_num, line in enumerate(f):
-                if line_num < 5:
-                    if re.search(regexp_to_check, line):
-                        has_copyright_notice = True
-                        break
-                else:
-                    break
+        for line in FileCache.readlines(filename)[:5]:
+            if re.search(regexp_to_check, line):
+                has_copyright_notice = True
+                break
 
         if not has_copyright_notice:
             failed = True
@@ -1664,7 +1747,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    # The html tags and attributes check check has an additional
+    # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)

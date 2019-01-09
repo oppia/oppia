@@ -23,7 +23,6 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
-from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -34,27 +33,48 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class HomePageTest(test_utils.GenericTestBase):
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
+
+class HomePageTests(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
-        response = self.testapp.get('/')
+        response = self.get_html_response('/', expected_status_int=302)
 
-        self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
-        response = self.testapp.get('/notifications_dashboard')
-        self.assertEqual(response.status_int, 302)
+        response = self.get_html_response(
+            '/notifications_dashboard', expected_status_int=302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
         self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.testapp.get('/notifications_dashboard')
+        self.get_html_response(
+            '/notifications_dashboard', expected_status_int=302)
         # This should redirect the user to complete signup.
-        self.assertEqual(response.status_int, 302)
         self.logout()
 
     def test_logged_in_notifications_dashboard(self):
@@ -62,12 +82,11 @@ class HomePageTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/notifications_dashboard')
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response('/notifications_dashboard')
         self.logout()
 
 
-class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
+class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
     OWNER_EMAIL_1 = 'owner1@example.com'
     OWNER_USERNAME_1 = 'owner1'
     OWNER_EMAIL_2 = 'owner2@example.com'
@@ -84,7 +103,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
     USER_IMPACT_SCORE_DEFAULT = 0.0
 
     def setUp(self):
-        super(CreatorDashboardStatisticsTest, self).setUp()
+        super(CreatorDashboardStatisticsTests, self).setUp()
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
 
@@ -122,8 +141,8 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
-        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
-         start_computation())
+        """Runs the User Stats Aggregator job."""
+        MockUserStatsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -416,7 +435,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
+class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
@@ -436,7 +455,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
     EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
-        super(CreatorDashboardHandlerTest, self).setUp()
+        super(CreatorDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -626,12 +645,12 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscribers_list']), 0)
 
 
-class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
+class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
 
     DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
 
     def setUp(self):
-        super(NotificationsDashboardHandlerTest, self).setUp()
+        super(NotificationsDashboardHandlerTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -689,18 +708,17 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-class CreationButtonsTest(test_utils.GenericTestBase):
+class CreationButtonsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CreationButtonsTest, self).setUp()
+        super(CreationButtonsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token

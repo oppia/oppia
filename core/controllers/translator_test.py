@@ -25,11 +25,11 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class BaseTranslatorControllerTest(test_utils.GenericTestBase):
+class BaseTranslatorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.TRANSLATOR_EMAIL."""
-        super(BaseTranslatorControllerTest, self).setUp()
+        super(BaseTranslatorControllerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
 
@@ -39,7 +39,7 @@ class BaseTranslatorControllerTest(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
 
-class TranslatorTest(BaseTranslatorControllerTest):
+class TranslatorTest(BaseTranslatorControllerTests):
     """Test the handling of saving translation work."""
 
     EXP_ID = 'exp1'
@@ -67,7 +67,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
 
         self.login(self.TRANSLATOR_EMAIL)
         # Generate CSRF token.
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_transator_can_save_valid_change_list(self):
@@ -100,7 +100,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
                 'commit_message': 'Changed exp objective',
                 'version': 1
             }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
         # Checking the response to have error.
         self.assertEqual(
             response, {'status_code': 400,
@@ -110,7 +110,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
                       })
 
 
-class TranslatorAutosaveTest(BaseTranslatorControllerTest):
+class TranslatorAutosaveTest(BaseTranslatorControllerTests):
     """Test the handling of translator autosave actions."""
 
     EXP_ID = 'expId'
@@ -160,7 +160,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
             draft_change_list_id=1).put()
 
         # Generate CSRF token.
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_draft_updated_version_valid(self):
@@ -184,8 +184,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID, {
                 'change_list': self.INVALID_DRAFT_CHANGELIST,
                 'version': 1,
-            }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            }, csrf_token=self.csrf_token, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertEqual(

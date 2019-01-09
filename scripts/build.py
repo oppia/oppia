@@ -14,6 +14,7 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+# pylint: disable=invalid-name
 import collections
 import fnmatch
 import hashlib
@@ -87,7 +88,7 @@ FILEPATHS_NOT_TO_RENAME = (
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
+    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
 

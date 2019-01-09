@@ -334,6 +334,7 @@ MATHJAX_SUBDIRS_TO_REMOVE = [
 
 
 def _install_third_party_libs():
+    """Installs all the third party libraries."""
     download_manifest_files(MANIFEST_FILE_PATH)
 
     # MathJax is too big. Remove many unneeded files by following these
