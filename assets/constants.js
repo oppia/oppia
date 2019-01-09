@@ -464,7 +464,7 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_NEW_STRUCTURE_EDITORS": true,
+  "ENABLE_NEW_STRUCTURE_EDITORS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
 
