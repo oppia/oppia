@@ -974,19 +974,19 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('should maintain its active sub-tab on saving draft and publishing changes'
-  	, function() {
-    users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
-    users.login('user@translationSubTab.com');
-    workflow.createExploration();
-    
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Check');
-    explorationEditorSettingsTab.setCategory('Algorithms');
-    explorationEditorSettingsTab.setObjective('To check the translation tab');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('one');
-    explorationEditorMainTab.setContent(forms.toRichText(
+  fit('should maintain its active sub-tab on saving draft and publishing changes'
+    , function() {
+      users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
+      users.login('user@translationSubTab.com');
+      workflow.createExploration();
+
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setTitle('Check');
+      explorationEditorSettingsTab.setCategory('Algorithms');
+      explorationEditorSettingsTab.setObjective('To check the translation tab');
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.setStateName('one');
+      explorationEditorMainTab.setContent(forms.toRichText(
       'This is first card.'));
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
