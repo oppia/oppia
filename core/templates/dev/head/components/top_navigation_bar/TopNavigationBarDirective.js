@@ -91,9 +91,15 @@ oppia.directive('topNavigationBar', [
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            $timeout(function() {
-              $window.location = GLOBALS.loginUrl;
-            }, 150);
+            UserService.getLoginAndLogoutUrls().then(
+              function(urlObject) {
+                if (urlObject.login_url) {
+                  $timeout(function() {
+                    $window.location = urlObject.login_url;
+                  }, 150);
+                }
+              }
+            );
           };
 
           $scope.googleSignInIconUrl = (

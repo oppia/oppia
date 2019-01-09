@@ -17,9 +17,9 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', 'UrlInterpolationService', 'UserInfoObjectFactory',
+  '$http', '$q', '$window', 'UrlInterpolationService', 'UserInfoObjectFactory',
   'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, UrlInterpolationService, UserInfoObjectFactory,
+  function($http, $q, $window, UrlInterpolationService, UserInfoObjectFactory,
       DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -65,6 +65,18 @@ oppia.factory('UserService', [
           update_type: 'profile_picture_data_url',
           data: newProfileImageDataUrl
         });
+      },
+      getLoginAndLogoutUrls: function() {
+        var urlParameters = {
+          current_url: $window.location.href
+        };
+        return $http.get('/url_handler', {params: urlParameters}).then(
+          function(response) {
+            return {
+              login_url: response.data.login_url,
+            };
+          }
+        );
       },
       getUserInfoAsync: getUserInfoAsync
     };
