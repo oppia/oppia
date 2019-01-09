@@ -987,53 +987,53 @@ describe('Exploration translation', function() {
       explorationEditorPage.navigateToMainTab();
       explorationEditorMainTab.setStateName('one');
       explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'two', true, 'Equals', 6);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'This is solution.'
-    });
-    explorationEditorMainTab.moveToState('two');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is second card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'final card', true, 'Equals', 7);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 7,
-      explanation: 'This is solution.'
-    });
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('two');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorPage.navigateToTranslationTabFeedback();
-    explorationEditorPage.saveChanges();
-    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+        'This is first card.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
+        'NumericInput', forms.toRichText('This is feedback1.'),
+        'two', true, 'Equals', 6);
+      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+      explorationEditorMainTab.addHint('This is hint1.');
+      explorationEditorMainTab.addHint('This is hint2.');
+      explorationEditorMainTab.addSolution('NumericInput', {
+        correctAnswer: 6,
+        explanation: 'This is solution.'
+      });
+      explorationEditorMainTab.moveToState('two');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'This is second card.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
+        'NumericInput', forms.toRichText('This is feedback1.'),
+        'final card', true, 'Equals', 7);
+      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+      explorationEditorMainTab.addHint('This is hint1.');
+      explorationEditorMainTab.addHint('This is hint2.');
+      explorationEditorMainTab.addSolution('NumericInput', {
+        correctAnswer: 7,
+        explanation: 'This is solution.'
+      });
+      explorationEditorMainTab.moveToState('final card');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorMainTab.moveToState('two');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorPage.navigateToTranslationTabFeedback();
+      explorationEditorPage.saveChanges();
+      expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+      ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
 
-    workflow.publishExploration()
+      workflow.publishExploration();
 
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.addHint('This is hint3.');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorPage.navigateToTranslationTabFeedback();
-     explorationEditorPage.saveChanges('Ok');
-    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
-  });
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.addHint('This is hint3.');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorPage.navigateToTranslationTabFeedback();
+      explorationEditorPage.saveChanges('Ok');
+      expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+      ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
