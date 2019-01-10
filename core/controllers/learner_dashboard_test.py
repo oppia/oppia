@@ -21,7 +21,7 @@ from core.tests import test_utils
 import feconf
 
 
-class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
+class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
@@ -41,7 +41,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
     COL_TITLE_3 = 'Collection title 3'
 
     def setUp(self):
-        super(LearnerDashboardHandlerTest, self).setUp()
+        super(LearnerDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -239,19 +239,19 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
             [self.COL_ID_3])
 
 
-class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
+class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = '0'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackThreadHandlerTest, self).setUp()
+        super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID_1)
 
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/%s' % self.EXP_ID_1)
+        response = self.get_html_response('/create/%s' % self.EXP_ID_1)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
