@@ -155,7 +155,7 @@ class SkillEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         skill_domain.Skill.require_valid_skill_id(skill_id)
 

@@ -79,7 +79,7 @@ oppia.directive('topNavigationBar', [
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
-            'topic_editor', 'story_editor'];
+            'topic_editor', 'skill_editor', 'story_editor'];
           $scope.currentUrl = window.location.pathname.split('/')[1];
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
