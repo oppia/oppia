@@ -249,7 +249,7 @@ def main():
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     if parsed_args.test_target:
-        if parsed_args.test_target.endswith('_test'):
+        if '_test' in parsed_args.test_target:
             all_test_targets = [parsed_args.test_target]
         else:
             print ''
