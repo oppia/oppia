@@ -428,7 +428,7 @@ oppia.factory('TopicUpdateService', [
       setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
           newContentIdsToAudioTranslations) {
         var oldContentIdsToAudioTranslations = angular.copy(
-          subtopicPage.getContentIdsToAudioTranslations());
+          subtopicPage.getPageContents().getContentIdsToAudioTranslations());
         _applySubtopicPagePropertyChange(
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO, subtopicId,
           newContentIdsToAudioTranslations.toBackendDict(),

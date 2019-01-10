@@ -152,7 +152,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
         var audioTanslationsDict = (
           contentIdsToAudioTranslationsDict[contentId]);
         var audioTranslations = {};
-        Object.keys(audioTanslationsDict).forEach(function(langCode){
+        Object.keys(audioTanslationsDict).forEach(function(langCode) {
           audioTranslations[langCode] = (
             AudioTranslationObjectFactory.createFromBackendDict(
               audioTanslationsDict[langCode]));

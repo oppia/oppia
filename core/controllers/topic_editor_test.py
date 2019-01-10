@@ -313,6 +313,23 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 },
                 'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
+                'subtopic_id': 2
             }]
         }
         self.login(self.ADMIN_EMAIL)
@@ -356,7 +373,13 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 },
                 'content_ids_to_audio_translations': {
-                    'content': {}
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
+                    }
                 },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
@@ -418,6 +441,23 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'new_value': {
                     'html': '<p>New Value</p>',
                     'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
                 },
                 'subtopic_id': 2
             }]

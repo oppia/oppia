@@ -733,4 +733,39 @@ describe('Topic update service', function() {
       }]);
     }
   );
+
+  it('should create a proper backend change dict for changing subtopic ' +
+     'page audio data',
+  function() {
+    var newSampleAudioDict = {
+      content: {
+        en: {
+          filename: 'test_2.mp3',
+          file_size_bytes: 1000,
+          needs_update: false
+        }
+      },
+    };
+    var newSampleAudio =
+      ContentIdsToAudioTranslationsObjectFactory
+        .createFromBackendDict(newSampleAudioDict);
+    TopicUpdateService.setSubtopicPageContentsAudio(
+      _sampleSubtopicPage, 1, newSampleAudio);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_page_property',
+      property_name: 'page_contents_audio',
+      subtopic_id: 1,
+      new_value: newSampleAudio.toBackendDict(),
+      old_value: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
+        }
+      },
+      change_affects_subtopic_page: true
+    }]);
+  });
 });
