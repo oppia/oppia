@@ -135,7 +135,7 @@ oppia.directive('questionsTab', [
               questionSummary.id).then(function(response) {
               response.associated_skill_dicts.forEach(function(skillDict) {
                 skillDict.misconceptions.forEach(function(misconception) {
-                  $scope.misconceptions.append(misconception);
+                  $scope.misconceptions.push(misconception);
                 });
               });
               $scope.question =
