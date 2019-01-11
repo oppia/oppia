@@ -1008,7 +1008,7 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.addResponse(
         'NumericInput', forms.toRichText('This is feedback1.'),
         'final card', true, 'Equals', 7);
-      var responseEditor = explorationEditorMainTab.getResponseEditor(
+      responseEditor = explorationEditorMainTab.getResponseEditor(
         'default');
       responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
       explorationEditorMainTab.addHint('This is hint1.');
