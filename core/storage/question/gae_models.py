@@ -151,7 +151,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     question_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
-    # The name of the skill for frontend display purposes
+    # The description of the skill for frontend display purposes.
     skill_description = ndb.StringProperty(required=True)
 
     @classmethod

@@ -167,7 +167,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
-            question_ids = [summary['summary'].id for summary in question_summaries]
+            question_ids = [
+                summary['summary'].id for summary in question_summaries
+            ]
             self.assertItemsEqual(
                 question_ids, [self.question_id, self.question_id_2])
             self.logout()

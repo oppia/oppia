@@ -101,7 +101,7 @@ oppia.directive('questionEditor', [
 
           var _updateQuestion = function(updateFunction) {
             if ($scope.questionChanged) {
-              $scope.questionChanged();              
+              $scope.questionChanged();
             }
             QuestionUpdateService.setQuestionStateData(
               $scope.question, updateFunction);

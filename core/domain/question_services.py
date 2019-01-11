@@ -137,9 +137,9 @@ def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
     question_ids = [obj['question_id'] for obj in question_skill_link_dicts]
     questions = get_questions_by_ids(question_ids)
     return_obj = []
-    for index in range(0, len(questions)):
+    for index, question in enumerate(questions):
         return_obj.append({
-            'question': questions[index],
+            'question': question,
             'skill_description': (
                 question_skill_link_dicts[index]['skill_description'])
         })
@@ -359,9 +359,9 @@ def get_question_summaries_linked_to_skills(
     question_ids = [obj['question_id'] for obj in question_skill_link_dicts]
     question_summaries = get_question_summaries_by_ids(question_ids)
     return_obj = []
-    for index in range(0, len(question_summaries)):
+    for index, summary in enumerate(question_summaries):
         return_obj.append({
-            'summary': question_summaries[index],
+            'summary': summary,
             'skill_description': (
                 question_skill_link_dicts[index]['skill_description'])
         })
