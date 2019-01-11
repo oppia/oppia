@@ -56,7 +56,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   var TranslationTabFeedbackButton = element(
-  by.css('.protractor-test-translation-feedback-tab'));
+    by.css('.protractor-test-translation-feedback-tab'));
 
 
   this.expectContentTabContentToMatch = function(content) {
@@ -109,7 +109,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectActiveTabToRemainSame = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-      ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
-  }
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+  };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

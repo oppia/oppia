@@ -1032,7 +1032,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.navigateToTranslationTabFeedback();
       explorationEditorPage.saveChanges('Ok');
       explorationEditorTranslationTab.expectActiveTabToRemainSame();
-      });
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
