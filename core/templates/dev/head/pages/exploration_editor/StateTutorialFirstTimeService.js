@@ -26,7 +26,7 @@ oppia.factory('StateTutorialFirstTimeService', [
     var _currentlyInTranslationFirstVisit = true;
     var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_translation_tutorial_event';
-  
+
     return {
       // After the first call to it in a client session, this does nothing.
       initEditor: function(firstTime, expId) {
@@ -39,7 +39,8 @@ oppia.factory('StateTutorialFirstTimeService', [
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).error(
             function() {
-              console.error('Warning: could not record editor tutorial start event.');
+              console.error('Warning: could not record editor tutorial ' +
+              'start event.');
             });
         }
       },
@@ -56,12 +57,13 @@ oppia.factory('StateTutorialFirstTimeService', [
           $rootScope.$broadcast('enterTranslationForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
 
-          $http.post( STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId).error(
-            function() {
-              console.error(
-                'Warning: could not record translation tutorial start event.'
-              );
-            });
+          $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
+            .error(
+              function() {
+                console.error(
+                  'Warning: could not record translation tutorial start event.'
+                );
+              });
           _currentlyInTranslationFirstVisit = false;
         }
       },
