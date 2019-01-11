@@ -942,7 +942,6 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setContent(
       forms.toRichText('This is second card.'));
     explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -974,7 +973,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('should maintain its active sub-tab on saving draft and publishing changes'
+  fit('should maintain its active sub-tab on saving draft and publishing changes'
     , function() {
       users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
       users.login('user@translationSubTab.com');
@@ -1021,21 +1020,19 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
       explorationEditorMainTab.moveToState('two');
       explorationEditorPage.navigateToTranslationTab();
-      explorationEditorPage.navigateToTranslationTabFeedback();
+      explorationEditorTranslationTab.navigateToTranslationTabFeedback();
       explorationEditorPage.saveChanges();
-      expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-      ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+      explorationEditorTranslationTab.expectActiveTabToRemainSame();
 
       workflow.publishExploration();
 
       explorationEditorPage.navigateToMainTab();
       explorationEditorMainTab.addHint('This is hint3.');
       explorationEditorPage.navigateToTranslationTab();
-      explorationEditorPage.navigateToTranslationTabFeedback();
+      explorationEditorTranslationTab.navigateToTranslationTabFeedback();
       explorationEditorPage.saveChanges('Ok');
-      expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-      ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
-    });
+      explorationEditorTranslationTab.expectActiveTabToRemainSame();
+      });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
