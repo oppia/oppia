@@ -26,7 +26,8 @@ oppia.directive('questionEditor', [
         getMisconceptions: '&misconceptions',
         canEditQuestion: '&',
         question: '=',
-        questionStateData: '='
+        questionStateData: '=',
+        questionChanged: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
@@ -99,9 +100,11 @@ oppia.directive('questionEditor', [
           };
 
           var _updateQuestion = function(updateFunction) {
+            if ($scope.questionChanged) {
+              $scope.questionChanged();              
+            }
             QuestionUpdateService.setQuestionStateData(
-              $scope.question,
-              updateFunction);
+              $scope.question, updateFunction);
           };
 
           $scope.saveStateContent = function(displayedValue) {

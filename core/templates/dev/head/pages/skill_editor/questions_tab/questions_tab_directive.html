@@ -21,11 +21,11 @@
       </tr>
       <tr ng-repeat="question in questionSummaries"
           class="list-item"
-          ng-click="editQuestion(question)">
+          ng-click="editQuestion(question.summary)">
         <td> <[getQuestionIndex($index)]> </td>
         <td>
           <a class="list-summary">
-            <angular-html-bind html-data="question.question_content"></angular-html-bind>
+            <angular-html-bind html-data="question.summary.question_content"></angular-html-bind>
           </a>
         </td>
       </tr>

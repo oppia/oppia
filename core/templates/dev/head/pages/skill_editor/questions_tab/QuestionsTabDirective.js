@@ -151,8 +151,8 @@ oppia.directive('questionsTab', [
               backdrop: 'static',
               keyboard: false,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance', 'StateEditorService',
+                function($scope, $uibModalInstance, StateEditorService) {
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
@@ -161,10 +161,19 @@ oppia.directive('questionsTab', [
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
                   };
+                  $scope.questionChanged = function() {
+                    $scope.removeErrors();
+                  };
                   $scope.done = function() {
                     $scope.validationError = $scope.question.validate(
                       $scope.misconceptions);
                     if ($scope.validationError) {
+                      return;
+                    }
+                    if (!StateEditorService.isCurrentSolutionValid()) {
+                      $scope.validationError =
+                        'The solution is invalid and does not ' +
+                        'correspond to a correct answer';
                       return;
                     }
                     $uibModalInstance.close();

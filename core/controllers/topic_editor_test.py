@@ -91,7 +91,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC'))
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id)
+                question_id, self.skill_id, 'Skill Description')
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
@@ -111,9 +111,12 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_summary_dicts_2 = (
                     json_response['question_summary_dicts'])
                 self.assertEqual(len(question_summary_dicts_2), 1)
+                self.assertEqual(
+                    question_summary_dicts[0]['skill_description'],
+                    'Skill Description')
                 self.assertNotEqual(
-                    question_summary_dicts[0]['id'],
-                    question_summary_dicts_2[0]['id'])
+                    question_summary_dicts[0]['summary']['id'],
+                    question_summary_dicts_2[0]['summary']['id'])
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)

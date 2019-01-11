@@ -151,6 +151,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     question_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
+    # The name of the skill for frontend display purposes
+    skill_description = ndb.StringProperty(required=True)
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -166,12 +168,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return '%s:%s' % (question_id, skill_id)
 
     @classmethod
-    def create(cls, question_id, skill_id):
+    def create(cls, question_id, skill_id, skill_description):
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
+            skill_description: str. The description of the skill to which
+                question is linked.
 
         Raises:
             Exception. The given question is already linked to the given skill.
@@ -188,7 +192,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_model_instance = cls(
             id=question_skill_link_id,
             question_id=question_id,
-            skill_id=skill_id
+            skill_id=skill_id,
+            skill_description=skill_description
         )
         return question_skill_link_model_instance
 
@@ -205,9 +210,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(str), str|None. The question ids linked to given skills and the
-                next cursor value to be used for the next page (or None if no
-                more pages are left). The returned next cursor value is urlsafe.
+            list(dict), str|None. The question ids linked to given skills and
+                the corresponding skill descrptions and the next cursor value
+                to be used for the next page (or None if no more pages are
+                left). The returned next cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
@@ -226,13 +232,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
-        question_ids = [
-            model.question_id for model in question_skill_link_models
-        ]
+        question_skill_link_dicts = [{
+            'question_id': model.question_id,
+            'skill_description': model.skill_description
+        } for model in question_skill_link_models]
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
-        return question_ids, next_cursor_str
+        return question_skill_link_dicts, next_cursor_str
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):

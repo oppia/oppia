@@ -165,8 +165,10 @@ class SkillEditorQuestionHandler(base.BaseHandler):
             question_services.get_question_summaries_linked_to_skills(
                 constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
         )
-        question_summary_dicts = [
-            summary.to_dict() for summary in question_summaries]
+        question_summary_dicts = [{
+            'summary': obj['summary'].to_dict(),
+            'skill_description': obj['skill_description']
+        } for obj in question_summaries]
 
         self.values.update({
             'question_summary_dicts': question_summary_dicts,

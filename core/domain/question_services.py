@@ -84,15 +84,17 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id):
+def create_new_question_skill_link(question_id, skill_id, skill_description):
     """Creates a new QuestionSkillLink model.
 
     Args:
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
+        skill_description: str. Description of the skill to which the question
+            is linked.
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id)
+        question_id, skill_id, skill_description)
     question_skill_link_model.put()
 
 
@@ -122,16 +124,26 @@ def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
             questions are to be returned. This value should be urlsafe.
 
     Returns:
-        list(Question), str. The list of questions which are linked to the given
-            skill ids and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(dict), str. The list of questions and the corresponding linked
+            skill descriptions which are linked to the given skill ids and the
+            next cursor value to be used for the next batch of questions (or
+            None if no more pages are left). The returned next cursor value is
+            urlsafe.
     """
-    question_ids, next_cursor = (
+    question_skill_link_dicts, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor))
 
-    return get_questions_by_ids(question_ids), next_cursor
+    question_ids = [obj['question_id'] for obj in question_skill_link_dicts]
+    questions = get_questions_by_ids(question_ids)
+    return_obj = []
+    for index in range(0, len(questions)):
+        return_obj.append({
+            'question': questions[index],
+            'skill_description': (
+                question_skill_link_dicts[index]['skill_description'])
+        })
+    return return_obj, next_cursor
 
 
 def get_new_question_id():
@@ -282,13 +294,15 @@ def get_question_skill_links_of_question(question_id):
     return question_skill_links
 
 
-def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
+def update_skill_ids_of_questions(
+        curr_skill_id, new_skill_id, new_skill_description):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
     Args:
         curr_skill_id: str. ID of the current skill.
         new_skill_id: str. ID of the superseding skill.
+        new_skill_description: str. Description of superseding skill.
     """
     old_question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
@@ -298,7 +312,8 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
     for question_skill_link in old_question_skill_links:
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id, new_skill_id)
+                question_skill_link.question_id, new_skill_id,
+                new_skill_description)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
         old_question_skill_link_models)
@@ -323,10 +338,11 @@ def get_question_summaries_linked_to_skills(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), str|None. The list of question summaries linked
-            to the given skill_ids and the next cursor value to be used for the
-            next page (or None if no more pages are left). The returned next
-            cursor value is urlsafe.
+        list(dict), str|None. The list of question summaries and the
+            corresponding linked skill descriptions which are linked to the
+            given skill ids and the next cursor value to be used for the next
+            batch of questions (or None if no more pages are left). The returned
+            next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], None
@@ -335,13 +351,21 @@ def get_question_summaries_linked_to_skills(
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_ids, next_cursor = (
+    question_skill_link_dicts, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor)
     )
 
+    question_ids = [obj['question_id'] for obj in question_skill_link_dicts]
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, next_cursor
+    return_obj = []
+    for index in range(0, len(question_summaries)):
+        return_obj.append({
+            'summary': question_summaries[index],
+            'skill_description': (
+                question_skill_link_dicts[index]['skill_description'])
+        })
+    return return_obj, next_cursor
 
 
 def get_questions_by_ids(question_ids):

@@ -149,7 +149,10 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
-            self.assertEqual(question_summaries[0].id, self.question_id)
+            self.assertEqual(
+                question_summaries[0]['summary'].id, self.question_id)
+            self.assertEqual(
+                question_summaries[0]['skill_description'], 'Skill Description')
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -164,16 +167,16 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
-            question_ids = [summary.id for summary in question_summaries]
+            question_ids = [summary['summary'].id for summary in question_summaries]
             self.assertItemsEqual(
                 question_ids, [self.question_id, self.question_id_2])
             self.logout()
 
     def test_delete(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 'Skill Description')
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id)
+            self.question_id_2, self.skill_id, 'Skill Description')
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             self.delete_json(
@@ -193,7 +196,10 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 question_services.get_question_summaries_linked_to_skills(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
-            self.assertEqual(question_summaries[0].id, self.question_id_2)
+            self.assertEqual(
+                question_summaries[0]['summary'].id, self.question_id_2)
+            self.assertEqual(
+                question_summaries[0]['skill_description'], 'Skill Description')
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -218,7 +224,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(
             self.skill_id, self.admin_id, 'Skill Description')
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 'Skill Description')
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):

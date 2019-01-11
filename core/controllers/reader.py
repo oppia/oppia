@@ -332,7 +332,7 @@ class PretestHandler(base.BaseHandler):
                 start_cursor)
         )
         pretest_question_dicts = [
-            question.to_dict() for question in pretest_questions
+            obj['question'].to_dict() for obj in pretest_questions
         ]
 
         self.values.update({

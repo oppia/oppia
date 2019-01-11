@@ -8,8 +8,9 @@
     </button>
     <table class="dashboard-table" ng-if="questionSummaries.length > 0">
       <colgroup>
-        <col style="width: 10%;">
-        <col style="width: 90%;">
+        <col style="width: 5%;">
+        <col style="width: 60%;">
+        <col style="width: 35%;">
       </colgroup>
       <tr>
         <th class="dashboard-table-headings">
@@ -18,16 +19,20 @@
         <th class="dashboard-table-headings">
           <p> Question Content </p>
         </th>
+        <th class="dashboard-table-headings">
+          <p> Skill linked to question </p>
+        </th>
       </tr>
       <tr ng-repeat="question in questionSummaries"
           class="list-item"
-          ng-click="editQuestion(question)">
+          ng-click="editQuestion(question.summary)">
         <td><[getQuestionIndex($index)]></td>
         <td>
           <a class="list-summary">
-            <angular-html-bind html-data="question.question_content"></angular-html-bind>
+            <angular-html-bind html-data="question.summary.question_content"></angular-html-bind>
           </a>
         </td>
+        <td><[question.skill_description]></td>
       </tr>
     </table>
     <h4 ng-if="questionSummaries.length === 0" style="color: gray;">

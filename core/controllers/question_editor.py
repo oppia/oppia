@@ -56,7 +56,7 @@ class QuestionCreationHandler(base.BaseHandler):
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question(self.user_id, question)
         question_services.create_new_question_skill_link(
-            question.id, skill_id)
+            question.id, skill_id, skill.description)
         self.values.update({
             'question_id': question.id
         })
@@ -79,7 +79,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
                 'The skill with the given id doesn\'t exist.')
 
         question_services.create_new_question_skill_link(
-            question_id, skill_id)
+            question_id, skill_id, skill.description)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
