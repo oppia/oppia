@@ -114,6 +114,8 @@ class SubtopicPageContents(object):
             content_ids_to_audio_translations)
 
     def validate(self):
+        """Validates the SubtopicPageContentsObject, verifying that all
+        fields are of the correct type."""
         self.subtitled_html.validate()
 
         # TODO(tjiang11): Extract content ids to audio translations out into
@@ -164,6 +166,11 @@ class SubtopicPageContents(object):
 
     @classmethod
     def create_default_subtopic_page_contents(cls):
+        """Creates a default subtopic page contents object.
+
+        Returns:
+            SubtopicPageContents. A default object.
+        """
         return cls(
             state_domain.SubtitledHtml.create_default_subtitled_html(
                 'content'), {'content': {}})
@@ -191,6 +198,15 @@ class SubtopicPageContents(object):
 
     @classmethod
     def from_dict(cls, page_contents_dict):
+        """Creates a subtopic page contents object from a dictionary.
+
+        Args:
+            page_contents_dict: dict. The dict representation of
+                SubtopicPageContents object.
+
+        Returns:
+            SubtopicPageContents. The corresponding object.
+        """
         content_ids_to_audio_translations = {
             content_id: {
                 language_code: state_domain.AudioTranslation.from_dict(
