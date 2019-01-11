@@ -119,7 +119,7 @@ oppia.factory('SVMPredictionService', [
             }
           }
 
-          if (maxError < eps){
+          if (maxError < eps) {
             break;
           }
 
