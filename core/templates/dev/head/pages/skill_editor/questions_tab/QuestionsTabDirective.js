@@ -124,11 +124,6 @@ oppia.directive('questionsTab', [
           $scope.editQuestion = function(questionSummary) {
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
-              response.associated_skill_dicts.forEach(function(skillDict) {
-                skillDict.misconceptions.forEach(function(misconception) {
-                  $scope.misconceptions.append(misconception);
-                });
-              });
               $scope.question =
                 QuestionObjectFactory.createFromBackendDict(
                   response.question_dict);

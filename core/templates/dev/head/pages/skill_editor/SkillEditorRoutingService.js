@@ -47,6 +47,9 @@ oppia.factory('SkillEditorRoutingService', [
     });
 
     var SkillEditorRouterService = {
+      getActiveTabName: function() {
+        return activeTab;
+      },
       getTabStatuses: function() {
         return activeTab;
       },

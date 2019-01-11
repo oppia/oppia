@@ -70,7 +70,7 @@ oppia.directive('searchBar', [
            *  onMenuKeypress($event, 'category', {enter: 'open'})
            */
 
-          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled){
+          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             $scope.activeMenuName = NavigationService.activeMenuName;
           };

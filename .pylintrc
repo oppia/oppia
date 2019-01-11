@@ -67,7 +67,7 @@ ignore-imports=yes
 
 [MESSAGES CONTROL]
 
-disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,len-as-condition,missing-docstring,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
+disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,len-as-condition,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
 
 [REPORTS]
 

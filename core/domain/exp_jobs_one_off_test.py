@@ -16,6 +16,7 @@
 
 """Tests for Exploration-related jobs."""
 
+import datetime
 import json
 import os
 
@@ -33,8 +34,10 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(job_models, exp_models, base_models) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model])
+(job_models, exp_models, base_models, classifier_models) = (
+    models.Registry.import_models([
+        models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
+        models.NAMES.classifier]))
 search_services = models.Registry.import_search_services()
 
 
@@ -81,7 +84,9 @@ def run_job_for_deleted_exp(
         self, job_class, check_error=False,
         error_type=None, error_msg=None, function_to_be_called=None,
         exp_id=None):
-
+    """Helper function to run job for an deleted exploration and check the
+    output or error condition.
+    """
     job_id = job_class.create_new()
     job_class.enqueue(job_id)
     self.process_and_flush_pending_tasks()
@@ -994,6 +999,42 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
             [])
 
+    def test_migration_job_creates_appropriate_classifier_models(self):
+        """Tests that the exploration migration job creates appropriate
+        classifier data models for explorations.
+        """
+        self.save_new_exp_with_states_schema_v21(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        initial_state_name = exploration.states.keys()[0]
+        # Store classifier model for the new exploration.
+        classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
+            'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
+            datetime.datetime.utcnow(), {}, initial_state_name,
+            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+        # Store training job model for the classifier model.
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            self.NEW_EXP_ID, exploration.version, initial_state_name,
+            classifier_model_id)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    self.process_and_flush_pending_tasks()
+
+        new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        initial_state_name = new_exploration.states.keys()[0]
+        self.assertLess(exploration.version, new_exploration.version)
+        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
+            self.NEW_EXP_ID, new_exploration.version,
+            [initial_state_name])[0]
+        self.assertEqual(
+            classifier_exp_mapping_model.job_id, classifier_model_id)
+
 
 class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
 
@@ -1082,11 +1123,19 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
                 job_id))
-        expected_output = [
+        expected_output1 = [
             '[u\'EndExploration\', [u\'exp_id0 End\', u\'exp_id1 End\']]',
             '[u\'ItemSelectionInput\', [u\'exp_id1 Introduction\']]',
             '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
-        self.assertEqual(actual_output, expected_output)
+        expected_output2 = [
+            '[u\'EndExploration\', [u\'exp_id1 End\', u\'exp_id0 End\']]',
+            '[u\'ItemSelectionInput\', [u\'exp_id1 Introduction\']]',
+            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
+
+        try:
+            self.assertEqual(actual_output, expected_output1)
+        except AssertionError:
+            self.assertEqual(actual_output, expected_output2)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -1675,10 +1724,17 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
-        expected_output = [
+        expected_output1 = [
             '[u\'2\', [u\'exp_id0 State1\']]',
             '[u\'1\', [u\'exp_id1 State1\', u\'exp_id0 State2\']]']
-        self.assertEqual(actual_output, expected_output)
+        expected_output2 = [
+            '[u\'2\', [u\'exp_id0 State1\']]',
+            '[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
+
+        try:
+            self.assertEqual(actual_output, expected_output1)
+        except AssertionError:
+            self.assertEqual(actual_output, expected_output2)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
