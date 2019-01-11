@@ -90,11 +90,13 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             except AttributeError:
                 yield ('FAILED', thread.id)
         else:
-            yield ('SUCCESS', thread.id)
+            yield ('NO-OP', thread.id)
 
     @staticmethod
     def reduce(message, thread_ids):
         if message == 'FAILED':
             yield (message, thread_ids)
         elif message == 'SUCCESS':
+            yield len(thread_ids)
+        elif message == 'NO-OP':
             yield len(thread_ids)

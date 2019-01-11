@@ -68,6 +68,8 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.assertEqual(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, 'one-off-jobs')
         self.process_and_flush_pending_tasks()
 
     def test_message_count_job(self):
