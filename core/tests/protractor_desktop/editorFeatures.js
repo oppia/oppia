@@ -929,7 +929,7 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
       'NumericInput', forms.toRichText('This is feedback1.'),
-      'two', true, 'Equals', 6);
+      'second', true, 'Equals', 6);
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
     explorationEditorMainTab.addHint('This is hint1.');
@@ -938,10 +938,11 @@ describe('Exploration translation', function() {
       correctAnswer: 6,
       explanation: 'This is solution.'
     });
-    explorationEditorMainTab.moveToState('two');
+    explorationEditorMainTab.moveToState('second');
     explorationEditorMainTab.setContent(
       forms.toRichText('This is second card.'));
     explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
