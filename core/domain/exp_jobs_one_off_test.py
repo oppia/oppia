@@ -1676,8 +1676,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
         expected_output = [
-            u'[u\'2\', [u\'exp_id0 State1\']]',
-            u'[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
+            '[u\'2\', [u\'exp_id0 State1\']]',
+            '[u\'1\', [u\'exp_id1 State1\', u\'exp_id0 State2\']]']
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
