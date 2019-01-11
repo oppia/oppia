@@ -33,7 +33,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')], {})
+                    state_domain.SubtitledHtml('2', 'Example 1')],
+            {'1': {}, '2': {}})
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
         self.skill = skill_domain.Skill(
@@ -124,6 +125,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.skill_contents = ''
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
+
+    def test_skill_contents_audio_validation(self):
+        self.skill.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
+            state_domain.SubtitledHtml('content_id_2', '<p>Hello 2</p>')
+        ]
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id_3': {}
+        }
+        self._assert_validation_error(
+            'Expected content_ids_to_audio_translations to contain '
+            'only content_ids in worked examples and explanation.')
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'
