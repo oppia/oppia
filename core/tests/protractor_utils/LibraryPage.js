@@ -20,7 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function(){
+var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
@@ -162,7 +162,7 @@ var LibraryPage = function(){
     });
   };
 
-  this.clickCreateActivity = function(){
+  this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
   };

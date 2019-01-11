@@ -345,13 +345,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
-
+    get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
+    get_redirect_route(
+        r'/explorehandler/features/<exploration_id>',
+        editor.ExplorationFeaturesHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
@@ -575,6 +578,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_QUESTION_URL,
+        skill_editor.SkillEditorQuestionHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
     get_redirect_route(
@@ -624,6 +630,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
+    get_redirect_route(
+        r'/playthroughdatahandler/whitelist',
+        editor.FetchPlaythroughWhitelistHandler),
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),

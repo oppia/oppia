@@ -47,7 +47,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Raises:
             AssertionError: Bucket url exists and doesn't start with 'gs://'.
         """
-        GCS_BUCKET_URL_PREFIX = 'gs://'
+        gcs_bucket_url_prefix = 'gs://'
 
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
@@ -63,12 +63,12 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
 
         output_url_prefix = self.request.get('output_url_prefix')
         assert output_url_prefix and output_url_prefix.startswith(
-            GCS_BUCKET_URL_PREFIX)
+            gcs_bucket_url_prefix)
 
         # Look for slash in the portion of the bucket URL that comes
         # after 'gs://'. If not present, then only a bucket name has been
         # provided and we append a trailing slash.
-        if '/' not in output_url_prefix[len(GCS_BUCKET_URL_PREFIX):]:
+        if '/' not in output_url_prefix[len(gcs_bucket_url_prefix):]:
              # Only a bucket name has been provided - no prefix or trailing
              # slash.
             output_url_prefix += '/' + timestamp
@@ -108,7 +108,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
             self.response.status_int = httplib.INTERNAL_SERVER_ERROR
 
 
-app = webapp2.WSGIApplication(
+app = webapp2.WSGIApplication(  # pylint: disable=invalid-name
     [
         ('/cloud_datastore_export', ExportToCloudDatastoreHandler),
     ], debug=True)

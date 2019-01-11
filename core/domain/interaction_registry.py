@@ -39,6 +39,9 @@ class Registry(object):
 
     @classmethod
     def _refresh(cls):
+        """Refreshes and updates all the interaction ids to add new interaction
+        instances to the registry.
+        """
         cls._interactions.clear()
 
         all_interaction_ids = cls.get_all_interaction_ids()

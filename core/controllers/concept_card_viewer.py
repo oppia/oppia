@@ -30,7 +30,7 @@ class ConceptCardDataHandler(base.BaseHandler):
     def get(self, skill_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
