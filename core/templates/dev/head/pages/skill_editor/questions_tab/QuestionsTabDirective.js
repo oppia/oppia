@@ -143,6 +143,7 @@ oppia.directive('questionsTab', [
             var questionStateData = $scope.questionStateData;
             var questionId = $scope.questionId;
             var misconceptions = $scope.skill.getMisconceptions();
+            QuestionUndoRedoService.clearChanges();
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -152,7 +153,10 @@ oppia.directive('questionsTab', [
               keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
-                function($scope, $uibModalInstance, StateEditorService) {
+                'UndoRedoService',
+                function(
+                    $scope, $uibModalInstance, StateEditorService,
+                    UndoRedoService) {
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
@@ -180,7 +184,32 @@ oppia.directive('questionsTab', [
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
+                    if (QuestionUndoRedoService.hasChanges()) {
+                      var modalInstance = $uibModal.open({
+                        templateUrl:
+                          UrlInterpolationService.getDirectiveTemplateUrl(
+                            '/pages/skill_editor/questions_tab/' +
+                            'confirm_question_modal_exit_modal_directive.html'),
+                        backdrop: true,
+                        controller: [
+                          '$scope', '$uibModalInstance',
+                          function($scope, $uibModalInstance) {
+                            $scope.cancel = function() {
+                              $uibModalInstance.dismiss('cancel');
+                            };
+
+                            $scope.close = function() {
+                              $uibModalInstance.close();
+                            };
+                          }
+                        ]
+                      });
+                      modalInstance.result.then(function() {
+                        $uibModalInstance.dismiss('cancel');
+                      });
+                    } else {
+                      $uibModalInstance.dismiss('cancel');
+                    }
                   };
                 }
               ]
