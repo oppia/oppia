@@ -76,4 +76,3 @@ oppia.factory('StateTutorialFirstTimeService', [
     };
   }
 ]);
-  
