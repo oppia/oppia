@@ -26,18 +26,17 @@
  */
 
 // TODO(anmol): Add functionality to add n_grams, remove stop words.
-oppia.factory('TextInputTokenizer', [
-  '$log', function($log) {
-    return {
-      generateTokens: function(textInput) {
-        var tokenizedTextInput;
-        // The default regexp select tokens of 2 or more alphanumeric
-        // characters (punctuation is completely ignored and always treated
-        // as a token separator).
-        var tokenPattern = '\\b\\w\\w+\\b';
-        var regexp = new RegExp(tokenPattern, 'g');
-        tokenizedTextInput = textInput.match(regexp);
-        return tokenizedTextInput;
-      }
-    };
-  }]);
+oppia.factory('TextInputTokenizer', [function() {
+  return {
+    generateTokens: function(textInput) {
+      var tokenizedTextInput;
+      // The default regexp select tokens of 2 or more alphanumeric
+      // characters (punctuation is completely ignored and always treated
+      // as a token separator).
+      var tokenPattern = '\\b\\w\\w+\\b';
+      var regexp = new RegExp(tokenPattern, 'g');
+      tokenizedTextInput = textInput.match(regexp);
+      return tokenizedTextInput;
+    }
+  };
+}]);
