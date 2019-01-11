@@ -130,7 +130,9 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'content_id': 'explanation',
                 'html': feconf.DEFAULT_SKILL_EXPLANATION
             },
-            'content_ids_to_audio_translations': {}
+            'content_ids_to_audio_translations': {
+                'explanation': {}
+            }
         }
         self.save_new_skill_with_story_and_skill_contents_schema_version(
             self.SKILL_ID, self.albert_id, 'A description', 0,

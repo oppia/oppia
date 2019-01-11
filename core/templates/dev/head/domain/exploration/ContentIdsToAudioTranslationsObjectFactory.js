@@ -163,6 +163,10 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       return new ContentIdsToAudioTranslations(contentIdsToAudioTranslations);
     };
 
+    ContentIdsToAudioTranslations.createEmpty = function() {
+      return new ContentIdsToAudioTranslations({});
+    };
+
     return ContentIdsToAudioTranslations;
   }
 ]);

@@ -18,12 +18,13 @@
  */
 
 oppia.factory('SubtopicPageObjectFactory', [
-  function() {
+  'SubtopicPageContentsObjectFactory',
+  function(SubtopicPageContentsObjectFactory) {
     var SubtopicPage = function(
-        subtopicPageId, topicId, htmlData, languageCode) {
+        subtopicPageId, topicId, pageContents, languageCode) {
       this._id = subtopicPageId;
       this._topicId = topicId;
-      this._htmlData = htmlData;
+      this._pageContents = pageContents;
       this._languageCode = languageCode;
     };
 
@@ -47,14 +48,14 @@ oppia.factory('SubtopicPageObjectFactory', [
       return this._topicId;
     };
 
-    // Returns the html data for the subtopic page.
-    SubtopicPage.prototype.getHtmlData = function() {
-      return this._htmlData;
+    // Returns the page data for the subtopic page.
+    SubtopicPage.prototype.getPageContents = function() {
+      return this._pageContents;
     };
 
-    // Sets the html data for the subtopic page.
-    SubtopicPage.prototype.setHtmlData = function(htmlData) {
-      this._htmlData = htmlData;
+    // Sets the page data for the subtopic page.
+    SubtopicPage.prototype.setPageContents = function(pageContents) {
+      this._pageContents = angular.copy(pageContents);
     };
 
     // Returns the language code for the subtopic page.
@@ -65,27 +66,29 @@ oppia.factory('SubtopicPageObjectFactory', [
     SubtopicPage.createFromBackendDict = function(subtopicPageBackendDict) {
       return new SubtopicPage(
         subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
-        subtopicPageBackendDict.html_data, subtopicPageBackendDict.language_code
+        SubtopicPageContentsObjectFactory.createFromBackendDict(
+          subtopicPageBackendDict.page_contents),
+        subtopicPageBackendDict.language_code
       );
     };
 
     SubtopicPage.prototype.copyFromSubtopicPage = function(otherSubtopicPage) {
       this._id = otherSubtopicPage.getId();
       this._topicId = otherSubtopicPage.getTopicId();
-      this._htmlData = otherSubtopicPage.getHtmlData();
+      this._pageContents = angular.copy(otherSubtopicPage.getPageContents());
       this._languageCode = otherSubtopicPage.getLanguageCode();
     };
 
     SubtopicPage.createDefault = function(topicId, subtopicId) {
-      return new SubtopicPage(
-        getSubtopicPageId(topicId, subtopicId), topicId, '', 'en'
-      );
+      return new SubtopicPage(getSubtopicPageId(topicId, subtopicId),
+        topicId, SubtopicPageContentsObjectFactory.createDefault(),
+        'en');
     };
 
     // Create an interstitial subtopic page that would be displayed in the
     // editor until the actual subtopic page is fetched from the backend.
     SubtopicPage.createInterstitialSubtopicPage = function() {
-      return new SubtopicPage(null, null, null, 'en');
+      return new SubtopicPage(null, null, null, 'en', {});
     };
     return SubtopicPage;
   }

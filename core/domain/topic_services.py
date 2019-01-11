@@ -414,9 +414,18 @@ def apply_change_list(topic_id, change_list):
                         'The subtopic with id %s doesn\'t exist' % change.id)
 
                 if (change.property_name ==
-                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    modified_subtopic_pages[subtopic_page_id].update_html_data(
-                        change.new_value)
+                        subtopic_page_domain.
+                        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    modified_subtopic_pages[
+                        subtopic_page_id].update_page_contents_html(
+                            change.new_value)
+
+                elif (change.property_name ==
+                      subtopic_page_domain.
+                      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
+                    modified_subtopic_pages[
+                        subtopic_page_id].update_page_contents_audio(
+                            change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
