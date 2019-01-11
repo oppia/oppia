@@ -115,7 +115,8 @@ class SubtopicPageContents(object):
 
     def validate(self):
         """Validates the SubtopicPageContentsObject, verifying that all
-        fields are of the correct type."""
+        fields are of the correct type.
+        """
         self.subtitled_html.validate()
 
         # TODO(tjiang11): Extract content ids to audio translations out into
