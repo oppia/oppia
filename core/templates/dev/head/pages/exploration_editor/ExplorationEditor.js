@@ -52,7 +52,7 @@ oppia.controller('ExplorationEditor', [
   'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
-  'StateEditorTutorialFirstTimeService',
+  'StateTutorialFirstTimeService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'ThreadDataService', 'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
@@ -70,7 +70,7 @@ oppia.controller('ExplorationEditor', [
       ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
-      StateEditorTutorialFirstTimeService,
+      StateTutorialFirstTimeService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
       ThreadDataService, UrlInterpolationService, UserEmailPreferencesService) {
     $scope.EditabilityService = EditabilityService;
@@ -234,7 +234,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        StateEditorTutorialFirstTimeService.init(
+        StateTutorialFirstTimeService.initEditor(
           explorationData.show_state_editor_tutorial_on_load,
           $scope.explorationId);
 
@@ -396,7 +396,7 @@ oppia.controller('ExplorationEditor', [
     var leaveTutorial = function() {
       EditabilityService.onEndTutorial();
       $scope.$apply();
-      StateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateTutorialFirstTimeService.markEditorTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -460,7 +460,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        StateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateTutorialFirstTimeService.markTutorialFinished();
       });
     };
 

@@ -17,19 +17,17 @@
  */
 
 oppia.directive('translationTab', [
-  'UrlInterpolationService', '$timeout',
-  'ContextService', 'ExplorationDataService',
-  'StateTranslationTutorialFirstTimeService',
-  function(UrlInterpolationService, $timeout,
-      ContextService, ExplorationDataService,
-      StateTranslationTutorialFirstTimeService) {
+  'UrlInterpolationService', 'ContextService', 'ExplorationDataService',
+  'StateTutorialFirstTimeService',
+  function(UrlInterpolationService, ContextService, ExplorationDataService,
+      StateTutorialFirstTimeService) {
     return {
       restrict: 'E',
       scope: {},
       link: function(scope) {
         scope.$broadcast('refreshTranslationTab');
         ExplorationDataService.getData().then(function(data) {
-          StateTranslationTutorialFirstTimeService.init(
+          StateTutorialFirstTimeService.initTranslation(
             data.show_state_translation_tutorial_on_load,
             ContextService.getExplorationId()
           );
@@ -40,16 +38,14 @@ oppia.directive('translationTab', [
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', '$templateCache',
         '$uibModal', 'EditabilityService',
-        'StateTranslationTutorialFirstTimeService', 'UrlInterpolationService',
+        'StateTutorialFirstTimeService', 'UrlInterpolationService',
         function($scope, $rootScope, $templateCache,
             $uibModal, EditabilityService,
-            StateTranslationTutorialFirstTimeService, UrlInterpolationService) {
+            StateTutorialFirstTimeService, UrlInterpolationService) {
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
             '#tutorialTranslationLanguage';
           var _ID_TUTORIAL_TRANSLATION_STATE =
             '#tutorialTranslationState';
-          var _ID_TUTORIAL_TRANSLATION_AUDIOBAR =
-            '#tutorialTranslationAudioBar';
           $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
             type: 'title',
             heading: 'Translations In Oppia',
@@ -219,7 +215,7 @@ oppia.directive('translationTab', [
           $scope.leaveTutorial = function() {
             EditabilityService.onEndTutorial();
             $scope.$apply();
-            StateTranslationTutorialFirstTimeService.markTutorialFinished();
+            StateTutorialFirstTimeService.markTranslationTutorialFinished();
             $scope.translationTutorial = false;
           };
 
@@ -277,7 +273,7 @@ oppia.directive('translationTab', [
             modalInstance.result.then(function() {
               $scope.onStartTutorial();
             }, function() {
-              StateTranslationTutorialFirstTimeService.markTutorialFinished();
+              StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };
 

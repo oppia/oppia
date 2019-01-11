@@ -27,18 +27,14 @@ oppia.directive('editorNavigation', [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'RouterService',
-        'StateEditorTutorialFirstTimeService',
-        'StateTranslationTutorialFirstTimeService',
-        'SiteAnalyticsService', 'ThreadDataService', 'UserService',
-        'WindowDimensionsService',
+        'StateTutorialFirstTimeService', 'SiteAnalyticsService',
+        'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, RouterService,
-            StateEditorTutorialFirstTimeService,
-            StateTranslationTutorialFirstTimeService,
-            SiteAnalyticsService, ThreadDataService, UserService,
-            WindowDimensionsService) {
+            StateTutorialFirstTimeService, SiteAnalyticsService,
+            ThreadDataService, UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -81,7 +77,7 @@ oppia.directive('editorNavigation', [
                   var explorationId = (
                     ContextService.getExplorationId());
 
-                  $scope.beginTutorial = function() {
+                  $scope.beginEditorTutorial = function() {
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
@@ -112,8 +108,8 @@ oppia.directive('editorNavigation', [
                 $rootScope.$broadcast('openTranslationTutorial');
               }
             }, function() {
-              StateEditorTutorialFirstTimeService.markTutorialFinished();
-              StateTranslationTutorialFirstTimeService.markTutorialFinished();
+              StateTutorialFirstTimeService.markEditorTutorialFinished();
+              StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };
 
