@@ -503,9 +503,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        init_state.interaction.hints.append(
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', {})))
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': {}
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
