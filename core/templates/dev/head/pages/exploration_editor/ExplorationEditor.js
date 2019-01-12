@@ -460,7 +460,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        StateTutorialFirstTimeService.markTutorialFinished();
+        StateTutorialFirstTimeService.markEditorTutorialFinished();
       });
     };
 
