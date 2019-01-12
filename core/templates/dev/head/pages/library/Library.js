@@ -252,15 +252,17 @@ oppia.controller('Library', [
     // The carousels do not work when the width is 1 card long, so we need to
     // handle this case discretely.
     // Also preventing swiping past the first and last card.
-    $scope.incrementLeftmostCardIndex = function(ind, lastItem) {
+    $scope.incrementLeftmostCardIndex = function(ind,
+        totalTiles, displayCount) {
+      var lastItem = (totalTiles - displayCount) <=
+        $scope.leftmostCardIndices[ind];
       if (!lastItem) {
         $scope.leftmostCardIndices[ind]++;
       }
     };
     $scope.decrementLeftmostCardIndex = function(ind) {
-      if ($scope.leftmostCardIndices[ind] > 0) {
-        $scope.leftmostCardIndices[ind]--;
-      }
+      $scope.leftmostCardIndices[ind] = Math.max(
+        $scope.leftmostCardIndices[ind] - 1, 0);
     };
 
     $(window).resize(function() {
