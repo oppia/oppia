@@ -334,8 +334,7 @@ class BaseHandler(webapp2.RequestHandler):
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
+                self.user_id)
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
