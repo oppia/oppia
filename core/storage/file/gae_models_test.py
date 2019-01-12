@@ -136,6 +136,30 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
 class FileModelTest(test_utils.GenericTestBase):
     """Tests the FileModel class."""
 
+    def test_file_model_content_is_reconstituted_correctly(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file1.png')
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        file_model.content = 'file_contents'
+        commit_cmds = [{'cmd': 'edit'}]
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, commit_cmds)
+        retrieved_model = file_models.FileModel.get_version(
+            'exp_id1', 'path/to/file1.png', 2)
+        self.assertEqual(file_model.key, retrieved_model.key)
+        self.assertEqual(retrieved_model.content, 'file_contents')
+
+    def test_file_model_snapshot_includes_file_model_content(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file1.png')
+
+        self.assertIsNone(file_model.content)
+
+        file_model.content = 'file_contents'
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        self.assertEqual(file_model.content, 'file_contents')
+
     def test_get_new_id_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
             file_models.FileModel.get_new_id('entity1')
@@ -191,16 +215,6 @@ class FileModelTest(test_utils.GenericTestBase):
             'exp_id1', 'path/to/file1.png', 1)
         self.assertEqual(file_model.key, retrieved_model.key)
         self.assertEqual(file_model.content, retrieved_model.content)
-
-        file_model.content = 'file_contents'
-        commit_cmds = [{
-            'cmd': 'edit'
-        }]
-        file_model.commit(feconf.SYSTEM_COMMITTER_ID, commit_cmds)
-        retrieved_model = file_models.FileModel.get_version(
-            'exp_id1', 'path/to/file1.png', 2)
-        self.assertEqual(file_model.key, retrieved_model.key)
-        self.assertEqual(retrieved_model.content, 'file_contents')
 
     def test_get_version_with_version_absent_raises_error(self):
         file_model = file_models.FileModel.create(
