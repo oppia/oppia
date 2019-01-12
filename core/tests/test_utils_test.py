@@ -31,24 +31,45 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         order = []
         testcase = self
 
-        class MyWrapper(test_utils.FunctionWrapper):
+        class MockWrapper(test_utils.FunctionWrapper):
 
             def pre_call_hook(self, args):
+                """Mock pre call hook.
+
+                Args:
+                    args: ArgumentParser. The specified arguments to be checked
+                        with the mock names.
+
+                Raises:
+                    AssertionError: The argument doesn't match with the mock
+                        name.
+                """
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
             def post_call_hook(self, args, result):
+                """Mock post call hook.
+
+                Args:
+                    args: ArgumentParser. The specified arguments to be checked
+                        with the mock names.
+                    result: str. The string to be checked with the mock name.
+
+                Raises:
+                    AssertionError: The argument doesn't match with the mock
+                        name.
+                """
                 order.append('after')
                 testcase.assertEqual(result, 'foobar')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
-        def function(posarg, kwarg):
+        def mock_function(posarg, kwarg):
             order.append('call')
             return posarg + kwarg
 
-        wrapped = MyWrapper(function)
+        wrapped = MockWrapper(mock_function)
 
         self.assertEqual(wrapped('foo', kwarg='bar'), 'foobar')
         self.assertEqual(order, ['before', 'call', 'after'])
@@ -57,18 +78,18 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class Klass(object):
+        class MockClass(object):
             def __init__(self, num1):
                 self.num1 = num1
 
-            def my_method(self, num2):
+            def mock_method(self, num2):
                 data['value'] = self.num1 + num2
                 return (self.num1 + num2) * 2
 
-        wrapped = test_utils.FunctionWrapper(Klass.my_method)
+        wrapped = test_utils.FunctionWrapper(MockClass.mock_method)
 
-        with self.swap(Klass, 'my_method', wrapped):
-            val = Klass('foo').my_method('bar')
+        with self.swap(MockClass, 'mock_method', wrapped):
+            val = MockClass('foo').mock_method('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
@@ -76,17 +97,17 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class Klass(object):
+        class MockClass(object):
             str_attr = 'foo'
 
             @classmethod
-            def class_method(cls, num):
+            def mock_classmethod(cls, num):
                 data['value'] = cls.str_attr + num
                 return (cls.str_attr + num) * 2
 
-        wrapped = test_utils.FunctionWrapper(Klass.class_method)
-        with self.swap(Klass, 'class_method', wrapped):
-            val = Klass.class_method('bar')
+        wrapped = test_utils.FunctionWrapper(MockClass.mock_classmethod)
+        with self.swap(MockClass, 'mock_classmethod', wrapped):
+            val = MockClass.mock_classmethod('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
@@ -94,28 +115,28 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class Klass(object):
+        class MockClass(object):
             @staticmethod
-            def static_method(num):
+            def mock_staticmethod(num):
                 data['value'] = num
                 return num * 2
 
-        wrapped = test_utils.FunctionWrapper(Klass.static_method)
-        with self.swap(Klass, 'static_method', wrapped):
-            val = Klass.static_method('foobar')
+        wrapped = test_utils.FunctionWrapper(MockClass.mock_staticmethod)
+        with self.swap(MockClass, 'mock_staticmethod', wrapped):
+            val = MockClass.mock_staticmethod('foobar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
     def test_wrapper_calls_passed_lambdas(self):
         data = {}
 
-        def side_effect(num):
+        def mock_function_with_side_effect(num):
             data['value'] = num
             return num
 
-        l = lambda x: side_effect(x) * 2
+        mock_lambda = lambda x: mock_function_with_side_effect(x) * 2
 
-        wrapped = test_utils.FunctionWrapper(l)
+        wrapped = test_utils.FunctionWrapper(mock_lambda)
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')
         self.assertEqual(data.get('value'), 'foobar')
 
@@ -136,29 +157,29 @@ class CallCounterTests(test_utils.GenericTestBase):
 
 class FailingFunctionTests(test_utils.GenericTestBase):
     def test_failing_function_fails_for_first_n_calls(self):
-        class CustomError(Exception):
+        class MockError(Exception):
             pass
 
         function = lambda x: x ** 2
 
-        failing_func = test_utils.FailingFunction(function, CustomError, 5)
+        failing_func = test_utils.FailingFunction(function, MockError, 5)
 
         for i in xrange(5):
-            with self.assertRaises(CustomError):
+            with self.assertRaises(MockError):
                 failing_func(i)
                 raise ValueError(str(i))
 
         self.assertEqual(failing_func(5), 25)
 
     def test_failing_function_never_succeeds_when_n_is_infinity(self):
-        class CustomError(Exception):
+        class MockError(Exception):
             pass
 
         function = lambda x: x ** 2
 
         failing_func = test_utils.FailingFunction(
-            function, CustomError, test_utils.FailingFunction.INFINITY)
+            function, MockError, test_utils.FailingFunction.INFINITY)
 
         for i in xrange(20):
-            with self.assertRaises(CustomError):
+            with self.assertRaises(MockError):
                 failing_func(i)

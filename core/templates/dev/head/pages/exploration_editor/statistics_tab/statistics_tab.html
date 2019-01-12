@@ -23,8 +23,8 @@
               </div>
             </div>
           </div>
-          <div class="container">
-            <issues-directive/>
+          <div class="container" ng-if="playthroughsAreAvailable">
+            <playthrough-issues-directive></playthrough-issues-directive>
           </div>
         </div>
       </div>

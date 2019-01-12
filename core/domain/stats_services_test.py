@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.stats_services."""
+
 import operator
 import os
 
@@ -34,13 +36,13 @@ import utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class StatisticsServicesTest(test_utils.GenericTestBase):
+class StatisticsServicesTests(test_utils.GenericTestBase):
     """Test the helper functions and methods defined in the stats_services
     module.
     """
 
     def setUp(self):
-        super(StatisticsServicesTest, self).setUp()
+        super(StatisticsServicesTests, self).setUp()
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
@@ -932,26 +934,26 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class ModifiedInteractionAnswerSummariesAggregator(
+class MockInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedInteractionAnswerSummariesMRJobManager
+        return MockInteractionAnswerSummariesMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedInteractionAnswerSummariesMRJobManager(
+class MockInteractionAnswerSummariesMRJobManager(
         stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedInteractionAnswerSummariesAggregator
+        return MockInteractionAnswerSummariesAggregator
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):
@@ -1559,7 +1561,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
     """
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
     INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
     TEXT_INPUT_EXP_ID = 'exp_id0'
     SET_INPUT_EXP_ID = 'exp_id1'
@@ -1567,12 +1569,18 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     NEW_STATE_NAME = 'new state'
 
     def _get_swap_context(self):
+        """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
+        value with ALL_CC_MANAGERS_FOR_TESTS.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _get_visualizations(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        """Returns the visualizations info corresponding to the given
+        exploration id and state name.
+        """
         exploration = exp_services.get_exploration_by_id(exp_id)
         init_state = exploration.states[state_name]
         return stats_services.get_visualizations_info(
@@ -1580,6 +1588,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        """Records the submitted answer corresponding to the given exploration
+        id and state name.
+        """
         exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
@@ -1587,7 +1598,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
 
     def _run_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        """Runs the MockInteractionAnswerSummariesAggregator."""
+        MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -1597,12 +1609,16 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
     def _rerun_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+        """Reruns the MockInteractionAnswerSummariesAggregator."""
+        MockInteractionAnswerSummariesAggregator.stop_computation('a')
         self._run_answer_summaries_aggregator()
 
     def _rename_state(
             self, new_state_name, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
+        """Renames the state corresponding to the given exploration id
+        and state name.
+        """
         exp_services.update_exploration(
             self.owner_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -1613,6 +1629,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     def _change_state_interaction_id(
             self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
+        """Updates the state interaction id corresponding to the given
+        exploration id and state name.
+        """
         exp_services.update_exploration(
             self.owner_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1624,6 +1643,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     def _change_state_content(
             self, new_content, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
+        """Updates the state content corresponding to the given exploration id
+        and state name.
+        """
         exp_services.update_exploration(
             self.owner_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1892,15 +1914,24 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
     def _get_top_state_answer_stats(
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
+        """Returns the top answer stats corresponding to the given exploration
+        id and state names.
+        """
         return stats_services.get_top_state_answer_stats(exp_id, state_name)
 
     def _get_top_state_unresolved_answer_stats(
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
+        """Returns the top unresolved answer stats corresponding to the given
+        exploration id and state names.
+        """
         return stats_services.get_top_state_unresolved_answers(
             exp_id, state_name)
 
     def _get_top_state_answer_stats_multi(
             self, exp_id=EXP_ID, state_names=None):
+        """Returns the top answer stats corresponding to the given exploration
+        id and state names.
+        """
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
         return stats_services.get_top_state_answer_stats_multi(
@@ -1909,6 +1940,9 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     def _record_answer(
             self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0],
             classification_category=exp_domain.EXPLICIT_CLASSIFICATION):
+        """Records the submitted answer corresponding to the given interaction
+        id in an exploration.
+        """
         exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
@@ -1916,7 +1950,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             classification_category, 'sid1', 10.0, {}, answer)
 
     def _run_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        """Runs the MockInteractionAnswerSummariesAggregator."""
+        MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -1924,7 +1959,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        ModifiedInteractionAnswerSummariesAggregator.stop_computation(
+        MockInteractionAnswerSummariesAggregator.stop_computation(
             feconf.SYSTEM_COMMITTER_ID)
 
     def setUp(self):

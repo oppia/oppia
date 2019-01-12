@@ -16,13 +16,14 @@
  * @fileoverview Directive for visualizing issues.
  */
 
-oppia.directive('issuesDirective', [
+oppia.directive('playthroughIssuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/statistics_tab/issues_directive.html'),
+        '/pages/exploration_editor/statistics_tab/' +
+        'playthrough_issues_directive.html'),
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {

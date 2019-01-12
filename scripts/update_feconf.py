@@ -67,6 +67,7 @@ def _apply_changes_to_feconf():
 
 
 def _update_feconf():
+    """Updates the 'feconf.py' file after doing the prerequisite checks."""
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     assert common.get_current_branch_name().startswith('release-')

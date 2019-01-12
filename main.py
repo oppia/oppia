@@ -76,7 +76,7 @@ class FrontendErrorHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class WarmupHandler(base.BaseHandler):
+class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
     @acl_decorators.open_access
@@ -85,7 +85,7 @@ class WarmupHandler(base.BaseHandler):
         pass
 
 
-class HomePageRedirectHandler(base.BaseHandler):
+class HomePageRedirectPage(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
@@ -170,8 +170,8 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
-    get_redirect_route(r'/_ah/warmup', WarmupHandler),
-    get_redirect_route(r'/', HomePageRedirectHandler),
+    get_redirect_route(r'/_ah/warmup', WarmupPage),
+    get_redirect_route(r'/', HomePageRedirectPage),
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
@@ -193,10 +193,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
-        admin.AdminTopicsCsvDownloadHandler),
+        admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
         r'/notifications_dashboard',
@@ -241,7 +241,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        creator_dashboard.UploadExploration),
+        creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
@@ -337,7 +337,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture_by_username/<username>',
-        profile.ProfilePictureHandlerByUsername),
+        profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
@@ -345,7 +345,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
-
+    get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
@@ -353,11 +353,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
+        r'/explorehandler/features/<exploration_id>',
+        editor.ExplorationFeaturesHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
-        reader.ExplorationPageEmbed),
+        reader.ExplorationEmbedPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -421,7 +424,7 @@ URLS = MAPREDUCE_HANDLERS + [
         translator.ExplorationTranslationHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
-        editor.ExplorationDownloadHandler),
+        editor.ExplorationFileDownloader),
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
@@ -489,7 +492,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.ThreadListHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-        feedback.ThreadListHandlerForTopics),
+        feedback.ThreadListHandlerForTopicsHandler),
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
@@ -575,6 +578,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_QUESTION_URL,
+        skill_editor.SkillEditorQuestionHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
     get_redirect_route(
@@ -596,7 +602,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
     get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheck),
+        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler),
     get_redirect_route(
         r'/emaildashboardresult/<query_id>',
         email_dashboard.EmailDashboardResultPage),
@@ -625,6 +631,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
     get_redirect_route(
+        r'/playthroughdatahandler/whitelist',
+        editor.FetchPlaythroughWhitelistHandler),
+    get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),
 
@@ -644,10 +653,10 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
         get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
         get_redirect_route(r'/adminhandler', admin.AdminHandler),
         get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvDownloadHandler),
+            admin.AdminTopicsCsvFileDownloader),
         get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
 else:
     URLS_TO_SERVE = URLS

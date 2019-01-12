@@ -393,9 +393,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
 
-# No. of questions to be displayed on a page in the topic editor.
-NUM_QUESTIONS_PER_PAGE = 10
-
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
 
@@ -684,6 +681,7 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
+SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
@@ -708,25 +706,6 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-
-NAV_MODE_ABOUT = 'about'
-NAV_MODE_GET_STARTED = 'get_started'
-NAV_MODE_COLLECTION = 'collection'
-NAV_MODE_CONTACT = 'contact'
-NAV_MODE_CREATE = 'create'
-NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
-NAV_MODE_DONATE = 'donate'
-NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
-NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PROFILE = 'profile'
-NAV_MODE_SIGNUP = 'signup'
-NAV_MODE_SPLASH = 'splash'
-NAV_MODE_STORY_EDITOR = 'story_editor'
-NAV_MODE_TEACH = 'teach'
-NAV_MODE_THANKS = 'thanks'
-NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
-NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -918,6 +897,7 @@ THANKS_PAGE_DESCRIPTION = (
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
