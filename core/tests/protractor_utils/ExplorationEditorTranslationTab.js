@@ -55,7 +55,7 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  var TranslationTabFeedbackButton = element(
+  var FeedbackButton = element(
     by.css('.protractor-test-translation-feedback-tab'));
 
 
@@ -99,15 +99,15 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.navigateToTranslationTabFeedback = function() {
+  this.navigateToFeedbackTab = function() {
     waitFor.elementToBeClickable(
-      TranslationTabFeedbackButton,
+      FeedbackButton,
       'Feedback tab of translation page is not clickable');
-    TranslationTabFeedbackButton.click();
+    FeedbackButton.click();
     waitFor.pageToFullyLoad();
   };
 
-  this.expectActiveTabToRemainSame = function() {
+  this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };

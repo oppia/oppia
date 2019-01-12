@@ -1021,18 +1021,18 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
       explorationEditorMainTab.moveToState('two');
       explorationEditorPage.navigateToTranslationTab();
-      explorationEditorTranslationTab.navigateToTranslationTabFeedback();
+      explorationEditorTranslationTab.navigateToFeedbackTab();
       explorationEditorPage.saveChanges();
-      explorationEditorTranslationTab.expectActiveTabToRemainSame();
+      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
 
       workflow.publishExploration();
 
       explorationEditorPage.navigateToMainTab();
       explorationEditorMainTab.addHint('This is hint3.');
       explorationEditorPage.navigateToTranslationTab();
-      explorationEditorTranslationTab.navigateToTranslationTabFeedback();
+      explorationEditorTranslationTab.navigateToFeedbackTab();
       explorationEditorPage.saveChanges('Ok');
-      explorationEditorTranslationTab.expectActiveTabToRemainSame();
+      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
     });
 
   afterEach(function() {
