@@ -20,7 +20,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(file_models,) = models.Registry.import_models([models.NAMES.file])
+(file_models, base_models) = models.Registry.import_models(
+    [models.NAMES.file, models.NAMES.base_model])
 
 
 class FileMetadataModelTest(test_utils.GenericTestBase):
@@ -90,13 +91,14 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         self.assertIsNone(retrieved_model)
 
     def test_get_model_strict_with_no_model_present_raises_error(self):
-        with self.assertRaisesRegexp(Exception, (
-            'Entity for class FileMetadataModel '
-            'with id /exp_id1/path/to/file2.png not found')):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError, (
+                'Entity for class FileMetadataModel '
+                'with id /exp_id1/path/to/file2.png not found')):
             file_models.FileMetadataModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
-    def test_get_version_returns_model_with_desired_version(self):
+    def test_get_version_with_version_present_returns_correct_model(self):
         file_metadata_model = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -109,6 +111,18 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         retrieved_model = file_models.FileMetadataModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
         self.assertEqual(file_metadata_model.key, retrieved_model.key)
+
+    def test_get_version_with_version_absent_raises_error(self):
+        file_metadata_model = file_models.FileMetadataModel.create(
+            'exp_id1', 'path/to/file1.png')
+        file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError, (
+                'Entity for class FileMetadataSnapshotContentModel with id '
+                '/exp_id1/path/to/file1.png-2 not found')):
+            file_models.FileMetadataModel.get_version(
+                'exp_id1', 'path/to/file1.png', 2)
 
     def test_commit_updates_version_of_stored_model(self):
         file_metadata_model = file_models.FileMetadataModel.create(
@@ -153,9 +167,10 @@ class FileModelTest(test_utils.GenericTestBase):
         self.assertIsNone(retrieved_model)
 
     def test_get_model_strict_with_no_model_present_raises_erro(self):
-        with self.assertRaisesRegexp(Exception, (
-            'Entity for class FileModel '
-            'with id /exp_id1/path/to/file2.png not found')):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError, (
+                'Entity for class FileModel '
+                'with id /exp_id1/path/to/file2.png not found')):
             file_models.FileModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
@@ -167,7 +182,7 @@ class FileModelTest(test_utils.GenericTestBase):
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
         self.assertEqual(file_model.version, 1)
 
-    def test_get_version_returns_model_with_desired_version(self):
+    def test_get_version_with_version_present_returns_correct_model(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -186,3 +201,15 @@ class FileModelTest(test_utils.GenericTestBase):
             'exp_id1', 'path/to/file1.png', 2)
         self.assertEqual(file_model.key, retrieved_model.key)
         self.assertEqual(retrieved_model.content, 'file_contents')
+
+    def test_get_version_with_version_absent_raises_error(self):
+        file_model = file_models.FileModel.create(
+            'exp_id1', 'path/to/file1.png')
+        file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError, (
+                'Entity for class FileSnapshotContentModel with id '
+                '/exp_id1/path/to/file1.png-2 not found')):
+            file_models.FileModel.get_version(
+                'exp_id1', 'path/to/file1.png', 2)
