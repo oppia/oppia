@@ -53,21 +53,15 @@ oppia.directive('stateContentEditor', [
 
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
-          $scope.isCardHeightLimitReached = false;
-          $scope.showCardHeightLimitWarning = true;
+          $scope.cardHeightLimitWarningIsShown = true;
 
-          var cardHeightWatcher = $scope.$watch(function() {
+          $scope.isCardHeightLimitReached = function() {
             var height = $('.oppia-learner-view-card-top-section').height();
-            if (height > 630) {
-              $scope.isCardHeightLimitReached = true;
-            } else {
-              $scope.isCardHeightLimitReached = false;
-            }
-          });
+            return (height > 630);
+          };
 
           $scope.hideCardHeightLimitWarning = function() {
-            $scope.showCardHeightLimitWarning = false;
-            cardHeightWatcher();
+            $scope.cardHeightLimitWarningIsShown = false;
           };
 
           var saveContent = function() {

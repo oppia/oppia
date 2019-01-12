@@ -50,7 +50,7 @@
     <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
     <div style="clear: both;"></div>
   </div>
-  <div ng-if="isCardHeightLimitReached && showCardHeightLimitWarning">
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown">
     <span class="oppia-card-height-limit-warning">
       <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
       <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
