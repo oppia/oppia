@@ -37,10 +37,8 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
 
     ContentIdsToAudioTranslations.prototype.getAudioTranslation = function(
         contentId, langCode) {
-      if (this._contentIdsToAudioTranslations[contentId] !== undefined) {
-        return this._contentIdsToAudioTranslations[contentId][
-          langCode];
-      }
+      return this._contentIdsToAudioTranslations[contentId][
+        langCode];
     };
 
     ContentIdsToAudioTranslations.prototype.markAllAudioAsNeedingUpdate = (
