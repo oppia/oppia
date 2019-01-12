@@ -50,8 +50,7 @@ jobs:
     # variables and are therefore not available for forks of the repository.
     # For more details, refer to https://docs.travis-ci.com/user/environment-variables#encrypting-environment-variables
     if: branch = develop AND type = push
-    env: RUN_E2E_TESTS_MOBILE=false
-    # TODO(apb7): Enable mobile tests. See Issue #5839.
+    env: RUN_E2E_TESTS_MOBILE=true
 
 notifications:
   email:
