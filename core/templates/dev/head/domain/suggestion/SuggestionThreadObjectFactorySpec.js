@@ -29,7 +29,7 @@ describe('Suggestion thread object factory', function() {
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
-  it('should create a new suggestion thread from a backend dict.', function(){
+  it('should create a new suggestion thread from a backend dict.', function() {
     suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',

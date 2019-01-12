@@ -58,11 +58,15 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
     def _get_swap_context(self):
+        """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
+        value with ALL_CC_MANAGERS_FOR_TESTS.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _run_job(self):
+        """Runs the job, then processes and flushes all the pending tasks."""
         self.process_and_flush_pending_tasks()
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
@@ -72,6 +76,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
     def _run_job_and_check_results(
             self, exp_id, expected_thread_analytics_dict):
+        """Runs the job and checks the thread analytics dict."""
         self._run_job()
         self.assertEqual(
             MockFeedbackAnalyticsAggregator.get_thread_analytics(
@@ -436,12 +441,18 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
     def _get_swap_context(self):
+        """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
+        value with ALL_CC_MANAGERS_FOR_TESTS.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _flush_tasks_and_check_analytics(
             self, exp_id, expected_thread_analytics_dict):
+        """Processes and flushes the pending tasks, then checks the thread
+        analytics dict.
+        """
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             MockFeedbackAnalyticsAggregator.get_thread_analytics(

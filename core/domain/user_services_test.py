@@ -924,6 +924,9 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 
 
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for testing that the last login time for a user updates
+    correctly.
+    """
 
     def setUp(self):
         """Create exploration with two versions."""
@@ -945,7 +948,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # After logging in and requesting a URL, the last_logged_in property is
         # set.
         self.login(self.VIEWER_EMAIL)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        self.get_html_response(feconf.LIBRARY_INDEX_URL)
         self.assertIsNotNone(
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
@@ -963,7 +966,11 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # Without explicitly defining the type of the patched datetimes, NDB
         # validation checks for datetime.datetime instances fail.
         class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
             def __instancecheck__(cls, other):
+                """Validates whether the given instance is a datatime
+                instance.
+                """
                 return isinstance(other, original_datetime_type)
 
         class MockDatetime11Hours(datetime.datetime):
@@ -971,6 +978,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
         class MockDatetime13Hours(datetime.datetime):
@@ -978,11 +986,12 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 13 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=13)
 
         with self.swap(datetime, 'datetime', MockDatetime11Hours):
             self.login(self.VIEWER_EMAIL)
-            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
@@ -990,7 +999,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
         with self.swap(datetime, 'datetime', MockDatetime13Hours):
             self.login(self.VIEWER_EMAIL)
-            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
@@ -998,6 +1007,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for testing the time the user last edited an
+    exploration updates correctly.
+    """
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1069,6 +1081,9 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for the time the user last created an exploration
+    updates correctly.
+    """
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 

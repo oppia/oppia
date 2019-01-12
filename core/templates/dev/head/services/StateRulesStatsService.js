@@ -29,9 +29,9 @@ oppia.factory('StateRulesStatsService', [
        *
        * @param {Object!} state
        * @return {Boolean} whether given state has an implementation for
-       *     displaying the issues overview tab in the State Editor.
+       *     displaying the improvements overview tab in the State Editor.
        */
-      stateSupportsIssuesOverview: function(state) {
+      stateSupportsImprovementsOverview: function(state) {
         return state.interaction.id === 'TextInput';
       },
 

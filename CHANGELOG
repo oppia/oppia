@@ -1,12 +1,68 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.1 (20 December 2018)
+-------------------------
+Updates to landing pages:
+* Updates to the text on the stewards page. (#5912)
+* Add landing page for parents and teachers. (#5905)
+
+Development workflow:
+* Fix #5466: Added check to enforce that all name of controllers end with "Handler" or "Page" (#5878)
+* Fix part of #5476: Enforce docstring arg order (#5844)
+* Fix #5843: Changes _check_comment to check for spaces and capitals (#5852)
+* Fix #5809: Add check to match line breaks in controller dependencies (#5833)
+* Fix docstrings tests, Swapped if blocks for _check_docstrings (#5752)
+* Remove mobile tests env var for PR builds and add a job for it (#5835)
+* Update bug_report.md (#5866)
+* Fix #5896: Set threads' daemon property to False (#5897)
+
+New Structures:
+* Add paging for questions in topic editor and story editor modifications (#5892)
+* UI modifications to story editor. (#5724)
+* Add functionality to Publish stories (#5709)
+* Revert some changes in #5810. (#5841)
+
+Improving test coverage:
+* Fix #5861: Updated Test for Email Truncation (#5915)
+* Fix part of #5134: Added missing tests for question domain. (#5887)
+* Fix part of #5134: Added backend tests for `core.domain.learner_progress_domain` (#5859)
+* Fix part of #5134: Backend test for core.controllers.tasks (#5840)
+* Fix #5787: Add a unit test to check blob type for uploaded audio. (#5858)
+
+Code health and documentation:
+* Added comment to Image Uploader fix (#5895)
+* Fix part of #4374: Add docstrings to python files (#5871)
+* Some follow-up fixes to style issues in #5730. (#5842)
+* Added missing docstrings in scripts/common.py and scripts/docstrings_checker.py (#5870)
+* Added missing docstrings in scripts/build.py (#5808)
+* Fix part of #4374: Add docstrings to the python files. (#5849)
+* Added docstring for clamp method and simplified usage. (#5834)
+
+Improvements to editor features
+* Fix #3691: Implements email functionality for failed ML training job (#5902)
+* Fix #5606: Logic Proof Truncation and Display (#5864)
+* Change 'compliment' feedback to use a green background colour. (#5865)
+* Fix #5746: Added saving log and disabled buttons while saving (#5764)
+* Fix #5777: Add statename in translation tab (#5830)
+* Fix #5821: Adjust placement of accessibility tooltips in the exploration editor. (#5824)
+
+Updates to the library and splash pages
+* Fix #5907: Increase width of search input box such that whole text is visible (#5910)
+* Swap the order of the browse/create buttons on the splash page. (#5828)
+
+Infrastructure changes
+* Consolidate image and audio handlers to use one AssetDevHandler that handles all assets (#5857)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+
 v2.7.0 (29 November 2018)
 -------------------------
 Bug fixes:
 * Fix video on fractions landing (#5906)
 * Fix profile picture modal not showing picture when we add it again after discard it (#5891)
 * Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
-* Added atts check for audio bar. (#5880)
+* Added automaticTextToSpeech check for audio bar. (#5880)
 * Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
 * Fix #5814: Double edit button in exploration player navbar (#5815)
 * Remove code duplication for calculating answer choices (#5779)
@@ -3969,4 +4025,3 @@ v1.0.1 (29 Mar 2013)
 v1.0 (22 Mar 2013)
 ------------------
 * Initial release
-

@@ -90,7 +90,6 @@ class SkillEditorPage(base.BaseHandler):
 
         self.values.update({
             'skill_id': skill.id,
-            'nav_mode': feconf.NAV_MODE_CREATE,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -156,7 +155,7 @@ class SkillEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         skill_domain.Skill.require_valid_skill_id(skill_id)
 

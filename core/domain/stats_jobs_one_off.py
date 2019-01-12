@@ -92,7 +92,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_model.deleted:
             return
 
-        RELEVANT_COMMIT_CMDS = [
+        relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,
             exp_domain.CMD_RENAME_STATE,
             exp_domain.CMD_DELETE_STATE,
@@ -140,7 +140,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     change_list = [
                         exp_domain.ExplorationChange(change_dict)
                         for change_dict in change_dicts
-                        if change_dict['cmd'] in RELEVANT_COMMIT_CMDS]
+                        if change_dict['cmd'] in relevant_commit_cmds]
                     exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                         change_list)
 
@@ -523,7 +523,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             dict. A dict representation of an ExplorationStatsModel
                 with updated state_stats_mapping and version.
         """
-        RELEVANT_COMMIT_CMDS = [
+        relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,
             exp_domain.CMD_RENAME_STATE,
             exp_domain.CMD_DELETE_STATE,
@@ -533,7 +533,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         change_list = [
             exp_domain.ExplorationChange(change_dict)
             for change_dict in change_dicts
-            if change_dict['cmd'] in RELEVANT_COMMIT_CMDS]
+            if change_dict['cmd'] in relevant_commit_cmds]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Handling state deletions, renames and additions (in that order). The
