@@ -61,7 +61,7 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             file_metadata_model1, file_metadata_model_list[0])
 
-    def test_create_creates_model_with_correct_id_and_deleted_status_as_true(
+    def test_create_creates_model_with_correct_id_and_deleted_status_as_false(
             self):
         file_metadata_model1 = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
@@ -75,44 +75,42 @@ class FileMetadataModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             file_metadata_model2.id, '/exp_id1/path/to/file2.png')
 
-    def test_get_model_returns_the_correct_model_if_model_is_present(self):
+    def test_get_model_with_model_present_returns_the_correct_model(self):
         file_metadata_model = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        actual_model = file_models.FileMetadataModel.get_model(
+        retrieved_model = file_models.FileMetadataModel.get_model(
             'exp_id1', 'path/to/file1.png')
 
-        self.assertEqual(actual_model, file_metadata_model)
+        self.assertEqual(retrieved_model, file_metadata_model)
 
-    def test_get_model_returns_None_if_model_is_absent_and_strict_fail_is_false(
-            self):
-        actual_model = file_models.FileMetadataModel.get_model(
+    def test_get_model_non_strict_with_no_model_present_returns_none(self):
+        retrieved_model = file_models.FileMetadataModel.get_model(
             'exp_id1', 'path/to/file2.png')
-        self.assertEqual(actual_model, None)
+        self.assertIsNone(retrieved_model)
 
-    def test_get_model_raises_error_if_model_is_absent_and_strict_fail_is_true(
-            self):
+    def test_get_model_strict_with_no_model_present_raises_error(self):
         with self.assertRaisesRegexp(Exception, (
             'Entity for class FileMetadataModel '
             'with id /exp_id1/path/to/file2.png not found')):
             file_models.FileMetadataModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
-    def test_get_version_returns_instance_with_desired_version(self):
+    def test_get_version_returns_model_with_desired_version(self):
         file_metadata_model = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
-        actual_model = file_models.FileMetadataModel.get_version(
+        retrieved_model = file_models.FileMetadataModel.get_version(
             'exp_id1', 'path/to/file1.png', 1)
-        self.assertEqual(file_metadata_model.key, actual_model.key)
+        self.assertEqual(file_metadata_model.key, retrieved_model.key)
 
         file_metadata_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        actual_model = file_models.FileMetadataModel.get_version(
+        retrieved_model = file_models.FileMetadataModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
-        self.assertEqual(file_metadata_model.key, actual_model.key)
+        self.assertEqual(file_metadata_model.key, retrieved_model.key)
 
-    def test_commit_updates_version_of_instance(self):
+    def test_commit_updates_version_of_stored_model(self):
         file_metadata_model = file_models.FileMetadataModel.create(
             'exp_id1', 'path/to/file1.png')
         self.assertEqual(file_metadata_model.version, 0)
@@ -128,7 +126,7 @@ class FileModelTest(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             file_models.FileModel.get_new_id('entity1')
 
-    def test_create_creates_model_with_correct_id_and_deleted_status_as_true(
+    def test_create_creates_model_with_correct_id_and_deleted_status_as_false(
             self):
         file_model1 = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
@@ -140,30 +138,28 @@ class FileModelTest(test_utils.GenericTestBase):
         self.assertEqual(file_model2.deleted, False)
         self.assertEqual(file_model2.id, '/exp_id1/path/to/file2.png')
 
-    def test_get_model_returns_the_correct_model_if_model_is_present(self):
+    def test_get_model_with_model_present_returns_the_correct_model(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        actual_model = file_models.FileModel.get_model(
+        retrieved_model = file_models.FileModel.get_model(
             'exp_id1', 'path/to/file1.png')
 
-        self.assertEqual(actual_model, file_model)
+        self.assertEqual(retrieved_model, file_model)
 
-    def test_get_model_returns_None_if_model_is_absent_and_strict_fail_is_false(
-            self):
-        actual_model = file_models.FileModel.get_model(
+    def test_get_model_non_strict_with_no_model_present_returns_none(self):
+        retrieved_model = file_models.FileModel.get_model(
             'exp_id1', 'path/to/file2.png')
-        self.assertEqual(actual_model, None)
+        self.assertIsNone(retrieved_model)
 
-    def test_get_model_raises_error_if_model_is_absent_and_strict_fail_is_true(
-            self):
+    def test_get_model_strict_with_no_model_present_raises_erro(self):
         with self.assertRaisesRegexp(Exception, (
             'Entity for class FileModel '
             'with id /exp_id1/path/to/file2.png not found')):
             file_models.FileModel.get_model(
                 'exp_id1', 'path/to/file2.png', True)
 
-    def test_commit_updates_version_of_instance(self):
+    def test_commit_updates_version_of_stored_model(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
         self.assertEqual(file_model.version, 0)
@@ -171,22 +167,22 @@ class FileModelTest(test_utils.GenericTestBase):
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
         self.assertEqual(file_model.version, 1)
 
-    def test_get_version_returns_instance_with_desired_version(self):
+    def test_get_version_returns_model_with_desired_version(self):
         file_model = file_models.FileModel.create(
             'exp_id1', 'path/to/file1.png')
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
-        actual_model = file_models.FileModel.get_version(
+        retrieved_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 1)
-        self.assertEqual(file_model.key, actual_model.key)
-        self.assertEqual(file_model.content, actual_model.content)
+        self.assertEqual(file_model.key, retrieved_model.key)
+        self.assertEqual(file_model.content, retrieved_model.content)
 
         file_model.content = 'file_contents'
         commit_cmds = [{
             'cmd': 'edit'
         }]
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, commit_cmds)
-        actual_model = file_models.FileModel.get_version(
+        retrieved_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
-        self.assertEqual(file_model.key, actual_model.key)
-        self.assertEqual(actual_model.content, 'file_contents')
+        self.assertEqual(file_model.key, retrieved_model.key)
+        self.assertEqual(retrieved_model.content, 'file_contents')
