@@ -25,7 +25,7 @@ oppia.directive('createActivityButton', [
       controller: [
         '$scope', '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
-        'SiteAnalyticsService', 'UrlService', 'UserService', 
+        'SiteAnalyticsService', 'UrlService', 'UserService',
         'ALLOW_YAML_FILE_UPLOAD',
         function(
             $scope, $timeout, $window, $uibModal,
