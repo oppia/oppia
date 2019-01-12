@@ -67,7 +67,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.testapp.get(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             json_response = self.post_json(
@@ -117,10 +117,9 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s?cursor=' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
-            self.assertEqual(response.status_int, 200)
             self.logout()
 
             topic_services.assign_role(
@@ -137,11 +136,10 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             self.logout()
 
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s?cursor=' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ), expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                ), expected_status_int=401)
             self.logout()
 
 
@@ -152,12 +150,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         # editable subtopic data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                    self.topic_id, 1), expected_status_int=401)
             self.logout()
 
             # Check that topic managers not assigned to this topic can
@@ -167,7 +163,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             topic_services.assign_role(
@@ -180,7 +184,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             # Check that admins can access the editable subtopic data.
@@ -189,7 +201,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
 
@@ -202,25 +222,22 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             # Check that non-admin and topic_manager cannot access the editor
             # page.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                expected_status_int=401)
             self.logout()
 
             # Check that admins can access the editor page.
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
             self.logout()
 
             # Check that any topic manager can access the editor page.
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(
+            self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
             self.logout()
 
 
@@ -228,11 +245,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         # Check that non-admins cannot access the editable topic data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                expected_status_int=401)
             self.logout()
 
             # Check that admins can access the editable topic data.
@@ -261,10 +277,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
                 'subtopic_id': 1,
-                'new_value': '<p>New Data</p>'
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
             }, {
                 'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
@@ -273,15 +295,38 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
-                'new_value': '<p>New Value</p>',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
                 'subtopic_id': 2
             }]
         }
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.testapp.get(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
 
@@ -301,33 +346,49 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual(
-                '<p>New Data</p>', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 2))
-            self.assertEqual(
-                '<p>New Value</p>', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
+                    }
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             # Test that any topic manager cannot edit the topic.
             self.login(self.TOPIC_MANAGER_EMAIL)
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                change_cmd, csrf_token=csrf_token, expected_status_int=401)
             self.logout()
 
             # Check that non-admins and non-topic managers cannot edit a topic.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
     def test_editable_topic_handler_put_for_assigned_topic_manager(self):
         change_cmd = {
@@ -342,10 +403,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
                 'subtopic_id': 1,
-                'new_value': '<p>New Data</p>'
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
             }, {
                 'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
@@ -354,9 +421,32 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
-                'new_value': '<p>New Value</p>',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
                 'subtopic_id': 2
             }]
         }
@@ -367,7 +457,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.testapp.get(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             # Check that the topic manager can edit the topic now.
@@ -392,11 +482,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
             # Check that non-admins cannot delete a topic.
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.delete(
+            self.delete_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                expected_status_int=401)
             self.logout()
 
 
@@ -406,38 +495,33 @@ class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
         """Test the assign topic manager role for a topic functionality."""
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.testapp.get(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
 
             # Test for when assignee does not have sufficient rights to become a
             # manager for a topic.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s/%s' % (
                     feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.new_user_id),
-                {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                {}, csrf_token=csrf_token, expected_status_int=401)
 
             # Test for valid case.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s/%s' % (
                     feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.topic_manager_id),
-                {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=200)
+                {}, csrf_token=csrf_token)
             self.logout()
 
             # Test for when committer doesn't have sufficient rights to assign
             # someone as manager.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s/%s' % (
                     feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.new_user_id),
-                {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                {}, csrf_token=csrf_token, expected_status_int=401)
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
@@ -456,11 +540,10 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
             self.login(self.NEW_USER_EMAIL)
             # Test that other users cannot access topic rights.
-            response = self.testapp.get(
+            self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
+                expected_status_int=401)
             self.logout()
 
 
@@ -470,18 +553,18 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.testapp.get(
+            response = self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             # Test whether admin can publish and unpublish a topic.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
                 {'publish_status': True}, csrf_token=csrf_token)
             topic_rights = topic_services.get_topic_rights(self.topic_id)
             self.assertTrue(topic_rights.topic_is_published)
 
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
                 {'publish_status': False}, csrf_token=csrf_token)
@@ -491,10 +574,9 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
             self.login(self.NEW_USER_EMAIL)
             # Test that other users cannot access topic rights.
-            json_response = self.put_json(
+            self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
                 {'publish_status': False}, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
+                expected_status_int=401)
             self.logout()
