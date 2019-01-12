@@ -323,7 +323,6 @@ oppia.controller('CreatorDashboard', [
     $scope.showSuggestionModal = function() {
       ShowSuggestionModalForCreatorViewService.showSuggestionModal(
         $scope.activeThread.suggestion.suggestionType,
-        'creator',
         {
           activeThread: $scope.activeThread,
           suggestionsToReviewList: $scope.suggestionsToReviewList,

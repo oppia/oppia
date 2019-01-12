@@ -471,7 +471,6 @@ oppia.controller('LearnerDashboard', [
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       ShowSuggestionModalForLearnerViewService.showSuggestionModal(
         'edit_exploration_state_content',
-        'learner',
         {
           newContent: newContent,
           oldContent: oldContent,

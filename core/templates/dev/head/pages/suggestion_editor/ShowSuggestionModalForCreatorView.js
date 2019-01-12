@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the edit state content suggestion in creator
- view.
+ * @fileoverview Controller to show suggestion modal in creator view.
  */
 
-oppia.controller('EditStateContentSuggestionForCreatorView', [
+oppia.controller('ShowSuggestionModalForCreatorView', [
   '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
   'suggestionStatus', 'description', 'oldContent',
   'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
+  'SuggestionObjectFactory',
   function(
       $scope, $log, $uibModalInstance, suggestionIsHandled,
       suggestionStatus, description, oldContent,
-      newContent, canReviewActiveThread, stateName, suggestionType
+      newContent, canReviewActiveThread, stateName, suggestionType,
+      SuggestionObjectFactory
   ) {
     var SUGGESTION_ACCEPTED_MSG = (
       'This suggestion has already been accepted.');
@@ -35,11 +36,6 @@ oppia.controller('EditStateContentSuggestionForCreatorView', [
     var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
     var SUGGESTION_ACCEPTED = 'accepted';
     var SUGGESTION_REJECTED = 'rejected';
-
-    $scope.isInCreatorMode = true;
-    $scope.isInLearnerMode = false;
-    $scope.isInEditorMode = false;
-    $scope.heading = 'I18N_CREATOR_DASHBOARD_SUGGESTION_TEXT';
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;
     $scope.canAccept = $scope.isNotHandled;
@@ -69,19 +65,23 @@ oppia.controller('EditStateContentSuggestionForCreatorView', [
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
     $scope.suggestionEditorIsShown = false;
     $scope.acceptSuggestion = function() {
-      $uibModalInstance.close({
-        action: ACTION_ACCEPT_SUGGESTION,
-        commitMessage: $scope.commitMessage,
-        reviewMessage: $scope.reviewMessage,
-      });
+      SuggestionObjectFactory.acceptSuggestion(
+        $uibModalInstance,
+        {
+          action: ACTION_ACCEPT_SUGGESTION,
+          commitMessage: $scope.commitMessage,
+          reviewMessage: $scope.reviewMessage,
+        });
     };
 
     $scope.rejectSuggestion = function() {
-      $uibModalInstance.close({
-        action: ACTION_REJECT_SUGGESTION,
-        commitMessage: null,
-        reviewMessage: $scope.reviewMessage
-      });
+      SuggestionObjectFactory.rejectSuggestion(
+        $uibModalInstance,
+        {
+          action: ACTION_REJECT_SUGGESTION,
+          commitMessage: null,
+          reviewMessage: $scope.reviewMessage
+        });
     };
     $scope.editSuggestion = function() {
       $scope.suggestionEditorIsShown = true;

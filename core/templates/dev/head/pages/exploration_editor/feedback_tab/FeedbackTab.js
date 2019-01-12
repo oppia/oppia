@@ -130,7 +130,6 @@ oppia.controller('FeedbackTab', [
     $scope.showSuggestionModal = function() {
       ShowSuggestionModalForEditorViewService.showSuggestionModal(
         $scope.activeThread.suggestion.suggestionType,
-        'editor',
         {
           activeThread: $scope.activeThread,
           setActiveThread: $scope.setActiveThread,

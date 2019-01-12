@@ -1,0 +1,63 @@
+<div class="modal-header">
+  <h3>Review Suggestion</h3>
+</div>
+
+<div class="modal-body">
+  <section ng-class="['oppia-suggestion-review-container', {'oppia-edit-mode': suggestionEditorIsShown}]">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong>Current:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind ng-if="oldContent" html-data="oldContent.html">
+        </angular-html-bind>
+        <div ng-if="!oldContent" style="color: red;">Oops! This state no longer exists!</div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong>Suggested:</strong>
+      <div class="oppia-suggestion-review-panel" ng-show="!suggestionEditorIsShown">
+        <angular-html-bind html-data="newContent.html">
+        </angular-html-bind>
+      </div>
+      <div ng-show="suggestionEditorIsShown">
+        <ck-editor-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-rte>
+        <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
+      </div>
+    </div>
+  </section>
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canReviewActiveThread">
+    Review message (required if rejecting):
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message"type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <div ng-show="errorMessage && !isResubmitButtonShown()" class="oppia-suggestion-review-error">
+    <[ errorMessage ]>
+  </div>
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-info" ng-if="isEditButtonShown()" ng-click="editSuggestion()">Edit</button>
+  <button class="btn btn-primary" ng-if="isResubmitButtonShown()" ng-disabled="isResubmitButtonDisabled()" ng-click="resubmitChanges()">Submit Changes</button>
+  <button class="btn btn-danger" ng-show="canReviewActiveThread && isNotHandled" ng-click="rejectSuggestion()">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
+</div>
+<style type="text/css">
+
+.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(1) {
+  width: 100%;
+  height: 35%;
+}
+.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(2) {
+  width: 100%;
+  height: 55%;
+  margin-top: 30px;
+}
+.oppia-edit-mode .oppia-rte {
+  max-height: 100px;
+  overflow-y: scroll;
+}
+.oppia-edit-mode .oppia-review-message {
+  margin-top: 10px;
+}
+</style>

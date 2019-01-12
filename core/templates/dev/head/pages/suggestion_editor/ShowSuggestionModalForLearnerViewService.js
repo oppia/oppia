@@ -23,7 +23,7 @@ oppia.factory('ShowSuggestionModalForLearnerViewService', [
       UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'edit_state_content_suggestion_modal_directive.html'
+      'learner_view_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(
@@ -42,12 +42,12 @@ oppia.factory('ShowSuggestionModalForLearnerViewService', [
             return description;
           }
         },
-        controller: 'EditStateContentSuggestionForLearnerView'
+        controller: 'ShowSuggestionModalForLearnerView'
       });
     };
 
     return {
-      showSuggestionModal: function(suggestionType, view, extraParams) {
+      showSuggestionModal: function(suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.newContent,

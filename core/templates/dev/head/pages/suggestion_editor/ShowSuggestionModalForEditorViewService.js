@@ -26,7 +26,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
       ExplorationDataService, StateObjectFactory, $log) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'edit_state_content_suggestion_modal_directive.html'
+      'editor_view_suggestion_modal_directive.html'
     );
 
     var ACTION_ACCEPT_SUGGESTION = 'accept';
@@ -63,7 +63,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             return activeThread.getReplacementHtmlFromSuggestion();
           }
         },
-        controller: 'EditStateContentSuggestionForEditorView'
+        controller: 'ShowSuggestionModalForEditorView'
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
@@ -99,7 +99,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
     };
 
     return {
-      showSuggestionModal: function(suggestionType, view, extraParams) {
+      showSuggestionModal: function(suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,

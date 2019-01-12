@@ -13,19 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the edit state content suggestion in learner
- view.
+ * @fileoverview Controller to show suggestion modal in learner view.
  */
 
-oppia.controller('EditStateContentSuggestionForLearnerView', [
+oppia.controller('ShowSuggestionModalForLearnerView', [
   '$scope', '$uibModalInstance', 'newContent', 'oldContent',
   'description',
   function($scope, $uibModalInstance, newContent, oldContent,
       description) {
-    $scope.isInCreatorMode = false;
-    $scope.isInLearnerMode = true;
-    $scope.isInEditorMode = false;
-    $scope.heading = 'I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT';
     $scope.newContent = newContent;
     $scope.oldContent = oldContent;
     $scope.description = description;

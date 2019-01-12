@@ -23,7 +23,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
       UrlInterpolationService, $http) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'edit_state_content_suggestion_modal_directive.html'
+      'creator_view_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(
@@ -59,7 +59,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             return activeThread.suggestion.suggestionType;
           }
         },
-        controller: 'EditStateContentSuggestionForCreatorView'
+        controller: 'ShowSuggestionModalForCreatorView'
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
@@ -118,7 +118,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
     };
 
     return {
-      showSuggestionModal: function(suggestionType, view, extraParams) {
+      showSuggestionModal: function(suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,

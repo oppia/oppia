@@ -13,19 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the edit state content suggestion in editor
- view.
+ * @fileoverview Controller to show suggestion modal in editor view.
  */
 
 // TODO(Allan): Implement ability to edit suggestions before applying.
-oppia.controller('EditStateContentSuggestionForEditorView', [
+oppia.controller('ShowSuggestionModalForEditorView', [
   '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
   'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
   'description', 'currentContent', 'newContent', 'EditabilityService',
+  'SuggestionObjectFactory',
   function(
       $scope, $log, $uibModalInstance, suggestionIsHandled,
       suggestionIsValid, unsavedChangesExist, suggestionStatus,
-      description, currentContent, newContent, EditabilityService) {
+      description, currentContent, newContent, EditabilityService,
+      SuggestionObjectFactory) {
     var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
       'accepted.';
     var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -38,10 +39,6 @@ oppia.controller('EditStateContentSuggestionForEditorView', [
     var ACTION_ACCEPT_SUGGESTION = 'accept';
     var ACTION_REJECT_SUGGESTION = 'reject';
 
-    $scope.isInCreatorMode = false;
-    $scope.isInLearnerMode = false;
-    $scope.isInEditorMode = true;
-    $scope.heading = 'I18N_EDITOR_MODE_SUGGESTION_TEXT';
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.canReject = $scope.canEdit && $scope.isNotHandled;
@@ -68,25 +65,29 @@ oppia.controller('EditStateContentSuggestionForEditorView', [
     $scope.reviewMessage = null;
 
     $scope.acceptSuggestion = function() {
-      $uibModalInstance.close({
-        action: ACTION_ACCEPT_SUGGESTION,
-        commitMessage: $scope.commitMessage,
-        reviewMessage: $scope.reviewMessage,
-        // TODO(sll): If audio files exist for the content being
-        // replaced, implement functionality in the modal for the
-        // exploration creator to indicate whether this change
-        // requires the corresponding audio subtitles to be updated.
-        // For now, we default to assuming that the changes are
-        // sufficiently small as to warrant no updates.
-        audioUpdateRequired: false
-      });
+      SuggestionObjectFactory.acceptSuggestion(
+        $uibModalInstance,
+        {
+          action: ACTION_ACCEPT_SUGGESTION,
+          commitMessage: $scope.commitMessage,
+          reviewMessage: $scope.reviewMessage,
+          // TODO(sll): If audio files exist for the content being
+          // replaced, implement functionality in the modal for the
+          // exploration creator to indicate whether this change
+          // requires the corresponding audio subtitles to be updated.
+          // For now, we default to assuming that the changes are
+          // sufficiently small as to warrant no updates.
+          audioUpdateRequired: false
+        });
     };
 
     $scope.rejectSuggestion = function() {
-      $uibModalInstance.close({
-        action: ACTION_REJECT_SUGGESTION,
-        reviewMessage: $scope.reviewMessage
-      });
+      SuggestionObjectFactory.rejectSuggestion(
+        $uibModalInstance,
+        {
+          action: ACTION_REJECT_SUGGESTION,
+          reviewMessage: $scope.reviewMessage
+        });
     };
 
     $scope.cancelReview = function() {
