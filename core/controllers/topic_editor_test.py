@@ -163,7 +163,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             topic_services.assign_role(
@@ -176,7 +184,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             # Check that admins can access the editable subtopic data.
@@ -185,7 +201,15 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
 
@@ -253,10 +277,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
                 'subtopic_id': 1,
-                'new_value': '<p>New Data</p>'
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
             }, {
                 'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
@@ -265,9 +295,32 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
-                'new_value': '<p>New Value</p>',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
                 'subtopic_id': 2
             }]
         }
@@ -293,14 +346,34 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 1))
-            self.assertEqual(
-                '<p>New Data</p>', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {}
+                },
+            }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
                     self.topic_id, 2))
-            self.assertEqual(
-                '<p>New Value</p>', json_response['subtopic_page']['html_data'])
+            self.assertEqual({
+                'subtitled_html': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'content_ids_to_audio_translations': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
+                    }
+                },
+            }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
             # Test that any topic manager cannot edit the topic.
@@ -330,10 +403,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
                 'subtopic_id': 1,
-                'new_value': '<p>New Data</p>'
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
             }, {
                 'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
@@ -342,9 +421,32 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }, {
                 'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
-                'property_name': 'html_data',
-                'old_value': '',
-                'new_value': '<p>New Value</p>',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'content': {}
+                },
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                },
                 'subtopic_id': 2
             }]
         }
