@@ -97,4 +97,4 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if message == 'FAILED':
             yield (message, thread_ids)
         else:
-            yield (len(thread_ids))
+            yield len(thread_ids)
