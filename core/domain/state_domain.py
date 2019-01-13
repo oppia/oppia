@@ -1300,29 +1300,6 @@ class State(object):
                 content_ids_to_audio_translations_dict.iteritems())
         }
 
-    def add_hint(self, hint_content):
-        """Add a new hint to the list of hints.
-
-        Args:
-            hint_content: str. The hint text.
-        """
-        self.interaction.hints.append(Hint(hint_content))
-
-    def delete_hint(self, index):
-        """Delete a hint from the list of hints.
-
-        Args:
-            index: int. The position of the hint in the list of hints.
-
-        Raises:
-            IndexError: Index is less than 0.
-            IndexError: Index is greater than or equal than the length of hints
-                list.
-        """
-        if index < 0 or index >= len(self.interaction.hints):
-            raise IndexError('Hint index out of range')
-        del self.interaction.hints[index]
-
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
