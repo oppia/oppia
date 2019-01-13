@@ -129,8 +129,6 @@ oppia.factory('ExplorationSaveService', [
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
-              whenModalClosed.resolve();
             };
           }
         ]
@@ -152,6 +150,9 @@ oppia.factory('ExplorationSaveService', [
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
+      }, function() {
+        AlertsService.clearWarnings();
+        whenModalClosed.resolve();
       });
 
       return whenModalClosed.promise;
