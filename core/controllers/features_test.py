@@ -27,6 +27,7 @@ def exploration_features_url(exp_id):
 
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
+    """Does common exploration set up for testing feature handlers."""
     EXP_ID = 'expId'
 
     def setUp(self):
@@ -41,6 +42,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 
 
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
+    """Tests for fetching whether playthrough recording is enabled."""
 
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         self.set_config_property(
@@ -71,6 +73,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
 
 class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
+    """Tests for fetching whether the improvements tab is enabled."""
 
     def test_improvements_tab_is_enabled(self):
         self.set_config_property(
