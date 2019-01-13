@@ -399,15 +399,7 @@ oppia.factory('ExplorationSaveService', [
                 };
 
                 $scope.cancel = function() {
-                  whenModalsClosed.resolve();
-                  ExplorationTitleService.restoreFromMemento();
-                  ExplorationObjectiveService.restoreFromMemento();
-                  ExplorationCategoryService.restoreFromMemento();
-                  ExplorationLanguageCodeService.restoreFromMemento();
-                  ExplorationTagsService.restoreFromMemento();
-
                   $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -446,6 +438,14 @@ oppia.factory('ExplorationSaveService', [
                   whenModalsClosed.resolve();
                 });
             }
+          }, function() {
+            whenModalsClosed.resolve();
+            ExplorationTitleService.restoreFromMemento();
+            ExplorationObjectiveService.restoreFromMemento();
+            ExplorationCategoryService.restoreFromMemento();
+            ExplorationLanguageCodeService.restoreFromMemento();
+            ExplorationTagsService.restoreFromMemento();
+            AlertsService.clearWarnings();
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.
