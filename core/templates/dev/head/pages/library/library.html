@@ -173,7 +173,7 @@
 
               <div class="oppia-library-carousel"
                    ng-swipe-right="decrementLeftmostCardIndex($index)"
-                   ng-swipe-left="incrementLeftmostCardIndex($index,group.activity_summary_dicts.length,tileDisplayCount)">
+                   ng-swipe-left="incrementLeftmostCardIndex($index)">
                 <div class="oppia-library-carousel-tiles">
                   <collection-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'collection'"
                                            collection-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
