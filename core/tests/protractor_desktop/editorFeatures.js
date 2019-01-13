@@ -917,7 +917,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
   });
 
-  it('should have all the state contents with numerical status', function() {
+  it('should have all the state contents', function() {
     users.createUser('user@translationTab.com', 'userTranslationTab');
     users.login('user@translationTab.com');
     workflow.createExploration();
