@@ -19,7 +19,8 @@
 
 oppia.factory('ExplorationPlayerStateService', [
   '$log', 'ContextService', 'EditableExplorationBackendApiService',
-  'ExplorationEngineService', 'NumberAttemptsService',
+  'ExplorationEngineService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesBackendApiService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestEngineService', 'PretestQuestionBackendApiService',
@@ -27,7 +28,8 @@ oppia.factory('ExplorationPlayerStateService', [
   'StatsReportingService', 'UrlService',
   function(
       $log, ContextService, EditableExplorationBackendApiService,
-      ExplorationEngineService, NumberAttemptsService,
+      ExplorationEngineService, ExplorationFeaturesService,
+      ExplorationFeaturesBackendApiService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestEngineService, PretestQuestionBackendApiService,
@@ -74,9 +76,15 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
-      EditableExplorationBackendApiService.fetchApplyDraftExploration(
-        explorationId
-      ).then(function(explorationData) {
+      Promise.all([
+        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          explorationId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
+      ]).then(function(combinedData) {
+        var explorationData = combinedData[0];
+        var featuresData = combinedData[1];
+        ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, callback);
         PlayerCorrectnessFeedbackEnabledService.init(
@@ -95,9 +103,13 @@ oppia.factory('ExplorationPlayerStateService', [
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var pretestQuestionsData = combinedData[1];
+        var featuresData = combinedData[2];
+        ExplorationFeaturesService.init(explorationData, featuresData);
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);

@@ -28,7 +28,6 @@ oppia.factory('PlaythroughIssuesService', [
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
-    var whitelistedExplorationIds = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
@@ -87,28 +86,10 @@ oppia.factory('PlaythroughIssuesService', [
        *    be targeting.
        * @param {number} newExplorationVersion - the version of the exploration
        *    the service will be targeting.
-       * @param {string[]=} testOnlyWhitelistedExplorationIds - a utility
-       *    parameter for tests to avoid making backend calls. This parameter
-       *    allows more explicit testing of the whitelist.
        */
-      initSession: function(
-          newExplorationId, newExplorationVersion,
-          testOnlyWhitelistedExplorationIds) {
+      initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        if (testOnlyWhitelistedExplorationIds !== undefined) {
-          whitelistedExplorationIds = testOnlyWhitelistedExplorationIds;
-        } else {
-          PlaythroughIssuesBackendApiService
-            .fetchWhitelistedExplorationsForPlaythroughs().then(
-              function(newWhitelistedExplorationIds) {
-                whitelistedExplorationIds = newWhitelistedExplorationIds;
-              });
-        }
-      },
-      isExplorationEligibleForPlaythroughIssues: function(explorationId) {
-        return whitelistedExplorationIds !== null &&
-          whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
       getIssues: function() {
         return PlaythroughIssuesBackendApiService.fetchIssues(

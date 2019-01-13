@@ -20,18 +20,18 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationStatesService',
-  'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
-  'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'PlaythroughIssuesService', 'RouterService', 'StateRulesStatsService',
+  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationFeaturesService',
+  'ExplorationStatesService', 'ExplorationDataService', 'ComputeGraphService',
+  'DateTimeFormatService', 'StatesObjectFactory',
+  'StateImprovementSuggestionService', 'ReadOnlyExplorationBackendApiService',
+  'UrlInterpolationService', 'RouterService', 'StateRulesStatsService',
   'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
-      ExplorationDataService, ComputeGraphService, DateTimeFormatService,
-      StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      PlaythroughIssuesService, RouterService, StateRulesStatsService,
+      $scope, $http, $uibModal, AlertsService, ExplorationFeaturesService,
+      ExplorationStatesService, ExplorationDataService, ComputeGraphService,
+      DateTimeFormatService, StatesObjectFactory,
+      StateImprovementSuggestionService, ReadOnlyExplorationBackendApiService,
+      UrlInterpolationService, RouterService, StateRulesStatsService,
       IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -84,8 +84,7 @@ oppia.controller('StatisticsTab', [
           var initStateName = response.exploration.init_state_name;
 
           $scope.playthroughsAreAvailable =
-            PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
-              ExplorationDataService.explorationId);
+            ExplorationFeaturesService.isPlaythroughRecordingEnabled();
           $scope.statsGraphData = ComputeGraphService.compute(
             initStateName, states);
           var improvements = (
