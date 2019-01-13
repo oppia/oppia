@@ -961,9 +961,9 @@ describe('Exploration translation', function() {
     users.logout();
   });
 
-  it('should have correct numerical status', function() {
-    users.createUser('user@translationTab.com', 'userTranslationTab');
-    users.login('user@translationTab.com');
+  it('should have a correct numerical status', function() {
+    users.createUser('user2@translationTab.com', 'user2TranslationTab');
+    users.login('user2@translationTab.com');
     workflow.createExploration();
 
     explorationEditorMainTab.setStateName('first');
