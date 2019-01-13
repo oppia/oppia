@@ -74,16 +74,16 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_message_count_job(self):
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp1.thread1'), 0)
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp2.thread2'), 0)
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp3.thread3'), 0)
         self._run_one_off_job()
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp1.thread1'), 2)
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp2.thread2'), 1)
-        self.assertEqual(feedback_services.job_get_message_count(
+        self.assertEqual(feedback_services.thread_message_count(
             'exp3.thread3'), 0)

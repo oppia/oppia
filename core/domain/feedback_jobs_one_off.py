@@ -79,7 +79,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(thread):
-        if thread.message_count is None or 0:
+        if thread.message_count in [None, 0]:
             # Assigning the value of message_count if it is None.
             thread.message_count = feedback_services.get_message_count(
                 thread.id)
