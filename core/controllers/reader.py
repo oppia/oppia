@@ -271,8 +271,8 @@ class ExplorationHandler(base.BaseHandler):
         state_classifier_mapping = {}
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
-                exploration_id, exploration.version, exploration.states))
-        for index, state_name in enumerate(exploration.states):
+                exploration_id, exploration.version, exploration.states.keys()))
+        for index, state_name in enumerate(exploration.states.keys()):
             if classifier_training_jobs[index] is not None:
                 classifier_data = classifier_training_jobs[
                     index].classifier_data
@@ -285,8 +285,6 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
-        whitelisted_exp_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -301,7 +299,6 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
-            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids,
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
         })

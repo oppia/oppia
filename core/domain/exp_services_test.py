@@ -22,6 +22,7 @@ import datetime
 import os
 import zipfile
 
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -95,6 +96,94 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+
+class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
+    """Test that classifier models are correctly mapped when an exploration
+    is reverted.
+    """
+
+    def test_reverting_an_exploration_maintains_classifier_models(self):
+        """Test that when exploration is reverted to previous version
+        it maintains appropriate classifier models mapping.
+        """
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id, title='Bridges in England',
+                category='Architecture', language_code='en')
+
+        interaction_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 'abc'},
+            }],
+            'outcome': {
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Try again'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': ['answer1', 'answer2', 'answer3'],
+            'tagged_misconception_id': None
+        }]
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
+            'new_value': {
+                'content': {},
+                'feedback_1': {},
+                'default_outcome': {}
+            }
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(job)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'A new title'
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+                    exp = exp_services.get_exploration_by_id(self.EXP_ID)
+                    # Revert exploration to previous version.
+                    exp_services.revert_exploration(
+                        self.owner_id, self.EXP_ID, exp.version,
+                        exp.version - 1)
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(new_job)
+        self.assertEqual(job.job_id, new_job.job_id)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -208,7 +297,8 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         Args:
             terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the query.
+            categories: list(str). A list of categories to be added in the
+                query.
             languages: list(str). A list of languages to be added in the query.
 
         Returns:

@@ -37,16 +37,40 @@ oppia.directive('skillEditorNavbar', [
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillRights = (
             SkillEditorStateService.getSkillRights());
-          $scope.getTabStatuses = SkillEditorRoutingService.getTabStatuses;
+          $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
           $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
-          $scope.selectQuestionsTab =
-            SkillEditorRoutingService.navigateToQuestionsTab;
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
           $scope.validationIssues = [];
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
 
           $scope.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
+          };
+
+          $scope.selectQuestionsTab = function() {
+            // This check is needed because if a skill has unsaved changes to
+            // misconceptions, then these will be reflected in the questions
+            // created at that time, but if page is refreshed/changes are
+            // discarded, the misconceptions won't be saved, but there will be
+            // some questions with these now non-existent misconceptions.
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill_editor/editor_tab/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              SkillEditorRoutingService.navigateToQuestionsTab();
+            }
           };
 
           var _validateSkill = function() {

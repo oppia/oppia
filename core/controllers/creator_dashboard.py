@@ -137,7 +137,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
@@ -164,12 +163,29 @@ class CreatorDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
 
         def _get_intro_card_color(category):
+            """Returns the intro card color according to the category.
+
+            Args:
+                category: str. The category of the lesson.
+
+            Returns:
+                str. The intro card color according to the category.
+            """
             return (
                 constants.CATEGORIES_TO_COLORS[category] if
                 category in constants.CATEGORIES_TO_COLORS else
                 constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
+            """Returns the rounded average rating to display on the creator
+            dashboard.
+
+            Args:
+                rating: float. The rating of the lesson.
+
+            Returns:
+                float. The rounded average value of rating.
+            """
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were
@@ -403,7 +419,7 @@ class UploadExplorationHandler(base.BaseHandler):
         yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if feconf.ALLOW_YAML_FILE_UPLOAD:
+        if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],
                 strip_audio_translations=True)

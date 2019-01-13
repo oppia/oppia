@@ -17,20 +17,21 @@
  *               the exploration editor.
  */
 
-oppia.factory('ExplorationAdvancedFeaturesService', [function() {
-  var _settings = {
-    areParametersEnabled: false
+oppia.factory('ExplorationFeaturesService', [function() {
+  var settings = {
+    areParametersEnabled: false,
+    isImprovementsTabEnabled: false,
+    isPlaythroughRecordingEnabled: false,
   };
 
   return {
-    areParametersEnabled: function() {
-      return _settings.areParametersEnabled;
-    },
-    enableParameters: function() {
-      _settings.areParametersEnabled = true;
-    },
-    init: function(explorationData) {
-      if (explorationData.param_changes.length > 0) {
+    init: function(explorationData, featuresData) {
+      settings.isImprovementsTabEnabled =
+        featuresData.is_improvements_tab_enabled;
+      settings.isPlaythroughRecordingEnabled =
+        featuresData.is_playthrough_recording_enabled;
+      if (explorationData.param_changes &&
+          explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {
         for (var state in explorationData.states) {
@@ -40,6 +41,18 @@ oppia.factory('ExplorationAdvancedFeaturesService', [function() {
           }
         }
       }
-    }
+    },
+    areParametersEnabled: function() {
+      return settings.areParametersEnabled;
+    },
+    isImprovementsTabEnabled: function() {
+      return settings.isImprovementsTabEnabled;
+    },
+    isPlaythroughRecordingEnabled: function() {
+      return settings.isPlaythroughRecordingEnabled;
+    },
+    enableParameters: function() {
+      settings.areParametersEnabled = true;
+    },
   };
 }]);

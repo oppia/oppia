@@ -713,22 +713,6 @@ class ResolveIssueHandler(EditorHandler):
         self.render_json({})
 
 
-class FetchPlaythroughWhitelistHandler(EditorHandler):
-    """Handles fetching the whitelisted exploration ids which will record and
-    render playthroughs.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handle GET requests for the playthrough whitelist of explorations."""
-        self.render_json({
-            'whitelisted_exploration_ids_for_playthroughs':
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
-        })
-
-
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 

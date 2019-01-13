@@ -252,7 +252,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/%s' % self.EXP_ID_1)
+        response = self.get_html_response('/create/%s' % self.EXP_ID_1)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1

@@ -34,11 +34,32 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         class MockWrapper(test_utils.FunctionWrapper):
 
             def pre_call_hook(self, args):
+                """Mock pre call hook.
+
+                Args:
+                    args: ArgumentParser. The specified arguments to be checked
+                        with the mock names.
+
+                Raises:
+                    AssertionError: The argument doesn't match with the mock
+                        name.
+                """
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
             def post_call_hook(self, args, result):
+                """Mock post call hook.
+
+                Args:
+                    args: ArgumentParser. The specified arguments to be checked
+                        with the mock names.
+                    result: str. The string to be checked with the mock name.
+
+                Raises:
+                    AssertionError: The argument doesn't match with the mock
+                        name.
+                """
                 order.append('after')
                 testcase.assertEqual(result, 'foobar')
                 testcase.assertEqual(args.get('posarg'), 'foo')
