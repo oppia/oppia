@@ -44,7 +44,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             author_id='author', text='message text').put()
         feedback_models.GeneralFeedbackThreadModel(
             id='exp2.thread2', entity_id='exp2', entity_type='state2',
-            original_author_id='author', message_count=1,
+            original_author_id='author', message_count=0,
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
@@ -57,6 +57,9 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
+        feedback_services.set_message_count('exp1.thread1', 0)
+        feedback_services.set_message_count('exp2.thread2', 0)
+        feedback_services.set_message_count('exp3.thread3', 0)
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -68,12 +71,19 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.assertEqual(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, 'one-off-jobs')
         self.process_and_flush_pending_tasks()
 
     def test_message_count_job(self):
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp1.thread1'), 0)
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp2.thread2'), 0)
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp3.thread3'), 0)
         self._run_one_off_job()
-        self.assertEqual(feedback_services.get_message_count('exp1.thread1'), 2)
-        self.assertEqual(feedback_services.get_message_count('exp2.thread2'), 1)
-        self.assertEqual(feedback_services.get_message_count('exp3.thread3'), 0)
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp1.thread1'), 2)
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp2.thread2'), 1)
+        self.assertEqual(feedback_services.job_get_message_count(
+            'exp3.thread3'), 0)
