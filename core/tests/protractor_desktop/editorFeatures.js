@@ -941,7 +941,6 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setContent(
       forms.toRichText('This is second card.'));
     explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -985,7 +984,6 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setContent(
       forms.toRichText('This is second card.'));
     explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
