@@ -917,7 +917,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
   });
 
-  it('should have all the state contents with numerical status', function() {
+  it('should have all the state contents', function() {
     users.createUser('user@translationTab.com', 'userTranslationTab');
     users.login('user@translationTab.com');
     workflow.createExploration();
@@ -958,9 +958,6 @@ describe('Exploration translation', function() {
       'This is solution.');
     explorationEditorTranslationTab.expectHintsTabContentsToMatch(
       ['This is hint1.', 'This is hint2.']);
-    explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(0/8)');
-    users.logout();
   });
 
   it('should have correct numerical status', function() {
