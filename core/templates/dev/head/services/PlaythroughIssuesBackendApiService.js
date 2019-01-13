@@ -20,10 +20,6 @@ oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 
 oppia.constant(
-  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
-  '/playthroughdatahandler/whitelist');
-
-oppia.constant(
   'FETCH_PLAYTHROUGH_URL',
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
@@ -32,16 +28,12 @@ oppia.constant(
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
   '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL',
-  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST', 'FETCH_PLAYTHROUGH_URL',
+  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
       $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL,
-      FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST, FETCH_PLAYTHROUGH_URL,
+      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
-    var whitelistCache = null;
-
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {
@@ -88,18 +80,6 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
         });
-      },
-      fetchWhitelistedExplorationsForPlaythroughs: function() {
-        if (whitelistCache !== null) {
-          return Promise.resolve(whitelistCache);
-        } else {
-          return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST).then(
-            function(response) {
-              whitelistCache =
-                response.data.whitelisted_exploration_ids_for_playthroughs;
-              return whitelistCache;
-            });
-        }
       },
     };
   }]);
