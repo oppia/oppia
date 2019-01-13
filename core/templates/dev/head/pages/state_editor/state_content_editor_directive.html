@@ -1,7 +1,7 @@
 <!--
   Off-screen preview of the learner view card in order to check if the height of the card has exceeded a specified limit.
 -->
-<div class="shadow-preview-card" aria-hidden="true">
+<div class="oppia-shadow-preview-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
       <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
@@ -50,7 +50,7 @@
     <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
     <div style="clear: both;"></div>
   </div>
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown">
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" style="padding-top: 10px;">
     <span class="oppia-card-height-limit-warning">
       <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
       <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
@@ -61,10 +61,9 @@
 <style>
   .oppia-card-height-limit-warning {
     color: #0277BD;
-    padding-top: 2px;
   }
 
-  .shadow-preview-card {
+  .oppia-shadow-preview-card {
     left: -30000px;
     max-width: 560px;
     position: fixed;
@@ -80,21 +79,21 @@
 
   /* TODO(ankita240796): Find a way to avoid repetition of comments to keep css in sync.
   */
-  .rte-viewer > p {
+  .oppia-shadow-preview-card .rte-viewer > p {
     line-height: 28px;
     margin-bottom: 18px;
     margin-top: 18px;
   }
 
-  .rte-viewer > p:first-child {
+  .oppia-shadow-preview-card .rte-viewer > p:first-child {
     margin-top: 0px;
   }
 
-  .rte-viewer > p:last-child {
+  .oppia-shadow-preview-card .rte-viewer > p:last-child {
     margin-bottom: 0px;
   }
 
-  .rte-viewer {
+  .oppia-shadow-preview-card .rte-viewer {
     border-radius: 2px;
     display: inline-block;
     max-width: 100%;

@@ -56,7 +56,9 @@ oppia.directive('stateContentEditor', [
           $scope.cardHeightLimitWarningIsShown = true;
 
           $scope.isCardHeightLimitReached = function() {
-            var height = $('.oppia-learner-view-card-top-section').height();
+            var shadowPreviewCard = $(
+              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section')
+            var height = shadowPreviewCard.height();
             return (height > 630);
           };
 
