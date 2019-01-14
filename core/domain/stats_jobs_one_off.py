@@ -22,7 +22,7 @@ import copy
 import datetime
 
 from core import jobs
-from core.domain import conig_domain
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
