@@ -189,7 +189,7 @@ oppia.directive('translationTab', [
             heading: 'Tutorial Complete',
             text: (
               '<p>' +
-              'Now, you are ready to begin adding translations ' + 
+              'Now, you are ready to begin adding translations ' +
               'to your explorations! ' +
               'This marks the end of this tour. ' +
               'Remember to save your progress periodically using ' +
