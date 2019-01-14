@@ -55,8 +55,6 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             are safe.
     """
     PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.date(2018, 8, 1)
-    WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = (
-        config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -64,9 +62,11 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_issues_model):
+        whitelisted_exploration_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         exp_id = playthrough_issues_model.exp_id
         playthroughs_deleted = 0
-        if exp_id not in WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS:
+        if exp_id not in whitelisted_exploration_ids_for_playthroughs:
             playthroughs_deleted += len(
                 playthrough_issues_model.unresolved_issues)
             playthrough_issues_model.delete()
