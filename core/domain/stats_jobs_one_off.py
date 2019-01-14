@@ -73,9 +73,9 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(playthrough_issues_model):
         whitelisted_exploration_ids = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        exploration_id = playthrough_issues_model.exp_id
+        exp_id = playthrough_issues_model.exp_id
         playthroughs_deleted = 0
-        if exploration_id not in whitelisted_exploration_ids:
+        if exp_id not in whitelisted_exploration_ids:
             for issue_json in playthrough_issues_model.unresolved_issues:
                 playthrough_ids = issue_json['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(playthrough_ids)
@@ -101,7 +101,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 playthrough_issues_model.delete()
             else:
                 playthrough_issues_model.put()
-        yield (exploration_id, playthroughs_deleted)
+        yield (exp_id, playthroughs_deleted)
 
     @staticmethod
     def reduce(exp_id, playthroughs_deleted_per_job):
