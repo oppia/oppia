@@ -974,7 +974,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('should maintain its active sub-tab on saving draft and publishing changes'
+  fit('should maintain its active sub-tab on saving draft and publishing changes'
     , function() {
       users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
       users.login('user@translationSubTab.com');
@@ -1024,14 +1024,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.navigateToFeedbackTab();
       explorationEditorPage.saveChanges();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
-
       workflow.publishExploration();
-
-      explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.addHint('This is hint3.');
-      explorationEditorPage.navigateToTranslationTab();
-      explorationEditorTranslationTab.navigateToFeedbackTab();
-      explorationEditorPage.saveChanges('Ok');
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
     });
 

@@ -55,9 +55,6 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  var FeedbackButton = element(
-    by.css('.protractor-test-translation-feedback-tab'));
-
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
@@ -101,9 +98,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.navigateToFeedbackTab = function() {
     waitFor.elementToBeClickable(
-      FeedbackButton,
+      feedbackTabButton,
       'Feedback tab of translation page is not clickable');
-    FeedbackButton.click();
+    feedbackTabButton.click();
     waitFor.pageToFullyLoad();
   };
 
