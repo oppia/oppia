@@ -34,7 +34,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(test_utils.GenericTestBase):
     exp_id2 = 'exp_id2'
 
     def setUp(self):
-        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
+        super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
         self.exp1 = self.save_new_valid_exploration(self.exp_id1, 'owner')
         self.exp1.add_states(['New state'])
         change_list = [

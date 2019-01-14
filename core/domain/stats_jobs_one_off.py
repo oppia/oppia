@@ -62,6 +62,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def is_pre_release(playthrough_issue_model):
+        """TODO"""
         return (
             playthrough_issue_model.created_on <
             RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
