@@ -1522,10 +1522,10 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 .form-control.oppia-rte-content > div > p:first-child {
-  margin-top: 0px;
+  margin-top: 0;
 }
 .form-control.oppia-rte-content > div > p:last-child {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .rte-viewer {
