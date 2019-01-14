@@ -109,7 +109,8 @@ def _get_remote_name():
     remotes = str(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
-            get_remotes_url_cmd = ('git config --get remote.%s.url' % remote).split()
+            get_remotes_url_cmd = (
+                'git config --get remote.%s.url' % remote).split()
             task = subprocess.Popen(get_remotes_url_cmd, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
