@@ -61,6 +61,12 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
+    def is_pre_release(playthrough_issue_model):
+        return (
+            playthrough_issue_model.created_on <
+            RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
+
+    @staticmethod
     def map(playthrough_issues_model):
         whitelisted_exploration_ids_for_playthroughs = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
@@ -80,7 +86,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 pre_release_playthrough_ids = [
                     p.id for p in playthrough_instances
-                    if p.created_on < PLAYTHROUGH_SERVICE_RELEASE_DATE]
+                    if RemoveInvalidPlaythroughsOneOffJob.is_pre_release(p)]
                 stats_models.PlaythroughModel.delete_multi(
                     pre_release_playthrough_ids)
                 playthroughs_deleted += len(pre_release_playthrough_ids)
