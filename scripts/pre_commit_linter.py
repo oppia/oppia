@@ -1402,26 +1402,29 @@ def _check_sorted_imports(all_files):
                 for arg in function_args:
                     if arg.startswith('$'):
                         dollar_imports.append(arg)
-                    elif (re.match(r'[a-z]', arg)):
+                    elif re.match(r'[A-Z]', arg):
                         constant_imports.append(arg)
                     else:
                         regular_imports.append(arg)
                 dollar_imports.sort()
                 regular_imports.sort()
                 constant_imports.sort()
-                sorted_imports = dollar_imports + regular_imports + constant_imports
+                sorted_imports = dollar_imports + regular_imports + constant_imports #pylint: disable=line-too-long
                 if sorted_imports != function_args:
                     failed = True
                     print (
-                        'Please ensure that %s in %s, the injected dependecies should be in the following manner.'
-                        'Firstly dollar imports in sorted form, then regular imports in sorted form'
-                        'and then constant imports in sorted form.' % (property_value, filename))
-       	        if sorted_imports != literal_args:
-       	            failed = True
-       	            print (
-       	                'Please ensure that %s in %s, the dependecies literally mentioned should be '
-       	                'in the following manner. Firstly dollar imports in sorted form, then regular'
-       	                'imports in sorted form and then constant imports in sorted form.'
+                        'Please ensure that %s in %s, the injected dependecies'
+                        'should be in the following manner. Firstly dollar '
+                        'imports in sorted form, then regular imports in sorted'
+                        'form and then constant imports in sorted form.'
+                        % (property_value, filename))
+                if sorted_imports != literal_args:
+                    failed = True
+                    print (
+       	                'Please ensure that %s in %s, the dependecies literally'
+       	                'mentioned should be in the following manner. Firstly '
+       	                'dollar imports in sorted form, then regular imports in'
+       	                'sorted form and then constant imports in sorted form.'
        	                % (property_value, filename))
 
     if failed:
@@ -1751,6 +1754,7 @@ def main():
     """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
+    sorted_imports_messages = _check_sorted_imports(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
@@ -1768,6 +1772,7 @@ def main():
     all_messages = (
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
+        sorted_imports_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
         linter_messages + pattern_messages + copyright_notice_messages)
