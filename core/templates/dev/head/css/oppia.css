@@ -1481,19 +1481,13 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 
-/* These rules must be kept in sync with corresponding rules in
-   pages/exploration_player/conversation_skin_directive.html
-   (those with '.rte-viewer > p' selectors specifying the same
-   line-height, margin-top and margin-bottom attributes)
-*/
-
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
    after saving. The value 1.846 came from
    /third_party/generated/css/third_party.css.
 */
 
-.oppia-rte-editor > p {
+.oppia-rte-editor > p, .rte-viewer > p {
   line-height: 1.846;
 }
 .oppia-info-card-content p {
@@ -1519,11 +1513,27 @@ pre.oppia-pre-wrapped-text {
 .oppia-rte-editor > p:last-child {
   margin-bottom: 0;
 }
-.form-control.oppia-rte-content > div > p:first-child {
+
+/* The four rules below should be in sync. */
+.rte-viewer > p:first-child {
   margin-top: 0;
 }
-.form-control.oppia-rte-content > div > p:last-child {
+.rte-viewer > p:last-child {
   margin-bottom: 0;
+}
+.form-control.oppia-rte-content > div > p:first-child {
+  margin-top: 0px;
+}
+.form-control.oppia-rte-content > div > p:last-child {
+  margin-bottom: 0px;
+}
+
+.rte-viewer {
+  border-radius: 2px;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  text-align: left;
 }
 
 .oppia-prevent-selection {
