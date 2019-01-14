@@ -317,33 +317,6 @@ def get_message_count(thread_id):
         thread_id)
 
 
-# TODO(anubhavsinha98): Remove this function once the message field in all
-# the threads are populated.
-def thread_message_count(thread_id):
-    """Returns the messages count of the given thread.
-
-    Args:
-        thread_id: str. The ID of the thread to count messages in.
-
-    Returns:
-        int. The count of messages of the given thread.
-    """
-    thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
-    return thread.message_count
-
-
-# TODO(anubhavsinha98): Remove this function once the message field in all
-# the threads are populated.
-def set_message_count(thread_id, message_count):
-    """Sets the message count of the given thread.
-     Args:
-         thread_id: str. The ID of the thread whose message_count is to be set.
-         message_count: int. The value which needs to be assigned.
-    """
-    thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
-    thread.message_count = message_count
-
-
 def get_next_page_of_all_feedback_messages(
         page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Fetches a single page from the list of all feedback messages that have

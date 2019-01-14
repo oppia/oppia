@@ -57,9 +57,6 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
-        feedback_services.set_message_count('exp1.thread1', 0)
-        feedback_services.set_message_count('exp2.thread2', 0)
-        feedback_services.set_message_count('exp3.thread3', 0)
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -74,16 +71,16 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_message_count_job(self):
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp1.thread1'), 0)
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp2.thread2'), 0)
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp3.thread3'), 0)
+        thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
+        thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
+        thread3 = feedback_models.GeneralFeedbackThreadModel.get('exp3.thread3')
+        self.assertEqual(thread1.message_count, 0)
+        self.assertEqual(thread2.message_count, 0)
+        self.assertEqual(thread3.message_count, 0)
         self._run_one_off_job()
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp1.thread1'), 2)
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp2.thread2'), 1)
-        self.assertEqual(feedback_services.thread_message_count(
-            'exp3.thread3'), 0)
+        thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
+        thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
+        thread3 = feedback_models.GeneralFeedbackThreadModel.get('exp3.thread3')
+        self.assertEqual(thread1.message_count, 2)
+        self.assertEqual(thread2.message_count, 1)
+        self.assertEqual(thread3.message_count, 0)

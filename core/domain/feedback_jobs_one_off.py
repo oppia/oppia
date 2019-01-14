@@ -79,7 +79,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(thread):
-        if thread.message_count in [None, 0]:
+        if thread.message_count is None:
             # Assigning the value of message_count if it is None.
             thread.message_count = feedback_services.get_message_count(
                 thread.id)
@@ -87,7 +87,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 # Sets the message_count if it is None.
                 thread.put()
                 yield ('SUCCESS', thread.id)
-            except AttributeError:
+            except Exception:
                 yield ('FAILED', thread.id)
         else:
             yield ('NO-OP', thread.id)
@@ -97,4 +97,4 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if message == 'FAILED':
             yield (message, thread_ids)
         else:
-            yield len(thread_ids)
+            yield ('POPULATED', len(thread_ids))
