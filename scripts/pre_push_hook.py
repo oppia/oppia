@@ -37,24 +37,8 @@ import shutil
 import subprocess
 import sys
 
-
-# Insert GitPython and its requirements to sys.path so that it can be imported.
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PATHS = [
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'smmap-0.9.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'gitdb-0.6.4'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11'),
-]
-
-for path in _PATHS:
-    sys.path.insert(0, path)
-
-# pylint: disable=wrong-import-position
-
-import git # isort:skip
-
-# pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
+
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -118,13 +102,25 @@ def _get_remote_name():
     """
     remote_name = ''
     remote_num = 0
-    # Get the current repository.
-    repo = git.Repo(os.getcwd())
-    for remote in repo.remotes:
-        remote_url = list(remote.urls)[0]
-        if remote_url.endswith('oppia/oppia.git'):
-            remote_num += 1
-            remote_name = remote.name
+    get_remotes_name_cmd = 'git remote'.split()
+    task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    remotes = str(out)[:-1].split('\n')
+    if not err:
+        for remote in remotes:
+            get_remotes_url_cmd = ('git config --get remote.%s.url' % remote).split()
+            task = subprocess.Popen(get_remotes_url_cmd, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            remote_url, err = task.communicate()
+            if not err:
+                if remote_url.endswith('oppia/oppia.git\n'):
+                    remote_num += 1
+                    remote_name = remote
+            else:
+                raise ValueError(err)
+    else:
+        raise ValueError(err)
 
     if not remote_num:
         print ('Warning: Please set upstream for the lint checks to run '
