@@ -1413,9 +1413,9 @@ def _check_sorted_imports(all_files):
                 if sorted_imports != function_args:
                     failed = True
                     print (
-       	                'Please ensure that %s in %s, the injected dependecies should be in the following manner.'
-       	                'Firstly dollar imports in sorted form, then regular imports in sorted form'
-       	                'and then constant imports in sorted form.' % (property_value, filename))
+                        'Please ensure that %s in %s, the injected dependecies should be in the following manner.'
+                        'Firstly dollar imports in sorted form, then regular imports in sorted form'
+                        'and then constant imports in sorted form.' % (property_value, filename))
        	        if sorted_imports != literal_args:
        	            failed = True
        	            print (
