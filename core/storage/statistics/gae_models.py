@@ -1046,9 +1046,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     def delete(self):
         """Recursively delete playthroughs before deleting self."""
         for i, issue in reversed(list(enumerate(self.unresolved_issues))):
-            for issue in unresolved_issues:
-                PlaythroughModel.delete_playthroughs_multi(
-                    issue['playthrough_ids'])
+            PlaythroughModel.delete_playthroughs_multi(issue['playthrough_ids'])
             self.unresolved_issues.pop(i)
         super(ExplorationIssuesModel, self).delete()
 
