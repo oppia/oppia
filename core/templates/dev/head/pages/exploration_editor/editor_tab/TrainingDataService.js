@@ -21,9 +21,11 @@
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
   'ExplorationStatesService', 'StateEditorService', 'GraphDataService',
+  'TrainingDataNormalizer',
   function(
       $rootScope, $http, ResponsesService, RuleObjectFactory,
-      ExplorationStatesService, StateEditorService, GraphDataService) {
+      ExplorationStatesService, StateEditorService, GraphDataService,
+      TrainingDataNormalizer) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -109,7 +111,8 @@ oppia.factory('TrainingDataService', [
             answers: answerGroup.trainingData
           });
         }
-        return trainingDataAnswers;
+        return TrainingDataNormalizer.normalize(
+          trainingDataAnswers, ExplorationStatesService.getState('State'));
       },
 
       getTrainingDataOfAnswerGroup: function(answerGroupIndex) {

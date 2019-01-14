@@ -38,10 +38,13 @@ describe('Text Input Prediction Service', function() {
       for (var i = 0; i < trainingData.length; i++) {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
-            classifierData, trainingData[i].answers[j].answer);
+            classifierData, trainingData[i].answers[j]);
 
           expect(predictedAnswerGroup).toEqual(
             trainingData[i].answer_group_index);
+          if (predictedAnswerGroup !== trainingData[i].answer_group_index) {
+            console.log(trainingData[i].answers[j]);
+          }
         }
       }
     });

@@ -270,4 +270,16 @@ describe('TrainingDataService', function() {
       answers: ['text answer', 'another answer']
     }]);
   });
+  it('should correctly invoke textinputnormalizer', function() {
+    tds.associateWithAnswerGroup(0, 'AnSwER');
+    tds.associateWithAnswerGroup(0, 'I\'m');
+    tds.associateWithAnswerGroup(0, 'he\'ll answer'); 
+    tds.associateWithAnswerGroup(0, 'i\'ve answer');
+    expected = [
+      {
+        answerGroupIndex: 0,
+        answers: ['answer', 'i am', 'he will answer', 'i have answer']
+      }];
+     expect(tds.getTrainingDataAnswers()).toEqual(expected);
+  });
 });
