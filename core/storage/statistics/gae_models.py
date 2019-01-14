@@ -1043,14 +1043,6 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance.put()
         return instance_id
 
-    def delete(self):
-        """Recursively delete playthroughs before deleting self."""
-        for i, issue in reversed(list(enumerate(self.unresolved_issues))):
-            PlaythroughModel.delete_playthroughs_multi(issue['playthrough_ids'])
-            self.unresolved_issues.pop(i)
-        super(ExplorationIssuesModel, self).delete()
-
-
 
 class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
