@@ -36,49 +36,65 @@ import feconf
 ])
 
 
-class RemoveBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for deleting invalid playthroughs.
 
+    Playthroughs were introduced as a GSoC 2018 project. During the project,
+    some invalid playthroughs made it through the cracks. This one-off job aims
+    to get rid of them so that our database is filled only with valid instances.
+
+    Specifically, we want to remove playthroughs which were:
+     1. Created *before* the final release of the project.
+          - These instances are missing important fields and are thus invalid.
+     2. Created for explorations that are not curated for playthroughs.
+          - Playthroughs have the potential to store personal-identifiable
+            information. We want to ensure that we can never record playthroughs
+            with malicious explorations (for example: TextInput -> "Please give
+            me your passport identification number"). Currently, we accomplish
+            this by only recording playthroughs in explorations we are confident
+            are safe.
+    """
     PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.date(2018, 8, 1)
+    WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = (
+        config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
-    def delete_non_curated_playthrough(playthrough_issues_model):
-        for playthrough_issue in playthrough_issues_model.unresolved_issues:
-            stats_models.PlaythroughModel.delete_multi(
-                stats_models.PlaythroughModel.get_multi(
-                    playthrough_issue['playthrough_ids']))
-        playthrough_issues_model.delete()
-
-    @staticmethod
-    def delete_pre_release_playthroughs(playthrough_issues_model):
-        indexed_issues = enumerate(playthrough_issues_model.unresolved_issues)
-        # Iterate in reverse to remove elements without invalidating iterators.
-        for index, playthrough_issue in reversed(indexed_issues):
-            playthrough_ids = playthrough_issue['playthrough_ids']
-            playthrough_instances = (
-                stats_models.PlaythroughModel.get_multi(playthrough_ids))
-            pre_release_playthroughs = [
-                p for p in playthrough_instances
-                if p.created_on < PLAYTHROUGH_SERVICE_RELEASE_DATE]
-            stats_models.PlaythroughModel.delete_multi(pre_release_playthroughs)
-            if len(pre_release_playthroughs) == len(playthrough_ids):
-                playthrough_issues_model.unresolved_issues.pop(index)
-        if not playthrough_issues_model.unresolved_issues:
-            playthrough_issues_model.delete()
-
-    @staticmethod
     def map(playthrough_issues_model):
-        whitelisted_exp_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        if playthrough_issues_model.exp_id in whitelisted_exp_ids:
-            delete_non_curated_playthrough(playthrough_issues_model)
+        exp_id = playthrough_issues_model.exp_id
+        playthroughs_deleted = 0
+        if exp_id not in WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS:
+            playthroughs_deleted += len(
+                playthrough_issues_model.unresolved_issues)
+            playthrough_issues_model.delete()
         else:
-            delete_pre_release_playthroughs(playthrough_issues_model)
-        playthrough_issues_model.put()
-        yield(
+            indexed_issues = (
+                enumerate(playthrough_issues_model.unresolved_issues))
+            # Iterate in reverse to remove models without invalidating indices.
+            for index, playthrough_issue in reversed(indexed_issues):
+                playthrough_ids = playthrough_issue['playthrough_ids']
+                playthrough_instances = (
+                    stats_models.PlaythroughModel.get_multi(playthrough_ids))
+                pre_release_playthrough_ids = [
+                    p.id for p in playthrough_instances
+                    if p.created_on < PLAYTHROUGH_SERVICE_RELEASE_DATE]
+                stats_models.PlaythroughModel.delete_multi(
+                    pre_release_playthrough_ids)
+                playthroughs_deleted += len(pre_release_playthrough_ids)
+                if len(pre_release_playthrough_ids) == len(playthrough_ids):
+                    playthrough_issues_model.unresolved_issues.pop(index)
+            if not playthrough_issues_model.unresolved_issues:
+                playthrough_issues_model.delete()
+            else:
+                playthrough_issues_model.put()
+        yield (exp_id, playthroughs_deleted)
+
+    @staticmethod
+    def reduce(exp_id, playthroughs_deleted_per_job):
+        yield '%s: %s' % (exp_id, sum(playthroughs_deleted_per_job))
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
