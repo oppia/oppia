@@ -62,10 +62,12 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
-    def is_pre_release(playthrough_issue_model):
-        """TODO."""
+    def is_pre_release(playthrough_model):
+        """Returns whether the given playthrough model was stored before the
+        playthroughs project was considered released.
+        """
         return (
-            playthrough_issue_model.created_on <
+            playthrough_model.created_on <
             RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
 
     @staticmethod
@@ -83,8 +85,8 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             indexed_issues = (
                 list(enumerate(playthrough_issues_model.unresolved_issues)))
-            # Iterate in reverse to conditionally remove some issues without
-            # invalidating the iterators to the rest.
+            # Iterate in reverse to conditionally remove issues without
+            # invalidating the indices to others.
             for index, issue_json in reversed(indexed_issues):
                 playthrough_ids = issue_json['playthrough_ids']
                 playthrough_models = (
@@ -94,7 +96,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if RemoveInvalidPlaythroughsOneOffJob.is_pre_release(model)]
                 stats_models.PlaythroughModel.delete_multi(bad_playthrough_ids)
                 playthroughs_deleted += len(bad_playthrough_ids)
-                if len(bad_playthrough_ids) == len(playthrough_ids):
+                if bad_playthrough_ids == playthrough_ids:
                     playthrough_issues_model.unresolved_issues.pop(index)
             if not playthrough_issues_model.unresolved_issues:
                 playthrough_issues_model.delete()
