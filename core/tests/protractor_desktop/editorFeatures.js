@@ -994,7 +994,8 @@ describe('Exploration translation', function() {
         'two', true, 'Equals', 6);
       var responseEditor = explorationEditorMainTab.getResponseEditor(
         'default');
-      responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+      responseEditor.setFeedback(forms.toRichText('This is default_outcome.')
+        );
       explorationEditorMainTab.addHint('This is hint1.');
       explorationEditorMainTab.addHint('This is hint2.');
       explorationEditorMainTab.addSolution('NumericInput', {
