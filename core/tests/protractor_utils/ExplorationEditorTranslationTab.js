@@ -50,8 +50,8 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
-  var numericalStatus =
-    element(by.css('.protractor-test-translation-numerical-status'));
+  var numericalStatus = element(
+    by.css('.protractor-test-translation-numerical-status'));
 
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
