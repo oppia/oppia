@@ -29,6 +29,23 @@ import feconf
     [models.NAMES.exploration, models.NAMES.statistics])
 
 
+class RemoveInvalidPlaythroughsOneOffJobTests(test_utils.GenericTestBase):
+    exp_id1 = 'exp_id1'
+    exp_id2 = 'exp_id2'
+
+    def setUp(self):
+        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
+        self.exp1 = self.save_new_valid_exploration(self.exp_id1, 'owner')
+        self.exp1.add_states(['New state'])
+        change_list = [
+            exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'New state'})]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
+        self.exp2 = self.save_new_valid_exploration(self.exp_id2, 'owner')
+
+
 class ExplorationIssuesModelCreatorOneOffJobTests(test_utils.GenericTestBase):
     exp_id1 = 'exp_id1'
     exp_id2 = 'exp_id2'
