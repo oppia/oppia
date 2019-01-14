@@ -20,7 +20,6 @@ import ast
 import collections
 import copy
 import datetime
-import itertools
 
 from core import jobs
 from core.domain import config_domain
