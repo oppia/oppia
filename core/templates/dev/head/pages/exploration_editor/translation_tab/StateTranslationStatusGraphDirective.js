@@ -51,7 +51,10 @@ oppia.directive('stateTranslationStatusGraph', [
                 StateEditorService.getActiveStateName(),
                 stateData.contentIdsToAudioTranslations);
               $rootScope.$broadcast('refreshStateTranslation');
-              $rootScope.$broadcast('refreshAudioTranslationBar');
+              setTimeout (function() { 
+                $rootScope.$broadcast('refreshAudioTranslationBar');
+              }, 0);
+              
             }
           };
         }
