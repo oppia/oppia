@@ -20,22 +20,22 @@
 oppia.factory('TextInputNormalizer', function() {
   return {
     normalize: function(trainingData) {
-       var normalizedTrainingData = [];
-       for(var i = 0; i<trainingData.length; i++) {
-         answerGroupAnswers = [];
-         for(var j = 0; j< trainingData[i].answers.length; j++) {
-            answer = trainingData[i].answers[j]
-            answer = answer.replace('\'m', ' am');
-            answer = answer.replace('\'ll', ' will');
-            answer = answer.replace('\'ve', ' have');
-            answerGroupAnswers.push(answer.toLowerCase());
-         }
-         normalizedTrainingData.push({
-            answerGroupIndex: i,
-            answers: answerGroupAnswers
+      var normalizedTrainingData = [];
+      for(var i = 0; i<trainingData.length; i++) {
+        answerGroupAnswers = [];
+        for(var j = 0; j< trainingData[i].answers.length; j++) {
+          answer = trainingData[i].answers[j]
+          answer = answer.replace('\'m', ' am');
+          answer = answer.replace('\'ll', ' will');
+          answer = answer.replace('\'ve', ' have');
+          answerGroupAnswers.push(answer.toLowerCase());
+        }
+        normalizedTrainingData.push({
+          answerGroupIndex: i,
+          answers: answerGroupAnswers
          });
        }
-       return normalizedTrainingData;
+      return normalizedTrainingData;
     }
-  }
+  };
 });

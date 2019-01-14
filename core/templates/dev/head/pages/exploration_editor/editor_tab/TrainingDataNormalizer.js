@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for training data that normalizes TextInput and 
+ * @fileoverview Service for training data that normalizes TextInput and
  * CodeRepl training data for classificaiton purposes.
  */
 
@@ -21,18 +21,15 @@ oppia.factory('TrainingDataNormalizer', [
   'TextInputNormalizer', 'CodeInputNormalizer',
   function(
       TextInputNormalizer, CodeInputNormalizer) {
-
-   return {
-     normalize: function(trainingDataAnswers, explorationState) {
-         interactionType = explorationState.interaction.id
-         if (interactionType === 'TextInput') 
-             return TextInputNormalizer.normalize(trainingDataAnswers);
-         else if (interactionType === 'CodeRepl')
-             return CodeInputNormalizer.normalize(trainingDataAnswers);
-         else
-             return trainingDataAnswers;
+    return {
+      normalize: function(trainingDataAnswers, explorationState) {
+        interactionType = explorationState.interaction.id;
+        if (interactionType === 'TextInput') 
+          return TextInputNormalizer.normalize(trainingDataAnswers);
+        else if (interactionType === 'CodeRepl')
+          return CodeInputNormalizer.normalize(trainingDataAnswers);
+        else
+          return trainingDataAnswers;
          }
-
-     }
-
+     };
 }]);
