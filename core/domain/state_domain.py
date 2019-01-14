@@ -714,6 +714,64 @@ class AudioTranslation(object):
                 self.needs_update)
 
 
+class TranslationScript(object):
+    """Value object representing a translation script."""
+
+    def __init__(self, html, needs_update):
+        """Initializes a TranslationScript domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            needs_update: bool. Whether html is marked for needing review.
+        """
+        self.html = html
+        self.needs_update = needs_update
+
+    def to_dict(self):
+        """Returns a dict representing this TranslationScript domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of TranslationScript instance.
+        """
+        return {
+            'html': self.html,
+            'needs_update': self.needs_update,
+        }
+
+    @classmethod
+    def from_dict(cls, translation_script_dict):
+        """Return a TranslationScript domain object from a dict.
+
+        Args:
+            translation_script_dict: dict. The dict representation of
+                TranslationScript object.
+
+        Returns:
+            TranslationScript. The corresponding TranslationScript domain
+            object.
+        """
+        return cls(
+            translation_script_dict['html'],
+            translation_script_dict['needs_update'])
+
+    def validate(self):
+        """Validates properties of the TranslationScript.
+
+        Raises:
+            ValidationError: One or more attributes of the TranslationScript are
+            invalid.
+        """
+        if not isinstance(self.html, basestring):
+            raise utils.ValidationError(
+                'Invalid content HTML: %s' % self.html)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+
 class RuleSpec(object):
     """Value object representing a rule specification."""
 

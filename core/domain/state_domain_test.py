@@ -421,6 +421,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_translation, 'needs_update', 'hello'):
                 audio_translation.validate()
 
+    def test_translation_script_validation(self):
+        """Test validation of translation script."""
+        translation_script = state_domain.TranslationScript('Test.', True)
+        translation_script.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'
+            ):
+            with self.swap(translation_script, 'html', 30):
+                translation_script.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+            ):
+            with self.swap(translation_script, 'needs_update', 20):
+                translation_script.validate()
+
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
