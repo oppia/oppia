@@ -356,7 +356,6 @@ oppia.directive('audioTranslationBar', [
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
             $scope.canTranslate = EditabilityService.isTranslatable();
-            $scope.contentId = 'content';
             var audioTranslationObject = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslationObject) {
