@@ -50,6 +50,9 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
+  var numericalStatus = element(
+    by.css('.protractor-test-translation-numerical-status'));
+
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
@@ -88,6 +91,10 @@ var ExplorationEditorTranslationTab = function() {
       solutionTabButton, 'Solution Tab button is not clickable');
     solutionTabButton.click();
     expect(solutionTabText.getText()).toMatch(content);
+  };
+
+  this.expectNumericalStatusToMatch = function(content) {
+    expect(numericalStatus.getText()).toMatch(content);
   };
 
   this.changeTranslationLanguage = function(language) {
