@@ -72,7 +72,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             playthrough_issues_model.delete()
         else:
             indexed_issues = (
-                enumerate(playthrough_issues_model.unresolved_issues))
+                list(enumerate(playthrough_issues_model.unresolved_issues)))
             # Iterate in reverse to remove models without invalidating indices.
             for index, playthrough_issue in reversed(indexed_issues):
                 playthrough_ids = playthrough_issue['playthrough_ids']
