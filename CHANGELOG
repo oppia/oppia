@@ -30,7 +30,7 @@ Development workflow
 * Introduce eslint: space-before-blocks rule (#6048)
 * Fix max-len error (#5994)
 * Fix false positive Travis build in pre-commit linter (#6002)
-  Fix #6040: Fix issues in develop which led to lint test failures (#6038)
+* Fix #6040: Fix issues in develop which led to lint test failures (#6038)
 
 New structures
 * Implement editing of questions (#5614)
@@ -61,7 +61,7 @@ Improvements to editor features
 * Fix #3972: Fix the faulty vertical offset (#6030)
 * Fix #6016: Limited the selection area of multiple choice option (#6029)
 * Fix #6056: Prevent the text box in the Save Draft modal from flowing out of the modal boundaries (#6057)
-- Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
+* Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
 
 Updates to the library and splash pages
 * Fix #4936: The drop down menus work similar to the keyboard behavior for the About and Profile dropdowns (#5974)
