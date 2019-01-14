@@ -18,134 +18,136 @@
  */
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ExplorationEngineService', 'PretestEngineService',
-  'ContextService', 'UrlService', 'StateClassifierMappingService',
-  'StatsReportingService', 'PlaythroughService',
-  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
-  'EditableExplorationBackendApiService', 'PlayerPositionService',
-  'ReadOnlyExplorationBackendApiService', 'PretestQuestionBackendApiService',
-  'NumberAttemptsService',
+  '$log', 'ContextService', 'EditableExplorationBackendApiService',
+  'ExplorationEngineService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesBackendApiService', 'NumberAttemptsService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
+  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
+  'PretestEngineService', 'PretestQuestionBackendApiService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService',
   function(
-      $log, $q, ExplorationEngineService, PretestEngineService,
-      ContextService, UrlService, StateClassifierMappingService,
-      StatsReportingService, PlaythroughService,
-      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
-      EditableExplorationBackendApiService, PlayerPositionService,
-      ReadOnlyExplorationBackendApiService, PretestQuestionBackendApiService,
-      NumberAttemptsService) {
-    var _currentEngineService = null;
-    var _inPretestMode = false;
-    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-    var _explorationId = ContextService.getExplorationId();
-    var _version = GLOBALS.explorationVersion;
-    var _storyId = UrlService.getStoryIdInPlayer();
+      $log, ContextService, EditableExplorationBackendApiService,
+      ExplorationEngineService, ExplorationFeaturesService,
+      ExplorationFeaturesBackendApiService, NumberAttemptsService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
+      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
+      PretestEngineService, PretestQuestionBackendApiService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlService) {
+    var currentEngineService = null;
+    var inPretestMode = false;
+    var editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var explorationId = ContextService.getExplorationId();
+    var version = GLOBALS.explorationVersion;
+    var storyId = UrlService.getStoryIdInPlayer();
 
-    var _initializeExplorationServices = function(
+    var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
-      StateClassifierMappingService.init(
-        returnDict.state_classifier_mapping);
+      StateClassifierMappingService.init(returnDict.state_classifier_mapping);
       StatsReportingService.initSession(
-        _explorationId, returnDict.exploration.title,
-        _version, returnDict.session_id, GLOBALS.collectionId);
+        explorationId, returnDict.exploration.title, version,
+        returnDict.session_id, GLOBALS.collectionId);
       PlaythroughService.initSession(
-        _explorationId, _version, returnDict.record_playthrough_probability,
-        returnDict.whitelisted_exploration_ids_for_playthroughs);
+        explorationId, version, returnDict.record_playthrough_probability);
+      PlaythroughIssuesService.initSession(explorationId, version);
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
         returnDict.exploration, returnDict.version,
-        returnDict.preferred_audio_language_code,
-        returnDict.auto_tts_enabled,
-        arePretestsAvailable ?
-        function() {} : callback);
+        returnDict.preferred_audio_language_code, returnDict.auto_tts_enabled,
+        arePretestsAvailable ? function() {} : callback);
     };
 
-    var _initializePretestServices = function(pretestQuestionDicts, callback) {
+    var initializePretestServices = function(pretestQuestionDicts, callback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
       PretestEngineService.init(pretestQuestionDicts, callback);
     };
 
-    var _setExplorationMode = function() {
-      _inPretestMode = false;
-      _currentEngineService = ExplorationEngineService;
+    var setExplorationMode = function() {
+      inPretestMode = false;
+      currentEngineService = ExplorationEngineService;
     };
 
-    var _setPretestMode = function() {
-      _inPretestMode = true;
-      _currentEngineService = PretestEngineService;
+    var setPretestMode = function() {
+      inPretestMode = true;
+      currentEngineService = PretestEngineService;
+    };
+
+    var initExplorationPreviewPlayer = function(callback) {
+      setExplorationMode();
+      Promise.all([
+        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          explorationId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
+      ]).then(function(combinedData) {
+        var explorationData = combinedData[0];
+        var featuresData = combinedData[1];
+        ExplorationFeaturesService.init(explorationData, featuresData);
+        ExplorationEngineService.init(
+          explorationData, null, null, null, callback);
+        PlayerCorrectnessFeedbackEnabledService.init(
+          explorationData.correctness_feedback_enabled);
+        NumberAttemptsService.reset();
+      });
+    };
+
+    var initExplorationPlayer = function(callback) {
+      var explorationDataPromise = version ?
+        ReadOnlyExplorationBackendApiService.loadExploration(
+          explorationId, version) :
+        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationId);
+      Promise.all([
+        explorationDataPromise,
+        PretestQuestionBackendApiService.fetchPretestQuestions(
+          explorationId, storyId),
+        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          explorationId),
+      ]).then(function(combinedData) {
+        var explorationData = combinedData[0];
+        var pretestQuestionsData = combinedData[1];
+        var featuresData = combinedData[2];
+        ExplorationFeaturesService.init(explorationData, featuresData);
+        if (pretestQuestionsData.length > 0) {
+          setPretestMode();
+          initializeExplorationServices(explorationData, true, callback);
+          initializePretestServices(pretestQuestionsData, callback);
+        } else {
+          setExplorationMode();
+          initializeExplorationServices(explorationData, false, callback);
+        }
+      });
     };
 
     return {
+      initializePlayer: function(callback) {
+        PlayerTranscriptService.init();
+        if (editorPreviewMode) {
+          initExplorationPreviewPlayer(callback);
+        } else {
+          initExplorationPlayer(callback);
+        }
+      },
       getCurrentEngineService: function() {
-        return _currentEngineService;
+        return currentEngineService;
       },
       isInPretestMode: function() {
-        return _inPretestMode;
+        return inPretestMode;
       },
       getPretestQuestionCount: function() {
         return PretestEngineService.getPretestQuestionCount();
       },
       moveToExploration: function(callback) {
-        _setExplorationMode();
+        setExplorationMode();
         ExplorationEngineService.moveToExploration(callback);
       },
       getLanguageCode: function() {
-        return _currentEngineService.getLanguageCode();
+        return currentEngineService.getLanguageCode();
       },
       recordNewCardAdded: function() {
-        return _currentEngineService.recordNewCardAdded();
+        return currentEngineService.recordNewCardAdded();
       },
-      initializePlayer: function(callback) {
-        PlayerTranscriptService.init();
-        if (_editorPreviewMode) {
-          _setExplorationMode();
-          EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            _explorationId).then(function(returnDict) {
-            ExplorationEngineService.init(
-              returnDict, null, null, null, callback);
-            PlayerCorrectnessFeedbackEnabledService.init(
-              returnDict.correctness_feedback_enabled);
-            NumberAttemptsService.reset();
-          });
-        } else {
-          if (_version) {
-            $q.all([
-              ReadOnlyExplorationBackendApiService.loadExploration(
-                _explorationId, _version),
-              PretestQuestionBackendApiService.fetchPretestQuestions(
-                _explorationId, _storyId
-              )]).then(function(returnValues) {
-              if (returnValues[1].length > 0) {
-                _setPretestMode();
-                _initializeExplorationServices(
-                  returnValues[0], true, callback);
-                _initializePretestServices(returnValues[1], callback);
-              } else {
-                _setExplorationMode();
-                _initializeExplorationServices(
-                  returnValues[0], false, callback);
-              }
-            });
-          } else {
-            $q.all([
-              ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                _explorationId),
-              PretestQuestionBackendApiService.fetchPretestQuestions(
-                _explorationId, _storyId
-              )]).then(function(returnValues) {
-              if (returnValues[1].length > 0) {
-                _setPretestMode();
-                _initializeExplorationServices(
-                  returnValues[0], true, callback);
-                _initializePretestServices(returnValues[1], callback);
-              } else {
-                _setExplorationMode();
-                _initializeExplorationServices(
-                  returnValues[0], false, callback);
-              }
-            });
-          }
-        }
-      }
     };
   }]);

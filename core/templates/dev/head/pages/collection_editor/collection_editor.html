@@ -28,19 +28,19 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <div ng-if="getTabStatuses().active === 'main'">
+    <div ng-if="getActiveTabName() === 'main'">
       <collection-main-tab></collection-main-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'settings'">
+    <div ng-show="getActiveTabName() === 'settings'">
       <collection-settings-tab></collection-settings-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'history'">
+    <div ng-show="getActiveTabName() === 'history'">
       <collection-history-tab></collection-history-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'stats'">
+    <div ng-show="getActiveTabName() === 'stats'">
       <collection-statistics-tab></collection-statistics-tab>
     </div>
   </div>
@@ -137,6 +137,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/RouterService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ChangesInHumanReadableFormService.js"></script>
 
+  <script src="/templates/dev/head/services/ExplorationFeaturesService.js"></script>
   <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>

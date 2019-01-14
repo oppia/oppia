@@ -192,7 +192,6 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
             'title': exploration.title,
@@ -234,11 +233,6 @@ class ExplorationHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        whitelisted_exp_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        self.values.update({
-            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids
-        })
         self.values.update(exploration_data)
         self.render_json(self.values)
 

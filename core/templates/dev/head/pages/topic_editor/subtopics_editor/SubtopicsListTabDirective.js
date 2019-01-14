@@ -65,12 +65,16 @@ oppia.directive('subtopicsListTab', [
                   $scope.editableTitle = editableTitle;
                   $scope.subtopicPage =
                     TopicEditorStateService.getSubtopicPage();
-                  $scope.htmlData = $scope.subtopicPage.getHtmlData();
+                  var pageContents = $scope.subtopicPage.getPageContents();
+                  if (pageContents) {
+                    $scope.htmlData = pageContents.getHtml();
+                  }
                   $scope.errorMsg = null;
                   $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
                     $scope.subtopicPage =
                       TopicEditorStateService.getSubtopicPage();
-                    $scope.htmlData = $scope.subtopicPage.getHtmlData();
+                    var pageContents = $scope.subtopicPage.getPageContents();
+                    $scope.htmlData = pageContents.getHtml();
                   });
                   $scope.SUBTOPIC_PAGE_SCHEMA = {
                     type: 'html',
@@ -96,7 +100,7 @@ oppia.directive('subtopicsListTab', [
                   };
 
                   $scope.updateHtmlData = function(htmlData) {
-                    $scope.htmlData = htmlData;
+                    $scope.subtopicPage.getPageContents().setHtml(htmlData);
                     $scope.openPreviewSubtopicPage(htmlData);
                   };
 
@@ -123,9 +127,13 @@ oppia.directive('subtopicsListTab', [
                 TopicUpdateService.setSubtopicTitle(
                   $scope.topic, subtopic.getId(), newTitle);
               }
-              if (newHtmlData !== $scope.subtopicPage.getHtmlData()) {
-                TopicUpdateService.setSubtopicPageHtmlData(
-                  $scope.subtopicPage, subtopic.getId(), newHtmlData);
+              if (newHtmlData !==
+                    $scope.subtopicPage.getPageContents().getHtml()) {
+                var subtitledHtml = angular.copy(
+                  $scope.subtopicPage.getPageContents().getSubtitledHtml());
+                subtitledHtml.setHtml(newHtmlData);
+                TopicUpdateService.setSubtopicPageContentsHtml(
+                  $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
             });

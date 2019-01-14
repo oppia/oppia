@@ -16,6 +16,7 @@
 
 """Unit tests for scripts/build.py."""
 
+# pylint: disable=invalid-name
 import StringIO
 import collections
 import os
