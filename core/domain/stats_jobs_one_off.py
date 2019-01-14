@@ -19,8 +19,10 @@
 import ast
 import collections
 import copy
+import datetime
 
 from core import jobs
+from core.domain import conig_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -32,6 +34,51 @@ import feconf
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
+
+
+class RemoveBadPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+
+    PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.date(2018, 8, 1)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.ExplorationIssuesModel]
+
+    @staticmethod
+    def delete_non_curated_playthrough(playthrough_issues_model):
+        for playthrough_issue in playthrough_issues_model.unresolved_issues:
+            stats_models.PlaythroughModel.delete_multi(
+                stats_models.PlaythroughModel.get_multi(
+                    playthrough_issue['playthrough_ids']))
+        playthrough_issues_model.delete()
+
+    @staticmethod
+    def delete_pre_release_playthroughs(playthrough_issues_model):
+        indexed_issues = enumerate(playthrough_issues_model.unresolved_issues)
+        # Iterate in reverse to remove elements without invalidating iterators.
+        for index, playthrough_issue in reversed(indexed_issues):
+            playthrough_ids = playthrough_issue['playthrough_ids']
+            playthrough_instances = (
+                stats_models.PlaythroughModel.get_multi(playthrough_ids))
+            pre_release_playthroughs = [
+                p for p in playthrough_instances
+                if p.created_on < PLAYTHROUGH_SERVICE_RELEASE_DATE]
+            stats_models.PlaythroughModel.delete_multi(pre_release_playthroughs)
+            if len(pre_release_playthroughs) == len(playthrough_ids):
+                playthrough_issues_model.unresolved_issues.pop(index)
+        if not playthrough_issues_model.unresolved_issues:
+            playthrough_issues_model.delete()
+
+    @staticmethod
+    def map(playthrough_issues_model):
+        whitelisted_exp_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+        if playthrough_issues_model.exp_id in whitelisted_exp_ids:
+            delete_non_curated_playthrough(playthrough_issues_model)
+        else:
+            delete_pre_release_playthroughs(playthrough_issues_model)
+        playthrough_issues_model.put()
+        yield(
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
