@@ -974,8 +974,9 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
   });
 
-  it('should maintain its active sub-tab on saving draft and publishing changes'
-    , function() {
+  it(
+  	'should maintain its active sub-tab on saving draft and publishing changes',
+  	function() {
       users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
       users.login('user@translationSubTab.com');
       workflow.createExploration();
