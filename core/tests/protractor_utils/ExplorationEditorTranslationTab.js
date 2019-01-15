@@ -55,7 +55,6 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
       contentTabButton, 'Content Tab button is not clickable');
