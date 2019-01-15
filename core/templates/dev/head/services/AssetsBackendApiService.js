@@ -16,7 +16,7 @@
  * @fileoverview Service to serve as the interface for fetching and uploading
  * assets from Google Cloud Storage.
  */
-UrlInterpolationService
+
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
   'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',
