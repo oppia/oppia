@@ -975,8 +975,8 @@ describe('Exploration translation', function() {
   });
 
   it(
-  	'should maintain its active sub-tab on saving draft and publishing changes',
-  	function() {
+    'should maintain its active sub-tab on saving draft and publishing changes',
+    function() {
       users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
       users.login('user@translationSubTab.com');
       workflow.createExploration();
