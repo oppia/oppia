@@ -19,19 +19,17 @@
  */
 
 oppia.factory('ExplorationStatesService', [
-  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
-  'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService',
-  'UrlInterpolationService',
+  '$filter', '$injector', '$location', '$log', '$q', '$rootScope', '$uibModal',
+  'AlertsService', 'AngularNameService', 'AnswerClassificationService',
+  'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
+  'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
+  'UrlInterpolationService', 'ValidatorsService',
   function(
-      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
-      ExplorationInitStateNameService, AlertsService, ChangeListService,
-      StateEditorService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ContextService,
-      UrlInterpolationService) {
+      $filter, $injector, $location, $log, $q, $rootScope, $uibModal,
+      AlertsService, AngularNameService, AnswerClassificationService,
+      ChangeListService, ContextService, ExplorationInitStateNameService,
+      SolutionValidityService, StateEditorService, StatesObjectFactory,
+      UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];

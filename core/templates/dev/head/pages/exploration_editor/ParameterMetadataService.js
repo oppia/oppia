@@ -21,12 +21,12 @@ oppia.constant('PARAM_ACTION_GET', 'get');
 oppia.constant('PARAM_ACTION_SET', 'set');
 
 oppia.factory('ParameterMetadataService', [
-  'ExplorationStatesService', 'ExpressionInterpolationService',
-  'ExplorationParamChangesService', 'GraphDataService',
+  'ExplorationParamChangesService', 'ExplorationStatesService',
+  'ExpressionInterpolationService', 'GraphDataService',
   'ParamMetadataObjectFactory', 'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
   function(
-      ExplorationStatesService, ExpressionInterpolationService,
-      ExplorationParamChangesService, GraphDataService,
+      ExplorationParamChangesService, ExplorationStatesService,
+      ExpressionInterpolationService, GraphDataService,
       ParamMetadataObjectFactory, PARAM_ACTION_GET, PARAM_ACTION_SET) {
     var PARAM_SOURCE_ANSWER = 'answer';
     var PARAM_SOURCE_CONTENT = 'content';

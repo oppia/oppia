@@ -18,8 +18,8 @@
  */
 
 oppia.factory('ExplorationCategoryService', [
-  'ExplorationPropertyService', '$filter', 'ValidatorsService',
-  'ExplorationRightsService',
+  '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
+  'ValidatorsService',
   function(
       ExplorationPropertyService, $filter, ValidatorsService,
       ExplorationRightsService) {
