@@ -34,7 +34,7 @@ oppia.factory('ResponsesService', [
       ContextService, StateContentIdsToAudioTranslationsService,
       SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE, INTERACTION_SPECS) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;

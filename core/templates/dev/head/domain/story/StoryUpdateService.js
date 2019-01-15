@@ -46,7 +46,7 @@ oppia.constant(
 oppia.constant('STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
 oppia.constant(
   'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');
-STORY_PROPERTY_TITLE
+
 oppia.factory('StoryUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
