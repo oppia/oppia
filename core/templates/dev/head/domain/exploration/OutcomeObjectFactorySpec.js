@@ -51,4 +51,12 @@ describe('Outcome object factory', function() {
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
     }
   );
+
+  it('should correctly set the destination of an outcome',
+    function() {
+      var testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
+      testOutcome.setDestination('B');
+      expect(testOutcome.dest).toEqual('B');
+    }
+  );
 });
