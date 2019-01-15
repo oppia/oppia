@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Base', [
-  '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'SITE_NAME', 'DEV_MODE',
-  function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService, SITE_NAME, DEV_MODE) {
+  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
+  'SidebarStatusService', 'DEV_MODE', 'SITE_NAME',
+  function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
+      SidebarStatusService, DEV_MODE, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
