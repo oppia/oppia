@@ -139,6 +139,8 @@ md-input-group.md-default-theme label {
 }
 .material-icons.md-18 {
   font-size: 18px;
+  margin-top: 2px;
+
 }
 .material-icons.md-32 {
   font-size: 32px;
