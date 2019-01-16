@@ -22,7 +22,8 @@ oppia.controller('Signup', [
   'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
   'SITE_NAME',
   function(
-      $http, $rootScope, $scope, $uibModal, AlertsService, FocusManagerService,
+      $http, $rootScope, $scope, $uibModal, AlertsService,
+      FocusManagerService,
       SiteAnalyticsService, UrlInterpolationService, UrlService,
       SITE_NAME) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';

@@ -29,7 +29,8 @@ oppia.controller('StatisticsTab', [
   'IMPROVE_TYPE_INCOMPLETE',
   function(
       $http, $scope, $uibModal, AlertsService, ComputeGraphService,
-      DateTimeFormatService, ExplorationDataService, ExplorationFeaturesService,
+      DateTimeFormatService, ExplorationDataService,
+      ExplorationFeaturesService,
       ExplorationStatesService, ReadOnlyExplorationBackendApiService,
       RouterService, StateImprovementSuggestionService,
       StateRulesStatsService, StatesObjectFactory, UrlInterpolationService,
