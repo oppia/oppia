@@ -142,7 +142,7 @@ class Hint(object):
 
         Args:
             hint_content: SubtitledHtml. The hint text and ID referring to the
-              audio translations for this content.
+              other assets for this content.
         """
         self.hint_content = hint_content
 
@@ -772,6 +772,121 @@ class TranslationScript(object):
                 self.needs_update)
 
 
+class ContentTranslations(object):
+    """Value object representing a content translations."""
+
+    def __init__(self, content_translations):
+        """Initializes a ContentTranslations domain object."""
+
+        self.content_translations = content_translations
+
+    def to_dict(self):
+        """Returns a dict representing this ContentTranslations domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of ContentTranslations instance.
+        """
+
+        content_translations_dict = {}
+        for (content_id, language_code_to_translation_script) in (
+                self.content_translations.iteritems()):
+            content_translations_dict[content_id] = {}
+            for (language_code, translation_script) in (
+                    language_code_to_translation_script.iteritems()):
+                content_translations_dict[content_id][language_code] = (
+                    translation_script.to_dict())
+
+        return content_translations_dict
+
+    @classmethod
+    def from_dict(cls, content_translations_dict):
+        """Return a ContentTranslations domain object from a dict.
+
+        Args:
+            content_translations_dict: dict. The dict representation of
+                ContentTranslations object.
+
+        Returns:
+            ContentTranslations. The corresponding ContentTranslations domain
+            object.
+        """
+
+        content_translations = {}
+        for (content_id, language_code_to_translation_script) in (
+                content_translations_dict.iteritems()):
+            content_translations[content_id] = {}
+            for (language_code, translation_script) in (
+                    language_code_to_translation_script.iteritems()):
+                content_translations[content_id][language_code] = (
+                    TranslationScript.from_dict(translation_script))
+
+        return cls(content_translations)
+
+    def validate(self):
+        """Validates properties of the ContentTranslations.
+
+        Raises:
+            ValidationError: One or more attributes of the ContentTranslations
+            are invalid.
+        """
+
+        for (content_id, language_code_to_translation_script) in (
+                self.content_translations.iteritems()):
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received %s'
+                    % content_id)
+            if not isinstance(language_code_to_translation_script, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_translation_script)
+            for (language_code, translation_script) in (
+                    language_code_to_translation_script.iteritems()):
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language_code to be a string, received %s'
+                        % language_code)
+                translation_script.validate()
+
+    def get_available_languages(self):
+        """Returns a set of language available in the ContentTranslations.
+
+        Returns:
+            set. A set of language available in the ContentTranslations.
+        """
+
+        languages_list = []
+        for (_, language_code_to_translation_script) in (
+                self.content_translations.iteritems()):
+            for (language_code, _) in (
+                    language_code_to_translation_script.iteritems()):
+                languages_list.append(language_code)
+        return set(languages_list)
+
+    def update_content_translation(
+            self, content_id, language_code, translation_script):
+        """Updates the ContentTranslations domain object with the give
+        parameters.
+
+        Args:
+            content_id: str. The contnet_id of a SubtitledHtml object.
+            language_code: str. The language code of the translation script.
+            translation_script: TranslationScript. The translation script in the
+                give language code.
+        """
+
+        translation_script = TranslationScript.from_dict(translation_script)
+        translation_script.validate()
+
+        if content_id not in self.content_translations:
+            self.content_translations[content_id] = {
+                language_code: translation_script
+            }
+        else:
+            self.content_translations[content_id][language_code] = (
+                translation_script)
+
+
 class RuleSpec(object):
     """Value object representing a rule specification."""
 
@@ -894,8 +1009,8 @@ class SubtitledHtml(object):
         """Initializes a SubtitledHtml domain object.
 
         Args:
-            content_id: str. A unique id referring to the audio translations for
-              this content.
+            content_id: str. A unique id referring to the other assets for this
+                content.
             html: str. A piece of user submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
         """

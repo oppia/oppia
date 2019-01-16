@@ -438,6 +438,35 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(translation_script, 'needs_update', 20):
                 translation_script.validate()
 
+    def test_content_translations_validations(self):
+        """Test validation of content translations."""
+        content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'hello',
+                    'needs_update': True
+                }
+            },
+            'content2': {
+                'ud': {
+                    'html': 'New script!',
+                    'needs_update': True
+                },
+                'en': {
+                    'html': 'Testing!',
+                    'needs_update': True
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        content_translations.validate()
+
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -561,3 +590,140 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solution': {}
         })
         exploration.validate()
+
+
+class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on content transcripts."""
+
+    def test_get_available_languages_gives_set_of_langauges(self):
+
+        content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                }
+            },
+            'content2': {
+                'hi': {
+                    'html': 'Testing!',
+                    'needs_update': False
+                },
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        expected_available_languages = set(['en', 'hi'])
+
+        self.assertEqual(
+            content_translations.get_available_languages(),
+            expected_available_languages)
+
+    def test_update_c_translation_for_existing_c_id_updates_correctly(self):
+
+        content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+
+        new_translation_dict = {
+            'html': 'new translation!',
+            'needs_update': True
+        }
+        new_translation_language = 'heb'
+
+        content_translations.update_content_translation(
+            'content1', new_translation_language, new_translation_dict
+            )
+
+        expected_content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                },
+                'heb': {
+                    'html': 'new translation!',
+                    'needs_update': True
+                }
+            }
+        }
+
+        self.assertEqual(
+            expected_content_translations_dict,
+            content_translations.to_dict())
+
+    def test_update_c_translation_for_non_existing_c_id_updates_correctly(self):
+
+        content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+
+        new_content_id = 'content2'
+        new_translation_dict = {
+            'html': 'new translation!',
+            'needs_update': True
+        }
+        new_translation_language = 'en'
+
+        content_translations.update_content_translation(
+            new_content_id, new_translation_language, new_translation_dict
+            )
+
+        expected_content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                },
+            },
+            'content2': {
+                'en': {
+                    'html': 'new translation!',
+                    'needs_update': True
+                }
+            }
+        }
+
+        self.assertEqual(
+            expected_content_translations_dict, content_translations.to_dict())
