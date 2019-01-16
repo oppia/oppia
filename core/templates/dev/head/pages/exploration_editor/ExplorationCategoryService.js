@@ -21,8 +21,8 @@ oppia.factory('ExplorationCategoryService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',
   function(
-      ExplorationPropertyService, $filter, ValidatorsService,
-      ExplorationRightsService) {
+      $filter, ExplorationPropertyService, ExplorationRightsService,
+      ValidatorsService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');

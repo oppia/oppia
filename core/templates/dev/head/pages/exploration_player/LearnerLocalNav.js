@@ -20,12 +20,12 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$rootScope', '$http', '$uibModal', 'AlertsService',
+  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
   'FocusManagerService', 'UrlInterpolationService', 'UserService',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-      $scope, $rootScope, $http, $uibModal, AlertsService,
+      $http, $rootScope, $scope, $uibModal, AlertsService,
       ExplorationEngineService, ExplorationPlayerStateService,
       FocusManagerService, UrlInterpolationService, UserService,
       FLAG_EXPLORATION_URL_TEMPLATE) {

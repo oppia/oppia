@@ -18,11 +18,12 @@
  */
 
 oppia.factory('ExplorationCreationService', [
-  '$http', '$uibModal', '$timeout', '$rootScope', '$window',
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'SiteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $uibModal, $timeout, $rootScope, $window,
-      AlertsService, SiteAnalyticsService, UrlInterpolationService) {
+      $http, $rootScope, $timeout, $uibModal, $window,
+      AlertsService, SiteAnalyticsService, UrlInterpolationService
+      ) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;

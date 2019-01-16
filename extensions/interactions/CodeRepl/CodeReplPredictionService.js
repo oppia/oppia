@@ -27,12 +27,12 @@
 oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
 
 oppia.factory('CodeReplPredictionService', [
-  'WinnowingPreprocessingService', 'SVMPredictionService',
-  'PythonProgramTokenizer', 'PythonProgramTokenType',
-  'CountVectorizerService', 'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
-      WinnowingPreprocessingService, SVMPredictionService,
-      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService,
-      CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
+  'CountVectorizerService', 'PythonProgramTokenType',
+  'PythonProgramTokenizer', 'SVMPredictionService',
+  'WinnowingPreprocessingService', 'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
+      CountVectorizerService, PythonProgramTokenType,
+      PythonProgramTokenizer, SVMPredictionService,
+      WinnowingPreprocessingService, CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
     // The string with which all the variable and method names need to be
     // replaced.
     var TOKEN_NAME_VAR = 'V';

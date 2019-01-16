@@ -23,11 +23,11 @@
 oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
-  'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
+  'HtmlEscaperService', 'UrlInterpolationService', 'UrlService',
+  'graphInputRulesService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      UrlService, EVENT_NEW_CARD_AVAILABLE) {
+      HtmlEscaperService, UrlInterpolationService, UrlService,
+      graphInputRulesService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -170,11 +170,11 @@ oppia.factory('graphDetailService', [function() {
 }]);
 
 oppia.directive('oppiaResponseGraphInput', [
-  'HtmlEscaperService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-  'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService', 'graphDetailService',
+  'GRAPH_INPUT_LEFT_MARGIN',
   function(
-      HtmlEscaperService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
-      UrlInterpolationService) {
+      HtmlEscaperService, UrlInterpolationService, graphDetailService,
+      GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},

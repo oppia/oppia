@@ -17,8 +17,8 @@
  */
 
 oppia.factory('GraphInputValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService',
-  function(WARNING_TYPES, baseInteractionValidationService) {
+  'baseInteractionValidationService', 'WARNING_TYPES',
+  function(baseInteractionValidationService, WARNING_TYPES) {
     var VERTICES_LIMIT = 50;
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {

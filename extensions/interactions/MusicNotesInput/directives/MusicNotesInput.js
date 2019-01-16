@@ -76,15 +76,15 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 });
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
-  'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
+  'CurrentInteractionService', 'HtmlEscaperService',
+  'UrlInterpolationService', 'WindowDimensionsService',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
-  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'CurrentInteractionService', 'WindowDimensionsService',
+  'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
-      HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
+      CurrentInteractionService, HtmlEscaperService,
+      UrlInterpolationService, WindowDimensionsService,
       musicNotesInputRulesService, musicPhrasePlayerService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      CurrentInteractionService, WindowDimensionsService) {
+      EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
       scope: {

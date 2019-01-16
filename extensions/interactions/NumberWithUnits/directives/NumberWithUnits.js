@@ -111,9 +111,9 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
 ]);
 
 oppia.directive('oppiaResponseNumberWithUnits', [
-  'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
-  'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-      HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
+  'UrlInterpolationService', function(HtmlEscaperService,
+      NumberWithUnitsObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -130,9 +130,9 @@ oppia.directive('oppiaResponseNumberWithUnits', [
 ]);
 
 oppia.directive('oppiaShortResponseNumberWithUnits', [
-  'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
-  'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-      HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
+  'UrlInterpolationService', function(HtmlEscaperService,
+      NumberWithUnitsObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -150,8 +150,8 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 
 // Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
-  function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+  'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
+  function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
     try {
       NumberWithUnitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}

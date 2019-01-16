@@ -17,8 +17,8 @@
  */
 
 oppia.directive('solutionExplanationEditor', [
-  'UrlInterpolationService', 'StateSolutionService',
-  function(UrlInterpolationService, StateSolutionService) {
+  'StateSolutionService', 'UrlInterpolationService',
+  function(StateSolutionService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
