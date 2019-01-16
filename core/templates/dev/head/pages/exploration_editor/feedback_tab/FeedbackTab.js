@@ -17,18 +17,17 @@
  */
 
 oppia.controller('FeedbackTab', [
+  '$http', '$log', '$q', '$rootScope', '$scope', '$timeout', '$uibModal',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION', 'AlertsService',
   'ChangeListService', 'DateTimeFormatService', 'ExplorationDataService',
-  'ExplorationStatesService', '$http', '$log', '$q', '$rootScope', '$scope',
-  'StateObjectFactory', 'ThreadDataService', '$timeout',
-  'ThreadStatusDisplayService', '$uibModal', 'UrlInterpolationService',
-  'UserService',
+  'ExplorationStatesService', 'StateObjectFactory', 'ThreadDataService',
+  'ThreadStatusDisplayService', 'UrlInterpolationService','UserService',
   function(
+      $http, $log, $q,$rootScope, $scope, $timeout, $uibModal,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, AlertsService,
       ChangeListService, DateTimeFormatService, ExplorationDataService,
-      ExplorationStatesService, $http, $log, $q, $rootScope, $scope,
-      StateObjectFactory, ThreadDataService, $timeout,
-      ThreadStatusDisplayService, $uibModal, UrlInterpolationService,
+      ExplorationStatesService, StateObjectFactory, ThreadDataService,
+      ThreadStatusDisplayService, UrlInterpolationService,
       UserService) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
