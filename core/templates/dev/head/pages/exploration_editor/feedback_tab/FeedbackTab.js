@@ -27,8 +27,7 @@ oppia.controller('FeedbackTab', [
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, AlertsService,
       ChangeListService, DateTimeFormatService, ExplorationDataService,
       ExplorationStatesService, StateObjectFactory, ThreadDataService,
-      ThreadStatusDisplayService, UrlInterpolationService,
-      UserService) {
+      ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
