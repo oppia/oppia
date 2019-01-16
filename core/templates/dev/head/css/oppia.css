@@ -2139,6 +2139,14 @@ div#ng-curtain {
   display: inline-block;
   vertical-align: top;
 }
+.oppia-navbar-tabs li a{
+
+  -webkit-transition: all .5s ease;
+  -moz-transition: all .5s ease;
+  -o-transition: all .5s ease;
+  transition: all .5s ease;
+
+}
 .oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
