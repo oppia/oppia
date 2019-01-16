@@ -21,9 +21,9 @@ oppia.controller('FeedbackTab', [
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION', 'AlertsService',
   'ChangeListService', 'DateTimeFormatService', 'ExplorationDataService',
   'ExplorationStatesService', 'StateObjectFactory', 'ThreadDataService',
-  'ThreadStatusDisplayService', 'UrlInterpolationService','UserService',
+  'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
   function(
-      $http, $log, $q,$rootScope, $scope, $timeout, $uibModal,
+      $http, $log, $q, $rootScope, $scope, $timeout, $uibModal,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, AlertsService,
       ChangeListService, DateTimeFormatService, ExplorationDataService,
       ExplorationStatesService, StateObjectFactory, ThreadDataService,
