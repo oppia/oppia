@@ -249,9 +249,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, skill_id, 'Description')
+            question_id, skill_id)
         question_services.create_new_question_skill_link(
-            question_id_2, skill_id, 'Description')
+            question_id_2, skill_id)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(

@@ -22,7 +22,9 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, skill_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.skill
+])
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -151,8 +153,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     question_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
-    # The description of the skill for frontend display purposes.
-    skill_description = ndb.StringProperty(required=True)
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -168,14 +168,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return '%s:%s' % (question_id, skill_id)
 
     @classmethod
-    def create(cls, question_id, skill_id, skill_description):
+    def create(cls, question_id, skill_id):
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
-            skill_description: str. The description of the skill to which
-                question is linked.
 
         Raises:
             Exception. The given question is already linked to the given skill.
@@ -192,8 +190,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_model_instance = cls(
             id=question_skill_link_id,
             question_id=question_id,
-            skill_id=skill_id,
-            skill_description=skill_description
+            skill_id=skill_id
         )
         return question_skill_link_model_instance
 
@@ -211,7 +208,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(dict), str|None. The question ids linked to given skills and
-                the corresponding skill descrptions and the next cursor value
+                the corresponding skill descriptions and the next cursor value
                 to be used for the next page (or None if no more pages are
                 left). The returned next cursor value is urlsafe.
         """
@@ -232,10 +229,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
+
+        skill_ids = [model.skill_id for model in question_skill_link_models]
+        skills = skill_models.SkillModel.get_multi(skill_ids)
         question_skill_link_dicts = [{
             'question_id': model.question_id,
-            'skill_description': model.skill_description
-        } for model in question_skill_link_models]
+            'skill_description': (
+                skills[index].description if skills[index] else None)
+        } for index, model in enumerate(question_skill_link_models)]
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )

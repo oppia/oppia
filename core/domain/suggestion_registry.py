@@ -509,7 +509,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change.skill_id, skill.description)
+            question_dict['id'], self.change.skill_id)
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""

@@ -176,9 +176,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_delete(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 'Skill Description')
+            self.question_id, self.skill_id)
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id, 'Skill Description')
+            self.question_id_2, self.skill_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             self.delete_json(
@@ -226,7 +226,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(
             self.skill_id, self.admin_id, 'Skill Description')
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 'Skill Description')
+            self.question_id, self.skill_id)
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):

@@ -193,7 +193,7 @@ class MergeSkillHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The new skill with the given id doesn\'t exist.'))
         question_services.update_skill_ids_of_questions(
-            old_skill_id, new_skill_id, new_skill.description)
+            old_skill_id, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,

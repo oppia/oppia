@@ -84,17 +84,15 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id, skill_description):
+def create_new_question_skill_link(question_id, skill_id):
     """Creates a new QuestionSkillLink model.
 
     Args:
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
-        skill_description: str. Description of the skill to which the question
-            is linked.
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id, skill_description)
+        question_id, skill_id)
     question_skill_link_model.put()
 
 
@@ -295,14 +293,13 @@ def get_question_skill_links_of_question(question_id):
 
 
 def update_skill_ids_of_questions(
-        curr_skill_id, new_skill_id, new_skill_description):
+        curr_skill_id, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
     Args:
         curr_skill_id: str. ID of the current skill.
         new_skill_id: str. ID of the superseding skill.
-        new_skill_description: str. Description of superseding skill.
     """
     old_question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
@@ -312,8 +309,7 @@ def update_skill_ids_of_questions(
     for question_skill_link in old_question_skill_links:
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id, new_skill_id,
-                new_skill_description)
+                question_skill_link.question_id, new_skill_id)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
         old_question_skill_link_models)
