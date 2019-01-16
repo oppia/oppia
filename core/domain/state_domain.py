@@ -777,7 +777,6 @@ class ContentTranslations(object):
 
     def __init__(self, content_translations):
         """Initializes a ContentTranslations domain object."""
-
         self.content_translations = content_translations
 
     def to_dict(self):
@@ -786,7 +785,6 @@ class ContentTranslations(object):
         Returns:
             dict. A dict, mapping all fields of ContentTranslations instance.
         """
-
         content_translations_dict = {}
         for (content_id, language_code_to_translation_script) in (
                 self.content_translations.iteritems()):
@@ -810,7 +808,6 @@ class ContentTranslations(object):
             ContentTranslations. The corresponding ContentTranslations domain
             object.
         """
-
         content_translations = {}
         for (content_id, language_code_to_translation_script) in (
                 content_translations_dict.iteritems()):
@@ -829,7 +826,6 @@ class ContentTranslations(object):
             ValidationError: One or more attributes of the ContentTranslations
             are invalid.
         """
-
         for (content_id, language_code_to_translation_script) in (
                 self.content_translations.iteritems()):
             if not isinstance(content_id, basestring):
@@ -852,9 +848,8 @@ class ContentTranslations(object):
         """Returns a set of language available in the ContentTranslations.
 
         Returns:
-            set. A set of language available in the ContentTranslations.
+            set. A set of languages available in the ContentTranslations.
         """
-
         languages_list = []
         for (_, language_code_to_translation_script) in (
                 self.content_translations.iteritems()):
@@ -874,7 +869,6 @@ class ContentTranslations(object):
             translation_script: TranslationScript. The translation script in the
                 give language code.
         """
-
         translation_script = TranslationScript.from_dict(translation_script)
         translation_script.validate()
 
