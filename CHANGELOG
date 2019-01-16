@@ -1,5 +1,80 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.2 (14 January 2019)
+------------------------
+Updates to landing pages
+* Small landing page changes based on feedback from Kefeh (#5951)
+* Fix #5978: Stewards page content alignment (#6042)
+
+Analytics for creators
+* Hide playthrough issues on exploration editor stats tab if exploration isn't whitelisted (#5947)
+* Fixes #5860: Fix fraction display in statistics tab (#5976)
+* Rename playthrough-related issues services/directives/factories (#5990)
+* Fix #5798: Introduce Improvements tab to exploration editor (#5991)
+* Introduce FetchPlaythroughWhitelistHandler (#5966)
+
+Generalized review system
+* Fix #4995: Remove complex logic from the storage layer, and add domain/service layer for emails (#5940)
+* Fix error while displaying suggestion threads on learner dashboard page (#5965)
+
+Development workflow
+* Fix #5761: --test_target flag redirects to the corresponding test file if needed (#6014)
+* Fix #5885: Only run front end tests when front end files are changed (#5936)
+* Fix #5782: Added custom check to remove backslash continuation (#5964)
+* Fix #5529: Print python lint errors at the end of the check (#6005)
+* Add try/except block in pre-commit linter (#6019)
+* Enforce variables to be in snake case (#5943)
+* Fix #5876: Check that cls arguments come first in function args (#5919)
+* Fix part of #6024: Consolidate file access in the pre-commit linter (#6023)
+* Fix #5938: Lint checks should run only for files changed by the user (#6033)
+* Introduce eslint: space-before-blocks rule (#6048)
+* Fix max-len error (#5994)
+* Fix false positive Travis build in pre-commit linter (#6002)
+* Fix #6040: Fix issues in develop which led to lint test failures (#6038)
+
+New structures
+* Implement editing of questions (#5614)
+* Allow admins to assign topic managers to topics (#5971)
+* Split ENABLE_NEW_STRUCTURES flag to 2 flags for editors and players (#5987)
+
+Test coverage
+* Fix part of #5134: Add more tests to increase coverage of core.controllers.classifier (#5926)
+* Fix part of #5134: Add tests for core.controllers.custom_landing_pages. (#5925)
+* Fix part of #5134: Add core.platform.models tests (#5944)
+
+Code health and documentation
+* Upgrade pylint to 1.9.3 and fix some docstring issues (#5935)
+* Fix code duplication in ExplorationPlayerStateService (#6000)
+* Fix #4968: Move customization args method from state_domain to customization_args_util (#6015)
+* Fix parts of #4374: Add docstrings to Python files. (#5928, #5969, #5977, #6006, #6013, #6027, #6035, #6041)
+
+Improvements to editor features
+* Fix #5933: Changed code editor prompt in test exploration to be more explicit (#5941)
+* Fix #5853: Remove weird image artifact in rich-text editor (#5954)
+* Fix #5039: Add continue button in preview mode (#5962)
+* Fix #5949: Make RTE spacing uniform (#5953)
+* Fix #5701: Alert user to save changes before publishing (#5948)
+* Fix #5980: Make line-spacing consistent within a paragraph (#5981)
+* Add questions list tab and create question functionality to skill editor (#5920)
+* Fix #5973: Fix the changed space when the text is added just below the image (#5996)
+* Fix #5982: Fix modal overflow issue by using word-break property (#5983)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #6016: Limited the selection area of multiple choice option (#6029)
+* Fix #6056: Prevent the text box in the Save Draft modal from flowing out of the modal boundaries (#6057)
+* Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
+
+Updates to the library and splash pages
+* Fix #4936: The drop down menus work similar to the keyboard behavior for the About and Profile dropdowns (#5974)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #5755: Add padding to cards to fix alignment issue on mobile view (#5968)
+
+Infrastructure changes
+* Fix part of #3950: Remove Jinja ifs from exploration_player.html (#5958)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+* Fix part of #5002: Remove NAV_MODE from side navigation bar (#6008)
+
+
 v2.7.1 (20 December 2018)
 -------------------------
 Updates to landing pages:
