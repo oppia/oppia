@@ -17,13 +17,13 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
+  '$scope', '$log', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
   'AlertsService', 'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $q, $uibModal, $timeout, $rootScope,
+      $scope, $log, $http, $q, $uibModal, $timeout, $rootScope,
       AlertsService, DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
