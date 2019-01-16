@@ -47,23 +47,23 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$q', '$rootScope', '$http', '$log', '$uibModal', '$window',
+  '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
   'ExplorationCreationService', 'QuestionObjectFactory',
   'RatingComputationService', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
   'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
-  'UserService', 'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
+  'UserService', 'EXPLORATIONS_SORT_BY_KEYS', 'EXPLORATION_DROPDOWN_STATS',
   'FATAL_ERROR_CODES', 'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $q, $rootScope, $http, $log, $uibModal, $window,
+      $http, $log, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
       ExplorationCreationService, QuestionObjectFactory,
       RatingComputationService, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ThreadStatusDisplayService,
       TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-      UserService, EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
+      UserService, EXPLORATIONS_SORT_BY_KEYS, EXPLORATION_DROPDOWN_STATS,
       FATAL_ERROR_CODES, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {

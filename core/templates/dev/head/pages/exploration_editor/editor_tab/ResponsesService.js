@@ -27,14 +27,14 @@ oppia.factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, StateEditorService,
-      OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
-      StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE, INTERACTION_SPECS) {
+  $rootScope, AlertsService, AnswerGroupsCacheService,
+  ContextService, OutcomeObjectFactory,
+  SolutionValidityService, SolutionVerificationService,
+  StateContentIdsToAudioTranslationsService, StateEditorService, StateInteractionIdService,
+  StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
+  INFO_MESSAGE_SOLUTION_IS_VALID, INTERACTION_SPECS) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
