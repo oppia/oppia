@@ -21,7 +21,8 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
-  'DateTimeFormatService', 'ExplorationDataService', 'ExplorationFeaturesService',
+  'DateTimeFormatService', 'ExplorationDataService',
+  'ExplorationFeaturesService',
   'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
   'RouterService', 'StateImprovementSuggestionService',
   'StateRulesStatsService', 'StatesObjectFactory', 'UrlInterpolationService',

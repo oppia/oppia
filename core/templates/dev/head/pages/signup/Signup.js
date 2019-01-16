@@ -17,7 +17,8 @@
  */
 
 oppia.controller('Signup', [
-  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService', 'FocusManagerService',
+  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+  'FocusManagerService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
   'SITE_NAME',
   function(

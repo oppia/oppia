@@ -30,15 +30,19 @@ oppia.constant(
 oppia.controller('TopicsAndSkillsDashboard', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'SkillCreationService',
-  'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED', 'EVENT_TYPE_SKILL_CREATION_ENABLED',
+  'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
+  'UrlInterpolationService',
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'EVENT_TYPE_SKILL_CREATION_ENABLED',
   'EVENT_TYPE_TOPIC_CREATION_ENABLED',
   'FATAL_ERROR_CODES',
   function(
       $http, $rootScope, $scope, $uibModal, $window,
       AlertsService, SkillCreationService,
-      TopicCreationService, TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, EVENT_TYPE_SKILL_CREATION_ENABLED,
+      TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
+      UrlInterpolationService,
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      EVENT_TYPE_SKILL_CREATION_ENABLED,
       EVENT_TYPE_TOPIC_CREATION_ENABLED,
       FATAL_ERROR_CODES) {
     $scope.TAB_NAME_TOPICS = 'topics';

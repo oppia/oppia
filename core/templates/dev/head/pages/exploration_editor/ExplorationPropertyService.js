@@ -19,7 +19,7 @@
  */
 
 oppia.factory('ExplorationPropertyService', [
-  '$log', '$rootScope', 'AlertsService', 'ChangeListService', 
+  '$log', '$rootScope', 'AlertsService', 'ChangeListService',
   function($log, $rootScope, AlertsService, ChangeListService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)

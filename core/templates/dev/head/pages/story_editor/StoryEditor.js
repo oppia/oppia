@@ -18,7 +18,8 @@
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
 oppia.controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'StoryEditorStateService', 'UndoRedoService',
+  '$scope', '$uibModal', '$window', 'StoryEditorStateService',
+  'UndoRedoService',
   'UrlInterpolationService', 'UrlService',
   function(
       $scope, $uibModal, $window, StoryEditorStateService, UndoRedoService,

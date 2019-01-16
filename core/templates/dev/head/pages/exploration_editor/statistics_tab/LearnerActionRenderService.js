@@ -31,7 +31,8 @@ oppia.factory('LearnerActionRenderService', [
   'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
       $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
-      ACTION_TYPE_EXPLORATION_START, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      ACTION_TYPE_EXPLORATION_START,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
         '<span class="oppia-issues-learner-action">' + actionIndex +

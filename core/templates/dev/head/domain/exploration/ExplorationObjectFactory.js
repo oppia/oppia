@@ -16,13 +16,15 @@
  * @fileoverview Factory for creating new frontend instances of Exploration
  * domain objects.
  */
- 
+
 oppia.factory('ExplorationObjectFactory', [
   '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-  'StatesObjectFactory', 'UrlInterpolationService', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'StatesObjectFactory', 'UrlInterpolationService',
+  'INTERACTION_DISPLAY_MODE_INLINE',
   'INTERACTION_SPECS', function(
       $log, ParamChangesObjectFactory, ParamSpecsObjectFactory,
-      StatesObjectFactory, UrlInterpolationService, INTERACTION_DISPLAY_MODE_INLINE,
+      StatesObjectFactory, UrlInterpolationService,
+      INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, states, title, languageCode) {

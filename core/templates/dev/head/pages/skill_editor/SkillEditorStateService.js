@@ -25,12 +25,14 @@ oppia.constant(
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
-  'SkillRightsObjectFactory', 'UndoRedoService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+  'SkillRightsObjectFactory', 'UndoRedoService',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
       SkillObjectFactory, SkillRightsBackendApiService,
-      SkillRightsObjectFactory, UndoRedoService, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+      SkillRightsObjectFactory, UndoRedoService,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();

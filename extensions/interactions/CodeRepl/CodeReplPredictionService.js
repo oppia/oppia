@@ -29,7 +29,8 @@ oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
 oppia.factory('CodeReplPredictionService', [
   'CountVectorizerService', 'PythonProgramTokenType',
   'PythonProgramTokenizer', 'SVMPredictionService',
-  'WinnowingPreprocessingService', 'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
+  'WinnowingPreprocessingService',
+  'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
       CountVectorizerService, PythonProgramTokenType,
       PythonProgramTokenizer, SVMPredictionService,
       WinnowingPreprocessingService, CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {

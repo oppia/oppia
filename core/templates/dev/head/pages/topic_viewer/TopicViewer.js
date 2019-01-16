@@ -17,7 +17,8 @@
  */
 
 oppia.controller('TopicViewer', [
-  '$rootScope', '$scope', '$window', 'AlertsService', 'TopicViewerBackendApiService',
+  '$rootScope', '$scope', '$window', 'AlertsService',
+  'TopicViewerBackendApiService',
   'UrlService', 'FATAL_ERROR_CODES',
   function(
       $rootScope, $scope, $window, AlertsService, TopicViewerBackendApiService,
