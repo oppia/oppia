@@ -879,7 +879,7 @@ describe('Suggestions on Explorations', function() {
     submitSuggestion(suggestion1, suggestionDescription1);
     explorationPlayerPage.closeSuggestionModal();
     explorationPlayerPage.submitSuggestion(
-    	suggestion2, suggestionDescription2);
+    suggestion2, suggestionDescription2);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
@@ -889,10 +889,10 @@ describe('Suggestions on Explorations', function() {
 
     explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.getFirstSuggestionThread().
-    then(function(threads) {
-      expect(threads.length).toEqual(2);
-      expect(threads[0]).toMatch(suggestionDescription2);
-    });
+      then(function(threads) {
+        expect(threads.length).toEqual(2);
+        expect(threads[0]).toMatch(suggestionDescription2);
+      });
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
