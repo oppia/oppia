@@ -2,7 +2,7 @@
   <div class="container" style="margin-left: 0;">
     <h3>Reload a single exploration</h3>
     <div ng-repeat="exploration in DEMO_EXPLORATIONS"
-         class="row protractor-test-reload-exploration-row">
+         class="row oppia-reload-exploration-row protractor-test-reload-exploration-row">
       <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
         <[exploration[1]]>
       </span>
@@ -57,7 +57,7 @@
   <div class="container" style="margin-left: 0;">
     <h3>Reload a single collection</h3>
     <div ng-repeat="collection in DEMO_COLLECTIONS"
-         class="row protractor-test-reload-collection-row">
+         class="row oppia-reload-collection-row protractor-test-reload-collection-row">
       <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
         <[collection[1]]>
       </span>
@@ -71,3 +71,9 @@
     </div>
   </div>
 </md-card>
+
+<style>
+    .oppia-reload-collection-row, .oppia-reload-exploration-row {
+      margin-bottom: 5px;
+    }
+</style>
