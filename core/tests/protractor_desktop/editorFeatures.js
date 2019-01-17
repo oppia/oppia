@@ -870,10 +870,14 @@ describe('Suggestions on Explorations', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    var suggestion = 'New Exploration';
-    var suggestionDescription = 'Uppercased the first letter';
+    var suggestion_1 = 'New Exploration';
+    var suggestionDescription_1 = 'Uppercased the first letter';
+    var suggestion_2 = 'New exploration';
+    var suggestionDescription_2 = 'Changed';
 
-    explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
+    explorationPlayerPage.submitSuggestion(suggestion_1, suggestionDescription_1);
+    explorationPlayerPage.closeSuggestionModal();
+    explorationPlayerPage.submitSuggestion(suggestion_2, suggestionDescription_2);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
@@ -882,14 +886,16 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
-      expect(threads.length).toEqual(1);
-      expect(threads[0]).toMatch(suggestionDescription);
+    explorationEditorFeedbackTab.getFirstSuggestionThread().then(function(threads) {
+      expect(threads.length).toEqual(2);
+      expect(threads[0]).toMatch(suggestionDescription_2);
     });
-    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription);
-
+    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription_2);
+    explorationEditorFeedbackTab.goBackToAllFeedbacks();
+    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription_1);
     explorationEditorPage.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion_1));
+
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.
@@ -897,7 +903,7 @@ describe('Suggestions on Explorations', function() {
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion_1));
     users.logout();
   });
 

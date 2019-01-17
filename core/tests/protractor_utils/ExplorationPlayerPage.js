@@ -26,6 +26,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-input'));
   var suggestionDescriptionInput = element(
     by.css('.protractor-test-suggestion-description-input'));
+  var closeSuggestionModalButton = element(
+    by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element.all(
@@ -124,6 +126,10 @@ var ExplorationPlayerPage = function() {
     returnToParentButton.click();
     waitFor.pageToFullyLoad();
   };
+
+  this.closeSuggestionModal = function() {
+    closeSuggestionModalButton.click();
+  }
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
