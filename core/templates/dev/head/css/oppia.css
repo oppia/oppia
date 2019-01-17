@@ -1507,6 +1507,7 @@ pre.oppia-pre-wrapped-text {
   margin-top: 10px;
 }
 
+/* The six rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
 }
@@ -1514,7 +1515,6 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 
-/* The four rules below should be in sync. */
 .rte-viewer > p:first-child {
   margin-top: 0;
 }
