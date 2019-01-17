@@ -57,6 +57,17 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(duplicated, True)
 
+    def test_non_duplicated_mails_not_detected(self):
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
         not_duplicated = email_models.SentEmailModel.check_duplicate_message(
             'recipient_id', 'Other Email Subject', 'Other Email Body')
 
@@ -184,7 +195,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_ids), len(set_ids))
 
     def test_create_raises_when_duplicate_ids(self):
-        with self.generate_constant_id_ctx, self.assertRaises(Exception):
+        with self.generate_constant_id_ctx, self.assertRaisesRegexp(Exception, 'Unique reply-to ID'):
             created1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 'user_id', 'thread_id')
             created1.put()
@@ -198,10 +209,9 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created = model.create('user_id', 'thread_id')
         created.put()
 
-        result = model.get_by_reply_to_id(created.reply_to_id)
+        reply = model.get_by_reply_to_id(created.reply_to_id)
 
-        self.assertNotEqual(result, None) # There should be a result
-        self.assertEqual(result.reply_to_id, created.reply_to_id)
+        self.assertEqual(reply.reply_to_id, created.reply_to_id)
 
     def test_nonexistent_get_reply_to_id_should_provide_no_model(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
@@ -209,37 +219,30 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created = model.create('user_id', 'thread_id')
         created.put()
 
-        result = model.get_by_reply_to_id(created.reply_to_id)
+        reply = model.get_by_reply_to_id('non_existent_reply_to_id')
 
-        result = model.get_by_reply_to_id('non_existent_reply_to_id')
-
-        self.assertEqual(result, None)
+        self.assertIsNone(reply)
 
     def test_get_can_be_used_to_retrive_model(self):
         created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'thread_id')
         created.put()
 
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+        retrived = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'user_id', 'thread_id', strict=False)
 
-        self.assertNotEqual(result, None)
-        self.assertIn('user_id.thread_id', str(result.key))
+        self.assertIn(created.reply_to_id, retrived.reply_to_id)
 
-    def test_get_returns_nothing_with_bad_id_if_not_strict(self):
+    def test_get_returns_nothing_with_bad_ids_if_not_strict(self):
         created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'thread_id')
         created.put()
 
-        result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+        retrived = email_models.GeneralFeedbackEmailReplyToIdModel.get(
             'bad_user_id', 'bad_thread_id', strict=False)
-        self.assertEqual(result, None)
+        self.assertIsNone(retrived)
 
-        with self.assertRaises(Exception):
-            result = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                'bad_user_id', 'bad_thread_id')
-
-    def test_get_returns_throws_with_bad_id_if_strict(self):
+    def test_get_returns_throws_with_bad_ids_if_strict(self):
         created = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'thread_id')
         created.put()
@@ -248,7 +251,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.get(
                 'bad_user_id', 'bad_thread_id')
 
-    def test_get_multi_by_user_ids_works_correctly_with_multiple_ids(self):
+    def test_get_multi_with_multiple_user_ids_returns_dict_ids_models(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
@@ -256,16 +259,16 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created2 = model.create('user_id_2', 'thread_id')
         created2.put()
 
-        result = model.get_multi_by_user_ids(
+        dict_replies = model.get_multi_by_user_ids(
             ['user_id_1', 'user_id_2'], 'thread_id')
 
-        self.assertEqual(len(result), 2)
-        self.assertIn('user_id_1', result.keys())
-        self.assertIn('user_id_2', result.keys())
-        self.assertEqual(result['user_id_1'], created1)
-        self.assertEqual(result['user_id_2'], created2)
+        self.assertEqual(len(dict_replies), 2)
+        self.assertIn('user_id_1', dict_replies.keys())
+        self.assertIn('user_id_2', dict_replies.keys())
+        self.assertEqual(dict_replies['user_id_1'], created1)
+        self.assertEqual(dict_replies['user_id_2'], created2)
 
-    def test_get_multi_by_user_ids_works_correctly_with_one_id(self):
+    def test_get_multi_with_one_user_id_gives_correct_id_in_dict(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
@@ -273,14 +276,14 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created2 = model.create('user_id_2', 'thread_id')
         created2.put()
 
-        result = model.get_multi_by_user_ids(
+        dict_reply = model.get_multi_by_user_ids(
             ['user_id_1'], 'thread_id')
 
-        self.assertEqual(len(result), 1)
-        self.assertIn('user_id_1', result.keys())
-        self.assertEqual(result['user_id_1'], created1)
+        self.assertEqual(len(dict_reply), 1)
+        self.assertIn('user_id_1', dict_reply.keys())
+        self.assertEqual(dict_reply['user_id_1'], created1)
 
-    def test_get_multi_by_user_ids_works_correctly_with_no_id(self):
+    def test_get_multi_with_no_user_ids_returns_empty_dict(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
@@ -288,12 +291,11 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created2 = model.create('user_id_2', 'thread_id')
         created2.put()
 
-        result = model.get_multi_by_user_ids(
-            [], 'thread_id')
+        dict_empty = model.get_multi_by_user_ids([], 'thread_id')
 
-        self.assertEqual(len(result), 0)
+        self.assertEqual(len(dict_empty), 0)
 
-    def test_get_multi_by_user_ids_works_correctly_with_bad_ids(self):
+    def test_get_multi_with_bad_user_ids_returns_key_associated_with_none_in_dict(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
@@ -301,14 +303,31 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         created2 = model.create('user_id_2', 'thread_id')
         created2.put()
 
-        result = model.get_multi_by_user_ids(
+        dict_replies = model.get_multi_by_user_ids(
             ['user_id_1', 'bad_user_id_2'], 'thread_id')
 
-        self.assertEqual(len(result), 2)
-        self.assertIn('user_id_1', result.keys())
-        self.assertIn('bad_user_id_2', result.keys())
-        self.assertEqual(result['user_id_1'], created1)
-        self.assertEqual(result['bad_user_id_2'], None)
+        self.assertEqual(len(dict_replies), 2)
+        self.assertIn('user_id_1', dict_replies.keys())
+        self.assertIn('bad_user_id_2', dict_replies.keys())
+        self.assertEqual(dict_replies['user_id_1'], created1)
+        self.assertIsNone(dict_replies['bad_user_id_2'])
+
+    def test_get_multi_with_bad_thread_id_returns_dict_with_none_every_key(self):
+        model = email_models.GeneralFeedbackEmailReplyToIdModel
+
+        created1 = model.create('user_id_1', 'thread_id')
+        created1.put()
+        created2 = model.create('user_id_2', 'thread_id')
+        created2.put()
+
+        dict_replies = model.get_multi_by_user_ids(
+            ['user_id_1', 'user_id_2'], 'bad_thread_id')
+
+        self.assertEqual(len(dict_replies), 2)
+        self.assertIn('user_id_1', dict_replies.keys())
+        self.assertIn('user_id_2', dict_replies.keys())
+        self.assertIsNone(dict_replies['user_id_1'])
+        self.assertIsNone(dict_replies['user_id_2'])
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
