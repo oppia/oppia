@@ -122,8 +122,8 @@ var ExplorationEditorFeedbackTab = function() {
           return suggestionDescription.indexOf(subject) !== -1;
         });
       });
-      expect(matchingSuggestionRows[0].isDisplayed()).toBe(true);
-      matchingSuggestionRows[0].click();
+      expect(matchingSuggestionRows[1].isDisplayed()).toBe(true);
+      matchingSuggestionRows[1].click();
       expect(viewSuggestionButton.isDisplayed()).toBe(true);
       viewSuggestionButton.click();
       expect(rejectSuggestionButton.isDisplayed()).toBe(true);

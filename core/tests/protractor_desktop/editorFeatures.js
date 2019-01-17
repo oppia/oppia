@@ -893,9 +893,9 @@ describe('Suggestions on Explorations', function() {
         expect(threads.length).toEqual(2);
         expect(threads[0]).toMatch(suggestionDescription2);
       });
-    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
-    explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
+    explorationEditorFeedbackTab.goBackToAllFeedbacks();
+    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 
