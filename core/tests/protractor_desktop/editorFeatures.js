@@ -855,7 +855,7 @@ describe('Suggestions on Explorations', function() {
       'studentExplorationSuggestions');
   });
 
-  it('accepts a suggestion on a published exploration', function() {
+  it('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
