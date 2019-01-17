@@ -17,7 +17,6 @@
 """Tests for feedback related jobs."""
 
 from core.domain import feedback_jobs_one_off
-from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 
