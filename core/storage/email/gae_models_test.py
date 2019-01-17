@@ -195,7 +195,8 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_ids), len(set_ids))
 
     def test_create_raises_when_duplicate_ids(self):
-        with self.generate_constant_id_ctx, self.assertRaisesRegexp(Exception, 'Unique reply-to ID'):
+        with self.generate_constant_id_ctx, 
+            self.assertRaisesRegexp(Exception, 'Unique reply-to ID'):
             created1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 'user_id', 'thread_id')
             created1.put()
@@ -295,7 +296,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(dict_empty), 0)
 
-    def test_get_multi_with_bad_user_ids_returns_key_associated_with_none_in_dict(self):
+    def test_get_multi_with_bad_user_ids_returns_key_equals_none_in_dict(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
@@ -312,7 +313,7 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(dict_replies['user_id_1'], created1)
         self.assertIsNone(dict_replies['bad_user_id_2'])
 
-    def test_get_multi_with_bad_thread_id_returns_dict_with_none_every_key(self):
+    def test_get_multi_with_bad_thread_id_returns_dict_keys_equals_none(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel
 
         created1 = model.create('user_id_1', 'thread_id')
