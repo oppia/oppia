@@ -891,7 +891,7 @@ describe('Suggestions on Explorations', function() {
     explorationEditorFeedbackTab.getSuggestionThreads().then(
     	function(threads) {
     	  expect(threads.length).toEqual(2);
-          expect(threads[]).toMatch(suggestionDescription2);
+          expect(threads[0]).toMatch(suggestionDescription2);
     });
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
