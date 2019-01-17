@@ -32,7 +32,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         super(PopulateMessageCountOneOffJobTest, self).setUp()
         feedback_models.GeneralFeedbackThreadModel(
             id='exp1.thread1', entity_id='exp1', entity_type='state1',
-            original_author_id='author', message_count=0,
+            original_author_id='author', message_count=None,
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
@@ -44,7 +44,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             author_id='author', text='message text').put()
         feedback_models.GeneralFeedbackThreadModel(
             id='exp2.thread2', entity_id='exp2', entity_type='state2',
-            original_author_id='author', message_count=0,
+            original_author_id='author', message_count=None,
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
@@ -53,7 +53,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             author_id='author', text='message text').put()
         feedback_models.GeneralFeedbackThreadModel(
             id='exp3.thread3', entity_id='exp3', entity_type='state3',
-            original_author_id='author', message_count=0,
+            original_author_id='author', message_count=None,
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
@@ -74,9 +74,15 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
         thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
         thread3 = feedback_models.GeneralFeedbackThreadModel.get('exp3.thread3')
-        self.assertEqual(thread1.message_count, 0)
-        self.assertEqual(thread2.message_count, 0)
-        self.assertEqual(thread3.message_count, 0)
+        thread1.message_count = None
+        thread1.put()
+        thread2.message_count = None
+        thread2.put()
+        thread3.message_count = None
+        thread3.put()
+        self.assertEqual(thread1.message_count, None)
+        self.assertEqual(thread2.message_count, None)
+        self.assertEqual(thread3.message_count, None)
         self._run_one_off_job()
         thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
         thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
