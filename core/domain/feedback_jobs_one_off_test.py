@@ -68,7 +68,8 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        return feedback_jobs_one_off.PopulateMessageCountOneOffJob.get_output(job_id)
+        return feedback_jobs_one_off.PopulateMessageCountOneOffJob.get_output(
+            job_id)
 
     def test_message_count_job(self):
         thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')

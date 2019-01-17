@@ -15,7 +15,6 @@
 """One off jobs relating to the feedback framework."""
 
 from core import jobs
-from core.domain import feedback_services
 from core.platform import models
 
 (feedback_models, email_models, user_models) = models.Registry.import_models(
@@ -81,8 +80,7 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(thread):
         if thread.message_count is None:
             # Assigning the value of message_count if it is None.
-            thread.message_count = feedback_models.GeneralFeedbackMessageModel.get_message_count(
-                thread.id)
+            thread.message_count = feedback_models.GeneralFeedbackMessageModel.get_message_count(thread.id)#pylint: disable=line-too-long
             try:
                 # Sets the message_count if it is None.
                 thread.put()
