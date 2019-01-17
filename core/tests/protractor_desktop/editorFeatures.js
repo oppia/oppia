@@ -888,11 +888,11 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getFirstSuggestionThread().
-      then(function(threads) {
-        expect(threads.length).toEqual(2);
-        expect(threads[0]).toMatch(suggestionDescription2);
-      });
+    explorationEditorFeedbackTab.getSuggestionThreads().then(
+    	function(threads) {
+    	  expect(threads.length).toEqual(2);
+          expect(threads[]).toMatch(suggestionDescription2);
+    });
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);

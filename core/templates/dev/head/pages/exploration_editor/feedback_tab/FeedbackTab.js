@@ -18,16 +18,18 @@
 
 oppia.controller('FeedbackTab', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$timeout', '$uibModal',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION', 'AlertsService',
-  'ChangeListService', 'DateTimeFormatService', 'ExplorationDataService',
-  'ExplorationStatesService', 'StateObjectFactory', 'ThreadDataService',
-  'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+  'AlertsService', 'ChangeListService', 'DateTimeFormatService',
+  'ExplorationDataService', 'ExplorationStatesService', 'StateObjectFactory',
+  'ThreadDataService', 'ThreadStatusDisplayService',
+  'UrlInterpolationService', 'UserService',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
       $http, $log, $q, $rootScope, $scope, $timeout, $uibModal,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, AlertsService,
-      ChangeListService, DateTimeFormatService, ExplorationDataService,
-      ExplorationStatesService, StateObjectFactory, ThreadDataService,
-      ThreadStatusDisplayService, UrlInterpolationService, UserService) {
+      AlertsService, ChangeListService, DateTimeFormatService,
+      ExplorationDataService, ExplorationStatesService, StateObjectFactory,
+      ThreadDataService, ThreadStatusDisplayService,
+      UrlInterpolationService, UserService,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;

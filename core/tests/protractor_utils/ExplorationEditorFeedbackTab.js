@@ -77,7 +77,7 @@ var ExplorationEditorFeedbackTab = function() {
     expect(feedbackTabRow.isPresent()).toBe(true);
   };
 
-  this.getFirstSuggestionThread = function() {
+  this.getSuggestionThreads = function() {
     var threads = [];
     waitFor.visibilityOf(
       element.all(by.css(suggestionRowClassName)).first(),
