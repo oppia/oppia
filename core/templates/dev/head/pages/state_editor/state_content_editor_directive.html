@@ -4,7 +4,7 @@
 <div class="oppia-shadow-preview-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
                          html-data="StateContentService.displayed._html">
       </angular-html-bind>
     </div>
@@ -68,36 +68,5 @@
     max-width: 560px;
     position: fixed;
     top: -30000px;
-  }
-
-
-  /* These rules must be kept in sync with corresponding rules in oppia.css
-     (those with '.oppia-rte-editor > p,
-       .form-control.oppia-rte-content > div > p' selectors specifying
-      the same line-height, margin-top and margin-bottom attributes)
-  */
-
-  /* TODO(ankita240796): Find a way to avoid repetition of comments to keep css in sync.
-  */
-  .oppia-shadow-preview-card .rte-viewer > p {
-    line-height: 28px;
-    margin-bottom: 18px;
-    margin-top: 18px;
-  }
-
-  .oppia-shadow-preview-card .rte-viewer > p:first-child {
-    margin-top: 0px;
-  }
-
-  .oppia-shadow-preview-card .rte-viewer > p:last-child {
-    margin-bottom: 0px;
-  }
-
-  .oppia-shadow-preview-card .rte-viewer {
-    border-radius: 2px;
-    display: inline-block;
-    max-width: 100%;
-    position: relative;
-    text-align: left;
   }
 </style>
