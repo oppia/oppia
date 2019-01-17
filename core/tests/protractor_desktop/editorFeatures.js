@@ -876,10 +876,10 @@ describe('Suggestions on Explorations', function() {
     var suggestionDescription2 = 'Changed';
 
     explorationPlayerPage.
-    submitSuggestion(suggestion1, suggestionDescription1);
+      submitSuggestion(suggestion1, suggestionDescription1);
     explorationPlayerPage.closeSuggestionModal();
     explorationPlayerPage.submitSuggestion(
-    suggestion2, suggestionDescription2);
+      suggestion2, suggestionDescription2);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
