@@ -1487,7 +1487,7 @@ pre.oppia-pre-wrapped-text {
    /third_party/generated/css/third_party.css.
 */
 
-.oppia-rte-editor > p, .rte-viewer > p {
+.oppia-rte-editor > p, .oppia-rte-viewer > p {
   line-height: 1.846;
 }
 .oppia-info-card-content p {
@@ -1515,10 +1515,10 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 
-.rte-viewer > p:first-child {
+.oppia-rte-viewer > p:first-child {
   margin-top: 0;
 }
-.rte-viewer > p:last-child {
+.oppia-rte-viewer > p:last-child {
   margin-bottom: 0;
 }
 .form-control.oppia-rte-content > div > p:first-child {
@@ -1528,7 +1528,7 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 
-.rte-viewer {
+.oppia-rte-viewer {
   border-radius: 2px;
   display: inline-block;
   max-width: 100%;
