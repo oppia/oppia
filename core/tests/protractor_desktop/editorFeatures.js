@@ -870,14 +870,16 @@ describe('Suggestions on Explorations', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    var suggestion_1 = 'New Exploration';
-    var suggestionDescription_1 = 'Uppercased the first letter';
-    var suggestion_2 = 'New exploration';
-    var suggestionDescription_2 = 'Changed';
+    var suggestion1 = 'New Exploration';
+    var suggestionDescription1 = 'Uppercased the first letter';
+    var suggestion2 = 'New exploration';
+    var suggestionDescription2 = 'Changed';
 
-    explorationPlayerPage.submitSuggestion(suggestion_1, suggestionDescription_1);
+    explorationPlayerPage.
+    submitSuggestion(suggestion1, suggestionDescription1);
     explorationPlayerPage.closeSuggestionModal();
-    explorationPlayerPage.submitSuggestion(suggestion_2, suggestionDescription_2);
+    explorationPlayerPage.submitSuggestion(
+    	suggestion2, suggestionDescription2);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
@@ -886,15 +888,16 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getFirstSuggestionThread().then(function(threads) {
+    explorationEditorFeedbackTab.getFirstSuggestionThread().
+    then(function(threads) {
       expect(threads.length).toEqual(2);
-      expect(threads[0]).toMatch(suggestionDescription_2);
+      expect(threads[0]).toMatch(suggestionDescription2);
     });
-    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription_2);
+    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
-    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription_1);
+    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
     explorationEditorPage.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion_1));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 
     users.logout();
 
@@ -903,7 +906,7 @@ describe('Suggestions on Explorations', function() {
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion_1));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
     users.logout();
   });
 

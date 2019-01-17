@@ -93,8 +93,8 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.goBackToAllFeedbacks = function() {
-   feedbackBackButton.click(); 
-  }
+    feedbackBackButton.click();
+  };
 
   this.readFeedbackMessages = function() {
     var messages = [];

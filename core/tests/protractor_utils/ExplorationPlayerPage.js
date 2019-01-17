@@ -129,7 +129,7 @@ var ExplorationPlayerPage = function() {
 
   this.closeSuggestionModal = function() {
     closeSuggestionModalButton.click();
-  }
+  };
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
