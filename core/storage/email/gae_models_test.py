@@ -195,8 +195,8 @@ class ReplyToIdModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_ids), len(set_ids))
 
     def test_create_raises_when_duplicate_ids(self):
-        with self.generate_constant_id_ctx, self.assertRaisesRegexp(Exception,
-            'Unique reply-to ID'):
+        with self.generate_constant_id_ctx, self.assertRaisesRegexp(
+            Exception, 'Unique reply-to ID'):
             created1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 'user_id', 'thread_id')
             created1.put()
