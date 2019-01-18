@@ -574,17 +574,13 @@ textarea {
 .oppia-navbar-dropdown > li > a {
   color: #009688;
 }
-
-/* smooth color chang to the navbar-tabs */
+/*Smooth color change to the navbar-tabs*/
 .oppia-navbar-tabs li a {
-
-  -webkit-transition: all .5s ease;
   -moz-transition: all .5s ease;
   -o-transition: all .5s ease;
   transition: all .5s ease;
-
+  -webkit-transition: all .5s ease;
 }
-
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
@@ -2150,8 +2146,6 @@ div#ng-curtain {
   display: inline-block;
   vertical-align: top;
 }
-
-
 .oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
@@ -2159,7 +2153,6 @@ div#ng-curtain {
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
-
 .nav > li > a.oppia-navbar-tab,
 .nav > li > div.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
