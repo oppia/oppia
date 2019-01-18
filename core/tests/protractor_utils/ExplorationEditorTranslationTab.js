@@ -101,5 +101,18 @@ var ExplorationEditorTranslationTab = function() {
     _selectLanguage(language);
     waitFor.pageToFullyLoad();
   };
+
+  this.navigateToFeedbackTab = function() {
+    waitFor.elementToBeClickable(
+      feedbackTabButton,
+      'Feedback tab of translation page is not clickable');
+    feedbackTabButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.expectFeedbackTabToBeActive = function() {
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+  };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
