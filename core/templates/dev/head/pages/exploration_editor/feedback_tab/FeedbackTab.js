@@ -17,13 +17,13 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
+  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope', '$window',
   'AlertsService', 'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $q, $uibModal, $timeout, $rootScope,
+      $scope, $http, $q, $uibModal, $timeout, $rootScope, $window,
       AlertsService, DateTimeFormatService, ThreadStatusDisplayService,
       ThreadDataService, ExplorationStatesService, ExplorationDataService,
       ChangeListService, StateObjectFactory, UrlInterpolationService,
@@ -60,6 +60,10 @@ oppia.controller('FeedbackTab', [
     };
     $scope.clearActiveThread();
     ThreadDataService.fetchFeedbackStats();
+    $scope.winReload = function() {
+      console.log("Check");
+      $window.location.reload();
+    };
     var threadPromise = ThreadDataService.fetchThreads();
     $q.all([userInfoPromise, threadPromise]).then(function() {
       $rootScope.loadingMessage = '';
