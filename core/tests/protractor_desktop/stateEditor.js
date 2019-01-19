@@ -555,16 +555,14 @@ describe('State editor', function() {
 
       richTextEditor.appendPlainText('\n\n\nline5');
       waitFor.visibilityOf(
-        heightMessage,
-        'Card height limit message not displayed');
+        heightMessage, 'Card height limit message not displayed');
 
       richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
       expect(heightMessage.isPresent()).toBe(false);
 
       richTextEditor.appendPlainText('\n\n\nline5');
       waitFor.visibilityOf(
-        heightMessage,
-        'Card height limit message not displayed');
+        heightMessage, 'Card height limit message not displayed');
 
       element(by.css('.oppia-hide-card-height-warning-icon')).click();
       expect(heightMessage.isPresent()).toBe(false);
