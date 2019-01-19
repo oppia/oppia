@@ -25,7 +25,9 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       initArgs: '=',
       isEditable: '@',
       objType: '@',
-      value: '='
+      value: '=',
+      validators: '&',
+      uiConfig: '&',
     },
     link: function(scope, element) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
@@ -45,8 +47,8 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
           '<' + directiveName +
           '-editor get-always-editable="getAlwaysEditable()"' +
           ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
-          ' obj-type="objType" value="value"></' +
-          directiveName + '-editor>');
+          ' obj-type="objType" value="value" validators="validators()"' +
+          ' ui-config="uiConfig()"></' + directiveName + '-editor>');
         $compile(element.contents())(scope);
       } else {
         $log.error('Error in objectEditor: no editor type supplied.');

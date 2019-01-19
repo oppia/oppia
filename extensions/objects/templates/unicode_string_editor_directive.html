@@ -5,7 +5,8 @@
   </span>
 
   <span ng-if="active || alwaysEditable">
-    <input ng-if="!largeInput" type="text" ng-model="localValue.label" class="form-control">
+    <input ng-if="!largeInput" type="text" ng-model="localValue.label" class="form-control"
+           placeholder="<[getPlaceholder()]>" apply-validation="validators()">
     <button type="button" class="btn btn-default" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
       Close
     </button>
