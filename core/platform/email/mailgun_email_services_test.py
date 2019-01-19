@@ -96,7 +96,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # lambda function, will replace requests.post() in send_mail
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
-                        self.assertEquals(data['bcc'], feconf.ADMIN_EMAIL_ADDRESS)
+                        self.assertEqual(data['bcc'], feconf.ADMIN_EMAIL_ADDRESS)
         modified_post_request = self.swap(requests, 'post', requests_post_lambda)
 
         with mailgun_api, mailgun_domain, modified_post_request, allow_email_sending:
@@ -116,7 +116,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # lambda function, will replace requests.post() in send_mail
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
-                        self.assertEquals(data['h:Reply-To'], \
+                        self.assertEqual(data['h:Reply-To'], \
                             "reply+" + str(reply_id) + "@" + feconf.INCOMING_EMAILS_DOMAIN_NAME)
         modified_post_request = self.swap(requests, 'post', requests_post_lambda)
 
