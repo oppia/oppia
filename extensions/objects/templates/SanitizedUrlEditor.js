@@ -22,7 +22,9 @@ oppia.directive('sanitizedUrlEditor', [
       restrict: 'E',
       scope: {
         getInitArgs: '&',
-        value: '='
+        value: '=',
+        validators: '&',
+        uiConfig: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/unicode_string_editor_directive.html'),
@@ -56,6 +58,19 @@ oppia.directive('sanitizedUrlEditor', [
             $scope.$apply();
           }
         });
+
+        $scope.getPlaceholder = function() {
+          if (!$scope.uiConfig()) {
+            return '';
+          } else {
+            if (!$scope.uiConfig().placeholder &&
+                DeviceInfoService.hasTouchEvents()) {
+              return $translate.instant(
+                'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+            }
+            return $scope.uiConfig().placeholder;
+          }
+        };
       }]
     };
   }]);
