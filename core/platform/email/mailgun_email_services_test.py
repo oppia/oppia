@@ -67,11 +67,11 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        # this data should have been sent in the requests.post()
+        # This data should have been sent in the requests.post().
         expected = {'from':feconf.SYSTEM_EMAIL_ADDRESS, 'to': feconf.ADMIN_EMAIL_ADDRESS, \
                     'subject':'subject', 'text':'body', 'html':'html'}
 
-        # lambda function, will replace requests.post() in send_mail
+        # Lambda function, will replace requests.post() in send_mail.
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
                                 self.assertDictContainsSubset(expected, data)
         modified_post_request = self.swap(requests, 'post', requests_post_lambda)
@@ -94,7 +94,7 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        # lambda function, will replace requests.post() in send_mail
+        # Lambda function, will replace requests.post() in send_mail.
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
                         self.assertEqual(data['bcc'], feconf.ADMIN_EMAIL_ADDRESS)
         modified_post_request = self.swap(requests, 'post', requests_post_lambda)
@@ -114,7 +114,7 @@ class EmailTests(test_utils.GenericTestBase):
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         reply_id = 123
 
-        # lambda function, will replace requests.post() in send_mail
+        # Lambda function, will replace requests.post() in send_mail.
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
                         self.assertEqual(data['h:Reply-To'], \
                             "reply+" + str(reply_id) + "@" + feconf.INCOMING_EMAILS_DOMAIN_NAME)
@@ -169,11 +169,11 @@ class EmailTests(test_utils.GenericTestBase):
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
-        # this data should have been sent in the requests.post()
+        # This data should have been sent in the requests.post().
         expected = {'from':feconf.SYSTEM_EMAIL_ADDRESS, 'to': [feconf.ADMIN_EMAIL_ADDRESS], \
                     'subject':'subject', 'text':'body', 'html':'html', 'recipient-variables': '{}'}
 
-        # lambda function, will replace requests.post() in send_mail
+        # Lambda function, will replace requests.post() in send_mail.
         requests_post_lambda = lambda domain_name, auth=None, data=None: \
                         self.assertDictContainsSubset(expected, data)
 
