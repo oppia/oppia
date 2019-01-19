@@ -26,8 +26,8 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     def test_sending_email_exceptions(self):
-        """
-        Will test the possible exceptions in the send_mail function.
+        """Will test the possible exceptions in the send_mail function.
+
         1) Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
         2) Mailgun API key and/or domain name are not supplied (required for API).
         """
@@ -60,9 +60,7 @@ class EmailTests(test_utils.GenericTestBase):
 
 
     def test_sending_email_data(self):
-        """
-        Verifies that the data sent in send_mail is correct.
-        """
+        """Verifies that the data sent in send_mail is correct."""
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -83,8 +81,7 @@ class EmailTests(test_utils.GenericTestBase):
 
 
     def test_bcc_admin_flag(self):
-        """
-        Verifies that the bcc admin flag is working properly in send_mail.
+        """Verifies that the bcc admin flag is working properly in send_mail.
 
         Note that we replace the requests.post() function in send_mail with 
         an alternate lambda that asserts the correct values were placed in 
@@ -106,9 +103,7 @@ class EmailTests(test_utils.GenericTestBase):
 
 
     def test_reply_to_id_flag(self):
-        """
-        Verifies that the reply_to_id flag is working properly.
-        """
+        """Verifies that the reply_to_id flag is working properly."""
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_email_sending = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -127,8 +122,7 @@ class EmailTests(test_utils.GenericTestBase):
 
 
     def test_sending_bulk_email_exceptions(self):
-        """
-        Will test the same exceptions as those in test_sending_email_exceptions,
+        """Will test the same exceptions as those in test_sending_email_exceptions,
         but for the send bulk mail function.
         """
         mailgun_api_exception = (
@@ -160,8 +154,7 @@ class EmailTests(test_utils.GenericTestBase):
 
 
     def test_sending_bulk_email_data(self):
-        """
-        Verifies that the data sent in send_bulk_mail is correct
+        """Verifies that the data sent in send_bulk_mail is correct
         for each user in the recipient list.
         """
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
