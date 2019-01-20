@@ -108,8 +108,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         unresolved issues and return it's id.
 
         Args:
-            playthrough_ids: list(list(str)). A list with the set of playthrough
-                ids each individual issue should reference.
+            playthrough_ids_list: list(list(str)). A list with the set of
+                playthrough ids each individual issue should reference.
 
         Returns:
             str. The ID of the new playthrough issue model.
