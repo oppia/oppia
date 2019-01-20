@@ -132,13 +132,13 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
 
         exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version)
-        self.assertEqual(exp_issues1.EXP_ID, self.EXP_ID1)
+        self.assertEqual(exp_issues1.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues1.exp_version, self.exp1.version)
         self.assertEqual(exp_issues1.unresolved_issues, [])
 
         exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID2, self.exp2.version)
-        self.assertEqual(exp_issues2.EXP_ID, self.EXP_ID2)
+        self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
@@ -343,12 +343,12 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
     def setUp(self):
         super(RecomputeAnswerSubmittedStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        self.state = self.exp.init_state_name
+        self.state_name = self.exp.init_state_name
 
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': self.STATE,
+                'old_state_name': self.state_name,
                 'new_state_name': 'b'
             })
         ]
@@ -360,7 +360,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             id='id1',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             is_feedback_useful=True,
@@ -369,7 +369,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             id='id2',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             is_feedback_useful=True,
@@ -378,7 +378,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             id='id3',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             is_feedback_useful=False,
@@ -387,7 +387,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             id='id4',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             is_feedback_useful=True,
@@ -418,7 +418,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0,
             {
-                self.state: state_stats_dict
+                self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
@@ -436,7 +436,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
         model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[self.state]
+        state_stats = model.state_stats_mapping[self.state_name]
         self.assertEqual(state_stats['total_answers_count_v2'], 3)
         self.assertEqual(state_stats['useful_feedback_count_v2'], 2)
 
@@ -460,7 +460,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
     def setUp(self):
         super(RecomputeStateHitStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        self.state = self.exp.init_state_name
+        self.state_name = self.exp.init_state_name
 
         change_list = []
         exp_services.update_exploration(
@@ -468,7 +468,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': self.STATE,
+                'old_state_name': self.state_name,
                 'new_state_name': 'b'
             })
         ]
@@ -480,7 +480,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -490,7 +490,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -500,7 +500,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_2,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -510,7 +510,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_2,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
@@ -554,13 +554,13 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             self.EXP_ID, 1, 0, 0, 0, 0, 0, 0,
             {
                 'a': state_stats_dict,
-                self.state: state_stats_dict
+                self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
             {
                 'a': state_stats_dict,
-                self.state: state_stats_dict
+                self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 3, 0, 0, 0, 0, 0, 0,
@@ -579,7 +579,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
         model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[self.state]
+        state_stats = model.state_stats_mapping[self.state_name]
         self.assertEqual(state_stats['first_hit_count_v2'], 2)
         self.assertEqual(state_stats['total_hit_count_v2'], 3)
 
