@@ -54,7 +54,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             this by only recording playthroughs in explorations we are confident
             are safe.
     """
-    PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.date(2018, 8, 1)
+    PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.datetime(2018, 8, 1)
 
     @classmethod
     def entity_classes_to_map_over(cls):

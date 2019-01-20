@@ -52,16 +52,21 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp.id, change_list, '')
 
-    def test_playthroughs_removed_from_non_whitelisted_explorations(self):
-        # self.EXP_ID is not in the whitelisted set of explorations.
+    def test_playthroughs_from_whitelisted_explorations_remain(self):
+        # self.EXP_ID is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID + '-differentiated'])
+            [self.EXP_ID])
 
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={}, actions=[])
-        playthrough_issue_id  = stats_models.ExplorationIssuesModel.create(
+        playthrough_ids = [
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+        ]
+        playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
             self.EXP_ID, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
@@ -69,7 +74,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                     'state_name': {'value': 'state_name1'},
                     'time_spent_in_exp_in_msecs': {'value': 200},
                 },
-                'playthrough_ids': [playthrough_id]
+                'playthrough_ids': playthrough_ids,
             }]
         )
 
@@ -79,9 +84,48 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        with self.assertRaises(
-                stats_models.PlaythroughModel.EntityNotFoundError):
-            stats_models.PlaythroughModel.get(playthrough_id)
+        for playthrough_id in playthrough_ids:
+            # EntityNotFoundError is not raised.
+            _ = stats_models.PlaythroughModel.get(playthrough_id)
+        # EntityNotFoundError is not raised.
+        _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
+
+    def test_playthroughs_removed_from_non_whitelisted_explorations(self):
+        # self.EXP_ID is not in the whitelisted set of explorations.
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.EXP_ID + '-differentiated'])
+
+        playthrough_ids = [
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+        ]
+        playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, self.exp.version,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {'value': 'state_name1'},
+                    'time_spent_in_exp_in_msecs': {'value': 200},
+                },
+                'playthrough_ids': playthrough_ids,
+            }]
+        )
+
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        for playthrough_id in playthrough_ids:
+            with self.assertRaises(
+                    stats_models.PlaythroughModel.EntityNotFoundError):
+                stats_models.PlaythroughModel.get(playthrough_id)
         with self.assertRaises(
                 stats_models.ExplorationIssuesModel.EntityNotFoundError):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
