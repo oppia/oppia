@@ -57,11 +57,27 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
             issue_customization_args={}, actions=[])
 
-    def create_playthrough_issue(self, playthrough_ids=None):
-        """Helper method to create a simple playthrough issue and return its id.
+    def create_old_playthrough(self):
+        """Helper method to create a playthrough with a creation date before the
+        start of the GSoC 2018 project.
         """
-        if playthrough_ids is None:
-            playthrough_ids = []
+        playthrough_id = self.create_playthrough()
+        playthrough = stats_models.PlaythroughModel.get(playthrough_id)
+        # An arbitrary date before GSoC 2018.
+        playthrough.created_on = datetime.datetime(2018, 1, 1)
+        playthrough.put()
+        return playthrough_id
+
+    def create_playthrough_issue(self, playthrough_ids):
+        """Helper method to create a simple playthrough issue and return its id.
+
+        Args:
+            playthrough_ids: list(str). The set of supporting playthrough
+                recordings for this issue.
+
+        Returns:
+            str. The ID of the new playthrough issue.
+        """
         return stats_models.ExplorationIssuesModel.create(
             self.exp.id, self.exp.version, [{
                 'issue_type': 'EarlyQuit',
@@ -86,6 +102,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         self.run_one_off_job()
 
+        # Should not raise:
         for playthrough_id in playthrough_ids:
             stats_models.PlaythroughModel.get(playthrough_id)
         stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
@@ -111,25 +128,22 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        bad_playthrough_id = self.create_playthrough()
-        bad_playthrough = stats_models.PlaythroughModel.get(bad_playthrough_id)
-        bad_playthrough.created_on = datetime.datetime(2018, 6, 1)
-        bad_playthrough.put()
-        good_playthrough_id = self.create_playthrough()
+        old_playthrough_id = self.create_old_playthrough()
+        recent_playthrough_id = self.create_playthrough()
         playthrough_issue_id = self.create_playthrough_issue(
-            [bad_playthrough_id, good_playthrough_id])
+            [old_playthrough_id, recent_playthrough_id])
 
         self.run_one_off_job()
 
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.PlaythroughModel.get(bad_playthrough_id)
+            stats_models.PlaythroughModel.get(old_playthrough_id)
         # Should not raise:
-        stats_models.PlaythroughModel.get(good_playthrough_id)
+        stats_models.PlaythroughModel.get(recent_playthrough_id)
         playthrough_issue = (
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id))
-        # Bad playthrough should be removed from the list:
+        # Should be missing old playthrough:
         self.assertNotIn(
-            bad_playthrough_id,
+            old_playthrough_id,
             playthrough_issue.unresolved_issues[0]['playthrough_ids'])
 
     def test_entire_issue_removed_when_all_playthroughs_removed(self):
@@ -137,21 +151,16 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        bad_playthrough_ids = [
-            self.create_playthrough(), self.create_playthrough()]
-        for bad_playthrough in (
-                stats_models.PlaythroughModel.get_multi(bad_playthrough_ids)):
-            # Created at the beginning of the GSoC project (still invalid).
-            bad_playthrough.created_on = datetime.datetime(2018, 6, 1)
-            bad_playthrough.put()
+        old_playthrough_ids = [
+            self.create_old_playthrough(), self.create_old_playthrough()]
         playthrough_issue_id = (
-            self.create_playthrough_issue(bad_playthrough_ids))
+            self.create_playthrough_issue(old_playthrough_ids))
 
         self.run_one_off_job()
 
-        for bad_playthrough_id in bad_playthrough_ids:
+        for old_playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(bad_playthrough_id)
+                stats_models.PlaythroughModel.get(old_playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
