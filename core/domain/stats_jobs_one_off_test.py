@@ -35,7 +35,7 @@ import feconf
 class OneOffJobTestBase(test_utils.GenericTestBase):
     """Base class providing convenience methods for testing one off jobs."""
 
-    def _count_one_off_jobs_in_queue(self):
+    def count_one_off_jobs_in_queue(self):
         """Counts one off jobs in the taskqueue."""
         return self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
