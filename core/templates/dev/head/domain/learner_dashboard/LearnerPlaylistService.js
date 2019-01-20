@@ -61,7 +61,7 @@ oppia.factory('LearnerPlaylistService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
           'remove_activity_from_learner_dashboard_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           activityId: function() {
             return activityId;

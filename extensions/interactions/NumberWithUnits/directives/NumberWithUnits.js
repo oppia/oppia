@@ -94,7 +94,7 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/NumberWithUnits/directives/' +
                 'number_with_units_help_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

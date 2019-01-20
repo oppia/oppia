@@ -83,7 +83,7 @@ oppia.directive('unresolvedAnswersOverview', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'teach_oppia_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$filter', '$http', '$injector', '$scope', '$uibModalInstance',
                 'AlertsService', 'AngularNameService',

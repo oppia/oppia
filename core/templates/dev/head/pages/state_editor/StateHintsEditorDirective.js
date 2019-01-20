@@ -140,7 +140,6 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -154,6 +153,8 @@ oppia.directive('stateHintsEditor', [
               $scope.onSaveContentIdsToAudioTranslations(
                 StateContentIdsToAudioTranslationsService.displayed
               );
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 
@@ -186,7 +187,7 @@ oppia.directive('stateHintsEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'delete_last_hint_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -196,7 +197,6 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -221,6 +221,8 @@ oppia.directive('stateHintsEditor', [
               $scope.onSaveContentIdsToAudioTranslations(
                 StateContentIdsToAudioTranslationsService.displayed
               );
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 
@@ -234,7 +236,7 @@ oppia.directive('stateHintsEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'delete_hint_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {
@@ -244,7 +246,6 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -265,6 +266,8 @@ oppia.directive('stateHintsEditor', [
                   StateContentIdsToAudioTranslationsService.displayed
                 );
               }
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 

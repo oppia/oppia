@@ -175,7 +175,7 @@ oppia.controller('Preferences', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/preferences/edit_profile_picture_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.uploadedImage = null;

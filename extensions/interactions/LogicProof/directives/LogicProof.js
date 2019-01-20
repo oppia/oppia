@@ -263,7 +263,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/LogicProof/directives/' +
                 'logic_proof_help_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

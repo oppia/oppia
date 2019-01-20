@@ -134,7 +134,7 @@ oppia.controller('StatisticsTab', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
             'state_stats_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             stateName: function() {
               return stateName;
@@ -232,7 +232,6 @@ oppia.controller('StatisticsTab', [
 
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
               };
 
               $scope.$on('$destroy', function() {
@@ -245,6 +244,10 @@ oppia.controller('StatisticsTab', [
               };
             }
           ]
+        }).result.then(function(result) {
+
+        }, function() {
+          AlertsService.clearWarnings();
         });
       });
     };

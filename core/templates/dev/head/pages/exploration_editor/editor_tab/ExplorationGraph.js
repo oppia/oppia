@@ -53,7 +53,7 @@ oppia.controller('ExplorationGraph', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'exploration_graph_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           isEditable: function() {
             return $scope.isEditable;
@@ -85,7 +85,6 @@ oppia.controller('ExplorationGraph', [
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
             };
           }
         ]
@@ -97,6 +96,8 @@ oppia.controller('ExplorationGraph', [
         } else {
           console.error('Invalid closeDict action: ' + closeDict.action);
         }
+      }, function() {
+        AlertsService.clearWarnings();
       });
     };
   }

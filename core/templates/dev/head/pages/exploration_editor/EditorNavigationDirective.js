@@ -67,7 +67,7 @@ oppia.directive('editorNavigation', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
                 'help_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 'SiteAnalyticsService', 'ContextService',

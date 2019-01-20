@@ -58,7 +58,7 @@ oppia.directive('skillEditorNavbar', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/skill_editor/editor_tab/' +
                   'save_pending_changes_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
@@ -120,7 +120,7 @@ oppia.directive('skillEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill_editor/' +
                 'skill_editor_save_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -145,7 +145,7 @@ oppia.directive('skillEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill_editor/' +
                 'skill_editor_pre_publish_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function(

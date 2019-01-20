@@ -212,7 +212,7 @@ oppia.directive('versionDiffVisualization', [
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'state_diff_modal_directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             windowClass: 'state-diff-modal',
             resolve: {
               newStateName: function() {

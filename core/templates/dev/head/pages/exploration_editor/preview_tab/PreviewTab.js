@@ -103,7 +103,6 @@ oppia.controller('PreviewTab', [
             $scope.previewParamModalOk = $uibModalInstance.close;
             $scope.previewParamModalCancel = function() {
               $uibModalInstance.dismiss('cancel');
-              RouterService.navigateToMainTab();
             };
           }
         ]
@@ -111,6 +110,8 @@ oppia.controller('PreviewTab', [
         if (callback) {
           callback();
         }
+      }, function() {
+        RouterService.navigateToMainTab();
       });
     };
 

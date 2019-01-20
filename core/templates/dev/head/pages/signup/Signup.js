@@ -55,7 +55,7 @@ oppia.controller('Signup', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/signup/licence_explanation_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', 'SITE_NAME',

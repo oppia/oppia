@@ -149,7 +149,6 @@ oppia.directive('questionsTab', [
                 '/pages/skill_editor/questions_tab/' +
                 'question_editor_modal_directive.html'),
               backdrop: 'static',
-              keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

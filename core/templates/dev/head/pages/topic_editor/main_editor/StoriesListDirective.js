@@ -44,7 +44,7 @@ oppia.directive('storiesList', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic_editor/main_editor/' +
                   'save_pending_changes_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
@@ -69,7 +69,7 @@ oppia.directive('storiesList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/main_editor/' +
                 'delete_story_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

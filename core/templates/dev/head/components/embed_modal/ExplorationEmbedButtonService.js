@@ -22,10 +22,10 @@ oppia.factory('ExplorationEmbedButtonService', [
     return {
       showModal: function(explorationId) {
         $uibModal.open({
-          backdrop: true,
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/embed_modal/' +
             'embed_exploration_modal_directive.html'),
+          backdrop: 'static',
           resolve: {
             explorationId: function() {
               return explorationId;

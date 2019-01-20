@@ -74,7 +74,7 @@ oppia.directive('answerGroupEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
                 'tag_misconception_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
                 function($scope, $uibModalInstance, StateEditorService) {

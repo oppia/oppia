@@ -109,7 +109,7 @@ oppia.controller('LearnerLocalNav', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
             'learner_suggestion_submitted_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {},
           controller: [
             '$scope', '$uibModalInstance',
@@ -126,7 +126,7 @@ oppia.controller('LearnerLocalNav', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/flag_exploration_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'PlayerPositionService',
           function($scope, $uibModalInstance, PlayerPositionService) {
@@ -173,7 +173,7 @@ oppia.controller('LearnerLocalNav', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
             'exploration_successfully_flagged_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {

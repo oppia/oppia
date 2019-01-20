@@ -66,7 +66,7 @@ oppia.directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
                 'delete_skill_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -99,7 +99,7 @@ oppia.directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
                 'assign_skill_to_topic_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -154,7 +154,7 @@ oppia.directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
                 'merge_skill_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

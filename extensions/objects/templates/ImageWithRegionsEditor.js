@@ -495,7 +495,6 @@ oppia.directive('imageWithRegionsEditor', [
                 '/objects/templates/' +
                 'image_with_regions_reset_confirmation_directive.html'),
               backdrop: 'static',
-              keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

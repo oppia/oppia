@@ -188,7 +188,7 @@ oppia.directive('stateInteractionEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration_editor/editor_tab/' +
                   'customize_interaction_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 resolve: {},
                 controller: [
                   '$scope', '$uibModalInstance', '$injector',
@@ -376,7 +376,7 @@ oppia.directive('stateInteractionEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'delete_interaction_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {
@@ -385,7 +385,6 @@ oppia.directive('stateInteractionEditor', [
                   };
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -422,6 +421,8 @@ oppia.directive('stateInteractionEditor', [
                 StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
         }

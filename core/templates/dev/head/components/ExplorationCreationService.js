@@ -58,7 +58,7 @@ oppia.factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          backdrop: true,
+          backdrop: 'static',
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/creator_dashboard/' +
             'upload_activity_modal_directive.html'),
@@ -78,7 +78,6 @@ oppia.factory('ExplorationCreationService', [
 
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
               };
             }
           ]
@@ -117,6 +116,8 @@ oppia.factory('ExplorationCreationService', [
             $rootScope.loadingMessage = '';
             $scope.$apply();
           });
+        }, function() {
+          AlertsService.clearWarnings();
         });
       }
     };

@@ -165,7 +165,7 @@ oppia.directive('questionsTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
                 'select_skill_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -229,7 +229,6 @@ oppia.directive('questionsTab', [
                 '/pages/topic_editor/questions/' +
                 'question_editor_modal_directive.html'),
               backdrop: 'static',
-              keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -329,7 +328,7 @@ oppia.directive('questionsTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
                 'select_skill_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

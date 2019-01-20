@@ -30,7 +30,7 @@ oppia.factory('TrainingDataEditorPanelService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'training_data_editor_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$injector', '$uibModalInstance', '$filter',
             'ExplorationStatesService', 'StateEditorService', 'AlertsService',

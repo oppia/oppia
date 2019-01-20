@@ -71,7 +71,7 @@ oppia.directive('multipleIncorrectIssueDirective', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration_editor/statistics_tab/' +
                   'playthrough_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 resolve: {
                   playthrough: function() {
                     return playthrough;
@@ -174,10 +174,13 @@ oppia.directive('multipleIncorrectIssueDirective', [
 
                     $scope.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
                     };
                   }
                 ]
+              }).result.then(function(result) {
+
+              }, function() {
+                AlertsService.clearWarnings();
               });
             });
           };

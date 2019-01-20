@@ -43,7 +43,7 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story_editor/' +
                   'save_pending_changes_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {

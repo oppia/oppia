@@ -35,7 +35,7 @@ oppia.factory('StoryCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic_editor/main_editor/' +
             'new_story_title_editor_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {

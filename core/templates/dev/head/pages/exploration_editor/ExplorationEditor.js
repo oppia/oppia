@@ -426,7 +426,7 @@ oppia.controller('ExplorationEditor', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'welcome_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'SiteAnalyticsService',
           'ContextService',
@@ -443,8 +443,6 @@ oppia.controller('ExplorationEditor', [
             };
 
             $scope.cancel = function() {
-              SiteAnalyticsService.registerDeclineTutorialModalEvent(
-                explorationId);
               $uibModalInstance.dismiss('cancel');
             };
 
@@ -459,6 +457,8 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
+        SiteAnalyticsService.registerDeclineTutorialModalEvent(
+          ContextService.getExplorationId());
         StateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };

@@ -473,7 +473,7 @@ oppia.controller('LearnerDashboard', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/' +
           'learner_view_suggestion_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           newContent: function() {
             return newContent;
@@ -507,7 +507,7 @@ oppia.controller('LearnerDashboard', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
           'remove_activity_from_learner_dashboard_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           sectionNameI18nId: function() {
             return sectionNameI18nId;

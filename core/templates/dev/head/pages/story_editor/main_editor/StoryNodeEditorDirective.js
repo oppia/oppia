@@ -114,7 +114,7 @@ oppia.directive('storyNodeEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story_editor/main_editor/' +
                 'new_chapter_title_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

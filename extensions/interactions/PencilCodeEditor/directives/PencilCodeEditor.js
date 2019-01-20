@@ -98,7 +98,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                 '/interactions/PencilCodeEditor/directives/' +
                 'pencil_code_reset_confirmation_directive.html'),
               backdrop: 'static',
-              keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

@@ -34,7 +34,7 @@ oppia.factory('TrainingModalService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'training_unresolved_answer_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$injector', '$uibModalInstance',
             'ExplorationStatesService', 'StateEditorService',

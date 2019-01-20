@@ -50,6 +50,7 @@ oppia.controller('LearnerViewInfo', [
         animation: true,
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/information_card_modal_directive.html'),
+        backdrop: 'static',
         windowClass: 'oppia-modal-information-card',
         resolve: {
           expInfo: function() {

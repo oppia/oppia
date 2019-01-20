@@ -54,7 +54,7 @@ oppia.directive('topicMainEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic_editor/main_editor/' +
                   'save_pending_changes_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {

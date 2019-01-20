@@ -232,7 +232,7 @@ oppia.controller('SettingsTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'preview_summary_tile_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.getExplorationTitle = function() {
@@ -263,10 +263,13 @@ oppia.controller('SettingsTab', [
 
             $scope.close = function() {
               $uibModalInstance.dismiss();
-              AlertsService.clearWarnings();
             };
           }
         ]
+      }).result.then(function(result) {
+
+      }, function() {
+        AlertsService.clearWarnings();
       });
     };
 
@@ -276,19 +279,20 @@ oppia.controller('SettingsTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'transfer_exploration_ownership_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.transfer = $uibModalInstance.close;
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
             };
           }
         ]
       }).result.then(function() {
         ExplorationRightsService.makeCommunityOwned();
+      }, function() {
+        AlertsService.clearWarnings();
       });
     };
 
@@ -299,14 +303,13 @@ oppia.controller('SettingsTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'delete_exploration_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = $uibModalInstance.close;
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
             };
           }
         ]
@@ -315,6 +318,8 @@ oppia.controller('SettingsTab', [
           $scope.explorationId).then(function() {
           $window.location = CREATOR_DASHBOARD_PAGE_URL;
         });
+      }, function() {
+        AlertsService.clearWarnings();
       });
     };
 
@@ -332,7 +337,7 @@ oppia.controller('SettingsTab', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/settings_tab/' +
             'moderator_unpublish_exploration_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             draftEmailBody: function() {
               return draftEmailBody;
@@ -361,13 +366,14 @@ oppia.controller('SettingsTab', [
 
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
               };
             }
           ]
         }).result.then(function(result) {
           ExplorationRightsService.saveModeratorChangeToBackend(
             result.emailBody);
+        }, function() {
+          AlertsService.clearWarnings();
         });
       });
     };

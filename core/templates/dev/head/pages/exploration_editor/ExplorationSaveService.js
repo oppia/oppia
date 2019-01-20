@@ -80,7 +80,7 @@ oppia.factory('ExplorationSaveService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'post_publish_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$window', '$uibModalInstance',
           'ContextService',
@@ -224,7 +224,6 @@ oppia.factory('ExplorationSaveService', [
             '/pages/exploration_editor/' +
             'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
-          keyboard: false,
           controller: [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.cancel = function() {
@@ -244,7 +243,6 @@ oppia.factory('ExplorationSaveService', [
               '/pages/exploration_editor/' +
               'editor_reloading_modal_directive.html'),
             backdrop: 'static',
-            keyboard: false,
             controller: [
               '$scope', '$uibModalInstance',
               function($scope, $uibModalInstance) {
@@ -509,7 +507,7 @@ oppia.factory('ExplorationSaveService', [
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'exploration_save_modal_directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             resolve: {
               isExplorationPrivate: function() {
                 return ExplorationRightsService.isPrivate();
@@ -546,7 +544,6 @@ oppia.factory('ExplorationSaveService', [
                 };
                 $scope.cancel = function() {
                   $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -581,6 +578,7 @@ oppia.factory('ExplorationSaveService', [
           }, function() {
             modalIsOpen = false;
             whenModalClosed.resolve();
+            AlertsService.clearWarnings();
           });
         });
         return whenModalClosed.promise;

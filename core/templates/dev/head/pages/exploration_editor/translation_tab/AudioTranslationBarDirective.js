@@ -266,7 +266,7 @@ oppia.directive('audioTranslationBar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
                 'translation_tab_busy_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 message: function() {
                   return getTranslationTabBusyMessage();
@@ -384,7 +384,7 @@ oppia.directive('audioTranslationBar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
                 'delete_audio_translation_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function( $scope, $uibModalInstance) {
@@ -489,7 +489,6 @@ oppia.directive('audioTranslationBar', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -505,6 +504,8 @@ oppia.directive('audioTranslationBar', [
                   result.fileSizeBytes);
               saveContentIdsToAudioTranslationChanges();
               $scope.initAudioBar();
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 

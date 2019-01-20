@@ -44,7 +44,6 @@ oppia.factory('AutosaveInfoModalsService', [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.closeAndRefresh = function() {
                 $uibModalInstance.dismiss('cancel');
-                _refreshPage(20);
               };
             }
           ]
@@ -52,6 +51,7 @@ oppia.factory('AutosaveInfoModalsService', [
           _isModalOpen = false;
         }, function() {
           _isModalOpen = false;
+          _refreshPage(20);
         });
 
         _isModalOpen = true;
@@ -105,7 +105,6 @@ oppia.factory('AutosaveInfoModalsService', [
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.close = function() {
-              LocalStorageService.removeExplorationDraft(explorationId);
               $uibModalInstance.dismiss('cancel');
             };
 
@@ -119,6 +118,7 @@ oppia.factory('AutosaveInfoModalsService', [
           _isModalOpen = false;
         }, function() {
           _isModalOpen = false;
+          LocalStorageService.removeExplorationDraft(explorationId);
         });
 
         _isModalOpen = true;

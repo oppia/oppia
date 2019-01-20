@@ -55,7 +55,7 @@ oppia.directive('topicsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
                 'delete_topic_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

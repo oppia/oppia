@@ -328,7 +328,7 @@ oppia.factory('ExplorationStatesService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             deleteStateName: function() {
               return deleteStateName;
@@ -347,7 +347,6 @@ oppia.factory('ExplorationStatesService', [
 
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
               };
             }
           ]
@@ -369,6 +368,8 @@ oppia.factory('ExplorationStatesService', [
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
+        }, function() {
+          AlertsService.clearWarnings();
         });
       },
       renameState: function(oldStateName, newStateName) {

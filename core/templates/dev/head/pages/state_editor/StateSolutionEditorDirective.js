@@ -179,7 +179,6 @@ oppia.directive('stateSolutionEditor', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -216,6 +215,8 @@ oppia.directive('stateSolutionEditor', [
                     INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
                 }
               }
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 
@@ -227,7 +228,7 @@ oppia.directive('stateSolutionEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'delete_solution_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -237,7 +238,6 @@ oppia.directive('stateSolutionEditor', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -254,6 +254,8 @@ oppia.directive('stateSolutionEditor', [
                 StateContentIdsToAudioTranslationsService.displayed
               );
               StateEditorService.deleteCurrentSolutionValidity();
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
         }

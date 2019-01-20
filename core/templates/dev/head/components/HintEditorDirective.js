@@ -85,7 +85,7 @@ oppia.directive('hintEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'mark_all_audio_as_needing_update_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {

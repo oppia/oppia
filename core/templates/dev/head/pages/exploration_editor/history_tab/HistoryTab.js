@@ -229,7 +229,7 @@ oppia.controller('HistoryTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/history_tab/' +
           'revert_exploration_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           version: function() {
             return version;

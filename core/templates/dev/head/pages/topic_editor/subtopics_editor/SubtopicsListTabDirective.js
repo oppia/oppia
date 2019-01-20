@@ -56,7 +56,7 @@ oppia.directive('subtopicsListTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/subtopics_editor/' +
                 'subtopic_editor_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -203,7 +203,7 @@ oppia.directive('subtopicsListTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/subtopics_editor/' +
                 'new_subtopic_title_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {

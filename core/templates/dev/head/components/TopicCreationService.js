@@ -34,7 +34,7 @@ oppia.factory('TopicCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics_and_skills_dashboard/' +
             'new_topic_name_editor_directive.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {

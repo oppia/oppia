@@ -334,7 +334,6 @@ oppia.directive('stateResponses', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -363,6 +362,8 @@ oppia.directive('stateResponses', [
               if (result.reopen) {
                 $scope.openAddAnswerGroupModal();
               }
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 
@@ -403,7 +404,7 @@ oppia.directive('stateResponses', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'delete_answer_group_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {
@@ -413,7 +414,6 @@ oppia.directive('stateResponses', [
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -433,6 +433,8 @@ oppia.directive('stateResponses', [
               $scope.onSaveContentIdsToAudioTranslations(
                 StateContentIdsToAudioTranslationsService.displayed
               );
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 

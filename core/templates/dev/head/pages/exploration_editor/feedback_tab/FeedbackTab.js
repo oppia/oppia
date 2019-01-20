@@ -70,7 +70,7 @@ oppia.controller('FeedbackTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
           'editor_create_feedback_thread_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {},
         controller: ['$scope', '$uibModalInstance', function(
             $scope, $uibModalInstance) {
@@ -130,7 +130,7 @@ oppia.controller('FeedbackTab', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
           'editor_view_suggestion_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         size: 'lg',
         resolve: {
           suggestionIsHandled: function() {

@@ -115,7 +115,7 @@ oppia.directive('collectionEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection_editor/' +
                 'collection_editor_save_modal_directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
@@ -147,7 +147,7 @@ oppia.directive('collectionEditorNavbar', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection_editor/' +
                   'collection_editor_pre_publish_modal_directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance', 'CollectionEditorStateService',
                   'CollectionUpdateService', 'ALL_CATEGORIES',

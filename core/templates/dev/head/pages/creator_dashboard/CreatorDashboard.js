@@ -329,7 +329,7 @@ oppia.controller('CreatorDashboard', [
 
       $uibModal.open({
         templateUrl: templateUrl,
-        backdrop: true,
+        backdrop: 'static',
         size: 'lg',
         resolve: {
           suggestionIsHandled: function() {
@@ -540,7 +540,6 @@ oppia.controller('CreatorDashboard', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/creator_dashboard/create_question_modal_directive.html'),
         backdrop: 'static',
-        keyboard: false,
         size: 'lg',
         resolve: {},
         controller: [
