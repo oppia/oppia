@@ -35,7 +35,8 @@ import feconf
 class OneOffJobTestBase(test_utils.GenericTestBase):
     """Base class providing convenience methods for testing one off jobs."""
 
-    def count_one_off_jobs_in_queue(self):
+    def _count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
         return self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
@@ -149,7 +150,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
             issue_customization_args={}, actions=[])
 
-        playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
+        stats_models.ExplorationIssuesModel.create(
             self.EXP_ID, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
