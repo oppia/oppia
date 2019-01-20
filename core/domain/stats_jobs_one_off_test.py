@@ -64,7 +64,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         playthrough_id = self.create_playthrough()
         playthrough = stats_models.PlaythroughModel.get(playthrough_id)
         # An arbitrary date before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2018, 1, 1)
+        playthrough.created_on = datetime.datetime(2017, 12, 31)
         playthrough.put()
         return playthrough_id
 
