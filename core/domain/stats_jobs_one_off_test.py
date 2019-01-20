@@ -238,7 +238,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             issues_model.unresolved_issues[0]['playthrough_ids'],
             [new_playthrough_ids[0], new_playthrough_ids[1]])
         # The second issue element should be the one with an old and a new
-        # playthrough. Only the new playthrough should exist.
+        # playthrough. Only the new playthrough should remain.
         self.assertEqual(
             issues_model.unresolved_issues[1]['playthrough_ids'],
             [new_playthrough_ids[2]])
