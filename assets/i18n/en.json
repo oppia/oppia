@@ -42,6 +42,7 @@
     "I18N_ACTION_BROWSE_LESSONS": "Browse our Lessons",
     "I18N_ACTION_CREATE_EXPLORATION": "Create an Exploration",
     "I18N_ACTION_CREATE_LESSON": "Create your own Lesson",
+    "I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "This card is quite long, and students might lose interest. Consider shortening it, or breaking it into two cards.",
     "I18N_CONTACT_PAGE_HEADING": "Get Involved!",
     "I18N_CONTACT_PAGE_PARAGRAPH_1": "Thanks for your interest in helping out with the Oppia project!",
     "I18N_CONTACT_PAGE_PARAGRAPH_10": "The Oppia project is fully open source, and is maintained by a large community of volunteers on <a href=\"https://github.com/oppia/oppia/\">GitHub</a>. We are in need of coders, designers and copywriters, so if you would like to help out, please drop us a line! The best way to get started is to follow the instructions on our <a href=\"https://github.com/oppia/oppia/wiki\">GitHub wiki page</a>.",

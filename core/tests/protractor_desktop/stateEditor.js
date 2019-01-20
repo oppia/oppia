@@ -19,6 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage =
@@ -521,6 +522,53 @@ describe('State editor', function() {
 
     users.logout();
   });
+
+  it('should generate warning message if card height limit is exceeded ',
+    function() {
+      users.createUser('user@heightWarning.com', 'userHeightWarning');
+      users.login('user@heightWarning.com');
+
+      workflow.createExploration();
+
+      var postTutorialPopover = element(by.css('.popover-content'));
+      var stateEditContent = element(by.css('.protractor-test-edit-content'));
+      waitFor.invisibilityOf(
+        postTutorialPopover, 'Post-tutorial popover does not disappear.');
+      waitFor.elementToBeClickable(
+        stateEditContent,
+        'stateEditContent taking too long to appear to set content');
+      stateEditContent.click();
+      var stateEditorTag = element(by.tagName('state-content-editor'));
+      var stateContentEditor = stateEditorTag.element(
+        by.css('.protractor-test-state-content-editor'));
+      waitFor.visibilityOf(
+        stateContentEditor,
+        'stateContentEditor taking too long to appear to set content');
+      var richTextEditor = forms.RichTextEditor(stateContentEditor);
+
+      var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
+
+      var heightMessage = element(by.css('.oppia-card-height-limit-warning'));
+
+      richTextEditor.appendPlainText(content);
+      expect(heightMessage.isPresent()).toBe(false);
+
+      richTextEditor.appendPlainText('\n\n\nline5');
+      waitFor.visibilityOf(
+        heightMessage, 'Card height limit message not displayed');
+
+      richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
+      expect(heightMessage.isPresent()).toBe(false);
+
+      richTextEditor.appendPlainText('\n\n\nline5');
+      waitFor.visibilityOf(
+        heightMessage, 'Card height limit message not displayed');
+
+      element(by.css('.oppia-hide-card-height-warning-icon')).click();
+      expect(heightMessage.isPresent()).toBe(false);
+
+      users.logout();
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
