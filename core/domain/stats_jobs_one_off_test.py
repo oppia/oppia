@@ -79,9 +79,12 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        # Shouldn't exist:
-        stats_models.PlaythroughModel.get_model(playthrough_id)
-        stats_models.ExplorationIssuesModel.get_model(playthrough_issue_id)
+        with self.assertRaises(
+                stats_models.PlaythroughModel.EntityNotFoundError):
+            stats_models.PlaythroughModel.get(playthrough_id)
+        with self.assertRaises(
+                stats_models.ExplorationIssuesModel.EntityNotFoundError):
+            stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_deprecated_playthroughs_removed(self):
         pass

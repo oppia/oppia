@@ -107,7 +107,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(exp_id, playthroughs_deleted_per_job):
-        yield '%s: %s' % (exp_id, sum(playthroughs_deleted_per_job))
+        yield '%s: %s' % (exp_id, sum(map(int, playthroughs_deleted_per_job)))
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
