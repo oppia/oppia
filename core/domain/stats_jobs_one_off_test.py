@@ -118,7 +118,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
-        # self.exp is not in the whitelisted set of explorations.
+        # self.exp is *not* in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id + '-differentiated'])
