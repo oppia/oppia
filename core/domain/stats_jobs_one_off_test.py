@@ -81,7 +81,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         return playthrough_id
 
     def create_playthrough_issues(self, playthrough_ids):
-        """Helper method to create a playthrough issues model and return it's id.
+        """Helper method to create a playthrough issues model and return it's
+        id.
 
         Args:
             playthrough_ids: list(str). The set of supporting playthrough
