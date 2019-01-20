@@ -61,12 +61,14 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
-    def is_pre_release(playthrough_model):
-        """Returns whether the given playthrough model was stored before the
-        playthroughs project was considered released.
+    def is_bad(playthrough_model):
+        """Returns whether the given playthrough model is bad.
+
+        A playthrough is bad if it was stored before the playthroughs project
+        was considered released.
         """
         return (
-            playthrough_model and
+            playthrough_model is None or
             playthrough_model.created_on <
             RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
 
@@ -77,24 +79,24 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exp_id = playthrough_issues_model.exp_id
         playthroughs_deleted = 0
         if exp_id not in whitelisted_exploration_ids:
-            for issue_json in playthrough_issues_model.unresolved_issues:
-                playthrough_ids = issue_json['playthrough_ids']
+            for unresolved_issue in playthrough_issues_model.unresolved_issues:
+                playthrough_ids = unresolved_issue['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
             playthrough_issues_model.delete()
         else:
-            indexed_issues = (
+            indexed_unresolved_issues = (
                 list(enumerate(playthrough_issues_model.unresolved_issues)))
             # Iterate in reverse to conditionally remove issues without
             # invalidating the indices to others.
-            for index, issue_json in reversed(indexed_issues):
-                playthrough_ids = issue_json['playthrough_ids']
-                playthrough_models = (
+            for index, unresolved_issue in reversed(indexed_unresolved_issues):
+                playthrough_ids = unresolved_issue['playthrough_ids']
+                playthroughs = (
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 bad_playthroughs = [
-                    model for model in playthrough_models
-                    if RemoveInvalidPlaythroughsOneOffJob.is_pre_release(model)]
+                    model for model in playthroughs
+                    if RemoveInvalidPlaythroughsOneOffJob.is_bad(model)]
                 for bad_playthrough in bad_playthroughs:
                     playthrough_ids.remove(bad_playthrough.id)
                 if not playthrough_ids:
