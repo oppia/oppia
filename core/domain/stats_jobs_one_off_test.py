@@ -172,6 +172,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             stats_models.PlaythroughModel.get(old_playthrough_id)
         # No error raised.
         _ = stats_models.PlaythroughModel.get(new_playthrough_id)
+
+        # Playthrough id list updated.
         playthrough_issue = (
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id))
         self.assertEqual(
