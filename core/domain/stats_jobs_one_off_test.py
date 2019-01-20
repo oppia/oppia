@@ -41,11 +41,11 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
-class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
+class RemoveInvalidPlaythroughsOneOffJobTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveInvalidPlaythroughsOneOffJob
 
     def setUp(self):
-        super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
+        super(RemoveInvalidPlaythroughsOneOffJobTest, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def test_playthroughs_from_whitelisted_explorations_remain(self):
@@ -218,14 +218,14 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
 
-class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
+class ExplorationIssuesModelCreatorOneOffJobTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
     EXP_ID1 = 'EXP_ID1'
     EXP_ID2 = 'EXP_ID2'
 
     def setUp(self):
-        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
+        super(ExplorationIssuesModelCreatorOneOffJobTest, self).setUp()
         self.exp1 = self.save_new_valid_exploration(self.EXP_ID1, 'owner')
         self.exp1.add_states(['New state'])
         change_list = [
@@ -299,12 +299,12 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
 
-class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
+class RegenerateMissingStatsModelsOneOffJobTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob
     EXP_ID = 'EXP_ID1'
 
     def setUp(self):
-        super(RegenerateMissingStatsModelsOneOffJobTests, self).setUp()
+        super(RegenerateMissingStatsModelsOneOffJobTest, self).setUp()
 
         self.exp1 = self.save_new_valid_exploration(self.EXP_ID, 'owner')
 
@@ -364,13 +364,13 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(state_stats.num_completions_v1, 3)
 
 
-class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
+class RecomputeStateCompleteStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     STATE_B = 'b'
 
     def setUp(self):
-        super(RecomputeStateCompleteStatisticsTests, self).setUp()
+        super(RecomputeStateCompleteStatisticsTest, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
 
         change_list = []
@@ -488,7 +488,7 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 4)
 
 
-class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
+class RecomputeAnswerSubmittedStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
@@ -496,7 +496,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
     SESSION_ID_2 = 'session_id_2'
 
     def setUp(self):
-        super(RecomputeAnswerSubmittedStatisticsTests, self).setUp()
+        super(RecomputeAnswerSubmittedStatisticsTest, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
         self.state_name = self.exp.init_state_name
 
@@ -602,7 +602,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['useful_feedback_count_v2'], 3)
 
 
-class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
+class RecomputeStateHitStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     # Start on version 2 as the update from version 1 to 2 is only to
@@ -612,7 +612,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
     SESSION_ID_2 = 'session_id_2'
 
     def setUp(self):
-        super(RecomputeStateHitStatisticsTests, self).setUp()
+        super(RecomputeStateHitStatisticsTest, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
         self.state_name = self.exp.init_state_name
 
@@ -758,7 +758,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['total_hit_count_v2'], 1)
 
 
-class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
+class RecomputeSolutionHitStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
@@ -767,7 +767,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
     SESSION_ID_3 = 'session_id_3'
 
     def setUp(self):
-        super(RecomputeSolutionHitStatisticsTests, self).setUp()
+        super(RecomputeSolutionHitStatisticsTest, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
         self.state_name = self.exp.init_state_name
 
@@ -874,14 +874,14 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 4)
 
 
-class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
+class RecomputeActualStartStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
     STATE_NAME = 'state_1'
 
     def setUp(self):
-        super(RecomputeActualStartStatisticsTests, self).setUp()
+        super(RecomputeActualStartStatisticsTest, self).setUp()
         self.save_new_default_exploration(self.EXP_ID, 'owner')
 
         change_list = []
@@ -975,14 +975,14 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         self.assertEqual(model.num_actual_starts_v2, 3)
 
 
-class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
+class RecomputeCompleteEventStatisticsTest(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
     STATE_NAME = 'state_1'
 
     def setUp(self):
-        super(RecomputeCompleteEventStatisticsTests, self).setUp()
+        super(RecomputeCompleteEventStatisticsTest, self).setUp()
         self.save_new_default_exploration(self.EXP_ID, 'owner')
 
         change_list = []
