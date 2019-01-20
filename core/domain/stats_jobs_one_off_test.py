@@ -355,7 +355,6 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
-
         stats_models.AnswerSubmittedEventLogEntryModel(
             id='id1',
             exp_id=self.EXP_ID,
@@ -536,7 +535,6 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             play_type=feconf.PLAY_TYPE_NORMAL,
             event_schema_version=2).put()
 
-
         state_stats_dict = {
             'total_answers_count_v1': 3,
             'total_answers_count_v2': 9,
@@ -603,7 +601,6 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         state_stats = model.state_stats_mapping['a']
         self.assertEqual(state_stats['first_hit_count_v2'], 1)
         self.assertEqual(state_stats['total_hit_count_v2'], 1)
-
 
 
 class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
