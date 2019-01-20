@@ -208,7 +208,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_playthrough_model(),
             self.create_playthrough_model(),
         ]
-        issues_model_id = (
+        playthrough_issues_model_id = (
             self.create_playthrough_issues_model_with_multiple_issues([
                 [old_playthrough_model_ids[0], old_playthrough_model_ids[1]],
                 [new_playthrough_model_ids[0], new_playthrough_model_ids[1]],
@@ -226,7 +226,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             # Should not raise.
             _ = stats_models.PlaythroughModel.get(new_playthrough_model_id)
 
-        issues_model = stats_models.ExplorationIssuesModel.get(issues_model_id)
+        issues_model = stats_models.ExplorationIssuesModel.get(
+            playthrough_issues_model_id)
         # Only two issues remain, because one of them only had old playthroughs.
         self.assertEqual(len(issues_model.unresolved_issues), 2)
         # The first issue element should be the one with only new elements.
