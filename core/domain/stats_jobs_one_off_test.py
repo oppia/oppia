@@ -89,20 +89,20 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
         # ExplorationIssuesModel will be created for versions 1 and 2.
         exp_issues11 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version - 1)
-        self.assertEqual(exp_issues11.EXP_ID, self.EXP_ID1)
+        self.assertEqual(exp_issues11.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues11.exp_version, self.exp1.version - 1)
         self.assertEqual(exp_issues11.unresolved_issues, [])
 
         exp_issues12 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version)
-        self.assertEqual(exp_issues12.EXP_ID, self.EXP_ID1)
+        self.assertEqual(exp_issues12.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues12.exp_version, self.exp1.version)
         self.assertEqual(exp_issues12.unresolved_issues, [])
 
         # ExplorationIssuesModel will be created only for version 1.
         exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID2, self.exp2.version)
-        self.assertEqual(exp_issues2.EXP_ID, self.EXP_ID2)
+        self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
