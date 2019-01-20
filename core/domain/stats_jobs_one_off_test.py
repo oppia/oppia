@@ -54,6 +54,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.ONE_OFF_JOB_CLASS.enqueue(job_id)
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
     def create_playthrough(self):
         """Helper method to create a simple playthrough and return its id."""
