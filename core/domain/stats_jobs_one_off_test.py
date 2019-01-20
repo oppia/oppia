@@ -16,6 +16,8 @@
 
 """Tests for one off statistics jobs."""
 
+import datetime
+
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -131,10 +133,93 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_deprecated_playthroughs_removed(self):
-        pass
+        # self.EXP_ID is in the whitelisted set of explorations.
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.EXP_ID])
+
+        old_playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={}, actions=[])
+        old_playthrough = (
+            stats_models.PlaythroughModel.get(old_playthrough_id))
+        # Created at the beginning of the GSoC project (still invalid).
+        old_playthrough.created_on = datetime.datetime(2018, 6, 1)
+        old_playthrough.put()
+
+        new_playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={}, actions=[])
+
+        playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, self.exp.version,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {'value': 'state_name1'},
+                    'time_spent_in_exp_in_msecs': {'value': 200},
+                },
+                'playthrough_ids': [old_playthrough_id, new_playthrough_id],
+            }]
+        )
+
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        with self.assertRaises(
+                stats_models.PlaythroughModel.EntityNotFoundError):
+            stats_models.PlaythroughModel.get(old_playthrough_id)
+        # No error raised.
+        _ = stats_models.PlaythroughModel.get(new_playthrough_id)
 
     def test_entire_issue_removed_when_all_playthroughs_removed(self):
-        pass
+        # self.EXP_ID is in the whitelisted set of explorations.
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.EXP_ID])
+
+        old_playthrough_ids = [
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+            stats_models.PlaythroughModel.create(
+                self.exp.id, self.exp.version, issue_type='EarlyQuit',
+                issue_customization_args={}, actions=[]),
+        ]
+        for old_playthrough in (
+                stats_models.PlaythroughModel.get_multi(old_playthrough_ids)):
+            # Created at the beginning of the GSoC project (still invalid).
+            old_playthrough.created_on = datetime.datetime(2018, 6, 1)
+            old_playthrough.put()
+
+        playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, self.exp.version,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {'value': 'state_name1'},
+                    'time_spent_in_exp_in_msecs': {'value': 200},
+                },
+                'playthrough_ids': old_playthrough_ids,
+            }]
+        )
+
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        for old_playthrough_id in old_playthrough_ids:
+            with self.assertRaises(
+                    stats_models.PlaythroughModel.EntityNotFoundError):
+                stats_models.PlaythroughModel.get(old_playthrough_id)
+        with self.assertRaises(
+                stats_models.ExplorationIssuesModel.EntityNotFoundError):
+            stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
 
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
