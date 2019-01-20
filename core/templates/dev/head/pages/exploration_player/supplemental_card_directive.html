@@ -7,7 +7,7 @@
             ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
-    <div class="">
+    <div>
       <angular-html-bind class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
       </angular-html-bind>
     </div>
@@ -64,7 +64,7 @@
   }
 
   .conversation-skin-help-card-content {
-    max-height: 400px;
+    max-height: 320px;
     overflow-y: auto;
     width: 270px;
   }
