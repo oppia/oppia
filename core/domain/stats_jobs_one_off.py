@@ -95,13 +95,12 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 bad_playthroughs = [
                     model for model in playthrough_models
                     if RemoveInvalidPlaythroughsOneOffJob.is_pre_release(model)]
+                for bad_playthrough in bad_playthroughs:
+                    playthrough_ids.remove(bad_playthrough.id)
+                if not playthrough_ids:
+                    playthrough_issues_model.unresolved_issues.pop(index)
                 stats_models.PlaythroughModel.delete_multi(bad_playthroughs)
                 playthroughs_deleted += len(bad_playthroughs)
-                if len(bad_playthroughs) == len(playthrough_ids):
-                    playthrough_issues_model.unresolved_issues.pop(index)
-                else:
-                    for bad_playthrough in bad_playthroughs:
-                        playthrough_ids.remove(bad_playthrough.id)
             if playthrough_issues_model.unresolved_issues:
                 playthrough_issues_model.put()
             else:
