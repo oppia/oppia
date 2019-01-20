@@ -66,6 +66,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         playthroughs project was considered released.
         """
         return (
+            playthrough_model and
             playthrough_model.created_on <
             RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
 
