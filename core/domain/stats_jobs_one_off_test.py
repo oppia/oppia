@@ -43,23 +43,16 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
 
 class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveInvalidPlaythroughsOneOffJob
-    EXP_ID = 'EXP_ID'
 
     def setUp(self):
         super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
-        self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        self.exp.add_states(['New state'])
-        change_list = [
-            exp_domain.ExplorationChange(
-                {'cmd': 'add_state', 'state_name': 'New state'})]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp.id, change_list, '')
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def test_playthroughs_from_whitelisted_explorations_remain(self):
-        # self.EXP_ID is in the whitelisted set of explorations.
+        # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID])
+            [self.exp.id])
 
         playthrough_ids = [
             stats_models.PlaythroughModel.create(
@@ -70,7 +63,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                 issue_customization_args={}, actions=[]),
         ]
         playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID, self.exp.version,
+            self.exp.id, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -94,10 +87,10 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
-        # self.EXP_ID is not in the whitelisted set of explorations.
+        # self.exp is not in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID + '-differentiated'])
+            [self.exp.id + '-differentiated'])
 
         playthrough_ids = [
             stats_models.PlaythroughModel.create(
@@ -108,7 +101,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                 issue_customization_args={}, actions=[]),
         ]
         playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID, self.exp.version,
+            self.exp.id, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -135,7 +128,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         # self.EXP_ID is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID])
+            [self.exp.id])
 
         old_playthrough_id = stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
@@ -151,7 +144,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             issue_customization_args={}, actions=[])
 
         playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID, self.exp.version,
+            self.exp.id, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -181,10 +174,10 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             [new_playthrough_id])
 
     def test_entire_issue_removed_when_all_playthroughs_removed(self):
-        # self.EXP_ID is in the whitelisted set of explorations.
+        # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID])
+            [self.exp.id])
 
         old_playthrough_ids = [
             stats_models.PlaythroughModel.create(
@@ -201,7 +194,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             old_playthrough.put()
 
         playthrough_issue_id = stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID, self.exp.version,
+            self.exp.id, self.exp.version,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
