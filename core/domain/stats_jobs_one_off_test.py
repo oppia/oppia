@@ -126,7 +126,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         with self.assertRaisesRegexp(Exception, 'not found'):
             _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
-    def test_deprecated_playthroughs_removed(self):
+    def test_old_playthroughs_removed(self):
         # self.EXP_ID is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
@@ -149,7 +149,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             old_playthrough_id,
             playthrough_issue.unresolved_issues[0]['playthrough_ids'])
 
-    def test_entire_issue_removed_when_all_playthroughs_removed(self):
+    def test_entire_issue_removed_when_all_playthroughs_are_old(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
