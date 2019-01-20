@@ -57,7 +57,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
     def create_playthrough(self):
-        """Helper method to create a simple playthrough and return its id."""
+        """Helper method to create a simple playthrough and return it's id."""
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
             issue_customization_args={}, actions=[])
@@ -74,11 +74,11 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         return playthrough_id
 
     def create_playthrough_issue(self, playthrough_ids):
-        """Helper method to create a simple playthrough issue and return its id.
+        """Helper method to create a playthrough issue and return it's id.
 
         Args:
             playthrough_ids: list(str). The set of supporting playthrough
-                recordings for this issue.
+                recording ids for this issue.
 
         Returns:
             str. The ID of the new playthrough issue.
