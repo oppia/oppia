@@ -125,11 +125,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.process_and_flush_pending_tasks()
 
         for playthrough_id in playthrough_ids:
-            with self.assertRaises(
-                    stats_models.PlaythroughModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(Exception, 'not found'):
                 stats_models.PlaythroughModel.get(playthrough_id)
-        with self.assertRaises(
-                stats_models.ExplorationIssuesModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(Exception, 'not found'):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_deprecated_playthroughs_removed(self):
@@ -169,8 +167,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        with self.assertRaises(
-                stats_models.PlaythroughModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(Exception, 'not found'):
             stats_models.PlaythroughModel.get(old_playthrough_id)
         # No error raised.
         _ = stats_models.PlaythroughModel.get(new_playthrough_id)
@@ -214,11 +211,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.process_and_flush_pending_tasks()
 
         for old_playthrough_id in old_playthrough_ids:
-            with self.assertRaises(
-                    stats_models.PlaythroughModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(Exception, 'not found'):
                 stats_models.PlaythroughModel.get(old_playthrough_id)
-        with self.assertRaises(
-                stats_models.ExplorationIssuesModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(Exception, 'not found'):
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
 
