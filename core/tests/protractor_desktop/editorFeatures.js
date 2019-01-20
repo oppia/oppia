@@ -875,9 +875,9 @@ describe('Suggestions on Explorations', function() {
     var suggestion2 = 'New exploration';
     var suggestionDescription2 = 'Changed';
 
-    explorationPlayerPage.
-      submitSuggestion(suggestion1, suggestionDescription1);
-    explorationPlayerPage.closeSuggestionModal();
+    explorationPlayerPage.submitSuggestion(
+      suggestion1, suggestionDescription1);
+    explorationPlayerPage.clickOnCloseSuggestionModalButton();
     explorationPlayerPage.submitSuggestion(
       suggestion2, suggestionDescription2);
     users.logout();

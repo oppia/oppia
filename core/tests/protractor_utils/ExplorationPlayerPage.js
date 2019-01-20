@@ -127,8 +127,12 @@ var ExplorationPlayerPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.closeSuggestionModal = function() {
+  this.clickOnCloseSuggestionModalButton = function() {
+    waitFor.elementToBeClickable(
+      closeSuggestionModalButton,
+      '"Close submitted suggestion modal" button takes too long to be clickable');
     closeSuggestionModalButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   // This verifies the question just asked, including formatting and
