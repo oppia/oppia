@@ -243,6 +243,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             issues_model.unresolved_issues[1]['playthrough_ids'],
             [new_playthrough_ids[2]])
 
+
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
