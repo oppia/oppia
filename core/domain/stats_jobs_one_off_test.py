@@ -141,7 +141,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         stats_models.PlaythroughModel.get(recent_playthrough_id)
         playthrough_issue = (
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id))
-        # Getting these models should not raise.
+        # The list of supporting playthroughs should not have the old one.
         self.assertNotIn(
             old_playthrough_id,
             playthrough_issue.unresolved_issues[0]['playthrough_ids'])
