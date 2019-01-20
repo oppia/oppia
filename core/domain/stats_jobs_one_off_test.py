@@ -60,7 +60,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         """Helper method to create a simple playthrough and return it's id.
 
         Returns:
-            str. The ID of the newly created playthrough.
+            str. The ID of the newly created playthrough model.
         """
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
@@ -71,7 +71,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         start of the GSoC 2018 project.
 
         Returns:
-            str. The ID of the newly created playthrough.
+            str. The ID of the newly created playthrough model.
         """
         playthrough_id = self.create_playthrough()
         playthrough = stats_models.PlaythroughModel.get(playthrough_id)
@@ -88,7 +88,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                 recording ids for this issue.
 
         Returns:
-            str. The ID of the new playthrough issue.
+            str. The ID of the new playthrough issue model.
         """
         return stats_models.ExplorationIssuesModel.create(
             self.exp.id, self.exp.version, [
