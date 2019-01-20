@@ -76,7 +76,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
-    def test_playthroughs_from_whitelisted_explorations_remain(self):
+    def test_playthroughs_remain_in_whitelisted_explorations(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
