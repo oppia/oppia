@@ -54,23 +54,25 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             this by only recording playthroughs in explorations we are confident
             are safe.
     """
-    PLAYTHROUGH_SERVICE_RELEASE_DATE = datetime.datetime(2018, 8, 1)
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
-    def is_bad(playthrough_model):
-        """Returns whether the given playthrough model is bad.
+    def is_too_old(playthrough_model):
+        """Returns whether the given playthrough model is too old.
 
-        A playthrough is bad if it was stored before the playthroughs project
-        was considered released.
+        Args:
+            playthrough_model: stats_models.PlaythroughModel|None.
+
+        Returns:
+            bool. Whether the playthrough model was created before the release
+            date of the Playthroughs GSoC 2018 project.
         """
         return (
             playthrough_model is None or
-            playthrough_model.created_on <
-            RemoveInvalidPlaythroughsOneOffJob.PLAYTHROUGH_SERVICE_RELEASE_DATE)
+            playthrough_model.created_on < datetime.datetime(2018, 8, 1))
 
     @staticmethod
     def map(playthrough_issues_model):
@@ -96,7 +98,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 bad_playthroughs = [
                     model for model in playthroughs
-                    if RemoveInvalidPlaythroughsOneOffJob.is_bad(model)]
+                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
                 for bad_playthrough in bad_playthroughs:
                     playthrough_ids.remove(bad_playthrough.id)
                 if not playthrough_ids:
