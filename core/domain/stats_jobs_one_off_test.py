@@ -80,13 +80,12 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         playthrough.put()
         return playthrough_model_id
 
-    def create_playthrough_issues_model_with_multiple_issues(
-            self, playthrough_model_ids_list):
+    def create_playthrough_issues_model(self, playthrough_ids_list):
         """Helper method to create a playthrough issues model with multiple
         unresolved issues and return its id.
 
         Args:
-            playthrough_model_ids_list: list(list(str)). A list with the set of
+            playthrough_ids_list: list(list(str)). A list with the set of
                 playthrough ids each individual issue should reference.
 
         Returns:
@@ -101,7 +100,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                         'time_spent_in_exp_in_msecs': {'value': 200},
                     },
                     'playthrough_ids': playthrough_model_ids,
-                } for playthrough_model_ids in playthrough_model_ids_list
+                }
+                for playthrough_model_ids in playthrough_ids_list
             ])
 
     def test_playthroughs_remain_in_whitelisted_explorations(self):
@@ -114,8 +114,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_playthrough_model(),
         ]
         playthrough_issues_model_id = (
-            self.create_playthrough_issues_model_with_multiple_issues(
-                [playthrough_model_ids]))
+            self.create_playthrough_issues_model([playthrough_model_ids]))
 
         self.run_one_off_job()
 
@@ -134,8 +133,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_playthrough_model(),
         ]
         playthrough_issues_model_id = (
-            self.create_playthrough_issues_model_with_multiple_issues(
-                [playthrough_model_ids]))
+            self.create_playthrough_issues_model([playthrough_model_ids]))
 
         self.run_one_off_job()
 
@@ -153,10 +151,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             [self.exp.id])
         old_playthrough_model_id = self.create_old_playthrough_model()
         new_playthrough_model_id = self.create_playthrough_model()
-        playthrough_issues_model_id = (
-            self.create_playthrough_issues_model_with_multiple_issues([
-                [old_playthrough_model_id, new_playthrough_model_id],
-            ]))
+        playthrough_issues_model_id = self.create_playthrough_issues_model([
+            [old_playthrough_model_id, new_playthrough_model_id],
+        ])
 
         self.run_one_off_job()
 
@@ -167,9 +164,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         playthrough_issue = stats_models.ExplorationIssuesModel.get(
             playthrough_issues_model_id)
         # The list of supporting playthroughs should not have the old one.
-        self.assertNotIn(
-            old_playthrough_model_id,
-            playthrough_issue.unresolved_issues[0]['playthrough_ids'])
+        self.assertEqual(
+            playthrough_issue.unresolved_issues[0]['playthrough_ids'],
+            [new_playthrough_model_id])
 
     def test_entire_issue_removed_when_all_playthroughs_are_old(self):
         # self.exp is in the whitelisted set of explorations.
@@ -181,8 +178,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_old_playthrough_model(),
         ]
         playthrough_issues_model_id = (
-            self.create_playthrough_issues_model_with_multiple_issues(
-                [old_playthrough_model_ids]))
+            self.create_playthrough_issues_model([old_playthrough_model_ids]))
 
         self.run_one_off_job()
 
@@ -208,12 +204,11 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_playthrough_model(),
             self.create_playthrough_model(),
         ]
-        playthrough_issues_model_id = (
-            self.create_playthrough_issues_model_with_multiple_issues([
-                [old_playthrough_model_ids[0], old_playthrough_model_ids[1]],
-                [new_playthrough_model_ids[0], new_playthrough_model_ids[1]],
-                [old_playthrough_model_ids[2], new_playthrough_model_ids[2]],
-            ]))
+        playthrough_issues_model_id = self.create_playthrough_issues_model([
+            [old_playthrough_model_ids[0], old_playthrough_model_ids[1]],
+            [new_playthrough_model_ids[0], new_playthrough_model_ids[1]],
+            [old_playthrough_model_ids[2], new_playthrough_model_ids[2]],
+        ])
 
         self.run_one_off_job()
 
