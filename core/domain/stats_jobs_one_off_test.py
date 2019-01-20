@@ -198,7 +198,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         with self.assertRaisesRegexp(Exception, 'not found'):
             _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
-    def test_issues_withh_mixed_playthrough_ages(self):
+    def test_issues_with_mixed_playthrough_ages(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
