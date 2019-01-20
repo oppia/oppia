@@ -76,10 +76,10 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_issues_model):
+        playthroughs_deleted = 0
         whitelisted_exploration_ids = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         exp_id = playthrough_issues_model.exp_id
-        playthroughs_deleted = 0
         if exp_id not in whitelisted_exploration_ids:
             for unresolved_issue in playthrough_issues_model.unresolved_issues:
                 playthrough_ids = unresolved_issue['playthrough_ids']
@@ -94,17 +94,17 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # invalidating the indices to others.
             for index, unresolved_issue in reversed(indexed_unresolved_issues):
                 playthrough_ids = unresolved_issue['playthrough_ids']
-                playthroughs = (
-                    stats_models.PlaythroughModel.get_multi(playthrough_ids))
-                bad_playthroughs = [
-                    model for model in playthroughs
-                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
-                for bad_playthrough in bad_playthroughs:
-                    playthrough_ids.remove(bad_playthrough.id)
+                old_models = [
+                    model for model in stats_models.PlaythroughModel.get_multi(
+                        playthrough_ids)
+                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)
+                ]
+                for model in old_models:
+                    playthrough_ids.remove(model.id)
                 if not playthrough_ids:
                     playthrough_issues_model.unresolved_issues.pop(index)
-                stats_models.PlaythroughModel.delete_multi(bad_playthroughs)
-                playthroughs_deleted += len(bad_playthroughs)
+                stats_models.PlaythroughModel.delete_multi(old_models)
+                playthroughs_deleted += len(old_models)
             if playthrough_issues_model.unresolved_issues:
                 playthrough_issues_model.put()
             else:
