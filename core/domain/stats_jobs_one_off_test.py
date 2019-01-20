@@ -617,12 +617,12 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
     def setUp(self):
         super(RecomputeSolutionHitStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        self.state = self.exp.init_state_name
+        self.state_name = self.exp.init_state_name
 
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': self.STATE,
+                'old_state_name': self.state_name,
                 'new_state_name': 'b'
             })
         ]
@@ -633,7 +633,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             id='id1',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             event_schema_version=2).put()
@@ -641,7 +641,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             id='id2',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             event_schema_version=2).put()
@@ -649,7 +649,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             id='id3',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_2,
             time_spent_in_state_secs=1.0,
             event_schema_version=2).put()
@@ -657,7 +657,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             id='id4',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_3,
             time_spent_in_state_secs=1.0,
             event_schema_version=2).put()
@@ -665,7 +665,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             id='id1',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.state_name,
             session_id=self.SESSION_ID_1,
             time_spent_in_state_secs=1.0,
             event_schema_version=1).put()
@@ -694,7 +694,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0,
             {
-                self.state: state_stats_dict
+                self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
@@ -712,7 +712,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
         model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[self.state]
+        state_stats = model.state_stats_mapping[self.state_name]
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 3)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
@@ -726,7 +726,7 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
-    STATE = 'state_1'
+    STATE_NAME = 'state_1'
 
     def setUp(self):
         super(RecomputeActualStartStatisticsTests, self).setUp()
@@ -743,28 +743,28 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             id='id1',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_1',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id2',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_2',
             event_schema_version=2).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id3',
             exp_id=self.EXP_ID,
             exp_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_3',
             event_schema_version=1).put()
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id4',
             exp_id=self.EXP_ID,
             exp_version=2,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_4',
             event_schema_version=2).put()
 
@@ -783,15 +783,15 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0, {
-                self.state: state_stats_dict
+                self.STATE_NAME: state_stats_dict
                 })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 2, 0, 0, 0, 0, 0, 0, {
-                self.state: state_stats_dict
+                self.STATE_NAME: state_stats_dict
                 })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 3, 0, 0, 0, 0, 0, 0, {
-                self.state: state_stats_dict
+                self.STATE_NAME: state_stats_dict
                 })
 
     def test_standard_operation(self):
@@ -827,7 +827,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
     EXP_ID = 'EXP_ID'
     EXP_VERSION = 1
-    STATE = 'state_1'
+    STATE_NAME = 'state_1'
 
     def setUp(self):
         super(RecomputeCompleteEventStatisticsTests, self).setUp()
@@ -842,7 +842,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_1',
             client_time_spent_in_secs=1.0,
             params={},
@@ -853,7 +853,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
             exploration_id=self.EXP_ID,
             exploration_version=self.EXP_VERSION,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_2',
             client_time_spent_in_secs=1.0,
             params={},
@@ -864,7 +864,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
             exploration_id=self.EXP_ID,
             exploration_version=2,
-            state_name=self.STATE,
+            state_name=self.STATE_NAME,
             session_id='session_id_3',
             client_time_spent_in_secs=1.0,
             params={},
@@ -886,11 +886,11 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0, {
-                self.state: state_stats_dict
+                self.STATE_NAME: state_stats_dict
                 })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, 2, 0, 0, 0, 0, 0, 0, {
-                self.state: state_stats_dict
+                self.STATE_NAME: state_stats_dict
                 })
 
     def test_standard_operation(self):
