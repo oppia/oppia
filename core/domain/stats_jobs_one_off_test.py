@@ -99,9 +99,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                         'state_name': {'value': 'state_name1'},
                         'time_spent_in_exp_in_msecs': {'value': 200},
                     },
-                    'playthrough_ids': playthrough_model_ids,
+                    'playthrough_ids': playthrough_ids,
                 }
-                for playthrough_model_ids in playthrough_ids_list
+                for playthrough_ids in playthrough_ids_list
             ])
 
     def test_playthroughs_remain_in_whitelisted_explorations(self):
