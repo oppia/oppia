@@ -90,7 +90,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                     'issue_customization_args': {
                         'state_name': {'value': 'state_name1'},
                         'time_spent_in_exp_in_msecs': {'value': 200},
-                        },
+                    },
                     'playthrough_ids': playthrough_ids,
                 }
             ])
