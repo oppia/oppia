@@ -84,14 +84,16 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             str. The ID of the new playthrough issue.
         """
         return stats_models.ExplorationIssuesModel.create(
-            self.exp.id, self.exp.version, [{
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': {
-                    'state_name': {'value': 'state_name1'},
-                    'time_spent_in_exp_in_msecs': {'value': 200},
-                },
-                'playthrough_ids': playthrough_ids,
-            }])
+            self.exp.id, self.exp.version, [
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name1'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                        },
+                    'playthrough_ids': playthrough_ids,
+                }
+            ])
 
     def test_playthroughs_remain_in_whitelisted_explorations(self):
         # self.exp is in the whitelisted set of explorations.
