@@ -57,7 +57,11 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
     def create_playthrough(self):
-        """Helper method to create a simple playthrough and return it's id."""
+        """Helper method to create a simple playthrough and return it's id.
+
+        Returns:
+            str. The ID of the newly created playthrough.
+        """
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
             issue_customization_args={}, actions=[])
@@ -65,6 +69,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     def create_old_playthrough(self):
         """Helper method to create a playthrough with a creation date before the
         start of the GSoC 2018 project.
+
+        Returns:
+            str. The ID of the newly created playthrough.
         """
         playthrough_id = self.create_playthrough()
         playthrough = stats_models.PlaythroughModel.get(playthrough_id)
@@ -127,7 +134,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_old_playthroughs_removed(self):
-        # self.EXP_ID is in the whitelisted set of explorations.
+        # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
