@@ -56,7 +56,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
-    def create_new_playthrough_model(self):
+    def create_playthrough_model(self):
         """Helper method to create a simple playthrough and return its id.
 
         Returns:
@@ -73,7 +73,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         Returns:
             str. The ID of the newly created playthrough model.
         """
-        playthrough_model_id = self.create_new_playthrough_model()
+        playthrough_model_id = self.create_playthrough_model()
         playthrough = stats_models.PlaythroughModel.get(playthrough_model_id)
         # An arbitrary date before GSoC 2018.
         playthrough.created_on = datetime.datetime(2017, 12, 31)
@@ -110,8 +110,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
         playthrough_model_ids = [
-            self.create_new_playthrough_model(),
-            self.create_new_playthrough_model(),
+            self.create_playthrough_model(),
+            self.create_playthrough_model(),
         ]
         playthrough_issues_model_id = (
             self.create_playthrough_issues_model_with_multiple_issues(
@@ -130,8 +130,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id + '-differentiated'])
         playthrough_model_ids = [
-            self.create_new_playthrough_model(),
-            self.create_new_playthrough_model(),
+            self.create_playthrough_model(),
+            self.create_playthrough_model(),
         ]
         playthrough_issues_model_id = (
             self.create_playthrough_issues_model_with_multiple_issues(
@@ -152,7 +152,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
         old_playthrough_model_id = self.create_old_playthrough_model()
-        new_playthrough_model_id = self.create_new_playthrough_model()
+        new_playthrough_model_id = self.create_playthrough_model()
         playthrough_issues_model_id = (
             self.create_playthrough_issues_model_with_multiple_issues([
                 [old_playthrough_model_id, new_playthrough_model_id],
@@ -204,9 +204,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
             self.create_old_playthrough_model(),
         ]
         new_playthrough_model_ids = [
-            self.create_new_playthrough_model(),
-            self.create_new_playthrough_model(),
-            self.create_new_playthrough_model(),
+            self.create_playthrough_model(),
+            self.create_playthrough_model(),
+            self.create_playthrough_model(),
         ]
         issues_model_id = (
             self.create_playthrough_issues_model_with_multiple_issues([
