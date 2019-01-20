@@ -102,7 +102,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         self.run_one_off_job()
 
-        # Should not raise:
+        # Getting these models should not raise.
         for playthrough_id in playthrough_ids:
             stats_models.PlaythroughModel.get(playthrough_id)
         stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
@@ -137,11 +137,11 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         with self.assertRaisesRegexp(Exception, 'not found'):
             stats_models.PlaythroughModel.get(old_playthrough_id)
-        # Should not raise:
+        # Getting these models should not raise.
         stats_models.PlaythroughModel.get(recent_playthrough_id)
         playthrough_issue = (
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id))
-        # Should be missing old playthrough:
+        # Getting these models should not raise.
         self.assertNotIn(
             old_playthrough_id,
             playthrough_issue.unresolved_issues[0]['playthrough_ids'])
