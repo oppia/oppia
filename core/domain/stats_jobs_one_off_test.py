@@ -44,6 +44,10 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
 class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveInvalidPlaythroughsOneOffJob
 
+    def setUp(self):
+        super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
+
     def run_one_off_job(self):
         """Begins the one off job and asserts it completes as expected."""
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -87,10 +91,6 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
                 },
                 'playthrough_ids': playthrough_ids,
             }])
-
-    def setUp(self):
-        super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def test_playthroughs_remain_in_whitelisted_explorations(self):
         # self.exp is in the whitelisted set of explorations.
