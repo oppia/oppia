@@ -16,6 +16,7 @@
 
 """Tests for one off statistics jobs."""
 
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs_one_off
@@ -39,26 +40,54 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
 
 class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveInvalidPlaythroughsOneOffJob
-    EXP_ID1 = 'EXP_ID1'
-    EXP_ID2 = 'EXP_ID2'
+    EXP_ID = 'EXP_ID'
 
     def setUp(self):
         super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
-        self.exp1 = self.save_new_valid_exploration(self.EXP_ID1, 'owner')
-        self.exp1.add_states(['New state'])
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner')
+        self.exp.add_states(['New state'])
         change_list = [
             exp_domain.ExplorationChange(
                 {'cmd': 'add_state', 'state_name': 'New state'})]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
-        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
-        self.exp2 = self.save_new_valid_exploration(self.EXP_ID2, 'owner')
+            feconf.SYSTEM_COMMITTER_ID, self.exp.id, change_list, '')
 
-    def test_default_job_execution(self):
+    def test_playthroughs_removed_from_non_whitelisted_explorations(self):
+        # self.EXP_ID is not in the whitelisted set of explorations.
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.EXP_ID + '-differentiated'])
+
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={}, actions=[])
+        playthrough_issue_id  = stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, self.exp.version,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {'value': 'state_name1'},
+                    'time_spent_in_exp_in_msecs': {'value': 200},
+                },
+                'playthrough_ids': [playthrough_id]
+            }]
+        )
+
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
         self.ONE_OFF_JOB_CLASS.enqueue(job_id)
 
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Shouldn't exist:
+        stats_models.PlaythroughModel.get_model(playthrough_id)
+        stats_models.ExplorationIssuesModel.get_model(playthrough_issue_id)
+
+    def test_deprecated_playthroughs_removed(self):
+        pass
+
+    def test_entire_issue_removed_when_all_playthroughs_removed(self):
+        pass
 
 
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
