@@ -104,8 +104,8 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         # Getting these models should not raise.
         for playthrough_id in playthrough_ids:
-            stats_models.PlaythroughModel.get(playthrough_id)
-        stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
+            _ = stats_models.PlaythroughModel.get(playthrough_id)
+        _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
         # self.exp is not in the whitelisted set of explorations.
@@ -119,9 +119,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         for playthrough_id in playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(playthrough_id)
+                _ = stats_models.PlaythroughModel.get(playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
+            _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
     def test_deprecated_playthroughs_removed(self):
         # self.EXP_ID is in the whitelisted set of explorations.
@@ -136,9 +136,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.run_one_off_job()
 
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.PlaythroughModel.get(old_playthrough_id)
+            _ = stats_models.PlaythroughModel.get(old_playthrough_id)
         # Getting these models should not raise.
-        stats_models.PlaythroughModel.get(recent_playthrough_id)
+        _ = stats_models.PlaythroughModel.get(recent_playthrough_id)
         playthrough_issue = (
             stats_models.ExplorationIssuesModel.get(playthrough_issue_id))
         # The list of supporting playthroughs should not have the old one.
@@ -160,9 +160,9 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         for old_playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(old_playthrough_id)
+                _ = stats_models.PlaythroughModel.get(old_playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
+            _ = stats_models.ExplorationIssuesModel.get(playthrough_issue_id)
 
 
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
