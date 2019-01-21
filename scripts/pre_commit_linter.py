@@ -69,7 +69,7 @@ import docstrings_checker  # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
@@ -77,6 +77,10 @@ _EXCLUSIVE_GROUP.add_argument(
     '--files',
     nargs='+',
     help='specific files to be linted. Space separated list',
+    action='store')
+_PARSER.add_argument(
+    '--mode',
+    help='v for verbose, nv for non-verbose',
     action='store')
 
 BAD_PATTERNS = {
@@ -226,6 +230,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     }
 ]
+
+MODE = 'nv'
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
@@ -492,8 +498,11 @@ def _lint_css_files(
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
     result_list = []
+    if MODE == 'nv':
+        print 'Linting CSS files ....'
     for _, filename in enumerate(files_to_lint):
-        print 'Linting: ', filename
+        if MODE == 'v':
+            print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -545,8 +554,11 @@ def _lint_js_files(
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
+    if MODE == 'nv':
+        print 'Linting JS files ....'
     for _, filename in enumerate(files_to_lint):
-        print 'Linting: ', filename
+        if MODE == 'v':
+            print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -653,9 +665,12 @@ def _lint_html_files(all_files):
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
+    if MODE == 'nv':
+        print 'Linting HTML files ....'
     for filename in html_files_to_lint:
         proc_args = htmllint_cmd_args + [filename]
-        print 'Linting %s file' % filename
+        if MODE == 'v':
+            print 'Linting %s file' % filename
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -697,6 +712,12 @@ def _get_all_files():
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
+    if parsed_args.mode == 'v':
+        global MODE #pylint: disable = global-statement
+        MODE = 'v'
+    elif parsed_args.mode not in ['nv', None]:
+        print 'Undefined Mode: Enter v for verbose, nv for non-verbose'
+        sys.exit(1)
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
@@ -1309,7 +1330,8 @@ def _validate_and_parse_js_file(filename, content):
     """
     # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
-    print 'Validating and parsing %s file ...' % filename
+    if MODE == 'v':
+        print 'Validating and parsing %s file ...' % filename
     return parser.parse(content)
 
 
