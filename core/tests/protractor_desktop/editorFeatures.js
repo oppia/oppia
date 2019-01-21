@@ -855,7 +855,7 @@ describe('Suggestions on Explorations', function() {
       'studentExplorationSuggestions');
   });
 
-  it('accepts a suggestion on a published exploration', function() {
+  it('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -870,10 +870,16 @@ describe('Suggestions on Explorations', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    var suggestion = 'New Exploration';
-    var suggestionDescription = 'Uppercased the first letter';
+    var suggestion1 = 'New Exploration';
+    var suggestionDescription1 = 'Uppercased the first letter';
+    var suggestion2 = 'New exploration';
+    var suggestionDescription2 = 'Changed';
 
-    explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
+    explorationPlayerPage.submitSuggestion(
+      suggestion1, suggestionDescription1);
+    explorationPlayerPage.clickOnCloseSuggestionModalButton();
+    explorationPlayerPage.submitSuggestion(
+      suggestion2, suggestionDescription2);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
@@ -882,14 +888,17 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
-      expect(threads.length).toEqual(1);
-      expect(threads[0]).toMatch(suggestionDescription);
-    });
-    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription);
-
+    explorationEditorFeedbackTab.getSuggestionThreads().then(
+      function(threads) {
+        expect(threads.length).toEqual(2);
+        expect(threads[0]).toMatch(suggestionDescription2);
+      });
+    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
+    explorationEditorFeedbackTab.goBackToAllFeedbacks();
+    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
     explorationEditorPage.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content.
@@ -897,7 +906,7 @@ describe('Suggestions on Explorations', function() {
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
     users.logout();
   });
 
