@@ -56,6 +56,7 @@ LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
+SUCCESSFUL_PUSH_THRESHOLD = 5
 
 
 class ChangedBranch(object):
@@ -337,7 +338,7 @@ def main():
         with open('successful_push_counter.txt', 'w') as f:
             successful_push_count = '0'
             f.write(successful_push_count)
-    if int(successful_push_count) < 5:
+    if int(successful_push_count) < SUCCESSFUL_PUSH_THRESHOLD:
         sys.stdin.flush()
         sys.stdin = open('/dev/tty', 'r')
         print ('Please confirm that you have performed all the tests by'
