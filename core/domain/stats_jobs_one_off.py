@@ -94,14 +94,15 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # without invalidating the indices to others.
             for i, unresolved_issue in reversed(enumerated_unresolved_issues):
                 playthrough_ids = unresolved_issue['playthrough_ids']
-                old_models = [
+                old_models = (
                     model for model in stats_models.PlaythroughModel.get_multi(
                         playthrough_ids)
-                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)
-                ]
-                stats_models.PlaythroughModel.delete_multi(old_models)
-                playthroughs_deleted += len(old_models)
-                if len(old_models) == len(playthrough_ids):
+                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model))
+                for model in old_models:
+                    stats_models.PlaythroughModel.delete_multi(old_models)
+                    playthroughs_deleted += len(old_models)
+                    playthrough_ids.remove(model.id)
+                if not playthrough_ids:
                     unresolved_issues.pop(i)
 
         if not unresolved_issues:
