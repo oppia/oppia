@@ -76,11 +76,13 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_issues_model):
+        """Keeps count of and deletes invalid playthroughs from the given model.
+        """
         playthroughs_deleted = 0
-        whitelisted_exploration_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         exp_id = playthrough_issues_model.exp_id
         unresolved_issues = playthrough_issues_model.unresolved_issues
+        whitelisted_exploration_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         if exp_id not in whitelisted_exploration_ids:
             for unresolved_issue in unresolved_issues:
                 playthrough_ids = unresolved_issue['playthrough_ids']
@@ -90,7 +92,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             playthrough_issues_model.delete()
         else:
             indexed_unresolved_issues = list(enumerate(unresolved_issues))
-            # Iterate in reverse to conditionally remove issues without
+            # Iterate in the issues in reverse so we can remove elements without
             # invalidating the indices to others.
             for index, unresolved_issue in reversed(indexed_unresolved_issues):
                 playthrough_ids = unresolved_issue['playthrough_ids']
