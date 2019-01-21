@@ -17,8 +17,8 @@ suggestions.
 """
 
 from core.domain import email_manager
-from core.domain import exp_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_domain
@@ -170,7 +170,7 @@ def edit_suggestion(suggestion_id, new_change):
     """Edits the submitted suggestion.
 
     Args:
-        suggestion: obj. suggestion to be changed.
+        suggestion_id: obj. Id of suggestion to be changed.
         new_change: dict(str, str). Dictionary contains the new suggestion.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
