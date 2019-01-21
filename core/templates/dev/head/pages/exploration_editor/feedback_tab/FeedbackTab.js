@@ -202,9 +202,9 @@ oppia.controller('FeedbackTab', [
           'currentContent', 'newContent', 'EditabilityService',
           function(
               $scope, $log, $http, $uibModalInstance, suggestionIsHandled,
-              suggestionIsValid, suggestionId, targetId, unsavedChangesExist,
-              suggestionStatus, stateName, description, currentContent,
-              newContent, EditabilityService) {
+              stateName, suggestionId, targetId, suggestionIsValid,
+              unsavedChangesExist, suggestionStatus, description,
+              currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
