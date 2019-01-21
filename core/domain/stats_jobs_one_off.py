@@ -105,10 +105,10 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 playthroughs_deleted += len(old_models)
                 if not playthrough_ids:
                     unresolved_issues.pop(index)
-            if unresolved_issues:
-                playthrough_issues_model.put()
-            else:
+            if not unresolved_issues:
                 playthrough_issues_model.delete()
+            else:
+                playthrough_issues_model.put()
         yield (exp_id, playthroughs_deleted)
 
     @staticmethod
