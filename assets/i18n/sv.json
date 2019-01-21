@@ -36,6 +36,7 @@
 	"I18N_ACTION_BROWSE_LESSONS": "Bläddra bland våra lektioner",
 	"I18N_ACTION_CREATE_EXPLORATION": "Skapa en utforskning",
 	"I18N_ACTION_CREATE_LESSON": "Skapa din egen lektion",
+	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Det här kortet är rätt så långt och studenter kan därför tappa intresse. Överväg att korta ner det eller gör om det till två kort.",
 	"I18N_CONTACT_PAGE_HEADING": "Engagera dig!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Tack för ditt intresse i att hjälpa till med Oppia-projektet!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10_HEADING": "Förbättra och underhålla webbsidan",
