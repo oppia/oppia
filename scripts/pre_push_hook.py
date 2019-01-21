@@ -330,6 +330,27 @@ def main():
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
                 sys.exit(1)
+    try:
+        with open('successful_push_counter.txt', 'r+') as f:
+            successful_push_count = f.read()
+    except IOError:
+        with open('successful_push_counter.txt', 'w') as f:
+            successful_push_count = '0'
+            f.write(successful_push_count)
+    if int(successful_push_count) < 5:
+        sys.stdin.flush()
+        sys.stdin = open('/dev/tty', 'r')
+        print ('Please confirm that you have performed all the tests by'
+               ' running bash scripts/run_tests.sh [y/N]')
+        confirmation = raw_input('Your response: ')
+        if confirmation.lower() == 'y':
+            successful_push_count = str(int(successful_push_count) + 1)
+            with open('successful_push_counter.txt', 'w') as f:
+                f.write(successful_push_count)
+        else:
+            print ('Please run the necessary tests locally before pushing.'
+                   '\nAborting...')
+            sys.exit(1)
     sys.exit(0)
 
 
