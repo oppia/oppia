@@ -189,4 +189,3 @@ class EditSuggestionHandler(base.BaseHandler):
         """
         new_change = self.payload.get('change')
         suggestion_services.edit_suggestion(suggestion_id, new_change)
-

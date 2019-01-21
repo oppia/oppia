@@ -480,7 +480,7 @@ oppia.controller('CreatorDashboard', [
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
         var EDIT_SUGGESTION_URL_TEMPLATE = (
-          '/suggestionactionhandler/edit/<target_id>/<suggestion_id>')
+          '/suggestionactionhandler/edit/<target_id>/<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
 
@@ -493,7 +493,7 @@ oppia.controller('CreatorDashboard', [
               target_id: $scope.activeThread.suggestion.targetId,
               suggestion_id: $scope.activeThread.suggestion.suggestionId
             });
-          
+
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
