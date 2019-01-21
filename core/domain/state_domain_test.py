@@ -438,7 +438,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(translation_script, 'needs_update', 20):
                 translation_script.validate()
 
-    def test_content_translations_validations(self):
+    def test_content_translations_validation(self):
         """Test validation of content translations."""
         content_translations_dict = {
             'content1': {
@@ -467,6 +467,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             content_translations_dict)
         content_translations.validate()
 
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'
+            ):
+            with self.swap(content_translations_dict, 'html', 30):
+                translation_script.validate()
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -595,8 +600,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on content transcripts."""
 
-    def test_get_available_languages_gives_set_of_langauges(self):
-
+    def test_get_available_languages_gives_correct_set_of_langauges(self):
         content_translations_dict = {
             'content1': {
                 'en': {
@@ -628,7 +632,7 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             content_translations.get_available_languages(),
             expected_available_languages)
 
-    def test_update_c_translation_for_existing_c_id_updates_correctly(self):
+    def test_update_content_translation_for_existing_content_id_updates_correctly(self): #pylint: disable=line-too-long
 
         content_translations_dict = {
             'content1': {
@@ -659,15 +663,15 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
         expected_content_translations_dict = {
             'content1': {
                 'en': {
-                    'html': 'hello',
+                    'html': 'Translation in english.',
                     'needs_update': True
                 },
                 'hi': {
-                    'html': 'Hey!',
+                    'html': 'Translation in hindi.',
                     'needs_update': False
                 },
                 'heb': {
-                    'html': 'new translation!',
+                    'html': 'Translation in other language.',
                     'needs_update': True
                 }
             }
@@ -677,7 +681,7 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             expected_content_translations_dict,
             content_translations.to_dict())
 
-    def test_update_c_translation_for_non_existing_c_id_updates_correctly(self):
+    def test_update_content_translation_for_non_existing_content_id_updates_correctly(self): #pylint: disable=line-too-long
 
         content_translations_dict = {
             'content1': {
