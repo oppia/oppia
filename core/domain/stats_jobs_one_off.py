@@ -100,7 +100,8 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
-
+                # We must update the actual list of playthroughs so that the
+                # deleted models are no longer associated.
                 unresolved_issue['playthrough_ids'] = [
                     pid for pid in playthrough_ids
                     if not any(model.id == pid for model in old_models)]
