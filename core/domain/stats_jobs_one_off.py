@@ -90,10 +90,10 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
         else:
-            indexed_unresolved_issues = list(enumerate(unresolved_issues))
-            # Iterate through the issues in reverse so we can remove elements
+            enumerated_unresolved_issues = list(enumerate(unresolved_issues))
+            # Iterate through the issues in reverse so we can pop elements
             # without invalidating the indices to others.
-            for index, unresolved_issue in reversed(indexed_unresolved_issues):
+            for i, unresolved_issue in reversed(enumerated_unresolved_issues):
                 playthrough_ids = unresolved_issue['playthrough_ids']
                 old_models = [
                     model for model in stats_models.PlaythroughModel.get_multi(
@@ -105,7 +105,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
                 if not playthrough_ids:
-                    unresolved_issues.pop(index)
+                    unresolved_issues.pop(i)
 
         if not unresolved_issues:
             playthrough_issues_model.delete()
