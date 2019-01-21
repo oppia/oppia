@@ -83,12 +83,12 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
         if exp_id not in whitelisted_exploration_ids:
-            for unresolved_issue in unresolved_issues:
+            while unresolved_issues:
+                unresolved_issue = unresolved_issues.pop()
                 playthrough_ids = unresolved_issue['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
-            playthrough_issues_model.delete()
         else:
             indexed_unresolved_issues = list(enumerate(unresolved_issues))
             # Iterate through the issues in reverse so we can remove elements
@@ -106,10 +106,11 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 playthroughs_deleted += len(old_models)
                 if not playthrough_ids:
                     unresolved_issues.pop(index)
-            if not unresolved_issues:
-                playthrough_issues_model.delete()
-            else:
-                playthrough_issues_model.put()
+
+        if not unresolved_issues:
+            playthrough_issues_model.delete()
+        else:
+            playthrough_issues_model.put()
         yield (exp_id, playthroughs_deleted)
 
     @staticmethod
