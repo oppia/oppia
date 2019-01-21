@@ -467,11 +467,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             content_translations_dict)
         content_translations.validate()
 
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content HTML'
-            ):
-            with self.swap(content_translations_dict, 'html', 30):
-                translation_script.validate()
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
