@@ -80,16 +80,16 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         whitelisted_exploration_ids = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         exp_id = playthrough_issues_model.exp_id
+        unresolved_issues = playthrough_issues_model.unresolved_issues
         if exp_id not in whitelisted_exploration_ids:
-            for unresolved_issue in playthrough_issues_model.unresolved_issues:
+            for unresolved_issue in unresolved_issues:
                 playthrough_ids = unresolved_issue['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
             playthrough_issues_model.delete()
         else:
-            indexed_unresolved_issues = (
-                list(enumerate(playthrough_issues_model.unresolved_issues)))
+            indexed_unresolved_issues = list(enumerate(unresolved_issues))
             # Iterate in reverse to conditionally remove issues without
             # invalidating the indices to others.
             for index, unresolved_issue in reversed(indexed_unresolved_issues):
@@ -101,11 +101,11 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 ]
                 for model in old_models:
                     playthrough_ids.remove(model.id)
-                if not playthrough_ids:
-                    playthrough_issues_model.unresolved_issues.pop(index)
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
-            if playthrough_issues_model.unresolved_issues:
+                if not playthrough_ids:
+                    unresolved_issues.pop(index)
+            if unresolved_issues:
                 playthrough_issues_model.put()
             else:
                 playthrough_issues_model.delete()
