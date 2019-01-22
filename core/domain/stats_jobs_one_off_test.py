@@ -119,7 +119,7 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.run_one_off_job()
 
         # Getting these models should not raise.
-        _ = stats_models.PlaythroughModel.get_multi(playthrough_id)
+        _ = stats_models.PlaythroughModel.get_multi(playthrough_ids)
         _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
