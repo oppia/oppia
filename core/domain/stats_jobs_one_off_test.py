@@ -332,10 +332,10 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
         }
 
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 1, 7, 0, 5, 0, 2, 0,
-            {
-                self.exp1.init_state_name: state_stats_dict
-            })
+            self.EXP_ID, exp_version=1, num_starts_v1=7, num_starts_v2=0,
+            num_actual_starts_v1=5, num_actual_starts_v2=0,
+            num_completions_v1=2, num_completions_v2=0,
+            state_stats_mapping={self.exp1.init_state_name: state_stats_dict})
 
         self.exp1.add_states(['New state'])
         change_list = [
@@ -357,8 +357,8 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify exploration version 2 has a stats model and values are correct.
-        exp_stats = stats_services.get_exploration_stats_by_id(
-            self.EXP_ID, 2)
+        exp_stats = (
+            stats_services.get_exploration_stats_by_id(self.EXP_ID, 2))
 
         self.assertEqual(exp_stats.num_starts_v1, 7)
         self.assertEqual(exp_stats.num_actual_starts_v1, 5)
@@ -450,20 +450,20 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 9
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 1, 0, 0, 0, 0, 0, 0,
-            {
-                self.exp.init_state_name: state_stats_dict
-            })
+            self.EXP_ID, exp_version=1, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v1=0, num_completions=0,
+            state_stats_mapping={self.exp.init_state_name: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
-            {
-                self.exp.init_state_name: state_stats_dict
-            })
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v1=0, num_completions=0,
+            state_stats_mapping={self.exp.init_state_name: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 3, 0, 0, 0, 0, 0, 0,
-            {
-                self.STATE_B: state_stats_dict
-            })
+            self.EXP_ID, exp_version=3, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v1=0, num_completions=0,
+            state_stats_mapping={self.STATE_B: state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -472,23 +472,23 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 1)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.exp.init_state_name]
         # Check the old event schema version was not counted.
         self.assertEqual(state_stats['num_completions_v2'], 2)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.exp.init_state_name]
         # Check that the new version counts events for the previous
         # versions.
         self.assertEqual(state_stats['num_completions_v2'], 3)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 3)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 3))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.STATE_B]
         # Check that the new version with a renamed state still
@@ -579,15 +579,15 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0,
-            {
-                self.state_name: state_stats_dict
-            })
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={self.state_name: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
-            {
-                'b': state_stats_dict
-            })
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={'b': state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -603,8 +603,8 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['total_answers_count_v2'], 3)
         self.assertEqual(state_stats['useful_feedback_count_v2'], 2)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['b']
         self.assertEqual(state_stats['total_answers_count_v2'], 4)
@@ -713,23 +713,26 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 1, 0, 0, 0, 0, 0, 0,
-            {
+            self.EXP_ID, exp_version=1, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={
                 'a': state_stats_dict,
                 self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
-            {
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={
                 'a': state_stats_dict,
                 self.state_name: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 3, 0, 0, 0, 0, 0, 0,
-            {
-                'a': state_stats_dict,
-                'b': state_stats_dict
-            })
+            self.EXP_ID, exp_version=3, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={'a': state_stats_dict, 'b': state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -745,8 +748,8 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['first_hit_count_v2'], 2)
         self.assertEqual(state_stats['total_hit_count_v2'], 3)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 3)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 3))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['b']
         self.assertEqual(state_stats['first_hit_count_v2'], 3)
@@ -759,8 +762,8 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['a']
         self.assertEqual(state_stats['first_hit_count_v2'], 1)
@@ -853,15 +856,15 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0,
-            {
-                self.state_name: state_stats_dict
-            })
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={self.state_name: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0,
-            {
-                'b': state_stats_dict
-            })
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={'b': state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -876,8 +879,8 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
         state_stats = model.state_stats_mapping[self.state_name]
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 3)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['b']
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 4)
@@ -943,17 +946,20 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0, {
-                self.STATE_NAME: state_stats_dict
-                })
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0, {
-                self.STATE_NAME: state_stats_dict
-                })
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 3, 0, 0, 0, 0, 0, 0, {
-                self.STATE_NAME: state_stats_dict
-                })
+            self.EXP_ID, exp_version=3, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v2=0, num_actual_starts_v1=0,
+            num_completions_v2=0, num_completions=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -966,8 +972,8 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             self.EXP_ID, self.EXP_VERSION)
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_actual_starts_v2, 2)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_actual_starts_v2, 3)
 
@@ -978,8 +984,8 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 3)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 3))
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_actual_starts_v2, 3)
 
@@ -1046,13 +1052,15 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, 0, 0, 0, 0, 0, 0, {
-                self.STATE_NAME: state_stats_dict
-                })
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v1=0, num_actual_starts_v2=0,
+            num_completions_v1=0, num_completions=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, 2, 0, 0, 0, 0, 0, 0, {
-                self.STATE_NAME: state_stats_dict
-                })
+            self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
+            num_actual_starts_v1=0, num_actual_starts_v2=0,
+            num_completions_v1=0, num_completions=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
     def test_standard_operation(self):
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
@@ -1066,7 +1074,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_completions_v2, 2)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
+        model_id = (
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_completions_v2, 3)
