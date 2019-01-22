@@ -274,8 +274,7 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
 
     def test_with_existing_exp_issues_instance(self):
         stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID1, self.exp1.version, unresolved_issues=[
-            {
+            self.EXP_ID1, self.exp1.version, unresolved_issues=[{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
