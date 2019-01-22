@@ -1481,6 +1481,15 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 
+.oppia-info-card-content p {
+  display: block;
+  font-size: 1.0em;
+  line-height: 1;
+  padding: 12px 0 24px 0;
+  position: relative;
+  word-spacing: 0;
+}
+
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
    after saving. The value 1.846 came from
@@ -1490,15 +1499,12 @@ pre.oppia-pre-wrapped-text {
 .oppia-rte-editor > p, .oppia-rte-viewer > p {
   line-height: 1.846;
 }
-.oppia-info-card-content p {
-  display: block;
-  font-size: 1.0em;
-  line-height: 1;
-  padding: 12px 0 24px 0;
-  position: relative;
-  word-spacing: 0;
-}
+
 .oppia-rte-content > div > p {
+  line-height: 1.846;
+}
+
+.oppia-shadow-preview-card .oppia-rte-viewer > p {
   line-height: 1.846;
 }
 
@@ -1507,7 +1513,7 @@ pre.oppia-pre-wrapped-text {
   margin-top: 10px;
 }
 
-/* The six rules below should be in sync. */
+/* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
 }
@@ -1521,6 +1527,14 @@ pre.oppia-pre-wrapped-text {
 .oppia-rte-viewer > p:last-child {
   margin-bottom: 0;
 }
+
+.oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
+  margin-top: 0;
+}
+.oppia-shadow-preview-card .oppia-rte-viewer > p:last-child {
+  margin-bottom: 0;
+}
+
 .form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0;
 }
@@ -1528,7 +1542,7 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 
-.oppia-rte-viewer {
+.oppia-rte-viewer, .oppia-shadow-preview-card .oppia-rte-viewer {
   border-radius: 2px;
   display: inline-block;
   max-width: 100%;
