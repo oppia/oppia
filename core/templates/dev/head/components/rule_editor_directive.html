@@ -1,7 +1,7 @@
 <div style="position: relative;">
   <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
     <div ng-if="rule.type != 'FuzzyMatches'" style="max-height: 350px;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     text-overflow: ellipsis;">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[rule.type]>" on-selection-change="onSelectNewRuleType">
