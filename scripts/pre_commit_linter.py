@@ -233,7 +233,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
 
 # Default non-verbose mode i.e. 'nv', for verbose
 # mode make it 'v'.
-MODE = 'v'
+MODE = 'nv'
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
