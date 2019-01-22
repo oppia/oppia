@@ -282,9 +282,9 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
                     },
                     'time_spent_in_exp_in_msecs': {
                         'value': 200
-                    }
+                    },
                 },
-                'playthrough_ids': ['playthrough_id1']
+                'playthrough_ids': ['playthrough_id1'],
             }]
         )
 
@@ -323,7 +323,7 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
 
         stats_models.ExplorationStatsModel.create(
@@ -380,7 +380,7 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': self.exp.init_state_name,
-                'new_state_name': self.STATE_B
+                'new_state_name': self.STATE_B,
             })
         ]
         exp_services.update_exploration(
@@ -438,7 +438,7 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 9
+            'num_completions_v2': 9,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, exp_version=1, num_starts_v1=0, num_starts_v2=0,
@@ -500,7 +500,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': self.state_name,
-                'new_state_name': 'b'
+                'new_state_name': 'b',
             })
         ]
         exp_services.update_exploration(
@@ -563,7 +563,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
@@ -615,7 +615,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': self.state_name,
-                'new_state_name': 'b'
+                'new_state_name': 'b',
             })
         ]
         exp_services.update_exploration(
@@ -693,7 +693,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, exp_version=1, num_starts_v1=0, num_starts_v2=0,
@@ -701,7 +701,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             num_completions_v2=0, num_completions=0,
             state_stats_mapping={
                 'a': state_stats_dict,
-                self.state_name: state_stats_dict
+                self.state_name: state_stats_dict,
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, exp_version=2, num_starts_v1=0, num_starts_v2=0,
@@ -709,7 +709,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             num_completions_v2=0, num_completions=0,
             state_stats_mapping={
                 'a': state_stats_dict,
-                self.state_name: state_stats_dict
+                self.state_name: state_stats_dict,
             })
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, exp_version=3, num_starts_v1=0, num_starts_v2=0,
@@ -762,7 +762,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': self.state_name,
-                'new_state_name': 'b'
+                'new_state_name': 'b',
             })
         ]
         exp_services.update_exploration(
@@ -828,7 +828,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
@@ -914,7 +914,7 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
@@ -1012,7 +1012,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             'first_hit_count_v2': 0,
             'num_times_solution_viewed_v2': 0,
             'num_completions_v1': 3,
-            'num_completions_v2': 0
+            'num_completions_v2': 0,
         }
         stats_models.ExplorationStatsModel.create(
             self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
