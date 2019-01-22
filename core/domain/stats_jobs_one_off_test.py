@@ -40,6 +40,17 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         return self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
+    def run_one_off_job(self):
+        """Begins the one off job and asserts it completes as expected.
+
+        Assumes the existence of a class constant ONE_OFF_JOB_CLASS.
+        """
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+
 
 class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveInvalidPlaythroughsOneOffJob
@@ -47,14 +58,6 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
     def setUp(self):
         super(RemoveInvalidPlaythroughsOneOffJobTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
-
-    def run_one_off_job(self):
-        """Begins the one off job and asserts it completes as expected."""
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
     def create_playthrough_model(self):
         """Helper method to create a simple playthrough and return its id.
@@ -246,11 +249,7 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
         self.exp2 = self.save_new_valid_exploration(self.EXP_ID2, 'owner')
 
     def test_default_job_execution(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         # ExplorationIssuesModel will be created for versions 1 and 2.
         exp_issues11 = stats_models.ExplorationIssuesModel.get_model(
@@ -289,11 +288,7 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
             }]
         )
 
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version)
@@ -350,11 +345,7 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
         """Test that stats models are regenerated with correct v1 stats
         values.
         """
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         # Verify exploration version 2 has a stats model and values are correct.
         exp_stats = (
@@ -466,11 +457,7 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={self.STATE_B: state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = (
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
@@ -590,11 +577,7 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={'b': state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
@@ -735,11 +718,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={'a': state_stats_dict, 'b': state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
@@ -756,11 +735,7 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
         self.assertEqual(state_stats['total_hit_count_v2'], 4)
 
     def test_session_hitting_multiple_states(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = (
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
@@ -867,11 +842,7 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={'b': state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
@@ -962,11 +933,7 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
@@ -978,11 +945,7 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         self.assertEqual(model.num_actual_starts_v2, 3)
 
     def test_recompute_for_version_with_no_events(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = (
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 3))
@@ -1063,11 +1026,7 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
     def test_standard_operation(self):
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
-
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.run_one_off_job()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.EXP_ID, self.EXP_VERSION)
