@@ -24,7 +24,9 @@ oppia.directive('storyNodeEditor', [
         getOutline: '&outline',
         getExplorationId: '&explorationId',
         isOutlineFinalized: '&outlineFinalized',
-        getDestinationNodeIds: '&destinationNodeIds'
+        getDestinationNodeIds: '&destinationNodeIds',
+        getPrerequisiteSkillIds: '&prerequisiteSkillIds',
+        getAcquiredSkillIds: '&acquiredSkillIds'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story_editor/main_editor/story_node_editor_directive.html'),
@@ -77,6 +79,10 @@ oppia.directive('storyNodeEditor', [
             };
           };
 
+          $scope.getSkillEditorUrl = function(skillId) {
+            return '/skill_editor/' + skillId;
+          };
+
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
               return;
@@ -98,6 +104,40 @@ oppia.directive('storyNodeEditor', [
           $scope.updateExplorationId = function(explorationId) {
             StoryUpdateService.setStoryNodeExplorationId(
               $scope.story, $scope.getId(), explorationId);
+          };
+
+          $scope.addPrerequisiteSkillId = function(skillId) {
+            if (!skillId) return;
+            try {
+              StoryUpdateService.addPrerequisiteSkillIdToNode(
+                $scope.story, $scope.getId(), skillId);
+            } catch (err) {
+              AlertsService.addWarning(
+                'Given skill is already a prerequisite skill');
+            }
+            $scope.prerequisiteSkillId = null;
+          };
+
+          $scope.removePrerequisiteSkillId = function(skillId) {
+            StoryUpdateService.removePrerequisiteSkillIdFromNode(
+              $scope.story, $scope.getId(), skillId);
+          };
+
+          $scope.addAcquiredSkillId = function(skillId) {
+            if (!skillId) return;
+            try {
+              StoryUpdateService.addAcquiredSkillIdToNode(
+                $scope.story, $scope.getId(), skillId);
+            } catch (err) {
+              AlertsService.addWarning(
+                'Given skill is already an acquired skill');
+            }
+            $scope.acquiredSkillId = null;
+          };
+
+          $scope.removeAcquiredSkillId = function(skillId) {
+            StoryUpdateService.removeAcquiredSkillIdFromNode(
+              $scope.story, $scope.getId(), skillId);
           };
 
           $scope.unfinalizeOutline = function() {

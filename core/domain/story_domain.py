@@ -452,8 +452,8 @@ class StoryContents(object):
             # starting node before starting the story. Also, this list models
             # the skill IDs acquired by a learner as they progress through the
             # story.
-            simulated_skill_ids = self.nodes[
-                starting_node_index].prerequisite_skill_ids
+            simulated_skill_ids = copy.deepcopy(
+                self.nodes[starting_node_index].prerequisite_skill_ids)
 
             # The following loop employs a Breadth First Search from the given
             # starting node and makes sure that the user has acquired all the
