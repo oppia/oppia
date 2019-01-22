@@ -73,12 +73,12 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         Returns:
             str. The ID of the newly created playthrough model.
         """
-        playthrough_model_id = self.create_playthrough_model()
-        playthrough = stats_models.PlaythroughModel.get(playthrough_model_id)
+        playthrough_id = self.create_playthrough_model()
+        playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
         # An arbitrary date before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.put()
-        return playthrough_model_id
+        playthrough_model.created_on = datetime.datetime(2017, 12, 31)
+        playthrough_model.put()
+        return playthrough_id
 
     def create_playthrough_issues_model(self, playthrough_ids_list):
         """Helper method to create a playthrough issues model with multiple
@@ -109,132 +109,125 @@ class RemoveInvalidPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        playthrough_model_ids = [
+        playthrough_ids = [
             self.create_playthrough_model(),
             self.create_playthrough_model(),
         ]
-        playthrough_issues_model_id = (
-            self.create_playthrough_issues_model([playthrough_model_ids]))
+        playthrough_issues_id = (
+            self.create_playthrough_issues_model([playthrough_ids]))
 
         self.run_one_off_job()
 
         # Getting these models should not raise.
-        for playthrough_model_id in playthrough_model_ids:
-            _ = stats_models.PlaythroughModel.get(playthrough_model_id)
-        _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_model_id)
+        _ = stats_models.PlaythroughModel.get_multi(playthrough_id)
+        _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
         # self.exp is *not* in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id + '-differentiated'])
-        playthrough_model_ids = [
+        playthrough_ids = [
             self.create_playthrough_model(),
             self.create_playthrough_model(),
         ]
-        playthrough_issues_model_id = (
-            self.create_playthrough_issues_model([playthrough_model_ids]))
+        playthrough_issues_id = (
+            self.create_playthrough_issues_model([playthrough_ids]))
 
         self.run_one_off_job()
 
-        for playthrough_model_id in playthrough_model_ids:
+        for playthrough_id in playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(playthrough_model_id)
+                _ = stats_models.PlaythroughModel.get(playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.ExplorationIssuesModel.get(
-                playthrough_issues_model_id)
+            _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_old_playthroughs_removed(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        old_playthrough_model_id = self.create_old_playthrough_model()
-        new_playthrough_model_id = self.create_playthrough_model()
-        playthrough_issues_model_id = self.create_playthrough_issues_model([
-            [old_playthrough_model_id, new_playthrough_model_id],
+        old_playthrough_id = self.create_old_playthrough_model()
+        new_playthrough_id = self.create_playthrough_model()
+        playthrough_issues_id = self.create_playthrough_issues_model([
+            [old_playthrough_id, new_playthrough_id],
         ])
 
         self.run_one_off_job()
 
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.PlaythroughModel.get(old_playthrough_model_id)
+            _ = stats_models.PlaythroughModel.get(old_playthrough_id)
         # Should not raise.
-        _ = stats_models.PlaythroughModel.get(new_playthrough_model_id)
-        playthrough_issue = stats_models.ExplorationIssuesModel.get(
-            playthrough_issues_model_id)
-        # The list of supporting playthroughs should not have the old one.
+        _ = stats_models.PlaythroughModel.get(new_playthrough_id)
+        playthrough_issues_model = (
+            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
+        # The list of supporting playthroughs should only have the new one.
         self.assertEqual(
-            playthrough_issue.unresolved_issues[0]['playthrough_ids'],
-            [new_playthrough_model_id])
+            playthrough_issues_model.unresolved_issues[0]['playthrough_ids'],
+            [new_playthrough_id])
 
     def test_entire_issue_removed_when_all_playthroughs_are_old(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        old_playthrough_model_ids = [
+        old_playthrough_ids = [
             self.create_old_playthrough_model(),
             self.create_old_playthrough_model(),
         ]
-        playthrough_issues_model_id = (
-            self.create_playthrough_issues_model([old_playthrough_model_ids]))
+        playthrough_issues_id = (
+            self.create_playthrough_issues_model([old_playthrough_ids]))
 
         self.run_one_off_job()
 
-        for old_playthrough_model_id in old_playthrough_model_ids:
+        for old_playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(old_playthrough_model_id)
+                _ = stats_models.PlaythroughModel.get(old_playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.ExplorationIssuesModel.get(
-                playthrough_issues_model_id)
+            _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_issues_with_mixed_playthrough_ages(self):
         # self.exp is in the whitelisted set of explorations.
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        old_playthrough_model_ids = [
+        old_playthrough_ids = [
             self.create_old_playthrough_model(),
             self.create_old_playthrough_model(),
             self.create_old_playthrough_model(),
         ]
-        new_playthrough_model_ids = [
+        new_playthrough_ids = [
             self.create_playthrough_model(),
             self.create_playthrough_model(),
             self.create_playthrough_model(),
         ]
-        playthrough_issues_model_id = self.create_playthrough_issues_model([
-            [old_playthrough_model_ids[0], old_playthrough_model_ids[1]],
-            [new_playthrough_model_ids[0], new_playthrough_model_ids[1]],
-            [old_playthrough_model_ids[2], new_playthrough_model_ids[2]],
+        playthrough_issues_id = self.create_playthrough_issues_model([
+            [old_playthrough_ids[0], old_playthrough_ids[1]],
+            [new_playthrough_ids[0], new_playthrough_ids[1]],
+            [old_playthrough_ids[2], new_playthrough_ids[2]],
         ])
 
         self.run_one_off_job()
 
         # Assert old playthroughs have been deleted.
-        for old_playthrough_model_id in old_playthrough_model_ids:
+        for old_playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(old_playthrough_model_id)
-        # Assert new playthroughs still remain.
-        for new_playthrough_model_id in new_playthrough_model_ids:
-            # Should not raise.
-            _ = stats_models.PlaythroughModel.get(new_playthrough_model_id)
-
-        playthrough_issues_model = stats_models.ExplorationIssuesModel.get(
-            playthrough_issues_model_id)
+                _ = stats_models.PlaythroughModel.get(old_playthrough_id)
+        # Should not raise.
+        _ = stats_models.PlaythroughModel.get_multi(new_playthrough_ids)
         # Only two issues remain, because one of them only had old playthroughs.
+        playthrough_issues_model = (
+            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
         self.assertEqual(len(playthrough_issues_model.unresolved_issues), 2)
         # The first issue element should be the one with only new elements.
         self.assertEqual(
             playthrough_issues_model.unresolved_issues[0]['playthrough_ids'],
-            [new_playthrough_model_ids[0], new_playthrough_model_ids[1]])
+            [new_playthrough_ids[0], new_playthrough_ids[1]])
         # The second issue element should be the one with an old playthrough and
-        # a new playthrough.
-        # Only the new playthrough should remain.
+        # a new playthrough. Only the new playthrough should remain.
         self.assertEqual(
             playthrough_issues_model.unresolved_issues[1]['playthrough_ids'],
-            [new_playthrough_model_ids[2]])
+            [new_playthrough_ids[2]])
 
 
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
