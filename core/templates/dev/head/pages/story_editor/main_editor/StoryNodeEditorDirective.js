@@ -107,7 +107,9 @@ oppia.directive('storyNodeEditor', [
           };
 
           $scope.addPrerequisiteSkillId = function(skillId) {
-            if (!skillId) return;
+            if (!skillId) {
+              return;
+            }
             try {
               StoryUpdateService.addPrerequisiteSkillIdToNode(
                 $scope.story, $scope.getId(), skillId);
@@ -124,7 +126,9 @@ oppia.directive('storyNodeEditor', [
           };
 
           $scope.addAcquiredSkillId = function(skillId) {
-            if (!skillId) return;
+            if (!skillId) {
+              return;
+            }
             try {
               StoryUpdateService.addAcquiredSkillIdToNode(
                 $scope.story, $scope.getId(), skillId);
