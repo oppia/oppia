@@ -65,11 +65,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
-                self.EXP_ID,
-                self.editor_id,
+                self.EXP_ID, self.editor_id,
                 ['State 1', 'State 2', 'State 3', 'State 4'],
-                ['TextInput'],
-                category='Algebra'))
+                ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', 'old content html').to_dict()
@@ -189,7 +187,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_create_suggestion(self):
-
         self.login(self.AUTHOR_EMAIL_2)
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -222,11 +219,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_accept_suggestion(self):
         # Test editor can accept successfully.
         self.login(self.EDITOR_EMAIL)
-        suggestions = self.get_json(
+        suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id_2))['suggestions']
-        suggestion_to_accept = suggestions[0]
+                self.author_id_2))['suggestions'][0]
 
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -250,25 +246,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             exploration.states[suggestion_to_accept[
                 'change']['state_name']].content.html,
             suggestion_to_accept['change']['new_value']['html'])
-
-        # Test editor can reject successfully.
-        suggestion_to_reject = suggestions[1]
-
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_reject['target_id'],
-            suggestion_to_reject['suggestion_id']), {
-                'action': u'reject',
-                'commit_message': u'commit message',
-                'review_message': u'Rejected'
-            }, csrf_token=csrf_token)
-        suggestion_post_accept = self.get_json(
-            '%s?author_id=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id_2))['suggestions'][1]
-        self.assertEqual(
-            suggestion_post_accept['status'],
-            suggestion_models.STATUS_REJECTED)
         self.logout()
 
         # Testing user without permissions cannot accept.
@@ -290,7 +267,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
-        # Testing that user cannot accept own suggestion.
+        # Testing that author cannot accept own suggestion.
         self.login(self.EDITOR_EMAIL)
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -362,8 +339,35 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
         self.logout()
 
-    def test_accept_suggestion_fails(self):
+    def test_reject_suggestion(self):
+        # Test editor can reject successfully.
+        self.login(self.EDITOR_EMAIL)
+        suggestion_to_reject = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions'][1]
 
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_reject['target_id'],
+            suggestion_to_reject['suggestion_id']), {
+                'action': u'reject',
+                'commit_message': u'commit message',
+                'review_message': u'Rejected'
+            }, csrf_token=csrf_token)
+        suggestion_post_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions'][1]
+        self.assertEqual(
+            suggestion_post_accept['status'],
+            suggestion_models.STATUS_REJECTED)
+        self.logout()
+
+    def test_accept_suggestion_fails(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -582,7 +586,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'This looks good!')
 
     def test_accept_question_suggestion_fails(self):
-
         suggestion_to_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
