@@ -141,7 +141,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_bulk_mail_raises_exception_for_missing_api_key(self):
         """Test that send_bulk_mail raises exception for missing
-            mailgun api key."""
+            mailgun api key.
+        """
         mailgun_api_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun API key is not available.'))
@@ -153,7 +154,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_bulk_mail_raises_exception_for_missing_domain_name(self):
         """Tests the missing Mailgun domain name exception for
-            send_bulk_mail."""
+            send_bulk_mail.
+        """
         mailgun_api_context = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain_name_exception = (
             self.assertRaisesRegexp(
@@ -166,7 +168,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_bulk_mail_exception_for_invalid_permissions(self):
         """Tests the send_bulk_mail exception raised for invalid user
-           permissions."""
+           permissions.
+        """
         send_email_exception = (
             self.assertRaisesRegexp(
                 Exception, 'This app cannot send emails to users.'))
@@ -181,7 +184,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_bulk_mail_data_properly_sent(self):
         """Verifies that the data sent in send_bulk_mail is correct
-           for each user in the recipient list."""
+           for each user in the recipient list.
+        """
         mailgun_api_context = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain_context = (self.swap(feconf, 'MAILGUN_DOMAIN_NAME',
                                             'domain'))
