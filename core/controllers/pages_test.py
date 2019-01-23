@@ -39,7 +39,7 @@ class SplashPageTest(test_utils.GenericTestBase):
         response.mustcontain('I18N_SPLASH_TITLE')
 
 
-    def test_loading_splash_page_with_c_value_loading_correctly(self):
+    def test_loading_splash_page_with_c_value_loads_correctly(self):
         """Test for splash page when c value is included."""
         response = self.testapp.get('/splash?c=c')
         self.assertEqual(response.status_int, 302)
@@ -125,7 +125,7 @@ class PrivacyPageTest(test_utils.GenericTestBase):
 class AboutRedirectPageTest(test_utils.GenericTestBase):
     """Test for about redirect page."""
 
-    def test_redirect_to_about_page_correctly(self):
+    def test_redirect_to_about_page_loads_correctly(self):
         response = self.testapp.get('/credits')
         self.assertEqual(response.status_int, 302)
 
@@ -133,7 +133,7 @@ class AboutRedirectPageTest(test_utils.GenericTestBase):
 class FoundationRedirectPageTest(test_utils.GenericTestBase):
     """Test for foundation redirect page."""
 
-    def test_redirect_to_foundation_page_correctly(self):
+    def test_redirect_to_foundation_page_loads_correctly(self):
         response = self.testapp.get('/foundation')
         self.assertEqual(response.status_int, 302)
 
@@ -141,7 +141,7 @@ class FoundationRedirectPageTest(test_utils.GenericTestBase):
 class TeachRedirectPageTest(test_utils.GenericTestBase):
     """Test for teach redirect page."""
 
-    def test_redirect_to_teach_page_correctly(self):
+    def test_redirect_to_teach_page_loads_correctly(self):
         response = self.testapp.get('/participate')
         self.assertEqual(response.status_int, 302)
 
