@@ -16,6 +16,7 @@
 
 """Tests for Exploration-related jobs."""
 
+import ast
 import datetime
 import json
 import os
@@ -274,7 +275,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         getattr(actual_job_output[exp_id], prop),
                         getattr(expected_job_output[exp_id], prop))
 
-    def test_exp_summaries_creation_job_produces_no_output(self):
+    def test_exp_summaries_creation_job_output(self):
         """Test that ExpSummariesCreationOneOff job produces no output."""
 
         with self.swap(
@@ -282,13 +283,22 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
 
-            exp_id = '1'
+            exp_id1 = '1'
             self.save_new_valid_exploration(
-                exp_id,
+                exp_id1,
                 self.admin_id,
                 title='title',
                 category='category')
-            rights_manager.publish_exploration(self.admin, exp_id)
+            rights_manager.publish_exploration(self.admin, exp_id1)
+
+            exp_id2 = '2'
+            self.save_new_valid_exploration(
+                exp_id2,
+                self.admin_id,
+                title='title',
+                category='category')
+            rights_manager.publish_exploration(self.admin, exp_id2)
+            exp_services.delete_exploration(self.admin_id, exp_id2)
 
             # Run ExpSummariesCreationOneOff job on sample exploration.
             job_id = (
@@ -296,9 +306,11 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
-            self.assertEqual(
+            actual_output = (
                 exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
-                    job_id), [])
+                    job_id))
+            expected_output = ['[u\'SUCCESS\', 1]']
+            self.assertEqual(actual_output, expected_output)
 
 
 class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
@@ -641,7 +653,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             function_to_be_called=exp_services.get_exploration_summary_by_id,
             exp_id=exp_id)
 
-    def test_exploration_contributors_summary_job_produces_no_output(self):
+    def test_exploration_contributors_summary_job_output(self):
         """Test that ExplorationContributorsSummaryOneOff job produces
         no output.
         """
@@ -655,9 +667,11 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
+        actual_output = (
             exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
-                job_id), [])
+                job_id))
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
@@ -985,19 +999,24 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_exploration_migration_job_produces_no_output(self):
+    def test_exploration_migration_job_output(self):
         """Test that Exploration Migration job produces no output."""
-        exp_domain.Exploration.create_default_exploration(
+        exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id),
-            [])
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
 
     def test_migration_job_creates_appropriate_classifier_models(self):
         """Tests that the exploration migration job creates appropriate
@@ -1123,19 +1142,19 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
                 job_id))
-        expected_output1 = [
-            '[u\'EndExploration\', [u\'exp_id0 End\', u\'exp_id1 End\']]',
-            '[u\'ItemSelectionInput\', [u\'exp_id1 Introduction\']]',
-            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
-        expected_output2 = [
-            '[u\'EndExploration\', [u\'exp_id1 End\', u\'exp_id0 End\']]',
-            '[u\'ItemSelectionInput\', [u\'exp_id1 Introduction\']]',
-            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
 
-        try:
-            self.assertEqual(actual_output, expected_output1)
-        except AssertionError:
-            self.assertEqual(actual_output, expected_output2)
+        actual_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            actual_output_dict[item[0]] = set(item[1])
+
+        expected_output_dict = {
+            'EndExploration': set(['exp_id0 End', 'exp_id1 End']),
+            'ItemSelectionInput': set(['exp_id1 Introduction']),
+            'TextInput': set(['exp_id0 Introduction'])
+        }
+
+        self.assertEqual(actual_output_dict, expected_output_dict)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -1414,6 +1433,34 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ViewableExplorationsAudit job on sample exploration.
+        job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
+        exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
+                job_id))
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_when_exploration_rights_is_none(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.set_admins([self.ALBERT_NAME])
+        owner = user_services.UserActionsInfo(self.albert_id)
+
+        rights_manager.set_private_viewability_of_exploration(
+            owner, self.VALID_EXP_ID, True)
+
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            self.VALID_EXP_ID)
+        exp_rights_model.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
 
         # Start ViewableExplorationsAudit job on sample exploration.
         job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
@@ -1724,17 +1771,18 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
-        expected_output1 = [
-            '[u\'2\', [u\'exp_id0 State1\']]',
-            '[u\'1\', [u\'exp_id1 State1\', u\'exp_id0 State2\']]']
-        expected_output2 = [
-            '[u\'2\', [u\'exp_id0 State1\']]',
-            '[u\'1\', [u\'exp_id0 State2\', u\'exp_id1 State1\']]']
 
-        try:
-            self.assertEqual(actual_output, expected_output1)
-        except AssertionError:
-            self.assertEqual(actual_output, expected_output2)
+        actual_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            actual_output_dict[item[0]] = set(item[1])
+
+        expected_output_dict = {
+            '1': set(['exp_id0 State2', 'exp_id1 State1']),
+            '2': set(['exp_id0 State1'])
+        }
+
+        self.assertEqual(actual_output_dict, expected_output_dict)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
