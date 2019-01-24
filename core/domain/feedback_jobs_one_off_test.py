@@ -85,7 +85,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread2.message_count, None)
         self.assertEqual(thread3.message_count, None)
         job_output = self._run_one_off_job()
-        self.assertEqual(len(job_output[0]), 17)
+        self.assertEqual(job_output, [u"[u'SUCCESS', 3]"])
         thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
         thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
         thread3 = feedback_models.GeneralFeedbackThreadModel.get('exp3.thread3')

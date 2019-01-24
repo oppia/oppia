@@ -80,7 +80,9 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(thread):
         if thread.message_count is None:
             # Assigning the value of message_count if it is None.
-            thread.message_count = feedback_models.GeneralFeedbackMessageModel.get_message_count(thread.id)#pylint: disable=line-too-long
+            thread.message_count = (
+                feedback_models.GeneralFeedbackMessageModel.get_message_count(
+                    thread.id))
             try:
                 # Sets the message_count if it is None.
                 thread.put()
@@ -95,4 +97,4 @@ class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if message == 'FAILED':
             yield (message, thread_ids)
         else:
-            yield ('POPULATED', len(thread_ids))
+            yield (message, len(thread_ids))
