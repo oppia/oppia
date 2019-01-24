@@ -77,11 +77,11 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(playthrough_issues_model):
         exp_id = playthrough_issues_model.exp_id
+        playthroughs_deleted = 0
         unresolved_issues = playthrough_issues_model.unresolved_issues
         whitelisted_exploration_ids = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
-        playthroughs_deleted = 0
         if exp_id not in whitelisted_exploration_ids:
             # Loop until all issues have been popped.
             while unresolved_issues:
