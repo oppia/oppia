@@ -56,6 +56,15 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
             status=feedback_models.STATUS_CHOICES_OPEN,
             subject='subject', summary='summary', has_suggestion=False,
             ).put()
+        feedback_models.GeneralFeedbackThreadModel(
+            id='exp4.thread4', entity_id='exp4', entity_type='state4',
+            original_author_id='author', message_count=1,
+            status=feedback_models.STATUS_CHOICES_OPEN,
+            subject='subject', summary='summary', has_suggestion=False,
+            ).put()
+        feedback_models.GeneralFeedbackMessageModel(
+            id='exp4.thread4.1', thread_id='exp4.thread4', message_id=1,
+            author_id='author', text='message text').put()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -85,7 +94,7 @@ class PopulateMessageCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread2.message_count, None)
         self.assertEqual(thread3.message_count, None)
         job_output = self._run_one_off_job()
-        self.assertEqual(job_output, [u"[u'SUCCESS', 3]"])#pylint: disable=invalid-string-quote
+        self.assertEqual(job_output, [u"[u'NO-OP', 1]", u"[u'SUCCESS', 3]"])#pylint: disable=invalid-string-quote
         thread1 = feedback_models.GeneralFeedbackThreadModel.get('exp1.thread1')
         thread2 = feedback_models.GeneralFeedbackThreadModel.get('exp2.thread2')
         thread3 = feedback_models.GeneralFeedbackThreadModel.get('exp3.thread3')
