@@ -71,6 +71,7 @@ class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
     """
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -80,6 +81,14 @@ class LibraryPage(base.BaseHandler):
             page_mode = feconf.LIBRARY_PAGE_MODE_SEARCH
         else:
             page_mode = feconf.LIBRARY_PAGE_MODE_INDEX
+
+        is_redirect = True
+        if self.request.referer and (
+                not self.request.referer.endswith('/library')):
+            is_redirect = False
+
+        if self.user_id is None and not is_redirect:
+            self.redirect('/library')
 
         self.values.update({
             'meta_description': (

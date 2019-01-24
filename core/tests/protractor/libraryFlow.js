@@ -27,6 +27,33 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+describe('Signin button test', function() {
+  beforeEach(function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('should not show sign in button if user is logged in', function() {
+    users.createAndLoginUser('user123@signInButton.com', 'userSignIn');
+    var libraryButton = element(by.css('a[translate=I18N_TOPNAV_LIBRARY]'));
+    waitFor.elementToBeClickable(
+      libraryButton, 'Could not click library button');
+    libraryButton.click();
+    var signInButton = element(by.css('.protractor-mobile-test-login'));
+    expect(signInButton.isPresent()).toBe(false);
+    users.logout();
+  });
+
+  it('should show sign in button if user is not logged in', function() {
+    var libraryButton = element(by.css('a[translate=I18N_TOPNAV_LIBRARY]'));
+    waitFor.elementToBeClickable(
+      libraryButton, 'Could not click library button');
+    libraryButton.click();
+    var signInButton = element(by.css('.protractor-mobile-test-login'));
+    expect(signInButton.isPresent()).toBe(true);
+  });
+});
+
 describe('Library pages tour', function() {
   var EXPLORATION_TITLE = 'Test Exploration';
   var EXPLORATION_OBJECTIVE = 'To learn testing';
