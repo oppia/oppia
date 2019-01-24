@@ -83,16 +83,14 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
         if exp_id not in whitelisted_exploration_ids:
-            # Loop until all issues have been popped.
+            # Loop until all unresolved issues have been popped.
             while unresolved_issues:
                 playthrough_ids = unresolved_issues.pop()['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
         else:
-            # NOTE: We are making a *copy* of the unresolved_issues list here so
-            # that we may safely pop issues from the real list while iterating.
-            for index, unresolved_issue in enumerate(unresolved_issues[:]):
+            for unresolved_issue in unresolved_issues:
                 playthrough_ids = unresolved_issue['playthrough_ids']
                 old_models = [
                     model for model in stats_models.PlaythroughModel.get_multi(
@@ -100,12 +98,16 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
-                # Update playthrough_ids by filtering out the old models.
+                # Update playthrough_ids by filtering out old models.
                 playthrough_ids[:] = [
                     pid for pid in playthrough_ids
                     if not any(model.id == pid for model in old_models)]
-                if not playthrough_ids:
-                    unresolved_issues.pop(index)
+            # Update unresolved_issues by filtering out issues with empty
+            # playthrough_ids.
+            unresolved_issues[:] = [
+                unresolved_issue for unresolved_issue in unresolved_issues
+                if unresolved_issue['playthrough_ids']]
+
         if not unresolved_issues:
             playthrough_issues_model.delete()
         else:
