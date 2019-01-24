@@ -47,6 +47,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         to the queue under test.
         """
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         self.ONE_OFF_JOB_CLASS.enqueue(job_id)
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
