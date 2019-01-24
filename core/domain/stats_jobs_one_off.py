@@ -90,8 +90,8 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
         else:
-            # NOTE: We are making a *copy* of the issues list here so that we
-            # may safely pop issues from the real list while iterating.
+            # NOTE: We are making a *copy* of the unresolved_issues list here so
+            # that we may safely pop issues from the real list while iterating.
             for i, unresolved_issue in enumerate(unresolved_issues[:]):
                 playthrough_ids = unresolved_issue['playthrough_ids']
                 old_models = [
