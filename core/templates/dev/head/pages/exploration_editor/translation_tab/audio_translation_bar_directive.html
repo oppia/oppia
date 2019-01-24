@@ -1,4 +1,4 @@
-<div  class="oppia-drop-area" ng-if="showDropArea">
+<div  class="oppia-drop-area" ng-if="showDropArea && !audioNotRequired">
   <div class="oppia-blur-background"></div>
   <div class="oppia-drop-area-message">Drop your file here!</div>
 </div>
@@ -7,7 +7,8 @@
     <i class="material-icons">&#xE039;</i>
   </button>
   <div class="oppia-audio-bar-info">
-    <div ng-if="!cannotRecord && !checkingMicrophonePermission">
+    <div ng-if="audioNotRequired" > Audio not required!</div>
+    <div ng-if="!cannotRecord && !audioNotRequired && !checkingMicrophonePermission">
       No audio recorded.<span ng-if="canTranslate"> Press <i class="material-icons">mic</i>  to start recording.</span>
     </div>
     <div ng-if="checkingMicrophonePermission">
@@ -20,13 +21,13 @@
       Sorry, your browser does not support recording feature.
     </div>
   </div>
-  <button class="btn oppia-audio-button"
+  <button ng-if="!audioNotRequired" class="btn oppia-audio-button"
           uib-tooltip="Record" tooltip-placement="bottom"
           ng-click="checkAndStartRecording()"
           ng-disabled="!canTranslate || cannotRecord">
     <i class="material-icons">&#xE029;</i>
   </button>
-  <button class="btn oppia-audio-button"
+  <button ng-if="!audioNotRequired" class="btn oppia-audio-button"
           uib-tooltip="Upload" tooltip-placement="bottom"
           ng-click="openAddAudioTranslationModal()"
           ng-disabled="!canTranslate">
@@ -147,6 +148,12 @@
 <div class="oppia-translation-bottom-right-container" ng-if="showRecorderWarning">
   <span>
     <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
+  </span>
+</div>
+
+<div class="oppia-translation-bottom-right-container" ng-if="isAudioAvailable && audioNotRequired">
+  <span>
+    <strong>Note: </strong>Text from this card has been removed try deleting audio if not required.
   </span>
 </div>
 

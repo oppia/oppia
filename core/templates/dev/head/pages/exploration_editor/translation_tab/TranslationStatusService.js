@@ -18,10 +18,12 @@
  */
 
 oppia.factory('TranslationStatusService', [
-  'StateContentIdsToAudioTranslationsService', 'ExplorationStatesService',
-  'TranslationLanguageService', 'INTERACTION_SPECS', function(
-      StateContentIdsToAudioTranslationsService, ExplorationStatesService,
-      TranslationLanguageService, INTERACTION_SPECS) {
+  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+  'ExplorationStatesService', 'TranslationLanguageService',
+  'TranslationRequirementQueryService', 'INTERACTION_SPECS', function(
+      StateContentIdsToAudioTranslationsService, StateEditorService,
+      ExplorationStatesService, TranslationLanguageService,
+      TranslationRequirementQueryService, INTERACTION_SPECS) {
     var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
@@ -34,6 +36,22 @@ oppia.factory('TranslationStatusService', [
     var explorationAudioNotAvailableCount = 0;
     var contentIdsToAudioTranslations =
         StateContentIdsToAudioTranslationsService.displayed;
+
+    var _isActiveStateContentIdTranslationRequired = function(contentId) {
+      var activeStateName = StateEditorService.getActiveStateName();
+      return !TranslationRequirementQueryService.isNotRequired(
+        activeStateName, contentId);
+    };
+
+    var filterTranslationNotRequiredContentId = function(
+        stateName, contentIdList) {
+      var translationNotRequiredContentIdList = (
+        TranslationRequirementQueryService.getNotRequiredContentIdList(
+          stateName));
+      return contentIdList.filter(function(contentId) {
+        return (translationNotRequiredContentIdList.indexOf(contentId) < 0);
+      });
+    };
     var _computeAllStatesStatus = function() {
       langCode = TranslationLanguageService.getActiveLanguageCode();
       stateNeedsUpdateWarnings = {};
@@ -46,6 +64,8 @@ oppia.factory('TranslationStatusService', [
           var contentIdsToAudioTranslations = ExplorationStatesService
             .getContentIdsToAudioTranslationsMemento(stateName);
           var allContentId = contentIdsToAudioTranslations.getAllContentId();
+          var filteredContentIdList = filterTranslationNotRequiredContentId(
+            stateName, allContentId);
           var interactionId = ExplorationStatesService
             .getInteractionIdMemento(stateName);
           // This is used to prevent users from adding unwanted hints audio, as
@@ -55,9 +75,9 @@ oppia.factory('TranslationStatusService', [
           if (!interactionId ||
             INTERACTION_SPECS[interactionId].is_linear ||
             INTERACTION_SPECS[interactionId].is_terminal) {
-            allContentId = ['content'];
+            filteredContentIdList = ['content'];
           }
-          explorationAudioRequiredCount += allContentId.length;
+
           allContentId.forEach(function(contentId) {
             availableTranslationLanguageCodes = contentIdsToAudioTranslations
               .getAudioLanguageCodes(contentId);
@@ -67,14 +87,20 @@ oppia.factory('TranslationStatusService', [
               if (audioTranslation.needsUpdate) {
                 stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
               }
-            } else {
+            } else if (filteredContentIdList.indexOf(contentId) >= 0) {
               noTranslationCount++;
             }
           });
+          var translationNotRequiredCount = (
+            TranslationRequirementQueryService.getNotRequiredContentIdList(
+              stateName).length);
+
           explorationAudioNotAvailableCount += noTranslationCount;
+          explorationAudioRequiredCount += filteredContentIdList.length;
           if (noTranslationCount === 0) {
             stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
-          } else if (noTranslationCount === allContentId.length) {
+          } else if (
+            noTranslationCount === allContentId.length) {
             stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
           } else {
             stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
@@ -103,6 +129,7 @@ oppia.factory('TranslationStatusService', [
             contentIdList.push('default_outcome');
           }
         }
+
         return contentIdList;
       } else {
         return null;
@@ -111,6 +138,9 @@ oppia.factory('TranslationStatusService', [
 
     var _getActiveStateComponentStatus = function(componentName) {
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
+      var activeStateName = StateEditorService.getActiveStateName();
+      contentIdList = filterTranslationNotRequiredContentId(
+        activeStateName, contentIdList);
       var availableAudioCount = 0;
       if (contentIdList) {
         contentIdList.forEach(function(contentId) {
@@ -153,7 +183,9 @@ oppia.factory('TranslationStatusService', [
         StateContentIdsToAudioTranslationsService.displayed;
       if (contentIdsToAudioTranslations) {
         if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1 ||
+          !_isActiveStateContentIdTranslationRequired(contentId)
+        ) {
           return ALL_AUDIO_AVAILABLE_COLOR;
         } else {
           return NO_AUDIO_AVAILABLE_COLOR;

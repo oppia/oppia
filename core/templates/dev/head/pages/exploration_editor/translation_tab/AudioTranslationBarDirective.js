@@ -62,35 +62,38 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$uibModal', '$rootScope',
-        'StateContentIdsToAudioTranslationsService', 'IdGenerationService',
-        'AudioPlayerService', 'TranslationLanguageService', 'AlertsService',
-        'StateEditorService', 'ExplorationStatesService', 'EditabilityService',
-        'AssetsBackendApiService', 'recorderService', 'ContextService',
-        'RECORDING_TIME_LIMIT',
-        function(
-            $scope, $filter, $timeout, $uibModal, $rootScope,
-            StateContentIdsToAudioTranslationsService, IdGenerationService,
-            AudioPlayerService, TranslationLanguageService, AlertsService,
-            StateEditorService, ExplorationStatesService, EditabilityService,
-            AssetsBackendApiService, recorderService, ContextService,
+        '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
+        'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'IdGenerationService', 'recorderService',
+        'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+        'TranslationLanguageService', 'TranslationRequirementQueryService',
+        'RECORDING_TIME_LIMIT', function(
+            $filter, $rootScope, $scope, $timeout, $uibModal,
+            AlertsService, AssetsBackendApiService, AudioPlayerService,
+            ContextService, EditabilityService, ExplorationStatesService,
+            IdGenerationService, recorderService,
+            StateContentIdsToAudioTranslationsService, StateEditorService,
+            TranslationLanguageService, TranslationRequirementQueryService,
             RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
-          $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
-          $scope.recorder = null;
-          $scope.unsupportedBrowser = false;
-          $scope.selectedRecording = false;
-          $scope.isAudioAvailable = false;
-          $scope.audioIsUpdating = false;
-          $scope.languageCode = null;
-          $scope.cannotRecord = false;
-          $scope.audioNeedsUpdate = false;
-          $scope.canTranslate = false;
-          $scope.showRecorderWarning = false;
-          $scope.audioLoadingIndicatorIsShown = false;
-          $scope.checkingMicrophonePermission = false;
           $scope.audioIsCurrentlyBeingSaved = false;
+          $scope.audioIsUpdating = false;
+          $scope.audioNeedsUpdate = false;
+          $scope.audioNotRequired = false;
+          $scope.audioLoadingIndicatorIsShown = false;
+          $scope.cannotRecord = false;
+          $scope.canTranslate = false;
+          $scope.checkingMicrophonePermission = false;
+          $scope.isAudioAvailable = false;
+          $scope.languageCode = null;
+          $scope.recorder = null;
+          $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
+          $scope.selectedRecording = false;
+          $scope.showRecorderWarning = false;
+          $scope.unsupportedBrowser = false;
+
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
@@ -349,6 +352,10 @@ oppia.directive('audioTranslationBar', [
                 recorderService.getHandler().clear();
               }
             }
+            var activeStateName = StateEditorService.getActiveStateName();
+            $scope.audioNotRequired = (
+              TranslationRequirementQueryService.isNotRequired(
+                activeStateName, $scope.contentId));
             $scope.isTranslationTabBusy = false;
             AudioPlayerService.stop();
             AudioPlayerService.clear();
