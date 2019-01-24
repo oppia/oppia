@@ -83,7 +83,6 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
         if exp_id not in whitelisted_exploration_ids:
-            # Loop until all unresolved issues have been popped.
             while unresolved_issues:
                 playthrough_ids = unresolved_issues.pop()['playthrough_ids']
                 stats_models.PlaythroughModel.delete_multi(
