@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview A service that check s the requirement of translation for a
-* content using it's translation_id.
+* @fileoverview A service that checks the requirement of translation for a
+* content using it's content_id.
 */
 
 oppia.factory('TranslationRequirementQueryService', [
