@@ -60,7 +60,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
@@ -93,7 +93,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID)
 
         # Start migration job on sample question.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
@@ -124,7 +124,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_schema_version, 26)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)

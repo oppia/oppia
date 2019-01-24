@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 import json
 
+from core.domain import email_services
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
@@ -153,6 +154,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             category='Architecture', language_code='fi')
 
     def _get_all_messages_read(self, user_id, thread_id):
+        """Returns the list of the ids of all the messages corresponding to the
+        given thread id read by the user.
+        """
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
@@ -162,6 +166,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_thread_user_model else [])
 
     def _run_computation(self):
+        """Runs the MockFeedbackAnalyticsAggregator computation."""
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -255,6 +260,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(1, len(threads_exp_2))
 
         def _close_thread(thread_id):
+            """Closes the thread corresponding to its thread id by updating its
+            status.
+            """
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
@@ -770,24 +778,22 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message')
             # Check that reply_to id is created for user A.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_a, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_a)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_a, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_a)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
             feedback_services.create_message(
                 thread_id, self.user_id_a, None, None, 'user a message')
             # Check that reply_to id is created for user B.
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                self.user_id_b, thread_id)
-            cross_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel
-                .get_by_reply_to_id(model.reply_to_id))
-            self.assertEqual(model, cross_model)
-            self.assertEqual(cross_model.user_id, self.user_id_b)
+            queried_object = (
+                email_services
+                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                    self.user_id_b, thread_id))
+            self.assertEqual(queried_object.user_id, self.user_id_b)
+            self.assertEqual(queried_object.thread_id, thread_id)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
@@ -940,7 +946,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_csrf_token_from_response(
-                self.testapp.get('/create/%s' % self.exploration.id))
+                self.get_html_response('/create/%s' % self.exploration.id))
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),

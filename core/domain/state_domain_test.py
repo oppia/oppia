@@ -429,12 +429,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        init_state.update_interaction_hints([{
+        hints_list = []
+        hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
                 'html': 'hint one'
             },
-        }])
+        })
+        init_state.update_interaction_hints(hints_list)
 
         solution = {
             'answer_is_exclusive': False,
@@ -457,14 +459,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.id, solution))
         exploration.validate()
 
-        # Add hint and delete hint.
-        init_state.add_hint(state_domain.SubtitledHtml('hint_2', 'new hint'))
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': 'new hint'
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
+
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             'new hint')
-        init_state.add_hint(
-            state_domain.SubtitledHtml('hint_3', 'hint three'))
-        init_state.delete_hint(1)
+
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_3',
+                'html': 'hint three'
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
+
+        del hints_list[1]
+        init_state.update_interaction_hints(hints_list)
+
         init_state.update_content_ids_to_audio_translations({
             'content': {},
             'default_outcome': {},
@@ -486,7 +503,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': {}
+            },
+        })
+        init_state.update_interaction_hints(hints_list)
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],

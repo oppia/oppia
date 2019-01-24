@@ -57,12 +57,13 @@ oppia.directive('translatorOverview', [
               };
             }));
           $scope.getTranslationProgressStyle = function() {
-            var numberRequiredAudio = TranslationStatusService
+            $scope.numberOfRequiredAudio = TranslationStatusService
               .getExplorationAudioRequiredCount();
-            var notAvailable = TranslationStatusService
+            $scope.numberOfAudioNotAvailable = TranslationStatusService
               .getExplorationAudioNotAvailableCount();
             var progressPercent = (
-              100 - (notAvailable / numberRequiredAudio) * 100);
+              100 - ($scope.numberOfAudioNotAvailable /
+                $scope.numberOfRequiredAudio) * 100);
             return {width: progressPercent + '%'};
           };
 

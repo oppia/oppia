@@ -5,7 +5,7 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
                          html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
@@ -238,31 +238,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     width: 650px;
     position: relative;
     z-index: 2;
-  }
-
-  /* These rules must be kept in sync with corresponding rules in oppia.css
-     (those with '.oppia-rte-editor > p,
-       .form-control.oppia-rte-content > div > p' selectors specifying
-      the same line-height, margin-top and margin-bottom attributes)
-  */
-  .rte-viewer > p {
-    line-height: 28px;
-    margin-bottom: 18px;
-    margin-top: 18px;
-  }
-  .rte-viewer > p:first-child {
-    margin-top: 0px;
-  }
-  .rte-viewer > p:last-child {
-    margin-bottom: 0px;
-  }
-
-  .rte-viewer {
-    border-radius: 2px;
-    display: inline-block;
-    max-width: 100%;
-    position: relative;
-    text-align: left;
   }
 
   .conversation-skin-oppia-feedback-content,

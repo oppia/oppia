@@ -590,13 +590,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+        hints_list = []
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': {}
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
+
         self._assert_validation_error(
             exploration,
             r'Expected state content_ids_to_audio_translations to have all '
             r'of the listed content ids \[\'content\', \'default_outcome\', '
             r'\'hint_1\'\]')
-        init_state.add_hint(state_domain.SubtitledHtml('hint_1', {}))
+
+        hints_list.append({
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': {}
+            }
+        })
+        init_state.update_interaction_hints(hints_list)
+
         self._assert_validation_error(
             exploration, 'Found a duplicate content id hint_1')
 
@@ -4369,6 +4385,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         exploration.add_states([second_state_name])
 
         def _get_default_state_dict(content_str, dest_name):
+            """Gets the default state dict of the exploration."""
             return {
                 'classifier_model_id': None,
                 'content': {

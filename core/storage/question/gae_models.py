@@ -268,8 +268,25 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             cls.skill_id == skill_id).fetch()
 
     @classmethod
+    def get_models_by_question_id(cls, question_id):
+        """Returns a list of QuestionSkillLinkModels of a particular
+        question ID.
+
+        Args:
+            question_id: str. ID of the question.
+
+        Returns:
+            list(QuestionSkillLinkModel)|None. The list of question skill link
+            models that are linked to the question ID, or None if there are no
+            question skill link models associated with the question ID.
+        """
+        return QuestionSkillLinkModel.query().filter(
+            cls.question_id == question_id,
+            cls.deleted == False).fetch() #pylint: disable=singleton-comparison
+
+    @classmethod
     def put_multi_question_skill_links(cls, question_skill_links):
-        """Puts multiple question skill links into the datastore.
+        """Puts multiple question skill link models into the datastore.
 
         Args:
             question_skill_links: list(QuestionSkillLink). The list of
