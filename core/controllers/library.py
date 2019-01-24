@@ -71,7 +71,6 @@ class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
     """
-
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
