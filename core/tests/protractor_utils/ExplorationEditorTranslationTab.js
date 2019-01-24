@@ -50,6 +50,9 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
+  var numericalStatus = element(
+    by.css('.protractor-test-translation-numerical-status'));
+
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
@@ -90,9 +93,26 @@ var ExplorationEditorTranslationTab = function() {
     expect(solutionTabText.getText()).toMatch(content);
   };
 
+  this.expectNumericalStatusToMatch = function(content) {
+    expect(numericalStatus.getText()).toMatch(content);
+  };
+
   this.changeTranslationLanguage = function(language) {
     _selectLanguage(language);
     waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToFeedbackTab = function() {
+    waitFor.elementToBeClickable(
+      feedbackTabButton,
+      'Feedback tab of translation page is not clickable');
+    feedbackTabButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.expectFeedbackTabToBeActive = function() {
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
