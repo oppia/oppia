@@ -54,7 +54,15 @@ describe('Editable topic backend API service', function() {
       subtopic_page: {
         id: 'topicId-1',
         topicId: 'topicId',
-        html_data: '<p>Data</p>',
+        page_contents: {
+          subtitled_html: {
+            html: '<p>Data</p>',
+            content_id: 'content'
+          },
+          content_ids_to_audio_translations: {
+            content: {}
+          },
+        },
         language_code: 'en'
       }
     };

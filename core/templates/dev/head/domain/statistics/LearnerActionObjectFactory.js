@@ -17,63 +17,75 @@
  *     Action domain objects.
  */
 
-oppia.factory('LearnerActionObjectFactory', [function() {
-  /**
-   * @constructor
-   * @param {string} actionType - type of an action.
-   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action.
-   * @param {number} schemaVersion - schema version of the class instance.
-   */
-  var LearnerAction = function(
-      actionType, actionCustomizationArgs, schemaVersion) {
-    /** @type {string} */
-    this.actionType = actionType;
-    /** @type {Object.<string, *>} */
-    this.actionCustomizationArgs = actionCustomizationArgs;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
-  };
+oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
 
-  /**
-   * @property {string} actionType - type of an action
-   * @property {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action
-   * @property {number} schemaVersion - schema version of the class instance
-   * @returns {LearnerAction}
-   */
-  LearnerAction.createNew = function(
-      actionType, actionCustomizationArgs, schemaVersion) {
-    return new LearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
-  };
+oppia.factory('LearnerActionObjectFactory', [
+  'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
+  function(LEARNER_ACTION_SCHEMA_LATEST_VERSION) {
+    /**
+     * @constructor
+     * @param {string} actionType - type of an action.
+     * @param {Object.<string, *>} actionCustomizationArgs - customization dict
+     *   for an action.
+     * @param {number} schemaVersion - schema version of the class instance.
+     */
+    var LearnerAction = function(
+        actionType, actionCustomizationArgs, schemaVersion) {
+      if (schemaVersion < 1) {
+        throw new Error('given invalid schema version');
+      }
 
-  /**
-   * @typedef LearnerActionBackendDict
-   * @property {string} actionType - type of an action.
-   * @property {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action.
-   * @property {number} schemaVersion - schema version of the class instance.
-   */
-  /**
-   * @param {LearnerActionBackendDict} learnerActionBackendDict
-   * @returns {LearnerAction}
-   */
-  LearnerAction.createFromBackendDict = function(learnerActionBackendDict) {
-    return new LearnerAction(
-      learnerActionBackendDict.action_type,
-      learnerActionBackendDict.action_customization_args,
-      learnerActionBackendDict.schema_version);
-  };
-
-  /** @returns {LearnerActionBackendDict} */
-  LearnerAction.prototype.toBackendDict = function() {
-    return {
-      action_type: this.actionType,
-      action_customization_args: this.actionCustomizationArgs,
-      schema_version: this.schemaVersion
+      /** @type {string} */
+      this.actionType = actionType;
+      /** @type {Object.<string, *>} */
+      this.actionCustomizationArgs = actionCustomizationArgs;
+      /** @type {number} */
+      this.schemaVersion = schemaVersion;
     };
-  };
 
-  return LearnerAction;
-}]);
+    /**
+     * @property {string} actionType - type of an action
+     * @property {Object.<string, *>} actionCustomizationArgs - customization
+     *   dict for an action
+     * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
+     *   - schema version of the class instance.
+     * @returns {LearnerAction}
+     */
+    LearnerAction.createNew = function(
+        actionType, actionCustomizationArgs, schemaVersion) {
+      schemaVersion = schemaVersion || LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      return new LearnerAction(
+        actionType, actionCustomizationArgs, schemaVersion);
+    };
+
+    /**
+     * @typedef LearnerActionBackendDict
+     * @property {string} actionType - type of an action.
+     * @property {Object.<string, *>} actionCustomizationArgs - customization
+     *   dict for an action.
+     * @property {number} schemaVersion - schema version of the class instance.
+     *   Defaults to the latest schema version.
+     */
+
+    /**
+     * @param {LearnerActionBackendDict} learnerActionBackendDict
+     * @returns {LearnerAction}
+     */
+    LearnerAction.createFromBackendDict = function(learnerActionBackendDict) {
+      return new LearnerAction(
+        learnerActionBackendDict.action_type,
+        learnerActionBackendDict.action_customization_args,
+        learnerActionBackendDict.schema_version);
+    };
+
+    /** @returns {LearnerActionBackendDict} */
+    LearnerAction.prototype.toBackendDict = function() {
+      return {
+        action_type: this.actionType,
+        action_customization_args: this.actionCustomizationArgs,
+        schema_version: this.schemaVersion,
+      };
+    };
+
+    return LearnerAction;
+  }]);
