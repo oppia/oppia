@@ -57,6 +57,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     feedback_jobs_one_off.PopulateLastUpdatedFieldOneOffJob,
     feedback_jobs_one_off.ValidateLastUpdatedFieldOneOffJob,
+    feedback_jobs_one_off.PopulateMessageCountOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
