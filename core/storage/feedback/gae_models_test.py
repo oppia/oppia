@@ -34,7 +34,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
-            subject='dummy subject')
+            subject='dummy subject', message_count=0)
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
