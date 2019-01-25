@@ -72,7 +72,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """
         return (
             playthrough_model is None or
-            playthrough_model.created_on < datetime.datetime(2018, 8, 25))
+            playthrough_model.created_on < datetime.datetime(2018, 9, 1))
 
     @staticmethod
     def map(playthrough_issues_model):
