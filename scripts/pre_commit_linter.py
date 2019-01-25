@@ -965,21 +965,27 @@ def _check_bad_patterns(all_files):
 
         if filename.endswith('.js'):
             for regexp in BAD_PATTERNS_JS_REGEXP:
-                failed_messages += (
+                failed_messages_from_bad_pattern = (
                     _check_bad_pattern_in_file(filename, content, regexp))
-                total_error_count += 1
+                if failed_messages_from_bad_pattern:
+                    total_error_count += 1
+                    failed_messages += failed_messages_from_bad_pattern
 
         if filename.endswith('.html'):
             for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                failed_messages += (
+                failed_messages_from_bad_pattern = (
                     _check_bad_pattern_in_file(filename, content, regexp))
-                total_error_count += 1
+                if failed_messages_from_bad_pattern:
+                    total_error_count += 1
+                    failed_messages += failed_messages_from_bad_pattern
 
         if filename.endswith('.py'):
             for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                failed_messages += (
+                failed_messages_from_bad_pattern = (
                     _check_bad_pattern_in_file(filename, content, regexp))
-                total_error_count += 1
+                if failed_messages_from_bad_pattern:
+                    total_error_count += 1
+                    failed_messages += failed_messages_from_bad_pattern
 
         if filename == 'constants.js':
             for pattern in REQUIRED_STRINGS_CONSTANTS:
