@@ -31,7 +31,7 @@ describe('Exploration translation', function() {
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
-  
+
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
