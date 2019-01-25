@@ -42,9 +42,9 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'All keyword arguments should be explicitly named in function call.'
         ),
         'C0007': (
-            'Keyword argument %s should not be named explicitly in %s call of %s.',
-            'explicit-keyword-args',
-            'Argument names should not be used explicitly if the formal parameter has no default value.'
+         'Keyword argument %s are not to be named explicitly in %s call of %s.',
+         'explicit-keyword-args',
+          'Argument names should not be used explicitly for non-default params'
         ),
     }
 
@@ -139,7 +139,8 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             func_name))
                     num_positional_args_unused -= 1
 
-            #Executed if name is not having any default value in the function definition
+            #Executed if name is not having any default value in the function
+            #definition
             else:
                 if name is None:
                     display_name = '<tuple>'
@@ -164,6 +165,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             display_name,
                             callable_name,
                             func_name), confidence=None)
+
 
 class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case
