@@ -472,7 +472,8 @@ def _redirect_stdout(new_target):
 
 
 def _lint_css_files(
-        node_path, stylelint_path, config_path, files_to_lint, stdout, result, mode):
+        node_path, stylelint_path, config_path, files_to_lint,
+        stdout, result, mode):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
@@ -482,6 +483,7 @@ def _lint_css_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
+        mode: str. v is Verbose mode.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -539,6 +541,7 @@ def _lint_js_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
+        mode: str. v is Verbose mode.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -712,7 +715,7 @@ def _get_all_files():
     parsed_args = _PARSER.parse_args()
     mode = 'nv'
     print parsed_args
-    if parsed_args.v == True:
+    if parsed_args.v is True:
         mode = 'v'
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
