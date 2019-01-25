@@ -20,7 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function(){
+var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
@@ -46,6 +46,7 @@ var LibraryPage = function(){
   );
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
+  var mainHeader = element(by.css('.protractor-test-library-main-header'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -100,6 +101,10 @@ var LibraryPage = function(){
 
   this.expectCurrentCategorySelectionToBe = function(expectedCategories) {
     categorySelector.expectCurrentSelectionToBe(expectedCategories);
+  };
+
+  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
+    expect(mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = function(name) {
@@ -157,7 +162,7 @@ var LibraryPage = function(){
     });
   };
 
-  this.clickCreateActivity = function(){
+  this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
   };

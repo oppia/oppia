@@ -26,10 +26,10 @@ import time
 import traceback
 import urlparse
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -90,7 +90,7 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
 
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             self.redirect(users.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
@@ -129,6 +129,9 @@ class BaseHandler(webapp2.RequestHandler):
 
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -152,7 +155,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
-        self.preferred_site_language_code = None
 
         if self.user_id:
             user_settings = user_services.get_user_settings(
@@ -170,8 +172,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.preferred_site_language_code = (
-                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
@@ -197,6 +197,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
+        self.values['is_topic_manager'] = (
+            user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
@@ -219,7 +221,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if feconf.DEV_MODE and self.partially_logged_in:
+        if constants.DEV_MODE and self.partially_logged_in:
             self.redirect(users.create_logout_url(self.request.uri))
             return
 
@@ -239,9 +241,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error(
-                    '%s: payload %s',
-                    e, self.payload)
+                logging.error('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
@@ -281,6 +281,13 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
+    def render_downloadable_file(self, values, filename, content_type):
+        """Prepares downloadable content to be sent to the client."""
+        self.response.headers['Content-Type'] = content_type
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s' % (filename))
+        self.response.write(values)
+
     def _get_logout_url(self, redirect_url_on_logout):
         """Prepares and returns logout url which will be handled
         by LogoutPage handler.
@@ -315,7 +322,7 @@ class BaseHandler(webapp2.RequestHandler):
         values.update({
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'DEV_MODE': feconf.DEV_MODE,
+            'DEV_MODE': constants.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
@@ -326,13 +333,8 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'can_create_collections': bool(
-                role_services.ACTION_CREATE_COLLECTION in self.user.actions),
-            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code,
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
+                self.user_id)
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
@@ -356,25 +358,12 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        # nav_mode is used as part of the GLOBALS object in the frontend, but
-        # not every backend handler declares a nav_mode. Thus, the following
-        # code is a failsafe to ensure that the nav_mode key is added to all
-        # page requests.
-        if 'nav_mode' not in values:
-            values['nav_mode'] = ''
-
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
 
         if self.user_id:
-            values['login_url'] = None
             values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
         else:
-            target_url = (
-                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
-                else self.request.uri)
-            values['login_url'] = (
-                current_user_services.create_login_url(target_url))
             values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
@@ -406,32 +395,59 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filepath).render(**values))
 
-    def _render_exception(self, error_code, values):
+    def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
 
-         Args:
-            error_code: int. The HTTP status code (expected to be one of
-                400, 401, 404 or 500).
+        Args:
+            return_type: str. Indicator to return JSON or HTML.
             values: dict. The key-value pairs to include in the response.
         """
-        assert error_code in [400, 401, 404, 500]
-        values['status_code'] = error_code
 
-        # This checks if the response should be JSON or HTML.
-        # For GET requests, there is no payload, so we check against
-        # GET_HANDLER_ERROR_RETURN_TYPE.
-        # Otherwise, we check whether self.payload exists.
-        if (self.payload is not None or
-                self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                feconf.HANDLER_TYPE_JSON):
-            self.render_json(values)
-        else:
+        method = self.request.environ['REQUEST_METHOD']
+
+        if return_type == feconf.HANDLER_TYPE_HTML and (
+                method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
                     'pages/error/error_iframed.html', iframe_restriction=None)
             else:
                 self.render_template('pages/error/error.html')
+        else:
+            if return_type != feconf.HANDLER_TYPE_JSON and (
+                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+                logging.warning('Not a recognized return type: '
+                                'defaulting to render JSON.')
+            self.render_json(values)
+
+    def _render_exception(self, error_code, values):
+        """Renders an error page, or an error JSON response.
+
+        Args:
+            error_code: int. The HTTP status code (expected to be one of
+                400, 401, 404 or 500).
+            values: dict. The key-value pairs to include in the response.
+        """
+        assert error_code in [400, 401, 404, 500]
+        values['status_code'] = error_code
+        method = self.request.environ['REQUEST_METHOD']
+
+        if method == 'GET':
+            self._render_exception_json_or_html(
+                self.GET_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'POST':
+            self._render_exception_json_or_html(
+                self.POST_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'PUT':
+            self._render_exception_json_or_html(
+                self.PUT_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'DELETE':
+            self._render_exception_json_or_html(
+                self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
+        else:
+            logging.warning('Not a recognized request method.')
+            self._render_exception_json_or_html(
+                None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.

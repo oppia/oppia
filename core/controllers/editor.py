@@ -30,6 +30,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -85,6 +86,8 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorLogoutHandler(base.BaseHandler):
     """Handles logout from editor page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):
@@ -189,7 +192,6 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
             'title': exploration.title,
@@ -445,12 +447,12 @@ class UserExplorationEmailsHandler(EditorHandler):
         })
 
 
-class ExplorationDownloadHandler(EditorHandler):
+class ExplorationFileDownloader(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
 
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
@@ -465,16 +467,14 @@ class ExplorationDownloadHandler(EditorHandler):
         width = int(self.request.get('width', default_value=80))
 
         # If the title of the exploration has changed, we use the new title.
-        filename = 'oppia-%s-v%s' % (
+        filename = 'oppia-%s-v%s.zip' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
-            self.response.headers['Content-Type'] = 'text/plain'
-            self.response.headers['Content-Disposition'] = (
-                'attachment; filename=%s.zip' % str(filename))
-            self.response.write(
+            self.render_downloadable_file(
                 exp_services.export_to_zip_file(
-                    exploration_id, version=version))
+                    exploration_id, version=version),
+                filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
                 exploration_id, version=version, width=width))
@@ -630,6 +630,7 @@ class FetchIssuesHandler(EditorHandler):
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id):
@@ -650,6 +651,8 @@ class FetchIssuesHandler(EditorHandler):
 
 class FetchPlaythroughHandler(EditorHandler):
     """Handler used for retrieving a playthrough."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id, playthrough_id):
@@ -756,17 +759,10 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-
-        # Image files are stored to the datastore in the dev env, and to GCS
-        # in production.
-        file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-            else fs_domain.GcsFileSystem)
+        file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/%s' % exploration_id))
-        filepath = (
-            filename if feconf.DEV_MODE
-            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
@@ -776,7 +772,7 @@ class ImageUploadHandler(EditorHandler):
         exp_services.save_original_and_compressed_versions_of_image(
             self.user_id, filename, exploration_id, raw)
 
-        self.render_json({'filepath': filename})
+        self.render_json({'filename': filename})
 
 
 class StartedTutorialEventHandler(EditorHandler):
@@ -829,6 +825,8 @@ class EditorAutosaveHandler(ExplorationHandler):
 class StateAnswerStatisticsHandler(EditorHandler):
     """Returns basic learner answer statistics for a state."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -846,6 +844,8 @@ class StateAnswerStatisticsHandler(EditorHandler):
 
 class TopUnresolvedAnswersHandler(EditorHandler):
     """Returns a list of top N unresolved answers."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):

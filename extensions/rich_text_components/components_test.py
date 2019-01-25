@@ -26,11 +26,12 @@ from extensions.rich_text_components import components
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
     """Tests validation of rich text components."""
 
-    def check_validation(self, cls, valid_items, invalid_items):
+    def check_validation(self, rte_component_class, valid_items, invalid_items):
         """Test that values are validated correctly.
 
         Args:
-          cls: the class whose validate() method is to be tested.
+          rte_component_class: the class whose validate() method
+            is to be tested.
           valid_items: a list of values. Each of these items is expected to
             be validated without any Exception.
           invalid_items: a list of values. Each of these is expected to raise
@@ -38,7 +39,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         """
         for item in valid_items:
             try:
-                cls.validate(item)
+                rte_component_class.validate(item)
             except Exception as e:
                 self.fail(
                     msg=(
@@ -48,7 +49,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
 
         for item in invalid_items:
             with self.assertRaises(Exception):
-                cls.validate(item)
+                rte_component_class.validate(item)
 
     def test_collapsible_validation(self):
         """Tests collapsible component validation."""

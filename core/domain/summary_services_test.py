@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.summary_services."""
+
 from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
@@ -256,7 +258,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with self.swap(

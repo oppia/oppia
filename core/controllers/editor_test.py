@@ -26,7 +26,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous_test
+from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -37,7 +37,7 @@ import feconf
     [models.NAMES.user, models.NAMES.statistics])
 
 
-class BaseEditorControllerTest(test_utils.GenericTestBase):
+class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
@@ -46,7 +46,7 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseEditorControllerTest, self).setUp()
+        super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -97,14 +97,34 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
 
 
-class EditorTest(BaseEditorControllerTest):
+class MockInteractionAnswerSummariesAggregator(
+        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
+    """A modified InteractionAnswerSummariesAggregator that does not start
+    a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockInteractionAnswerSummariesMRJobManager
 
-    ALL_CC_MANAGERS_FOR_TESTS = [
-        stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
-    ]
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockInteractionAnswerSummariesMRJobManager(
+        stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockInteractionAnswerSummariesAggregator
+
+
+class EditorTests(BaseEditorControllerTests):
+
+    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
 
     def setUp(self):
-        super(EditorTest, self).setUp()
+        super(EditorTests, self).setUp()
         exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
@@ -114,8 +134,7 @@ class EditorTest(BaseEditorControllerTest):
         """Test access to editor pages for the sample exploration."""
 
         # Check that non-editors can access, but not edit, the editor page.
-        response = self.testapp.get('/create/0')
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
         self.assert_cannot_edit(response.body)
 
@@ -123,9 +142,8 @@ class EditorTest(BaseEditorControllerTest):
         self.login(self.EDITOR_EMAIL)
 
         # Check that it is now possible to access and edit the editor page.
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
-        self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
@@ -154,21 +172,19 @@ class EditorTest(BaseEditorControllerTest):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
 
-        response = self.testapp.get('/create/%s' % exp_id)
+        response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
         self.put_json(
             publish_url, {
                 'make_public': True,
-            }, csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
@@ -177,10 +193,11 @@ class EditorTest(BaseEditorControllerTest):
         current_version = 1
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         def _get_payload(new_state_name, version=None):
+            """Gets the payload in the dict format."""
             result = {
                 'change_list': [{
                     'cmd': 'add_state',
@@ -193,10 +210,12 @@ class EditorTest(BaseEditorControllerTest):
             return result
 
         def _put_and_expect_400_error(payload):
+            """Puts a request with no version number and hence, expects 400
+            error.
+            """
             return self.put_json(
                 '/createhandler/data/0', payload,
-                csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=400)
+                csrf_token=csrf_token, expected_status_int=400)
 
         # A request with no version number is invalid.
         response_dict = _put_and_expect_400_error(_get_payload('New state'))
@@ -245,7 +264,7 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ExplorationEditorLogoutTest(BaseEditorControllerTest):
+class ExplorationEditorLogoutTest(BaseEditorControllerTests):
     """Test handler for logout from exploration editor page."""
 
     def test_logout_from_invalid_url(self):
@@ -264,7 +283,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        response = self.get_html_response(
+            invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -288,7 +308,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        response = self.get_html_response(
+            invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -312,7 +333,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             invalid_current_page))
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        response = self.get_html_response(
+            invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -326,7 +348,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         empty_redirect_logout_url = '/exploration_editor_logout?return_url='
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(empty_redirect_logout_url)
+        response = self.get_html_response(
+            empty_redirect_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
 
         response.follow()
@@ -345,7 +368,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             '/exploration_editor_logout?return_url=%s' % invalid_current_page)
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        response = self.get_html_response(
+            invalid_logout_url, expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response.follow()
         self.assertEqual(response.status_int, 302)
@@ -365,11 +389,11 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         current_page_url = '%s/%s' % (
             feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(current_page_url, expect_errors=False)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(current_page_url)
 
-        response = self.testapp.get(
-            '/exploration_editor_logout?return_url=%s' % current_page_url)
+        response = self.get_html_response(
+            '/exploration_editor_logout?return_url=%s' % current_page_url,
+            expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response = response.follow()
         self.assertEqual(response.status_int, 302)
@@ -389,13 +413,13 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         current_page_url = '%s/%s' % (
             feconf.EDITOR_URL_PREFIX, published_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(current_page_url, expect_errors=False)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(current_page_url)
 
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
-        response = self.testapp.get(
-            '/exploration_editor_logout?return_url=%s' % current_page_url)
+        response = self.get_html_response(
+            '/exploration_editor_logout?return_url=%s' % current_page_url,
+            expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         response = response.follow()
         self.assertEqual(response.status_int, 302)
@@ -403,7 +427,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         self.logout()
 
 
-class DownloadIntegrationTest(BaseEditorControllerTest):
+class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
@@ -584,15 +608,14 @@ param_changes: []
                     'state_name': 'State 3',
                 })], 'changes')
         exploration = exp_services.get_exploration_by_id(exp_id)
-        response = self.testapp.get('/create/%s' % exp_id)
+        response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
         # Download to zip file using download handler.
         download_url = '/createhandler/download/%s' % exp_id
-        response = self.testapp.get(download_url)
+        response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
-        self.assertEqual(response.headers['Content-Type'], 'text/plain')
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % str(filename))
@@ -647,7 +670,7 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-        response = self.testapp.get(
+        response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -661,7 +684,7 @@ param_changes: []
         self.logout()
 
 
-class ExplorationDeletionRightsTest(BaseEditorControllerTest):
+class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -680,19 +703,19 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
         self.logout()
 
@@ -719,25 +742,25 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % published_exp_id,
             expected_status_int=401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % published_exp_id,
             expected_status_int=401)
         self.logout()
 
         self.login(self.TRANSLATOR_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % published_exp_id,
             expected_status_int=401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
         self.delete_json(
-            '/createhandler/data/%s' % published_exp_id, expect_errors=True,
+            '/createhandler/data/%s' % published_exp_id,
             expected_status_int=401)
         self.logout()
 
@@ -751,7 +774,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test correctness of logged statements while deleting exploration."""
         observed_log_messages = []
 
-        def add_logging_info(msg, *_):
+        def mock_logging_function(msg, *_):
             # Message logged by function clear_all_pending() in
             # oppia_tools/google_appengine_1.9.67/google_appengine/google/
             # appengine/ext/ndb/tasklets.py, not to be checked here.
@@ -760,8 +783,8 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', add_logging_info), self.swap(
-            logging, 'debug', add_logging_info):
+        with self.swap(logging, 'info', mock_logging_function), self.swap(
+            logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
@@ -770,7 +793,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
             self.login(self.OWNER_EMAIL)
             self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+                '/createhandler/data/%s' % exp_id)
 
             # Observed_log_messages[1] is 'Attempting to delete documents
             # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
@@ -796,8 +819,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.admin_id, exploration)
 
             self.login(self.ADMIN_EMAIL)
-            self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
                 observed_log_messages[0],
@@ -817,8 +839,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             exp_services.save_new_exploration(self.moderator_id, exploration)
 
             self.login(self.MODERATOR_EMAIL)
-            self.delete_json(
-                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(
                 observed_log_messages[0],
@@ -831,7 +852,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.logout()
 
 
-class VersioningIntegrationTest(BaseEditorControllerTest):
+class VersioningIntegrationTest(BaseEditorControllerTests):
     """Test retrieval of and reverting to old exploration versions."""
 
     EXP_ID = '0'
@@ -867,7 +888,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
         # Open editor page.
-        response = self.testapp.get(
+        response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -877,8 +898,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 '/createhandler/revert/%s' % self.EXP_ID, {
                     'current_version': 2,
                     'revert_to_version': rev_version
-                }, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token, expected_status_int=400)
 
             # Check error message.
             if not isinstance(rev_version, int):
@@ -949,13 +969,12 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # v3 does not exist.
-        response = self.testapp.get(
+        self.get_json(
             '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
 
 
-class ExplorationEditRightsTest(BaseEditorControllerTest):
+class ExplorationEditRightsTest(BaseEditorControllerTests):
     """Test the handling of edit rights for explorations."""
 
     def test_user_banning(self):
@@ -973,21 +992,16 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Joe logs in.
         self.login('joe@example.com')
 
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        self.assertEqual(response.status_int, 200)
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
 
         # Ban joe.
         self.set_banned_users(['joe'])
 
         # Test that Joe is banned (He can still access the library page).
-        response = self.testapp.get(
-            feconf.LIBRARY_INDEX_URL, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-        response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
 
         # Joe logs out.
@@ -995,13 +1009,12 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
         # Sandra logs in and is unaffected.
         self.login('sandra@example.com')
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
         self.logout()
 
 
-class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
+class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for managing exploration editing rights."""
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
@@ -1036,7 +1049,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
 
-        response = self.testapp.get(
+        response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -1071,16 +1084,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Check that viewer can access editor page but cannot edit.
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
         self.assert_cannot_translate(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
         self.assert_can_translate(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -1110,21 +1121,19 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         # Check that collaborator cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
             }, csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['status_code'], 401)
+            expected_status_int=401)
 
         self.logout()
 
         # Check that collaborator2 can access editor page and can edit.
         self.login(self.COLLABORATOR2_EMAIL)
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -1153,21 +1162,18 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         # Check that collaborator2 cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['status_code'], 401)
+                }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
 
         # Check that translator can access editor page and can only translate.
         self.login(self.TRANSLATOR_EMAIL)
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
         self.assert_can_translate(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -1175,14 +1181,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         # Check that translator cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['status_code'], 401)
+                }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
 
@@ -1196,7 +1200,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='My Exploration',
             end_state_name='END')
-        response = self.testapp.get('/create/%s' % exp_id)
+        response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         rights_manager.publish_exploration(self.owner, exp_id)
 
@@ -1222,14 +1226,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Check that any random user can access editor page and can edit.
         self.login(self.RANDOM_USER_EMAIL)
-        response = self.testapp.get('/create/%s' % exp_id)
-        self.assertEqual(response.status_int, 200)
+        response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
 
         self.logout()
 
 
-class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
+class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
 
     def test_user_exploration_emails_handler(self):
@@ -1244,7 +1247,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
 
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        response = self.testapp.get(
+        response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -1291,13 +1294,13 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ModeratorEmailsTest(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.GenericTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
 
     def setUp(self):
-        super(ModeratorEmailsTest, self).setUp()
+        super(ModeratorEmailsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1327,8 +1330,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.login(self.MODERATOR_EMAIL)
 
             # Go to the exploration editor page.
-            response = self.testapp.get('/create/%s' % self.EXP_ID)
-            self.assertEqual(response.status_int, 200)
+            response = self.get_html_response('/create/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # Try to unpublish the exploration without an email body. This
@@ -1337,8 +1339,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
                     'email_body': None,
                     'version': 1,
-                }, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token, expected_status_int=400)
             self.assertIn(
                 'Moderator actions should include an email',
                 response_dict['error'])
@@ -1347,8 +1348,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
                     'email_body': '',
                     'version': 1,
-                }, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=400)
+                }, csrf_token=csrf_token, expected_status_int=400)
             self.assertIn(
                 'Moderator actions should include an email',
                 response_dict['error'])
@@ -1363,7 +1363,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
                 valid_payload, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=500)
+                expected_status_int=500)
 
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 # Now the email gets sent with no error.
@@ -1383,8 +1383,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.login(self.MODERATOR_EMAIL)
 
             # Go to the exploration editor page.
-            response = self.testapp.get('/create/%s' % self.EXP_ID)
-            self.assertEqual(response.status_int, 200)
+            response = self.get_html_response('/create/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
 
             new_email_body = 'Your exploration is unpublished :('
@@ -1445,8 +1444,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
 
             # Go to the exploration editor page.
-            response = self.testapp.get('/create/%s' % self.EXP_ID)
-            self.assertEqual(response.status_int, 200)
+            response = self.get_html_response('/create/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
 
             new_email_body = 'Your exploration is unpublished :('
@@ -1461,18 +1459,18 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
                 valid_payload, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
 
             self.logout()
 
 
-class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
+class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     """Test the handling of request to fetch issues and playthroughs."""
 
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(FetchIssuesPlaythroughHandlerTest, self).setUp()
+        super(FetchIssuesPlaythroughHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1607,13 +1605,13 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
             }])
 
 
-class ResolveIssueHandlerTest(test_utils.GenericTestBase):
+class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     """Test the handler for resolving issues."""
 
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(ResolveIssueHandlerTest, self).setUp()
+        super(ResolveIssueHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
@@ -1699,7 +1697,7 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_resolve_issue_handler(self):
@@ -1731,7 +1729,7 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                 'exp_issue_dict': self.exp_issue_dict,
                 'exp_version': 1
             }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=404)
+            expected_status_int=404)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
@@ -1745,10 +1743,10 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                 'exp_issue_dict': self.exp_issue_dict,
                 'exp_version': 1
             }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=404)
+            expected_status_int=404)
 
 
-class EditorAutosaveTest(BaseEditorControllerTest):
+class EditorAutosaveTest(BaseEditorControllerTests):
     """Test the handling of editor autosave actions."""
 
     EXP_ID1 = '1'
@@ -1774,6 +1772,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         'new_value': 1}]
 
     def _create_explorations_for_tests(self):
+        """Creates the mock explorations for testing."""
         self.save_new_valid_exploration(self.EXP_ID1, self.owner_id)
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         exploration.add_states(['State A'])
@@ -1782,6 +1781,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
 
     def _create_exp_user_data_model_objects_for_tests(self):
+        """Creates the ExplorationUserDataModel objects for testing."""
         # Explorations with draft set.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, self.EXP_ID1), user_id=self.owner_id,
@@ -1811,7 +1811,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self._create_exp_user_data_model_objects_for_tests()
 
         # Generate CSRF token.
-        response = self.testapp.get('/create/%s' % self.EXP_ID1)
+        response = self.get_html_response('/create/%s' % self.EXP_ID1)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_exploration_loaded_with_draft_applied(self):
@@ -1878,12 +1878,12 @@ class EditorAutosaveTest(BaseEditorControllerTest):
                 'change_list': self.INVALID_CHANGELIST,
                 'version': 2,
             }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
-        # id is incremented the first time but not the second.
+        # ID is incremented the first time but not the second.
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'status_code': 400,

@@ -16,6 +16,7 @@
 
 """Tests for Exploration-related jobs."""
 
+import datetime
 import json
 import os
 
@@ -24,7 +25,6 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
@@ -33,8 +33,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(job_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.exploration])
+(job_models, exp_models, classifier_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.classifier])
 search_services = models.Registry.import_search_services()
 
 
@@ -216,7 +216,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         getattr(expected_job_output[exp_id], prop))
 
 
-class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
+class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
@@ -264,7 +264,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
             exp_first_published, exploration_rights.first_published_msec)
 
 
-class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
+class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob]
@@ -399,7 +399,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             exploration_summary.contributor_ids)
 
 
-class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
+class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
 
@@ -411,7 +411,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
     EMAIL_B = 'emailb@example.com'
 
     def setUp(self):
-        super(ExplorationContributorsSummaryOneOffJobTest, self).setUp()
+        super(ExplorationContributorsSummaryOneOffJobTests, self).setUp()
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
 
@@ -567,7 +567,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 exploration_summary.contributors_summary)
 
 
-class ExplorationMigrationJobTest(test_utils.GenericTestBase):
+class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -577,7 +577,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationMigrationJobTest, self).setUp()
+        super(ExplorationMigrationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -668,6 +668,42 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+    def test_migration_job_creates_appropriate_classifier_models(self):
+        """Tests that the exploration migration job creates appropriate
+        classifier data models for explorations.
+        """
+        self.save_new_exp_with_states_schema_v21(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        initial_state_name = exploration.states.keys()[0]
+        # Store classifier model for the new exploration.
+        classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
+            'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
+            datetime.datetime.utcnow(), {}, initial_state_name,
+            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+        # Store training job model for the classifier model.
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            self.NEW_EXP_ID, exploration.version, initial_state_name,
+            classifier_model_id)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    self.process_and_flush_pending_tasks()
+
+        new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        initial_state_name = new_exploration.states.keys()[0]
+        self.assertLess(exploration.version, new_exploration.version)
+        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
+            self.NEW_EXP_ID, new_exploration.version,
+            [initial_state_name])[0]
+        self.assertEqual(
+            classifier_exp_mapping_model.job_id, classifier_model_id)
 
 
 class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
@@ -768,7 +804,7 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
 
 
-class ExplorationContentValidationJobForTextAngularTest(
+class ExplorationContentValidationJobForTextAngularTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -779,7 +815,7 @@ class ExplorationContentValidationJobForTextAngularTest(
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationContentValidationJobForTextAngularTest, self).setUp()
+        super(ExplorationContentValidationJobForTextAngularTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -865,9 +901,9 @@ class ExplorationContentValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'br', [u'[document]']]",
-            "[u'invalidTags', [u'span']]",
-            "[u'oppia-noninteractive-link', [u'[document]']]",
+            '[u\'br\', [u\'[document]\']]',
+            '[u\'invalidTags\', [u\'span\']]',
+            '[u\'oppia-noninteractive-link\', [u\'[document]\']]',
             (
                 '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
                 'like your <span>program </span>prints output</p>.<blockquote>'
@@ -883,7 +919,7 @@ class ExplorationContentValidationJobForTextAngularTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMigrationValidationJobForTextAngularTest(
+class ExplorationMigrationValidationJobForTextAngularTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -895,7 +931,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
 
     def setUp(self):
         super(
-            ExplorationMigrationValidationJobForTextAngularTest, self).setUp()
+            ExplorationMigrationValidationJobForTextAngularTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -977,7 +1013,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'oppia-noninteractive-image', [u'ol']]",
+            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
@@ -988,7 +1024,7 @@ class ExplorationMigrationValidationJobForTextAngularTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
+class TextAngularValidationAndMigrationTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -998,7 +1034,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(TextAngularValidationAndMigrationTest, self).setUp()
+        super(TextAngularValidationAndMigrationTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1095,7 +1131,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(actual_output), 16)
 
 
-class ExplorationContentValidationJobForCKEditorTest(
+class ExplorationContentValidationJobForCKEditorTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1106,7 +1142,7 @@ class ExplorationContentValidationJobForCKEditorTest(
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationContentValidationJobForCKEditorTest, self).setUp()
+        super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1220,10 +1256,10 @@ class ExplorationContentValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
-            "[u'invalidTags', [u'span', u'code', u'b']]",
-            "[u'ol', [u'ol']]",
-            "[u'oppia-noninteractive-image', [u'p', u'b']]",
-            "[u'p', [u'pre']]",
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
+            '[u\'ol\', [u\'ol\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
+            '[u\'p\', [u\'pre\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1248,48 +1284,7 @@ class ExplorationContentValidationJobForCKEditorTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class DeleteImagesFromGAEJobTest(test_utils.GenericTestBase):
-
-    COMMITER_ID = 'ADMIN'
-    COMMIT_MESSAGE = 'Deleting file_model for image from GAE'
-    EXP_ID = 'eid'
-    FILENAME = 'imageFile.png'
-
-    def setUp(self):
-        super(DeleteImagesFromGAEJobTest, self).setUp()
-        self.process_and_flush_pending_tasks()
-
-    def test_for_deletion_job(self):
-        """Checks that images get deleted from the GAE after running the job.
-        """
-        # This job is for deleting the images from the datastore that were
-        # stored in old format --- exp_id/assets/image.png . It should not be
-        # run on the current develop branch because we now store the images
-        # as exploration/exp_id/assets/image.png .
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
-        imageData = ''
-        mimetype = 'image/png'
-        fs.commit(
-            self.COMMITER_ID, self.FILENAME, imageData,
-            mimetype=mimetype)
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-
-        job_id = exp_jobs_one_off.DeleteImagesFromGAEJob.create_new()
-        exp_jobs_one_off.DeleteImagesFromGAEJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.DeleteImagesFromGAEJob.get_output(job_id))
-        expected_output = [
-            u"[u'Number of files that got deleted', 1]"
-        ]
-
-        self.assertEqual(fs.isfile(self.FILENAME), False)
-        self.assertEqual(actual_output, expected_output)
-
-
-class ExplorationMigrationValidationJobForCKEditorTest(
+class ExplorationMigrationValidationJobForCKEditorTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1301,7 +1296,7 @@ class ExplorationMigrationValidationJobForCKEditorTest(
 
     def setUp(self):
         super(
-            ExplorationMigrationValidationJobForCKEditorTest, self).setUp()
+            ExplorationMigrationValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -1390,15 +1385,15 @@ class ExplorationMigrationValidationJobForCKEditorTest(
             exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
-            "[u'invalidTags', [u'code', u'span']]",
-            "[u'strings', [u'<p>Lorem <span>ipsum </span>"
-            "</p> Hello this is <code>oppia </code>']]"
+            '[u\'invalidTags\', [u\'code\', u\'span\']]',
+            '[u\'strings\', [u\'<p>Lorem <span>ipsum </span>'
+            '</p> Hello this is <code>oppia </code>\']]'
         ]
 
         self.assertEqual(actual_output, expected_output)
 
 
-class InteractionCustomizationArgsValidationJobTest(
+class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1410,7 +1405,7 @@ class InteractionCustomizationArgsValidationJobTest(
 
     def setUp(self):
         super(
-            InteractionCustomizationArgsValidationJobTest, self).setUp()
+            InteractionCustomizationArgsValidationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

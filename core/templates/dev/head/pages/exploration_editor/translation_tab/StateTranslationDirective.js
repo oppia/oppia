@@ -268,23 +268,27 @@ oppia.directive('stateTranslation', [
                 ExplorationInitStateNameService.displayed);
             }
 
-            var stateName = StateEditorService.getActiveStateName();
+            $scope.stateName = StateEditorService.getActiveStateName();
 
             $scope.stateContent = ExplorationStatesService
-              .getStateContentMemento(stateName);
+              .getStateContentMemento($scope.stateName);
             $scope.stateSolution = ExplorationStatesService
-              .getSolutionMemento(stateName);
+              .getSolutionMemento($scope.stateName);
             $scope.stateHints = ExplorationStatesService
-              .getHintsMemento(stateName);
+              .getHintsMemento($scope.stateName);
             $scope.stateAnswerGroups = ExplorationStatesService
-              .getInteractionAnswerGroupsMemento(stateName);
+              .getInteractionAnswerGroupsMemento($scope.stateName);
             $scope.stateDefaultOutcome = ExplorationStatesService
-              .getInteractionDefaultOutcomeMemento(stateName);
+              .getInteractionDefaultOutcomeMemento($scope.stateName);
             $scope.stateInteractionId = ExplorationStatesService
-              .getInteractionIdMemento(stateName);
+              .getInteractionIdMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
 
+            var currentCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento($scope.stateName);
+            $scope.answerChoices = StateEditorService.getAnswerChoices(
+              $scope.stateInteractionId, currentCustomizationArgs);
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 

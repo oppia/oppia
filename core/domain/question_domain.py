@@ -36,6 +36,8 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 # optionally, 'old_value'.
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION = 'create_new_fully_specified_question'
+CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_state_schema_to_latest_version')
 
 # The following commands are deprecated, as these functionalities will be
 # handled by a QuestionSkillLink class in the future.
@@ -51,6 +53,11 @@ class QuestionChange(object):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE)
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'question_dict',
+        'skill_id', 'from_version', 'to_version'
+    ]
+
     def __init__(self, change_dict):
         """Initialize a QuestionChange object from a dict.
 
@@ -63,6 +70,8 @@ class QuestionChange(object):
                 and old_value)
                 - 'create_new_fully_specified_question' (with question_dict,
                 skill_id)
+                - 'migrate_state_schema_to_latest_version' (with from_version
+                and to_version)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -79,32 +88,31 @@ class QuestionChange(object):
                 self.old_value = change_dict['old_value']
             else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-
-        if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
+        elif self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
             self.question_dict = change_dict['question_dict']
             # Note that change_dict['skill_id'] may be None if this change is
             # being done in the context of a suggestion.
             self.skill_id = change_dict['skill_id']
+        elif self.cmd == CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
 
     def to_dict(self):
-        """Returns a dict representing QuestionChange domain object.
+        """Returns a dict representing the QuestionChange domain object.
 
         Returns:
-            dict. A dict representing QuestionChange instance.
+            A dict, mapping all fields of QuestionChange instance.
         """
-        if self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
-            return {
-                'cmd': self.cmd,
-                'question_dict': self.question_dict,
-                'skill_id': self.skill_id
-            }
+        question_change_dict = {}
+        question_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                question_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
 
-        return {
-            'cmd': self.cmd,
-            'property_name': self.property_name,
-            'new_value': self.new_value,
-            'old_value': self.old_value
-        }
+        return question_change_dict
 
 
 class Question(object):
@@ -164,6 +172,32 @@ class Question(object):
         return state_domain.State.create_default_state(
             None, is_initial_state=True)
 
+    @classmethod
+    def update_state_from_model(
+            cls, versioned_question_state, current_state_schema_version):
+        """Converts the state object contained in the given
+        versioned_question_state dict from current_state_schema_version to
+        current_state_schema_version + 1.
+        Note that the versioned_question_state being passed in is modified
+        in-place.
+
+        Args:
+            versioned_question_state: dict. A dict with two keys:
+                - state_schema_version: int. The state schema version for the
+                    question.
+                - state: The State domain object representing the question
+                    state data.
+            current_state_schema_version: int. The current state
+                schema version.
+        """
+        versioned_question_state['state_schema_version'] = (
+            current_state_schema_version + 1)
+
+        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+            current_state_schema_version, current_state_schema_version + 1))
+        versioned_question_state['state'] = conversion_fn(
+            versioned_question_state['state'])
+
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
@@ -189,7 +223,7 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
+        interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_state_data.interaction
@@ -222,7 +256,7 @@ class Question(object):
 
         if (
                 (interaction.solution is None) and
-                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
+                (interaction_specs[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
@@ -295,8 +329,7 @@ class Question(object):
 
 
 class QuestionSummary(object):
-    """Domain object for Question Summary.
-    """
+    """Domain object for Question Summary."""
     def __init__(
             self, creator_id, question_id, question_content,
             question_model_created_on=None, question_model_last_updated=None):

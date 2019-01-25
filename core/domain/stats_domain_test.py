@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.domain.stats_domain."""
+
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.tests import test_utils
@@ -25,6 +27,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
 
     def _get_exploration_stats_from_dict(self, exploration_stats_dict):
+        """Converts and returns the ExplorationStats object from the given
+        exploration stats dict.
+        """
         state_stats_mapping = {}
         for state_name in exploration_stats_dict['state_stats_mapping']:
             state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
@@ -1265,7 +1270,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class UnknownCalculationOutputObject(object):
+    class MockCalculationOutputObjectWithUnknownType(object):
         pass
 
     def setUp(self):
@@ -1297,7 +1302,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
 
     def test_calculation_output_must_be_known_type(self):
         self.state_answers_calc_output.calculation_output = (
-            self.UnknownCalculationOutputObject())
+            self.MockCalculationOutputObjectWithUnknownType())
         self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected calculation output to be one of')

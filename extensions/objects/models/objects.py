@@ -44,12 +44,15 @@ class BaseObject(object):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
 
+        Args:
+            raw: *. A normalized Python object to be normalized.
+
         Returns:
-          a normalized Python object describing the Object specified by this
-          class.
+            *. A normalized Python object describing the Object specified by
+                this class.
 
         Raises:
-          TypeError: if the Python object cannot be normalized.
+          TypeError: The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -66,7 +69,15 @@ class Boolean(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            bool. The normalized object (or False if the input is None or '').
+        """
         if raw is None or raw == '':
             raw = False
 
@@ -163,6 +174,15 @@ class CodeString(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            unicode. The normalized object containing string in unicode format.
+        """
         if '\t' in raw:
             raise TypeError(
                 'Unexpected tab characters in code string: %s' % raw)
@@ -411,7 +431,29 @@ class CheckedProof(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions_string: basestring. The string containing the
+                        assumptions.
+                    target_string: basestring. The target string of the proof.
+                    proof_string: basestring. The proof string.
+                    correct: bool. Whether the proof is correct.
+                    error_category: basestring. The category of the error.
+                    error_code: basestring. The error code.
+                    error_message: basestring. The error message.
+                    error_line_number: basestring. The line number at which the
+                        error has occurred.
+
+        Raises:
+            TypeError: Cannot convert to the CheckedProof schema.
+        """
         try:
             assert isinstance(raw, dict)
             assert isinstance(raw['assumptions_string'], basestring)
@@ -435,9 +477,50 @@ class LogicQuestion(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions: list(dict(str, *)). The list containing all the
+                        assumptions in the dict format containing following
+                        key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    results: list(dict(str, *)). The list containing the final
+                        results of the required proof in the dict format
+                        containing following key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    default_proof_string: basestring. The default proof string.
+
+        Raises:
+            TypeError: Cannot convert to LogicQuestion schema.
+        """
 
         def _validate_expression(expression):
+            """Validates the given expression.
+
+            Args:
+                expression: dict(str, *). The expression to be verified in the
+                    dict format.
+
+            Raises:
+                AssertionError: The specified expression is not in the correct
+                    format.
+            """
             assert isinstance(expression, dict)
             assert isinstance(expression['top_kind_name'], basestring)
             assert isinstance(expression['top_operator_name'], basestring)
@@ -445,6 +528,15 @@ class LogicQuestion(BaseObject):
             _validate_expression_array(expression['dummies'])
 
         def _validate_expression_array(array):
+            """Validates the given expression array.
+
+            Args:
+                array: list(dict(str, *)). The expression array to be verified.
+
+            Raises:
+                AssertionError: The specified expression array is not in the
+                    list format.
+            """
             assert isinstance(array, list)
             for item in array:
                 _validate_expression(item)
@@ -547,6 +639,16 @@ class Graph(BaseObject):
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
         TODO(czx): Think about support for multigraphs?
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the Graph schema.
+
+        Raises:
+            TypeError. Cannot convert to the Graph schema.
         """
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
@@ -621,17 +723,37 @@ class NormalizedRectangle2D(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        # Moves cur_value to the nearest available value in the range
-        # [min_value, max_value].
-        def clamp(min_value, current_value, max_value):
-            return min(max_value, max(min_value, current_value))
+        """Returns the normalized coordinates of the rectangle.
+
+        Args:
+            raw: *. An object to be validated against the schema, normalizing if
+                necessary.
+
+        Returns:
+            list(list(float)). The normalized object containing list of lists of
+                float values as coordinates of the rectangle.
+
+        Raises:
+            TypeError: Cannot convert to the NormalizedRectangle2D schema.
+        """
+        def clamp(value):
+            """Clamps a number to range [0, 1].
+
+            Args:
+                value: float. A number to be clamped.
+
+            Returns:
+                float. The clamped value.
+            """
+            return min(0.0, max(value, 1.0))
+
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
-            raw[0][0] = clamp(0.0, raw[0][0], 1.0)
-            raw[0][1] = clamp(0.0, raw[0][1], 1.0)
-            raw[1][0] = clamp(0.0, raw[1][0], 1.0)
-            raw[1][1] = clamp(0.0, raw[1][1], 1.0)
+            raw[0][0] = clamp(raw[0][0])
+            raw[0][1] = clamp(raw[0][1])
+            raw[1][0] = clamp(raw[1][0])
+            raw[1][1] = clamp(raw[1][1])
 
         except Exception:
             raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
@@ -692,7 +814,7 @@ class ImageWithRegions(BaseObject):
 class ClickOnImage(BaseObject):
     """A click on an image and the clicked regions."""
 
-    description = "Position of a click and a list of regions clicked."
+    description = 'Position of a click and a list of regions clicked.'
 
     SCHEMA = {
         'type': 'dict',
@@ -729,7 +851,7 @@ class ParameterName(BaseObject):
 class SetOfHtmlString(BaseObject):
     """A Set of Html Strings."""
 
-    description = "A list of Html strings."
+    description = 'A list of Html strings.'
     default_value = []
 
     SCHEMA = {

@@ -114,14 +114,15 @@ def preprocess_release():
 
     (1) Changes the app name in app.yaml to APP_NAME.
     (2) Substitutes files from the per-app deployment data.
+    (3) Change the DEV_MODE constant in assets/constants.js.
     """
     # Change the app name in app.yaml.
-    f = open('app.yaml', 'r')
-    content = f.read()
+    with open('app.yaml', 'r') as app_yaml_file:
+        content = app_yaml_file.read()
     os.remove('app.yaml')
     content = content.replace('oppiaserver', APP_NAME)
-    d = open('app.yaml', 'w+')
-    d.write(content)
+    with open('app.yaml', 'w+') as new_app_yaml_file:
+        new_app_yaml_file.write(content)
 
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
@@ -157,6 +158,15 @@ def preprocess_release():
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
+    # Changes the DEV_MODE constant in assets/constants.js.
+    with open(os.path.join('assets', 'constants.js'), 'r') as assets_file:
+        content = assets_file.read()
+    assert '"DEV_MODE": true' in content
+    os.remove(os.path.join('assets', 'constants.js'))
+    content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
+    with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+        new_assets_file.write(content)
+
 
 def _get_served_version():
     """Retrieves the default version being served on the specified application
@@ -188,9 +198,11 @@ def _get_current_release_version():
 
 
 def _execute_deployment():
+    """Executes the deployment process after doing the prerequisite checks."""
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
+    common.require_gcloud_to_be_available()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
@@ -237,7 +249,12 @@ def _execute_deployment():
         if build_process.returncode > 0:
             raise Exception('Build failed.')
 
-        # Deploy to GAE.
+        # Deploy export service to GAE.
+        subprocess.check_output([
+            common.GCLOUD_PATH, 'app', 'deploy', 'export/app.yaml',
+            '--project=%s' % APP_NAME])
+
+        # Deploy app to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Writing log entry.

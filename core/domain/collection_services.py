@@ -104,22 +104,13 @@ def _get_collection_memcache_key(collection_id, version=None):
         return 'collection:%s' % collection_id
 
 
-def get_collection_from_model(collection_model, run_conversion=True):
+def get_collection_from_model(collection_model):
     """Returns a Collection domain object given a collection model loaded
     from the datastore.
 
     Args:
         collection_model: CollectionModel. The collection model loaded from the
             datastore.
-        run_conversion: bool. If true, the the collection's schema version will
-            be checked against the current schema version. If they do not match,
-            the collection will be automatically updated to the latest schema
-            version.
-
-            IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should
-            never be False. This option is only used for testing that the
-            schema version migration works correctly, and it should never be
-            changed otherwise.
 
     Returns:
         Collection. A Collection domain object corresponding to the given
@@ -140,7 +131,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
         }
 
     # Migrate the collection if it is not using the latest schema version.
-    if (run_conversion and collection_model.schema_version !=
+    if (collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         _migrate_collection_contents_to_latest_schema(
             versioned_collection_contents)
@@ -497,13 +488,13 @@ def _get_collection_summary_dicts_from_models(collection_summary_models):
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
 
-    Args：
-        collection_summary_models: An iterable of CollectionSummaryModel
-            instances.
+    Args:
+        collection_summary_models: iterable(CollectionSummaryModel). An
+            iterable of CollectionSummaryModel instances.
 
     Returns:
-        A dict containing corresponding collection summary domain objects, keyed
-        by id.
+        A dict containing corresponding collection summary domain objects,
+        keyed by id.
     """
     collection_summaries = [
         get_collection_summary_from_model(collection_summary_model)
@@ -597,7 +588,7 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry in change_list is a dict that represents a
+            collection. Each entry is a dict that represents a
             CollectionChange.
     object.
 
@@ -895,15 +886,15 @@ def update_collection(
     """Updates a collection. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - collection_id: str. The collection id.
-    - change_list: list of dicts, each representing a CollectionChange object.
-        These changes are applied in sequence to produce the resulting
-        collection.
-    - commit_message: str or None. A description of changes made to the
-        collection. For published collections, this must be present; for
-        unpublished collections, it may be equal to None.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        collection_id: str. The collection id.
+        change_list: list(dict). Each entry represents a CollectionChange
+            object. These changes are applied in sequence to produce the
+            resulting collection.
+        commit_message: str or None. A description of changes made to the
+            collection. For published collections, this must be present; for
+            unpublished collections, it may be equal to None.
     """
     is_public = rights_manager.is_collection_public(collection_id)
 

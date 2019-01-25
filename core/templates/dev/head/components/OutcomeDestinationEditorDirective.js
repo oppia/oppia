@@ -28,17 +28,16 @@ oppia.directive('outcomeDestinationEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_destination_editor_directive.html'),
       controller: [
-        '$scope', 'StateEditorService',
-        'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
-        'FocusManagerService', 'EditorFirstTimeEventsService',
-        'EXPLORATION_AND_SKILL_ID_PATTERN',
+        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
+        'StateEditorService', 'StateGraphLayoutService', 'UserService',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, StateEditorService,
-            StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
-            FocusManagerService, EditorFirstTimeEventsService,
-            EXPLORATION_AND_SKILL_ID_PATTERN) {
+            $scope, EditorFirstTimeEventsService, FocusManagerService,
+            StateEditorService, StateGraphLayoutService, UserService,
+            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var currentStateName = null;
-          $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
+          $scope.canAddPrerequisiteSkill =
+            constants.ENABLE_NEW_STRUCTURE_EDITORS;
 
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
@@ -54,11 +53,15 @@ oppia.directive('outcomeDestinationEditor', [
             }
           });
 
-          // We restrict editing of refresher exploration IDs to
-          // admins/moderators for now, since the feature is still in
-          // development.
-          $scope.canEditRefresherExplorationId = (
-            GLOBALS.isAdmin || GLOBALS.isModerator);
+          $scope.canEditRefresherExplorationId = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            // We restrict editing of refresher exploration IDs to
+            // admins/moderators for now, since the feature is still in
+            // development.
+            $scope.canEditRefresherExplorationId = (
+              userInfo.isAdmin() || userInfo.isModerator());
+          });
+
           $scope.explorationAndSkillIdPattern =
             EXPLORATION_AND_SKILL_ID_PATTERN;
 

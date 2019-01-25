@@ -17,6 +17,7 @@
 import datetime
 import types
 
+from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import rights_manager
@@ -27,6 +28,48 @@ from core.tests import test_utils
 import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+
+
+class FailedMLTest(test_utils.GenericTestBase):
+    """Test that email functionality for sending failed ML Job emails
+    works.
+    """
+
+    def setUp(self):
+        super(FailedMLTest, self).setUp()
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_property = config_domain.Registry.get_config_property(
+            'notification_emails_for_failed_tasks')
+        config_property.set_value(
+            'committer_id', ['moderator@example.com'])
+
+    def test_send_failed_ml_email(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            messages = self.mail_stub.get_sent_messages(
+                to='moderator@example.com')
+            self.assertEqual(len(messages), 0)
+
+            # Send job failure email with mock Job ID.
+            email_manager.send_job_failure_email('123ABC')
+
+            # Make sure emails are sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_subject = 'Failed ML Job'
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject.decode(), expected_subject)
+            messages = self.mail_stub.get_sent_messages(
+                to='moderator@example.com')
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject.decode(), expected_subject)
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -119,7 +162,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
-            response = self.testapp.get('%s/%s' % (
+            response = self.get_html_response('%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, self.exploration.id))
             csrf_token = self.get_csrf_token_from_response(response)
             self.put_json('%s/%s' % (
@@ -472,7 +515,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -492,6 +535,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -502,7 +546,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -539,6 +583,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -549,7 +594,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -584,6 +629,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -594,7 +640,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
@@ -626,7 +672,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -659,7 +705,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -693,7 +739,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -702,9 +748,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                     'agreed_to_terms': True,
                     'username': 'BadUsername!!!'
                 },
-                csrf_token=csrf_token,
-                expect_errors=True,
-                expected_status_int=400)
+                csrf_token=csrf_token, expected_status_int=400)
 
             # Check that no email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -737,7 +781,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
@@ -799,9 +843,10 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
         }
 
-        # pylint: disable=unused-argument
         def _generate_hash_for_tests(
-                cls, recipient_id, email_subject, email_body):
+                unused_cls, unused_recipient_id, unused_email_subject,
+                unused_email_body):
+            """Returns the generated hash for tests."""
             return 'Email Hash'
 
         self.generate_hash_ctx = self.swap(
@@ -820,6 +865,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -871,6 +917,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         logged_errors = []
 
         def _log_error_for_tests(error_message):
+            """Appends the error message to the logged errors list."""
             logged_errors.append(error_message)
 
         log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
@@ -1213,7 +1260,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
-            # check that email body is correct.
+            # Check that email body is correct.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1223,7 +1270,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-            # check that email model is correct.
+            # Check that email model is correct.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
@@ -1244,9 +1291,9 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 sent_email_model.subject, self.expected_email_subject)
 
 
-class SuggestionEmailTest(test_utils.GenericTestBase):
+class SuggestionEmailTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(SuggestionEmailTest, self).setUp()
+        super(SuggestionEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1299,7 +1346,7 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1328,9 +1375,9 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
 
-class SubscriptionEmailTest(test_utils.GenericTestBase):
+class SubscriptionEmailTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(SubscriptionEmailTest, self).setUp()
+        super(SubscriptionEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1382,7 +1429,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1617,8 +1664,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 
 class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while onboarding reviewers.
-    """
+    """Test that correct email is sent while onboarding reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1684,8 +1730,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
 
 
 class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
-    """Test that correct email is sent while notifying reviewers.
-    """
+    """Test that correct email is sent while notifying reviewers."""
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 

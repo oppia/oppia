@@ -1,3 +1,6 @@
+<div class="oppia-translation-page-statename">
+  <strong><[stateName]></strong>
+</div>
 <div class="oppia-page-card oppia-state-translation-page">
   <div class="translation-nav md-tab">
     <ul class="oppia-translation-tabs">
@@ -51,8 +54,8 @@
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
                ng-style="contentIdStatusColorStyle(answerGroup.outcome.feedback.getContentId())">
               <response-header index="$index"
-                               summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), false)"
-                               short-summary="summarizeAnswerGroup(answerGroup, stateInteractionId, getAnswerChoices(), true)"
+                               summary="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
+                               short-summary="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
                                is-active="$index === activeAnswerGroupIndex"
                                outcome="answerGroup.outcome"
                                num-rules="answerGroup.rules.length"
@@ -147,21 +150,28 @@
 </div>
 
 <style>
+  .oppia-translation-page-statename {
+    margin-left: 80px;
+    margin-top: 35px;
+    position: relative;
+  }
   .oppia-state-translation-page {
-    height: 500px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 80px;
+    margin-top: 20px;
+    min-height: 500px;
     padding: 0px;
     width: 80%;
   }
   .oppia-translation-tabs {
-    display: -webkit-flex;
     display: flex;
-    height: 10%;
+    height: 50px;
     margin-bottom: 0;
     padding-left: 0px;
     text-align: center;
   }
   .oppia-translation-tabs li {
-    display: -webkit-flex;
     display: flex;
     margin-bottom: 5px;
     width: -webkit-calc(100% / 4);
@@ -196,13 +206,14 @@
   }
   .translation-state-contents {
     border-bottom: 2px solid #eee;
-    display: block;
-    height: 80%;
-    margin: auto;
-    overflow: auto;
-    }
+    min-height: 400px;
+    word-break: break-all;
+  }
   .translation-state-content {
     margin: auto;
     padding: 20px 30px 20px 30px;
+  }
+  .oppia-audio-translation-bar {
+    height: 50px;
   }
 </style>

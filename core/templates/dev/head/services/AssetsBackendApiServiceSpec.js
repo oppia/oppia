@@ -42,12 +42,20 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('Should successfully fetch and cache audio', function() {
+  it('should correctly formulate the download URL', function() {
+    // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
+    // can test the production URL, too.
+    expect(
+      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
+    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+  });
+
+  it('should successfully fetch and cache audio', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/audiohandler/<exploration_id>/audio/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
@@ -69,12 +77,12 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('Should successfully fetch and cache image', function() {
+  it('should successfully fetch and cache image', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/<filename>', {
+      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
         exploration_id: '0',
         filename: 'myfile.png'
       });
@@ -96,13 +104,13 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('Should call the provided failure handler on HTTP failure for an audio',
+  it('should call the provided failure handler on HTTP failure for an audio',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/audiohandler/<exploration_id>/audio/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -117,13 +125,13 @@ describe('Assets Backend API Service', function() {
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
-  it('Should call the provided failure handler on HTTP failure for an image',
+  it('should call the provided failure handler on HTTP failure for an image',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/imagehandler/<exploration_id>/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
@@ -138,13 +146,13 @@ describe('Assets Backend API Service', function() {
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
-  it('Should successfully abort the download of all the audio files',
+  it('should successfully abort the download of all the audio files',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/audiohandler/<exploration_id>/audio/<filename>', {
+        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -164,13 +172,13 @@ describe('Assets Backend API Service', function() {
       expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
     });
 
-  it('Should successfully abort the download of the all the image files',
+  it('should successfully abort the download of the all the image files',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        'imagehandler/<exploration_id>/image/<filename>', {
+        'assetsdevhandler/<exploration_id>/assets/image/<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
@@ -189,4 +197,29 @@ describe('Assets Backend API Service', function() {
         .image.length).toBe(0);
       expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
     });
+
+  it('should use the correct blob type for audio assets', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var requestUrl = UrlInterpolationService.interpolateUrl(
+      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        exploration_id: '0',
+        filename: 'myfile.mp3'
+      });
+
+    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      successHandler, failHandler);
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(1);
+    $httpBackend.flush();
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(0);
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg');
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
 });

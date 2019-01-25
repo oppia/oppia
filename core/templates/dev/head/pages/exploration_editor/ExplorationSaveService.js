@@ -24,7 +24,7 @@ oppia.factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
   'ExplorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
+  'FocusManagerService', 'ChangeListService', 'SiteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   'AutosaveInfoModalsService',
   function(
@@ -35,7 +35,7 @@ oppia.factory('ExplorationSaveService', [
       ExplorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
       ExplorationInitStateNameService, RouterService,
-      FocusManagerService, ChangeListService, siteAnalyticsService,
+      FocusManagerService, ChangeListService, SiteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService,
       AutosaveInfoModalsService) {
     // Whether or not a save action is currently in progress
@@ -122,15 +122,13 @@ oppia.factory('ExplorationSaveService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'exploration_publish_modal_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
-              whenModalClosed.resolve();
             };
           }
         ]
@@ -148,10 +146,13 @@ oppia.factory('ExplorationSaveService', [
             }
 
             showCongratulatorySharingModal();
-            siteAnalyticsService.registerPublishExplorationEvent(
+            SiteAnalyticsService.registerPublishExplorationEvent(
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
+      }, function() {
+        AlertsService.clearWarnings();
+        whenModalClosed.resolve();
       });
 
       return whenModalClosed.promise;
@@ -165,15 +166,15 @@ oppia.factory('ExplorationSaveService', [
       var changeList = ChangeListService.getChangeList();
 
       if (ExplorationRightsService.isPrivate()) {
-        siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
+        SiteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
           ExplorationDataService.explorationId);
       } else {
-        siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+        SiteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
           ExplorationDataService.explorationId);
       }
 
       if (ExplorationWarningsService.countWarnings() === 0) {
-        siteAnalyticsService.registerSavePlayableExplorationEvent(
+        SiteAnalyticsService.registerSavePlayableExplorationEvent(
           ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
@@ -272,7 +273,7 @@ oppia.factory('ExplorationSaveService', [
         // so we can remove the loading-dots.
         var whenModalsClosed = $q.defer();
 
-        siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+        SiteAnalyticsService.registerOpenPublishExplorationModalEvent(
           ExplorationDataService.explorationId);
         AlertsService.clearWarnings();
 
@@ -399,15 +400,7 @@ oppia.factory('ExplorationSaveService', [
                 };
 
                 $scope.cancel = function() {
-                  whenModalsClosed.resolve();
-                  ExplorationTitleService.restoreFromMemento();
-                  ExplorationObjectiveService.restoreFromMemento();
-                  ExplorationCategoryService.restoreFromMemento();
-                  ExplorationLanguageCodeService.restoreFromMemento();
-                  ExplorationTagsService.restoreFromMemento();
-
                   $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -446,6 +439,14 @@ oppia.factory('ExplorationSaveService', [
                   whenModalsClosed.resolve();
                 });
             }
+          }, function() {
+            whenModalsClosed.resolve();
+            ExplorationTitleService.restoreFromMemento();
+            ExplorationObjectiveService.restoreFromMemento();
+            ExplorationCategoryService.restoreFromMemento();
+            ExplorationLanguageCodeService.restoreFromMemento();
+            ExplorationTagsService.restoreFromMemento();
+            AlertsService.clearWarnings();
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.

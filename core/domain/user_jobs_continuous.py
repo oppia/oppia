@@ -17,7 +17,6 @@
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -241,10 +240,7 @@ class RecentUpdatesMRJobManager(
 
         exploration_ids_list = item.activity_ids
         collection_ids_list = item.collection_ids
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            feedback_thread_ids_list = item.general_feedback_thread_ids
-        else:
-            feedback_thread_ids_list = item.feedback_thread_ids
+        feedback_thread_ids_list = item.general_feedback_thread_ids
 
         (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
@@ -271,16 +267,10 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-                last_message = (
-                    feedback_models.GeneralFeedbackMessageModel
-                    .get_most_recent_message(feedback_thread_id))
-                exploration_id = last_message.entity_id
-            else:
-                last_message = (
-                    feedback_models.FeedbackMessageModel
-                    .get_most_recent_message(feedback_thread_id))
-                exploration_id = last_message.exploration_id
+            last_message = (
+                feedback_models.GeneralFeedbackMessageModel
+                .get_most_recent_message(feedback_thread_id))
+            exploration_id = last_message.entity_id
 
             yield (
                 reducer_key, {
@@ -397,6 +387,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _refresh_average_ratings(user_id, rating, old_rating):
+            """Refreshes the average ratings in the given realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+                rating: int. The new rating of the exploration.
+                old_rating: int. The old rating of the exploration before
+                    refreshing.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -423,6 +421,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _increment_total_plays_count(user_id):
+            """Increments the total plays count of the exploration in the
+            realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -609,7 +613,7 @@ class UserStatsMRJobManager(
                         value_per_user * reach * contribution)
                 })
 
-            # if the user is an owner for the exploration, then update dict with
+            # If the user is an owner for the exploration, then update dict with
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
                 mapped_owner_ids.append(contrib_id)

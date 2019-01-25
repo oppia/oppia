@@ -16,6 +16,7 @@
 
 """Controllers for suggestions."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
@@ -83,13 +84,33 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ResubmitSuggestionHandler(base.BaseHandler):
+    """Handler to reopen a rejected suggestion."""
+
+    @acl_decorators.can_resubmit_suggestion
+    def put(self, suggestion_id):
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if not suggestion:
+            raise self.InvalidInputException(
+                'No suggestion found with given suggestion id')
+        new_change = self.payload.get('change')
+        change_cls = type(suggestion.change)
+        change_object = change_cls(new_change)
+        suggestion.pre_update_validate(change_object)
+        suggestion.change = change_object
+        summary_message = self.payload.get('summary_message')
+        suggestion_services.resubmit_rejected_suggestion(
+            suggestion, summary_message, self.user_id)
+        self.render_json(self.values)
+
+
 class SuggestionToTopicActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to topics."""
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         if len(suggestion_id.split('.')) != 3:
@@ -131,6 +152,8 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):

@@ -65,7 +65,6 @@ class NotificationsDashboardPage(base.BaseHandler):
     def get(self):
         self.values.update({
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
         })
         self.render_template(
             'pages/notifications_dashboard/notifications_dashboard.html',
@@ -138,8 +137,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
@@ -166,12 +163,29 @@ class CreatorDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
 
         def _get_intro_card_color(category):
+            """Returns the intro card color according to the category.
+
+            Args:
+                category: str. The category of the lesson.
+
+            Returns:
+                str. The intro card color according to the category.
+            """
             return (
                 constants.CATEGORIES_TO_COLORS[category] if
                 category in constants.CATEGORIES_TO_COLORS else
                 constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
+            """Returns the rounded average rating to display on the creator
+            dashboard.
+
+            Args:
+                rating: float. The rating of the lesson.
+
+            Returns:
+                float. The rounded average value of rating.
+            """
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were
@@ -211,7 +225,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if feconf.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             topic_summaries = topic_services.get_all_topic_summaries()
             topic_summary_dicts = [
                 summary.to_dict() for summary in topic_summaries]
@@ -303,14 +317,6 @@ class CreatorDashboardHandler(base.BaseHandler):
             [s['suggestion_id']
              for s in suggestion_dicts_which_can_be_reviewed])
 
-        if not constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            ids_of_suggestions_created_by_user = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_created_by_user])
-            ids_of_suggestions_which_can_be_reviewed = (
-                ['.'.join(t.split('.')[1:])
-                 for t in ids_of_suggestions_which_can_be_reviewed])
-
         threads_linked_to_suggestions_by_user = (
             [t.to_dict() for t in feedback_services.get_multiple_threads(
                 ids_of_suggestions_created_by_user)])
@@ -332,7 +338,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             'created_suggestions_list': suggestion_dicts_created_by_user,
             'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
         })
-        if feconf.ENABLE_NEW_STRUCTURES:
+        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             self.values.update({
                 'topic_summary_dicts': topic_summary_dicts
             })
@@ -404,7 +410,7 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class UploadExploration(base.BaseHandler):
+class UploadExplorationHandler(base.BaseHandler):
     """Uploads a new exploration."""
 
     @acl_decorators.can_upload_exploration
@@ -413,7 +419,7 @@ class UploadExploration(base.BaseHandler):
         yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if feconf.ALLOW_YAML_FILE_UPLOAD:
+        if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],
                 strip_audio_translations=True)

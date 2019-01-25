@@ -18,8 +18,12 @@
 
 oppia.directive('skillConceptCardEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
+  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_WORKED_EXAMPLE',
+  'COMPONENT_NAME_EXPLANATION', 'GenerateContentIdService',
   function(
-      UrlInterpolationService, SkillUpdateService, SkillEditorStateService) {
+      UrlInterpolationService, SkillUpdateService, SkillEditorStateService,
+      SubtitledHtmlObjectFactory, COMPONENT_NAME_WORKED_EXAMPLE,
+      COMPONENT_NAME_EXPLANATION, GenerateContentIdService) {
     return {
       restrict: 'E',
       scope: {},
@@ -27,26 +31,35 @@ oppia.directive('skillConceptCardEditor', [
         '/pages/skill_editor/editor_tab/' +
         'skill_concept_card_editor_directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal',
-        function($scope, $filter, $uibModal) {
+        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
+        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
-          $scope.bindableFieldsDict = {
-            displayedConceptCardExplanation:
-              $scope.skill.getConceptCard().getExplanation(),
-            displayedWorkedExamples:
-              $scope.skill.getConceptCard().getWorkedExamples()
+
+          var initBindableFieldsDict = function() {
+            $scope.bindableFieldsDict = {
+              displayedConceptCardExplanation:
+                $scope.skill.getConceptCard().getExplanation().getHtml(),
+              displayedWorkedExamples:
+                $scope.skill.getConceptCard().getWorkedExamples()
+            };
           };
+
           var explanationMemento = null;
           var workedExamplesMemento = null;
 
           $scope.isEditable = function() {
             return true;
           };
+
+          initBindableFieldsDict();
+          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+            initBindableFieldsDict();
+          });
 
           // When the page is scrolled so that the top of the page is above the
           // browser viewport, there are some bugs in the positioning of the
@@ -97,10 +110,12 @@ oppia.directive('skillConceptCardEditor', [
             $scope.conceptCardExplanationEditorIsShown = false;
             SkillUpdateService.setConceptCardExplanation(
               $scope.skill,
-              $scope.bindableFieldsDict.displayedConceptCardExplanation);
+              SubtitledHtmlObjectFactory.createDefault(
+                $scope.bindableFieldsDict.displayedConceptCardExplanation,
+                COMPONENT_NAME_EXPLANATION));
             explanationMemento = null;
             $scope.displayedConceptCardExplanation =
-              $scope.skill.getConceptCard().getExplanation();
+              $scope.skill.getConceptCard().getExplanation().getHtml();
           };
 
           $scope.deleteWorkedExample = function(index, evt) {
@@ -149,7 +164,7 @@ oppia.directive('skillConceptCardEditor', [
                   $scope.tmpWorkedExampleHtml = '';
                   $scope.saveWorkedExample = function() {
                     $uibModalInstance.close({
-                      workedExample: $scope.tmpWorkedExampleHtml
+                      workedExampleHtml: $scope.tmpWorkedExampleHtml
                     });
                   };
 
@@ -160,7 +175,12 @@ oppia.directive('skillConceptCardEditor', [
               ]
             }).result.then(function(result) {
               SkillUpdateService.addWorkedExample(
-                $scope.skill, result.workedExample);
+                $scope.skill, SubtitledHtmlObjectFactory.createDefault(
+                  result.workedExampleHtml,
+                  GenerateContentIdService.getNextId(
+                    $scope.skill.getConceptCard()
+                      .getContentIdsToAudioTranslations().getAllContentId(),
+                    COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
             });

@@ -14,6 +14,7 @@
 
 """Services for questions data model."""
 
+import copy
 import logging
 
 from core.domain import question_domain
@@ -23,6 +24,41 @@ import feconf
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
+
+
+def _migrate_state_schema(versioned_question_state):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the state structure based on the schema version of the input
+    state dictionary. If the current State schema changes, a new
+    conversion function must be added and some code appended to this function
+    to account for that new version.
+
+    Args:
+        versioned_question_state: dict. A dict with two keys:
+            state_schema_version: int. the state schema version for the
+                question.
+            state: The State domain object representing the question
+                state data.
+
+    Raises:
+        Exception: The given state_schema_version is invalid.
+    """
+    state_schema_version = versioned_question_state[
+        'state_schema_version']
+    if state_schema_version is None or state_schema_version < 1:
+        state_schema_version = 0
+
+    if not (25 <= state_schema_version
+            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v25-v%d state schemas at present.' %
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    while (state_schema_version <
+           feconf.CURRENT_STATE_SCHEMA_VERSION):
+        question_domain.Question.update_state_from_model(
+            versioned_question_state, state_schema_version)
+        state_schema_version += 1
 
 
 def _create_new_question(committer_id, question, commit_message):
@@ -138,7 +174,7 @@ def delete_question(
 
 
 def get_question_from_model(question_model):
-    """Returns domain object repersenting the given question model.
+    """Returns domain object representing the given question model.
 
     Args:
         question_model: QuestionModel. The question model loaded from the
@@ -147,12 +183,42 @@ def get_question_from_model(question_model):
     Returns:
         Question. The domain object representing the question model.
     """
+
+    # Ensure the original question model does not get altered.
+    versioned_question_state = {
+        'state_schema_version': question_model.question_state_schema_version,
+        'state': copy.deepcopy(
+            question_model.question_state_data)
+    }
+
+    # Migrate the question if it is not using the latest schema version.
+    if (question_model.question_state_schema_version !=
+            feconf.CURRENT_STATES_SCHEMA_VERSION):
+        _migrate_state_schema(versioned_question_state)
+
     return question_domain.Question(
         question_model.id,
-        state_domain.State.from_dict(question_model.question_state_data),
-        question_model.question_state_schema_version,
+        state_domain.State.from_dict(versioned_question_state['state']),
+        versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.created_on, question_model.last_updated)
+
+
+def get_question_skill_link_from_model(question_skill_link_model):
+    """Returns domain object representing the given question skill link model.
+
+    Args:
+        question_skill_link_model: QuestionSkillLinkModel. The question skill
+            link model loaded from the datastore.
+
+    Returns:
+        QuestionSkillLink. The domain object representing the question skill
+            link model.
+    """
+
+    return question_domain.QuestionSkillLink(
+        question_skill_link_model.question_id,
+        question_skill_link_model.skill_id)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -177,23 +243,43 @@ def get_question_by_id(question_id, strict=True):
 
 
 def get_question_skill_links_of_skill(skill_id):
-    """Returns a list of QuestionSkillLinkModels of
+    """Returns a list of QuestionSkillLinks of
     a particular skill ID.
 
     Args:
         skill_id: str. ID of the skill.
 
     Returns:
-        list(QuestionSkillLinkModel). The list of question skill link
+        list(QuestionSkillLink). The list of question skill link
         domain objects that are linked to the skill ID or an empty list
-         if the skill does not exist.
+        if the skill does not exist.
     """
 
-    question_skill_link_models = (
+    question_skill_links = [
+        get_question_skill_link_from_model(model) for model in
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
-            skill_id)
-    )
-    return question_skill_link_models
+            skill_id)]
+    return question_skill_links
+
+
+def get_question_skill_links_of_question(question_id):
+    """Returns a list of QuestionSkillLinks of
+    a particular question ID.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        list(QuestionSkillLink). The list of question skill link
+        domain objects that are linked to the question ID or an empty list
+        if the question does not exist.
+    """
+
+    question_skill_links = [
+        get_question_skill_link_from_model(model) for model in
+        question_models.QuestionSkillLinkModel.get_models_by_question_id(
+            question_id)]
+    return question_skill_links
 
 
 def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
@@ -204,17 +290,20 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
         curr_skill_id: str. ID of the current skill.
         new_skill_id: str. ID of the superseding skill.
     """
+    old_question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+            curr_skill_id))
     old_question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
-    new_question_skill_links = []
+    new_question_skill_link_models = []
     for question_skill_link in old_question_skill_links:
-        new_question_skill_links.append(
+        new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
                 question_skill_link.question_id, new_skill_id)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
-        old_question_skill_links)
+        old_question_skill_link_models)
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-        new_question_skill_links)
+        new_question_skill_link_models)
 
 
 def get_question_summaries_linked_to_skills(
@@ -316,9 +405,9 @@ def apply_change_list(question_id, change_list):
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
                     question.update_language_code(change.new_value)
-                elif (change.cmd ==
+                elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                    question.update_question_data(change.new_value)
+                    question.update_question_state_data(change.new_value)
 
         return question
 
@@ -441,7 +530,7 @@ def save_question_summary(question_summary):
 
 def get_question_summary_from_model(question_summary_model):
     """Returns a domain object for an Oppia question summary given a
-    questioin summary model.
+    question summary model.
 
     Args:
         question_summary_model: QuestionSummaryModel.

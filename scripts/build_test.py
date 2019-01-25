@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for scripts/build.py."""
+
+# pylint: disable=invalid-name
 import StringIO
 import collections
 import os
@@ -61,7 +64,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Tests _minify with an invalid filepath."""
         with self.assertRaises(subprocess.CalledProcessError) as called_process:
             build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # returncode is the exit status of the child process.
+        # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_minify_and_create_sourcemap(self):
@@ -69,7 +72,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaises(subprocess.CalledProcessError) as called_process:
             build._minify_and_create_sourcemap(
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # returncode is the exit status of the child process.
+        # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_ensure_files_exist(self):
@@ -121,8 +124,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self):
-        """Test _insert_hash returns correct filenames with provided hashes.
-        """
+        """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')
         self.assertEqual(
@@ -227,7 +229,7 @@ class BuildTests(test_utils.GenericTestBase):
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
-                msg="No white spaces detected in %s unexpectedly"
+                msg='No white spaces detected in %s unexpectedly'
                 % BASE_HTML_SOURCE_PATH)
             # Look for templates/pages/Base.js in source_base_file_content.
             self.assertIn(BASE_JS_RELATIVE_PATH, source_base_file_content)
@@ -421,7 +423,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test get_hashes_json_file_contents parses provided hash dict
         correctly to JSON format.
         """
-        # set constant to provide everything to frontend.
+        # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/file.js': '123456'}
             self.assertEqual(

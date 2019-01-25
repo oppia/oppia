@@ -27,6 +27,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJob domain."""
 
     def _get_training_job_from_dict(self, training_job_dict):
+        """Returns the ClassifierTrainingJob object after receiving the content
+        from the training_job_dict.
+        """
         training_job = classifier_domain.ClassifierTrainingJob(
             training_job_dict['job_id'],
             training_job_dict['algorithm_id'],
@@ -134,7 +137,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         # Verify validation error is raised when invalid state_name is provided.
         training_job_dict['next_scheduled_check_time'] = (
             datetime.datetime.strptime(
-                "2017-08-11 12:42:31", "%Y-%m-%d %H:%M:%S"))
+                '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'))
         training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -163,6 +166,9 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the TrainingJobExplorationMapping domain."""
 
     def _get_mapping_from_dict(self, mapping_dict):
+        """Returns the TrainingJobExplorationMapping object after receiving the
+        content from the mapping_dict.
+        """
         mapping = classifier_domain.TrainingJobExplorationMapping(
             mapping_dict['exp_id'],
             mapping_dict['exp_version'],

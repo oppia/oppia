@@ -35,6 +35,20 @@ import common  # pylint: disable=relative-import
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
+    """Checks that the new version name matches the expected pattern.
+
+    Args:
+        arg: str. The new version name.
+        pattern: RegularExpression. The pattern that release version should
+            match.
+
+    Raises:
+        argparse.ArgumentTypeError: The new version name does not match
+            the pattern.
+
+    Returns:
+        str. The new version name with correct pattern.
+    """
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
             'The format of "new_version" should be: x.x.x')
@@ -60,6 +74,18 @@ assert '.' not in NEW_APP_YAML_VERSION
 def _verify_target_branch_does_not_already_exist(remote_alias):
     """Checks that the new release branch doesn't already exist locally or
     remotely.
+
+    Args:
+        remote_alias: str. The alias that points to the remote oppia
+            repository. Example: When calling git remote -v, you get:
+            upstream    https://github.com/oppia/oppia.git (fetch),
+            where 'upstream' is the alias that points to the remote oppia
+            repository.
+
+    Raises:
+        Exception: The target branch name already exists locally.
+        Exception: The target branch name already exists on the remote
+            oppia repository.
     """
 
     git_branch_output = subprocess.check_output(['git', 'branch'])
@@ -78,6 +104,18 @@ def _verify_target_branch_does_not_already_exist(remote_alias):
 def _verify_target_version_is_consistent_with_latest_released_version():
     """Checks that the target version is consistent with the latest released
     version on GitHub.
+
+    Raises:
+        Exception: Failed to fetch latest release info from GitHub.
+        Exception: Could not parse version number of latest GitHub release.
+        AssertionError: The previous and the current major version are not the
+            same.
+        AssertionError: The current patch version is not equal to previous patch
+            version plus one.
+        AssertionError: The current patch version is greater or equal to 10.
+        AssertionError: The current minor version is not equal to previous
+            minor version plus one.
+        AssertionError: The current patch version is different than 0.
     """
     response = urllib.urlopen(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
@@ -108,6 +146,11 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
+    """Pushes the new release branch to Github.
+
+    Raises:
+         AssertionError: 'version: default' was not found in app.yaml.
+    """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.verify_local_repo_is_clean()

@@ -232,7 +232,8 @@ class BaseModel(ndb.Model):
 
 
 class BaseCommitLogEntryModel(BaseModel):
-    """Base Model for the models that store the log of commits to a construct.
+    """Base Model for the models that store the log of commits to a
+    construct.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
@@ -420,6 +421,7 @@ class VersionedModel(BaseModel):
     version = ndb.IntegerProperty(default=0)
 
     def _require_not_marked_deleted(self):
+        """Checks whether the model instance is deleted."""
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
@@ -428,6 +430,16 @@ class VersionedModel(BaseModel):
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
     def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+                with the the snapshot.
+        """
         self.populate(**snapshot_dict)
         return self
 

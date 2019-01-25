@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.rte_component_registry."""
+
 import inspect
 import os
 import pkgutil
@@ -44,7 +46,7 @@ _COMPONENT_CONFIG_SCHEMA = [
 
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
-    """Tests that all the default RTE comopnents are valid."""
+    """Tests that all the default RTE components are valid."""
 
     def _is_camel_cased(self, name):
         """Check whether a name is in CamelCase."""
@@ -52,9 +54,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
+        return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
     def _validate_customization_arg_specs(self, customization_arg_specs):
+        """Validates the given customization arg specs."""
         for ca_spec in customization_arg_specs:
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value']))

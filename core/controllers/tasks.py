@@ -16,12 +16,12 @@
 
 import json
 
-from constants import constants
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import suggestion_services
 from core.platform import models
 
 (job_models, email_models) = models.Registry.import_models(
@@ -80,7 +80,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        suggestion = feedback_services.get_suggestion(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
 
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
@@ -100,12 +100,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
-        if constants.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                user_id, reference_dict['thread_id'])
-        else:
-            model = email_models.FeedbackEmailReplyToIdModel.get(
-                user_id, reference_dict['thread_id'])
+        model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+            user_id, reference_dict['thread_id'])
         reply_to_id = model.reply_to_id
 
         subject = 'New Oppia message in "%s"' % thread.subject

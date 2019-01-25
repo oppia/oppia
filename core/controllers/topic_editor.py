@@ -16,6 +16,7 @@
 are created.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import dependency_registry
@@ -41,12 +42,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
     display in topic editor page.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
@@ -71,7 +73,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
@@ -96,11 +98,12 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     """Manages the creation of a question and receiving of all question
     summaries for display in topic editor page.
     """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -110,7 +113,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
 
         question_summaries, next_start_cursor = (
             question_services.get_question_summaries_linked_to_skills(
-                feconf.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
         )
         question_summary_dicts = [
             summary.to_dict() for summary in question_summaries]
@@ -131,7 +134,7 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -158,7 +161,6 @@ class TopicEditorPage(base.BaseHandler):
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
-            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -176,6 +178,8 @@ class TopicEditorPage(base.BaseHandler):
 class EditableSubtopicPageDataHandler(base.BaseHandler):
     """The data handler for subtopic pages."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def _require_valid_version(
             self, version_from_payload, subtopic_page_version):
         """Check that the payload version matches the given subtopic page
@@ -191,11 +195,11 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (subtopic_page_version, version_from_payload))
 
-    @acl_decorators.can_edit_subtopic_page
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -217,6 +221,8 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 class EditableTopicDataHandler(base.BaseHandler):
     """A data handler for topics which supports writing."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def _require_valid_version(self, version_from_payload, topic_version):
         """Check that the payload version matches the given topic
         version.
@@ -234,7 +240,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -266,7 +272,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -312,7 +318,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -327,6 +333,8 @@ class EditableTopicDataHandler(base.BaseHandler):
 
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):

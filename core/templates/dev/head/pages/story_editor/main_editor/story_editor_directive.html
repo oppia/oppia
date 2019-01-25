@@ -1,24 +1,17 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="story-title">
-      <span ng-if="!storyTitleEditorIsShown" ng-click="openStoryTitleEditor()"
-            class="oppia-editable-section">
-        <strong class="form-heading"><[story.getTitle()]></strong>
-        <i class="material-icons oppia-editor-edit-icon"
-           title="Edit Story Title">&#xE254;
-        </i>
-      </span>
-      <span ng-if="storyTitleEditorIsShown">
-        <form class="form-horizontal" role="form" ng-submit="updateStoryTitle(editableTitle)">
-          <input type="text" ng-model="editableTitle">
-          <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="closeStoryTitleEditor()">Cancel</button>
-        </form>
+      <label for="storyTitle" class="form-heading">Story Title</label>
+      <input id="storyTitle" type="text" class="form-control"
+             ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
+             placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
+        <em>Please use at most 20 characters for the story title.</em>
       </span>
     </div>
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
-      <label for="storyDescription" class="form-heading">Description</label>
+      <label for="storyDescription" class="form-heading">Story Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
@@ -31,48 +24,61 @@
     </div>
 
     <div class="story-notes">
-      <label for="storyNotes" class="form-heading">Notes</label>
-      <div ng-if="!notesEditorIsShown" class="preview">
-        <angular-html-bind html-data="notes">
-        </angular-html-bind>
-        <button type="button"
-                class="btn btn-default save-button"
-                ng-click="closePreviewNotes(notes)">
-          Edit
-        </button>
-      </div>
-      <div ng-if="notesEditorIsShown" class="oppia-editor-card-body">
-        <schema-based-editor schema="NOTES_SCHEMA"
-                             local-value="editableNotes">
-        </schema-based-editor>
-        <button type="button"
-                class="btn btn-default save-button"
-                ng-click="openPreviewNotes(editableNotes)">
-          Preview
-        </button>
-        <button type="button"
-                class="btn btn-success save-button"
-                ng-disabled="!editableNotes"
-                ng-click="updateNotes(editableNotes)">
-          Save
-        </button>
+      <div class="oppia-editor-card-body">
+        <label class="form-heading">Notes</label>
+        <div ng-if="!notesEditorIsShown" style="padding-top: 0.5em; padding-bottom: 1em;">
+          <div ng-class="oppia-editable-section"
+               ng-click="openNotesEditor()">
+            <i class="material-icons oppia-editor-edit-icon pull-right"
+               title="Edit Story Notes">&#xE254;
+            </i>
+            <div class="oppia-state-content-display oppia-transition-200"
+                 ng-class="oppia-prevent-selection"
+                 title="Story notes">
+              <span class="oppia-placeholder" ng-show="editableNotes === ''">
+                  Add notes about the story to help other contributors.
+              </span>
+              <angular-html-bind html-data="editableNotes">
+              </angular-html-bind>
+            </div>
+            <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+            <div class="oppia-editable-section-mask">
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="notesEditorIsShown">
+          <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
+          </schema-based-editor>
+          <div class="editor-buttons">
+            <button type="button"
+                    class="btn btn-success oppia-save-state-item-button pull-right"
+                    ng-disabled="!editableNotes"
+                    ng-click="updateNotes(editableNotes)">
+              Save
+            </button>
+            <button type="button" class="btn btn-default pull-right" ng-click="closeNotesEditor()">Cancel</button>
+            <div style="clear: both;"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="story-nodes-title">
-      <label for="storyNodes" class="form-heading">Story Nodes</label>
-      <br>
-      Click on the check box to mark it as initial node
+      <label for="storyNodes" class="form-heading">Chapters</label>
+      <span ng-if="nodes.length > 0"> <i> (Click on check box to mark it as the first chapter.)</i> </span>
     </div>
-    <div class="story-node-editor">
-      <br>
+    <div class="story-node-editor" ng-if="nodes.length > 0">
       <div class="story-nodes-container">
         <div ng-repeat="node in nodes">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <[node.getId()]>
+              <[node.getTitle()]>
             </div>
+            <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
+              <i>This chapter is not reachable from any other chapter</i>
+            </span>
             <span class="story-editor-initial-node">
               <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
                 <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
@@ -99,6 +105,16 @@
         </div>
       </div>
     </div>
+    <div ng-if="nodes.length === 0" style="text-align: center;">
+      <p class="no-chapters-message" style="padding-top: 6px;">
+        This story has no chapters.
+      </p>
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+              style="color: white; text-decoration: none;"
+              ng-click="createNode()">
+        Create Chapter
+      </button>
+    </div>
   </md-card>
 </div>
 
@@ -107,6 +123,12 @@
     margin-left: 10%;
     margin-top: -1%;
     width: 80%;
+  }
+
+  story-editor .no-chapters-message {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
   }
 
   story-editor .story-editor-node {
@@ -121,6 +143,7 @@
     position: relative;
     text-align: center;
     width: 15vw;
+    white-space: normal;
   }
 
   story-editor .selected-node {
@@ -179,7 +202,6 @@
 
   story-editor .story-notes {
     margin-top: 1.5%;
-    height: auto;
     margin-bottom: 2%;
   }
 

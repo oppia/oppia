@@ -25,19 +25,20 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService',
+        'SkillRightsBackendApiService', 'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService,
+            SkillRightsBackendApiService, SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillRights = (
             SkillEditorStateService.getSkillRights());
-
+          $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
+          $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
           $scope.validationIssues = [];
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
@@ -46,8 +47,39 @@ oppia.directive('skillEditorNavbar', [
             return UndoRedoService.getChangeCount();
           };
 
+          $scope.selectQuestionsTab = function() {
+            // This check is needed because if a skill has unsaved changes to
+            // misconceptions, then these will be reflected in the questions
+            // created at that time, but if page is refreshed/changes are
+            // discarded, the misconceptions won't be saved, but there will be
+            // some questions with these now non-existent misconceptions.
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill_editor/editor_tab/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              SkillEditorRoutingService.navigateToQuestionsTab();
+            }
+          };
+
           var _validateSkill = function() {
             $scope.validationIssues = $scope.skill.getValidationIssues();
+          };
+
+          $scope.discardChanges = function() {
+            UndoRedoService.clearChanges();
+            SkillEditorStateService.loadSkill($scope.skill.getId());
           };
 
           $scope.getWarningsCount = function() {
@@ -79,6 +111,7 @@ oppia.directive('skillEditorNavbar', [
                 $scope.skillRights.setPublic();
                 SkillEditorStateService.setSkillRights(
                   $scope.skillRights);
+                AlertsService.addSuccessMessage('Skill Published.');
               });
           };
 
@@ -103,6 +136,7 @@ oppia.directive('skillEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
+              AlertsService.addSuccessMessage('Changes Saved.');
             });
           };
 

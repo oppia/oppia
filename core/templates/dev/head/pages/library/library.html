@@ -4,7 +4,7 @@
   {% if page_mode in ['group', 'search'] %}
     Find explorations to learn from - Oppia
   {% else %}
-    I18N_LIBRARY_PAGE_TITLE
+    Exploration Library - Oppia
   {% endif %}
 {% endblock maintitle %}
 
@@ -81,7 +81,7 @@
           <img ng-src="<[bannerImageFileUrl]>" align="center"
                width="100%" alt="">
           <div style="text-align: center; width: 100%;">
-            <h1 class="oppia-library-h1" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
+            <h1 class="oppia-library-h1 protractor-test-library-main-header" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
             <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
           </div>
 
@@ -95,7 +95,7 @@
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
-            <div class="row oppia-library-group-header-container">
+            <div class="oppia-library-group-header-container">
               <h2 ng-class="{'active': activeGroupIndex === $index}" class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="showFullResultsPage(group.categories, group.full_results_url)" tabindex="0">
                   <span translate="<[group.header_i18n_id]>"></span>
@@ -171,7 +171,9 @@
               </md-button>
               <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
 
-              <div class="oppia-library-carousel">
+              <div class="oppia-library-carousel"
+                   ng-swipe-right="decrementLeftmostCardIndex($index)"
+                   ng-swipe-left="incrementLeftmostCardIndex($index)">
                 <div class="oppia-library-carousel-tiles">
                   <collection-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'collection'"
                                            collection-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
@@ -240,6 +242,7 @@
     }
     .oppia-library-group-header-container {
       max-width: 928px;
+      margin: 0 -15px 0 0;
       min-width: 315px;
       width: calc(100% - 120px);
       width: -moz-calc(100% - 120px);
@@ -273,6 +276,11 @@
         width: -moz-calc(80% - 120px);
         width: -o-calc(80% - 120px);
         width: calc(80% - 120px);
+      }
+    }
+    @media(max-width: 390px) {
+      .oppia-library-group-header {
+        margin-left: 11.25%;
       }
     }
     .oppia-library-group-header a, .oppia-library-group-header span {
@@ -357,7 +365,9 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/templates/dev/head/services/NavigationService.js"></script>
   <script src="/templates/dev/head/services/SearchService.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
   <script src="/templates/dev/head/components/RatingComputationService.js"></script>
   <script src="/templates/dev/head/domain/learner_dashboard/LearnerDashboardIdsBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.js"></script>

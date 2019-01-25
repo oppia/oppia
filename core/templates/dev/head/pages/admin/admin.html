@@ -8,10 +8,7 @@
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
-        USERNAME: JSON.parse('{{username|js_string}}'),
         USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
-        IS_MODERATOR: JSON.parse('{{is_moderator|js_string}}'),
-        IS_SUPER_ADMIN: JSON.parse('{{is_super_admin|js_string}}'),
         LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
         DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
@@ -25,8 +22,8 @@
         RECENT_JOB_DATA: JSON.parse('{{recent_job_data|js_string}}'),
         UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
         VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
+        TOPIC_SUMMARIES: JSON.parse('{{topic_summaries|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
       }
     </script>
@@ -35,10 +32,7 @@
   </head>
 
   <body>
-    <admin-navbar username="username" user-email="userEmail"
-                  is-moderator="isModerator" is-super-admin="isSuperAdmin"
-                  logout-url="logoutUrl">
-    </admin-navbar>
+    <admin-navbar user-email="userEmail" logout-url="logoutUrl"></admin-navbar>
 
     <div align="center"
          ng-if="statusMessage"
@@ -127,6 +121,7 @@
     <script src="/templates/dev/head/expressions/ExpressionSyntaxTreeService.js"></script>
     <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>
     <script src="/templates/dev/head/expressions/ExpressionParserService.js"></script>
+    <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
     <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
 
     {% include 'components/rich_text_components.html' %}

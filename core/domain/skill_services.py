@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on skills.
-"""
+"""Commands that can be used to operate on skills."""
 
 import copy
 import logging
@@ -25,8 +24,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(skill_models, user_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.user])
+(skill_models, user_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -109,17 +108,22 @@ def _get_skill_memcache_key(skill_id, version=None):
         return 'skill:%s' % skill_id
 
 
-def get_skill_from_model(skill_model, run_conversion=True):
+def get_merged_skill_ids():
+    """Returns the skill IDs of skills that have been merged.
+
+    Returns:
+        list(str). List of skill IDs of merged skills.
+    """
+    return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
+
+
+def get_skill_from_model(skill_model):
     """Returns a skill domain object given a skill model loaded
     from the datastore.
 
     Args:
         skill_model: SkillModel. The skill model loaded from the
             datastore.
-        run_conversion: bool. If true, the the skill's schema version will
-            be checked against the current schema version. If they do not match,
-            the skill will be automatically updated to the latest schema
-            version.
 
     Returns:
         skill. A Skill domain object corresponding to the given
@@ -138,11 +142,11 @@ def get_skill_from_model(skill_model, run_conversion=True):
     }
 
     # Migrate the skill if it is not using the latest schema version.
-    if (run_conversion and skill_model.skill_contents_schema_version !=
+    if (skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
 
-    if (run_conversion and skill_model.misconceptions_schema_version !=
+    if (skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
@@ -190,6 +194,26 @@ def get_multi_skill_summaries(skill_ids):
         get_skill_summary_from_model(skill_summary_model)
         for skill_summary_model in skill_summaries_models]
     return skill_summaries
+
+
+def get_multi_skills(skill_ids):
+    """Returns a list of skills matching the skill IDs provided.
+
+    Args:
+        skill_ids: list(str). List of skill IDs to get skills for.
+
+    Returns:
+        list(Skill). The list of skills matching the provided IDs.
+    """
+    local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    for skill_id, skill_model in zip(skill_ids, local_skill_models):
+        if skill_model is None:
+            raise Exception('No skill exists for ID %s' % skill_id)
+    skills = [
+        get_skill_from_model(skill_model)
+        for skill_model in local_skill_models
+        if skill_model is not None]
+    return skills
 
 
 def get_skill_summary_from_model(skill_summary_model):
@@ -507,14 +531,14 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     """Updates a skill. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - skill_id: str. The skill id.
-    - change_list: list(SkillChange). These changes are applied in sequence to
-        produce the resulting skill.
-    - commit_message: str or None. A description of changes made to the
-        skill. For published skills, this must be present; for
-        unpublished skills, it may be equal to None.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        skill_id: str. The skill id.
+        change_list: list(SkillChange). These changes are applied in sequence to
+            produce the resulting skill.
+        commit_message: str or None. A description of changes made to the
+            skill. For published skills, this must be present; for
+            unpublished skills, it may be equal to None.
 
     Raises:
         ValueError: No commit message was provided.
@@ -845,3 +869,18 @@ def get_multi_skill_mastery(user_id, skill_ids):
         degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
 
     return degrees_of_mastery
+
+
+def skill_has_associated_questions(skill_id):
+    """Returns whether or not any question has this skill attached.
+
+    Args:
+        skill_id: str. The skill ID of the user.
+
+    Returns:
+        bool. Whether any question has this skill attached.
+    """
+    question_ids = (
+        question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
+            skill_id))
+    return len(question_ids) > 0

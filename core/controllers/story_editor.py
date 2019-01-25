@@ -14,6 +14,7 @@
 
 """Controllers for the story editor."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_domain
@@ -31,7 +32,7 @@ class StoryEditorPage(base.BaseHandler):
     def get(self, topic_id, story_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         story_domain.Story.require_valid_story_id(story_id)
@@ -48,7 +49,6 @@ class StoryEditorPage(base.BaseHandler):
         self.values.update({
             'story_id': story.id,
             'story_title': story.title,
-            'nav_mode': feconf.NAV_MODE_STORY_EDITOR
         })
 
         self.render_template(
@@ -57,6 +57,8 @@ class StoryEditorPage(base.BaseHandler):
 
 class EditableStoryDataHandler(base.BaseHandler):
     """A data handler for stories which support writing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _require_valid_version(self, version_from_payload, story_version):
         """Check that the payload version matches the given story
@@ -75,7 +77,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, topic_id, story_id):
         """Populates the data on the individual story page."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         story_domain.Story.require_valid_story_id(story_id)
@@ -90,7 +92,8 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'story': story.to_dict()
+            'story': story.to_dict(),
+            'topic_name': topic.name
         })
 
         self.render_json(self.values)
@@ -98,7 +101,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def put(self, topic_id, story_id):
         """Updates properties of the given story."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         story_domain.Story.require_valid_story_id(story_id)
@@ -137,7 +140,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_story
     def delete(self, topic_id, story_id):
         """Handles Delete requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         story_domain.Story.require_valid_story_id(story_id)

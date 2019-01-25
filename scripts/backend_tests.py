@@ -249,7 +249,17 @@ def main():
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     if parsed_args.test_target:
-        all_test_targets = [parsed_args.test_target]
+        if '_test' in parsed_args.test_target:
+            all_test_targets = [parsed_args.test_target]
+        else:
+            print ''
+            print '---------------------------------------------------------'
+            print 'WARNING : test_target flag should point to the test file.'
+            print '---------------------------------------------------------'
+            print ''
+            time.sleep(3)
+            print 'Redirecting to its corresponding test file...'
+            all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
@@ -316,9 +326,10 @@ def main():
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
+                total_errors += 1
                 print ''
                 print '------------------------------------------------------'
-                print '    WARNING: FAILED TO RUN TESTS.'
+                print '    WARNING: FAILED TO RUN %s' % spec.test_target
                 print ''
                 print '    This is most likely due to an import error.'
                 print '------------------------------------------------------'

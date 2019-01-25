@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.exp_services."""
+
 import StringIO
 import copy
 import datetime
 import os
 import zipfile
 
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -46,6 +49,15 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def _count_at_least_editable_exploration_summaries(user_id):
+    """Counts exp summaries that are at least editable by the given user.
+
+    Args:
+        user_id: unicode. The id of the given user.
+
+    Returns:
+        int. The number of exploration summaries that are at least editable
+            by the given user.
+    """
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
@@ -84,6 +96,94 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+
+class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
+    """Test that classifier models are correctly mapped when an exploration
+    is reverted.
+    """
+
+    def test_reverting_an_exploration_maintains_classifier_models(self):
+        """Test that when exploration is reverted to previous version
+        it maintains appropriate classifier models mapping.
+        """
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id, title='Bridges in England',
+                category='Architecture', language_code='en')
+
+        interaction_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 'abc'},
+            }],
+            'outcome': {
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Try again'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': ['answer1', 'answer2', 'answer3'],
+            'tagged_misconception_id': None
+        }]
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
+            'new_value': {
+                'content': {},
+                'feedback_1': {},
+                'default_outcome': {}
+            }
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(job)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'A new title'
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+                    exp = exp_services.get_exploration_by_id(self.EXP_ID)
+                    # Revert exploration to previous version.
+                    exp_services.revert_exploration(
+                        self.owner_id, self.EXP_ID, exp.version,
+                        exp.version - 1)
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(new_job)
+        self.assertEqual(job.job_id, new_job.job_id)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -193,6 +293,17 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
+        """Creates search query from list of arguments.
+
+        Args:
+            terms: list(str). A list of terms to be added in the query.
+            categories: list(str). A list of categories to be added in the
+                query.
+            languages: list(str). A list of languages to be added in the query.
+
+        Returns:
+            str. A search query string.
+        """
         query = ' '.join(terms)
         if categories:
             query += ' category=(' + ' OR '.join([
@@ -602,7 +713,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 })], 'Did migration.')
 
 
-class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
+class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
@@ -799,7 +910,8 @@ title: Title
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
-        self.assertEqual(fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
+        self.assertEqual(
+            fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
     def test_can_load_yaml_with_audio_translations(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -1110,15 +1222,19 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(
                 'exploration/%s' % self.EXPLORATION_ID))
-        self.assertEqual(fs.isfile(self.FILENAME), False)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), False)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), False)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         exp_services.save_original_and_compressed_versions_of_image(
             self.USER, self.FILENAME, self.EXPLORATION_ID,
             original_image_content)
-        self.assertEqual(fs.isfile(self.FILENAME), True)
-        self.assertEqual(fs.isfile(self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(fs.isfile(self.MICRO_IMAGE_FILENAME), True)
+        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
+        self.assertEqual(
+            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
 
 
 # pylint: disable=protected-access
@@ -2454,6 +2570,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         # puts to the event log are asynchronous.
         @transaction_services.toplevel_wrapper
         def populate_datastore():
+            """Populates the database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(
                 self.EXP_ID_1, self.albert_id)
 
@@ -2495,7 +2612,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        #TODO(frederikcreemers@gmail.com) test max_age here.
+        # TODO(frederikcreemers@gmail.com) test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
@@ -2680,6 +2797,16 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual([albert_id], exploration_summary.contributor_ids)
 
     def _check_contributors_summary(self, exp_id, expected):
+        """Check if contributors summary of the given exp is same as expected.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            expected: dict(unicode, int). Expected summary.
+
+        Raises:
+            AssertionError: Contributors summary of the given exp is not same
+                as expected.
+        """
         contributors_summary = exp_services.get_exploration_summary_by_id(
             exp_id).contributors_summary
         self.assertEqual(expected, contributors_summary)
@@ -2824,7 +2951,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2868,7 +2995,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             )
         }
 
-        # check actual summaries equal expected summaries.
+        # Check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -3348,7 +3475,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
 
-class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
+class GetExplorationAndExplorationRightsTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_and_exploration_rights_object(self):
         exploration_id = self.EXP_ID
@@ -3436,13 +3563,13 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.2 not found"):
+            'Entity for class StateIdMappingModel with id eid.2 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version)
 
         with self.assertRaisesRegexp(
             Exception,
-            "Entity for class StateIdMappingModel with id eid.1 not found"):
+            'Entity for class StateIdMappingModel with id eid.1 not found'):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version - 1)
 

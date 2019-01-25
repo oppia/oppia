@@ -17,6 +17,7 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import inspect
 import json
 import os
 import re
@@ -44,17 +45,17 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
-class BaseHandlerTest(test_utils.GenericTestBase):
+class BaseHandlerTests(test_utils.GenericTestBase):
 
-    TEST_LEARNER_EMAIL = "test.learner@example.com"
-    TEST_LEARNER_USERNAME = "testlearneruser"
-    TEST_CREATOR_EMAIL = "test.creator@example.com"
-    TEST_CREATOR_USERNAME = "testcreatoruser"
-    TEST_EDITOR_EMAIL = "test.editor@example.com"
-    TEST_EDITOR_USERNAME = "testeditoruser"
+    TEST_LEARNER_EMAIL = 'test.learner@example.com'
+    TEST_LEARNER_USERNAME = 'testlearneruser'
+    TEST_CREATOR_EMAIL = 'test.creator@example.com'
+    TEST_CREATOR_USERNAME = 'testcreatoruser'
+    TEST_EDITOR_EMAIL = 'test.editor@example.com'
+    TEST_EDITOR_USERNAME = 'testeditoruser'
 
     def setUp(self):
-        super(BaseHandlerTest, self).setUp()
+        super(BaseHandlerTests, self).setUp()
         self.signup('user@example.com', 'user')
 
         # Create a user to test redirect behavior for the learner.
@@ -71,17 +72,13 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
-        with self.swap(feconf, 'DEV_MODE', True):
-            response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'true\')',
-                          response.body)
+        with self.swap(constants, 'DEV_MODE', True):
+            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
-        with self.swap(feconf, 'DEV_MODE', False):
-            response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('DEV_MODE: JSON.parse(\'false\')',
-                          response.body)
+        with self.swap(constants, 'DEV_MODE', False):
+            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
                           response.body)
 
@@ -98,9 +95,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             url = re.sub('<([^/^:]+)>', 'abc123', url)
 
             # Some of these will 404 or 302. This is expected.
-            response = self.testapp.get(url, expect_errors=True)
-            self.assertIn(
-                response.status_int, [200, 302, 400, 401, 404], msg=url)
+            self.get_response_without_checking_for_errors(
+                url, [200, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -110,25 +106,22 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
 
-        response = self.testapp.get('/library/extra', expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.get_html_response(
+            '/library/extra', expected_status_int=404)
 
-        response = self.testapp.get('/library/data/extra', expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.get_html_response(
+            '/library/data/extra', expected_status_int=404)
 
-        response = self.testapp.post(
-            '/library/extra', params={}, expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.post_json(
+            '/library/extra', payload={}, expected_status_int=404)
 
-        response = self.testapp.put(
-            '/library/extra', params={}, expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.put_json(
+            '/library/extra', payload={}, expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
 
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
+        response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('splash', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_learners(self):
@@ -137,15 +130,14 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
+        response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
             self):
         self.login(self.TEST_LEARNER_EMAIL)
-        # delete the UserContributionModel.
+        # Delete the UserContributionModel.
         user_id = user_services.get_user_id_from_username(
             self.TEST_LEARNER_USERNAME)
         user_contribution_model = user_models.UserContributionsModel.get(
@@ -155,8 +147,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since by default the homepage for all logged in users is the
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
+        response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
@@ -169,7 +160,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
-        response = self.testapp.get('/')
+        response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('creator_dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
@@ -199,13 +190,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
+        response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
 
-class CsrfTokenManagerTest(test_utils.GenericTestBase):
+class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
     def test_create_and_validate_token(self):
         uid = 'user_id'
@@ -230,12 +220,12 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         orig_time = 100.0
         current_time = orig_time
 
-        def _get_current_time(unused_cls):
+        def mock_get_current_time(unused_cls):
             return current_time
 
         with self.swap(
             base.CsrfTokenManager, '_get_current_time',
-            types.MethodType(_get_current_time, base.CsrfTokenManager)):
+            types.MethodType(mock_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
             token = base.CsrfTokenManager().create_csrf_token('uid')
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
@@ -254,7 +244,7 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
                 'uid', token))
 
 
-class EscapingTest(test_utils.GenericTestBase):
+class EscapingTests(test_utils.GenericTestBase):
 
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
@@ -268,7 +258,7 @@ class EscapingTest(test_utils.GenericTestBase):
             self.render_json({'big_value': u'\n<script>马={{'})
 
     def setUp(self):
-        super(EscapingTest, self).setUp()
+        super(EscapingTests, self).setUp()
 
         # Update a config property that shows in all pages.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -283,8 +273,7 @@ class EscapingTest(test_utils.GenericTestBase):
     def test_jinja_autoescaping(self):
         form_url = '<[angular_tag]> x{{51 * 3}}y'
         with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
-            response = self.testapp.get('/fake')
-            self.assertEqual(response.status_int, 200)
+            response = self.get_html_response('/fake')
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
             self.assertNotIn('<[angular_tag]>', response.body)
@@ -302,7 +291,37 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertNotIn('马', response.body)
 
 
-class LogoutPageTest(test_utils.GenericTestBase):
+class RenderDownloadableTests(test_utils.GenericTestBase):
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler that subclasses BaseHandler and serves a response
+        that is of a 'downloadable' type.
+        """
+        def get(self):
+            """Handles GET requests."""
+            file_contents = 'example'
+            self.render_downloadable_file(
+                file_contents, 'example.pdf', 'text/plain')
+
+    def setUp(self):
+        super(RenderDownloadableTests, self).setUp()
+
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_downloadable(self):
+        response = self.testapp.get('/mock')
+        self.assertEqual(
+            response.content_disposition,
+            'attachment; filename=example.pdf')
+        self.assertEqual(response.body, 'example')
+        self.assertEqual(response.content_type, 'text/plain')
+
+
+class LogoutPageTests(test_utils.GenericTestBase):
 
     def test_logout_page(self):
         """Tests for logout handler."""
@@ -310,10 +329,10 @@ class LogoutPageTest(test_utils.GenericTestBase):
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
-        response = self.testapp.get(current_page)
-        self.assertEqual(response.status_int, 200)
-        response = self.testapp.get(current_user_services.create_logout_url(
-            current_page))
+        response = self.get_html_response(current_page)
+        response = self.get_html_response(
+            current_user_services.create_logout_url(
+                current_page), expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(
@@ -321,15 +340,22 @@ class LogoutPageTest(test_utils.GenericTestBase):
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
 
 
-class I18nDictsTest(test_utils.GenericTestBase):
+class I18nDictsTests(test_utils.GenericTestBase):
+    """Tests for I18n dicts."""
 
     def _extract_keys_from_json_file(self, filename):
+        """Returns the extracted keys from the json file corresponding to the
+        given filename.
+        """
         return sorted(json.loads(utils.get_file_contents(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n', filename)
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
+        """Returns the extracted keys from the html file corresponding to the
+        given filename.
+        """
         # The \b is added at the start to ensure that keys ending with
         # '_I18N_IDS' do not get matched. Instances of such keys can be found
         # in learner_dashboard.html.
@@ -340,6 +366,17 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def _get_tags(self, input_string, key, filename):
         """Returns the parts in the input string that lie within <...>
         characters.
+
+        Args:
+            input_string: str. The string to extract tags from.
+            key: str. The key for the key-value pair in the dict where the
+                string comes from (the string is typically the value in this
+                key-value pair). This is used only for logging errors.
+            filename: str. The filename which the string comes from. This is
+                used only for logging errors.
+
+        Returns:
+            list(str). A list of all tags contained in the input string.
         """
         result = []
         bracket_level = 0
@@ -485,12 +522,14 @@ class I18nDictsTest(test_utils.GenericTestBase):
         self.assertEqual(sorted(mismatches), [])
 
 
-class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
+class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
+        """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         def get(self):
+            """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
     def test_error_response_for_get_request_of_type_json_has_json_format(self):
@@ -504,11 +543,11 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
             self.testapp = webtest.TestApp(app)
 
             response = self.get_json(
-                '/fake', expect_errors=True, expected_status_int=500)
+                '/fake', expected_status_int=500)
             self.assertTrue(isinstance(response, dict))
 
 
-class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
+class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     """Tests that all methods in handlers have authentication decorators
     applied on them.
     """
@@ -517,7 +556,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
         handlers_checked = []
 
         for route in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
@@ -563,7 +602,7 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
             self.assertTrue(handler_is_decorated)
 
 
-class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
+class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
     class MockHandler(base.BaseHandler):
 
@@ -593,3 +632,68 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
                 'param2=value%20with%20%26%20%2B%20-%20/&'
                 'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
             self.assertDictContainsSubset(params, result)
+
+
+class ControllerClassNameTests(test_utils.GenericTestBase):
+
+    def test_controller_class_names(self):
+        """This function checks that all controller class names end with
+        either 'Handler', 'Page' or 'FileDownloader'.
+        """
+        # A mapping of returned handler types to expected name endings.
+        handler_type_to_name_endings_dict = {
+            feconf.HANDLER_TYPE_HTML: 'Page',
+            feconf.HANDLER_TYPE_JSON: 'Handler',
+            feconf.HANDLER_TYPE_DOWNLOADABLE: 'FileDownloader',
+        }
+        num_handlers_checked = 0
+        for url in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to pick only those which have
+            # a RedirectRoute associated with it.
+            if isinstance(url, main.routes.RedirectRoute):
+                clazz = url.handler
+                num_handlers_checked += 1
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it is a subclass of 'BaseHandler'.
+                if 'BaseHandler' in all_base_classes:
+                    class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
+                    # Check that any class with a get handler has a
+                    # GET_HANDLER_ERROR_RETURN_TYPE that's one of
+                    # the allowed values.
+                    if 'get' in clazz.__dict__.keys():
+                        self.assertIn(
+                            class_return_type,
+                            handler_type_to_name_endings_dict)
+                    class_name = clazz.__name__
+                    file_name = inspect.getfile(clazz)
+                    line_num = inspect.getsourcelines(clazz)[1]
+                    allowed_class_ending = handler_type_to_name_endings_dict[
+                        class_return_type]
+                    # Check that the name of the class ends with
+                    # the proper word if it has a get function.
+                    if 'get' in clazz.__dict__.keys():
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'%s\'' % allowed_class_ending)
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(
+                            class_name.endswith(allowed_class_ending),
+                            msg=error_message)
+
+                    # Check that the name of the class ends with 'Handler'
+                    # if it does not has a get function.
+                    else:
+                        message = (
+                            'Please ensure that the name of this class '
+                            'ends with \'Handler\'')
+                        error_message = (
+                            '%s --> Line %s: %s'
+                            % (file_name, line_num, message))
+                        self.assertTrue(class_name.endswith('Handler'),
+                                        msg=error_message)
+
+        self.assertGreater(num_handlers_checked, 150)

@@ -20,29 +20,17 @@ import copy
 import datetime
 import os
 
+from constants import constants  # pylint: disable=relative-import
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform for the storage backend. This is used in the model-switching
-# code in core/platform.
-PLATFORM = 'gae'
-
-# This variable is for serving minified resources
-# when set to True. It reflects we are emulating running Oppia in a production
-# environment.
-FORCE_PROD_MODE = False
-
-# Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment,
-# or if you want to use minified resources in the development environment.
-
-if PLATFORM == 'gae':
-    DEV_MODE = (
-        (not os.environ.get('SERVER_SOFTWARE') or
-         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
-        not FORCE_PROD_MODE)
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
+# When DEV_MODE is true check that we are running in development environment.
+# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
+# need for an explicit check.
+if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
+        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
+    raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -51,7 +39,7 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not DEV_MODE else '')
+    'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -66,7 +54,7 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not DEV_MODE:
+if not constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
@@ -219,6 +207,8 @@ DEFAULT_INIT_STATE_NAME = 'Introduction'
 DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 # Default content id for the interaction's default outcome.
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content id for the explanation in the concept card of a skill.
+DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Default content_ids_to_audio_translations dict for a default state template.
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
@@ -378,9 +368,6 @@ ENABLE_PROMO_BAR = True
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -405,9 +392,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # To prevent recording scores for users until details like whether to score
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
-
-# No. of questions to be displayed on a page in the topic editor.
-NUM_QUESTIONS_PER_PAGE = 10
 
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
@@ -614,9 +598,6 @@ EMBEDDED_GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
-# Whether to allow YAML file uploads.
-ALLOW_YAML_FILE_UPLOAD = False
-
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
@@ -644,9 +625,15 @@ COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
+CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
+CUSTOM_PARTNERS_LANDING_PAGE_URL = '/partners'
+CUSTOM_TEACHERS_LANDING_PAGE_URL = '/teachers'
+CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
@@ -662,9 +649,6 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GENERAL_SUGGESTION_ACTION_URL_PREFIX = '/generalsuggestionactionhandler'
-GENERAL_SUGGESTION_LIST_URL_PREFIX = '/generalsuggestionlisthandler'
-GENERAL_SUGGESTION_URL_PREFIX = '/generalsuggestionhandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -678,6 +662,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
+MERGE_SKILL_URL = '/merge_skill'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -697,6 +682,7 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
+SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
@@ -721,25 +707,6 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-
-NAV_MODE_ABOUT = 'about'
-NAV_MODE_GET_STARTED = 'get_started'
-NAV_MODE_COLLECTION = 'collection'
-NAV_MODE_CONTACT = 'contact'
-NAV_MODE_CREATE = 'create'
-NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
-NAV_MODE_DONATE = 'donate'
-NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
-NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PROFILE = 'profile'
-NAV_MODE_SIGNUP = 'signup'
-NAV_MODE_SPLASH = 'splash'
-NAV_MODE_STORY_EDITOR = 'story_editor'
-NAV_MODE_TEACH = 'teach'
-NAV_MODE_THANKS = 'thanks'
-NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
-NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -931,6 +898,7 @@ THANKS_PAGE_DESCRIPTION = (
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'

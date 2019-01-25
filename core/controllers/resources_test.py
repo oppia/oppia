@@ -23,14 +23,20 @@ from core.tests import test_utils
 import feconf
 
 
-class ImageHandlerTest(test_utils.GenericTestBase):
+class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
-    IMAGE_VIEW_URL_PREFIX = '/imagehandler'
+    ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
+
+    def _get_image_url(self, exp_id, filename):
+        """Gets the image URL."""
+        return str(
+            '%s/%s/assets/image/%s' %
+            (self.ASSET_HANDLER_URL_PREFIX, exp_id, filename))
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
-        super(ImageHandlerTest, self).setUp()
+        super(AssetDevHandlerImageTests, self).setUp()
 
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
@@ -44,7 +50,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         """Test image uploading and downloading."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -56,18 +62,17 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-        filepath = response_dict['filepath']
+        filename = response_dict['filename']
 
         self.logout()
 
-        response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, filepath)))
-        self.assertEqual(response.content_type, 'image/png')
+        response = self.get_custom_response(
+            self._get_image_url('0', filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
     def test_non_matching_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         filename_without_extension = 'test'
@@ -85,7 +90,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': supplied_filename},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
@@ -96,21 +100,18 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
         # Test that neither form of the image is stored.
-        response = self.testapp.get(
-            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, supplied_filename)),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
-        response = self.testapp.get(
-            str('%s/0/%s' % (
-                self.IMAGE_VIEW_URL_PREFIX, filename_with_correct_extension)),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.get_json(
+            self._get_image_url('0', supplied_filename),
+            expected_status_int=404)
+        self.get_json(
+            self._get_image_url('0', filename_with_correct_extension),
+            expected_status_int=404)
 
     def test_upload_empty_image(self):
         """Test upload of an empty image."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Upload an empty image.
@@ -118,7 +119,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', ''),)
         )
@@ -131,7 +131,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         """Test upload of a malformed image."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Upload an invalid image.
@@ -139,7 +139,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', 'non_image_data'),)
         )
@@ -151,15 +150,15 @@ class ImageHandlerTest(test_utils.GenericTestBase):
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
 
-        response = self.testapp.get(
-            '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        self.get_json(
+            self._get_image_url('0', 'bad_image'),
+            expected_status_int=404)
 
     def test_bad_filenames_are_detected(self):
         # TODO(sll): Add more tests here.
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -169,7 +168,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test/a.png'},
             csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=400,
+            expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
@@ -179,7 +178,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
     def test_missing_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -189,7 +188,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test'},
             csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=400,
+            expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
@@ -200,7 +199,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
     def test_bad_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -210,7 +209,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.pdf'},
             csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=400,
+            expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
@@ -219,8 +218,17 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_request_invalid_asset_type(self):
+        """Test that requests for invalid asset type is rejected with a 404."""
+        self.login(self.EDITOR_EMAIL)
 
-class AudioHandlerTest(test_utils.GenericTestBase):
+        self.get_html_response(
+            '/assetsdevhandler/0/assets/unknowntype/myfile',
+            expected_status_int=404)
+        self.logout()
+
+
+class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
@@ -230,7 +238,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
     def setUp(self):
-        super(AudioHandlerTest, self).setUp()
+        super(AssetDevHandlerAudioTest, self).setUp()
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
         exp_services.load_demo('0')
@@ -241,7 +249,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
 
     def test_audio_upload(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
@@ -257,7 +265,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
 
     def test_audio_upload_mpeg_container(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(
@@ -276,7 +284,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test that invalid extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         filename_without_extension = 'test'
@@ -291,7 +299,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': supplied_filename},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
@@ -307,7 +314,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test upload of empty audio."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Upload empty audio.
@@ -315,7 +322,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', ''),)
         )
@@ -327,13 +333,12 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test upload of malformed audio."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(
                 ('raw_audio_file', 'unused_filename', 'non_audio_data'),)
@@ -347,7 +352,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test upload of filenames with no extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         missing_extension_filename = 'test'
@@ -358,7 +363,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': missing_extension_filename},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
@@ -374,7 +378,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test that audio file is less than max playback length."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
@@ -385,7 +389,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
@@ -401,7 +404,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
+        response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Use an accepted audio extension in mismatched_filename
@@ -415,7 +418,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': mismatched_filename},
             csrf_token=csrf_token,
-            expect_errors=True,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )

@@ -17,6 +17,7 @@
 import logging
 import random
 
+from constants import constants
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -31,6 +32,8 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import stats_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -50,6 +53,9 @@ class AdminPage(base.BaseHandler):
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
             job['can_be_canceled'] = job['is_cancelable'] and any([
                 klass.__name__ == job['job_type']
@@ -100,6 +106,7 @@ class AdminPage(base.BaseHandler):
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.VIEWABLE_ROLES
             },
+            'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data()
         })
 
@@ -195,7 +202,16 @@ class AdminHandler(base.BaseHandler):
             raise
 
     def _reload_exploration(self, exploration_id):
-        if feconf.DEV_MODE:
+        """Reloads the exploration in dev_mode corresponding to the given
+        exploration id.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Raises:
+            Exception: Cannot reload an exploration in production.
+        """
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
@@ -206,7 +222,16 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload an exploration in production.')
 
     def _reload_collection(self, collection_id):
-        if feconf.DEV_MODE:
+        """Reloads the collection in dev_mode corresponding to the given
+        collection id.
+
+        Args:
+            collection_id: str. The collection id.
+
+        Raises:
+            Exception: Cannot reload a collection in production.
+        """
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
@@ -230,7 +255,7 @@ class AdminHandler(base.BaseHandler):
             Exception: Environment is not DEVMODE.
         """
 
-        if feconf.DEV_MODE:
+        if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
                 (self.user_id, num_dummy_exps_to_generate))
@@ -296,6 +321,7 @@ class AdminRoleHandler(base.BaseHandler):
     def post(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
+        topic_id = self.payload.get('topic_id')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -304,10 +330,17 @@ class AdminRoleHandler(base.BaseHandler):
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
             username=username)
+
+        if topic_id:
+            user = user_services.UserActionsInfo(user_id)
+            topic_services.assign_role(
+                user_services.get_system_user(), user,
+                topic_domain.ROLE_MANAGER, topic_id)
+
         self.render_json({})
 
 
-class AdminJobOutput(base.BaseHandler):
+class AdminJobOutputHandler(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -321,22 +354,22 @@ class AdminJobOutput(base.BaseHandler):
         })
 
 
-class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=topic_similarities.csv')
-        self.response.write(
-            recommendations_services.get_topic_similarities_as_csv())
+        self.render_downloadable_file(
+            recommendations_services.get_topic_similarities_as_csv(),
+            'topic_similarities.csv', 'text/csv')
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
     """Handler for data extraction query."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):

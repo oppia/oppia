@@ -15,28 +15,84 @@
 /**
  * @fileoverview Controller for the skills list viewer.
  */
+oppia.constant(
+  'MERGE_SKILL_URL', '/merge_skill');
+
 oppia.directive('skillsList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$http', 'AlertsService', 'UrlInterpolationService',
+  'MERGE_SKILL_URL',
+  function(
+      $http, AlertsService, UrlInterpolationService, MERGE_SKILL_URL) {
     return {
       restrict: 'E',
       scope: {
         getSkillSummaries: '&skillSummaries',
-        getEditableTopicSummaries: '&editableTopicSummaries'
+        getEditableTopicSummaries: '&editableTopicSummaries',
+        isInModal: '&inModal',
+        getMergeableSkillSummaries: '&mergeableSkillSummaries',
+        selectedSkill: '=',
+        canDeleteSkill: '&userCanDeleteSkill',
+        isUnpublishedSkill: '&unpublishedSkill'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        'EditableSkillBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
+            EditableSkillBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
           ];
+
+          $scope.highlightedIndex = null;
+          $scope.highlightColumns = function(index) {
+            $scope.highlightedIndex = index;
+          };
+
+          $scope.unhighlightColumns = function() {
+            $scope.highlightedIndex = null;
+          };
+
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
+
+          $scope.deleteSkill = function(skillId) {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'delete_skill_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.confirmDeletion = function() {
+                    $uibModalInstance.close();
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function() {
+              EditableSkillBackendApiService.deleteSkill(skillId).then(
+                function(status) {
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                }
+              );
+            }).then(function() {
+              var successToast = 'The skill has been deleted.';
+              AlertsService.addSuccessMessage(successToast, 1000);
+            });
+          };
+
           $scope.assignSkillToTopic = function(skillId) {
             var topicSummaries = $scope.getEditableTopicSummaries();
             var modalInstance = $uibModal.open({
@@ -77,10 +133,74 @@ oppia.directive('skillsList', [
                     ).then(function() {
                       $rootScope.$broadcast(
                         EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                    }).then(function() {
+                      var successToast = (
+                        'The skill has been assigned to the topic.');
+                      AlertsService.addSuccessMessage(successToast, 1000);
                     });
                   }
                 }
               }
+            });
+          };
+
+          $scope.selectSkill = function(skill) {
+            $scope.selectedSkill = skill;
+          };
+
+          $scope.mergeSkill = function(skill) {
+            var skillSummaries = $scope.getMergeableSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'merge_skill_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkill = {};
+                  $scope.done = function() {
+                    $uibModalInstance.close(
+                      {skill: skill,
+                        supersedingSkillId: $scope.selectedSkill.id
+                      });
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(result) {
+              var skill = result.skill;
+              var supersedingSkillId = result.supersedingSkillId;
+              var changeList = [{
+                cmd: 'update_skill_property',
+                property_name: 'superseding_skill_id',
+                old_value: '',
+                new_value: supersedingSkillId
+              }];
+              EditableSkillBackendApiService.updateSkill(
+                skill.id, skill.version,
+                'Added superseding skill id ' +
+                 supersedingSkillId + ' to skill.',
+                changeList
+              ).then(function() {
+                // Broadcast will update the skills so it will get the skill
+                // with updated superseding skill id
+                $rootScope.$broadcast(
+                  EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                // Start the transfer of questions from the old skill to
+                // the new one.
+                var mergeSkillUrl = MERGE_SKILL_URL;
+                var mergeSkillData = {
+                  old_skill_id: skill.id,
+                  new_skill_id: supersedingSkillId
+                };
+                $http.post(mergeSkillUrl, mergeSkillData);
+              });
             });
           };
         }

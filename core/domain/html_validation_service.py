@@ -21,6 +21,7 @@ import logging
 
 import bs4
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
@@ -38,7 +39,7 @@ def escape_html(unescaped_html_data):
         str. Escaped HTML string.
     """
     # Replace list to escape html strings.
-    REPLACE_LIST_FOR_ESCAPING = [
+    replace_list_for_escaping = [
         ('&', '&amp;'),
         ('"', '&quot;'),
         ('\'', '&#39;'),
@@ -46,7 +47,7 @@ def escape_html(unescaped_html_data):
         ('>', '&gt;')
     ]
     escaped_html_data = unescaped_html_data
-    for replace_tuple in REPLACE_LIST_FOR_ESCAPING:
+    for replace_tuple in replace_list_for_escaping:
         escaped_html_data = escaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -63,7 +64,7 @@ def unescape_html(escaped_html_data):
         str. Unescaped HTML string.
     """
     # Replace list to unescape html strings.
-    REPLACE_LIST_FOR_UNESCAPING = [
+    replace_list_for_unescaping = [
         ('&quot;', '"'),
         ('&#39;', '\''),
         ('&lt;', '<'),
@@ -71,7 +72,7 @@ def unescape_html(escaped_html_data):
         ('&amp;', '&')
     ]
     unescaped_html_data = escaped_html_data
-    for replace_tuple in REPLACE_LIST_FOR_UNESCAPING:
+    for replace_tuple in replace_list_for_unescaping:
         unescaped_html_data = unescaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -160,7 +161,7 @@ def convert_to_textangular(html_data):
         feconf.RTE_CONTENT_SPEC[
             'RTE_TYPE_TEXTANGULAR']['ALLOWED_PARENT_LIST'])
 
-    # td tag will be unwrapped and tr tag will be replaced with p tag.
+    # The td tag will be unwrapped and tr tag will be replaced with p tag.
     # So if td is parent of blockquote after migration blockquote should
     # be parent of the p tag to get the alomst same appearance. p cannot
     # remain parent of blockquote since that is not allowed in TextAngular.
@@ -193,7 +194,7 @@ def convert_to_textangular(html_data):
         # the same appearance.
         elif tag.name == 'hr':
             tag.name = 'br'
-        # a tag is to be replaced with oppia-noninteractive-link.
+        # 'a' tag is to be replaced with oppia-noninteractive-link.
         # For this the attributes and text within a tag is used to
         # create new link tag which is wrapped as parent of a and then
         # a tag is removed.
@@ -237,8 +238,8 @@ def convert_to_textangular(html_data):
         elif tag.name == 'td' and tag.next_sibling:
             tag.insert_after(' ')
             tag.unwrap()
-        # div and table rows both are replaced with p tag
-        # to maintain almost same apperance.
+        # Divs and table rows are both replaced with p tag
+        # to maintain almost same appearance.
         elif tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
         # All other invalid tags are simply removed.
@@ -386,11 +387,11 @@ def convert_to_ckeditor(html_data):
         while li.parent.name in ['li', 'p']:
             li.parent.unwrap()
 
-    LIST_TAGS = ['ol', 'ul']
+    list_tags = ['ol', 'ul']
 
     # Ensure li is wrapped in ol/ul.
     for li in soup.findAll(name='li'):
-        if li.parent.name not in LIST_TAGS:
+        if li.parent.name not in list_tags:
             new_parent = soup.new_tag('ul')
             next_sib = list(li.next_siblings)
             li.wrap(new_parent)
@@ -401,7 +402,7 @@ def convert_to_ckeditor(html_data):
                     break
 
     # Ensure that the children of ol/ul are li/pre.
-    for tag_name in LIST_TAGS:
+    for tag_name in list_tags:
         for tag in soup.findAll(name=tag_name):
             for child in tag.children:
                 if child.name not in ['li', 'pre', 'ol', 'ul']:
@@ -419,7 +420,7 @@ def convert_to_ckeditor(html_data):
     for p in soup.findAll(name='p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in LIST_TAGS:
+        elif p.parent.name in list_tags:
             p.wrap(soup.new_tag('li'))
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
@@ -429,9 +430,9 @@ def convert_to_ckeditor(html_data):
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
     # it is wrapped in its previous sibling. If there is no previous sibling,
     # the tag is unwrapped.
-    for tag_name in LIST_TAGS:
+    for tag_name in list_tags:
         for tag in soup.findAll(name=tag_name):
-            if tag.parent.name in LIST_TAGS:
+            if tag.parent.name in list_tags:
                 prev_sib = tag.previous_sibling
                 if prev_sib and prev_sib.name == 'li':
                     prev_sib.append(tag)
@@ -611,12 +612,12 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
         bool. Boolean indicating whether a html string is valid for given RTE.
     """
     if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-        RTE_TYPE = 'RTE_TYPE_TEXTANGULAR'
+        rte_type = 'RTE_TYPE_TEXTANGULAR'
     else:
-        RTE_TYPE = 'RTE_TYPE_CKEDITOR'
+        rte_type = 'RTE_TYPE_CKEDITOR'
     allowed_parent_list = feconf.RTE_CONTENT_SPEC[
-        RTE_TYPE]['ALLOWED_PARENT_LIST']
-    allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE_TYPE]['ALLOWED_TAG_LIST']
+        rte_type]['ALLOWED_PARENT_LIST']
+    allowed_tag_list = feconf.RTE_CONTENT_SPEC[rte_type]['ALLOWED_TAG_LIST']
 
     is_invalid = False
 
@@ -651,7 +652,7 @@ def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
-        html_string. str: HTML string in which the caption attribute is to be
+        html_string: str. HTML string in which the caption attribute is to be
             added.
 
     Returns:
@@ -683,7 +684,7 @@ def validate_customization_args(html_list):
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     err_dict = {}
-    RICH_TEXT_COMPONENT_TAG_NAMES = (
+    rich_text_component_tag_names = (
         INLINE_COMPONENT_TAG_NAMES + BLOCK_COMPONENT_TAG_NAMES)
 
     tags_to_original_html_strings = {}
@@ -691,7 +692,7 @@ def validate_customization_args(html_list):
         soup = bs4.BeautifulSoup(
             html_string.encode(encoding='utf-8'), 'html.parser')
 
-        for tag_name in RICH_TEXT_COMPONENT_TAG_NAMES:
+        for tag_name in rich_text_component_tag_names:
             for tag in soup.findAll(name=tag_name):
                 tags_to_original_html_strings[tag] = html_string
 
@@ -718,8 +719,8 @@ def _validate_customization_args_in_tag(tag):
         Error message if the attributes of tag are invalid.
     """
 
-    COMPONENT_TYPES_TO_COMPONENT_CLASSES = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
-    SIMPLE_COMPONENT_TAG_NAMES = (
+    component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
+    simple_component_tag_names = (
         rte_component_registry.Registry.get_simple_component_tag_names())
     tag_name = tag.name
     value_dict = {}
@@ -729,12 +730,12 @@ def _validate_customization_args_in_tag(tag):
         value_dict[attr] = json.loads(unescape_html(attrs[attr]))
 
     try:
-        COMPONENT_TYPES_TO_COMPONENT_CLASSES[tag_name].validate(value_dict)
+        component_types_to_component_classes[tag_name].validate(value_dict)
         if tag_name == 'oppia-noninteractive-collapsible':
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html, 'html.parser')
-            for component_name in SIMPLE_COMPONENT_TAG_NAMES:
+            for component_name in simple_component_tag_names:
                 for component_tag in soup_for_collapsible.findAll(
                         name=component_name):
                     for err_msg in _validate_customization_args_in_tag(
@@ -747,7 +748,7 @@ def _validate_customization_args_in_tag(tag):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html, 'html.parser')
-                for component_name in SIMPLE_COMPONENT_TAG_NAMES:
+                for component_name in simple_component_tag_names:
                     for component_tag in soup_for_tabs.findAll(name=tag_name):
                         for err_msg in _validate_customization_args_in_tag(
                                 component_tag):
@@ -780,8 +781,8 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        html_string: str. HTML string to modify.
         exp_id: str. Exploration id.
+        html_string: str. HTML string to modify.
 
     Returns:
         str. Updated HTML string with the dimensions for all
@@ -817,14 +818,10 @@ def get_filename_with_dimensions(old_filename, exp_id):
     Returns:
         str. The new filename of the image file.
     """
-    file_system_class = (
-        fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-        else fs_domain.GcsFileSystem)
+    file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         'exploration/%s' % exp_id))
-    filepath = (
-        old_filename if feconf.DEV_MODE
-        else ('image/%s' % old_filename))
+    filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)

@@ -19,16 +19,13 @@
 describe('URL Interpolation Service', function() {
   var uis = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(module('oppia', function($provide) {
+    $provide.constant('DEV_MODE', false);
+  }));
 
   beforeEach(inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
-    GLOBALS.DEV_MODE = false;
   }));
-
-  afterEach(function() {
-    GLOBALS.DEV_MODE = true;
-  });
 
   it('should add hash to url if hash is set', function() {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
@@ -247,6 +244,14 @@ describe('URL Interpolation Service', function() {
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
       '.png');
 
+    expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
+      '/build/assets/videos/test.mp4');
+    expect(uis.getStaticVideoUrl('/test_url/test.mp4')).toBe(
+      '/build/assets/videos/test_url/test.mp4');
+    expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
+      '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
+      '.mp4');
+
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       '/build/extensions/interactions/LogicProof/static/LogicProof.png');
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
@@ -282,10 +287,10 @@ describe('URL Interpolation Service', function() {
     expect(uis.getStoryUrl('/storyId', {})).toBe('/story/storyId');
     expect(uis.getStoryUrl('/storyId123', {})).toBe('/story/storyId123');
     expect(uis.getStoryUrl('/story&Id', {})).toBe('/story/story&Id');
-    expect(function(){
+    expect(function() {
       uis.getStoryUrl('', {});
     }).toThrowError('Empty path passed in method.');
-    expect(function(){
+    expect(function() {
       uis.getStoryUrl('storyId', {});
     }).toThrowError('Path must start with \'/\': \'storyId\'.');
   });
@@ -295,6 +300,13 @@ describe('URL Interpolation Service', function() {
       new Error(
         'Empty path passed in method.'));
     expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+
+    expect(uis.getStaticVideoUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+    expect(uis.getStaticVideoUrl.bind(null, '')).toThrow(
       new Error(
         'Empty path passed in method.'));
 
@@ -327,6 +339,13 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+
+      expect(uis.getStaticVideoUrl.bind(null, 'test_fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
+      expect(uis.getStaticVideoUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
 

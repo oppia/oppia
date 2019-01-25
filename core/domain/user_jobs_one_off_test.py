@@ -30,7 +30,7 @@ from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_jobs_continuous_test
+from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
@@ -236,7 +236,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         default user having the username - 'tmpsuperadm1n'.
         """
         output = self._run_one_off_job()
-        # number of users = 1.
+        # Number of users = 1.
         # length of usernames = 13 (tmpsuperadm1n).
         self.assertEqual(output['13'], 1)
 
@@ -246,7 +246,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         """
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 2.
+        # Number of users = 2.
         # length of usernames = 13 (tmpsuperadm1n), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['1'], 1)
@@ -258,7 +258,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 3
+        # Number of users = 3
         # length of usernames = 13 (tmpsuperadm1n), 2 (ab), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['2'], 1)
@@ -267,7 +267,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         output = self._run_one_off_job()
-        # number of users = 5
+        # Number of users = 5
         # length of usernames = 13 (tmpsuperadm1n), 3 (bcd), 2 (ab, bc), 1 (a).
         self.assertEqual(output['13'], 1)
         self.assertEqual(output['3'], 1)
@@ -433,20 +433,16 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_exploration', self._null_fn
             ):
-            with self.swap(
-                constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-                # User B starts a feedback thread.
-                feedback_services.create_thread(
-                    'exploration', self.EXP_ID_1, None, self.user_b_id,
-                    'subject', 'text')
-                # User C adds to that thread.
-                thread_id = feedback_services.get_all_threads(
-                    'exploration', self.EXP_ID_1, False)[0].id
-                feedback_services.create_message(
-                    thread_id, self.user_c_id, None, None, 'more text')
+            # User B starts a feedback thread.
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, self.user_b_id, 'subject', 'text')
+            # User C adds to that thread.
+            thread_id = feedback_services.get_all_threads(
+                'exploration', self.EXP_ID_1, False)[0].id
+            feedback_services.create_message(
+                thread_id, self.user_c_id, None, None, 'more text')
 
-        with self.swap(constants, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            self._run_one_off_job()
+        self._run_one_off_job()
 
         # Both users are subscribed to the feedback thread.
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -708,6 +704,28 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
 
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
+
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard stats job."""
 
@@ -737,13 +755,29 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def _mock_get_current_date_as_string(self):
+    def mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
     def _rate_exploration(self, user_id, exp_id, rating):
+        """Assigns rating to the exploration corresponding to the given
+        exploration id.
+
+        Args:
+            user_id: str. The user id.
+            exp_id: str. The exploration id.
+            rating: int. The rating to be assigned to the given exploration.
+        """
         rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
 
     def _record_play(self, exp_id, state):
+        """Calls StartExplorationEventHandler and records the 'play' event
+        corresponding to the given exploration id.
+
+        Args:
+            exp_id: str. The exploration id.
+            state: dict(str, *). The state of the exploration corresponding to
+                the given id.
+        """
         event_services.StartExplorationEventHandler.record(
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
@@ -764,12 +798,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         expected_results_list = [{
-            self._mock_get_current_date_as_string(): {
+            self.mock_get_current_date_as_string(): {
                 'num_ratings': 0,
                 'average_ratings': None,
                 'total_plays': 0
@@ -781,21 +815,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             expected_results_list[0])
 
     def test_weekly_stats_if_no_explorations(self):
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 0,
                     'average_ratings': None,
                     'total_plays': 0
@@ -817,21 +849,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 5.0,
                     'total_plays': 1
@@ -857,21 +887,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 2,
                     'average_ratings': 4.5,
                     'total_plays': 1
@@ -894,37 +922,31 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
                 }
             }])
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            stop_computation(self.owner_id))
+        MockUserStatsAggregator.stop_computation(self.owner_id)
         self.process_and_flush_pending_tasks()
 
         self._rate_exploration('user2', exp_id, 2)
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         def _mock_get_date_after_one_week():
@@ -939,7 +961,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_results_list = [
             {
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
@@ -1059,10 +1081,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -1083,10 +1105,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.

@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = function(){
+var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
@@ -112,7 +112,7 @@ var AdminPage = function(){
       });
   };
 
-  this.get = function(){
+  this.get = function() {
     browser.get(ADMIN_URL_SUFFIX);
     return waitFor.pageToFullyLoad();
   };

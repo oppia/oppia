@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Collection-related one-off jobs."""
+import ast
 
 from core.domain import collection_domain
 from core.domain import collection_jobs_one_off
@@ -26,10 +27,9 @@ import feconf
 
 (job_models, collection_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.collection])
-search_services = models.Registry.import_search_services()
 
 
-class CollectionMigrationJobTest(test_utils.GenericTestBase):
+class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -38,7 +38,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(CollectionMigrationJobTest, self).setUp()
+        super(CollectionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test collections.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -49,7 +49,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         """Tests that the collection migration job does not convert an
         collection that is already the latest collection content schema version.
         """
-        # Create a new, collection that should not be affected by the
+        # Create a new collection that should not be affected by the
         # job.
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID, title='A title',
@@ -62,8 +62,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the collection is exactly the same after migration.
@@ -74,6 +74,13 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
         after_converted_yaml = updated_collection.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
+
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
+        expected = [[u'collection_migrated',
+                     [u'1 collections successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_collection(self):
         """Tests that the collection migration job skips deleted collection
@@ -99,8 +106,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample collection.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the deleted collection is
         # being ignored.
@@ -110,7 +117,14 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id(self.COLLECTION_ID)
 
-    def test_migrate_colections_failing_strict_validation(self):
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
+        expected = [[u'collection_deleted',
+                     [u'Encountered 1 deleted collections.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migrate_collections_failing_strict_validation(self):
         """Tests that the collection migration job migrates collections which
         do not pass strict validation.
         """
@@ -142,8 +156,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample collection.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
         # This running without errors indicates the collection is migrated.
         self.process_and_flush_pending_tasks()
@@ -152,6 +166,55 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
             new_model.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+    def test_migration_job_skips_collection_failing_validation(self):
+        """Tests that the collection migration job skips the collection
+        failing validation and does not attempt to migrate.
+        """
+        # Create a collection directly using the model and with an
+        # invalid language code.
+        collection_title = 'A title'
+        collection_category = 'A category'
+        collection_language_code = 'abc'
+        collection_schema_version = 2
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.albert_id)
+        model = collection_models.CollectionModel(
+            id=self.COLLECTION_ID,
+            category=collection_title,
+            title=collection_category,
+            language_code=collection_language_code,
+            objective='An objective',
+            tags=[],
+            schema_version=collection_schema_version
+        )
+        model.commit(self.albert_id, 'Made a new collection!', [{
+            'cmd': collection_services.CMD_CREATE_NEW,
+            'title': collection_title,
+            'category': collection_category,
+        }])
+
+        # Start migration job on sample collection.
+        job_id = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the collection failing
+        # validation is being ignored.
+        self.process_and_flush_pending_tasks()
+
+        # Check that the version number of the new model is same as old model.
+        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
+        self.assertEqual(new_model.schema_version, collection_schema_version)
+
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
+        expected = [[u'validation_error',
+                     [u'Collection %s failed validation: Invalid '
+                      u'language code: %s'
+                      % (self.COLLECTION_ID, collection_language_code)]]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_migrates_collection_nodes(self):
         """Tests that the collection migration job migrates content from
@@ -199,8 +262,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         # Run the job. This should populate collection_contents.
         job_id = (
-            collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)

@@ -18,9 +18,7 @@
 
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {
-    module('oppia', function($provide){
-      $provide.constant('ENABLE_GENERALIZED_FEEDBACK_THREADS', true);
-    });
+    module('oppia');
   });
   var SuggestionThreadObjectFactory = null;
   var SuggestionObjectFactory = null;
@@ -31,7 +29,7 @@ describe('Suggestion thread object factory', function() {
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
-  it('should create a new suggestion thread from a backend dict.', function(){
+  it('should create a new suggestion thread from a backend dict.', function() {
     suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
@@ -64,7 +62,6 @@ describe('Suggestion thread object factory', function() {
       },
       last_updated: 1000
     };
-    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = true;
     suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
@@ -105,6 +102,5 @@ describe('Suggestion thread object factory', function() {
     }];
     suggestionThread.setMessages(messages);
     expect(suggestionThread.messages).toEqual(messages);
-    constants.ENABLE_GENERALIZED_FEEDBACK_THREADS = false;
   });
 });

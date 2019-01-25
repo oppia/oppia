@@ -5,7 +5,7 @@
 {% endblock prerender %}
 
 {% block maintitle %}
-  I18N_SPLASH_PAGE_TITLE
+  Oppia: Teach, Learn, Explore
 {% endblock maintitle %}
 
 {% block header_js %}
@@ -121,25 +121,26 @@
         </div>
 
         <div class="oppia-splash-button-container">
+          <button type="button" ng-click="onClickBrowseLibraryButton()"
+                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
+                  style="bottom: 210px; z-index: 10;"
+                  translate="I18N_ACTION_BROWSE_LESSONS">
+          </button>
+
           <!-- User must complete the registration process. -->
           <button type="button"
                   ng-if="!userIsLoggedIn"
                   ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  style="bottom: 210px; z-index: 10;"
+                  style="bottom: 150px; z-index: 10;"
                   translate="I18N_ACTION_CREATE_LESSON">
           </button>
           <button type="button"
                   ng-if="userIsLoggedIn"
                   ng-click="onClickCreateExplorationButton()"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  style="bottom: 210px; z-index: 10;"
-                  translate="I18N_ACTION_CREATE_LESSON">
-          </button>
-          <button type="button" ng-click="onClickBrowseLibraryButton()"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
                   style="bottom: 150px; z-index: 10;"
-                  translate="I18N_ACTION_BROWSE_LESSONS">
+                  translate="I18N_ACTION_CREATE_LESSON">
           </button>
         </div>
       </div>
@@ -203,4 +204,5 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/pages/splash/Splash.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

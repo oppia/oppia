@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.activity_jobs_one_off."""
+
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -29,10 +31,10 @@ from core.tests import test_utils
 gae_search_services = models.Registry.import_search_services()
 
 
-class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
+class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(OneOffReindexActivitiesJobTest, self).setUp()
+        super(OneOffReindexActivitiesJobTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -71,13 +73,14 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
         indexed_docs = []
 
-        def add_docs_mock(docs, index):
+        def mock_add_documents_to_index(docs, index):
             indexed_docs.extend(docs)
             self.assertIn(index, (search_services.SEARCH_INDEX_EXPLORATIONS,
                                   search_services.SEARCH_INDEX_COLLECTIONS))
 
         add_docs_swap = self.swap(
-            gae_search_services, 'add_documents_to_index', add_docs_mock)
+            gae_search_services, 'add_documents_to_index',
+            mock_add_documents_to_index)
 
         with add_docs_swap:
             self.process_and_flush_pending_tasks()
@@ -87,6 +90,6 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
         categories = [doc['category'] for doc in indexed_docs]
 
         for index in xrange(5):
-            self.assertIn("%s" % index, ids)
+            self.assertIn('%s' % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)

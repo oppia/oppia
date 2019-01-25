@@ -32,10 +32,10 @@ import utils
 CAN_EDIT_STR = 'can_edit'
 
 
-class LibraryPageTest(test_utils.GenericTestBase):
+class LibraryPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryPageTest, self).setUp()
+        super(LibraryPageTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -45,9 +45,8 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
     def test_library_page(self):
         """Test access to the library page."""
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain('I18N_LIBRARY_PAGE_TITLE')
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
+        response.mustcontain('Library - Oppia')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
@@ -55,6 +54,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.assertEqual({
             'iframed': False,
             'is_admin': False,
+            'is_topic_manager': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
@@ -93,7 +93,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        # change title and category.
+        # Change title and category.
         exp_services.update_exploration(
             self.editor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -194,15 +194,13 @@ class LibraryPageTest(test_utils.GenericTestBase):
         }, response_dict['activity_list'][0])
 
 
-class LibraryGroupPageTest(test_utils.GenericTestBase):
+class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def test_library_group_pages(self):
         """Test access to the top rated and recently published pages."""
-        response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(feconf.LIBRARY_TOP_RATED_URL)
 
-        response = self.testapp.get(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
 
     def test_handler_for_recently_published_library_group_page(self):
         """Test library handler for recently published group page."""
@@ -307,7 +305,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
         }, response_dict['activity_list'][1])
 
 
-class CategoryConfigTest(test_utils.GenericTestBase):
+class CategoryConfigTests(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self):
         all_categories = constants.CATEGORIES_TO_COLORS.keys()
@@ -324,14 +322,14 @@ class CategoryConfigTest(test_utils.GenericTestBase):
             '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
-class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
+class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
     PRIVATE_EXP_ID_EDITOR = 'eid0'
     PUBLIC_EXP_ID_EDITOR = 'eid1'
     PRIVATE_EXP_ID_VIEWER = 'eid2'
 
     def setUp(self):
-        super(ExplorationSummariesHandlerTest, self).setUp()
+        super(ExplorationSummariesHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

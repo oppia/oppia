@@ -25,13 +25,12 @@ from core.tests import test_utils
 import feconf
 
 
-class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
+class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'eid1'
 
     EXPECTED_THREAD_DICT = {
         'status': u'open',
-        'state_name': u'a_state_name',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject'
@@ -41,7 +40,7 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(FeedbackThreadSummariesLoadTest, self).setUp()
+        super(FeedbackThreadSummariesLoadTests, self).setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -61,7 +60,6 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
         for _ in range(100):
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'],
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
         threadlist = feedback_services.get_all_threads(

@@ -17,11 +17,16 @@
  */
 
 oppia.controller('Splash', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
-  'UrlInterpolationService',
-  function($scope, $timeout, $window, siteAnalyticsService,
-      UrlInterpolationService) {
-    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+  '$scope', '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+  'UrlInterpolationService', 'UserService',
+  function($scope, $rootScope, $timeout, $window, SiteAnalyticsService,
+      UrlInterpolationService, UserService) {
+    $scope.userIsLoggedIn = null;
+    $rootScope.loadingMessage = 'Loading';
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      $scope.userIsLoggedIn = userInfo.isLoggedIn();
+      $rootScope.loadingMessage = '';
+    });
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
@@ -29,7 +34,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent(
+      SiteAnalyticsService.registerStartLoginEvent(
         'splashPageCreateExplorationButton');
       $timeout(function() {
         $window.location = destinationUrl;
@@ -38,7 +43,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onClickBrowseLibraryButton = function() {
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+      SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
       $timeout(function() {
         $window.location = '/library';
       }, 150);
@@ -46,7 +51,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onClickCreateExplorationButton = function() {
-      siteAnalyticsService.registerClickCreateExplorationButtonEvent();
+      SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
       $timeout(function() {
         $window.location = '/creator_dashboard?mode=create';
       }, 150);

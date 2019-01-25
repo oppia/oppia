@@ -53,7 +53,9 @@ oppia.directive('misconceptionEditor', [
 
           $scope.FEEDBACK_FORM_SCHEMA = {
             type: 'html',
-            ui_config: {}
+            ui_config: {
+              hide_complex_extensions: 'true'
+            }
           };
 
           $scope.openNameEditor = function() {

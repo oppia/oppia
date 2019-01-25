@@ -58,18 +58,16 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             category=self.UNICODE_TEST_STRING)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
@@ -82,45 +80,38 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             other_editor_email, other_exploration)
 
         self.login(other_editor_email)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_published_explorations_are_visible_to_logged_out_users(self):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
-        response = self.testapp.get(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
 
     def test_published_explorations_are_visible_to_logged_in_users(self):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
@@ -210,13 +201,21 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
-        STORY_ID = story_services.get_new_story_id()
+        story_id = story_services.get_new_story_id()
         self.save_new_story(
-            STORY_ID, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes'
         )
-        SKILL_ID = skill_services.get_new_skill_id()
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story('user', story_id, changelist, 'Added node.')
+        skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            SKILL_ID, 'user', 'Description')
+            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -229,7 +228,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [SKILL_ID],
+            'new_value': [skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -240,7 +239,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'node_id': 'node_1'
         })]
         story_services.update_story(
-            'user', STORY_ID, change_list, 'Updated Node 1.')
+            'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
@@ -250,37 +249,35 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, SKILL_ID)
+            question_id, skill_id)
         question_services.create_new_question_skill_link(
-            question_id_2, SKILL_ID)
+            question_id_2, skill_id)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s&cursor=' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID))
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
             next_cursor = json_response_1['next_start_cursor']
 
             self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
             json_response_2 = self.get_json(
                 '%s/%s?story_id=%s&cursor=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, STORY_ID,
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id,
                     next_cursor))
             self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
             self.assertNotEqual(
                 json_response_1['pretest_question_dicts'][0]['id'],
                 json_response_2['pretest_question_dicts'][0]['id'])
 
-        response = self.testapp.get(
+        self.get_json(
             '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, STORY_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 400)
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
+            expected_status_int=400)
 
-        response = self.testapp.get(
+        self.get_json(
             '%s/%s?story_id=%s' % (
                 feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 400)
+            expected_status_int=400)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
@@ -355,7 +352,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % self.EXP_ID))
+            self.get_html_response('/explore/%s' % self.EXP_ID))
 
         # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -397,7 +394,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % self.EXP_ID))
+            self.get_html_response('/explore/%s' % self.EXP_ID))
         self.logout()
 
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -409,7 +406,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 1
             }, csrf_token=csrf_token,
-            expected_status_int=401, expect_errors=True
+            expected_status_int=401
         )
 
     def test_ratings_by_different_users(self):
@@ -420,7 +417,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.login('a@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % self.EXP_ID))
+            self.get_html_response('/explore/%s' % self.EXP_ID))
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 4
@@ -430,7 +427,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.login('b@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % self.EXP_ID))
+            self.get_html_response('/explore/%s' % self.EXP_ID))
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.put_json(
@@ -482,12 +479,14 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def _get_exploration_ids_from_summaries(self, summaries):
+        """Returns the sorted list of all the exploration ids from summaries."""
         return sorted([summary['id'] for summary in summaries])
 
     def _get_recommendation_ids(
             self, exploration_id, collection_id=None,
             include_system_recommendations=None,
             author_recommended_ids_str='[]'):
+        """Gets the recommended exploration ids from the summaries."""
         collection_id_param = (
             '&collection_id=%s' % collection_id
             if collection_id is not None else '')
@@ -501,10 +500,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
-        response = self.testapp.get('/explore/%s' % exploration_id)
-        csrf_token = self.get_csrf_token_from_response(response)
-        summaries = self.get_json(
-            recommendations_url, params=csrf_token)['summaries']
+        summaries = self.get_json(recommendations_url)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)
 
     # TODO(bhenning): Add tests for ensuring system explorations are properly
@@ -515,13 +511,21 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
     # desirable.
 
     def _set_recommendations(self, exp_id, recommended_ids):
+        """Sets the recommendations in the exploration corresponding to the
+        given exploration id.
+        """
         recommendations_services.set_recommendations(exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
+        """Completes the exploration within the collection. Records that the
+        exploration has been played by the user in the context of the
+        collection.
+        """
         collection_services.record_played_exploration_in_collection_context(
             self.new_user_id, self.COL_ID, exp_id)
 
     def _complete_entire_collection_in_order(self):
+        """Completes the entire collection in order."""
         self._complete_exploration_in_collection(self.EXP_ID_19)
         self._complete_exploration_in_collection(self.EXP_ID_20)
         self._complete_exploration_in_collection(self.EXP_ID_21)
@@ -927,7 +931,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)
 
-        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
         self.post_json(
@@ -983,7 +987,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % self.EXP_ID))
+            self.get_html_response('/explore/%s' % self.EXP_ID))
         self.logout()
 
         # Create report for exploration.
@@ -991,7 +995,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
             }, csrf_token=csrf_token,
-            expected_status_int=401, expect_errors=True)
+            expected_status_int=401)
 
 
 class LearnerProgressTest(test_utils.GenericTestBase):
@@ -1068,7 +1072,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
@@ -1106,7 +1110,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
@@ -1151,7 +1155,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for leaving an exploration incomplete."""
 
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
@@ -1345,7 +1349,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }]
         }
 
-        response = self.testapp.get('/explore/%s' % self.exp_id)
+        response = self.get_html_response('/explore/%s' % self.exp_id)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_new_playthrough_gets_stored(self):
@@ -1559,7 +1563,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             payload_dict_without_schema_version,
             csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""
@@ -1572,7 +1576,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1,
                 'playthrough_id': None
             }, csrf_token=self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
 
     def test_playthrough_id_is_returned(self):
         """Test that playthrough ID is returned when it is stored for the first
@@ -1715,7 +1719,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
                     'exp_version': None},
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400)
 
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
@@ -1752,3 +1756,45 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
+
+
+class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
+    """Tests for the answer submitted event handler."""
+
+    def test_submit_answer_for_exploration(self):
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 'This is an answer.',
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+            }
+        )
+        submitted_answer = stats_services.get_state_answers(
+            exp_id, version, state_name_1)
+        self.assertEqual(
+            len(submitted_answer.get_submitted_answer_dict_list()), 1)
+        self.assertEqual(
+            submitted_answer.get_submitted_answer_dict_list()[0]['answer'],
+            'This is an answer.'
+        )
+        self.logout()

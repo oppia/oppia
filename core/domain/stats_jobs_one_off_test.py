@@ -29,12 +29,12 @@ import feconf
     [models.NAMES.exploration, models.NAMES.statistics])
 
 
-class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
+class ExplorationIssuesModelCreatorOneOffJobTests(test_utils.GenericTestBase):
     exp_id1 = 'exp_id1'
     exp_id2 = 'exp_id2'
 
     def setUp(self):
-        super(ExplorationIssuesModelCreatorOneOffJobTest, self).setUp()
+        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
         self.exp1 = self.save_new_valid_exploration(self.exp_id1, 'owner')
         self.exp1.add_states(['New state'])
         change_list = [exp_domain.ExplorationChange({
@@ -117,11 +117,11 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
 
-class RegenerateMissingStatsModelsOneOffJobTest(test_utils.GenericTestBase):
+class RegenerateMissingStatsModelsOneOffJobTests(test_utils.GenericTestBase):
     exp_id = 'exp_id1'
 
     def setUp(self):
-        super(RegenerateMissingStatsModelsOneOffJobTest, self).setUp()
+        super(RegenerateMissingStatsModelsOneOffJobTests, self).setUp()
 
         self.exp1 = self.save_new_valid_exploration(self.exp_id, 'owner')
 
@@ -156,7 +156,8 @@ class RegenerateMissingStatsModelsOneOffJobTest(test_utils.GenericTestBase):
         self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
 
     def test_stats_models_regeneration_works(self):
-        """Test that stats models are regenerated with correct v1 stats values.
+        """Test that stats models are regenerated with correct v1 stats
+        values.
         """
         job_id = (
             stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob.create_new()) # pylint: disable=line-too-long
@@ -185,12 +186,12 @@ class RegenerateMissingStatsModelsOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(state_stats.num_completions_v1, 3)
 
 
-class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
+class RecomputeStateCompleteStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     state_b = 'b'
 
     def setUp(self):
-        super(RecomputeStateCompleteStatisticsTest, self).setUp()
+        super(RecomputeStateCompleteStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
 
         change_list = []
@@ -311,14 +312,14 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 4)
 
 
-class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
+class RecomputeAnswerSubmittedStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     session_id_1 = 'session_id_1'
     session_id_2 = 'session_id_2'
 
     def setUp(self):
-        super(RecomputeAnswerSubmittedStatisticsTest, self).setUp()
+        super(RecomputeAnswerSubmittedStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
@@ -428,7 +429,7 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(state_stats['useful_feedback_count_v2'], 3)
 
 
-class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
+class RecomputeStateHitStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     # Start on version 2 as the update from version 1 to 2 is only to
     # setup states for testing.
@@ -437,7 +438,7 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
     session_id_2 = 'session_id_2'
 
     def setUp(self):
-        super(RecomputeStateHitStatisticsTest, self).setUp()
+        super(RecomputeStateHitStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
@@ -591,7 +592,7 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
 
 
 
-class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
+class RecomputeSolutionHitStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     session_id_1 = 'session_id_1'
@@ -599,7 +600,7 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
     session_id_3 = 'session_id_3'
 
     def setUp(self):
-        super(RecomputeSolutionHitStatisticsTest, self).setUp()
+        super(RecomputeSolutionHitStatisticsTests, self).setUp()
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
@@ -709,13 +710,13 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 4)
 
 
-class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
+class RecomputeActualStartStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
 
     def setUp(self):
-        super(RecomputeActualStartStatisticsTest, self).setUp()
+        super(RecomputeActualStartStatisticsTests, self).setUp()
         self.save_new_default_exploration(self.exp_id, 'owner')
 
         change_list = []
@@ -813,13 +814,13 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(model.num_actual_starts_v2, 3)
 
 
-class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
+class RecomputeCompleteEventStatisticsTests(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
     state = 'state_1'
 
     def setUp(self):
-        super(RecomputeCompleteEventStatisticsTest, self).setUp()
+        super(RecomputeCompleteEventStatisticsTests, self).setUp()
         self.save_new_default_exploration(self.exp_id, 'owner')
 
         change_list = []

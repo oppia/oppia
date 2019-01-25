@@ -18,10 +18,12 @@ import hashlib
 import hmac
 import json
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import email_manager
 import feconf
 
 
@@ -100,7 +102,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         signature = self.payload.get('signature')
         message = self.payload.get('message')
         vm_id = self.payload.get('vm_id')
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
 
         if not validate_job_result_message_dict(message):
@@ -122,6 +124,9 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
+            # Send email to admin and admin-specified email recipients.
+            # Other email recipients are specified on admin config page.
+            email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:
@@ -148,7 +153,7 @@ class NextJobHandler(base.BaseHandler):
         vm_id = self.payload.get('vm_id')
         message = self.payload.get('message')
 
-        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
         if not verify_signature(message, vm_id, signature):
             raise self.UnauthorizedUserException

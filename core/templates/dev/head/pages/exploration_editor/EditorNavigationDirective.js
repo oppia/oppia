@@ -24,20 +24,23 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationRightsService', 'ExplorationWarningsService',
-        'RouterService', 'StateEditorTutorialFirstTimeService',
-        'siteAnalyticsService', 'ThreadDataService', 'WindowDimensionsService',
-
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+        'ExplorationFeaturesService', 'ExplorationRightsService',
+        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+        'StateEditorTutorialFirstTimeService', 'ThreadDataService',
+        'UserService', 'WindowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $uibModal, ContextService,
-            ExplorationRightsService, ExplorationWarningsService,
-            RouterService, StateEditorTutorialFirstTimeService,
-            siteAnalyticsService, ThreadDataService, WindowDimensionsService) {
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
+            ExplorationFeaturesService, ExplorationRightsService,
+            ExplorationWarningsService, RouterService, SiteAnalyticsService,
+            StateEditorTutorialFirstTimeService, ThreadDataService,
+            UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
+          $scope.isImprovementsTabEnabled =
+            ExplorationFeaturesService.isImprovementsTabEnabled;
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -52,11 +55,14 @@ oppia.directive('editorNavigation', [
             }
           });
 
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+          });
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
-            siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+            SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -64,22 +70,22 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
-                'siteAnalyticsService', 'ContextService',
+                'SiteAnalyticsService', 'ContextService',
                 function(
                     $scope, $uibModalInstance,
-                    siteAnalyticsService, ContextService) {
+                    SiteAnalyticsService, ContextService) {
                   var explorationId = (
                     ContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
-                    siteAnalyticsService
+                    SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
                     $uibModalInstance.close();
                   };
 
                   $scope.goToHelpCenter = function() {
-                    siteAnalyticsService.registerVisitHelpCenterEvent(
+                    SiteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
                     $uibModalInstance.dismiss('cancel');
                   };
@@ -101,12 +107,14 @@ oppia.directive('editorNavigation', [
             ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.ExplorationRightsService = ExplorationRightsService;
-          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.getActiveTabName = RouterService.getActiveTabName;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectTranslationTab = RouterService.navigateToTranslationTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
           $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
+          $scope.selectImprovementsTab =
+            RouterService.navigateToImprovementsTab;
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;

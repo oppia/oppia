@@ -14,6 +14,7 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+# pylint: disable=invalid-name
 import collections
 import fnmatch
 import hashlib
@@ -87,7 +88,7 @@ FILEPATHS_NOT_TO_RENAME = (
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
+    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
 
@@ -339,9 +340,10 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -357,9 +359,10 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -375,9 +378,10 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            'js': List of paths to js files that need to be copied.
-            'css': List of paths to css files that need to be copied.
-            'fontsPath': Path to folder containing fonts that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
+                copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
 
@@ -436,7 +440,8 @@ def get_dependencies_filepaths():
 
 
 def minify_third_party_libs(third_party_directory_path):
-    """Minify third_party.js and third_party.css and remove un-minified files.
+    """Minify third_party.js and third_party.css and remove un-minified
+    files.
     """
     THIRD_PARTY_JS_FILEPATH = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
@@ -888,9 +893,9 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
             - 'staging_dir': the directory that contains minified files waiting
-            for final copy process.
+                for final copy process.
             - 'out_dir': the final directory that contains built files with hash
-            inserted into filenames.
+                inserted into filenames.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
 
@@ -1043,8 +1048,6 @@ def generate_build_directory():
     hashes = dict()
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
-    # Minify third party resources.
-    minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -1099,15 +1102,32 @@ def generate_build_directory():
 
 
 def build():
+    """The main method of this script.
+
+    Creates a third-party directory where all the JS and CSS dependencies are
+    built and stored. Depending on the options passed to the script, might also
+    minify third-party libraries and/or generate a build directory.
+    """
     parser = optparse.OptionParser()
     parser.add_option(
         '--prod_env', action='store_true', default=False, dest='prod_mode')
+    parser.add_option(
+        '--minify_third_party_libs_only', action='store_true', default=False,
+        dest='minify_third_party_libs_only')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    # If minify_third_party_libs_only is set to True, skips the rest of the
+    # build process once third party libs are minified.
+    if options.minify_third_party_libs_only and not options.prod_mode:
+        raise Exception(
+            'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
-        generate_build_directory()
+        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        if not options.minify_third_party_libs_only:
+            generate_build_directory()
 
 
 if __name__ == '__main__':

@@ -3,24 +3,25 @@
     Enter Subtopic Title
   </h3>
 </div>
-<div class="modal-body new-subtopic-title-editor"
-     ng-class="{'has-error': isSubtopicTitleEmpty(subtopicTitle)}">
-  <p>
-    Enter the title for the subtopic: &nbsp;
-    <input class="form-group" ng-model="subtopicTitle">
-    <span ng-if="isSubtopicTitleEmpty(subtopicTitle)"
-          class="help-block" style="font-size: smaller">
-      A title is required to create a subtopic.
+<form ng-submit="save(subtopicTitle)">
+  <div class="modal-body new-subtopic-title-editor">
+    <p>
+      Enter the title for the subtopic
+    </p>
+    <input class="form-control" style="font-size: 12px;"
+           placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
+           ng-model="subtopicTitle" ng-change="resetErrorMsg()" autofocus>
+    <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+      <em><[errorMsg]></em>
     </span>
-  </p>
-</div>
-<div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success" ng-disabled="isSubtopicTitleEmpty(subtopicTitle)"
-          ng-click="save(subtopicTitle)">
-    <span>Create Subtopic</span>
-  </button>
-</div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-success" type="submit" ng-disabled="isSubtopicTitleEmpty(subtopicTitle)">
+      <span>Create Subtopic</span>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</form>
 <style>
   .new-subtopic-title-editor .help-block {
     margin-left: 37.5%;

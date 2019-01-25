@@ -464,9 +464,11 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_GENERALIZED_FEEDBACK_THREADS": false,
+  "ENABLE_NEW_STRUCTURE_EDITORS": false,
 
-  "ENABLE_NEW_STRUCTURES": false,
+  "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
@@ -500,5 +502,9 @@ var constants = {
       }
   },
 
-  "CURRENT_STATES_SCHEMA_VERSION": 25
+  "ALLOW_YAML_FILE_UPLOAD": false,
+
+  "CURRENT_STATES_SCHEMA_VERSION": 25,
+
+  "DEV_MODE": true
 };

@@ -38,7 +38,12 @@
           <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <p ng-hide="!dashboardStats.num_ratings">
-            (by <[dashboardStats.num_ratings]> users)
+            <p ng-if="dashboardStats.num_ratings === 1">
+              (by <[dashboardStats.num_ratings]> user)
+            </p>
+            <p ng-if="dashboardStats.num_ratings > 1">
+              (by <[dashboardStats.num_ratings]> users)
+            </p>
           </p>
         </div>
         <div class="total-plays stats-card">
@@ -923,6 +928,7 @@
   <script src="/extensions/objects/templates/SetOfUnicodeStringEditor.js"></script>
   <script src="/extensions/objects/templates/UnicodeStringEditor.js"></script>
   <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
+  <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/MessengerService.js"></script>
   <script src="/templates/dev/head/services/AudioPlayerService.js"></script>
   <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
@@ -932,7 +938,9 @@
   <script src="/templates/dev/head/services/ComputeGraphService.js"></script>
   <script src="/templates/dev/head/services/EditabilityService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+  <script src="/templates/dev/head/services/ImprovementsService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
@@ -979,7 +987,6 @@
   <script src="/templates/dev/head/domain/exploration/SolutionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/StatesObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>

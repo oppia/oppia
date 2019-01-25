@@ -17,10 +17,29 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', 'UrlInterpolationService', 'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, UrlInterpolationService, DEFAULT_PROFILE_IMAGE_PATH) {
-    var _isLoggedIn = GLOBALS.userIsLoggedIn;
+  '$http', '$q', '$window', 'UrlInterpolationService', 'UserInfoObjectFactory',
+  'DEFAULT_PROFILE_IMAGE_PATH',
+  function($http, $q, $window, UrlInterpolationService, UserInfoObjectFactory,
+      DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
+
+    var userInfo = null;
+
+    var getUserInfoAsync = function() {
+      if (GLOBALS.userIsLoggedIn) {
+        if (userInfo) {
+          return $q.resolve(userInfo);
+        }
+        return $http.get(
+          '/userinfohandler'
+        ).then(function(response) {
+          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
+          return userInfo;
+        });
+      } else {
+        return $q.resolve(UserInfoObjectFactory.createDefault());
+      }
+    };
 
     return {
       getProfileImageDataUrlAsync: function() {
@@ -28,7 +47,7 @@ oppia.factory('UserService', [
           UrlInterpolationService.getStaticImageUrl(
             DEFAULT_PROFILE_IMAGE_PATH));
 
-        if (_isLoggedIn) {
+        if (GLOBALS.userIsLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
@@ -46,7 +65,20 @@ oppia.factory('UserService', [
           update_type: 'profile_picture_data_url',
           data: newProfileImageDataUrl
         });
-      }
+      },
+      getLoginAndLogoutUrls: function() {
+        var urlParameters = {
+          current_url: $window.location.href
+        };
+        return $http.get('/url_handler', {params: urlParameters}).then(
+          function(response) {
+            return {
+              login_url: response.data.login_url,
+            };
+          }
+        );
+      },
+      getUserInfoAsync: getUserInfoAsync
     };
   }
 ]);

@@ -110,13 +110,22 @@ if ! type pip > /dev/null 2>&1 ; then
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4"
+  pip install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
-  touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
+  touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
+fi
+
+echo Checking if pylint-quotes is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/pylint-quotes-0.1.9" ]; then
+  echo Installing pylint-quotes
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pylint-quotes-0.1.9.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.1.9.tar.gz
+  tar xzf pylint-quotes-0.1.9.tar.gz -C $TOOLS_DIR
+  rm pylint-quotes-0.1.9.tar.gz
 fi
 
 # Install webtest.

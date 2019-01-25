@@ -258,7 +258,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         with add_docs_ctx, put_ctx, assert_raises_ctx as e:
             gae_search_services.add_documents_to_index(docs, 'my_index')
 
-        # assert that the method only gets called once, since the error is not
+        # Assert that the method only gets called once, since the error is not
         # transient.
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
@@ -432,7 +432,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c'],
                 'my_index')
 
-        # assert that the method only gets called once, since the error is not
+        # Assert that the method only gets called once, since the error is not
         # transient.
         self.assertEqual(delete_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
@@ -689,15 +689,15 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 4)
         self.assertEqual(result, ['doc2', 'doc1'])
 
-        # also check that the cursor is preserved.
+        # Also check that the cursor is preserved.
         self.assertEqual(search_counter2.times_called, 4)
         self.assertEqual(result2, ['doc0'])
 
 
 class SearchGetFromIndexTests(test_utils.GenericTestBase):
     def test_get_document_from_index(self):
-        document = search.Document(doc_id="my_doc", fields=[
-            search.TextField(name="my_field", value="value")
+        document = search.Document(doc_id='my_doc', fields=[
+            search.TextField(name='my_field', value='value')
         ])
         search.Index('my_index').put(document)
         result = gae_search_services.get_document_from_index(

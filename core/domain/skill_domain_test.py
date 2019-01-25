@@ -16,6 +16,7 @@
 
 from constants import constants
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.tests import test_utils
 import feconf
 import utils
@@ -30,7 +31,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
-            'Explanation', ['Example 1'])
+            state_domain.SubtitledHtml(
+                '1', 'Explanation'), [
+                    state_domain.SubtitledHtml('2', 'Example 1')],
+            {'1': {}, '2': {}})
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
         self.skill = skill_domain.Skill(
@@ -112,15 +116,27 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.skill_contents.worked_examples = [1]
         self._assert_validation_error(
-            'Expected each worked example to be a string')
+            'Expected worked example to be a SubtitledHtml object')
 
-        self.skill.skill_contents.explanation = 0
+        self.skill.skill_contents.explanation = 'explanation'
         self._assert_validation_error(
-            'Expected skill explanation to be a string')
+            'Expected skill explanation to be a SubtitledHtml object')
 
         self.skill.skill_contents = ''
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
+
+    def test_skill_contents_audio_validation(self):
+        self.skill.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
+            state_domain.SubtitledHtml('content_id_2', '<p>Hello 2</p>')
+        ]
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id_3': {}
+        }
+        self._assert_validation_error(
+            'Expected content_ids_to_audio_translations to contain '
+            'only content_ids in worked examples and explanation.')
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'
@@ -135,8 +151,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'all_questions_merged is True.')
 
     def test_create_default_skill(self):
-        """Test the create_default_skill function.
-        """
+        """Test the create_default_skill function."""
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description')
         expected_skill_dict = {
@@ -144,7 +159,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'description': 'Description',
             'misconceptions': [],
             'skill_contents': {
-                'explanation': feconf.DEFAULT_SKILL_EXPLANATION,
+                'explanation': {
+                    'html': feconf.DEFAULT_SKILL_EXPLANATION,
+                    'content_id': 'explanation'
+                },
+                'content_ids_to_audio_translations': {},
                 'worked_examples': []
             },
             'misconceptions_schema_version': (
@@ -166,7 +185,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents and misconception object.
         """
         skill_contents = skill_domain.SkillContents(
-            'Explanation', ['example_1'])
+            state_domain.SubtitledHtml('1', 'Explanation'), [
+                state_domain.SubtitledHtml('2', 'Example 1')], {})
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)

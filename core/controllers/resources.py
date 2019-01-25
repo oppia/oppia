@@ -17,14 +17,18 @@
 import logging
 import urllib
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+import feconf
 
 
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self, generator_id):
@@ -39,30 +43,42 @@ class ValueGeneratorHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ImageHandler(base.BaseHandler):
-    """Handles image retrievals."""
+class AssetDevHandler(base.BaseHandler):
+    """Handles image and audio retrievals (only in dev -- in production,
+    image and audio files are served from GCS).
+    """
+
+    _SUPPORTED_TYPES = ['image', 'audio']
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, exploration_id, encoded_filepath):
-        """Returns an image.
+    def get(self, exploration_id, asset_type, encoded_filename):
+        """Returns an asset file.
 
         Args:
-            exploration_id: the id of the exploration.
-            encoded_filepath: a string representing the image filepath. This
+            exploration_id: str. The id of the exploration.
+            asset_type: str. Type of the asset, either image or audio.
+            encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
         """
+        if not constants.DEV_MODE:
+            raise self.PageNotFoundException
+        if asset_type not in self._SUPPORTED_TYPES:
+            raise Exception('%s is not a supported asset type.' % asset_type)
         try:
-            filepath = urllib.unquote(encoded_filepath)
-            file_format = filepath[(filepath.rfind('.') + 1):]
+            filename = urllib.unquote(encoded_filename)
+            file_format = filename[(filename.rfind('.') + 1):]
+
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
             self.response.headers['Content-Type'] = str(
-                'image/%s' % file_format)
+                '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(
                     'exploration/%s' % exploration_id))
-            raw = fs.get(filepath)
+            raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
@@ -70,38 +86,3 @@ class ImageHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
-
-
-class AudioHandler(base.BaseHandler):
-    """Handles audio retrievals (only in dev -- in production, audio files are
-    served from GCS).
-    """
-
-    _AUDIO_PATH_PREFIX = 'audio'
-
-    @acl_decorators.open_access
-    def get(self, exploration_id, filename):
-        """Returns an audio file.
-
-        Args:
-            encoded_filepath: a string representing the audio filepath. This
-              string is encoded in the frontend using encodeURIComponent().
-        """
-        file_format = filename[(filename.rfind('.') + 1):]
-        # If the following is not cast to str, an error occurs in the wsgi
-        # library because unicode gets used.
-        self.response.headers['Content-Type'] = str(
-            'audio/%s' % file_format)
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
-
-        try:
-            raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filename))
-        except:
-            raise self.PageNotFoundException
-
-        self.response.cache_control.no_cache = None
-        self.response.cache_control.public = True
-        self.response.cache_control.max_age = 600
-        self.response.write(raw)
