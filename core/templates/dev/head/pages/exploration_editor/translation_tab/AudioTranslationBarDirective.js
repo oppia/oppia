@@ -67,14 +67,14 @@ oppia.directive('audioTranslationBar', [
         'AudioPlayerService', 'TranslationLanguageService', 'AlertsService',
         'StateEditorService', 'ExplorationStatesService', 'EditabilityService',
         'AssetsBackendApiService', 'recorderService', 'ContextService',
-        'RECORDING_TIME_LIMIT',
+        'RECORDING_TIME_LIMIT', 'SiteAnalyticsService',
         function(
             $scope, $filter, $timeout, $uibModal, $rootScope,
             StateContentIdsToAudioTranslationsService, IdGenerationService,
             AudioPlayerService, TranslationLanguageService, AlertsService,
             StateEditorService, ExplorationStatesService, EditabilityService,
             AssetsBackendApiService, recorderService, ContextService,
-            RECORDING_TIME_LIMIT) {
+            RECORDING_TIME_LIMIT, SiteAnalyticsService) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
@@ -162,6 +162,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.checkAndStartRecording = function() {
             if (!$scope.recorder.isAvailable) {
+              SiteAnalyticsService.registerClickStartRecordingButtonEvent();
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
@@ -207,6 +208,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.saveRecordedAudio = function() {
             $scope.audioIsCurrentlyBeingSaved = true;
+            SiteAnalyticsService.registerClickSaveRecordedAudioButtonEvent();
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
@@ -406,6 +408,7 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.openAddAudioTranslationModal = function(audioFile) {
+            SiteAnalyticsService.registerClickUploadRecordedAudioButtonEvent();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
