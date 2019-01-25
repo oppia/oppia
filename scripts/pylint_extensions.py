@@ -41,6 +41,11 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
+        'C0007': (
+            'Keyword argument %s should not be named explicitly in %s call of %s.',
+            'explicit-keyword-args',
+            'Argument names should not be used explicitly if the formal parameter has no default value.'
+        ),
     }
 
     def visit_call(self, node):
@@ -134,6 +139,31 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             func_name))
                     num_positional_args_unused -= 1
 
+            #Executed if name is not having any default value in the function definition
+            else:
+                if name is None:
+                    display_name = '<tuple>'
+                else:
+                    display_name = repr(name)
+
+                if name in keyword_args:
+                    # This try/except block tries to get the function
+                    # name. Since each node may differ, multiple
+                    # blocks have been used.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        try:
+                            func_name = node.func.name
+                        except AttributeError:
+                            func_name = node.fun
+
+                    self.add_message(
+                        'explicit-keyword-args', node=node,
+                        args=(
+                            display_name,
+                            callable_name,
+                            func_name), confidence=None)
 
 class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case

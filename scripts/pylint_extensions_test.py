@@ -52,7 +52,6 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"):
             test_var_five = test_var_two + test_var_three
             return test_var_five
-
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
@@ -89,6 +88,38 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_call(
                 func_call_node_three)
 
+class NonExplicitKeywordArgsCheckerTests(unittest.TestCase):
+
+    def test_finds_explicit_keyword_args(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ExplicitKeywordArgsChecker)
+        checker_test_object.setup_method()
+        func_call_node_one, func_call_node_two = (
+            astroid.extract_node("""
+        def test(test_var_one, test_var_two):
+            pass
+        test(1, 2) #@
+        test(1, test_var_two=2) #@
+        """))
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(
+                func_call_node_one)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='explicit-keyword-args',
+                node=func_call_node_two,
+                args=(
+                    '\'test_var_two\'',
+                    'function',
+                    'test'
+                )
+            ),
+        ):
+            checker_test_object.checker.visit_call(
+                func_call_node_two)
 
 class HangingIndentCheckerTests(unittest.TestCase):
 
