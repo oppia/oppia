@@ -27,13 +27,13 @@ oppia.directive('editorNavigation', [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'RouterService',
-        'StateTutorialFirstTimeService', 'SiteAnalyticsService',
+        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, RouterService,
-            StateTutorialFirstTimeService, SiteAnalyticsService,
+            SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
@@ -63,6 +63,8 @@ oppia.directive('editorNavigation', [
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
             SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+            var editorTutorialMode = 'editor';
+            var translationTutorialMode = 'translation';
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -81,14 +83,14 @@ oppia.directive('editorNavigation', [
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close('editor');
+                    $uibModalInstance.close(editorTutorialMode);
                   };
 
-                  $scope.beginTranslateTutorial = function() {
+                  $scope.beginTranslationTutorial = function() {
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close('translation');
+                    $uibModalInstance.close(translationTutorialMode);
                   };
 
                   $scope.goToHelpCenter = function() {
@@ -102,14 +104,12 @@ oppia.directive('editorNavigation', [
             });
 
             modalInstance.result.then(function(mode) {
-              if (mode === 'editor') {
+              if (mode === editorTutorialMode) {
                 $rootScope.$broadcast('openEditorTutorial');
-              } else if (mode === 'translation') {
+              } else if (mode === translationTutorialMode) {
                 $rootScope.$broadcast('openTranslationTutorial');
               }
             }, function() {
-              StateTutorialFirstTimeService.markEditorTutorialFinished();
-              StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };
 

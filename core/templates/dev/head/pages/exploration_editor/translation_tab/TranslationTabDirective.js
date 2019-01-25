@@ -36,16 +36,19 @@ oppia.directive('translationTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
-      controller: ['$scope', '$rootScope', '$templateCache',
-        '$uibModal', 'EditabilityService',
-        'StateTutorialFirstTimeService', 'UrlInterpolationService',
-        function($scope, $rootScope, $templateCache,
-            $uibModal, EditabilityService,
-            StateTutorialFirstTimeService, UrlInterpolationService) {
+      controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
+        'EditabilityService', 'StateTutorialFirstTimeService',
+        'UrlInterpolationService',
+        function($scope, $rootScope, $templateCache, $uibModal,
+            EditabilityService, StateTutorialFirstTimeService,
+            UrlInterpolationService) {
+          $rootScope.loadingMessage = 'Loading';
+          $scope.isTranslationTabBusy = false;
+          // Toggles the translation tab tutorial on/off
+          $scope.translationTutorial = false;
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
             '#tutorialTranslationLanguage';
-          var _ID_TUTORIAL_TRANSLATION_STATE =
-            '#tutorialTranslationState';
+          var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
           var _ID_TUTORIAL_TRANSLATION_OVERVIEW =
             '#tutorialTranslationOverview';
           $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
@@ -224,9 +227,9 @@ oppia.directive('translationTab', [
             $scope.leaveTutorial();
           };
 
-          $scope.translationTutorial = false;
           $scope.onStartTutorial = function() {
             if (GLOBALS.can_translate) {
+              EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
           };
@@ -238,10 +241,10 @@ oppia.directive('translationTab', [
                 'welcome_translation_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'ContextService',
-                function($scope, $uibModalInstance, SiteAnalyticsService,
-                    ContextService) {
+                '$scope', '$uibModalInstance', 'ContextService',
+                'SiteAnalyticsService',
+                function($scope, $uibModalInstance, ContextService,
+                    SiteAnalyticsService) {
                   var explorationId = ContextService.getExplorationId();
 
                   SiteAnalyticsService.registerTutorialModalOpenEvent(
@@ -258,7 +261,7 @@ oppia.directive('translationTab', [
                       explorationId);
                     $uibModalInstance.dismiss('cancel');
                   };
-
+                  // translation tutorial image url for modal
                   $scope.editorWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
                       '/general/editor_welcome.svg'));
@@ -274,13 +277,10 @@ oppia.directive('translationTab', [
             });
           };
 
-          $rootScope.loadingMessage = 'Loading';
-          $scope.isTranslationTabBusy = false;
           $scope.$on('refreshTranslationTab', function() {
             $scope.$broadcast('refreshStateTranslation');
           });
-          $scope.$on(
-            'enterTranslationForTheFirstTime',
+          $scope.$on('enterTranslationForTheFirstTime',
             $scope.showWelcomeTranslationModal
           );
           $scope.$on('openTranslationTutorial', $scope.onStartTutorial);

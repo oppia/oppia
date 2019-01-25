@@ -52,9 +52,9 @@ oppia.controller('ExplorationEditor', [
   'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
-  'StateTutorialFirstTimeService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
-  'ThreadDataService', 'UrlInterpolationService', 'UserEmailPreferencesService',
+  'StateTutorialFirstTimeService', 'ThreadDataService',
+  'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
       $http, $log, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
@@ -70,9 +70,9 @@ oppia.controller('ExplorationEditor', [
       ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
-      StateTutorialFirstTimeService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
-      ThreadDataService, UrlInterpolationService, UserEmailPreferencesService) {
+      StateTutorialFirstTimeService, ThreadDataService,
+      UrlInterpolationService, UserEmailPreferencesService) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 

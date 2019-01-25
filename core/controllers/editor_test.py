@@ -1931,8 +1931,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
 
 class EditorFirstTimeTutorialIntegrationTest(BaseEditorControllerTests):
-    """This controller does integration tests of
-    the first time tutorial instances for the exploration editor.
+    """This controller does integration tests of the first time tutorial
+    instances for the exploration editor.
     """
 
     def setUp(self):

@@ -28,8 +28,8 @@ oppia.factory('StateTutorialFirstTimeService', [
     'started_translation_tutorial_event';
 
     return {
-      // After the first call to it in a client session, this does nothing.
       initEditor: function(firstTime, expId) {
+        // After the first call to it in a client session, this does nothing.
         if (!firstTime || !_currentlyInEditorFirstVisit) {
           _currentlyInEditorFirstVisit = false;
         }
@@ -54,16 +54,16 @@ oppia.factory('StateTutorialFirstTimeService', [
       },
       initTranslation: function(firstTime, expId) {
         if (firstTime && _currentlyInTranslationFirstVisit) {
+          // After the first call to it in a client session, this does nothing.
           $rootScope.$broadcast('enterTranslationForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
 
           $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-            .error(
-              function() {
-                console.error(
-                  'Warning: could not record translation tutorial start event.'
-                );
-              });
+            .error(function() {
+              console.error(
+                'Warning: could not record translation tutorial start event.'
+              );
+            });
           _currentlyInTranslationFirstVisit = false;
         }
       },

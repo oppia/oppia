@@ -85,10 +85,9 @@ class UserSettings(object):
     def __init__(
             self, user_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
-            last_started_state_translation_tutorial=None,
-            last_logged_in=None, last_created_an_exploration=None,
-            last_edited_an_exploration=None, profile_picture_data_url=None,
-            default_dashboard=None,
+            last_started_state_translation_tutorial=None, last_logged_in=None,
+            last_created_an_exploration=None, last_edited_an_exploration=None,
+            profile_picture_data_url=None, default_dashboard=None,
             creator_dashboard_display_pref=(
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
