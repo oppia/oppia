@@ -162,10 +162,10 @@ oppia.directive('audioTranslationBar', [
 
           $scope.checkAndStartRecording = function() {
             if (!$scope.recorder.isAvailable) {
-              SiteAnalyticsService.registerClickStartRecordingButtonEvent();
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
+              SiteAnalyticsService.registerClickStartRecordingButtonEvent();
               $scope.unsupportedBrowser = false;
               showPermissionAndStartRecording();
             }

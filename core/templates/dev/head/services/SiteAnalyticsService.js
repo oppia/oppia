@@ -203,11 +203,11 @@ oppia.factory('SiteAnalyticsService', ['$window', function($window) {
     },
     registerClickStartRecordingButtonEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'saveRecordingButton', 'click', explorationId);
+        'startRecordingButton', 'click', explorationId);
     },
     registerClickUploadRecordedAudioButtonEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'saveRecordingButton', 'click', explorationId);
+        'uploadingAudioFileButton', 'click', explorationId);
     },
   };
 }]);
