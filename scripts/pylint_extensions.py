@@ -165,6 +165,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             callable_name,
                             func_name), confidence=None)
 
+
 class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.

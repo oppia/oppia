@@ -24,6 +24,7 @@ import sys
 import tempfile
 import unittest
 
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 sys.path.insert(0, _PYLINT_PATH)
@@ -88,6 +89,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_call(
                 func_call_node_three)
 
+
 class NonExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
     def test_finds_explicit_keyword_args(self):
@@ -120,6 +122,7 @@ class NonExplicitKeywordArgsCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_call(
                 func_call_node_two)
+
 
 class HangingIndentCheckerTests(unittest.TestCase):
 
